@@ -89,12 +89,12 @@ $dataFim = date("Y-m-d");
                     },
                     {
                         orderable: true, //Número Doc.
-                        width: "15%",
+                        width: "13%",
                         targets: [4]
                     },
                     {
                         orderable: true, //Valor Total
-                        width: "13%",
+                        width: "15%",
                         targets: [5]
                     },
                     {
@@ -108,7 +108,7 @@ $dataFim = date("Y-m-d");
                         targets: [7]
                     }
                 ],
-                dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+                dom: '<"datatable-header"fl><"datatable-scroll-wrap"t>',
                 language: {
                     search: '<span>Filtro:</span> _INPUT_',
                     searchPlaceholder: 'filtra qualquer coluna...',
@@ -452,7 +452,7 @@ $dataFim = date("Y-m-d");
                             // adiciona os atributos nas tags <td>
                             $(rowNode).find('td').eq(1).attr('style', 'text-align: center;')
                             $(rowNode).find('td').eq(4).attr('style', 'text-align: center;')
-                            $(rowNode).find('td').eq(5).attr('style', 'text-align: right;')
+                            $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;')
                             $(rowNode).find('td').eq(6).attr('style', 'text-align: center;')
 
                             contador++
@@ -463,20 +463,44 @@ $dataFim = date("Y-m-d");
                         modalParcelas()
                         //pagamentoAgrupado(contador)
 
-                        divTotal = `<div id='footer-total' style='position:absolute; padding-right: 21.2%; text-align: right; font-weight: bold; width: 100%;'>Total: ${float2moeda(valorTotal)}</div>`                    
+                        divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`                    
             
-                        $('#footer-total').remove() //Para evitar que os valores se sobrescrevam
+                        $('#legenda').remove() //Para evitar que os valores se sobrescrevam
                         
-                        $('.datatable-footer').append(divTotal)
+                        $('.datatable-header').append(divLegenda)
+
+                        let total = 'Total: ' + float2moeda(valorTotal)
+
+                        total = `
+                        <tr id="total" role="row" class="even">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align: right; font-size: 12px; font-weight: bold; color: green;"> ${total} </td>
+                            <td></td>
+                            <td></td>
+                        </tr>`
+                        
+                        $('#total').remove()
+
+                        $('#tblMovimentacao tfoot').append(total)
                     },
                     error: function(e) {
+                        divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`                    
+            
+                        $('#legenda').remove() 
+                        
+                        $('.datatable-header').append(divLegenda)
+
+                        $('#total').remove() 
+
                         let tabelaVazia = $(
                             '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
                         )
                         
                         $('tbody').html(tabelaVazia)
-
-                        $('#footer-total').remove()
                     },
                 })
             }
@@ -504,11 +528,27 @@ $dataFim = date("Y-m-d");
                     alerta('Permissão Negada!','');
                     return false;
                 }
-            }            
+            }else if (Tipo == 'estornar') {
+                return false
+            }          
 
             document.formContasAReceber.submit();
         }     
 
+        //Essa função dá um submit no formulário de estornar conta
+		function estornaConta() {
+            let justificativa = document.getElementById('inputJustificativa').value 
+
+            if((justificativa) == '') {
+                alerta('Atenção', 'Este campo é obrigatório!', 'error');
+                $('#inputJustificativa').focus()
+                return false
+            }
+
+            document.getElementById('inputContasAPagarJustificativa').value = justificativa;
+            document.formContasAReceber.action = "contasEstornar.php";
+            document.formContasAReceber.submit();
+		}
     </script>
 
 </head>
@@ -782,9 +822,7 @@ $dataFim = date("Y-m-d");
 
                                     </tbody>
                                     <tfoot>
-                                        <div style="width: 100%; background-color: red">
-
-                                        </div>
+                                        
                                     </tfoot>
                                 </table>
 
@@ -873,10 +911,36 @@ $dataFim = date("Y-m-d");
                     </div>
                 </div>
                 <!--------------------------------------------------------------------------------------------------->
+                <!--Modal estornar-->
+                <div id="modal_mini-estornar" class="modal fade" tabindex="-1">
+                    <div class="modal-dialog modal-xs">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Estornar conta</h5>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="inputJustificativa">Justificativa<span class="text-danger"> *</span></label>
+                                    <div class="input-group">
+                                        <textarea id="inputJustificativa" class="form-control" name="inputJustificativa" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-basic" data-dismiss="modal">Cancelar</button>
+                                <button onclick= estornaConta() type="button" class="btn bg-slate">Estornar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <form name="formContasAReceber" method="post">
 					<input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza" value="<?php echo $atualizar; ?>" >
                     <input type="hidden" id="inputPermissionExclui" name="inputPermissionExclui" value="<?php echo $excluir; ?>" >
 					<input type="hidden" id="inputContasAReceberId" name="inputContasAReceberId" >
+                    <input type="hidden" id="inputContasAPagarJustificativa" name="inputContasAPagarJustificativa" >
 				</form>
             </div>
             <!-- /content area -->

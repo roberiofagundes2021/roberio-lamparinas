@@ -138,9 +138,8 @@ if ((array_key_exists('MovimentacaoFinanceiraConciliacaoPeriodoDe', $_SESSION) |
 $arquivosContasAPagar = array(
 	'contasAPagar.php', 'contasAPagarNovoLancamento.php',
 	'contasAPagarFiltra.php', 'contasAPagarExclui.php',
-	'contasAPagarPagamentoAgrupado.php',
-	'contasAPagarParcelamento.php',
-	'resumoFinanceiroFiltra.php'
+	'contasAPagarPagamentoAgrupado.php', 'contasAPagarParcelamento.php',
+	'resumoFinanceiroFiltra.php', 'contasEstornar.php'
 );
 
 if ((array_key_exists('ContPagPeriodoDe', $_SESSION) || array_key_exists('ContPagAte', $_SESSION) || array_key_exists('ContPagFornecedor', $_SESSION) || array_key_exists('ContPagPlanoContas', $_SESSION) || array_key_exists('ContPagStatus', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosContasAPagar)) {
@@ -155,9 +154,8 @@ if ((array_key_exists('ContPagPeriodoDe', $_SESSION) || array_key_exists('ContPa
 $arquivosContasAReceber = array(
 	'contasAReceber.php', 'contasAReceberNovoLancamento.php',
 	'contasAReceberFiltra.php', 'contasAReceberExclui.php',
-	'contasAReceberPagamentoAgrupado.php',
-	'contasAReceberParcelamento.php',
-	'resumoFinanceiroFiltra.php'
+	'contasAReceberPagamentoAgrupado.php', 'contasAReceberParcelamento.php',
+	'resumoFinanceiroFiltra.php', 'contasEstornar.php'
 );
 
 if ((array_key_exists('ContRecPeriodoDe', $_SESSION)

@@ -286,9 +286,10 @@ if (isset($_POST['cmbPlanoContas'])) {
 //Se estiver editando entra no IF
 if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) {
     $sql = "SELECT CnAPaId, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
-            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero
+            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero, SituaNome 
     		FROM ContasAPagar
             LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
+            JOIN Situacao on SituaId = CnAPaStatus
     		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_POST['inputContasAPagarId'] . "";
     $result = $conn->query($sql);
     $lancamento = $result->fetch(PDO::FETCH_ASSOC);
@@ -665,6 +666,20 @@ $dataInicio = date("Y-m-d");
                 e.preventDefault()
                 pagamento()
             })
+
+            if ($('#inputValor').val() == '') {
+                document.getElementById('btnParcelar').style =
+                "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
+            }
+
+            $("#inputValor").change(function(){
+                if($(this).val() == ''){
+                    document.getElementById('btnParcelar').style =
+                    "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
+                }else{
+                    document.getElementById('btnParcelar').style = "margin-top: 5px";
+                }
+            });
         })
     </script>
 
@@ -701,7 +716,7 @@ $dataInicio = date("Y-m-d");
                             <!-- Basic responsive configuration -->
                             <div class="card">
                                 <div class="card-header header-elements-inline">
-                                    <h3 class="card-title">Novo Lançamento - Contas a Pagar</h3>
+                                    <h3 class="card-title"><?php if (!isset($lancamento)) { echo 'Novo'; } else { echo 'Editar'; }  ?> Lançamento - Contas a Pagar</h3>
                                 </div>
 
                                 <div class="card-body">
@@ -716,13 +731,13 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputDataEmissao">Data de Emissão</label>
-                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>"  readOnly>
+                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> readOnly>
                                             </div>
                                         </div>
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbPlanoContas">Plano de Contas <span class="text-danger">*</span></label>
-                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" required>
+                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT PlConId, PlConCodigo, PlConNome
@@ -753,7 +768,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-5">
                                             <div class="form-group">
                                                 <label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
-                                                <select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" required>
+                                                <select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT ForneId, ForneNome
@@ -784,19 +799,19 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
-                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>" required>
+                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputOrdemCarta">Ordem Compra/C. Contrato</label>
-                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" class="form-control" readonly>
+                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> class="form-control" readonly>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputNotaFiscal">Nº Nota Fiscal/Documento</label>
-                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNotaFiscal'] ?>" class="form-control">
+                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNotaFiscal'] ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> class="form-control">
                                             </div>
                                         </div>
                                     </div>                              
@@ -807,7 +822,7 @@ $dataInicio = date("Y-m-d");
                                                     <h5>Valor à Pagar</h5>
                                                     <?php
                                                     if (!isset($lancamento)) {
-                                                        print('<a href="#" id="btnParcelar" style="margin-top: 5px;">Parcelar</a>');
+                                                        print('<a href="#" id="btnParcelar" style="color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px">Parcelar</a>');
                                                     }
                                                     ?>
                                                 </div>
@@ -817,11 +832,11 @@ $dataInicio = date("Y-m-d");
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataVencimento">Data do
                                                                     Vencimento</label>
-                                                                <input type="date" id="inputDataVencimento" value="<?php isset($lancamento) ? print($lancamento['CnAPaDtVencimento']) : print($dataInicio) ?>" name="inputDataVencimento" class="form-control">
+                                                                <input type="date" id="inputDataVencimento" value="<?php isset($lancamento) ? print($lancamento['CnAPaDtVencimento']) : print($dataInicio) ?>" name="inputDataVencimento" class="form-control" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?>>
                                                             </div>
                                                             <div class="form-group col-6">
                                                                 <label for="inputValor">Valor</label>
-                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValor" name="inputValor" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAPaValorAPagar']) ?>" class="form-control">
+                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValor" name="inputValor" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAPaValorAPagar']) ?>" class="form-control" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?>>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -833,10 +848,15 @@ $dataInicio = date("Y-m-d");
                                                 <div class="row justify-content-between m-0">
                                                     <h5>Valor Pago</h5>
                                                     <div class="row pr-2" style="margin-top: 5px;">
-                                                        <a id="habilitarPagamento" href="#">Habilitar Pagamento </a>
-                                                        <span class="mx-2">|</span>
-                                                        <a id="jurusDescontos" href="" style="color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none;">
-                                                            Juros/Descontos</a>
+                                                        <?php  
+                                                        if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] != 'Pago' || !isset($lancamento['SituaNome'])) {
+                                                            print('
+                                                            <a id="habilitarPagamento" href="#" >Habilitar Pagamento</a>
+                                                            <span class="mx-1">|</span>
+                                                            <a id="jurusDescontos" href="" style="color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none;">
+                                                                Juros/Descontos</a>');
+                                                        } 
+                                                        ?>
                                                     </div>
                                                 </div>
                                                 <div class="card">
@@ -845,12 +865,12 @@ $dataInicio = date("Y-m-d");
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataPagamento">Data do
                                                                     Pagamento</label>
-                                                                <input type="date" id="inputDataPagamento" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDtPagamento'] ?>" name="inputDataPagamento" class="form-control" readOnly>
+                                                                <input type="date" id="inputDataPagamento" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDtPagamento'] ?>" name="inputDataPagamento" class="form-control" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> readOnly>
                                                             </div>
                                                             <div class="form-group col-6">
                                                                 <label for="inputValorTotalPago">Valor Total
                                                                     Pago</label>
-                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotalPago" name="inputValorTotalPago" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAPaValorPago']) ?>" class="form-control" disabled>
+                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotalPago" name="inputValorTotalPago" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAPaValorPago']) ?>" class="form-control" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> disabled>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -870,7 +890,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbContaBanco">Conta/Banco <span class="text-danger">*</span></label>
-                                                <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2">
+                                                <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?>>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT CnBanId, CnBanNome
@@ -898,7 +918,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbFormaPagemento">Forma de Pagamento <span class="text-danger">*</span></label>
-                                                <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2">
+                                                <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?>>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT FrPagId, FrPagNome
@@ -926,7 +946,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="inputNumeroDocumento">Nº Documento</label>
-                                                <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNumDocumento'] ?>" class="form-control" placeholder="Nº Documento">
+                                                <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNumDocumento'] ?>" class="form-control" placeholder="Nº Documento" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?>>
                                             </div>
                                         </div>
                                     </div>
@@ -935,7 +955,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-12">
                                             <div class="form-group">
                                                 <label for="inputObservacao">Observação</label>
-                                                <textarea id="inputObservacao" class="form-control" name="inputObservacao" rows="3"></textarea>
+                                                <textarea id="inputObservacao" class="form-control" name="inputObservacao" rows="3" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?>></textarea>
                                             </div>
                                         </div>
                                     </div>

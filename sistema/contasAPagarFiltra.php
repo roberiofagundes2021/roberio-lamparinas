@@ -187,11 +187,13 @@ include('global_assets/php/conexao.php');
 
             $visibilidade = ($status == 'Pago') ? 'none' : 'block';
 
+            $acaoConta = ($status == 'Pago') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : '<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+
             $acoes = '
                 <div class="list-icons">
                     <div class="list-icons list-icons-extended">
                         <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
-                        <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>
+                        '.$acaoConta.'
                         <div class="dropdown" style="display: '.$visibilidade.';">													
                             <a href="#" class="list-icons-item" data-toggle="dropdown">
                                 <i class="icon-menu9"></i>
