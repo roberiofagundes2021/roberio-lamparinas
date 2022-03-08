@@ -343,10 +343,10 @@ $dataFim = date("Y-m-d");
               <td></td>
               <td></td>
               <td></td>
-              <td style="text-align: right; font-weight: bold; font-size: 10px; white-space: nowrap; color: green;">Total: ${float2moeda(entradaTotal)}</td>
-              <td style="text-align: right; font-weight: bold; font-size: 10px; white-space: nowrap; color: red;">Total: - ${float2moeda(saidaTotal)}</td>
-              <td style="text-align: right; font-weight: bold; font-size: 10px; white-space: nowrap; color: ${corSaldoTotal};">Total:${epsSaldoTotal}${float2moeda(saldoTotal)}
-              <td style="text-align: right; font-weight: bold; font-size: 10px; white-space: nowrap; color: ${corConciliacaoTotal};">Total:${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
+              <td style="text-align: right; font-weight: bold; font-size: 12px; white-space: nowrap; color: green;">Total: ${float2moeda(entradaTotal)}</td>
+              <td style="text-align: right; font-weight: bold; font-size: 12px; white-space: nowrap; color: red;">Total: - ${float2moeda(saidaTotal)}</td>
+              <td style="text-align: right; font-weight: bold; font-size: 12px; white-space: nowrap; color: ${corSaldoTotal};">Total:${epsSaldoTotal}${float2moeda(saldoTotal)}
+              <td style="text-align: right; font-weight: bold; font-size: 12px; white-space: nowrap; color: ${corConciliacaoTotal};">Total:${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
               <td></td>
               <td></td>
             </tr>`
