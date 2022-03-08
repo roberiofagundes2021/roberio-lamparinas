@@ -971,15 +971,15 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
 
                  <div id="pageModalPatrimonio" class="custon-modal">
                     <div class="custon-modal-container">
-                        <div class="card custon-modal-content">
-                            <div class="custon-modal-title">
+                        <div class="card custon-modal-content ">
+                            <div class="custon-modal-title"style="margin-bottom:10px;">
                                 <i class=""></i>
                                 <p class="h3">Dados Produto</p>
                                 <i id="modalClosePatri" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
                             </div>
                             <form name="incluirProduto" id="incluirProduto" method="post" class="form-validate-jquery">
-                                <div class="px-3 pt-3">
-                                    <div class="d-flex flex-row p-1">
+                                <div class="px-3 ">
+                                    <div class="d-flex flex-row ">
                                         <div class='col-lg-2'>
                                             <div class="form-group">
                                                 <label for="inputPatriNumero">Patrimônio <span class="text-danger">*</span></label>
@@ -1015,8 +1015,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                     </div>
                                 </div>
 
-                                <div class="px-3 pt-3">
-                                    <div class="d-flex flex-row p-1">
+                                <div class="px-3 ">
+                                    <div class="d-flex flex-row ">
                                         <div class='col-lg-6'>
                                             <div class="form-group">
                                                 <label for="inputPatriOrigem">Origem <span class="text-danger">*</span></label>
@@ -1070,8 +1070,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                     </div>
                                 </div>
 
-                                <div class="px-3 pt-3">
-                                    <div class="d-flex flex-row p-1">
+                                <div class="px-3 ">
+                                    <div class="d-flex flex-row">
                                         <div class='col-lg-3'>
                                             <div class="form-group">
                                                     <label for="inputPatriNotaFiscal">Nota Fiscal</label>
@@ -1107,8 +1107,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                     </div>
                                 </div>
 
-                                <div class="px-3 pt-3">
-                                    <div class="d-flex flex-row p-1">
+                                <div class="px-3 ">
+                                    <div class="d-flex flex-row ">
                                         <div class='col-lg-4'>
                                             <div class="form-group">
                                                 <label for="cmbPatriMarca">Marca</label>
@@ -1175,8 +1175,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                     </div>
                                 </div>
                                 
-                                <div class="px-3 pt-3">
-                                    <div class="d-flex flex-row p-1">
+                                <div class="px-3 ">
+                                    <div class="d-flex flex-row ">
                                         <div class='col-lg-6'>
                                             <div class="form-group">
                                                     <label for="inputPatriNumSerie">Nº Série/Chassi</label>
@@ -1209,7 +1209,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                     </div>
                                 </div>    
                                 <div class="card-footer mt-2 d-flex flex-column">
-                                    <div class="row" style="margin-top: 10px;">
+                                    <div class="row" style="margin-bottom:-20px;">
                                         <div class="col-lg-12">
                                             <div class="form-group">
                                                 <button class="btn btn-lg btn-principal" id="salvarPatrimonio">Salvar</button>
