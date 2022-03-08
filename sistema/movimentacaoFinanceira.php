@@ -82,41 +82,41 @@ $dataFim = date("Y-m-d");
           },
           {
             orderable: true, //Histórico
-            width: "25%",
+            width: "20%",
             targets: [1]
           },
           {
             orderable: true, //Conta Caixa
-            width: "22%",
+            width: "18%",
             targets: [2]
           },
           {
             orderable: true, //Nª doc
-            width: "8%",
+            width: "6%",
             targets: [3]
           },
           {
             orderable: true, //Entrada
-            width: "10%",
+            width: "14%",
             targets: [4]
           },
           {
             orderable: true, //Saída
-            width: "10%",
+            width: "14%",
             targets: [5]
           },
           {
             orderable: true, //Saldo
-            width: "10%",
+            width: "14%",
             targets: [6]
           },
           {
             orderable: false, //Ações
-            width: "5%",
+            width: "4%",
             targets: [6]
           }
         ],
-        dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+        dom: '<"datatable-header"fl><"datatable-scroll-wrap"t>',
         language: {
           search: '<span>Filtro:</span> _INPUT_',
           searchPlaceholder: 'filtra qualquer coluna...',
@@ -219,6 +219,7 @@ $dataFim = date("Y-m-d");
             
             table = $('#tblMovimentacaoFinanceira').DataTable()
 
+            let contador = 0
             let rowNode
             let entrada = 0
             let entradaTotal = 0
@@ -253,37 +254,48 @@ $dataFim = date("Y-m-d");
               saldo = (item.data[6] != null) ? item.data[6] : '0,00'
               saldo = saldo.replace(".", "").replace(",", ".")
               saldoTotal += parseFloat(saldo)
+
+              contador++
             })
+
+            divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`                    
+            
+            $('#legenda').remove() //Para evitar que os valores se sobrescrevam
+            
+            $('.datatable-header').append(divLegenda)
 
             corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
 
-            divTotal = `
-              <div id='footer-total' class='row' style='position:absolute; text-align: right; font-weight: bold; width: 100%; margin-top: 0.9%; font-size: 11px;'>
-                <div style="width: 71.4%; color: green;">
-                  Total: ${float2moeda(entradaTotal)}
-                </div>
-
-                <div style="width: 9.6%; color: red;">
-                  Total: -${float2moeda(saidaTotal)}
-                </div>
-
-                <div style="width: 9.6%; color: ${corSaldoTotal};">
-                  Total: ${float2moeda(saldoTotal)}
-                </div>
-              </div>`                    
-
-            $('#footer-total').remove() //Para evitar que os valores se sobrescrevam
+            total = `
+            <tr id="total" role="row" class="even">
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td style="text-align: right; font-size: 12px; font-weight: bold; font-size: 11px; color: green;">Total: ${float2moeda(entradaTotal)}</td>
+              <td style="text-align: right; font-size: 12px; font-weight: bold; font-size: 11px; color: red;">Total: - ${float2moeda(saidaTotal)}</td>
+              <td style="text-align: right; font-size: 12px; font-weight: bold; font-size: 11px; color: ${corSaldoTotal};">Total: ${float2moeda(saldoTotal)}</td>
+              <td></td>
+            </tr>`
             
-            $('.datatable-footer').append(divTotal)
+            $('#total').remove() 
+
+            $('#tblMovimentacaoFinanceira tfoot').append(total)
           },
           error: function(e) { 
+            divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`                    
+
+            $('#legenda').remove() 
+            
+            $('.datatable-header').append(divLegenda)
+
+            $('#total').remove() 
+
             let tabelaVazia = $(
               '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
             )
 
             $('tbody').html(tabelaVazia)
-
-            $('#footer-total').remove()
           }
         })
 
@@ -712,9 +724,7 @@ $dataFim = date("Y-m-d");
 
                   </tbody>
                   <tfoot>
-                    <div style="width: 100%; background-color: red">
 
-                    </div>
                   </tfoot>
                 </table>
 

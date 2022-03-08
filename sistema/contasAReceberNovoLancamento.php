@@ -1094,6 +1094,20 @@ $dataInicio = date("Y-m-d");
                 e.preventDefault()
                 pagamento()
             })
+
+            if ($('#inputValor').val() == '') {
+                document.getElementById('btnParcelar').style =
+                "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
+            }
+
+            $("#inputValor").change(function(){
+                if($(this).val() == ''){
+                    document.getElementById('btnParcelar').style =
+                    "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
+                }else{
+                    document.getElementById('btnParcelar').style = "margin-top: 5px";
+                }
+            });
         })
     </script>
 
@@ -1130,7 +1144,7 @@ $dataInicio = date("Y-m-d");
                             <!-- Basic responsive configuration -->
                             <div class="card">
                                 <div class="card-header header-elements-inline">
-                                    <h3 class="card-title">Novo Lançamento - Contas a Receber</h3>
+                                    <h3 class="card-title"><?php if (!isset($lancamento)) { echo 'Novo'; } else { echo 'Editar'; }  ?> Lançamento - Contas a Receber</h3>
                                     <div class="header-elements">
                                         <div class="list-icons">
                                             <a class="list-icons-item" data-action="collapse"></a>
@@ -1265,7 +1279,7 @@ $dataInicio = date("Y-m-d");
                                                     <h5>Valor à Receber</h5>
                                                     <?php
                                                     if (!isset($lancamento)) {
-                                                        print('<a href="#" id="btnParcelar" style="margin-top: 5px;">Parcelar</a>');
+                                                        print('<a href="#" id="btnParcelar" style="color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px">Parcelar</a>');
                                                     }
                                                     ?>
                                                 </div>
@@ -1295,7 +1309,7 @@ $dataInicio = date("Y-m-d");
                                                         if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] != 'Recebido' || !isset($lancamento['SituaNome'])) {
                                                             print('
                                                             <a id="habilitarRecebimento" href="#" >Habilitar Recebimento</a>
-                                                            <span class="mx-1">|</span>
+                                                            <span class="mx-2">|</span>
                                                             <a id="jurusDescontos" href="" style="color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none;">
                                                                 Juros/Descontos</a>');
                                                         } 
