@@ -361,7 +361,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         $('#cmbPatriFabricanteEdita').val(fabricante).change()
 
                         formModal = `
-                                        <div class='row'>
+                                        <div class='row'style="margin-bottom:-10px;">
                                             <div class='col-lg-4'>
                                                 <div class="form-group">
                                                     <label for="produto">Patrimônio</label>
@@ -379,7 +379,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class='row'>
+                                        <div class='row'style="margin-bottom:-10px;">
                                             <div class='col-lg-6'>
                                                 <div class="form-group">
                                                     <label for="produto">Origem</label>
@@ -398,7 +398,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                             </div>
                                         </div>
                                         
-                                        <div class='row'>
+                                        <div class='row'style="margin-bottom:-10px;">
                                             <div class='col-lg-3'>
                                                 <div class="form-group">
                                                     <label for="produto">Nota Fiscal</label>
@@ -424,7 +424,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                                 </div>
                                             </div>     
                                         </div>
-                                        <div class='row'> 
+                                        <div class='row'style="margin-bottom:-10px;"> 
                                             <div class='col-lg-4'>
                                                 <div class="form-group">
                                                     <label for="produto">Data da Fabricação</label>
@@ -1227,18 +1227,18 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                 <div id="page-modal" class="custon-modal">
                     <div class="custon-modal-container">
                         <div class="card custon-modal-content">
-                            <div class="custon-modal-title">
+                            <div class="custon-modal-title" style="margin-bottom:-10px;">
                                 <i class=""></i>
                                 <p class="h3">Dados Produto</p>
                                 <i id="modal-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
                             </div>
                             <form id="editarProduto" method="POST">
-                                <div class="dados-produto p-3">
+                                <div class="dados-produto p-3" style="margin-bottom:-15px;">
 
                                 </div>
                                 
-                                <div class="px-3">
-                                    <div class="d-flex flex-row">
+                                <div class="px-2" style="margin-bottom:-20px;">
+                                    <div class="d-flex flex-row ">
                                         <div class='col-lg-4'>
                                             <div class="form-group">
                                                 <label for="cmbPatriMarcaEdita">Marca</label>
@@ -1305,7 +1305,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                     </div>
                                 </div>
 
-                                <div class="d-flex flex-row p-3">
+                                <div class="d-flex flex-row p-2" style="margin-bottom:-20px;">
                                     <div class='col-lg-6'>
                                         <div class="form-group">
                                             <label for="numeroSerie">Nº Série/Chassi <span
@@ -1340,7 +1340,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                 </div>
                             </form>
                             <div class="card-footer mt-2 d-flex flex-column">
-                                <div class="row" style="margin-top: 10px;">
+                                <div class="row" style="margin-bottom:-20px;">
                                     <div class="col-lg-12">
                                         <div class="form-group">
                                             <?php 
