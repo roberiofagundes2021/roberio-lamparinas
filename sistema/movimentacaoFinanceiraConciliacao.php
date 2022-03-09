@@ -200,8 +200,7 @@ $dataFim = date("Y-m-d");
     */
 
 
-    function Filtrar(carregamentoPagina) {
-      console.log('entrou');
+    function Filtrar() {
       let cont = false;
 
       const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
@@ -218,7 +217,6 @@ $dataFim = date("Y-m-d");
       const status = statusArray[0];
       const statusTipo = statusArray[1];
       const url = "movimentacaoFinanceiraConciliacaoFiltra.php";
-      const tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal';
 
       var inputsValues = {
         inputPeriodoDe: periodoDe,
@@ -228,8 +226,7 @@ $dataFim = date("Y-m-d");
         cmbPlanoContas: planoContas,
         cmbFormaDeRecebimento: FormaPagamento,
         cmbStatus: status,
-        statusTipo: statusTipo,
-        tipoFiltro: tipoFiltro,
+        statusTipo: statusTipo
       };
 
       /*
@@ -333,6 +330,7 @@ $dataFim = date("Y-m-d");
             
             $('.datatable-header').append(divLegenda)
 
+            sinalNegativo = (saidaTotal == 0) ? '' : '-'
             corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
             corConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? 'green' : 'red'
             epsSaldoTotal = (saldoTotal >= 0) ? ' ' : '' //Apenas uma codificação estética para evitar espaçamento duplo nos números negativos
@@ -344,7 +342,7 @@ $dataFim = date("Y-m-d");
               <td></td>
               <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
               <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: green;">${float2moeda(entradaTotal)}</td>
-              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: red;">- ${float2moeda(saidaTotal)}</td>
+              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
               <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corSaldoTotal};">${epsSaldoTotal}${float2moeda(saldoTotal)}
               <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corConciliacaoTotal};">${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
               <td></td>
@@ -374,10 +372,10 @@ $dataFim = date("Y-m-d");
 
     $('#submitPesquisar').on('click', (e) => {
       e.preventDefault();
-      Filtrar(false);
+      Filtrar();
     })
 
-    Filtrar(true);
+    Filtrar();
 
     $('#novoLacamento').on('click', (e) => {
       location.href = "movimentacaoFinanceiraPagamento.php";
@@ -516,8 +514,6 @@ $dataFim = date("Y-m-d");
       $('.datatable-footer').append(divTotalSaldoConciliado);
     }
     */
-
-
     /*
     function Filtrar(carregamentoPagina) {
       let cont = false;
@@ -612,12 +608,12 @@ $dataFim = date("Y-m-d");
     document.getElementById('inputPermissionAtualiza').value = 1;
     
     if(tipoConta == 'ContaAReceber') {
-      document.formEditaConciliacao.action = "contasAReceberNovoLancamento.php";
+      document.formMovimentacaoFinanceira.action = "contasAReceberNovoLancamento.php";
     }else if(tipoConta == 'ContaAPagar') {
-      document.formEditaConciliacao.action = "contasAPagarNovoLancamento.php";
+      document.formMovimentacaoFinanceira.action = "contasAPagarNovoLancamento.php";
     }
     
-    document.formEditaConciliacao.submit();
+    document.formMovimentacaoFinanceira.submit();
   }
   </script>
 
@@ -900,12 +896,8 @@ $dataFim = date("Y-m-d");
 					<input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza">
           <input type="hidden" id="tipoMovId" name="tipoMovId">
 					<input type="hidden" id="inputMovimentacaoFinanceiraId" name="inputMovimentacaoFinanceiraId" >
+          <input type="hidden" id="inputConciliacaoId" name="inputConciliacaoId" >
         </form>
-
-				<form name="formEditaConciliacao" method="post">
-					<input type="hidden" id="inputConciliacaoId" name="inputConciliacaoId" >
-          <input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza" >
-				</form>
       </div>
 
       <!-- /content area -->

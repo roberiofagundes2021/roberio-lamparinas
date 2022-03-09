@@ -7,121 +7,61 @@ include('global_assets/php/conexao.php');
 //{
 //    include('global_assets/php/conexao.php');
 
-    if($_POST['tipoFiltro'] == 'FiltroNormal')
-    {
+    $cont = 0;
 
-        $cont = 0;
+    $args = [];
 
-        $args = [];
-    
-        if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
-            empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
-            empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
-    
-            if($_POST['statusTipo'] == 'APAGAR'){
-                $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
-            } else {
-                $args[]  = "CnAPaDtPagamento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";                
-            }
+    if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
+        empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
+        empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
 
-            if(!empty($_POST['inputPeriodoDe'])){
-                $_SESSION['ContPagPeriodoDe'] = $_POST['inputPeriodoDe'];
-            }
-
-            if(!empty($_POST['inputAte'])){
-                $_SESSION['ContPagAte'] = $_POST['inputAte'];
-            }
-        }
-    
-        if (!empty($_POST['cmbFornecedor'])) {
-            $args[]  = "CnAPaFornecedor = " . $_POST['cmbFornecedor'] . " ";
-            $_SESSION['ContPagFornecedor'] = $_POST['cmbFornecedor'];
-        }
-    
-        if (!empty($_POST['cmbPlanoContas'])) {
-            $args[]  = "CnAPaPlanoContas = " . $_POST['cmbPlanoContas'] . " ";
-            $_SESSION['ContPagPlanoContas'] = $_POST['cmbPlanoContas'];
-        }
-    
-        if (!empty($_POST['cmbStatus'])) {
-            $args[]  = "CnApaStatus = " . $_POST['cmbStatus'] . " ";
-            $_SESSION['ContPagStatus'] = $_POST['cmbStatus'];
-        }
-
-        if (count($args) >= 1) {
-
-            $string = implode(" and ", $args);
-    
-            if ($string != '') {
-                $string .= ' and ';
-            }
-    
-            $sql = "SELECT * 
-                    FROM ContasAPagar
-                    LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
-                    JOIN Situacao on SituaId = CnApaStatus
-                    WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                ";
-            $result = $conn->query($sql);
-            $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
-
-            count($rowData) >= 1 ? $cont = 1 : $cont = 0;
-        }
-    } else if(isset($_SESSION['ContPagPeriodoDe']) ||  isset($_SESSION['ContPagAte']) || isset($_SESSION['ContPagFornecedor']) || isset($_SESSION['ContPagPlanoContas']) || isset($_SESSION['ContPagStatus'])){
-
-        $cont = 0;
-        $args = [];
-        
-        if (!empty($_SESSION['ContPagPeriodoDe']) || !empty($_SESSION['ContPagAte'])) {
-            empty($_SESSION['ContPagPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_SESSION['ContPagPeriodoDe'];
-            empty($_SESSION['ContPagAte']) ? $inputAte = '2100-01-01' : $inputAte = $_SESSION['ContPagAte'];
-    
+        if($_POST['statusTipo'] == 'APAGAR'){
             $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
-        }
-    
-        if (!empty($_SESSION['ContPagFornecedor'])) {
-            $args[]  = "CnAPaFornecedor = " . $_SESSION['ContPagFornecedor'] . " ";
-        }
-    
-        if (!empty($_SESSION['ContPagPlanoContas'])) {
-            $args[]  = "CnAPaPlanoContas = " . $_SESSION['ContPagPlanoContas'] . " ";
-        }
-    
-        if (!empty($_SESSION['ContPagStatus'])) {
-            $args[]  = "CnApaStatus = " . $_SESSION['ContPagStatus'] . " ";
+        } else {
+            $args[]  = "CnAPaDtPagamento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";                
         }
 
-        if (count($args) >= 1) {
-
-            $string = implode(" and ", $args);
-    
-            if ($string != '') {
-                $string .= ' and ';
-            }
-    
-            $sql = "SELECT * 
-                    FROM ContasAPagar
-                    LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
-                    JOIN Situacao on SituaId = CnApaStatus
-                    WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                ";
-            $result = $conn->query($sql);
-            $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
-
-            count($rowData) >= 1 ? $cont = 1 : $cont = 0;
+        if(!empty($_POST['inputPeriodoDe'])){
+            $_SESSION['ContPagPeriodoDe'] = $_POST['inputPeriodoDe'];
         }
-    } else {
-        $dataInicio = date("Y-m-d");
-        $dataFim = date("Y-m-d");
+
+        if(!empty($_POST['inputAte'])){
+            $_SESSION['ContPagAte'] = $_POST['inputAte'];
+        }
+    }
+
+    if (!empty($_POST['cmbFornecedor'])) {
+        $args[]  = "CnAPaFornecedor = " . $_POST['cmbFornecedor'] . " ";
+        $_SESSION['ContPagFornecedor'] = $_POST['cmbFornecedor'];
+    }
+
+    if (!empty($_POST['cmbPlanoContas'])) {
+        $args[]  = "CnAPaPlanoContas = " . $_POST['cmbPlanoContas'] . " ";
+        $_SESSION['ContPagPlanoContas'] = $_POST['cmbPlanoContas'];
+    }
+
+    if (!empty($_POST['cmbStatus'])) {
+        $args[]  = "CnApaStatus = " . $_POST['cmbStatus'] . " ";
+        $_SESSION['ContPagStatus'] = $_POST['cmbStatus'];
+    }
+
+    if (count($args) >= 1) {
+
+        $string = implode(" and ", $args);
+
+        if ($string != '') {
+            $string .= ' and ';
+        }
 
         $sql = "SELECT * 
                 FROM ContasAPagar
                 LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
                 JOIN Situacao on SituaId = CnApaStatus
-                WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' and SituaChave = 'APAGAR'
-        ";
+                WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+            ";
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
+
         count($rowData) >= 1 ? $cont = 1 : $cont = 0;
     }
 
@@ -171,7 +111,9 @@ include('global_assets/php/conexao.php');
             ');
             */
 
-            $checkbox = '<input type="checkbox" id="check'.$cont.'"> <input type="hidden" value="'.$item["CnAPaId"].'">';
+            $visibilidade = ($status == 'Pago') ? 'none' : 'block';
+
+            $checkbox = '<input type="checkbox" id="check'.$cont.'" style="display: '.$visibilidade.';"> <input type="hidden" value="'.$item["CnAPaId"].'">';
             
             $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$item["CnAPaDtVencimento"].'">';
 
@@ -184,8 +126,6 @@ include('global_assets/php/conexao.php');
             $valorTotal = mostraValor($item["CnAPaValorAPagar"]);
 
             $status = $status;
-
-            $visibilidade = ($status == 'Pago') ? 'none' : 'block';
 
             $acaoConta = ($status == 'Pago') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : '<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
 

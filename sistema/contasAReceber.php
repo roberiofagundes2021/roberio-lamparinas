@@ -24,7 +24,7 @@ $Y = date("Y");
 
 // $dataInicio = date("Y-m-01"); //30 dias atrás
 $dataInicio = date("Y-m-d");
-$dataFim = date("Y-m-d");
+$dataFim = date("Y")."-12-31";
 ?>
 
 <!DOCTYPE html>
@@ -353,7 +353,7 @@ $dataFim = date("Y-m-d");
             }
 
 
-            function Filtrar(carregamentoPagina) {
+            function Filtrar() {
                 let cont = false;
 
                 const msg = $(
@@ -378,7 +378,6 @@ $dataFim = date("Y-m-d");
                 let status = statusArray[0]
                 let statusTipo = statusArray[1]
                 let url = "contasAReceberFiltra.php";
-                let tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal'
 
                 if (statusArray[1] == 'ARECEBER') {
                     $('#dataGrid').html('Vencimento')
@@ -395,7 +394,6 @@ $dataFim = date("Y-m-d");
                     cmbFormaDeRecebimento: FormaPagamento,
                     cmbStatus: status,
                     statusTipo: statusTipo,
-                    tipoFiltro: tipoFiltro,
                     permissionAtualiza: inputPermissionAtualiza,
                     permissionExclui: inputPermissionExclui
                 };
@@ -507,10 +505,10 @@ $dataFim = date("Y-m-d");
 
             $('#submitFiltro').on('click', (e) => {
                 e.preventDefault()
-                Filtrar(false)
+                Filtrar()
             })
 
-            Filtrar(true)
+            Filtrar()
         });
 
         //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
