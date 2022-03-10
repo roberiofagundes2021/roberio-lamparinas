@@ -307,8 +307,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 																	if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
                                     									print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'cancelar\', \'\', \''.$item['SolicNumero'].'\')" class="dropdown-item" title="Cancelar Solicitação"><i class="icon-cancel-circle2"></i> Cancelar</a>');
 																	}
-																		   
-																	print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'imprimir\', \'\', \''.$item['SolicNumero'].'\')" class="dropdown-item" title="Imprimir Solicitação"><i class="icon-printer2"></i> Imprimir</a>');
+
+																	if($item['SituaChave'] != 'CANCELADO'){
+																		print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'imprimir\', \'\', \''.$item['SolicNumero'].'\')" class="dropdown-item" title="Imprimir Solicitação"><i class="icon-printer2"></i> Imprimir</a>');
+																	}	   
 
 																	if (isset($item['BandeMotivo'])){
 																		print('<a href="#" onclick="atualizaSolicitacao('.$item['SolicId'].', \'motivo\', \''.$item['BandeMotivo'].'\', \''.$item['SolicNumero'].'\')" class="dropdown-item" title="Motivo da Não liberação"><i class="icon-question4"></i> Motivo da Não Liberação</a>');
