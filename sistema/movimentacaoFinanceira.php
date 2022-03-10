@@ -170,7 +170,7 @@ $dataFim = date("Y-m-d");
       }
       */
 
-      function Filtrar(carregamentoPagina) {
+      function Filtrar() {
         let cont = false;
 
         const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
@@ -189,7 +189,6 @@ $dataFim = date("Y-m-d");
         const status = statusArray[0];
         const statusTipo = statusArray[1];
         const url = "movimentacaoFinanceiraFiltra.php";
-        const tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal';
 
         inputsValues = {
           inputPeriodoDe: periodoDe,
@@ -200,7 +199,6 @@ $dataFim = date("Y-m-d");
           cmbFormaDeRecebimento: FormaPagamento,
           cmbStatus: status,
           statusTipo: statusTipo,
-          tipoFiltro: tipoFiltro,
           permissionAtualiza: inputPermissionAtualiza,
           permissionExclui: inputPermissionExclui
         }; 
@@ -264,6 +262,7 @@ $dataFim = date("Y-m-d");
             
             $('.datatable-header').append(divLegenda)
 
+            sinalNegativo = (saidaTotal == 0) ? '' : '-'
             corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
 
             total = `
@@ -273,7 +272,7 @@ $dataFim = date("Y-m-d");
               <td></td>
               <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
               <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: green;">${float2moeda(entradaTotal)}</td>
-              <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: red;">- ${float2moeda(saidaTotal)}</td>
+              <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
               <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: ${corSaldoTotal};">${float2moeda(saldoTotal)}</td>
               <td></td>
             </tr>`
@@ -328,10 +327,10 @@ $dataFim = date("Y-m-d");
       $('#submitPesquisar').on('click', (e) => {
         e.preventDefault()
         
-        Filtrar(false);
+        Filtrar();
       })
 
-      Filtrar(true);
+      Filtrar();
 
      /* $('#novoLacamento').on('click', (e) => {
         location.href = "movimentacaoFinanceiraPagamento.php";

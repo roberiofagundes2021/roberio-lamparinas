@@ -7,120 +7,71 @@ include('global_assets/php/conexao.php');
 //{
 //   include('global_assets/php/conexao.php');
 
-    if ($_POST['tipoFiltro'] == 'FiltroNormal') {
+    $cont = 0;
 
-        $cont = 0;
+    $args = [];
 
-        $args = [];
+    if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
+        empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
+        empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
 
-        if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
-            empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
-            empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
-
-            if ($_POST['statusTipo'] == 'ARECEBER') {
-                $args[]  = "CnAReDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
-            } else {
-                $args[]  = "CnAReDtRecebimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
-            }
-
-            if (!empty($_POST['inputPeriodoDe'])) {
-                $_SESSION['ContRecPeriodoDe'] = $_POST['inputPeriodoDe'];
-            }
-
-            if (!empty($_POST['inputAte'])) {
-                $_SESSION['ContRecAte'] = $_POST['inputAte'];
-            }
-        }
-
-        if (!empty($_POST['cmbClientes'])) {
-            $args[]  = "CnAReCliente = " . $_POST['cmbClientes'] . " ";
-            $_SESSION['ContRecCliente'] = $_POST['cmbClientes'];
-        }
-
-        if (!empty($_POST['cmbPlanoContas'])) {
-            $args[]  = "CnARePlanoContas = " . $_POST['cmbPlanoContas'] . " ";
-            $_SESSION['ContRecPlanoContas'] = $_POST['cmbPlanoContas'];
-        }
-
-        if (!empty($_POST['cmbStatus'])) {
-            $args[]  = "CnAReStatus = " . $_POST['cmbStatus'] . " ";
-            $_SESSION['ContRecStatus'] = $_POST['cmbStatus'];
-        }
-
-        if (count($args) >= 1) {
-
-            $string = implode(" and ", $args);
-
-            if ($string != '') {
-                $string .= ' and ';
-            }
-
-            $sql = "SELECT * 
-                    FROM ContasAReceber
-                    LEFT JOIN Cliente on ClienId = CnAReCliente
-                    JOIN Situacao on SituaId = CnAReStatus
-                    WHERE " . $string . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
-                ";
-            $result = $conn->query($sql);
-            $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
-
-            count($rowData) >= 1 ? $cont = 1 : $cont = 0;
-        }
-    } else if (isset($_SESSION['ContRecPeriodoDe']) ||  isset($_SESSION['ContRecAte']) || isset($_SESSION['ContRecCliente']) || isset($_SESSION['ContRecPlanoContas']) || isset($_SESSION['ContRecStatus'])) {
-
-        $cont = 0;
-        $args = [];
-
-        if (!empty($_SESSION['ContRecPeriodoDe']) || !empty($_SESSION['ContRecAte'])) {
-            empty($_SESSION['ContRecPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_SESSION['ContRecPeriodoDe'];
-            empty($_SESSION['ContRecAte']) ? $inputAte = '2100-01-01' : $inputAte = $_SESSION['ContRecAte'];
-
+        if ($_POST['statusTipo'] == 'ARECEBER') {
             $args[]  = "CnAReDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+        } else {
+            $args[]  = "CnAReDtRecebimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
         }
 
-        if (!empty($_SESSION['ContRecCliente'])) {
-            $args[]  = "CnAReCliente = " . $_SESSION['ContRecCliente'] . " ";
+        if (!empty($_POST['inputPeriodoDe'])) {
+            $_SESSION['ContRecPeriodoDe'] = $_POST['inputPeriodoDe'];
         }
 
-        if (!empty($_SESSION['ContRecPlanoContas'])) {
-            $args[]  = "CnARePlanoContas = " . $_SESSION['ContRecPlanoContas'] . " ";
+        if (!empty($_POST['inputAte'])) {
+            $_SESSION['ContRecAte'] = $_POST['inputAte'];
         }
+    }
 
-        if (!empty($_SESSION['ContRecStatus'])) {
-            $args[]  = "CnAReStatus = " . $_SESSION['ContRecStatus'] . " ";
+    if (!empty($_POST['cmbClientes'])) {
+        $args[]  = "CnAReCliente = " . $_POST['cmbClientes'] . " ";
+        $_SESSION['ContRecCliente'] = $_POST['cmbClientes'];
+    }
+
+    if (!empty($_POST['cmbPlanoContas'])) {
+        $args[]  = "CnARePlanoContas = " . $_POST['cmbPlanoContas'] . " ";
+        $_SESSION['ContRecPlanoContas'] = $_POST['cmbPlanoContas'];
+    }
+
+    if (!empty($_POST['cmbStatus'])) {
+        $args[]  = "CnAReStatus = " . $_POST['cmbStatus'] . " ";
+        $_SESSION['ContRecStatus'] = $_POST['cmbStatus'];
+    }
+
+    if (!empty($_POST['cmbNumDoc'])) {
+        $args[]  = "CnAReNumDocumento = " . $_POST['cmbNumDoc'] . " ";
+        $_SESSION['ContRecNumDoc'] = $_POST['cmbNumDoc'];
+    }
+
+    if (!empty($_POST['cmbFormaDeRecebimento'])) {
+        $args[]  = "CnAReFormaPagamento = " . $_POST['cmbFormaDeRecebimento'] . " ";
+        $_SESSION['ContRecFormaPagamento'] = $_POST['cmbFormaDeRecebimento'];
+    }
+
+    if (count($args) >= 1) {
+
+        $string = implode(" and ", $args);
+
+        if ($string != '') {
+            $string .= ' and ';
         }
-
-        if (count($args) >= 1) {
-
-            $string = implode(" and ", $args);
-
-            if ($string != '') {
-                $string .= ' and ';
-            }
-
-            $sql = "SELECT * 
-                    FROM ContasAReceber
-                    LEFT JOIN Cliente on ClienId = CnAReCliente
-                    JOIN Situacao on SituaId = CnAReStatus
-                    WHERE " . $string . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
-                ";
-            $result = $conn->query($sql);
-            $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
-
-            count($rowData) >= 1 ? $cont = 1 : $cont = 0;
-        }
-    } else {
-        $dataInicio = date("Y-m-d");
-        $dataFim = date("Y-m-d");
 
         $sql = "SELECT * 
                 FROM ContasAReceber
                 LEFT JOIN Cliente on ClienId = CnAReCliente
                 JOIN Situacao on SituaId = CnAReStatus
-                WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReDtVencimento BETWEEN '" . $dataInicio . "' and '" . $dataFim . "' and SituaChave = 'ARECEBER'
-        ";
+                WHERE " . $string . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
+            ";
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
+
         count($rowData) >= 1 ? $cont = 1 : $cont = 0;
     }
 
@@ -170,7 +121,9 @@ include('global_assets/php/conexao.php');
             ');
             */
 
-            $checkbox = '<input type="checkbox" id="check'.$cont.'"> <input type="hidden" value="'.$item["CnAReId"].'">';
+            $visibilidade = ($status == 'Recebido') ? 'none' : 'block';
+
+            $checkbox = '<input type="checkbox" id="check'.$cont.'" style="display: '.$visibilidade.';"> <input type="hidden" value="'.$item["CnAReId"].'">';
             
             $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$item["CnAReDtVencimento"].'">';
 
@@ -183,8 +136,6 @@ include('global_assets/php/conexao.php');
             $valorTotal = mostraValor($item["CnAReValorAReceber"]);
 
             $status = $status;
-
-            $visibilidade = ($status == 'Recebido') ? 'none' : 'block';
 
             $acaoConta = ($status == 'Recebido') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : '<a href="#" onclick="atualizaContasAReceber('.$_POST['permissionExclui'].','.$item["CnAReId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
 
