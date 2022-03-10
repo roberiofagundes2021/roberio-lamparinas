@@ -54,8 +54,8 @@ if (isset($_POST['inputCpf'])) {
 			if (!isset($_SESSION['EmpresaId'])){
 				
 				//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
-				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
-						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
+				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnUsuarioAtualizador)
+						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :iUsuarioAtualizador)";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
@@ -63,6 +63,7 @@ if (isset($_POST['inputCpf'])) {
 					':iUnidade' => $_SESSION['UnidadeId'],
 					':iSetor' => $_POST['cmbSetor'],
 					':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] != '' ? $_POST['cmbLocalEstoque'] : null,
+					':PermissaoPerfil' => 1,
 					':iUsuarioAtualizador' => $_SESSION['UsuarId']
 					));
 			}
@@ -101,8 +102,8 @@ if (isset($_POST['inputCpf'])) {
 			if (!$_SESSION['EmpresaId']){			
 				
 				//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
-				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
-							VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
+				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnUsuarioAtualizador)
+							VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :iUsuarioAtualizador)";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
@@ -110,6 +111,7 @@ if (isset($_POST['inputCpf'])) {
 					':iUnidade' => $_SESSION['UnidadeId'],
 					':iSetor' => $_POST['cmbSetor'],
 					':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] != '' ? $_POST['cmbLocalEstoque'] : null,
+					':PermissaoPerfil' => 1,
 					':iUsuarioAtualizador' => $_SESSION['UsuarId']
 					));
 			}

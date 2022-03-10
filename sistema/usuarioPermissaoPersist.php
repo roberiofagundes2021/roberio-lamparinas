@@ -7,6 +7,7 @@ $_SESSION['PaginaAtual'] = 'Permissões';
 include('global_assets/php/conexao.php');
 $usuario = $_POST['usuarioId'];
 $unidade = $_POST['UnidadeId'];
+$empresa = $_SESSION['EmpreId'];
 
 unset($_POST['usuarioId']);
 unset($_POST['UnidadeId']);
@@ -27,33 +28,58 @@ try{
 		$UsXPe = $conn->query($sqlMenuUxP);
 		$UsXPeList = $UsXPe->fetchAll(PDO::FETCH_ASSOC);
 
-		$sqlUpdateUser = "UPDATE Usuario set UsuarPermissaoPerfil=0 where UsuarId = '$usuario'";
+		$sqlUpdateUser = "UPDATE UsuarioXUnidade SET UsXUnPermissaoPerfil = 0
+		WHERE UsXUnUnidade = $unidade and
+		UsXUnEmpresaUsuarioPerfil = (SELECT EXUXPId FROM EmpresaXUsuarioXPerfil WHERE EXUXPUsuario = $usuario and EXUXPEmpresa = $empresa)";
 		$conn->query($sqlUpdateUser);
 
 		if (count($UsXPeList)==0){
+			$count = 0;
 			$sqlInsert = "INSERT INTO UsuarioXPermissao
-				(UsXPeUsuario, UsXPeMenu, UsXPeUnidade, UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeInserir)
-				VALUES ";
+			(UsXPeUsuario, UsXPeMenu, UsXPeUnidade, UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeInserir, UsXPeSuperAdmin)
+			VALUES ";
 			foreach($menuUxPId as $key){
 				$id = $key['MenuId'];
-				$sqlInsert = $sqlInsert."('$usuario', '$id', '$unidade', 0, 0, 0, 0),";
-			}
-			$sqlInsert = substr($sqlInsert, 0, -1);
-			$conn->query($sqlInsert);
-		}
+				$view=array_key_exists($id."-view", $_POST)? 1:0;
+				$update=array_key_exists($id."-edit", $_POST)? 1:0;
+				$delet=array_key_exists($id."-delet", $_POST)? 1:0;
+				$insert=array_key_exists($id."-insert", $_POST)? 1:0;
+				$SuperAdmin=isset($_POST[$id."-SuperAdmin"])? $_POST[$id."-SuperAdmin"]:0;
 
-		foreach($menuUxPId as $key){
-			$id = $key['MenuId'];
-			$sqlUpdate = "UPDATE UsuarioXPermissao set UsXPeVisualizar=".
-			(array_key_exists($id."-view", $_POST)? 1:0).", UsXPeAtualizar=".
-			(array_key_exists($id."-edit", $_POST)? 1:0).", UsXPeInserir=".
-			(array_key_exists($id."-insert", $_POST)? 1:0).", UsXPeExcluir=".
-			(array_key_exists($id."-delet", $_POST)? 1:0)."
-			WHERE UsXPeUsuario='$usuario' and UsXPeMenu='$id' and UsXPeUnidade = '$unidade'";
-			$conn->query($sqlUpdate);
+				$sqlInsert .= "('$usuario', '$id', '$unidade', $view, $update, $delet, $insert, $SuperAdmin),";
+				$count++;
+				
+				if($count == 800){
+					$sqlInsert = substr($sqlInsert, 0, -1);
+					$conn->query($sqlInsert);
+					$count = 0;
+
+					$sqlInsert = "INSERT INTO UsuarioXPermissao
+					(UsXPeUsuario, UsXPeMenu, UsXPeUnidade, UsXPeVisualizar, UsXPeAtualizar, UsXPeExcluir, UsXPeInserir)
+					VALUES ";
+				}
+			}
+			if($count < 800){
+				$sqlInsert = substr($sqlInsert, 0, -1);
+				$conn->query($sqlInsert);
+			}
+		} else {
+			foreach($menuUxPId as $key){
+				$id = $key['MenuId'];
+				$sqlUpdate = "UPDATE UsuarioXPermissao set UsXPeVisualizar=".
+				(array_key_exists($id."-view", $_POST)? 1:0).", UsXPeAtualizar=".
+				(array_key_exists($id."-edit", $_POST)? 1:0).", UsXPeInserir=".
+				(array_key_exists($id."-insert", $_POST)? 1:0).", UsXPeExcluir=".
+				(array_key_exists($id."-delet", $_POST)? 1:0).
+				"WHERE UsXPeUsuario='$usuario' and UsXPeMenu='$id' and UsXPeUnidade = '$unidade'";
+				$conn->query($sqlUpdate);
+			}
 		}
 	}else{
-		$sqlUpdateUser = "UPDATE Usuario set UsuarPermissaoPerfil=1 where UsuarId = '$usuario'";
+		$sqlUpdateUser = "UPDATE UsuarioXUnidade SET UsXUnPermissaoPerfil = 1
+		WHERE UsXUnUnidade = $unidade and
+		UsXUnEmpresaUsuarioPerfil = (SELECT EXUXPId FROM EmpresaXUsuarioXPerfil WHERE EXUXPUsuario = $usuario and EXUXPEmpresa = $empresa)";
+		$conn->query($sqlUpdateUser);
 		$sqlDelete = "DELETE FROM UsuarioXPermissao where UsXPeUsuario = '$usuario'";
 		$conn->query($sqlUpdateUser);
 		$conn->query($sqlDelete);

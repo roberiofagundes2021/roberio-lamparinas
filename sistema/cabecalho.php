@@ -2,9 +2,13 @@
 
 				//Recupera todos os menus do sistema caso esteja usando permissao personalizada
 				$userId = $_SESSION['UsuarId'];
-				$sqlUser = "SELECT UsuarPermissaoPerfil
+				$unidade = $_SESSION['UnidadeId'];
+
+				$sqlUser = "SELECT UsXUnPermissaoPerfil as UsuarPermissaoPerfil
 				FROM Usuario
-				Where UsuarId = '$userId'";
+				JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+				JOIN UsuarioXUnidade ON UsXUnEmpresaUsuarioPerfil = EXUXPId
+				Where UsuarId = '$userId' and UsXUnUnidade = $unidade";
 			
 				$resultUserId = $conn->query($sqlUser);
 				$usuaXPerm = $resultUserId->fetch(PDO::FETCH_ASSOC);

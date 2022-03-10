@@ -16,8 +16,8 @@ if(isset($_POST['cmbUnidade'])){
 
 	try{
 		//echo $_POST['cmbUnidade'];die;
-		$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
-				    VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
+		$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnUsuarioAtualizador)
+				    VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :iUsuarioAtualizador)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
@@ -25,6 +25,7 @@ if(isset($_POST['cmbUnidade'])){
             ':iUnidade' => $_POST['cmbUnidade'],
             ':iSetor' => $_POST['cmbSetor'],
             ':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) ? $_POST['cmbLocalEstoque'] : null,
+            ':PermissaoPerfil' => 1,
             ':iUsuarioAtualizador' => $_SESSION['UsuarId']
             ));
 		

@@ -57,8 +57,8 @@
 			}
 
 			//echo $_POST['cmbUnidade'];die;
-			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnUsuarioAtualizador)
-						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :iUsuarioAtualizador)";
+			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnUsuarioAtualizador)
+						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :iUsuarioAtualizador)";
 			$result = $conn->prepare($sql);
 	
 			$result->execute(array(
@@ -66,6 +66,7 @@
 				':iUnidade' => $iUnidade,
 				':iSetor' => $_POST['cmbSetor'],
 				':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] != '' ? $_POST['cmbLocalEstoque'] : null,
+				':PermissaoPerfil' => 1,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
 				));
 			

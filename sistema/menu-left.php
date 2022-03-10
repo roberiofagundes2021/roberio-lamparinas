@@ -4,10 +4,11 @@
   $perfil = $_SESSION['PerfiChave'];
   $userId = $_SESSION['UsuarId'];
 
-
-  $sqlUser = "SELECT UsuarPermissaoPerfil
-              FROM Usuario
-              Where UsuarId = " . $userId;
+  $sqlUser = "SELECT UsXUnPermissaoPerfil as UsuarPermissaoPerfil
+  FROM Usuario
+  JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+  JOIN UsuarioXUnidade ON UsXUnEmpresaUsuarioPerfil = EXUXPId
+  Where UsuarId = '$userId' and UsXUnUnidade = $unidade";
 
   $resultUserId = $conn->query($sqlUser);
   $usuaXPerm = $resultUserId->fetch(PDO::FETCH_ASSOC);
