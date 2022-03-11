@@ -225,6 +225,8 @@ try{
 				
 				var inputCategoria = $('#inputIdCategoria').val();
 				var produtos = $(this).val();
+				var iFluxoOperacional = $('#iFluxoOperacional').val();
+				var SOrigem = $('#SOrigem').val();
 				//console.log(produtos);
 				
 				var cont = 1;
@@ -258,7 +260,14 @@ try{
 				$.ajax({
 					type: "POST",
 					url: "fluxoFiltraProduto.php",
-					data: {idCategoria: inputCategoria, produtos: produtos, produtoId: produtoId, produtoQuant: produtoQuant, produtoValor: produtoValor},
+					data: {
+						idCategoria: inputCategoria,
+						produtos: produtos,
+						produtoId: produtoId,
+						produtoQuant:produtoQuant,
+						produtoValor: produtoValor,
+						iFluxoOperacional: iFluxoOperacional,
+						Origem: SOrigem},
 					success: function(resposta){
 						//alert(resposta);
 						$("#tabelaProdutos").html(resposta).show();
@@ -432,9 +441,11 @@ try{
 							<h5 class="text-uppercase font-weight-bold">Listar Produtos - Fluxo Operacional Nº Contrato "<?php echo $row['FlOpeNumContrato']; ?>"</h5>
 						</div>					
 						
-						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional" class="form-control" value="<?php echo $row['FlOpeId']; ?>">
-						<input type="hidden" id="inputStatus" name="inputStatus" class="form-control" value="<?php echo $row['FlOpeStatus']; ?>">
-						<input type="hidden" id="inputOrigem" name="inputOrigem" class="form-control" value="<?php echo $_POST['inputOrigem']; ?>">
+						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional" value="<?php echo $row['FlOpeId']; ?>">
+						<input type="hidden" id="inputStatus" name="inputStatus" value="<?php echo $row['FlOpeStatus']; ?>">
+						<input type="hidden" id="inputOrigem" name="inputOrigem" value="<?php echo $_POST['inputOrigem']; ?>">
+						<input type="hidden" id="iFluxoOperacional" name="iFluxoOperacional" value="<?php echo $iFluxoOperacional; ?>">
+						<input type="hidden" id="SOrigem" name="SOrigem" value="<?php echo $_POST['inputOrigem']; ?>">
 						
 						<div class="card-body">		
 								
@@ -660,16 +671,16 @@ try{
 														<div class="col-lg-1">
 															<label for="inputCodigo"><strong>Item</strong></label>
 														</div>
-														<div class="col-lg-2">
+														<div class="col-lg-5">
 															<label for="inputProduto"><strong>Produto</strong></label>
 														</div>
-														<div class="col-lg-3">
+														<div class="col-lg-2">
 															<label for="inputMarca"><strong>Marca</strong></label>
 														</div>
-														<div class="col-lg-3">
+														<div class="col-lg-2">
 															<label for="inputModelo"><strong>Modelo</strong></label>
 														</div>
-														<div class="col-lg-3">
+														<div class="col-lg-2">
 															<label for="inputFabricante"><strong>Fabricante</strong></label>
 														</div>
 													</div>
@@ -709,12 +720,66 @@ try{
 											$iUnidade = $_SESSION['UnidadeId'];
 
 											// vai buscar na tabela ProdutoXFabricante os dados caso esse fluxo ja tenha sido liberado
+											$HTML_MARCA = '';
+											$HTML_MODELO = '';
+											$HTML_FABRICANTE = '';
 
 											$sqlPrXFa = "SELECT PrXFaId, PrXFaMarca, PrXFaModelo, PrXFaFabricante
 													FROM ProdutoXFabricante
 													WHERE PrXFaProduto = $item[ProduId] and PrXFaFluxoOperacional = $iFluxoOperacional and PrXFaUnidade = $iUnidade";
 											$resultPrXFa = $conn->query($sqlPrXFa);
 											$resultPrXFa = $resultPrXFa->fetch(PDO::FETCH_ASSOC);
+
+											$sql = "SELECT MarcaId, MarcaNome
+													FROM Marca
+													JOIN Situacao on SituaId = MarcaStatus
+													WHERE MarcaUnidade = $iUnidade and SituaChave = 'ATIVO'
+													ORDER BY MarcaNome ASC";
+											$resultMarca = $conn->query($sql);
+											$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
+
+											$sql = "SELECT ModelId, ModelNome
+													FROM Modelo
+													JOIN Situacao on SituaId = ModelStatus
+													WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+													ORDER BY ModelNome ASC";
+											$resultModelo = $conn->query($sql);
+											$rowModelo = $resultModelo->fetchAll(PDO::FETCH_ASSOC);
+
+											$sql = "SELECT FabriId, FabriNome
+													FROM Fabricante
+													JOIN Situacao on SituaId = FabriStatus
+													WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+													ORDER BY FabriNome ASC";
+											$resultFabricante = $conn->query($sql);
+											$rowFabricante = $resultFabricante->fetchAll(PDO::FETCH_ASSOC);
+											
+											foreach ($rowMarca as $itemMarca){
+												$seleciona = "";
+												if(isset($resultPrXFa['PrXFaMarca'])){
+													$seleciona = ($resultPrXFa['PrXFaMarca'] == $itemMarca['MarcaId']) ? " selected " : "";
+												}
+												
+												$HTML_MARCA .= '<option value="'.$itemMarca['MarcaId'].'" '.$seleciona.'>'.$itemMarca['MarcaNome'].'</option>';
+											}
+
+											foreach ($rowModelo as $itemModelo){
+												$seleciona = "";
+												if(isset($resultPrXFa['PrXFaModelo'])){
+													$seleciona = ($resultPrXFa['PrXFaModelo'] == $itemModelo['ModelId']) ? "selected " : "";
+												}
+												
+												$HTML_MODELO .= '<option value="'.$itemModelo['ModelId'].'" '.$seleciona.'>'.$itemModelo['ModelNome'].'</option>';
+											}
+
+											foreach ($rowFabricante as $itemFabricante){
+												$seleciona = "";
+												if(isset($resultPrXFa['PrXFaFabricante'])){
+													$seleciona = ($resultPrXFa['PrXFaFabricante'] == $itemFabricante['FabriId']) ? "selected " : "";
+												}
+												
+												$HTML_FABRICANTE = '<option value="'.$itemFabricante['FabriId'].'" '.$seleciona.'>'.$itemFabricante['FabriNome'].'</option>';
+											}
 											
 											$iQuantidade = isset($item['FOXPrQuantidade']) ? $item['FOXPrQuantidade'] : '';
 											$fValorUnitario = isset($item['FOXPrValorUnitario']) ? mostraValor($item['FOXPrValorUnitario']) : '';											
@@ -730,72 +795,21 @@ try{
 															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
 															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
 														</div>
-														<div class="col-lg-2">
+														<div class="col-lg-5">
 															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'. substr($item['Detalhamento'],0,380).'..." value="'.$item['ProduNome'].'" readOnly>
 															<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 														</div>
-														<div class="col-lg-3">
+														<div class="col-lg-2">
 															<select id="inputMarca'.$cont.'" name="inputMarca'.$cont.'"'.($row['SituaChave'] == 'LIBERADO'?' disabled ':'').'class="form-control select-search">
-																<option value="">Selecione</option>');
-																$sql = "SELECT MarcaId, MarcaNome
-																		FROM Marca
-																		JOIN Situacao on SituaId = MarcaStatus
-																		WHERE MarcaUnidade = $iUnidade and SituaChave = 'ATIVO'
-																		ORDER BY MarcaNome ASC";
-																$resultMarca = $conn->query($sql);
-																$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
-																
-																foreach ($rowMarca as $itemMarca){
-																	$seleciona = "";
-																	if(isset($resultPrXFa['PrXFaMarca'])){
-																		$seleciona = ($resultPrXFa['PrXFaMarca'] == $itemMarca['MarcaId']) ? " selected " : "";
-																	}
-																	
-																	print('<option value="'.$itemMarca['MarcaId'].'" '.$seleciona.'>'.$itemMarca['MarcaNome'].'</option>');
-																}
-											print('			</select>
+																<option value="">Selecione</option>'.$HTML_MARCA.'</select>
 														</div>
-														<div class="col-lg-3">
+														<div class="col-lg-2">
 															<select id="inputModelo'.$cont.'" name="inputModelo'.$cont.'" '.($row['SituaChave'] == 'LIBERADO'?' disabled ':'').'class="form-control select-search">
-																<option value="">Selecione</option>');
-																	$sql = "SELECT ModelId, ModelNome
-																			FROM Modelo
-																			JOIN Situacao on SituaId = ModelStatus
-																			WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																			ORDER BY ModelNome ASC";
-																	$resultMarca = $conn->query($sql);
-																	$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
-																
-																foreach ($rowMarca as $itemMarca){
-																	$seleciona = "";
-																	if(isset($resultPrXFa['PrXFaModelo'])){
-																		$seleciona = ($resultPrXFa['PrXFaModelo'] == $itemMarca['ModelId']) ? "selected " : "";
-																	}
-																	
-																	print('<option value="'.$itemMarca['ModelId'].'" '.$seleciona.'>'.$itemMarca['ModelNome'].'</option>');
-																}
-											print('			</select>
+																<option value="">Selecione</option>'.$HTML_MODELO.'</select>
 														</div>
-														<div class="col-lg-3">
+														<div class="col-lg-2">
 															<select id="inputFabricante'.$cont.'" name="inputFabricante'.$cont.'" '.($row['SituaChave'] == 'LIBERADO'?' disabled ':'').'class="form-control select-search">
-																<option value="">Selecione</option>');
-																	$sql = "SELECT FabriId, FabriNome
-																			FROM Fabricante
-																			JOIN Situacao on SituaId = FabriStatus
-																			WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
-																			ORDER BY FabriNome ASC";
-																	$resultMarca = $conn->query($sql);
-																	$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
-																
-																foreach ($rowMarca as $itemMarca){
-																	$seleciona = "";
-																	if(isset($resultPrXFa['PrXFaFabricante'])){
-																		$seleciona = ($resultPrXFa['PrXFaFabricante'] == $itemMarca['FabriId']) ? "selected " : "";
-																	}
-																	
-																	print('<option value="'.$itemMarca['FabriId'].'" '.$seleciona.'>'.$itemMarca['FabriNome'].'</option>');
-																}
-											print('			</select>
+																<option value="">Selecione</option>'.$HTML_FABRICANTE.'</select>
 														</div>
 													</div>
 												</div>								
@@ -849,7 +863,7 @@ try{
 												<div class="col-lg-2">
 													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="'.mostraValor($fTotalGeral).'" readOnly>
 												</div>											
-											</div>'										
+											</div>'
 										);
 										
 										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="'.$cont.'" >');
