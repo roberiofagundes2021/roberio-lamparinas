@@ -209,6 +209,8 @@ try {
 
 				var inputCategoria = $('#inputIdCategoria').val();
 				var servicos = $(this).val();
+				var iFluxoOperacional = $('#iFluxoOperacional').val();
+				var SOrigem = $('#SOrigem').val();
 				//console.log(servicos);
 
 				var cont = 1;
@@ -247,7 +249,9 @@ try {
 						servicos: servicos,
 						servicoId: servicoId,
 						servicoQuant: servicoQuant,
-						servicoValor: servicoValor
+						servicoValor: servicoValor,
+						iFluxoOperacional: iFluxoOperacional,
+						Origem: SOrigem
 					},
 					success: function(resposta) {
 						//alert(resposta);
@@ -395,7 +399,7 @@ try {
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>
 
@@ -423,6 +427,8 @@ try {
 						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional" class="form-control" value="<?php echo $row['FlOpeId']; ?>">
 						<input type="hidden" id="inputStatus" name="inputStatus" class="form-control" value="<?php echo $row['FlOpeStatus']; ?>">
 						<input type="hidden" id="inputOrigem" name="inputOrigem" class="form-control" value="<?php echo $_POST['inputOrigem']; ?>">
+						<input type="hidden" id="iFluxoOperacional" name="iFluxoOperacional" value="<?php echo $iFluxoOperacional; ?>">
+						<input type="hidden" id="SOrigem" name="SOrigem" value="<?php echo $_POST['inputOrigem']; ?>">
 
 						<div class="card-body">
 
@@ -581,7 +587,7 @@ try {
 
 									<?php       
 
-										$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
+										$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario, FOXSrValorUnitario
 												FROM Servico
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 												LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
@@ -759,7 +765,7 @@ try {
 																<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
 															</div>
 															<div class="col-lg-5">
-																<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['Detalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+																<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="'. substr($item['Detalhamento'],0,380).'..." value="' . $item['ServiNome'] . '" readOnly>
 																<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
 															</div>
 															<div class="col-lg-2">

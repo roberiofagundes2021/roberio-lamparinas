@@ -11,13 +11,16 @@ if(!isset($_POST['inputUsuarioId']) || !isset($_POST['inputUsuarioPerfil'])){
 $user = $_POST['inputUsuarioId'];
 $perfilId = $_POST['inputUsuarioPerfil'];
 
-$sqlUserPerfil = "SELECT PerfiId FROM Perfil WHERE PerfiChave = '$perfilId' and PerfiUnidade = " . $_SESSION['UnidadeId'];
+$sqlUserPerfil = "SELECT PerfiId FROM Perfil WHERE PerfiChave = '$perfilId' and PerfiUnidade = $unidade";
 $resultUserPerfil = $conn->query($sqlUserPerfil);
 $perfilId = $resultUserPerfil->fetch(PDO::FETCH_ASSOC);
 
-$userPxP = "SELECT UsuarPermissaoPerfil
-			FROM Usuario
-			WHERE UsuarId = '$user'";
+$userPxP = "SELECT UsXUnPermissaoPerfil as UsuarPermissaoPerfil
+FROM Usuario
+JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+JOIN UsuarioXUnidade ON UsXUnEmpresaUsuarioPerfil = EXUXPId
+Where UsuarId = '$user' and UsXUnUnidade = $unidade";
+
 $resultUserUxP = $conn->query($userPxP);
 $UxPxP = $resultUserUxP->fetch(PDO::FETCH_ASSOC);
 
@@ -360,12 +363,14 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 									<?php
 
 										foreach($menuUxP as $men){
-											$superADmin = false;
-											if ($men["PrXPeSuperAdmin"] == 0 || $_SESSION['PerfiChave'] == 'SUPER'){
-												$superADmin = true;
+											$superAdmin = false;
+											$permission = isset($men["PrXPeSuperAdmin"])?$men["PrXPeSuperAdmin"]:$men["UsXPeSuperAdmin"];
+											if ($permission == 0 || $_SESSION['PerfiChave'] == 'SUPER'){
+												$superAdmin = true;
 											}
-											if ($men["MenuModulo"] == $mod["ModulId"] && $men['MenuSubMenu'] == 0 && $men['MenuPai'] == 0 && $men['SituaChave'] == strtoupper("ativo") && $superADmin){
-												echo '<input name="'.$men['MenuId'].'-MenuId" value='.$men['MenuId'].' type="hidden">';
+											echo "<input name='$men[MenuId]-MenuId' value='$men[MenuId]' type='hidden'/>";
+											echo "<input name='$men[MenuId]-SuperAdmin' value='$permission' type='hidden' />";
+											if ($men["MenuModulo"] == $mod["ModulId"] && $men['MenuSubMenu'] == 0 && $men['MenuPai'] == 0 && $men['SituaChave'] == strtoupper("ativo") && $superAdmin){
 												echo '<tr>
 													<td><h5>'.$men['MenuNome'].'</h5></td>
 													<td class="text-center">
@@ -414,7 +419,6 @@ $situacao = $resultSituacao->fetchAll(PDO::FETCH_ASSOC);
 											if($men['MenuSubMenu'] == 1  && $men["MenuModulo"] == $mod["ModulId"]){
 												foreach($menuUxP as $men_f){
 													if ($men_f["MenuPai"] == $men["MenuId"] && $men_f['SituaChave'] == strtoupper("ativo")){
-														echo '<input name="MenuId" value='.$men_f['MenuId'].' type="hidden">';
 														echo '<tr>
 															<td><h5>('.$men['MenuNome'].') - '.$men_f['MenuNome'].'</h5></td>
 															<td class="text-center">';
