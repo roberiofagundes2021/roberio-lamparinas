@@ -6,6 +6,10 @@ $_SESSION['PaginaAtual'] = 'Novo Lançamento - Contas a Receber';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputPermissionAtualiza'])){
+  $_SESSION['MovFinancPermissionAtualiza'] = $_POST['inputPermissionAtualiza'];
+}
+
 if (isset($_POST['inputDataEmissao'])) {
 
     if (isset($_POST['cmbFormaDePagamento'])){

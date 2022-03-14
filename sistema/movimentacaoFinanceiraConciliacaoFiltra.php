@@ -373,16 +373,18 @@ function queryPesquisa(){
             }
 
             //CHECKBOX - CONCILIADO
+            $visibilidade = ($chave == 'ARECEBER' || $chave == 'APAGAR') ? 'disabled' : 'style="cursor: pointer;"';
+
             $prod = $item['ID'].'#'.$item['TIPO'];
             //BOTAO CONCILIADO
             if ($item['CONCILIADO'] >= 1) {
-                $checkbox = "
-                    <input type='checkbox' id='".$prod."' onchange='atualizarConciliado()' value='1' checked/>
-                ";
+                $checkbox = '
+                    <input type="checkbox" id="'.$prod.'" onchange="atualizarConciliado();" value="1" '.$visibilidade.' checked/>
+                    ';
             } else {
-                $checkbox = "
-                    <input type='checkbox' id='".$prod."' onchange='atualizarConciliado()'  value='0' />
-                ";
+                $checkbox = '
+                    <input type="checkbox" id="'.$prod.'" onchange="atualizarConciliado();" value="0" '.$visibilidade.' />
+                ';
             }
 
             $array = [

@@ -255,56 +255,31 @@ if (isset($_POST['cmbPlanoContas'])) {
                        $result = $conn->query($sql);
                        $situacao = $result->fetch(PDO::FETCH_ASSOC);
 
-                       $sql = "INSERT INTO ContasAReceber ( CnARePlanoContas, 
-                                                            CnAReCliente, 
-                                                            CnAReContaBanco, 
-                                                            CnAReFormaPagamento, 
-                                                            CnAReNumDocumento,
-                                                            CnAReDtEmissao, 
-                                                            CnAReDescricao, 
-                                                            CnAReDtVencimento, 
-                                                            CnAReValorAReceber,
-                                                            CnAReDtRecebimento, 
-                                                            CnAReValorRecebido,
-                                                            CnAReObservacao,
-                                                            CnAReStatus, 
-                                                            CnAReUsuarioAtualizador, 
-                                                            CnAReUnidade)
-                                    VALUES ( :iPlanoContas, 
-                                        :iCliente,
-                                        :iContaBanco, 
-                                        :iFormaPagamento,
-                                        :sNumDocumento,  
-                                        :dDtEmissao, 
-                                        :sDescricao, 
-                                        :dDtVencimento, 
-                                        :fValorAReceber, 
-                                        :dDtRecebimento,
-                                        :fValorRecebido, 
-                                        :sObservacao,
-                                        :iStatus, 
-                                        :iUsuarioAtualizador, 
-                                        :iUnidade)";
+                       $sql = "INSERT INTO ContasAReceber ( CnARePlanoContas, CnAReCliente, CnAReContaBanco, CnAReFormaPagamento, CnAReNumDocumento,
+                                                       CnAReDtEmissao, CnAReDescricao, CnAReDtVencimento, CnAReValorAReceber,
+                                                        CnAReDtRecebimento, CnAReValorRecebido, CnAReObservacao, CnAReStatus, CnAReUsuarioAtualizador, CnAReUnidade)
+                                VALUES ( :iPlanoContas, :iCliente, :iContaBanco, :iFormaPagamento,:sNumDocumento, :dateDtEmissao,:sDescricao, :dateDtVencimento, 
+                                        :fValorAReceber, :dateDtRecebimento, :fValorRecebido, :sObservacao, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+                        $result = $conn->prepare($sql);
 
-                                    $result = $conn->prepare($sql);
-                                    $result->execute(array(
+                        $result->execute(array(
 
-                                    ':iPlanoContas'         => $_POST['cmbPlanoContas'],
-                                    ':iCliente   '          => $_POST['cmbCliente'],
-                                    ':iContaBanco'          => $_POST['cmbContaBanco'],
-                                    ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
-                                    ':sNumDocumento'        => $_POST['inputNumeroDocumento'],
-                                    ':dDtEmissao'           => $_POST['inputDataEmissao'],
-                                    ':sDescricao'           => $_POST['inputParcelaDescricao' . $i . ''],
-                                    ':dDtVencimento'        => $_POST['inputParcelaDataVencimento' . $i . ''],
-                                    ':fValorAReceber'       => floatval(gravaValor($_POST['inputParcelaValorAReceber' . $i . ''])),
-                                    ':dDtRecebimento'       => $_POST['inputDataRecebimento'],
-                                    ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                                    ':sObservacao'          => $_POST['inputObservacao'],
-                                    ':iStatus'              => $situacao['SituaId'],
-                                    ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
-                                    ':iUnidade'             => $_SESSION['UnidadeId']
-                                    ));
+                            ':iPlanoContas' => $_POST['cmbPlanoContas'],
+                            ':iCliente' => $_POST['cmbCliente'],
+                            ':iContaBanco' => $_POST['cmbContaBanco'],
+                            ':iFormaPagamento' => isset($idFormaPagamento) ? $idFormaPagamento : null,
+                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
+                            ':dateDtEmissao' => $_POST['inputDataEmissao'],
+                            ':sDescricao' => $_POST['inputParcelaDescricao' . $i . ''],
+                            ':dateDtVencimento' => $_POST['inputParcelaDataVencimento' . $i . ''],
+                            ':fValorAReceber' => floatval(gravaValor($_POST['inputParcelaValorAReceber' . $i . ''])),
+                            ':dateDtRecebimento' => $_POST['inputDataRecebimento'],
+                            ':fValorRecebido' => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
+                            ':sObservacao' => $_POST['inputObservacao'],
+                            ':iStatus' => $situacao['SituaId'],
+                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                            ':iUnidade' => $_SESSION['UnidadeId']
+                        ));
                     } catch (Exception $e) {
                         echo 'Error: ',  $e->getMessage(), "\n";
                     }

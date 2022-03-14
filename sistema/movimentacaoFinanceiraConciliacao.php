@@ -257,117 +257,117 @@ $dataFim = date("Y-m-d");
       */
 
       $.ajax({
-          type: "POST",
-          url: url,
-          dataType: "json",
-          data: inputsValues,
-          success: function(resposta) {
-            //|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
-            let table 
-            table = $('#tblMovimentacaoFinanceira').DataTable()
-            table = $('#tblMovimentacaoFinanceira').DataTable().clear().draw()
-            //--|
+        type: "POST",
+        url: url,
+        dataType: "json",
+        data: inputsValues,
+        success: function(resposta) {
+          //|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
+          let table 
+          table = $('#tblMovimentacaoFinanceira').DataTable()
+          table = $('#tblMovimentacaoFinanceira').DataTable().clear().draw()
+          //--|
 
-            table = $('#tblMovimentacaoFinanceira').DataTable()
+          table = $('#tblMovimentacaoFinanceira').DataTable()
 
-            let contador = 0
-            let rowNode
-            let entrada = 0
-            let entradaTotal = 0
-            let saida = 0
-            let saidaTotal = 0
-            let saldo = 0
-            let saldoTotal = 0
-            let saldoConciliacao = 0
-            let saldoConciliacaoTotal = 0
+          let contador = 0
+          let rowNode
+          let entrada = 0
+          let entradaTotal = 0
+          let saida = 0
+          let saidaTotal = 0
+          let saldo = 0
+          let saldoTotal = 0
+          let saldoConciliacao = 0
+          let saldoConciliacaoTotal = 0
 
-            resposta.forEach(item => {
-              rowNode = table.row.add(item.data).draw().node()
+          resposta.forEach(item => {
+            rowNode = table.row.add(item.data).draw().node()
 
-              saldo = parseFloat(item.data[5].replace(",", "."))
-              saldoConciliado = parseFloat(item.data[6].replace(",", "."))
+            saldo = parseFloat(item.data[5].replace(",", "."))
+            saldoConciliado = parseFloat(item.data[6].replace(",", "."))
 
-              // adiciona os atributos nas tags <td>
-              $(rowNode).find('td').eq(3).attr('style', 'text-align: right; color: green;')
-              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: red;')
-              
-              if(saldo >= 0) {
-                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;')
-              }else {
-                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;')
-              }
-
-              if(saldoConciliado >= 0) {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;')
-              }else {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
-              }
-
-              $(rowNode).find('td').eq(8).attr('style', 'text-align: center;')
-
-              entrada = (item.data[3] != null) ? item.data[3] : '0,00'
-              entrada = entrada.replace(".", "").replace(",", ".")
-              entradaTotal += parseFloat(entrada)
-
-              saida = (item.data[4] != null) ? item.data[4] : '0,00'
-              saida = saida.replace(".", "").replace(",", ".")
-              saidaTotal += parseFloat(saida)
-
-              saldo = (item.data[5] != null) ? item.data[5] : '0,00'
-              saldo = saldo.replace(".", "").replace(",", ".")
-              saldoTotal += parseFloat(saldo)
-
-              saldoConciliacao = (item.data[6] != null) ? item.data[6] : '0,00'
-              saldoConciliacao = saldoConciliacao.replace(".", "").replace(",", ".")
-              saldoConciliacaoTotal += parseFloat(saldoConciliacao)
-
-              contador++
-            })
-
-            divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`                    
+            // adiciona os atributos nas tags <td>
+            $(rowNode).find('td').eq(3).attr('style', 'text-align: right; color: green;')
+            $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: red;')
             
-            $('#legenda').remove() //Para evitar que os valores se sobrescrevam
-            
-            $('.datatable-header').append(divLegenda)
+            if(saldo >= 0) {
+              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;')
+            }else {
+              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;')
+            }
 
-            sinalNegativo = (saidaTotal == 0) ? '' : '-'
-            corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
-            corConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? 'green' : 'red'
-            epsSaldoTotal = (saldoTotal >= 0) ? ' ' : '' //Apenas uma codificação estética para evitar espaçamento duplo nos números negativos
-            epsConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? ' ' : ''
-            
-            total = `
-            <tr id="total" role="row" class="even" position='relative'>
-              <td></td>
-              <td></td>
-              <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
-              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: green;">${float2moeda(entradaTotal)}</td>
-              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
-              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corSaldoTotal};">${epsSaldoTotal}${float2moeda(saldoTotal)}
-              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corConciliacaoTotal};">${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
-              <td></td>
-              <td></td>
-            </tr>`
-            
-            $('#total').remove()
+            if(saldoConciliado >= 0) {
+              $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;')
+            }else {
+              $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
+            }
 
-            $('#tblMovimentacaoFinanceira tfoot').prepend(total)
-          },
-          error: function(e) { 
-            divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`                    
+            $(rowNode).find('td').eq(8).attr('style', 'text-align: center;')
 
-            $('#legenda').remove() 
-            
-            $('.datatable-header').append(divLegenda)
+            entrada = (item.data[3] != null) ? item.data[3] : '0,00'
+            entrada = entrada.replace(".", "").replace(",", ".")
+            entradaTotal += parseFloat(entrada)
 
-            $('#total').remove() 
-            let tabelaVazia = $(
-              '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-            )
+            saida = (item.data[4] != null) ? item.data[4] : '0,00'
+            saida = saida.replace(".", "").replace(",", ".")
+            saidaTotal += parseFloat(saida)
 
-            $('tbody').html(tabelaVazia)
-          }
-        })
+            saldo = (item.data[5] != null) ? item.data[5] : '0,00'
+            saldo = saldo.replace(".", "").replace(",", ".")
+            saldoTotal += parseFloat(saldo)
+
+            saldoConciliacao = (item.data[6] != null) ? item.data[6] : '0,00'
+            saldoConciliacao = saldoConciliacao.replace(".", "").replace(",", ".")
+            saldoConciliacaoTotal += parseFloat(saldoConciliacao)
+
+            contador++
+          })
+
+          divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`                    
+          
+          $('#legenda').remove() //Para evitar que os valores se sobrescrevam
+          
+          $('.datatable-header').append(divLegenda)
+
+          sinalNegativo = (saidaTotal == 0) ? '' : '-'
+          corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
+          corConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? 'green' : 'red'
+          epsSaldoTotal = (saldoTotal >= 0) ? ' ' : '' //Apenas uma codificação estética para evitar espaçamento duplo nos números negativos
+          epsConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? ' ' : ''
+          
+          total = `
+          <tr id="total" role="row" class="even" position='relative'>
+            <td></td>
+            <td></td>
+            <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
+            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: green;">${float2moeda(entradaTotal)}</td>
+            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
+            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corSaldoTotal};">${epsSaldoTotal}${float2moeda(saldoTotal)}
+            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corConciliacaoTotal};">${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
+            <td></td>
+            <td></td>
+          </tr>`
+          
+          $('#total').remove()
+
+          $('#tblMovimentacaoFinanceira tfoot').prepend(total)
+        },
+        error: function(e) { 
+          divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`                    
+
+          $('#legenda').remove() 
+          
+          $('.datatable-header').append(divLegenda)
+
+          $('#total').remove() 
+          let tabelaVazia = $(
+            '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+          )
+
+          $('tbody').html(tabelaVazia)
+        }
+      })
     }
 
     $('#submitPesquisar').on('click', (e) => {
@@ -514,8 +514,8 @@ $dataFim = date("Y-m-d");
       $('.datatable-footer').append(divTotalSaldoConciliado);
     }
     */
-    /*
-    function Filtrar(carregamentoPagina) {
+    
+    function Filtrar() {
       let cont = false;
 
       const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
@@ -532,7 +532,6 @@ $dataFim = date("Y-m-d");
       const status = statusArray[0];
       const statusTipo = statusArray[1];
       const url = "movimentacaoFinanceiraConciliacaoFiltra.php";
-      const tipoFiltro = carregamentoPagina ? 'CarregamentoPagina' : 'FiltroNormal';
 
       var inputsValues = {
         inputPeriodoDe: periodoDe,
@@ -543,37 +542,126 @@ $dataFim = date("Y-m-d");
         cmbFormaDeRecebimento: FormaPagamento,
         cmbStatus: status,
         statusTipo: statusTipo,
-        tipoFiltro: tipoFiltro,
         tpConciliado: custom[1],
         valorConciliado: custom[2],
-        idConciliado: custom[0],
+        idConciliado: custom[0]
       };
 
-      $.post(
-        url,
-        inputsValues,
-        (data) => {
-          if (data) {
-            $('tbody').html(data)
-            $('#imprimir').removeAttr('disabled')
-            resultadosConsulta = data
+      $.ajax({
+        type: "POST",
+        url: url,
+        dataType: "json",
+        data: inputsValues,
+        success: function(resposta) {
+          //|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
+          let table 
+          table = $('#tblMovimentacaoFinanceira').DataTable()
+          table = $('#tblMovimentacaoFinanceira').DataTable().clear().draw()
+          //--|
 
-            atualizaTotal();
+          table = $('#tblMovimentacaoFinanceira').DataTable()
 
-          } else {
-            let msg2 = $(
-              '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-            )
-            $('tbody').html(msg2)
-            $('#imprimir').attr('disabled', '')
-            $('#footer-total').remove()
-          }
+          let contador = 0
+          let rowNode
+          let entrada = 0
+          let entradaTotal = 0
+          let saida = 0
+          let saidaTotal = 0
+          let saldo = 0
+          let saldoTotal = 0
+          let saldoConciliacao = 0
+          let saldoConciliacaoTotal = 0
+
+          resposta.forEach(item => {
+            rowNode = table.row.add(item.data).draw().node()
+
+            saldo = parseFloat(item.data[5].replace(",", "."))
+            saldoConciliado = parseFloat(item.data[6].replace(",", "."))
+
+            // adiciona os atributos nas tags <td>
+            $(rowNode).find('td').eq(3).attr('style', 'text-align: right; color: green;')
+            $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: red;')
+            
+            if(saldo >= 0) {
+              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;')
+            }else {
+              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;')
+            }
+
+            if(saldoConciliado >= 0) {
+              $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;')
+            }else {
+              $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
+            }
+
+            $(rowNode).find('td').eq(8).attr('style', 'text-align: center;')
+
+            entrada = (item.data[3] != null) ? item.data[3] : '0,00'
+            entrada = entrada.replace(".", "").replace(",", ".")
+            entradaTotal += parseFloat(entrada)
+
+            saida = (item.data[4] != null) ? item.data[4] : '0,00'
+            saida = saida.replace(".", "").replace(",", ".")
+            saidaTotal += parseFloat(saida)
+
+            saldo = (item.data[5] != null) ? item.data[5] : '0,00'
+            saldo = saldo.replace(".", "").replace(",", ".")
+            saldoTotal += parseFloat(saldo)
+
+            saldoConciliacao = (item.data[6] != null) ? item.data[6] : '0,00'
+            saldoConciliacao = saldoConciliacao.replace(".", "").replace(",", ".")
+            saldoConciliacaoTotal += parseFloat(saldoConciliacao)
+
+            contador++
+          })
+
+          divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`                    
+          
+          $('#legenda').remove() //Para evitar que os valores se sobrescrevam
+          
+          $('.datatable-header').append(divLegenda)
+
+          sinalNegativo = (saidaTotal == 0) ? '' : '-'
+          corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
+          corConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? 'green' : 'red'
+          epsSaldoTotal = (saldoTotal >= 0) ? ' ' : '' //Apenas uma codificação estética para evitar espaçamento duplo nos números negativos
+          epsConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? ' ' : ''
+          
+          total = `
+          <tr id="total" role="row" class="even" position='relative'>
+            <td></td>
+            <td></td>
+            <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
+            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: green;">${float2moeda(entradaTotal)}</td>
+            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
+            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corSaldoTotal};">${epsSaldoTotal}${float2moeda(saldoTotal)}
+            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corConciliacaoTotal};">${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
+            <td></td>
+            <td></td>
+          </tr>`
+          
+          $('#total').remove()
+
+          $('#tblMovimentacaoFinanceira tfoot').prepend(total)
+        },
+        error: function(e) { 
+          divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`                    
+
+          $('#legenda').remove() 
+          
+          $('.datatable-header').append(divLegenda)
+
+          $('#total').remove() 
+          let tabelaVazia = $(
+            '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+          )
+
+          $('tbody').html(tabelaVazia)
         }
-      );
+      })
     }
 
-    Filtrar(true);
-    */
+    Filtrar()
   }
 
   function atualizaMovimentacaoFinanceira(Permission, MovimentacaoFinanceiraId, TipoMov, Tipo) {

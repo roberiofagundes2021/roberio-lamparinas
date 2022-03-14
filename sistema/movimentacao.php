@@ -20,6 +20,14 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
+$sql = "SELECT ParamEmpresaPublica
+    FROM Parametro
+    WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
+$result = $conn->query($sql);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+
+$empresaPublica = ($rowParametro['ParamEmpresaPublica']  == 1) ? true : false;
+
 ?>
 
 <!DOCTYPE html>
@@ -63,12 +71,12 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
         responsive: true,
         columnDefs: [{
             orderable: true, //Data
-            width: "10%",
+            width: "8%",
             targets: [0]
           },
           {
             orderable: true, //Tipo
-            width: "10%",
+            width: "8%",
             targets: [1]
           },
           {
@@ -78,28 +86,28 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
           },
           {
             orderable: true, //Nº Recibo
-            width: "10%",
-            targets: [2]
-          },
-          {
-            orderable: true, //Fornecedor
-            width: "20%",
+            width: "14%",
             targets: [3]
           },
           {
-            orderable: true, //Destino
-            width: "20%",
+            orderable: true, //Fornecedor
+            width: "24%",
             targets: [4]
+          },
+          {
+            orderable: true, //Destino
+            width: "16%",
+            targets: [5]
           },
           {
             orderable: true, //Situação
             width: "10%",
-            targets: [5]
+            targets: [6]
           },
           {
             orderable: false, //Ações
             width: "10%",
-            targets: [6]
+            targets: [7]
           }
         ],
         dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -347,7 +355,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
                                   print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'aprovacaoContabilidade\', \'\');" class="dropdown-item"><i class="icon-list2"></i> Enviar para Contabilidade</a>');
                                 }
 
-                                if ($item['MovimTipo'] == 'E' && $item['SituaChave'] != 'AGUARDANDOLIBERACAO'){
+                                if ($item['MovimTipo'] == 'E' && $item['SituaChave'] != 'AGUARDANDOLIBERACAO' && $empresaPublica){
                                   print('<a href="#" onclick="atualizaMovimentacao(1,' . $item['MovimId'] . ', \'' . $item['MovimData'] . '\', \'' . $item['MovimNotaFiscal'] . '\', \''.$item['MovimTipo'].'\', \'liquidar\', \'\');" class="dropdown-item"><i class="icon-coin-dollar"></i>Liquidar</a>');
                                 }
 
