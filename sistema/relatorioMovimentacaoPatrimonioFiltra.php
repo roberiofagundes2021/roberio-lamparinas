@@ -81,9 +81,11 @@ function queryPesquisa(){
 
     if ($cont == 1) {
         $cont = 0;
+
+        $arrayData = [];
         foreach ($rowData as $item) {
             $cont++;
-            print("
+           /* print("
                 
                 <tr idPatrimonio=".$item['PatriId'].'#'.$item['ProduId'].'#'.$item['PrXFaId']." editado='0'>
                    <td class='even'>" . $cont . "</td>
@@ -98,22 +100,74 @@ function queryPesquisa(){
                    <td class='even' style='display: none'>" . mostraData($item['MovimData']) . "</td>
                    <td class='even' style='display: none'>" . mostraData($item['MvXPrAnoFabricacao']) . "</td>
                    <td class='even' style='display: none'>" . $item['EmpenhosOrdemCompra'] . "</td>
-                   <td style='text-align: center'>
-                         <i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>
-                   </td>
-                   <td style='display: none' id='inputNumeroSerie'>
-                        <input type='text' value='" . $item['PatriNumSerie'] . "'>
-                   </td>
-                   <td style='display: none' id='inputEstadoConservacao'>
-                        <input type='text' value='" . $item['PatriEstadoConservacao'] . "'>
-                   </td> 
-                   <td style='display: none' id='inputIdProdutoXFabricante'>
-                        <input type='text' value='" . $item['PrXFaMarca'] . '#' . $item['PrXFaModelo'] . '#' . $item['PrXFaFabricante'] ."'>
-                   </td>                   
+                   <td style='text-align: center'><i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i></td>
+                   <td style='display: none' id='inputNumeroSerie'><input type='text' value='" . $item['PatriNumSerie'] . "'></td>
+                   <td style='display: none' id='inputEstadoConservacao'><input type='text' value='" . $item['PatriEstadoConservacao'] . "'></td> 
+                   <td style='display: none' id='inputIdProdutoXFabricante'><input type='text' value='" . $item['PrXFaMarca'] . '#' . $item['PrXFaModelo'] . '#' . $item['PrXFaFabricante'] ."'></td>                   
                 </tr>
-             ");
+             ");*/
+
+            $contador = $cont;  
+
+            $nomeProduto = $item['ProduNome'];
+
+            $patriNumero = $item['PatriNumero'];
+
+            $notaFiscal = $item['MovimNotaFiscal'];
+
+            $valorUnitario = mostraValor($item['MvXPrValorUnitario']);
+
+            $valor = ;
+
+            $validade = mostraData($item['MvXPrValidade']);
+
+            $origem = $item['Origem'];
+
+            $destino = $item['Destino'];
+
+            $datas = mostraData($item['MovimData']);
+
+            $anoFabricacao = mostraData($item['MvXPrAnoFabricacao']);
+
+            $empenhos = $item['EmpenhosOrdemCompra'];
+
+            $acoes = '<i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>';
+
+            $numeroSerie = $item['PatriNumSerie'];
+
+            $estadoConservacao = $item['PatriEstadoConservacao'];
+
+            $fabricante = $item['PrXFaMarca'];
+           
+            $array = [
+                'data'=>[
+                    isset($contador) ? $contador : null,
+                    isset($nomeProduto) ? $nomeProduto : null,
+                    isset($patriNumero) ? $patriNumero : null,
+                    isset($notaFiscal) ? $notaFiscal : null,
+                    isset($valorUnitario) ? $valorUnitario : null,
+                    isset($valor) ? $valor : null, 
+                    isset($validade) ? $validade : null,  
+                    isset($origem) ? $origem : null, 
+                    isset($destino) ? $destino : null,
+                    isset($datas) ? $datas : null,
+                    isset($anoFabricacao) ? $anoFabricacao : null,
+                    isset($empenhos) ? $empenhos : null,
+                    isset($acoes) ? $acoes : null,
+                    isset($numeroSerie) ? $numeroSerie : null, 
+                    isset($estadoConservacao) ? $estadoConservacao : null,
+                    isset($fabricante) ? $fabricante : null
+
+                    
+                ],
+                'identify'=>[
+                    
+                ]
+            ];
+
+            array_push($arrayData,$array);
         }
-        
+        print(json_encode($arrayData));
     }
 }
 
