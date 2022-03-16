@@ -111,10 +111,12 @@ function queryPesquisa()
 
     if ($cont == 1) {
         $cont = 0;
+
+        $arrayData = [];
         foreach ($rowData as $item) {
             $cont++;     
 
-            print("
+           /* print("
             
             <tr>
                 <td class='even'>" . mostraData($item['MovimData']) . "</td>
@@ -126,8 +128,46 @@ function queryPesquisa()
                 <td class='odd'>" . $item['Origem']  . "</td>
                 <td class='even'>" . $item['Destino'] . "</td>
             </tr>
-            ");
+            ");*/
+
+            $datas = mostraData($item['MovimData']);
+
+            $tipo = $item['MovimTipo'];
+
+            $nomeProduto = $item['ProduNome'];
+
+            $nomeCategoria = $item['CategNome'];
+
+            $nomeFornecedor = $item['ForneNome'];
+
+            $quantidade = $item['MvXPrQuantidade'];
+
+            $origem = $item['Origem'];
+
+            $destino = $item['Destino'];
+
+            $array = [
+                'data'=>[
+                    isset($datas) ? $datas : null,
+                    isset($tipo) ? $tipo : null, 
+                    isset($nomeProduto) ? $nomeProduto : null,
+                    isset($nomeCategoria) ? $nomeCategoria : null, 
+                    isset($nomeFornecedor) ? $nomeFornecedor : null, 
+                    isset($quantidade) ? $quantidade : null, 
+                    isset($origem) ? $origem : null, 
+                    isset($destino) ? $destino : null 
+                    
+                ],
+                'identify'=>[
+                    
+                ]
+            ];
+
+            array_push($arrayData,$array);
+
         }
+
+         print(json_encode($arrayData));
     }
 }
 

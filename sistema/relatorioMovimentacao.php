@@ -435,7 +435,7 @@ $dataFim = date("Y-m-d");
 						cmbCodigo: codigo,
 					};
 
-					$.post(
+					/*$.post(
 						url,
 						inputsValues,
 						(data) => {
@@ -449,7 +449,45 @@ $dataFim = date("Y-m-d");
 								$('#imprimir').attr('disabled', '')
 							}
 						}
-					);
+					);*/
+
+					$.ajax({
+						type: "POST",
+						url: url,
+						dataType: "json",
+						data: inputsValues,
+						success: function(resposta) {
+							//|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
+							let table 
+							table = $('#tblMovimentacao').DataTable()
+							table = $('#tblMovimentacao').DataTable().clear().draw()
+							//--|
+
+							table = $('#tblMovimentacao').DataTable()
+
+							let rowNode
+
+							resposta.forEach(item => {
+								rowNode = table.row.add(item.data).draw().node()
+									
+								// adiciona os atributos nas tags <td>
+								$(rowNode).find('td').eq(1).attr('style', 'text-align: center;') 
+								$(rowNode).find('td').eq(5).attr('style', 'text-align: center;')
+							
+
+							})
+							
+						},
+						error: function(e) {
+
+							let tabelaVazia = $(
+								'<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+							)
+
+							$('tbody').html(tabelaVazia)
+						}
+					})
+
 				})
 			}
 			Filtrar()
@@ -553,13 +591,6 @@ $dataFim = date("Y-m-d");
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relatório de Movimentação</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="relatorioMovimentacao.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
