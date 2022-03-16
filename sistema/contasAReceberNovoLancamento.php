@@ -1264,11 +1264,11 @@ $dataInicio = date("Y-m-d");
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataVencimento">Data do
                                                                     Vencimento</label>
-                                                                <input type="date" id="inputDataVencimento" value="<?php isset($lancamento) ? print($lancamento['CnAReDtVencimento']) : print($dataInicio) ?>" name="inputDataVencimento" class="form-control"  <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Recebido') echo 'readOnly disabled' ?>>
+                                                                <input type="date" id="inputDataVencimento" value="<?php isset($lancamento) ? print($lancamento['CnAReDtVencimento']) : print($dataInicio) ?>" name="inputDataVencimento" class="form-control removeValidacao" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Recebido') echo 'readOnly disabled' ?>>
                                                             </div>
                                                             <div class="form-group col-6">
                                                                 <label for="inputValor">Valor</label>
-                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValor" name="inputValor" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAReValorAReceber']) ?>" class="form-control"  <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Recebido') echo 'readOnly disabled' ?>>
+                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValor" name="inputValor" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAReValorAReceber']) ?>" class="form-control removeValidacao"  <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Recebido') echo 'readOnly disabled' ?>>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1297,12 +1297,12 @@ $dataInicio = date("Y-m-d");
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataRecebimento">Data do
                                                                     Pagamento</label>
-                                                                <input type="date" id="inputDataRecebimento" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtRecebimento'] ?>" name="inputDataRecebimento" class="form-control"  <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Recebido') echo 'disabled' ?> readonly>
+                                                                <input type="date" id="inputDataRecebimento" value="<?php if (isset($lancamento)) echo $lancamento['CnAReDtRecebimento'] ?>" name="inputDataRecebimento" class="form-control removeValidacao"  <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Recebido') echo 'disabled' ?> readonly>
                                                             </div>
                                                             <div class="form-group col-6">
                                                                 <label for="inputValorTotalRecebido">Valor Total
                                                                     Recebido</label>
-                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotalRecebido" name="inputValorTotalRecebido" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAReValorRecebido']) ?>" class="form-control"  <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Recebido') echo 'readOnly disabled' ?> disabled>
+                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotalRecebido" name="inputValorTotalRecebido" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAReValorRecebido']) ?>" class="form-control removeValidacao"  <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Recebido') echo 'readOnly disabled' ?> disabled>
                                                             </div>
                                                         </div>
                                                     </div>

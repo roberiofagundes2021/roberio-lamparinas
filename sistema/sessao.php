@@ -154,7 +154,7 @@ if ((array_key_exists('ContPagPeriodoDe', $_SESSION) || array_key_exists('ContPa
 $arquivosContasAReceber = array(
 	'contasAReceber.php', 'contasAReceberNovoLancamento.php',
 	'contasAReceberFiltra.php', 'contasAReceberExclui.php',
-	'contasAReceberPagamentoAgrupado.php', 'contasAReceberParcelamento.php',
+	'contasAReceberRecebimentoAgrupado.php', 'contasAReceberParcelamento.php',
 	'resumoFinanceiroFiltra.php', 'contasEstornar.php'
 );
 

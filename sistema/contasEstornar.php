@@ -3,7 +3,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$justificativa = $_POST['inputContasAPagarJustificativa'];
+$justificativa = $_POST['inputContaJustificativa'];
 
 if(isset($_POST['inputContasAPagarId'])) {
     $contaApagarId = $_POST['inputContasAPagarId'];

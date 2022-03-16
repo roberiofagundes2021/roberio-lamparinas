@@ -62,7 +62,8 @@ $dataFim = date("Y")."-12-31";
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
                 "order": [
-                    [1, "desc"]
+                    [1, "desc"],
+                    [2, "asc"]
                 ],
                 autoWidth: false,
                 responsive: true,
@@ -110,6 +111,8 @@ $dataFim = date("Y")."-12-31";
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t>',
                 language: {
+                    decimal: ",",
+                    thousands: ".",
                     search: '<span>Filtro:</span> _INPUT_',
                     searchPlaceholder: 'filtra qualquer coluna...',
                     lengthMenu: '<span>Mostrar:</span> _MENU_',
@@ -153,6 +156,8 @@ $dataFim = date("Y")."-12-31";
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
+                    decimal: ",",
+                    thousands: ".",
                     search: '<span>Filtro:</span> _INPUT_',
                     searchPlaceholder: 'filtra qualquer coluna...',
                     lengthMenu: '<span>Mostrar:</span> _MENU_',
@@ -170,7 +175,7 @@ $dataFim = date("Y")."-12-31";
                 $('.btnParcelar').each((i, elem) => {
                     $(elem).on('click', function() {
 
-                        //let recebimentos = $("#RecebimentoAgrupadoContainer").children()
+                        let recebimentos = $("#pagamentoAgrupadoContainer").children()
 
                         let linha = $(elem).parent().parent().parent().parent().parent()
                             .parent()
@@ -246,7 +251,7 @@ $dataFim = date("Y")."-12-31";
                         location.href = "contasAReceber.php";
                         modalParcelas()
                         $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
-                        //RecebimentoAgrupado()
+                        RecebimentoAgrupado()
                       //  atualizaTotal()                        
                     }
                 )
@@ -327,10 +332,250 @@ $dataFim = date("Y")."-12-31";
             parcelamento()
             /////////////////////////////////////////////////////////////////
 
+            function desfazerPagamentoAgrupado() {
+                $("#pagamentoAgrupadoForm").children().remove()
+                $("#pagamentoAgrupadoContainer").html("")
+                $("#efetuarRecebimento").prop('disabled', true)
 
+                $("#cmbFormaPagamentoPA").val('')
+                $("#select2-cmbFormaPagamentoPA-container").html("Selecionar")
+                $("#cmbContaBancoPA").val('')
+                $("#select2-cmbContaBancoPA-container").html("Selecionar")
+                $("#inputNumeroDocumentoPA").val("")
+
+                $(".clicado").each((i, elem) => {
+                    $(elem).removeClass('clicado').prop('checked', false)
+                })
+            }
+
+            function pagamentoAgrupado(contadorLinha) {
+
+                for (let i = 1; i <= contadorLinha; i++) {
+
+                    let id = $(`#check${i}`).parent().children().last().val();
+                    let elementosLista = $(`#check${i}`).parent().parent().children()
+                    let descricaoLink = $(elementosLista[2]).children()[0]
+                    let descricao = $(descricaoLink).html()
+                    let status = $(elementosLista[6]).html()
+                    let valor = $(elementosLista[5]).html()
+
+                    $(`#check${i}`).on('click', () => {
+
+                        if (status == 'Recebido') {
+                            alerta('Atenção', 'A conta selecionada já foi paga!', 'error');
+                            $(`#check${i}`).prop('checked', false)
+                            return false
+                        } else {
+                            if (!$(`#check${i}`).hasClass('clicado')) {
+                                $(`#check${i}`).addClass('clicado')
+                                let input =
+                                    `<input type="hidden" name="conta${i}" value="${id}" descricao="${descricao}" valor="${valor}">`
+                                $("#pagamentoAgrupadoForm").append(input)
+
+                                let quantInputs = $("#pagamentoAgrupadoForm").children()
+
+                                if (quantInputs.length >= 1) {
+                                    $("#efetuarRecebimento").removeAttr('disabled')
+                                } else {
+                                    $("#efetuarRecebimento").attr('disabled')
+                                }
+
+                            } else {
+                                $(`[name=conta${i}]`).remove()
+
+                                $(`#check${i}`).removeClass('clicado')
+
+                                let quantInputs = $("#pagamentoAgrupadoForm").children()
+
+                                if (quantInputs.length == 0) {
+                                    $("#efetuarRecebimento").prop('disabled', true)
+                                }
+                            }
+                        }
+                    })
+                }
+            }
+
+            let countPlanoContas = 0;
+
+            function pagamentoAgrupadoEnvia() {
+                let pagamentos = $("#pagamentoAgrupadoContainer").children()
+                let dataPagamento = $("#inputDataPagamentoPA").val()
+                let formaPagamento = $("#cmbFormaPagamentoPA").val()
+                let contaBanco = $("#cmbContaBancoPA").val()
+                let numeroDocumento = $("#inputNumeroDocumentoPA").val()
+
+                let pagamentoValores = []
+
+                pagamentos.each((i, elem) => {
+                    let linhaFilhos = $(elem).children()
+
+                    let id = $(`#idPA${i+1}`).val()
+                    let descricao = $(`#inputDescricaoPA${i+1}`).val()
+                    let planoContas = $(`#cmbPlanoContasPA${i+1}`).val()
+                    let valor = $(`#inputValorPA${i+1}`).val()
+
+                    if (planoContas == '#') {
+                        countPlanoContas += 1
+                    }
+
+                    pagamentoValores[i] = {
+                        id: id,
+                        descricao: descricao,
+                        planoContas: planoContas,
+                        valor: valor
+                    }
+
+                })
+
+                data = {
+                    valores: pagamentoValores,
+                    dataPagamento: dataPagamento,
+                    formaPagamento: formaPagamento,
+                    contaBanco: contaBanco,
+                    numeroDocumento: numeroDocumento
+                }
+
+                url = 'contasAReceberRecebimentoAgrupado.php'
+
+                if (countPlanoContas >= 1) {
+                    alerta('Atenção', 'Selecione um plano de contas para cada recebimento!', 'error');
+                } else {
+                    $.post(
+                        url,
+                        data,
+                        (data) => {
+                            let linhas = $('tbody').children()
+                            let ids = data.split('/')
+                            for (let h = 0; h <= ids.length; h++) {
+                                for (let i = 1; i <= linhas.length - 1; i++) {
+
+                                    let p = $(linhas[i]).children()[0]
+                                    let irm = $(p).children()[1]
+
+                                    if ($(irm).val() == ids[h]) {
+
+                                        let linha = $(`#check${i}`)
+                                        let status = $(linhas[i]).children()[6]
+                                        $(status).html('Recebido')
+                                        alerta('Atenção', 'Recebimento agrupado efetuado com sucesso!',
+                                            'success');
+                                        Filtrar()
+                                        desfazerPagamentoAgrupado()
+                                        $(`#check${i}`).removeClass('clicado')
+                                        atualizaTotal()
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+            }
+
+            $("#salvarPA").on('click', (e) => {
+                e.preventDefault()
+                if($('#inputDescricaoPA').val() == '') {
+                    alerta('Atenção', 'A descrição é obrigatória!', 'error');
+                    $('#inputDescricaoPA').focus();
+                    return false
+                }
+                
+                pagamentoAgrupadoEnvia()
+
+                if (countPlanoContas == 0) {
+                    desfazerPagamentoAgrupado()
+                    $('#modal-pagamentoAgrupado').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                }
+
+                countPlanoContas = 0;
+            })
+
+            function modalPagamentoAgrupado() {
+
+                $("#pagamentoAgrupadoContainer").html("")
+
+                $("#efetuarRecebimento").on("click", (e) => {
+                    e.preventDefault()
+
+                    let pagamentos = $("#pagamentoAgrupadoForm").children()
+                    
+                    if(pagamentos.length == 1){
+                        pagamentos.each((i, elem) => {
+                            let id = $(elem).val()
+                            redirecionarPagamento(id)                            
+                        })
+                    } else {
+                        $('#modal-pagamentoAgrupado').fadeIn(200)
+                        $("#pagamentoAgrupadoContainer").html("")
+                    }
+
+                    let numLinhas = $("#pagamentoAgrupadoForm").children().length
+                    let linhasSelecionadas = $("#pagamentoAgrupadoForm").children()
+                    let valorTotal = 0;
+
+
+                    linhasSelecionadas.each((i, elem) => {
+                        let id = $(elem).val()
+                        let descricao = $(elem).attr('descricao')
+                        let valor = $(elem).attr('valor')
+                        let indice = i + 1
+
+
+                        valorTotal += parseFloat(valor.replace(".", "").replace(",", "."));
+                        let elemNode = `<div class="d-flex flex-row justify-content-center">
+                    <p class="col-1 mt-3">
+                        ${indice}
+                        <input type="hidden" id="idPA${indice}" value="${id}">
+                    </p>
+                    <div class="form-group col-5 p-2">
+                        <input type="text" class="form-control" id="inputDescricaoPA${indice}" name="inputDescricaoPA${indice}" value="${descricao}" readOnly>
+                    </div>
+                    <div class="form-group col-3 p-2">
+                        <div class="form-group">
+                            <select id="cmbPlanoContasPA${indice}" name="cmbPlanoContasPA${indice}"
+                                class="form-control form-control-select2" required>
+                                <option value="#">Selecionar</option>
+                                <?php
+                                    $sql = "SELECT PlConId, PlConNome
+                                            FROM PlanoConta
+                                            JOIN Situacao on SituaId = PlConStatus
+                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and 
+                                            PlConNatureza = 'R' and SituaChave = 'ATIVO'
+                                            ORDER BY PlConNome ASC";
+                                    $result = $conn->query($sql);
+                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+                                    
+                                    
+                                    foreach ($rowPlanoContas as $item) {
+                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-3 p-2">
+                        <input type="text" class="form-control" id="inputValorPA${indice}" name="inputValorPA${indice}" value="${valor}" readOnly>
+                    </div> 
+                </div>`
+
+                        $("#pagamentoAgrupadoContainer").append(elemNode)
+                    })
+
+                    $('#inputValorTotalPA').val(float2moeda(valorTotal))
+                })
+
+                $('#modal-closePA').on('click', function () {
+                    desfazerPagamentoAgrupado()
+                    $('#modal-pagamentoAgrupado').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                })
+            }
+            modalPagamentoAgrupado()
 
             function redirecionarPagamento(id) {
-                window.location.href = `contasAReceberNovoLancamento.php?lancamentoId=${id}`
+                let atualiza = "<?php echo $atualizar; ?>"
+                atualizaContasAReceber(atualiza, id , 'edita')
             }
 
             function atualizaTotal() {
@@ -459,7 +704,7 @@ $dataFim = date("Y")."-12-31";
                         })
 
                         modalParcelas()
-                        //pagamentoAgrupado(contador)
+                        pagamentoAgrupado(contador)
 
                         divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`                    
             
@@ -543,7 +788,7 @@ $dataFim = date("Y")."-12-31";
                 return false
             }
 
-            document.getElementById('inputContasAPagarJustificativa').value = justificativa;
+            document.getElementById('inputContaJustificativa').value = justificativa;
             document.formContasAReceber.action = "contasEstornar.php";
             document.formContasAReceber.submit();
 		}
@@ -831,6 +1076,7 @@ $dataFim = date("Y")."-12-31";
 
                     </div>
                 </div>
+                <form id="pagamentoAgrupadoForm" action=""></form>
 
                 <!-- /info blocks -->
 
@@ -909,6 +1155,141 @@ $dataFim = date("Y")."-12-31";
                     </div>
                 </div>
                 <!--------------------------------------------------------------------------------------------------->
+                <!--Modal Pagamen-->
+                <div id="modal-pagamentoAgrupado" class="custon-modal">
+                    <div class="custon-modal-container">
+                        <div class="card custon-modal-content">
+                            <div class="custon-modal-title">
+                                <i class=""></i>
+                                <p class="h3">Efetuar Recebimentos Agrupados</p>
+                                <i class=""></i>
+                            </div>
+                            <form class="px-5 pt-4" id="editarProduto" method="POST">
+                                <div class="d-flex flex-row">
+                                    <div class='col-lg-4'>
+                                        <div class="form-group">
+                                            <label for="inputDataPagamentoPA">Data do Pagamento</label>
+                                            <div class="input-group">
+                                                <input type="date" id="inputDataPagamentoPA" name="inputDataPagamentoPA"
+                                                    value="<?php echo $dataInicio?>" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='col-lg-4'>
+                                        <div class="form-group">
+                                            <label for="inputValorTotalPA">Valor Total</label>
+                                            <div class="input-group">
+                                                <input type="text" id="inputValorTotalPA" onKeyUp="moeda(this)"
+                                                    maxLength="12" name="inputValorTotalPA" class="form-control"
+                                                    readOnly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row">
+                                    <div class="col-lg-6">
+                                        <label for="cmbFormaPagamentoPA">Forma Pagamento</label>
+                                        <div class="form-group">
+                                            <select id="cmbFormaPagamentoPA" name="cmbFormaPagamentoPA"
+                                                class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                                <?php
+												    $sql = "SELECT FrPagId, FrPagNome
+												    			FROM FormaPagamento
+												    			JOIN Situacao on SituaId = FrPagStatus
+												    			WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+												    			ORDER BY FrPagNome ASC";
+												    $result = $conn->query($sql);
+												    $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
+												    foreach ($rowFormaPagamento as $item) {
+                                                        print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+												    }
+												?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label for="cmbContaBancoPA">Conta/Banco</label>
+                                        <div class="form-group">
+                                            <select id="cmbContaBancoPA" name="cmbContaBancoPA"
+                                                class="form-control form-control-select2">
+                                                <option value="">Selecionar</option>
+                                                <?php
+												        $sql = "SELECT CnBanId, CnBanNome
+												        			FROM ContaBanco
+												        			JOIN Situacao on SituaId = CnBanStatus
+												        			WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+												        			ORDER BY CnBanNome ASC";
+												        $result = $conn->query($sql);
+												        $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+												        foreach ($rowContaBanco as $item) {
+                                                            if(isset($lancamento)){
+                                                                if($lancamento['CnAPaContaBanco'] == $item['CnBanId']){
+                                                                    print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
+                                                                } else {
+                                                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                                }
+                                                            } else {
+                                                                print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                            }
+												        }
+												    ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row">
+                                    <div class='col-lg-7'>
+                                        <div class="form-group">
+                                            <label for="inputDescricaoPA">Descrição do Agrupamento <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="text" id="inputDescricaoPA" name="inputDescricaoPA"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class='col-lg-5'>
+                                        <div class="form-group">
+                                            <label for="inputNumeroDocumentoPA">Número Documento</label>
+                                            <div class="input-group">
+                                                <input type="text" id="inputNumeroDocumentoPA"
+                                                    name="inputNumeroDocumentoPA" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row">
+                                    <div class="col-12 d-flex flex-row justify-content-center">
+                                        <p class="col-2 p-2 text-center" style="background-color:#f2f2f2">Item</p>
+                                        <p class="col-4 p-2" style="background-color:#f2f2f2">Descrição</p>
+                                        <p class="col-3 p-2" style="background-color:#f2f2f2">Plano de Contas *</p>
+                                        <p class="col-3 p-2" style="background-color:#f2f2f2">Valor</p>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div id="pagamentoAgrupadoContainer" class="d-flex flex-column px-5"
+                                    style="overflow-Y: scroll; max-height: 200px">
+
+                                </div>
+                                <input type="hidden" id='inputDataVencimento'>
+                                <input type="hidden" id='inputDescricao'>
+                                <input type="hidden" id='inputId'>
+                            </form>
+
+                            <div class="card-footer mt-2 d-flex flex-column">
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <button class="btn btn-lg btn-success" id="salvarPA">Salvar</button>
+                                            <a id="modal-closePA" class="btn btn-basic" role="button">Cancelar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--------------------------------------------------------------------------------------------------->
                 <!--Modal estornar-->
                 <div id="modal_mini-estornar" class="modal fade" tabindex="-1">
                     <div class="modal-dialog modal-xs">
@@ -938,7 +1319,7 @@ $dataFim = date("Y")."-12-31";
 					<input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza" value="<?php echo $atualizar; ?>" >
                     <input type="hidden" id="inputPermissionExclui" name="inputPermissionExclui" value="<?php echo $excluir; ?>" >
 					<input type="hidden" id="inputContasAReceberId" name="inputContasAReceberId" >
-                    <input type="hidden" id="inputContasAPagarJustificativa" name="inputContasAPagarJustificativa" >
+                    <input type="hidden" id="inputContaJustificativa" name="inputContaJustificativa" >
 				</form>
             </div>
             <!-- /content area -->

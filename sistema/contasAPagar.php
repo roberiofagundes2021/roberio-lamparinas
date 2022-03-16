@@ -110,6 +110,8 @@ $dataFim = date("Y")."-12-31";
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t>',
                 language: {
+                    decimal: ",",
+                    thousands: ".",
                     search: '<span>Filtro:</span> _INPUT_',
                     searchPlaceholder: 'filtra qualquer coluna...',
                     lengthMenu: '<span>Mostrar:</span> _MENU_',
@@ -153,6 +155,8 @@ $dataFim = date("Y")."-12-31";
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
+                    decimal: ",",
+                    thousands: ".",
                     search: '<span>Filtro:</span> _INPUT_',
                     searchPlaceholder: 'filtra qualquer coluna...',
                     lengthMenu: '<span>Mostrar:</span> _MENU_',
@@ -249,7 +253,6 @@ $dataFim = date("Y")."-12-31";
                         //editarLancamento()
                         //excluirConta()
                         $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
-                        pagamentoAgrupado()
                         //atualizaTotal()
                     }
                 )
@@ -458,8 +461,7 @@ $dataFim = date("Y")."-12-31";
                                         $(status).html('Pago')
                                         alerta('Atenção', 'Pagamento agrupado efetuado com sucesso!',
                                             'success');
-                                        pagamentoAgrupado()
-                                        Filtrar(true)
+                                        Filtrar()
                                         desfazerPagamentoAgrupado()
                                         $(`#check${i}`).removeClass('clicado')
                                         atualizaTotal()
@@ -491,7 +493,8 @@ $dataFim = date("Y")."-12-31";
             })
 
             function redirecionarPagamento(id){
-                window.location.href =`contasAPagarNovoLancamento.php?lancamentoId=${id}`
+                let atualiza = "<?php echo $atualizar; ?>"
+                atualizaContasAPagar(atualiza, id , 'edita')
             }
 
             function modalPagamentoAgrupado() {
@@ -543,7 +546,8 @@ $dataFim = date("Y")."-12-31";
                                     $sql = "SELECT PlConId, PlConNome
                                             FROM PlanoConta
                                             JOIN Situacao on SituaId = PlConStatus
-                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and 
+                                            PlConNatureza = 'D' and SituaChave = 'ATIVO'
                                             ORDER BY PlConNome ASC";
                                     $result = $conn->query($sql);
                                     $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -785,7 +789,7 @@ $dataFim = date("Y")."-12-31";
                 return false
             }
 
-            document.getElementById('inputContasAPagarJustificativa').value = justificativa;
+            document.getElementById('inputContaJustificativa').value = justificativa;
             document.formContasAPagar.action = "contasEstornar.php";
             document.formContasAPagar.submit();
 		}
@@ -1259,7 +1263,7 @@ $dataFim = date("Y")."-12-31";
 					<input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza" value="<?php echo $atualizar; ?>" >
                     <input type="hidden" id="inputPermissionExclui" name="inputPermissionExclui" value="<?php echo $excluir; ?>" >
 					<input type="hidden" id="inputContasAPagarId" name="inputContasAPagarId" >
-                    <input type="hidden" id="inputContasAPagarJustificativa" name="inputContasAPagarJustificativa" >
+                    <input type="hidden" id="inputContaJustificativa" name="inputContaJustificativa" >
 				</form>
 
             </div>

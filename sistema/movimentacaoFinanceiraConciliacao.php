@@ -121,6 +121,8 @@ $dataFim = date("Y-m-d");
       ],
       dom: '<"datatable-header"fl><"datatable-scroll-wrap"t>',
       language: {
+        decimal: ",",
+        thousands: ".",
         search: '<span>Filtro:</span> _INPUT_',
         searchPlaceholder: 'filtra qualquer coluna...',
         lengthMenu: '<span>Mostrar:</span> _MENU_',
