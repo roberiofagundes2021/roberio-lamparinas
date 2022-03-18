@@ -32,6 +32,15 @@ function queryPesquisa(){
     $argsCenCustCp = '';
     $status = explode('|', $_POST['cmbStatus']);
 
+    //Aqui é para limpar a sessão caso o usuário filtre todos novamente
+    $_SESSION['MovimentacaoFinanceiraConciliacaoPeriodoDe'] = '';
+    $_SESSION['MovimentacaoFinanceiraConciliacaoAte'] = '';
+    $_SESSION['MovimentacaoFinanceiraConciliacaoContaBanco'] = '';
+    $_SESSION['MovimentacaoFinanceiraConciliacaoCentroDeCustos'] = '';
+    $_SESSION['MovimentacaoFinanceiraConciliacaoPlanoContas'] = '';
+    $_SESSION['MovimentacaoFinanceiraConciliacaoFormaPagamento'] = '';
+    $_SESSION['MovimentacaoFinanceiraConciliacaoStatus'] = '';
+
     if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
         empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
         empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];

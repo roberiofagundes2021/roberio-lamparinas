@@ -258,12 +258,10 @@ $dataFim = date("Y-m-d");
               contador++
             })
 
-            divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`                    
+            $('#legenda').remove() //Para evitar que os valores se sobreescreva
+            let legenda = document.querySelector(".datatable-header")
+            legenda.insertAdjacentHTML('beforeend', `<div id='legenda' style='text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`)
             
-            $('#legenda').remove() //Para evitar que os valores se sobrescrevam
-            
-            $('.datatable-header').append(divLegenda)
-
             sinalNegativo = (saidaTotal == 0) ? '' : '-'
             corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
 
@@ -284,13 +282,9 @@ $dataFim = date("Y-m-d");
             $('#tblMovimentacaoFinanceira tfoot').append(total)
           },
           error: function(e) { 
-            divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`                    
-
-            $('#legenda').remove() 
-            
-            $('.datatable-header').append(divLegenda)
-
-            $('#total').remove() 
+            $('#legenda').remove()      
+            let legenda = document.querySelector(".datatable-header")
+            legenda.insertAdjacentHTML('beforeend', `<div id='legenda' style='text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`)
 
             let tabelaVazia = $(
               '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
@@ -356,47 +350,14 @@ $dataFim = date("Y-m-d");
             $('#inputStatus_imp').val(inputsValues.cmbStatus)
             $('#inputStatusTipo_imp').val(inputsValues.statusTipo)
 
-
             $('#formImprime').attr('action', url)
 
             $('#formImprime').submit()
           }
         })
       }
-      imprime()
-
-      //Ao mudar a centro de custo, filtra o Plano de Contas via ajax (retorno via JSON)
-      $('#cmbCentroDeCustos').on('change', function(e) {
-
-        FiltraPlanoContas();
-
-        var cmbCentroDeCustos = $('#cmbCentroDeCustos').val();
-
-        $.getJSON('filtraPlanoContas.php?idCentroCusto=' + cmbCentroDeCustos, function(dados) {
-
-          var option = '<option value="">Todos</option>';
-
-          if (dados.length) {
-
-            $.each(dados, function(i, obj) {
-              option += '<option value="' + obj.PlConId + '">' + obj.PlConCodigo + ' - ' + obj.PlConNome + '</option>';
-            });
-
-            $('#cmbPlanoContas').html(option).show();
-          } else {
-            ResetPlanoContas();
-          }
-        });
-      });    
+      imprime()    
     });
-
-    function FiltraPlanoContas() {
-      $('#cmbPlanoContas').empty().append('<option value="">Filtrando...</option>');    
-    }
-
-    function ResetPlanoContas() {
-      $('#cmbPlanoContas').empty().append('<option value="">Sem Plano de Contas</option>');
-    } 
 
     //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
     function atualizaMovimentacaoFinanceira(Permission, MovimentacaoFinanceiraId, TipoMov, Tipo) {

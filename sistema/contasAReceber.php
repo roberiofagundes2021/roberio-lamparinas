@@ -706,11 +706,9 @@ $dataFim = date("Y")."-12-31";
                         modalParcelas()
                         pagamentoAgrupado(contador)
 
-                        divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`                    
-            
-                        $('#legenda').remove() //Para evitar que os valores se sobrescrevam
-                        
-                        $('.datatable-header').append(divLegenda)
+                        $('#legenda').remove() //Para evitar que os valores se sobreescreva
+                        let legenda = document.querySelector(".datatable-header")
+                        legenda.insertAdjacentHTML('beforeend', `<div id='legenda' style='text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`)
 
                         let total = 'Total: ' + float2moeda(valorTotal)
 
@@ -731,11 +729,9 @@ $dataFim = date("Y")."-12-31";
                         $('#tblMovimentacao tfoot').append(total)
                     },
                     error: function(e) {
-                        divLegenda = `<div id='legenda' style='position: relative; text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`                    
-            
-                        $('#legenda').remove() 
-                        
-                        $('.datatable-header').append(divLegenda)
+                        $('#legenda').remove()      
+                        let legenda = document.querySelector(".datatable-header")
+                        legenda.insertAdjacentHTML('beforeend', `<div id='legenda' style='text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`)
 
                         $('#total').remove() 
 

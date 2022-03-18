@@ -11,6 +11,15 @@ include('global_assets/php/conexao.php');
 
     $args = [];
 
+    //Aqui é para limpar a sessão caso o usuário filtre todos novamente
+    $_SESSION['ContRecPeriodoDe'] = '';
+    $_SESSION['ContRecAte'] = '';
+    $_SESSION['ContRecCliente'] = '';
+    $_SESSION['ContRecPlanoContas'] = '';
+    $_SESSION['ContRecStatus'] = '';
+    $_SESSION['ContRecNumDoc'] = '';
+    $_SESSION['ContRecFormaPagamento'] = '';
+
     if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
         empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
         empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
