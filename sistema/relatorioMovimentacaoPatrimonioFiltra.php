@@ -117,7 +117,7 @@ function queryPesquisa(){
 
             $valorUnitario = mostraValor($item['MvXPrValorUnitario']);
 
-            $valor = ;
+            $valor = '';
 
             $validade = mostraData($item['MvXPrValidade']);
 
@@ -127,11 +127,11 @@ function queryPesquisa(){
 
             $datas = mostraData($item['MovimData']);
 
+            $acoes = "<i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>";
+
             $anoFabricacao = mostraData($item['MvXPrAnoFabricacao']);
 
             $empenhos = $item['EmpenhosOrdemCompra'];
-
-            $acoes = '<i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i>';
 
             $numeroSerie = $item['PatriNumSerie'];
 
@@ -150,10 +150,10 @@ function queryPesquisa(){
                     isset($validade) ? $validade : null,  
                     isset($origem) ? $origem : null, 
                     isset($destino) ? $destino : null,
+                    isset($acoes) ? $acoes : null,
                     isset($datas) ? $datas : null,
                     isset($anoFabricacao) ? $anoFabricacao : null,
-                    isset($empenhos) ? $empenhos : null,
-                    isset($acoes) ? $acoes : null,
+                    isset($empenhos) ? $empenhos : null,  
                     isset($numeroSerie) ? $numeroSerie : null, 
                     isset($estadoConservacao) ? $estadoConservacao : null,
                     isset($fabricante) ? $fabricante : null

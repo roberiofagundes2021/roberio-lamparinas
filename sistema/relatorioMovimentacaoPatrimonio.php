@@ -482,63 +482,60 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
                 "order": [
-                    [0, "desc"]
+                    [0, "asc"]
                 ],
                 autoWidth: false,
                 responsive: true,
                 columnDefs: [{
-                        visible: false,
+                        
+                        orderable: true, // Item
+                        width: "5%",
                         targets: [0]
                     },
                     {
-                        orderable: true, // Item
-                        width: "10%",
-                        targets: [1]
-                    },
-                    {
                         orderable: true, // Descrição do Produto
-                        width: "10%",
-                        targets: [2]
+                        width: "20%",
+                        targets: [1]
                     },
                     {
                         orderable: true, //Patrimônio
                         width: "10%",
-                        targets: [3]
+                        targets: [2]
                     },
                     {
                         orderable: true, // Nota Fiscal
                         width: "10%",
-                        targets: [4]
+                        targets: [3]
                     },
                     {
                         orderable: true, //Aquisição
                         width: "10%",
-                        targets: [5]
+                        targets: [4]
                     },
                     {
                         orderable: true, //Depreciação
                         width: "10%",
-                        targets: [6]
+                        targets: [5]
                     },
                     {
                         orderable: true, // Validade
                         width: "10%",
+                        targets: [6]
+                    },
+                    {
+                        orderable: true, // Origem
+                        width: "10%",
                         targets: [7]
                     },
                     {
-                        orderable: false, // Origem
+                        orderable: true, // Destino
                         width: "10%",
                         targets: [8]
                     },
                     {
-                        orderable: false, // Destino
-                        width: "10%",
-                        targets: [9]
-                    },
-                    {
                         orderable: false, //Ações
-                        width: "10%",
-                        targets: [10]
+                        width: "5%",
+                        targets: [9]
                     }
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -679,13 +676,15 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                             rowNode = table.row.add(item.data).draw().node()
                                 
                             // adiciona os atributos nas tags <td>
+                            $(rowNode).find('td').eq(4).attr('style', 'text-align: right;')
+                            $(rowNode).find('td').eq(5).attr('style', 'text-align: right;')
+                            $(rowNode).find('td').eq(09).attr('style', 'text-align: center;')
                             $(rowNode).find('td').eq(10).attr('style', 'display: none;')
                             $(rowNode).find('td').eq(11).attr('style', 'display: none;')
                             $(rowNode).find('td').eq(12).attr('style', 'display: none;')
-                            $(rowNode).find('td').eq(13).attr('style', 'text-align: center;')
+                            $(rowNode).find('td').eq(13).attr('style', 'display: none;')
                             $(rowNode).find('td').eq(14).attr('style', 'display: none;')
                             $(rowNode).find('td').eq(15).attr('style', 'display: none;')
-                            $(rowNode).find('td').eq(16).attr('style', 'display: none;')
    
                         })
                         
@@ -808,7 +807,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
     <?php include_once("topo.php"); ?>
 
@@ -980,7 +979,6 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                             <table class="table" id="tblMovimentacao">
                                 <thead>
                                     <tr class="bg-slate">
-                                        <th>Descrição do Produto</th>
                                         <th>Item</th>
                                         <th>Descrição do Produto</th>
                                         <th>Patrimônio</th>
