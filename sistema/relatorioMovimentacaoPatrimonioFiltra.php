@@ -107,6 +107,8 @@ function queryPesquisa(){
                 </tr>
              ");*/
 
+            $idPatrimonio = "<idPatrimonio=".$item['PatriId'].'#'.$item['ProduId'].'#'.$item['PrXFaId']." editado='0'>";
+
             $contador = $cont;  
 
             $nomeProduto = $item['ProduNome'];
@@ -138,6 +140,7 @@ function queryPesquisa(){
             $estadoConservacao = $item['PatriEstadoConservacao'];
 
             $fabricante = $item['PrXFaMarca'];
+
            
             $array = [
                 'data'=>[
@@ -161,7 +164,7 @@ function queryPesquisa(){
                     
                 ],
                 'identify'=>[
-                    
+                   isset($idPatrimonio) ? $idPatrimonio : null
                 ]
             ];
 

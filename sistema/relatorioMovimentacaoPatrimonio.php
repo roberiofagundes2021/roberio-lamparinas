@@ -667,13 +667,14 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         table = $('#tblMovimentacao').DataTable()
                         table = $('#tblMovimentacao').DataTable().clear().draw()
                         //--|
-
+ 
                         table = $('#tblMovimentacao').DataTable()
 
                         let rowNode
 
                         resposta.forEach(item => {
                             rowNode = table.row.add(item.data).draw().node()
+                            $(rowNode).attr('idPatrimonio', item.identify[0]);
                                 
                             // adiciona os atributos nas tags <td>
                             $(rowNode).find('td').eq(4).attr('style', 'text-align: right;')
