@@ -131,7 +131,7 @@ if (isset($_POST['inputData'])) {
 							':sLote' => $registro[5],
 							':dValidade' => $registro[6] != '0' ? $registro[6] : gravaData('12/09/2333'),
 							':iNumSerie' => isset($registro[7])? $registro[7] : '',
-							':iFabricacao' => $registro[8] != '0' ? $registro[8] : gravaData('12/09/2333') ? $registro[8] : null,
+							':iFabricacao' => $registro[8] != '0' ? $registro[8] : (gravaData('12/09/2333') ? $registro[8] : null),
 							':iClassificacao' => isset($registro[9]) ? (int) $registro[9] : null,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId'],
