@@ -344,10 +344,15 @@ if (isset($_POST['inputData'])) {
 						let inputQuantidade = $('<input type="text">');
 						let inputSaldo = $('<input type="text">');
 						let inputValidade = $('<input type="text">');
+						let MarcaModeloFabri = ''
 
 						let linhaTabela = '';
 
 						tds.each((i, elem) => {
+							var id = $(elem).attr('id')
+							MarcaModeloFabri += id === 'MarcaNome' ? '\n Marca: '+$(elem).val():''
+							MarcaModeloFabri += id === 'ModelNome' ? '\n Modelo: '+$(elem).val():''
+							MarcaModeloFabri += id === 'FabriNome' ? '\n Fabricante: '+$(elem).val():''
 							valores[i] = $(elem).html();
 						})
 
@@ -355,45 +360,41 @@ if (isset($_POST['inputData'])) {
 
 						if (tipoProdutoServico != 'P') {
 
-							cabecalho = `
-							               
-														<tr class="bg-slate">
-															<th width="5%">Item</th>
-															<th width="75%">Serviço</th>
-															<th width="10%">Quantidade</th>
-															<th width="10%">Saldo</th>
-														</tr>`;
+							cabecalho = `<tr class="bg-slate">
+											<th width="5%">Item</th>
+											<th width="55%">Serviço</th>
+											<th width="20%">Quantidade</th>
+											<th width="20%">Saldo</th>
+										</tr>`;
 
 							linhaTabela = `<tr id='trModal'>
-															<td>${valores[0]}</td>
-															<td>${valores[1]}</td>
-															<td><input id='quantidade' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus></td>
-															<td><input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled></td>
-														</tr>`;
+												<td title='${MarcaModeloFabri}'>${valores[0]}</td>
+												<td title='${MarcaModeloFabri}'>${valores[1]}</td>
+												<td><input id='quantidade' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus></td>
+												<td><input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled></td>
+											</tr>`;
 						} else {
 							cabecalho = `<tr class="bg-slate">
-														<th width="5%">Item</th>
-														<th width="40%">Produto</th>
-														<th width="5%">Quantidade</th>
-														<th width="5%">Saldo</th>
-														<th width="10%">Lote</th>
-														<th width="15%">Nº Série/Chassi</th>
-														<th width="10%">Fabricação</th>
-														<th width="10%">Validade</th>
-													</tr>
-												`;
+											<th width='5%'>Item</th>
+											<th width='65%'">Produto</th>
+											<th width='5%'>Quantidade</th>
+											<th width='5%'>Saldo</th>
+											<th width='5%'>Lote</th>
+											<th width='5%'>Nº Série/Chassi</th>
+											<th width='5%'>Fabricação</th>
+											<th width='5%'>Validade</th>
+										</tr>`;
 
 							linhaTabela = `<tr id='trModal'>
-												<td>${valores[0]}</td>
-												<td>${valores[1]}</td>
+												<td title='${MarcaModeloFabri}' >${valores[0]}</td>
+												<td title='${MarcaModeloFabri}' >${valores[1]}</td>
 												<td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus></td>
 												<td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
 												<td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
 												<td><input id='numSerie' type="text" class="form-control" value="" style="text-align: center"></td>
 												<td><input id='fabricacao' type="date" class="form-control" value="" style="text-align: center"></td>
-												<td><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
-											</tr>
-											`;
+												<td ><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
+											</tr>`;
 						}
 
 						$('#thead-modal').html(cabecalho);
