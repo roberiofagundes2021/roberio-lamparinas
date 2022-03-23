@@ -202,7 +202,6 @@ if($permissao == 1){
 
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function atualizaTR(Permission, TRId, TRNumero, TRCategoria, CategNome, TRStatus, Tipo, liberaParcial, Motivo) {
-
 			document.getElementById('inputPermission').value = Permission;
 			document.getElementById('inputTRId').value = TRId;
 			document.getElementById('inputTRNumero').value = TRNumero;
@@ -383,7 +382,7 @@ if($permissao == 1){
 										<th>Categoria</th>
 										<th>SubCategoria</th>
 										<th>Situação</th>
-										<th class="text-center" style="text-center">Ações</th>
+										<th class="text-center">Ações</th>
 									</tr>
 								</thead>
 								<tbody>
