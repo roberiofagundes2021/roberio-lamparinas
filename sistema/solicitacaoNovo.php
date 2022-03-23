@@ -148,13 +148,10 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 										inputQuantidadeProduto: quantidade,
 										inputIdProduto: id
 									}
-
 									$.post(
 										url,
 										dataPost,
 										function(data) {
-											console.log(dataPost)
-											console.log(data)
 											if (!data) {
 												$(elemInp).val(1)
 											} else {
