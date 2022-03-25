@@ -67,8 +67,7 @@ function queryPesquisa(){
                     LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
                     LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
                     LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
-                    WHERE ".$string." ProduUnidade = ".$_SESSION['UnidadeId']."
-                    ";
+                    WHERE $string ProduUnidade = ".$_SESSION['UnidadeId'];
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -85,27 +84,8 @@ function queryPesquisa(){
         $arrayData = [];
         foreach ($rowData as $item) {
             $cont++;
-           /* print("
-                
-                <tr idPatrimonio=".$item['PatriId'].'#'.$item['ProduId'].'#'.$item['PrXFaId']." editado='0'>
-                   <td class='even'>" . $cont . "</td>
-                   <td class='odd'>" . $item['ProduNome'] . "</td>
-                   <td class='even'>".$item['PatriNumero']."</td>
-                   <td class='odd'>" . $item['MovimNotaFiscal'] . "</td>
-                   <td class='even'>".mostraValor($item['MvXPrValorUnitario'])."</td>
-                   <td class='odd'></td>
-                   <td class='even'>".mostraData($item['MvXPrValidade'])."</td>
-                   <td class='odd'>" . $item['Origem'] . "</td>
-                   <td class='even'>" . $item['Destino'] . "</td>
-                   <td class='even' style='display: none'>" . mostraData($item['MovimData']) . "</td>
-                   <td class='even' style='display: none'>" . mostraData($item['MvXPrAnoFabricacao']) . "</td>
-                   <td class='even' style='display: none'>" . $item['EmpenhosOrdemCompra'] . "</td>
-                   <td style='text-align: center'><i idinput='campo3' idrow='row3' class='icon-pencil7 btn-acoes' style='cursor: pointer'></i></td>
-                   <td style='display: none' id='inputNumeroSerie'><input type='text' value='" . $item['PatriNumSerie'] . "'></td>
-                   <td style='display: none' id='inputEstadoConservacao'><input type='text' value='" . $item['PatriEstadoConservacao'] . "'></td> 
-                   <td style='display: none' id='inputIdProdutoXFabricante'><input type='text' value='" . $item['PrXFaMarca'] . '#' . $item['PrXFaModelo'] . '#' . $item['PrXFaFabricante'] ."'></td>                   
-                </tr>
-             ");*/
+
+            $idPatrimonio = "<idPatrimonio=".$item['PatriId'].'#'.$item['ProduId'].'#'.$item['PrXFaId']." editado='0'>";
 
             $contador = $cont;  
 
@@ -137,7 +117,7 @@ function queryPesquisa(){
 
             $estadoConservacao = $item['PatriEstadoConservacao'];
 
-            $fabricante = $item['PrXFaMarca'];
+            $fabricante = $item['PrXFaMarca']? "$item[PrXFaMarca]#$item[PrXFaModelo]#$item[PrXFaFabricante]" : "";
            
             $array = [
                 'data'=>[
@@ -151,17 +131,16 @@ function queryPesquisa(){
                     isset($origem) ? $origem : null, 
                     isset($destino) ? $destino : null,
                     isset($acoes) ? $acoes : null,
+
                     isset($datas) ? $datas : null,
                     isset($anoFabricacao) ? $anoFabricacao : null,
                     isset($empenhos) ? $empenhos : null,  
                     isset($numeroSerie) ? $numeroSerie : null, 
                     isset($estadoConservacao) ? $estadoConservacao : null,
-                    isset($fabricante) ? $fabricante : null
-
-                    
+                    $fabricante
                 ],
                 'identify'=>[
-                    
+                   isset($idPatrimonio) ? $idPatrimonio : null
                 ]
             ];
 

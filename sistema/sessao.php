@@ -11,10 +11,10 @@ if (!array_key_exists('UsuarId', $_SESSION) or !array_key_exists('UnidadeId', $_
 }
 
 $visualizar = true;
-$novo = 1;
 $atualizar = 0;
 $excluir = 0;
 $inserir = 0;
+$novo = 1;
 $keys = [];
 
 // faz o controle de acesso às paginas de acordo à permissão
@@ -24,22 +24,22 @@ if (isset($_SESSION['Permissoes'])){
 			// adiciona as posições(no array) dos menus que redirecionam para uma mesma pagina
 			array_push($keys, $key);
 
+			$visualizar = $permissao['visualizar'];
 			$atualizar = $permissao['atualizar'];
 			$excluir = $permissao['excluir'];
 			$inserir = $permissao['inserir'];
-
-			$visualizar = $permissao['visualizar'];
 		}
 	}
 }
-// verifica se existe mais de um menu pertencente a modulos diferentes que
-// redireciona para a mesma pagina e verifica se possui visibilidade "true" em alguma delas
-// para que não ocorra o problema de sobrescrever o valor adicionado anteriormente
+/* verifica se existe mais de um menu pertencente a modulos diferentes que
+redireciona para a mesma pagina e verifica se possui visibilidade "true" em alguma delas
+para que não ocorra o problema de sobrescrever o valor adicionado anteriormente*/
 if($keys > 1){
 	foreach($keys as $key){
-		if($_SESSION['Permissoes'][$key]['visualizar']){
-			$visualizar = true;
-		}
+		$visualizar = $_SESSION['Permissoes'][$key]['visualizar']? true:$visualizar;
+		$atualizar = $_SESSION['Permissoes'][$key]['atualizar']? true:$atualizar;
+		$excluir = $_SESSION['Permissoes'][$key]['excluir']? true:$excluir;
+		$inserir = $_SESSION['Permissoes'][$key]['inserir']? true:$inserir;
 	}
 }
 if(!$visualizar){header("location:javascript://history.go(-1)");}

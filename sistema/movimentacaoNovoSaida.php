@@ -970,10 +970,12 @@ if (isset($_POST['inputData'])) {
 
 			$('#btnAdicionar').click(function() {
 				var val = $('#tabelaProdutoServicoSaida tbody').children()
-				var leng = val.length-1
-				var id = (val[leng] && val[leng].id)?parseInt(val[leng].id.split('w')[1]):0
-
-				$('#inputNumItens').val(id);
+				var id = 0
+				$('.produtoSolicitacao').each((i, elemento) => {
+					id = $(elemento).find('td')[$('.produtoSolicitacao').length-1]
+					id = id?parseInt($(id).text()):0
+				})
+				$('#inputNumItens').val(id)
 
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputProdutoServico = $('input[name="inputProdutoServico"]:checked').val();

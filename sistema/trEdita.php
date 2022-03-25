@@ -19,6 +19,14 @@ $aSubCategorias = [];
 if (isset($_POST['inputTRId'])) {
 
 	$iTR = $_POST['inputTRId'];
+	$unidade = $_SESSION['UnidadeId'];
+	$userId = $_SESSION['UsuarId'];
+
+	$sqlUsuarioEquipe = "SELECT TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente, TRXEqUnidade
+					 FROM TRXEquipe
+					 WHERE TRXEqUsuario = $userId and TRXEqUnidade = $unidade and TRXEqTermoReferencia = $iTR";
+	$resultUsuarioEquipe = $conn->query($sqlUsuarioEquipe);
+	$UsuarioEquipe = $resultUsuarioEquipe->fetchAll(PDO::FETCH_ASSOC);
 
 	$sql = "SELECT TrRefId, TrRefNumero, TrRefData, TrRefCategoria, TrRefConteudoInicio, TrRefConteudoFim, TrRefTipo, SituaChave
 			FROM TermoReferencia
@@ -30,7 +38,7 @@ if (isset($_POST['inputTRId'])) {
 	$sql = "SELECT SbCatId, SbCatNome
 			 FROM SubCategoria
 			 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-			 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = $iTR
+			 WHERE SbCatUnidade = $unidade and TRXSCTermoReferencia = $iTR
 			 ORDER BY SbCatNome ASC";
 	$result = $conn->query($sql);
 	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -606,11 +614,22 @@ if (isset($_POST['inputTRData'])) {
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">
 									<div class="form-group">
-										<?php 
-											if ($_POST['inputPermission']) {
-												if ($row['SituaChave'] != 'FASEINTERNAFINALIZADA'){
-													print('<button type="submit" class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-												}											
+										<?php
+											// verifica se o status é diferente de "FASEINTERNAFINALIZADA" caso sim verifica
+											// se o usuário tem permissão de acesso caso não verifica se ele é o diretor
+											
+											// esse array contem os PerfiChave que não podem permitir alteração
+											$status = [
+												'LIBERADOCONTABILIDADE',
+												'FASEINTERNAFINALIZADA',
+												'AGUARDANDOFINALIZACAO'
+											];
+											$dretor = isset($UsuarioEquipe['TRXEqPresidente'])?$UsuarioEquipe['TRXEqPresidente']:0;
+											$permission = !in_array($row['SituaChave'], $status)?
+											($_POST['inputPermission']?true:($diretor?true:false)):false;
+
+											if ($permission) {
+												print('<button type="submit" class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
 											}
 										?>
 										<a href="tr.php" class="btn btn-basic" role="button">Cancelar</a>

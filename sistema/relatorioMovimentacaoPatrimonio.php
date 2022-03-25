@@ -307,9 +307,9 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
             }        
 
             function modalAcoes() {
-
                 $('.btn-acoes').each((i, elem) => {
                     $(elem).on('click', function () {
+
                         $('#page-modal').fadeIn(200);
 
                         let linha = $(elem).parent().parent()
@@ -318,6 +318,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         let editado = linha.attr('editado')
 
                         let tds = linha.children();
+
                         let produto = $(tds[1]).html();
                         let patrimonio = $(tds[2]).html();
                         let notaFisc = $(tds[3]).html();
@@ -325,14 +326,12 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         let depreciacao = $(tds[5]).html();
                         let origem = $(tds[7]).html();
                         let destino = $(tds[8]).html();
-                        let data = $(tds[9]).html();
-                        let anoFabr = $(tds[10]).html();
-                        let empenho = $(tds[11]).html();
+                        let data = $(tds[10]).html();
+                        let anoFabr = $(tds[11]).html();
+                        let empenho = $(tds[12]).html();
                         let numeroSerie = $(tds[13]).children().first().val();
                         let estadoConservacao = $(tds[14]).children().first().val();
-                        let arrayProdutoXFabricante = $(tds[15]).children().first().val().split('#');
-                        
-                        //console.log(numeroSerie)
+                        let arrayProdutoXFabricante = $(tds[15]).text()?$(tds[15]).text().split('#'):[];
 
                         const fonte1 = 'style="font-size: 1.1rem"'
                         const fonte2 = 'style="font-size: 0.9rem"'
@@ -344,11 +343,15 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
 
                         var NumSerie = numeroSerie ? numeroSerie : ''
 
-                        let marca = arrayProdutoXFabricante[0]
+                        let marca = ''
+                        let modelo = ''
+                        let fabricante = ''
 
-                        let modelo = arrayProdutoXFabricante[1]
-
-                        let fabricante = arrayProdutoXFabricante[2]
+                        if (arrayProdutoXFabricante.length){
+                            let marca = arrayProdutoXFabricante[0]
+                            let modelo = arrayProdutoXFabricante[1]
+                            let fabricante = arrayProdutoXFabricante[2]
+                        }
 
                         $('#numeroSerie').val(NumSerie)
 
@@ -612,7 +615,6 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
             function Filtrar() {
                 let cont = false;
 
-
                 const msg = $(
                     '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
                 )
@@ -638,23 +640,6 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                     inputProduto: inputProduto
                     
                 };
-                /*
-                $.post(
-                    url,
-                    inputsValues,
-                    (data) => {
-
-                        if (data) {
-                            $('tbody').html(data)
-                            $('#imprimir').removeAttr('disabled')
-                            resultadosConsulta = data
-                            modalAcoes()
-                        } else {
-                            $('tbody').html(msg)
-                            $('#imprimir').attr('disabled', '')
-                        }
-                    }
-                );*/
                 
                 $.ajax({
                     type: "POST",
@@ -667,24 +652,26 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         table = $('#tblMovimentacao').DataTable()
                         table = $('#tblMovimentacao').DataTable().clear().draw()
                         //--|
-
+ 
                         table = $('#tblMovimentacao').DataTable()
 
                         let rowNode
+                        console.log(resposta)
 
                         resposta.forEach(item => {
                             rowNode = table.row.add(item.data).draw().node()
-                                
+                            $(rowNode).attr('idPatrimonio', item.identify[0]);
+
                             // adiciona os atributos nas tags <td>
                             $(rowNode).find('td').eq(4).attr('style', 'text-align: right;')
                             $(rowNode).find('td').eq(5).attr('style', 'text-align: right;')
-                            $(rowNode).find('td').eq(09).attr('style', 'text-align: center;')
-                            $(rowNode).find('td').eq(10).attr('style', 'display: none;')
-                            $(rowNode).find('td').eq(11).attr('style', 'display: none;')
-                            $(rowNode).find('td').eq(12).attr('style', 'display: none;')
-                            $(rowNode).find('td').eq(13).attr('style', 'display: none;')
-                            $(rowNode).find('td').eq(14).attr('style', 'display: none;')
-                            $(rowNode).find('td').eq(15).attr('style', 'display: none;')
+                            $(rowNode).find('td').eq(9).attr('style', 'text-align: center;')
+                            $(rowNode).find('td').eq(10).attr('class', 'd-none')
+                            $(rowNode).find('td').eq(11).attr('class', 'd-none')
+                            $(rowNode).find('td').eq(12).attr('class', 'd-none')
+                            $(rowNode).find('td').eq(13).attr('class', 'd-none')
+                            $(rowNode).find('td').eq(14).attr('class', 'd-none')
+                            $(rowNode).find('td').eq(15).attr('class', 'd-none')
    
                         })
                         
@@ -989,6 +976,12 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                         <th>Origem</th>
                                         <th>Destino</th>
                                         <th>Ações</th>
+                                        <th class="d-none"></th>
+                                        <th class="d-none"></th>
+                                        <th class="d-none"></th>
+                                        <th class="d-none"></th>
+                                        <th class="d-none"></th>
+                                        <th class="d-none"></th>
                                     </tr>
                                 </thead>
                                 <tbody>

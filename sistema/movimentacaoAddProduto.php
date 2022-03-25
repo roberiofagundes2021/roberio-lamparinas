@@ -39,7 +39,7 @@ if ($count) {
 		$result = $conn->query($sql);
 		$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
-		$classificacao = '<select id="' . $_POST['numItens'] . '" name="cmbClassificacao' . $_POST['numItens'] . '" class="form-control form-control-select2 selectClassific2">
+		$classificacao = '<select id="' . $_POST['idProduto'] . '" name="cmbClassificacao' . $_POST['idProduto'] . '" class="form-control form-control-select2 selectClassific2">
 						<option value="#">Selecione</option>';
 		foreach ($rowClassificacao as $item) {
 			if ($_POST['classific'] == $item['ClassId']) {
@@ -60,10 +60,10 @@ if ($count) {
 				$valorCusto,
 				$valorTotal,
 				$classificacao,
-				"<span name='remove' id='" . $_POST['numItens'] . "#$total#P' class='btn btn_remove'>X</span>"
+				"<span name='remove' id='" . $_POST['idProduto'] . "#$total#P' class='btn btn_remove'>X</span>"
 			],
 			'identify' => [
-				'row' . $_POST['numItens'],  //ID
+				'row' . $_POST['idProduto'],//ID
 				$row['ProduId'],            //ProdId
 				'P',                        //Tipo
 				$lote,                      //lote

@@ -36,10 +36,10 @@ if ($count) {
 				$valorCusto,
 				$valorTotal,
 				'',
-				"<span name='remove' id='" . $_POST['numItens'] . "#$total#S' class='btn btn_remove'>X</span>"
+				"<span name='remove' id='" .$_POST['idServico'] . "#$total#S' class='btn btn_remove'>X</span>"
 			],
 			'identify' => [
-				'row' . $_POST['numItens'], //ID
+				'row' . $_POST['idServico'], //ID
 				$row['ServiId'],            //ProdId
 				'S',                        //Tipo
 				'',                         //lote
