@@ -1075,7 +1075,7 @@ $dataInicio = date("Y-m-d");
                 "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
             }
 
-            $("#inputValor").change(function(){
+            $("#inputValor").on('input', function(element){
                 if($(this).val() == ''){
                     document.getElementById('btnParcelar').style =
                     "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
