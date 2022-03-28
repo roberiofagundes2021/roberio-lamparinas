@@ -9,6 +9,13 @@ if(isset($_POST['inputContasAPagarId'])){
     $id = $_POST['inputContasAPagarId'];
 
     try{
+		$conn->beginTransaction();
+		
+		$sql = "DELETE FROM ContasAPagarXCentroCusto
+				WHERE CAPXCContasAPagar = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $id); 
+		$result->execute();
 		
 		$sql = "DELETE FROM ContasAPagar
 				WHERE CnAPaId = :id";
@@ -19,8 +26,11 @@ if(isset($_POST['inputContasAPagarId'])){
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Conta excluída!!!";
 		$_SESSION['msg']['tipo'] = "success";
+
+		$conn->commit();
 		
 	} catch(PDOException $e) {
+		$conn->rollback();
 			
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao excluir Conta!!!";

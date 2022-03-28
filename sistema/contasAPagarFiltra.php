@@ -120,6 +120,9 @@ include('global_assets/php/conexao.php');
 
             $visibilidade = ($status == 'Pago') ? 'none' : 'block';
 
+            $estornamento =  (!isset($item['CnAPaJustificativaEstorno'])) ? 'none' : 'block';
+            $justificativaEstornamento = (isset($item['CnAPaJustificativaEstorno'])) ? $item['CnAPaJustificativaEstorno'] : '';
+
             $checkbox = '<input type="checkbox" id="check'.$cont.'" style="display: '.$visibilidade.';"> <input type="hidden" value="'.$item["CnAPaId"].'">';
             
             $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$item["CnAPaDtVencimento"].'">';
@@ -141,6 +144,8 @@ include('global_assets/php/conexao.php');
                     <div class="list-icons list-icons-extended">
                         <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
                         '.$acaoConta.'
+                        <a href="#" class="list-icons-item" data-toggle="modal" data-target="#modal_mini-justificativa-estorno" onclick="estornoJustificativa(\''.$justificativaEstornamento.'\');"  data-popup="tooltip" data-placement="bottom"title="Motivo do estorno" style="display: '.$estornamento.';"><i class="icon-info3"></i></a>
+                        <!-- Retirado ícone de parcelar
                         <div class="dropdown" style="display: '.$visibilidade.';">													
                             <a href="#" class="list-icons-item" data-toggle="dropdown">
                                 <i class="icon-menu9"></i>
@@ -148,7 +153,7 @@ include('global_assets/php/conexao.php');
                             <div class="dropdown-menu dropdown-menu-right">
                                 <a href="#" class="dropdown-item btnParcelar"  data-popup="tooltip" data-placement="bottom" title="Parcelar"><i class="icon-file-text2"></i> Parcelar</a>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
                 </div>';
 
