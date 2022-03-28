@@ -890,11 +890,15 @@ $dataInicio = date("Y-m-d");
                 document.getElementById('btnParcelar').style =
                 "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
             }else{
+                $("#valorAPagarCentroCusto").html('<h6><span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">R$ '+$('#inputValor').val()+'</span></h6>')
+
                 document.getElementById('centroCusto').style= "";
             }
 
             $("#inputValor").on('input', function(element){
                 if($(this).val() == ''){
+                    $("#valorAPagarCentroCusto").html('')
+
                     document.getElementById('centroCusto').style=
                     "cursor: not-allowed; opacity: 0.7; pointer-events: none;";
 
@@ -905,6 +909,10 @@ $dataInicio = date("Y-m-d");
 
                     document.getElementById('btnParcelar').style = "margin-top: 5px";
                 }
+            });
+
+            $("#inputValor").blur(function(){
+                $("#valorAPagarCentroCusto").html('<h6><span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">R$ '+$('#inputValor').val()+'</span></h6>')
             });
           
             function centroCusto() {
@@ -933,7 +941,7 @@ $dataInicio = date("Y-m-d");
                     $('#pageCentroCusto').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                 } else {
-                    var menssagem = 'Os valores dos centros de custos devem bater com o total do Valor a pagar (R$ '+parseFloat(response.val).toFixed(2).replace('.', ',')+') !'
+                    var menssagem = 'Os valores dos centros de custos devem bater com o total do Valor a pagar (R$ '+float2moeda(parseFloat(response.val))+') !'
                     alerta('Atenção', menssagem, 'error')
                 }
             })
@@ -973,16 +981,16 @@ $dataInicio = date("Y-m-d");
                                                     <label for=''><strong>Item</strong></label>
                                                 </div>
                                                 <div class="col-lg-2">
-                                                <label for=''><strong>Código</strong></label>
+                                                    <label for=''><strong>Código</strong></label>
                                                 </div>
                                                 <div class="col-lg-9">
-                                                <label for=''><strong>Valor</strong></label>
+                                                    <label for=''><strong>Centro de Custo</strong></label>
                                                 </div>
                                             </div>
                                         </div>
         
                                         <div class="col-lg-2">
-                                            <label for='inputProduto'><strong>Centro de Custo</strong></label>
+                                            <label for=''><strong>Valor</strong></label>
                                         </div>
         
                                         <div class="col-lg-1">
@@ -998,16 +1006,16 @@ $dataInicio = date("Y-m-d");
                                                         <label for=''><strong>Item</strong></label>
                                                     </div>
                                                     <div class="col-lg-2">
-                                                    <label for=''><strong>Código</strong></label>
+                                                        <label for=''><strong>Código</strong></label>
                                                     </div>
                                                     <div class="col-lg-9">
-                                                    <label for=''><strong>Valor</strong></label>
+                                                        <label for=''><strong>Centro de Custo</strong></label>
                                                     </div>
                                                 </div>
                                             </div>
             
                                             <div class="col-lg-2">
-                                                <label for='inputProduto'><strong>Centro de Custo</strong></label>
+                                                <label for=''><strong>Valor</strong></label>
                                             </div>
                                         </div>`;
                                 }
@@ -1139,16 +1147,16 @@ $dataInicio = date("Y-m-d");
                                                     <label for=''><strong>Item</strong></label>
                                                 </div>
                                                 <div class="col-lg-2">
-                                                <label for=''><strong>Código</strong></label>
+                                                    <label for=''><strong>Código</strong></label>
                                                 </div>
                                                 <div class="col-lg-9">
-                                                <label for=''><strong>Valor</strong></label>
+                                                    <label for=''><strong>Centro de Custo</strong></label>
                                                 </div>
                                             </div>
                                         </div>
         
                                         <div class="col-lg-2">
-                                            <label for='inputProduto'><strong>Centro de Custo</strong></label>
+                                            <label for=''><strong>Valor</strong></label>
                                         </div>
         
                                         <div class="col-lg-1">
@@ -1378,13 +1386,41 @@ $dataInicio = date("Y-m-d");
 
                                     ?>
                                     <div class="row">
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="inputDataEmissao">Data de Emissão</label>
                                                 <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> readOnly>
                                             </div>
                                         </div>
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
+                                                <select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+                                                    $sql = "SELECT ForneId, ForneNome
+															FROM Fornecedor
+															JOIN Situacao on SituaId = ForneStatus
+															WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															ORDER BY ForneNome ASC";
+                                                    $result = $conn->query($sql);
+                                                    $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                    foreach ($rowFornecedor as $item) {
+                                                        if (isset($lancamento)) {
+                                                            if ($lancamento['CnAPaFornecedor'] == $item['ForneId']) {
+                                                                print('<option value="' . $item['ForneId'] . '" selected>' . $item['ForneNome'] . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                            }
+                                                        } else {
+                                                            print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                                                        }
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbPlanoContas">Plano de Contas <span class="text-danger">*</span></label>
                                                 <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
@@ -1415,39 +1451,8 @@ $dataInicio = date("Y-m-d");
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-3">
-                                            <label for="centroCusto" class="w-100">Centro de Custo <span class="text-danger">*</span></label>
-                                            <a id="centroCusto" href="" class="btn bg-slate" role="button" data-placement="bottom" data-container="body" style="cursor: not-allowed; opacity: 0.7; pointer-events: none;">
-                                                CENTRO DE CUSTO																						
-                                            </a>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
-                                                <select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
-                                                    <option value="">Selecionar</option>
-                                                    <?php
-                                                    $sql = "SELECT ForneId, ForneNome
-															FROM Fornecedor
-															JOIN Situacao on SituaId = ForneStatus
-															WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-															ORDER BY ForneNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-                                                    foreach ($rowFornecedor as $item) {
-                                                        if (isset($lancamento)) {
-                                                            if ($lancamento['CnAPaFornecedor'] == $item['ForneId']) {
-                                                                print('<option value="' . $item['ForneId'] . '" selected>' . $item['ForneNome'] . '</option>');
-                                                            } else {
-                                                                print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
-                                                            }
-                                                        } else {
-                                                            print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
-                                                        }
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
+                                        <div class="col-lg-2 m-auto">
+                                            <button id="centroCusto" type="button" class="btn bg-slate btn-sm" style="cursor: not-allowed; opacity: 0.7; pointer-events: none;">CENTRO DE CUSTO</button>
                                         </div>
                                     </div>
 
@@ -1788,9 +1793,12 @@ $dataInicio = date("Y-m-d");
                                     <i class=""></i>
                                 </div>
                                 <div class="px-5 pt-5">
+                                    <div id="valorAPagarCentroCusto" class="d-flex justify-content-center">
+                                    </div>
                                     <div class="d-flex flex-row p-2">
                                         <div class='<?php echo $tamanho = (isset($rowNotaFiscal['MvAneArquivo'])) ? 'col-lg-10' : 'col-lg-12'; ?>'>
                                             <div class="form-group">
+                                                <label for="cmbCentroCusto" class="ml-1">Centro de Custo <span class="text-danger">*</span></label>
                                                 <?php
                                                     $sql = "SELECT CnCusId, CnCusNome
                                                             FROM CentroCusto
@@ -1831,15 +1839,14 @@ $dataInicio = date("Y-m-d");
 
                                         <div class="col-lg-2 d-flex justify-content-center" style="display : <?php echo $visibilidade = (isset($rowNotaFiscal['MvAneArquivo'])) ? 'block' : 'none'; ?>">
                                             <?php
-                                            echo '<span class="input-group-prepend" style="cursor: pointer;">';
-                                                                
                                             if (isset($rowNotaFiscal['MvAneArquivo'])){
-                                                echo '<a href="global_assets/anexos/movimentacao/'.$rowNotaFiscal['MvAneArquivo'].'" target="_blank" title="Abrir Nota Fiscal">
+                                                echo '
+                                                <span class="input-group-prepend m-auto" style="cursor: pointer;">
+                                                    <a href="global_assets/anexos/movimentacao/'.$rowNotaFiscal['MvAneArquivo'].'" target="_blank" title="Abrir Nota Fiscal">
                                                         <span class="input-group-text" style="color: red;"><i class="icon-file-pdf"></i></span>
-                                                        </a>';
+                                                    </a>
+                                                </span>';
                                             }                                                              
-
-                                            echo '</span>';
                                             ?>
                                         </div>
                                     </div>

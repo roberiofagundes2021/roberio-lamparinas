@@ -170,6 +170,7 @@ $dataFim = date("Y")."-12-31";
                 }
             });
 
+            /*
             function modalParcelas() {
 
                 $('.btnParcelar').each((i, elem) => {
@@ -213,7 +214,7 @@ $dataFim = date("Y")."-12-31";
                     $('body').css('overflow', 'scroll');
                     $("#parcelasContainer").html('');
                 })
-            }
+            }*/
 
             function cadastraParcelas() {
                 let parcelasNum = $("#cmbParcelas").val()
@@ -249,7 +250,7 @@ $dataFim = date("Y")."-12-31";
                         //$('tbody').append(data)
                         alerta('Atenção', 'Parcelas geradas com sucesso!')
                         location.href = "contasAReceber.php";
-                        modalParcelas()
+                        //modalParcelas()
                         $('#elementosGrid').val(parseInt(parcelasNum) + parseInt(numLinhas))
                         RecebimentoAgrupado()
                       //  atualizaTotal()                        
@@ -697,13 +698,14 @@ $dataFim = date("Y")."-12-31";
                             $(rowNode).find('td').eq(4).attr('style', 'text-align: center;')
                             $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;')
                             $(rowNode).find('td').eq(6).attr('style', 'text-align: center;')
+                            $(rowNode).find('td').eq(7).attr('style', 'text-align: center;')
 
                             contador++
                             valor = item.data[5].replace(".", "").replace(",", ".")
                             valorTotal += parseFloat(valor)
                         })
 
-                        modalParcelas()
+                        //modalParcelas()
                         pagamentoAgrupado(contador)
 
                         $('#legenda').remove() //Para evitar que os valores se sobreescreva
@@ -788,6 +790,10 @@ $dataFim = date("Y")."-12-31";
             document.formContasAReceber.action = "contasEstornar.php";
             document.formContasAReceber.submit();
 		}
+
+        function estornoJustificativa(justificativa) {
+            $('#txtJustificativa').val(justificativa);
+        }
     </script>
 
 </head>
@@ -1290,8 +1296,10 @@ $dataFim = date("Y")."-12-31";
                 <div id="modal_mini-estornar" class="modal fade" tabindex="-1">
                     <div class="modal-dialog modal-xs">
                         <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Estornar conta</h5>
+                            <div class="custon-modal-title">
+                                <i class=""></i>
+                                <p class="h3">Estornar conta</p>
+                                <i class=""></i>
                             </div>
 
                             <div class="modal-body">
@@ -1306,6 +1314,30 @@ $dataFim = date("Y")."-12-31";
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-basic" data-dismiss="modal">Cancelar</button>
                                 <button onclick= estornaConta() type="button" class="btn bg-slate">Estornar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Modal justificativa de estorno-->
+                <div id="modal_mini-justificativa-estorno" class="modal fade" tabindex="-1">
+                    <div class="modal-dialog modal-xs">
+                        <div class="modal-content">
+                            <div class="custon-modal-title">
+                                <i class=""></i>
+                                <p class="h3">Justificativa do estorno</p>
+                                <i class=""></i>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <textarea rows="5" cols="3" id="txtJustificativa" name="txtJustificativa" class="form-control" readonly></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn bg-slate" data-dismiss="modal">Ok</button>
                             </div>
                         </div>
                     </div>
