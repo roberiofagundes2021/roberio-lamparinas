@@ -350,9 +350,9 @@ if (isset($_POST['inputData'])) {
 
 						tds.each((i, elem) => {
 							var id = $(elem).attr('id')
-							MarcaModeloFabri += id === 'MarcaNome' ? '\n Marca: '+$(elem).val():''
-							MarcaModeloFabri += id === 'ModelNome' ? '\n Modelo: '+$(elem).val():''
-							MarcaModeloFabri += id === 'FabriNome' ? '\n Fabricante: '+$(elem).val():''
+							MarcaModeloFabri += id === 'MarcaNome' ? ' Marca: '+$(elem).val():''
+							MarcaModeloFabri += id === 'ModelNome' ? '; Modelo: '+$(elem).val():''
+							MarcaModeloFabri += id === 'FabriNome' ? '; Fabricante: '+$(elem).val():''
 							valores[i] = $(elem).html();
 						})
 
@@ -398,6 +398,8 @@ if (isset($_POST['inputData'])) {
 						}
 
 						$('#thead-modal').html(cabecalho);
+
+						$("#MarcaModeloFabricante").html(MarcaModeloFabri);
 
 						$('#tbody-modal').html(linhaTabela);
 
@@ -1109,6 +1111,13 @@ if (isset($_POST['inputData'])) {
 
 									</tbody>
 								</table>
+								<div class="row mb-3" style="margin-top: 10px;">
+									<div class="col-lg-12">
+										<div id="MarcaModeloFabricante" class="text-bold">
+											teste
+										</div>
+									</div>
+								</div>
 								<div class="row" style="margin-top: 10px;">
 									<div class="col-lg-12">
 										<div class="form-group">
