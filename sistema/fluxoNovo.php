@@ -6,18 +6,6 @@ $_SESSION['PaginaAtual'] = 'Novo Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ParamEmpresaPublica
-		FROM Parametro
-	    WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
-$result = $conn->query($sql);
-$row = $result->fetch(PDO::FETCH_ASSOC);
-
-if ($row['ParamEmpresaPublica']) {
-	$bObrigatorio = "required";
-} else {
-	$bObrigatorio = "";
-}
-
 if (isset($_POST['inputDataInicio'])) {
 
 	try {
@@ -30,9 +18,9 @@ if (isset($_POST['inputDataInicio'])) {
 		$result = $conn->query($sql);
 		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeNumAta, FlOpeModalidadeLicitacao,
+		$sql = "INSERT INTO FluxoOperacional (FlOpeFornecedor, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, FlOpeNumContrato,
 											  FlOpeValor, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa, FlOpeUnidade)
-				VALUES (:iFornecedor, :iCategoria, :dDataInicio, :dDataFim, :iNumContrato, :iNumProcesso, :iNumAta, :iModalidadeLicitacao,
+				VALUES (:iFornecedor, :iCategoria, :dDataInicio, :dDataFim, :iNumContrato,
 						:fValor, :sFlOpeConteudoInicio, :sFlOpeConteudoFim, :bStatus, :iUsuarioAtualizador, :iEmpresa, :iUnidade)";
 		$result = $conn->prepare($sql);
 		
@@ -42,9 +30,6 @@ if (isset($_POST['inputDataInicio'])) {
 			':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':iNumContrato' => $_POST['inputNumContrato'],
-			':iNumProcesso' => $_POST['inputNumProcesso'],
-			':iNumAta' => $_POST['inputNumAta'],
-			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'] == '' ? null : $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
 			':sFlOpeConteudoInicio' => $_POST['txtareaConteudoInicio'],
 			':sFlOpeConteudoFim' => $_POST['txtareaConteudoFim'],
@@ -298,7 +283,7 @@ if (isset($_POST['inputDataInicio'])) {
 								</div>
 							</div>
 
-							<h5 class="mb-0 font-weight-semibold">Dados do Contrato</h5>
+							<h5 class="mb-0 font-weight-semibold">Dados do Fluxo</h5>
 							<br>
 							<div class="row">
 								<div class="col-lg-3">
@@ -327,46 +312,8 @@ if (isset($_POST['inputDataInicio'])) {
 
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputNumContrato">Número do Contrato  <?php if ($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
-										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" <?php echo $bObrigatorio; ?>>
-									</div>
-								</div>
-
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="cmbModalidadeLicitacao">Modalidade de Licitação</label>
-										<select id="cmbModalidadeLicitacao" name="cmbModalidadeLicitacao" class="form-control form-control-select2">
-											<option value="">Selecione</option>
-											<?php
-											$sql = "SELECT MdLicId, MdLicNome
-													FROM ModalidadeLicitacao
-													JOIN Situacao on SituaId = MdLicStatus
-													WHERE SituaChave = 'ATIVO'
-													ORDER BY MdLicNome ASC";
-											$result = $conn->query($sql);
-											$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-											foreach ($row as $item) {
-												print('<option value="' . $item['MdLicId'] . '">' . $item['MdLicNome'] . '</option>');
-											}
-											?>
-										</select>
-									</div>
-								</div>
-							</div>
-
-							<div class="row">			
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputNumProcesso">Número do Processo <?php if ($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
-										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" <?php echo $bObrigatorio; ?>>
-									</div>
-								</div>
-
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputNumAta">Nº Ata Registro</label>
-										<input type="text" id="inputNumAta" name="inputNumAta" class="form-control" placeholder="Nº Ata Registro">
+										<label for="inputNumContrato">Número do Fluxo  <span class="text-danger">*</span></label>
+										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Fluxo"  required>
 									</div>
 								</div>
 
@@ -377,6 +324,7 @@ if (isset($_POST['inputDataInicio'])) {
 									</div>
 								</div>
 							</div>
+
 							<br>
 							<div class="row">
 								<div class="col-lg-12">

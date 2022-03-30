@@ -6,18 +6,6 @@ $_SESSION['PaginaAtual'] = 'Novo Fluxo Operacional';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ParamEmpresaPublica
-		FROM Parametro
-	    WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
-$result = $conn->query($sql);
-$row = $result->fetch(PDO::FETCH_ASSOC);
-
-if ($row['ParamEmpresaPublica']) {
-	$bObrigatorio = "required";
-} else {
-	$bObrigatorio = "";
-}
-
 //Se veio do fluxo.php
 if (isset($_POST['inputFluxoOperacionalId'])) {
 
@@ -54,8 +42,7 @@ if (isset($_POST['inputDataInicio'])) {
 	try {
 
 		$sql = "UPDATE FluxoOperacional SET FlOpeFornecedor = :iFornecedor, FlOpeCategoria = :iCategoria, FlOpeDataInicio = :dDataInicio, 
-		                                    FlOpeDataFim = :dDataFim, FlOpeNumContrato = :iNumContrato, FlOpeNumProcesso = :iNumProcesso,
-											FlOpeNumAta = :iNumAta, FlOpeModalidadeLicitacao = :iModalidadeLicitacao, FlOpeValor = :fValor,
+		                                    FlOpeDataFim = :dDataFim, FlOpeNumContrato = :iNumContrato, FlOpeValor = :fValor,
 										    FlOpeConteudoInicio = :sConteudoInicio, FlOpeConteudoFim = :sConteudoFim, FlOpeUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE FlOpeId = " . $_POST['inputFluxoOperacionalId'] . "
 				";
@@ -70,9 +57,6 @@ if (isset($_POST['inputDataInicio'])) {
 			':dDataInicio' => $_POST['inputDataInicio'] == '' ? null : $_POST['inputDataInicio'],
 			':dDataFim' => $_POST['inputDataFim'] == '' ? null : $_POST['inputDataFim'],
 			':iNumContrato' => $_POST['inputNumContrato'],
-			':iNumProcesso' => $_POST['inputNumProcesso'],
-			':iNumAta' => $_POST['inputNumAta'],
-			':iModalidadeLicitacao' => $_POST['cmbModalidadeLicitacao'] == '' ? null : $_POST['cmbModalidadeLicitacao'],
 			':fValor' => gravaValor($_POST['inputValor']),
 			':sConteudoInicio' => $_POST['txtareaConteudoInicio'],
 			':sConteudoFim' => $_POST['txtareaConteudoFim'],
@@ -369,7 +353,7 @@ if (isset($_POST['inputDataInicio'])) {
 								</div>
 							</div>
 
-							<h5 class="mb-0 font-weight-semibold">Dados do Contrato</h5>
+							<h5 class="mb-0 font-weight-semibold">Dados do Fluxo</h5>
 							<br>
 							<div class="row">
 								<div class="col-lg-3">
@@ -398,50 +382,8 @@ if (isset($_POST['inputDataInicio'])) {
 
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputNumContrato">Número do Contrato <?php if ($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
-										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Contrato" value="<?php echo $row['FlOpeNumContrato']; ?>" <?php echo $bObrigatorio; ?>>
-									</div>
-								</div>
-
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="cmbModalidadeLicitacao">Modalidade de Licitação</label>
-										<select id="cmbModalidadeLicitacao" name="cmbModalidadeLicitacao" class="form-control form-control-select2">
-											<option value="">Selecione</option>
-											<?php
-											$sql = "SELECT MdLicId, MdLicNome
-													FROM ModalidadeLicitacao
-													JOIN Situacao on SituaId = MdLicStatus
-													WHERE SituaChave = 'ATIVO'
-													ORDER BY MdLicNome ASC";
-											$result = $conn->query($sql);
-											$rowMdLic = $result->fetchAll(PDO::FETCH_ASSOC);
-
-											foreach ($rowMdLic as $item) {
-												if ($item['MdLicId'] == $row['FlOpeModalidadeLicitacao']) {
-													print('<option value="' . $item['MdLicId'] . '" selected>' . $item['MdLicNome'] . '</option>');
-												} else {
-													print('<option value="' . $item['MdLicId'] . '">' . $item['MdLicNome'] . '</option>');
-												}
-											}
-											?>
-										</select>
-									</div>
-								</div>
-							</div>
-
-							<div class="row">
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputNumProcesso">Número do Processo <?php if ($bObrigatorio) echo '<span class="text-danger">*</span>'; ?></label>
-										<input type="text" id="inputNumProcesso" name="inputNumProcesso" class="form-control" placeholder="Nº do Processo" value="<?php echo $row['FlOpeNumProcesso']; ?>" <?php echo $bObrigatorio; ?>>
-									</div>
-								</div>
-
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputNumAta">Nº Ata Registro</label>
-										<input type="text" id="inputNumAta" name="inputNumAta" class="form-control" placeholder="Nº da Ata" value="<?php echo $row['FlOpeNumAta']; ?>">
+										<label for="inputNumContrato">Número do Fluxo <span class="text-danger">*</span></label>
+										<input type="text" id="inputNumContrato" name="inputNumContrato" class="form-control" placeholder="Nº do Fluxo" value="<?php echo $row['FlOpeNumContrato']; ?>" required>
 									</div>
 								</div>
 
@@ -451,6 +393,7 @@ if (isset($_POST['inputDataInicio'])) {
 										<input type="text" id="inputValor" name="inputValor" class="form-control" placeholder="Valor Total" value="<?php echo mostraValor($row['FlOpeValor']); ?>" onKeyUp="moeda(this)" maxLength="12" required>
 									</div>
 								</div>
+
 							</div>
 
 							<br>

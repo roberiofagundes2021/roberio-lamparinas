@@ -9,7 +9,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Operacional';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT DISTINCT FlOpeId, ForneRazaoSocial, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, 
-		FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SituaChave, 
+		FlOpeNumContrato, FlOpeValor, FlOpeStatus, CategNome, SituaChave, 
 		SituaNome, SituaCor, dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
 		dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado, BandeMotivo,
 		dbo.fnFimContrato(FlOpeId) as FimContrato
@@ -191,11 +191,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação dos Fluxos Operacionais</h3>
 								<div class="header-elements">
-									<!--<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="fluxo.php" class="list-icons-item" data-action="reload"></a>
-										<a class="list-icons-item" data-action="remove"></a>
-									</div>-->
 								</div>
 							</div>
 
@@ -217,11 +212,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<tr class="bg-slate">
 										<th width="10%">Início</th>
 										<th width="10%">Fim</th>
-										<th width="10%">Nº Contrato</th>
-										<th width="10%">Nº Processo</th>
-										<th width="14%">Fornecedor</th>
-										<th width="14%">Categoria</th>
-										<th width="12%">SubCategoria</th>
+										<th width="12%">Nº Contrato</th>
+										<th width="17%">Fornecedor</th>
+										<th width="17%">Categoria</th>
+										<th width="14%">SubCategoria</th>
 										<th width="10%">Situação</th>
 										<th width="10%" class="text-center">Ações</th>
 									</tr>
@@ -239,7 +233,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.mostraData($item['FlOpeDataInicio']).'</td>
 											<td>'.mostraData($item['FimContrato']).'</td>
 											<td>'.$item['FlOpeNumContrato'].'</td>
-											<td>'.$item['FlOpeNumProcesso'].'</td>
 											<td>'.$item['ForneRazaoSocial'].'</td>
 											<td>'.$item['CategNome'].'</td>
 											<td>'. $item['SubCategorias'].'</td>

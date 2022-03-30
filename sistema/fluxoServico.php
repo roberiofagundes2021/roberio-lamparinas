@@ -31,6 +31,21 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 	}
 }
 
+$sql = "SELECT ParamEmpresaPublica
+			FROM Parametro
+			WHERE ParamEmpresa = ". $_SESSION['EmpreId'];
+	$result = $conn->query($sql);
+	$rowParametros = $result->fetch(PDO::FETCH_ASSOC);
+
+	if ($rowParametros['ParamEmpresaPublica']){
+		$fluxo = "CONTRATO";
+		$contrato= "Contrato";
+
+	} else {
+		$fluxo = " ";
+		$contrato= "Nº Fluxo";
+	}
+
 //Se está alterando
 if (isset($_POST['inputIdFluxoOperacional'])) {
 	$conn->beginTransaction();
@@ -421,7 +436,7 @@ try {
 
 					<form name="formFluxoOperacionalServico" id="formFluxoOperacionalServico" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Listar Servicos - Fluxo Operacional Nº Contrato "<?php echo $row['FlOpeNumContrato']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Listar Servicos - Fluxo Operacional Nº <?php echo $fluxo; ?> "<?php echo $row['FlOpeNumContrato']; ?>"</h5>
 						</div>
 
 						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional" class="form-control" value="<?php echo $row['FlOpeId']; ?>">
@@ -499,16 +514,21 @@ try {
 
 										<div class="col-lg-1">
 											<div class="form-group">
-												<label for="inputContrato">Contrato</label>
+												<label for="inputContrato"><?php echo $contrato; ?></label>
 												<input type="text" id="inputContrato" name="inputContrato" class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly>
 											</div>
 										</div>
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputProcesso">Processo</label>
-												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="<?php echo $row['FlOpeNumProcesso']; ?>" readOnly>
-											</div>
-										</div>
+										<?php
+											if ($fluxo == 'CONTRATO'){	
+												print('
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputProcesso">Processo</label>
+													<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="' . $row['FlOpeNumProcesso'] . '" readOnly>
+												</div>
+											</div>	');
+											}										
+										?>	
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>
@@ -784,7 +804,7 @@ try {
 																<select required id="inputFabricante'.$cont.'" name="inputFabricante'.$cont.'"'.($row['SituaChave'] == 'LIBERADO'?' disabled ':'').'class="form-control select-search">
 																	<option value="">Selecione</option>
 																	'.$HTML_FABRICANTE.'
-																</select>
+												 				</select>
 															</div>
 														</div>
 													</div>');
