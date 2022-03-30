@@ -19,7 +19,7 @@ if (isset($_SESSION['Carrinho']) && !empty($_POST['inputIdProduto'])) {
             if ($value['id'] == $idProdu) {
                 $produtos[$key]['quantidade'] = $quantProdu;
                 array_push($newProdutos, $produtos[$key]);
-                print('' . $produtos[$key]['quantidade'] . '');
+                print($produtos[$key]['quantidade']);
             }
         } else {
             if ($value['id'] != $idProdu) {
