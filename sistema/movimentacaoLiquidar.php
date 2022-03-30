@@ -18,13 +18,13 @@ $UnidadeId = $_SESSION['UnidadeId'];
 $sqlMovimentacao = "SELECT MovimId, MovimNumRecibo, MovimData, MovimValorTotal, MovimNotaFiscal,
                     MovimDataEmissao, MovimNumSerie, SituaChave, MvLiqData
                     FROM  Movimentacao
-                    JOIN MovimentacaoLiquidacao ON MvLiqMovimentacao = MovimId
+                    LEFT JOIN MovimentacaoLiquidacao ON MvLiqMovimentacao = MovimId
                     JOIN Situacao on SituaId = MovimSituacao
                     WHERE MovimUnidade = $UnidadeId and MovimId = $inputMovimentacaoId";
 $resultMovimentacao = $conn->query($sqlMovimentacao);
 $Movimentacao = $resultMovimentacao->fetch(PDO::FETCH_ASSOC);
 
-if($Movimentacao['SituaChave'] == 'LIBERADOCONTABILIDADE'){
+if(isset($Movimentacao['SituaChave']) && $Movimentacao['SituaChave'] == 'LIBERADOCONTABILIDADE'){
     // Se ja estiver liqidado ira buscar os dados da liquidação
     $sqlLiquidacao = "SELECT MvLiqId, MvLiqMovimentacao, MvLiqData, MvLiqUsuario,
                     MvLiqUnidade, MvLiqPlanoConta, UsuarNome
@@ -355,12 +355,14 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                             <input readOnly type="text" id="inputNumeroNota" name="inputNumeroNota" class="form-control" value="'.$Movimentacao['MovimNotaFiscal'].'">
                                                             <span class="input-group-prepend" style="cursor: pointer;">';
                                                                 
-                                                                if ($rowNotaFiscal['MvAneArquivo']){
+                                                                if (isset($rowNotaFiscal['MvAneArquivo']) && $rowNotaFiscal['MvAneArquivo']){
                                                                     echo '<a href="global_assets/anexos/movimentacao/'.$rowNotaFiscal['MvAneArquivo'].'" target="_blank" title="Abrir Nota Fiscal">
                                                                             <span class="input-group-text" style="color: red;"><i class="icon-file-pdf"></i></span>
                                                                           </a>';
                                                                 } else{
-                                                                    echo '<span class="input-group-text" style="color: red;"><i class="icon-file-pdf"></i></span>';
+                                                                    echo '<a href="#" title="Nota fiscal não anexada">
+                                                                            <span class="input-group-text" style="color: red;"><i class="icon-file-pdf"></i></span>
+                                                                          </a>';
                                                                 }                                                               
 
                                             echo            '</span>
