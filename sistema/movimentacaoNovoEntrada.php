@@ -350,10 +350,10 @@ if (isset($_POST['inputData'])) {
 
 						tds.each((i, elem) => {
 							var id = $(elem).attr('id')
-							MarcaModeloFabri += id === 'MarcaNome' ? ' Marca: '+$(elem).val():''
-							MarcaModeloFabri += id === 'ModelNome' ? '; Modelo: '+$(elem).val():''
-							MarcaModeloFabri += id === 'FabriNome' ? '; Fabricante: '+$(elem).val():''
 							valores[i] = $(elem).html();
+							MarcaModeloFabri += id === 'MarcaNome' && $(elem).val() ? ' Marca: '+$(elem).val():''
+							MarcaModeloFabri += id === 'ModelNome' && $(elem).val() ? '; Modelo: '+$(elem).val():''
+							MarcaModeloFabri += id === 'FabriNome' && $(elem).val() ? '; Fabricante: '+$(elem).val():''
 						})
 
 						inputItem.val(valores[0]);
