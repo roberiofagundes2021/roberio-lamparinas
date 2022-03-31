@@ -30,7 +30,8 @@ $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, 
         LEFT JOIN Marca on MarcaId = SrXFaMarca
         LEFT JOIN Modelo on ModelId = SrXFaModelo
         LEFT JOIN Fabricante on FabriId = SrXFaFabricante
-        WHERE ServiUnidade = $iUnidade and OCXSrOrdemCompra = $ordemCompra";
+        WHERE ServiUnidade = $iUnidade and OCXSrOrdemCompra = $ordemCompra
+        ORDER BY nome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
@@ -79,7 +80,7 @@ if ($countMovimentAprovada) {
         ';
         $output .= '<tbody>';
 
-        foreach (array_reverse($row) as $item) {
+        foreach ($row as $item) {
 
             if ($item['tipo'] == 'P') {
                 $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Saldo
@@ -182,7 +183,7 @@ if ($countMovimentAprovada) {
         ';
         $output .= '<tbody>';
 
-        foreach (array_reverse($row) as $item) {
+        foreach ($row as $item) {
 
             if ($item['tipo'] == 'P') {
                 $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Saldo

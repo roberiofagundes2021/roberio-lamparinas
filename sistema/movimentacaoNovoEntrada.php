@@ -953,7 +953,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorTotal">Total (R$) Nota Fiscal<span style="color: red">*</span></label>
-												<input type="text" id="inputValorTotal" name="inputValorTotal" class="form-control" onKeyUp="moeda(this)" maxLength="11" required>
+												<input type="text" id="inputValorTotal" name="inputValorTotal" class="form-control" onKeyUp="moeda(this)" maxLength="16" required>
 											</div>
 										</div>
 
