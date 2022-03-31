@@ -471,7 +471,7 @@ try {
 										</div>
 									</div>
 									<div class="row">
-										<div class="col-lg-3">
+									<div class="<?php if ($fluxo == 'CONTRATO') { echo "col-lg-3"; } else { echo "col-lg-4"; } ?>">
 											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>
 												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome" class="form-control" value="<?php echo $row['CategNome']; ?>" readOnly>
@@ -512,7 +512,7 @@ try {
 											</div>
 										</div>
 
-										<div class="col-lg-1">
+										<div class="<?php if ($fluxo == 'CONTRATO') { echo "col-lg-1"; } else { echo "col-lg-2"; } ?>">
 											<div class="form-group">
 												<label for="inputContrato"><?php echo $contrato; ?></label>
 												<input type="text" id="inputContrato" name="inputContrato" class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly>

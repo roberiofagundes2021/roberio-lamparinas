@@ -525,7 +525,7 @@ try{
 												
 											</div>
 										</div>
-										<div class="col-lg-1" style="min-width:250px">
+										<div class="<?php if ($fluxo == 'CONTRATO') { echo "col-lg-1"; } else { echo "col-lg-2"; } ?>">
 											<div class="form-group">
 												<label for="inputContrato"><?php echo $contrato; ?></label>
 												<input type="text" id="inputContrato" name="inputContrato" class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly>
@@ -534,7 +534,7 @@ try{
 										<?php
 											if ($fluxo == 'CONTRATO'){	
 												print('
-											<div class="col-lg-1" style="min-width:200px">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputProcesso">Processo</label>
 													<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="' . $row['FlOpeNumProcesso'] . '" readOnly>
@@ -542,7 +542,7 @@ try{
 											</div>	');
 											}										
 									   ?>	
-										<div class="col-lg-1" style="<?php if ($fluxo == 'CONTRATO'){ echo "min-width:200px"; } else { echo "min-width:270px"; } ?>">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>
 												<input type="text" id="inputValor" name="inputValor" class="form-control" value="<?php echo mostraValor($row['FlOpeValor']); ?>" readOnly>
