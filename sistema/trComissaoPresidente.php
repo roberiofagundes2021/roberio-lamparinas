@@ -17,6 +17,21 @@ try{
 
 		$conn->beginTransaction();
 
+		if(!$bIsPresident){
+			$sql = "SELECT BandeId FROM Bandeja 
+			WHERE BandeTabela = 'TermoReferencia' and BandeTabelaId = $iTRXEqTermoRefencia
+			and BandePerfil = 'COMISSAO'";
+			$result = $conn->query($sql);
+			$row = $result->fetch(PDO::FETCH_ASSOC);
+	
+			if(isset($row['BandeId'])){
+				$sql = "UPDATE Bandeja SET BandeUsuario = $iTRXEqUsuario
+				WHERE BandeTabela = 'TermoReferencia' and BandeTabelaId = $iTRXEqTermoRefencia
+				and BandePerfil = 'COMISSAO'";
+				$result = $conn->query($sql);
+			}
+		}
+
 		/* Atualiza status de todos para falso */
 		$sql = "
 			UPDATE TRXEquipe 
