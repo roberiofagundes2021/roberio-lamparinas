@@ -923,7 +923,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputTotalOrdemCompraCartaContrato">Total (R$) Ordem de Compra/Carta Contrato</label>
-												<input type="text" id="inputTotalOrdemCompraCartaContrato" name="inputTotalOrdemCompraCartaContrato" class="form-control" onKeyUp="moeda(this)" maxLength="11">
+												<input type="text" id="inputTotalOrdemCompraCartaContrato" name="inputTotalOrdemCompraCartaContrato" class="form-control" onKeyUp="moeda(this)" maxLength="16">
 											</div>
 										</div>
 									</div> <!-- row -->
