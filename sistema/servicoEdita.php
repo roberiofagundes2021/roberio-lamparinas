@@ -38,9 +38,9 @@ if(isset($_POST['inputServicoId'])){
 		$outrasDespesas = mostraValor($row['ServiOutrasDespesas']);
 		$custoFinal = mostraValor($row['ServiCustoFinal']);
 		$margemLucro = mostraValor($row['ServiMargemLucro']);
-		$numSerie = $row['ServiNumSerie'];
+		//$numSerie = $row['ServiNumSerie'];
 
-		/* Verifica se tem Ordem de Compra ou Fluxo para esse produto (de acordo com o parâmetro) */
+		/* Verifica se tem Ordem de Compra ou Fluxo para esse Servico (de acordo com o parâmetro) */
 		$sql = "SELECT ParamValorAtualizadoFluxo, ParamValorAtualizadoOrdemCompra
 				FROM Parametro				
 				WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
@@ -87,6 +87,8 @@ if(isset($_POST['inputNome'])){
 		
 	try{
 
+		$conn->beginTransaction();
+
 		$sql = "SELECT SituaId
 				FROM Situacao
 				WHERE SituaChave = 'ATIVO' ";
@@ -127,13 +129,37 @@ if(isset($_POST['inputNome'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iServico' => $_POST['inputServicoId']
 						));
+
+		$sql = "SELECT SrOrcId
+				FROM ServicoOrcamento
+				WHERE SrOrcServico = ".$_POST['inputServicoId'];
+		$result = $conn->query($sql);
+		$rowServicoOrcamento = $result->fetch(PDO::FETCH_ASSOC);							
+		$count = count($rowServicoOrcamento);
 		
+		if ($count){
+
+			$sql = "UPDATE ServicoOrcamento SET SrOrcDetalhamento = :sDetalhamento, SrOrcUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE SrOrcServico = :iServico and SrOrcUnidade = :iUnidade";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+						':sDetalhamento' => $_POST['txtDetalhamento'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iServico' => $_POST['inputServicoId'],
+						':iUnidade' => $_SESSION['UnidadeId']
+						));
+		}							
+		
+		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Serviço alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
-	} catch(PDOException $e) {		
+	} catch(PDOException $e) {	
+		
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao alterar serviço!!!";
@@ -217,7 +243,7 @@ if(isset($_POST['inputNome'])){
 				
 				if (inputNome.length == 0){
 					$('#inputNome').val('');
-					//$("#formProduto").submit(); //Isso aqui é para submeter o formulário, validando os campos obrigatórios novamente
+					//$("#formServico").submit(); //Isso aqui é para submeter o formulário, validando os campos obrigatórios novamente
 				}
 			});
 	
