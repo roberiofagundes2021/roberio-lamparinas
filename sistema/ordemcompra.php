@@ -63,8 +63,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
 			
-			/* Início: Tabela Personalizada */
-			$('#tblOrdemCompra').DataTable( {
+			/* Início: Tabela Personalizada do Setor Publico */
+			$('#tblOrdemCompraPublica').DataTable( {
 				"order": [[ 0, "desc" ]],
 			    autoWidth: false,
 				responsive: true,
@@ -122,6 +122,70 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					orderable: false,  //Ações
 					width: "5%",
 					targets: [10]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+			});
+
+			/* Início: Tabela Personalizada do Setor Privado */
+			$('#tblOrdemCompraPrivada').DataTable( {
+				"order": [[ 0, "desc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [{ 
+					orderable: true,   //Data
+					width: "10%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Numero Ordem Compra
+					width: "5%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //Fluxo
+					width: "5%",
+					targets: [2]
+				},				
+				{ 
+					orderable: true,   //Lote
+					width: "10%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //Tipo
+					width: "9%",
+					targets: [4]
+				},
+				{ 
+					orderable: true,   //Fornecedor
+					width: "19%",
+					targets: [5]
+				},
+				{
+					orderable: true,   //SubCategoria
+					width: "24%",
+					targets: [6]
+				},
+				{
+					orderable: true,   //Valor Total
+					width: "10%",
+					targets: [7]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "3%",
+					targets: [8]
+				},
+				{ 
+					orderable: false,  //Ações
+					width: "5%",
+					targets: [9]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -288,8 +352,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									</div>
 								</div>
 							</div>
-							
-							<table class="table" id="tblOrdemCompra">
+
+							<table class="table" id="tblOrdemCompraPublica">
 								<thead>
 									<tr class="bg-slate">
 										<th>Data</th>
@@ -321,7 +385,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['OrComLote'].'</td>
 											<td>'.$tipo.'</td>
 											<td>'.$item['ForneNome'].'</td>
-											<td>'.$item['OrComNumProcesso'].'</td>
+										');
+
+										print('<td>'.$item['OrComNumProcesso'].'</td>');
+										
+										print('
 											<td>'.$item['SbCatNome'].'</td>
 											<td class="text-right" style="padding-right:40px !important;">'.mostraValor($item['ValorTotalOrdemCompra']).'</td>											
 											');
