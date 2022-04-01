@@ -82,7 +82,8 @@ try {
 			JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 			LEFT JOIN Marca on MarcaId = ProduMarca
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OCXPrOrdemCompra = ".$iOrdemCompra;
+			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OCXPrOrdemCompra = ".$iOrdemCompra."
+			ORDER BY ProduNome ASC";
 
 	$result = $conn->query($sql);
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -91,7 +92,8 @@ try {
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OCXSrQuantidade, OCXSrValorUnitario
 			FROM Servico
 			JOIN OrdemCompraXServico on OCXSrServico = ServiId
-			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and OCXSrOrdemCompra = ".$iOrdemCompra;
+			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and OCXSrOrdemCompra = ".$iOrdemCompra."
+			ORDER BY ServiNome ASC";
 
 	$result = $conn->query($sql);
 	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -143,10 +145,10 @@ try {
 		<table style="width:100%; border-collapse: collapse;">
 			<tr>
 				<th style="text-align: center; width:8%">Item</th>
-				<th style="text-align: left; width:43%">Produto</th>
+				<th style="text-align: left; width:40%">Produto</th>
 				<th style="text-align: center; width:10%">Unidade</th>				
 				<th style="text-align: center; width:12%">Quant.</th>
-				<th style="text-align: center; width:12%">V. Unit.</th>
+				<th style="text-align: center; width:15%">V. Unit.</th>
 				<th style="text-align: center; width:15%">V. Total</th>
 			</tr>
 		';
@@ -214,9 +216,9 @@ try {
 		<table style="width:100%; border-collapse: collapse; margin-top: 20px;">
 			<tr>
 				<th style="text-align: center; width:8%">Item</th>
-				<th style="text-align: left; width:53%">Serviço</th>
+				<th style="text-align: left; width:50%">Serviço</th>
 				<th style="text-align: center; width:12%">Quant.</th>
-				<th style="text-align: center; width:12%">V. Unit.</th>
+				<th style="text-align: center; width:15%">V. Unit.</th>
 				<th style="text-align: center; width:15%">V. Total</th>
 			</tr>
 		';

@@ -99,6 +99,8 @@ if(isset($_POST['inputNome'])){
 		
 	try{
 
+		$conn->beginTransaction();
+
 		$sql = "SELECT SituaId
 				FROM Situacao
 				WHERE SituaChave = 'ATIVO' ";
@@ -112,7 +114,6 @@ if(isset($_POST['inputNome'])){
 			$Status = $rowSituacao['SituaId'];
 		}
 
-		
 		$sql = "UPDATE Produto SET ProduCodigo = :sCodigo, ProduCodigoBarras = :sCodigoBarras, ProduNome = :sNome, ProduDetalhamento = :sDetalhamento, 
 								   ProduFoto = :sFoto, ProduCategoria = :iCategoria, ProduSubCategoria = :iSubCategoria, ProduValorCusto = :fValorCusto, 
 								   ProduOutrasDespesas = :fOutrasDespesas, ProduCustoFinal = :fCustoFinal, ProduMargemLucro = :fMargemLucro, 
@@ -149,13 +150,37 @@ if(isset($_POST['inputNome'])){
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iProduto' => $_POST['inputProdutoId']
 						));
+
+		$sql = "SELECT PrOrcId
+				FROM ProdutoOrcamento
+				WHERE PrOrcProduto = ".$_POST['inputProdutoId'];
+		$result = $conn->query($sql);
+		$rowProdutoOrcamento = $result->fetch(PDO::FETCH_ASSOC);							
+		$count = count($rowProdutoOrcamento);
 		
-		
+		if ($count){
+
+			$sql = "UPDATE ProdutoOrcamento SET PrOrcDetalhamento = :sDetalhamento, PrOrcUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE PrOrcProduto = :iProduto and PrOrcUnidade = :iUnidade";
+			$result = $conn->prepare($sql);
+
+			$result->execute(array(
+						':sDetalhamento' => $_POST['txtDetalhamento'],
+						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+						':iProduto' => $_POST['inputProdutoId'],
+						':iUnidade' => $_SESSION['UnidadeId']
+						));
+		}				
+
+		$conn->commit();
+
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Produto alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
-	} catch(PDOException $e) {		
+	} catch(PDOException $e) {	
+		
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao alterar produto!!!";

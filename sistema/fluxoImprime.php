@@ -129,11 +129,15 @@ try {
     <table style="width:100%; border-collapse: collapse;">
         <tr style="background-color:#F1F1F1;">
             <td style="width:20%; font-size:14px;">Início:<br>' . mostraData($row['FlOpeDataInicio']) . '</td>
-            <td style="width:20%; font-size:14px;">Fim:<br>' . mostraData($row['FlOpeDataFim']) . '</td>
-            <td style="width:20%; font-size:14px;">Nº Ata Registro:<br>' . $row['FlOpeNumContrato'] . '</td>
-			<td style="width:20%; font-size:14px;">Nº Processo:<br>' . $row['FlOpeNumProcesso'] . '</td>
-			<td style="width:20%; font-size:14px; border-left: none; text-align:right;">Valor:<br>' . mostraValor($row['FlOpeValor']) . '</td>
-        </tr>
+            <td style="width:20%; font-size:14px;">Fim:<br>' . mostraData($row['FlOpeDataFim']) . '</td> ';
+			if ($fluxo == 'CONTRATO'){
+				$html .= ' <td style="width:20%; font-size:14px;">Nº Ata Registro:<br>' . $row['FlOpeNumContrato'] . '</td>
+						   <td style="width:20%; font-size:14px;">Nº Processo:<br>' . $row['FlOpeNumProcesso'] . '</td> ';
+			}else{		
+				$html .= ' <td style="width:40%; font-size:14px;">Nº FLUXO OPERACIONAL:<br>' . $row['FlOpeNumContrato'] . '</td>';
+			}				
+				$html .= '<td style="width:20%; font-size:14px; border-left: none; text-align:right;">Valor:<br>' . mostraValor($row['FlOpeValor']) . '</td>
+		</tr>
 	</table>
 	<table style="width:100%; border-collapse: collapse;">
         <tr>
