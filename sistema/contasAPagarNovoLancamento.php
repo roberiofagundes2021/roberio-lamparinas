@@ -17,6 +17,55 @@ if (isset($_POST['cmbPlanoContas'])) {
         try {
             $conn->beginTransaction();
 
+            $pagamentoParcial = false;
+
+            if (isset($_POST['inputPagamentoParcial'])) {
+                if (intval($_POST['inputPagamentoParcial']) != 0) {
+                    $sql = "SELECT SituaId
+                            FROM Situacao
+                            WHERE SituaChave = 'APAGAR'
+                     ";
+                    $result = $conn->query($sql);
+                    $situacaoPagamentoParcial = $result->fetch(PDO::FETCH_ASSOC);
+
+                    $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                                  CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                                  CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
+                                                  CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                            VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                    :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
+                                    :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+                    $result = $conn->prepare($sql);
+
+                    $result->execute(array(
+                        ':iPlanoContas' => $_POST['cmbPlanoContas'],
+                        ':iFornecedor' => $_POST['cmbFornecedor'],
+                        ':iContaBanco' => $_POST['cmbContaBanco'],
+                        ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+                        ':sNumDocumento' => $_POST['inputNumeroDocumento'],
+                        ':sNotaFiscal' => $_POST['inputNotaFiscal'],
+                        ':dateDtEmissao' => $_POST['inputDataEmissao'],
+                        ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
+                        ':sDescricao' => $_POST['inputDescricao'],
+                        ':dateDtVencimento' => $_POST['inputDataVencimento'],
+                        ':fValorAPagar' => $_POST['inputPagamentoParcial'],
+                        ':dateDtPagamento' => $_POST['inputDataPagamento'],
+                        ':fValorPago' => null,
+                        ':sObservacao' => $_POST['inputObservacao'],
+                        ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                        ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                        ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                        ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                        ':iStatus' => $situacaoPagamentoParcial['SituaId'],
+                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                        ':iUnidade' => $_SESSION['UnidadeId']
+                    ));
+
+                    $idContaAPagarParcial = $conn->lastInsertId();
+                    $pagamentoParcial = true;
+                }
+            }
+
             if (isset($_POST['inputValorTotalPago'])) {
                 $sql = "SELECT SituaId
                         FROM Situacao
@@ -65,64 +114,133 @@ if (isset($_POST['cmbPlanoContas'])) {
             ));
 
             $idContaAPagar = $_POST['inputContaId'];
-            
-            $sql = "SELECT CAPXCCentroCusto
-                    FROM ContasAPagarXCentroCusto
-                    WHERE CAPXCContasAPagar = $idContaAPagar";
-            $resultQuantContaAPagarXCentroCusto = $conn->query($sql);
-            $centroCustoBancoDeDados = $resultQuantContaAPagarXCentroCusto->fetchAll(PDO::FETCH_ASSOC);
 
-            $registros = intval($_POST['totalRegistros']);
-            $controle = true;
-            $i = 0;
-            
-            for($x=0; $x < $registros; $x++){
-                $keyId = 'inputIdCentro-'.$x;
-                $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
-                $valor = str_replace(',', '.', $valor);
+            if($pagamentoParcial) {
+                $valorPagoParcialmente = floatval(gravaValor($_POST['inputValor']));
+                $valorAPagarParcialmente = $_POST['inputPagamentoParcial'];
+                $totalParcialmente = $valorPagoParcialmente + $valorAPagarParcialmente;
+                
+                $percentualAPagarParcialmente = ($valorAPagarParcialmente * 100) / $totalParcialmente;
+                $percentualPagoParcialmente = ($valorPagoParcialmente * 100) / $totalParcialmente;
 
-                $centroCusto = $_POST[$keyId];
-                $valor;
-                $arrayControleCentroCustoSistema[] = $centroCusto;
-                $arrayCentroCusto[$i]['idCentroCusto'] = $centroCusto;
-                $arrayCentroCusto[$i]['valorCentroCusto'] = $valor;
+                $registros = intval($_POST['totalRegistros']);
+                for($x=0; $x < $registros; $x++){
+                    //$keyNome = 'inputCentroNome-'.$x;
+                    $keyId = 'inputIdCentro-'.$x;
+                    $centroCusto = $_POST[$keyId];
+                    $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                    $valor = str_replace(',', '.', $valor);
 
-                foreach($centroCustoBancoDeDados as $idCentroContaAtualiza) {
-                    if($idCentroContaAtualiza['CAPXCCentroCusto'] == $centroCusto) {
-                        $sql = "UPDATE ContasAPagarXCentroCusto SET CAPXCValor = :fValor, CAPXCUsuarioAtualizador = :iUsuarioAtualizador
-                                WHERE CAPXCCentroCusto = $centroCusto AND CAPXCContasAPagar = $idContaAPagar";
-                        $result = $conn->prepare($sql);
+                    $valor = ($percentualAPagarParcialmente / 100) * $valor;
+                    $valor;
 
-                        $result->execute(array(
-                            ':fValor' => $valor,
-                            ':iUsuarioAtualizador' => $_SESSION['UsuarId']
-                        ));
+                    $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                            VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                    $result = $conn->prepare($sql);
 
-                        $arrayControle[] = $centroCusto;
-                        $arrayIdAntigoCentroCusto[$i]['idCentroCusto'] = $idCentroContaAtualiza['CAPXCCentroCusto'];
-                        $arrayIdAntigoCentroCusto[$i]['valorCentroCusto'] = $valor;
-                    }
-                    if($controle) {
-                        $arrayBancoDeDados[] = $idCentroContaAtualiza['CAPXCCentroCusto'];
-                    }
+                    $result->execute(array(
+
+                        ':iContasAPagar' => $idContaAPagarParcial,
+                        ':iCentroCusto' => $centroCusto,
+                        ':iValor' => $valor,
+                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                        ':iUnidade' => $_SESSION['UnidadeId']
+                    ));
                 }
-                $controle = false;
 
-                $i++;
-            }
+                $sql = "SELECT CAPXCCentroCusto
+                        FROM ContasAPagarXCentroCusto
+                        WHERE CAPXCContasAPagar = $idContaAPagar";
+                $resultQuantContaAPagarXCentroCusto = $conn->query($sql);
+                $centroCustoBancoDeDados = $resultQuantContaAPagarXCentroCusto->fetchAll(PDO::FETCH_ASSOC);
+    
+                $registros = intval($_POST['totalRegistros']);
+                $controle = true;
+                $i = 0;
+                
+                for($x=0; $x < $registros; $x++){
+                    $keyId = 'inputIdCentro-'.$x;
+                    $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                    $valor = str_replace(',', '.', $valor);
+    
+                    $centroCusto = $_POST[$keyId];
+                    $valor;
+                    $valor = ($percentualPagoParcialmente / 100) * $valor;
+                    $valor;
+                    $arrayControleCentroCustoSistema[] = $centroCusto;
+                    $arrayCentroCusto[$i]['idCentroCusto'] = $centroCusto;
+                    $arrayCentroCusto[$i]['valorCentroCusto'] = $valor;
+    
+                    foreach($centroCustoBancoDeDados as $idCentroContaAtualiza) {
+                        if($idCentroContaAtualiza['CAPXCCentroCusto'] == $centroCusto) {
+                            $sql = "UPDATE ContasAPagarXCentroCusto SET CAPXCValor = :fValor, CAPXCUsuarioAtualizador = :iUsuarioAtualizador
+                                    WHERE CAPXCCentroCusto = $centroCusto AND CAPXCContasAPagar = $idContaAPagar";
+                            $result = $conn->prepare($sql);
+    
+                            $result->execute(array(
+                                ':fValor' => $valor,
+                                ':iUsuarioAtualizador' => $_SESSION['UsuarId']
+                            ));
 
-            if(isset($arrayControle)) {
-                $arrayCentroCustoInsere = pegaDiferencaArray($arrayControleCentroCustoSistema, $arrayControle);
-                if($arrayCentroCustoInsere) {
-                    foreach($arrayCentroCustoInsere as $idCentroCusto) {
+                            $arrayControle[] = $centroCusto;
+                            $arrayIdAntigoCentroCusto[$i]['idCentroCusto'] = $idCentroContaAtualiza['CAPXCCentroCusto'];
+                            $arrayIdAntigoCentroCusto[$i]['valorCentroCusto'] = $valor;
+                        }
+                        if($controle) {
+                            $arrayBancoDeDados[] = $idCentroContaAtualiza['CAPXCCentroCusto'];
+                        }
+                    }
+                    $controle = false;
+    
+                    $i++;
+                }
+    
+                if(isset($arrayControle)) {
+                    $arrayCentroCustoInsere = pegaDiferencaArray($arrayControleCentroCustoSistema, $arrayControle);
+                    if($arrayCentroCustoInsere) {
+                        foreach($arrayCentroCustoInsere as $idCentroCusto) {
+                            foreach($arrayCentroCusto as $insereCentroCusto) {
+                                if($insereCentroCusto['idCentroCusto'] == $idCentroCusto) {
+                                    $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                                            VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                                    $result = $conn->prepare($sql);
+    
+                                    $result->execute(array(
+    
+                                        ':iContasAPagar' => $idContaAPagar,
+                                        ':iCentroCusto' => $insereCentroCusto['idCentroCusto'],
+                                        ':iValor' => $insereCentroCusto['valorCentroCusto'],
+                                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                        ':iUnidade' => $_SESSION['UnidadeId']
+                                    ));
+                                }
+                            }
+                        }
+                    }
+        
+                    $arrayCentroCustoDeleta = pegaDiferencaArray($arrayBancoDeDados, $arrayControle);
+                    if($arrayCentroCustoDeleta) {
+                        foreach($arrayCentroCustoDeleta as $deletaCentroCusto) {
+                            $sql = "DELETE FROM ContasAPagarXCentroCusto
+                                    WHERE CAPXCCentroCusto = :iCentroCusto AND CAPXCContasAPagar = :iContaAPagar";
+                            $result = $conn->prepare($sql);
+                            
+                            $result->execute(array(
+                                ':iCentroCusto' => $deletaCentroCusto,
+                                ':iContaAPagar' => $idContaAPagar
+                            ));
+                        }
+                    }
+                }else {
+                    foreach($arrayControleCentroCustoSistema as $novoCentroCusto) {
                         foreach($arrayCentroCusto as $insereCentroCusto) {
-                            if($insereCentroCusto['idCentroCusto'] == $idCentroCusto) {
+                            if($insereCentroCusto['idCentroCusto'] == $novoCentroCusto) {
                                 $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
                                         VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
                                 $result = $conn->prepare($sql);
-
+    
                                 $result->execute(array(
-
+    
                                     ':iContasAPagar' => $idContaAPagar,
                                     ':iCentroCusto' => $insereCentroCusto['idCentroCusto'],
                                     ':iValor' => $insereCentroCusto['valorCentroCusto'],
@@ -132,11 +250,8 @@ if (isset($_POST['cmbPlanoContas'])) {
                             }
                         }
                     }
-                }
     
-                $arrayCentroCustoDeleta = pegaDiferencaArray($arrayBancoDeDados, $arrayControle);
-                if($arrayCentroCustoDeleta) {
-                    foreach($arrayCentroCustoDeleta as $deletaCentroCusto) {
+                    foreach($arrayBancoDeDados as $deletaCentroCusto) {
                         $sql = "DELETE FROM ContasAPagarXCentroCusto
                                 WHERE CAPXCCentroCusto = :iCentroCusto AND CAPXCContasAPagar = :iContaAPagar";
                         $result = $conn->prepare($sql);
@@ -147,81 +262,125 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ));
                     }
                 }
+
             }else {
-                foreach($arrayControleCentroCustoSistema as $novoCentroCusto) {
-                    foreach($arrayCentroCusto as $insereCentroCusto) {
-                        if($insereCentroCusto['idCentroCusto'] == $novoCentroCusto) {
-                            $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
-                                    VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                $sql = "SELECT CAPXCCentroCusto
+                        FROM ContasAPagarXCentroCusto
+                        WHERE CAPXCContasAPagar = $idContaAPagar";
+                $resultQuantContaAPagarXCentroCusto = $conn->query($sql);
+                $centroCustoBancoDeDados = $resultQuantContaAPagarXCentroCusto->fetchAll(PDO::FETCH_ASSOC);
+    
+                $registros = intval($_POST['totalRegistros']);
+                $controle = true;
+                $i = 0;
+                
+                for($x=0; $x < $registros; $x++){
+                    $keyId = 'inputIdCentro-'.$x;
+                    $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                    $valor = str_replace(',', '.', $valor);
+    
+                    $centroCusto = $_POST[$keyId];
+                    $valor;
+                    $arrayControleCentroCustoSistema[] = $centroCusto;
+                    $arrayCentroCusto[$i]['idCentroCusto'] = $centroCusto;
+                    $arrayCentroCusto[$i]['valorCentroCusto'] = $valor;
+    
+                    foreach($centroCustoBancoDeDados as $idCentroContaAtualiza) {
+                        if($idCentroContaAtualiza['CAPXCCentroCusto'] == $centroCusto) {
+                            $sql = "UPDATE ContasAPagarXCentroCusto SET CAPXCValor = :fValor, CAPXCUsuarioAtualizador = :iUsuarioAtualizador
+                                    WHERE CAPXCCentroCusto = $centroCusto AND CAPXCContasAPagar = $idContaAPagar";
                             $result = $conn->prepare($sql);
-
+    
                             $result->execute(array(
-
-                                ':iContasAPagar' => $idContaAPagar,
-                                ':iCentroCusto' => $insereCentroCusto['idCentroCusto'],
-                                ':iValor' => $insereCentroCusto['valorCentroCusto'],
-                                ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-                                ':iUnidade' => $_SESSION['UnidadeId']
+                                ':fValor' => $valor,
+                                ':iUsuarioAtualizador' => $_SESSION['UsuarId']
+                            ));
+    
+                            $arrayControle[] = $centroCusto;
+                            $arrayIdAntigoCentroCusto[$i]['idCentroCusto'] = $idCentroContaAtualiza['CAPXCCentroCusto'];
+                            $arrayIdAntigoCentroCusto[$i]['valorCentroCusto'] = $valor;
+                        }
+                        if($controle) {
+                            $arrayBancoDeDados[] = $idCentroContaAtualiza['CAPXCCentroCusto'];
+                        }
+                    }
+                    $controle = false;
+    
+                    $i++;
+                }
+    
+                if(isset($arrayControle)) {
+                    $arrayCentroCustoInsere = pegaDiferencaArray($arrayControleCentroCustoSistema, $arrayControle);
+                    if($arrayCentroCustoInsere) {
+                        foreach($arrayCentroCustoInsere as $idCentroCusto) {
+                            foreach($arrayCentroCusto as $insereCentroCusto) {
+                                if($insereCentroCusto['idCentroCusto'] == $idCentroCusto) {
+                                    $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                                            VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                                    $result = $conn->prepare($sql);
+    
+                                    $result->execute(array(
+    
+                                        ':iContasAPagar' => $idContaAPagar,
+                                        ':iCentroCusto' => $insereCentroCusto['idCentroCusto'],
+                                        ':iValor' => $insereCentroCusto['valorCentroCusto'],
+                                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                        ':iUnidade' => $_SESSION['UnidadeId']
+                                    ));
+                                }
+                            }
+                        }
+                    }
+        
+                    $arrayCentroCustoDeleta = pegaDiferencaArray($arrayBancoDeDados, $arrayControle);
+                    if($arrayCentroCustoDeleta) {
+                        foreach($arrayCentroCustoDeleta as $deletaCentroCusto) {
+                            $sql = "DELETE FROM ContasAPagarXCentroCusto
+                                    WHERE CAPXCCentroCusto = :iCentroCusto AND CAPXCContasAPagar = :iContaAPagar";
+                            $result = $conn->prepare($sql);
+                            
+                            $result->execute(array(
+                                ':iCentroCusto' => $deletaCentroCusto,
+                                ':iContaAPagar' => $idContaAPagar
                             ));
                         }
                     }
-                }
-
-                foreach($arrayBancoDeDados as $deletaCentroCusto) {
-                    $sql = "DELETE FROM ContasAPagarXCentroCusto
-                            WHERE CAPXCCentroCusto = :iCentroCusto AND CAPXCContasAPagar = :iContaAPagar";
-                    $result = $conn->prepare($sql);
-                    
-                    $result->execute(array(
-                        ':iCentroCusto' => $deletaCentroCusto,
-                        ':iContaAPagar' => $idContaAPagar
-                    ));
-                }
-            }
-
-            if (isset($_POST['inputPagamentoParcial'])) {
-                if (intval($_POST['inputPagamentoParcial']) != 0) {
-                    $sql = "SELECT SituaId
-                            FROM Situacao
-                            WHERE SituaChave = 'APAGAR'
-                     ";
-                    $result = $conn->query($sql);
-                    $situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-                    $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
-                                                  CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
-                                                  CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
-                                                  CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                            VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
-                                    :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
-                                    :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-                    $result = $conn->prepare($sql);
-
-                    $result->execute(array(
-                        ':iPlanoContas' => $_POST['cmbPlanoContas'],
-                        ':iFornecedor' => $_POST['cmbFornecedor'],
-                        ':iContaBanco' => $_POST['cmbContaBanco'],
-                        ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-                        ':sNumDocumento' => $_POST['inputNumeroDocumento'],
-                        ':sNotaFiscal' => $_POST['inputNotaFiscal'],
-                        ':dateDtEmissao' => $_POST['inputDataEmissao'],
-                        ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
-                        ':sDescricao' => $_POST['inputDescricao'],
-                        ':dateDtVencimento' => $_POST['inputDataVencimento'],
-                        ':fValorAPagar' => $_POST['inputPagamentoParcial'],
-                        ':dateDtPagamento' => $_POST['inputDataPagamento'],
-                        ':fValorPago' => null,
-                        ':sObservacao' => $_POST['inputObservacao'],
-                        ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                        ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                        ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                        ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
-                        ':iStatus' => $situacao['SituaId'],
-                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-                        ':iUnidade' => $_SESSION['UnidadeId']
-                    ));
+                }else {
+                    foreach($arrayControleCentroCustoSistema as $novoCentroCusto) {
+                        foreach($arrayCentroCusto as $insereCentroCusto) {
+                            if($insereCentroCusto['idCentroCusto'] == $novoCentroCusto) {
+                                $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                                        VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                                $result = $conn->prepare($sql);
+    
+                                $result->execute(array(
+    
+                                    ':iContasAPagar' => $idContaAPagar,
+                                    ':iCentroCusto' => $insereCentroCusto['idCentroCusto'],
+                                    ':iValor' => $insereCentroCusto['valorCentroCusto'],
+                                    ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                    ':iUnidade' => $_SESSION['UnidadeId']
+                                ));
+                            }
+                        }
+                    }
+    
+                    foreach($arrayBancoDeDados as $deletaCentroCusto) {
+                        $sql = "DELETE FROM ContasAPagarXCentroCusto
+                                WHERE CAPXCCentroCusto = :iCentroCusto AND CAPXCContasAPagar = :iContaAPagar";
+                        $result = $conn->prepare($sql);
+                        
+                        $result->execute(array(
+                            ':iCentroCusto' => $deletaCentroCusto,
+                            ':iContaAPagar' => $idContaAPagar
+                        ));
+                    }
                 }
             }
+
+
+            //irpara('contasAPagar.php');
+
             $conn->commit();
 
             $_SESSION['msg']['titulo'] = "Sucesso";
@@ -246,13 +405,14 @@ if (isset($_POST['cmbPlanoContas'])) {
 
                 $numParcelas = intVal($_POST['inputNumeroParcelas']);
 
-                for ($i = 1; $i <= $numParcelas; $i++) {
-                    $sql = "SELECT SituaId
+                $sql = "SELECT SituaId
                     FROM Situacao
                     WHERE SituaChave = 'APAGAR'
                     ";
-                    $result = $conn->query($sql);
-                    $situacao = $result->fetch(PDO::FETCH_ASSOC);
+                $result = $conn->query($sql);
+                $situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+                for ($i = 1; $i <= $numParcelas; $i++) {
 
                     $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
                                                   CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
@@ -281,8 +441,118 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                         ':iUnidade' => $_SESSION['UnidadeId']
                     ));
+
+                    $idContaAPagar = $conn->lastInsertId();
+
+                    $registros = intval($_POST['totalRegistros']);
+
+                    $proporcaoCentroCusto = 0;
+                    //Para verificar valor do parcelamento
+                    for($x=0; $x < $registros; $x++) {
+                        $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                        $valor = str_replace(',', '.', $valor);
+
+                        $valor = mostraValor(($valor) / $numParcelas);
+                        $valor = str_replace('.', '', $valor);
+                        $valor = str_replace(',', '.', $valor);
+
+                        $proporcaoCentroCusto += $valor;
+                    }
+
+                    $proporcaoCentroCustoVerdadeiro = false;
+                    $teste = 0;
+                    if(floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . ''])) != $proporcaoCentroCusto) {
+                        $valParcela = floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . '']));
+                        $diferenca = $valParcela - $proporcaoCentroCusto;
+
+                        $proporcaoCentroCustoVerdadeiro = true;
+                    }
+
+                    for($x=0; $x < $registros; $x++){
+                        $keyNome = 'inputCentroNome-'.$x;
+                        $keyId = 'inputIdCentro-'.$x;
+                        $centroCusto = $_POST[$keyId];
+                        $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                        $valor = str_replace(',', '.', $valor);
+
+                        if($proporcaoCentroCustoVerdadeiro) {
+                            $soma = 0;
+                            $soma = ($x == 0) ? $diferenca : 0;
+                            
+                            $valor = mostraValor(($valor) / $numParcelas);
+                            $valor = str_replace('.', '', $valor);
+                            $valor = str_replace(',', '.', $valor);
+                            $valor += $soma;
+                            
+                        }else {
+                            $valor = mostraValor(($valor) / $numParcelas);
+                            $valor = str_replace('.', '', $valor);
+                            $valor = str_replace(',', '.', $valor);
+                        }
+
+                        $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                                VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                        $result = $conn->prepare($sql);
+
+                        $result->execute(array(
+
+                            ':iContasAPagar' => $idContaAPagar,
+                            ':iCentroCusto' => $centroCusto,
+                            ':iValor' => $valor,
+                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                            ':iUnidade' => $_SESSION['UnidadeId']
+                        ));
+                    }
                 }
             } else {
+                $pagamentoParcial = false;
+                if (isset($_POST['inputPagamentoParcial'])) {
+                    if (intval($_POST['inputPagamentoParcial']) != 0) {
+                        $sql = "SELECT SituaId
+                                FROM Situacao
+                                WHERE SituaChave = 'APAGAR'
+                         ";
+                        $result = $conn->query($sql);
+                        $situacaoPagamentoParcial = $result->fetch(PDO::FETCH_ASSOC);
+
+                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                                      CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                                      CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
+                                                      CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                        :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
+                                        :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+                        $result = $conn->prepare($sql);
+
+                        $result->execute(array(
+                            ':iPlanoContas' => $_POST['cmbPlanoContas'],
+                            ':iFornecedor' => $_POST['cmbFornecedor'],
+                            ':iContaBanco' => $_POST['cmbContaBanco'],
+                            ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
+                            ':sNotaFiscal' => $_POST['inputNotaFiscal'],
+                            ':dateDtEmissao' => $_POST['inputDataEmissao'],
+                            ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
+                            ':sDescricao' => $_POST['inputDescricao'],
+                            ':dateDtVencimento' => $_POST['inputDataVencimento'],
+                            ':fValorAPagar' => $_POST['inputPagamentoParcial'],
+                            ':dateDtPagamento' => $_POST['inputDataPagamento'],
+                            ':fValorPago' => null,
+                            ':sObservacao' => $_POST['inputObservacao'],
+                            ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                            ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                            ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                            ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                            ':iStatus' => $situacaoPagamentoParcial['SituaId'],
+                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                            ':iUnidade' => $_SESSION['UnidadeId']
+                        ));
+                        
+                        $idContaAPagarParcial = $conn->lastInsertId();
+                        $pagamentoParcial = true;
+                    }
+
+                }
 
                 if (isset($_POST['inputValorTotalPago'])) {
                     $sql = "SELECT SituaId
@@ -333,71 +603,93 @@ if (isset($_POST['cmbPlanoContas'])) {
                     ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                     ':iUnidade' => $_SESSION['UnidadeId']
                 ));
-                
+
                 $idContaAPagar = $conn->lastInsertId();
 
-                $registros = intval($_POST['totalRegistros']);
-                for($x=0; $x < $registros; $x++){
-                    $keyNome = 'inputCentroNome-'.$x;
-                    $keyId = 'inputIdCentro-'.$x;
-                    $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
-                    $valor = str_replace(',', '.', $valor);
+                if($pagamentoParcial) {
 
-                    $centroCusto = $_POST[$keyId];
-                    $valor;
+                    $valorPagoParcialmente = floatval(gravaValor($_POST['inputValor']));
+                    $valorAPagarParcialmente = $_POST['inputPagamentoParcial'];
+                    $totalParcialmente = $valorPagoParcialmente + $valorAPagarParcialmente;
+                    
+                    $percentualAPagarParcialmente = ($valorAPagarParcialmente * 100) / $totalParcialmente;
+                    $percentualPagoParcialmente = ($valorPagoParcialmente * 100) / $totalParcialmente;
 
-                    $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
-                            VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
-                    $result = $conn->prepare($sql);
+                    alerta('Percentual pago: '.$percentualPagoParcialmente);
+                    alerta('Percentual a pagar: '.$percentualAPagarParcialmente);
+                    
+                    $registros = intval($_POST['totalRegistros']);
+                    for($x=0; $x < $registros; $x++){
+                        //$keyNome = 'inputCentroNome-'.$x;
+                        $keyId = 'inputIdCentro-'.$x;
+                        $centroCusto = $_POST[$keyId];
+                        $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                        $valor = str_replace(',', '.', $valor);
 
-                    $result->execute(array(
+                        $valor = ($percentualAPagarParcialmente / 100) * $valor;
+                        $valor;
 
-                        ':iContasAPagar' => $idContaAPagar,
-                        ':iCentroCusto' => $centroCusto,
-                        ':iValor' => $valor,
-                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-                        ':iUnidade' => $_SESSION['UnidadeId']
-                    ));
-                }
-
-                if (isset($_POST['inputPagamentoParcial'])) {
-                    if (intval($_POST['inputPagamentoParcial']) != 0) {
-                        $sql = "SELECT SituaId
-                                FROM Situacao
-                                WHERE SituaChave = 'APAGAR'
-                         ";
-                        $result = $conn->query($sql);
-                        $situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
-                                                      CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
-                                                      CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
-                                                      CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
-                                        :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
-                                        :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+                        alerta('Valor: '.$valor.' Porcentagem: '.$percentualAPagarParcialmente);
+    
+                        $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                                VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
                         $result = $conn->prepare($sql);
-
+    
                         $result->execute(array(
-                            ':iPlanoContas' => $_POST['cmbPlanoContas'],
-                            ':iFornecedor' => $_POST['cmbFornecedor'],
-                            ':iContaBanco' => $_POST['cmbContaBanco'],
-                            ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
-                            ':sNotaFiscal' => $_POST['inputNotaFiscal'],
-                            ':dateDtEmissao' => $_POST['inputDataEmissao'],
-                            ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
-                            ':sDescricao' => $_POST['inputDescricao'],
-                            ':dateDtVencimento' => $_POST['inputDataVencimento'],
-                            ':fValorAPagar' => $_POST['inputPagamentoParcial'],
-                            ':dateDtPagamento' => $_POST['inputDataPagamento'],
-                            ':fValorPago' => null,
-                            ':sObservacao' => $_POST['inputObservacao'],
-                            ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                            ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                            ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                            ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
-                            ':iStatus' => $situacao['SituaId'],
+    
+                            ':iContasAPagar' => $idContaAPagarParcial,
+                            ':iCentroCusto' => $centroCusto,
+                            ':iValor' => $valor,
+                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                            ':iUnidade' => $_SESSION['UnidadeId']
+                        ));
+                    }
+
+                    for($x=0; $x < $registros; $x++){
+                        //$keyNome = 'inputCentroNome-'.$x;
+                        $keyId = 'inputIdCentro-'.$x;
+                        $centroCusto = $_POST[$keyId];
+                        $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                        $valor = str_replace(',', '.', $valor);
+    
+                        $valor = ($percentualPagoParcialmente / 100) * $valor;
+                        $valor;
+
+                        alerta('Valor: '.$valor.' Porcentagem: '.$percentualPagoParcialmente);
+    
+                        $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                                VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                        $result = $conn->prepare($sql);
+    
+                        $result->execute(array(
+                            ':iContasAPagar' => $idContaAPagar,
+                            ':iCentroCusto' => $centroCusto,
+                            ':iValor' => $valor,
+                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                            ':iUnidade' => $_SESSION['UnidadeId']
+                        ));
+                    }
+                }else {
+                    alerta('ID único: '.$idContaAPagar.' Valor: '.floatval(gravaValor($_POST['inputValor'])).' Status:'.$situacao['SituaId']);
+    
+                    $registros = intval($_POST['totalRegistros']);
+                    for($x=0; $x < $registros; $x++){
+                        //$keyNome = 'inputCentroNome-'.$x;
+                        $keyId = 'inputIdCentro-'.$x;
+                        $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                        $valor = str_replace(',', '.', $valor);
+    
+                        $centroCusto = $_POST[$keyId];
+                        $valor;
+    
+                        $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                                VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                        $result = $conn->prepare($sql);
+    
+                        $result->execute(array(
+                            ':iContasAPagar' => $idContaAPagar,
+                            ':iCentroCusto' => $centroCusto,
+                            ':iValor' => $valor,
                             ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                             ':iUnidade' => $_SESSION['UnidadeId']
                         ));
@@ -467,6 +759,7 @@ if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) 
             CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero, SituaNome, SituaChave
     		FROM ContasAPagar
             LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
+            JOIN Situacao on SituaId = CnAPaStatus
     		WHERE CnAPaUnidade = " . $_SESSION['UnidadeId'] . " and CnAPaId = " . $_POST['inputConciliacaoId'] . "";
     $result = $conn->query($sql);
     $lancamento = $result->fetch(PDO::FETCH_ASSOC);
@@ -695,6 +988,9 @@ $dataInicio = date("Y-m-d");
                 })
 
                 $('#modalCloseParcelar').on('click', function() {
+                    var menssagem = 'Parcelamento cancelado!'
+                    alerta('Atenção', menssagem, 'error')
+
                     $('#pageModalParcelar').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                     $("#parcelasContainer").html("")
@@ -831,6 +1127,22 @@ $dataInicio = date("Y-m-d");
                 // && cmbContaBanco != '' && cmbFormaPagamento != '' && inputNumeroDocumento != ''
                 if (planoContas != '' && cmbFornecedor != '' && inputDescricao != '') {
                     if (valorPagof < valorTotalf && valorPagof) {
+                        if($('#cmbContaBanco').val() == '') {
+                            $("#cmbContaBanco").focus()
+                            var menssagem = 'Por favor informe um banco !'
+                            alerta('Atenção', menssagem, 'error')
+                            
+                            return false
+                        }
+
+                        if($('#cmbFormaPagamento').val() == '') {
+                            $("#cmbFormaPagamento").focus()
+                            var menssagem = 'Por favor informe uma forma de pagamento !'
+                            alerta('Atenção', menssagem, 'error')
+                            
+                            return false
+                        }
+
                         $("#inputPagamentoParcial").val(valorRestante)
                         $('#inputValor').val(valorPago)
 
@@ -840,13 +1152,22 @@ $dataInicio = date("Y-m-d");
                             $("#cmbContaBanco").prop('required', true)
                             $("#cmbFormaPagamento").prop('required', true)
 
-                            confirmaExclusao(document.lancamento,
+                            if(!confirmaExclusao(document.lancamento,
                                 "O valor pago é menor que o valor total da conta. Será gerado uma nova conta com o valor restante. Deseja continuar?",
-                                'contasAPagarNovoLancamento.php');
+                                'contasAPagarNovoLancamento.php')) {
+                                
+                                $("#inputPagamentoParcial").val(valorRestante)
+                                $('#inputValor').val(1000)
+                            }
+
                         } else {
-                            confirmaExclusao(document.lancamento,
+                            if(!confirmaExclusao(document.lancamento,
                                 "O valor pago é menor que o valor total da conta. Será gerado uma nova conta com o valor restante. Deseja continuar?",
-                                'contasAPagarNovoLancamento.php');
+                                'contasAPagarNovoLancamento.php')) {
+                                
+                                $("#inputPagamentoParcial").val(valorRestante)
+                                $('#inputValor').val(1000)
+                            }
                         }
 
                         document.lancamento.submit()
@@ -884,44 +1205,48 @@ $dataInicio = date("Y-m-d");
             })
 
             if ($('#inputValor').val() == '') {
-                document.getElementById('centroCusto').style=
-                "cursor: not-allowed; opacity: 0.7; pointer-events: none;";
-
                 document.getElementById('btnParcelar').style =
                 "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
             }else{
                 $("#valorAPagarCentroCusto").html('<h6><span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">R$ '+$('#inputValor').val()+'</span></h6>')
-
-                document.getElementById('centroCusto').style= "";
             }
 
             $("#inputValor").on('input', function(element){
                 if($(this).val() == ''){
                     $("#valorAPagarCentroCusto").html('')
 
-                    document.getElementById('centroCusto').style=
-                    "cursor: not-allowed; opacity: 0.7; pointer-events: none;";
-
                     document.getElementById('btnParcelar').style =
                     "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
                 }else{
-                    document.getElementById('centroCusto').style= "";
-
                     document.getElementById('btnParcelar').style = "margin-top: 5px";
                 }
             });
 
             $("#inputValor").blur(function(){
                 $("#valorAPagarCentroCusto").html('<h6><span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">R$ '+$('#inputValor').val()+'</span></h6>')
+
+                let parcelas = $("#cmbParcelas").val()
+                if(parcelas > 1) {
+                    var menssagem = 'Valor do parcelamento alterado! Clique em OK para confirmar'
+                    alerta('Sucesso', menssagem, 'success')
+                    $('#btnParcelar').click()
+                    $('#gerarParcelas').click()
+                }
             });
           
             function centroCusto() {
-                $('#centroCusto').on('click', (e) => {
+                $("#centroCusto").on('click', (e) => {
                     e.preventDefault()
-                    $('#pageCentroCusto').fadeIn(200);
-                    $('.cardJuDes').css('width', '500px').css('margin', '0px auto')
+                    if($('#inputValor').val() == '') {
+                        var menssagem = 'Por favor informe um valor a pagar!'
+                        alerta('Atenção', menssagem, 'error')
+                    }else {
+                        e.preventDefault()
+                        $('#pageCentroCusto').fadeIn(200);
+                        $('.cardJuDes').css('width', '500px').css('margin', '0px auto')
+                    }
                 })
-    
+
                 $('#modalCloseCentroCusto').on('click', function() {
                     $('#pageCentroCusto').fadeOut(200);
                     $('body').css('overflow', 'scroll');
@@ -1292,11 +1617,12 @@ $dataInicio = date("Y-m-d");
                     $('#inputCentroValor-'+id).val(float2moeda(valor - cont))
                 }
             }
+            ValTotal = (ValTotal).toFixed(2)
             var newValue = float2moeda(ValTotal) //parseFloat(ValTotal).toFixed(2).replace('.', ',')
             $('#inputTotalGeral').val(`R$ ${newValue}`)
             // retorna o status para quando for submeter o sistema verificar
             // se o valor está batendo com o total
-            if (ValTotal !== totalValorAPagar && total > 0){
+            if (ValTotal != totalValorAPagar && total > 0){
                 var obj = {
                     status: false,
                     val: totalValorAPagar
@@ -1452,7 +1778,7 @@ $dataInicio = date("Y-m-d");
                                             </div>
                                         </div>
                                         <div class="col-lg-2 m-auto">
-                                            <button id="centroCusto" type="button" class="btn bg-slate btn-sm" style="cursor: not-allowed; opacity: 0.7; pointer-events: none;">CENTRO DE CUSTO</button>
+                                            <button id="centroCusto" type="button" class="btn bg-slate btn-sm">CENTRO DE CUSTO</button>
                                         </div>
                                     </div>
 
@@ -1541,7 +1867,7 @@ $dataInicio = date("Y-m-d");
                                     </div>
 
                                     <?php
-                                    if (isset($lancamento) && $lancamento['CnAPaContaBanco'] != null) {
+                                    if (isset($lancamento) && $lancamento['CnAPaContaBanco'] != null && $lancamento['CnAPaContaBanco'] != 0) {
                                         $mostrar = '';
                                     } else {
                                         $mostrar = 'style="display:none;"';
@@ -1622,7 +1948,8 @@ $dataInicio = date("Y-m-d");
                                     </div>
                                         <?php 
                                             if ($atualizar) {
-                                                echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
+                                                $disabled = (isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') ? 'disabled' : '';
+                                                echo' <button id="salvar" class="btn btn-principal" '.$disabled.'>Salvar</button>';
                                              }
                                         ?>
                                         <a href="javascript:history.go(-1)" class="btn">Cancelar</a>
@@ -1652,7 +1979,7 @@ $dataInicio = date("Y-m-d");
                                             <div class="form-group">
                                                 <label for="valorTotal">Valor Total</label>
                                                 <div class="input-group">
-                                                    <input type="text" id="valorTotal" onKeyUp="moeda(this)" maxLength="12" name="valorTotal" class="form-control" readOnly>
+                                                    <input type="text" id="valorTotal" onKeyUp="moeda(this)" maxLength="12" name="valorTotal" class="form-control removeValidacao" readOnly>
                                                 </div>
                                             </div>
                                         </div>

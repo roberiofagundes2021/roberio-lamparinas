@@ -19,8 +19,9 @@ $array .= ')';
 
 $sqlCentroCusto = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, SituaChave
                 FROM  CentroCusto JOIN Situacao on SituaId = CnCusStatus
-                WHERE CnCusUnidade = ".$_SESSION['UnidadeId'].
-                " and SituaChave = 'ATIVO' and CnCusId in ".$array;
+                WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and 
+                SituaChave = 'ATIVO' and CnCusId in ".$array."
+                ORDER BY CnCusNome ASC";
 
 $resultCentroCusto = $conn->query($sqlCentroCusto);
 $CentroCustos = $resultCentroCusto->fetchAll(PDO::FETCH_ASSOC);
