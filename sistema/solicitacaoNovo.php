@@ -175,7 +175,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 							let id = $(elem).attr('idProdu')
 							const url = 'solicitacaoAlteraCarrinho.php'
 
-							if (quantidade != '') {
+							if (quantidade != '' && quantidade > 0) {
 								let quantidadeInt = parseInt($(elem).val())
 								let quantidadeEstoqueInt = parseInt($(elem).attr('quantiestoque'))
                             
@@ -218,7 +218,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 								}
 							} else {
 								let dataPost = {
-									inputQuantidadeProduto: 0,
+									inputQuantidadeProduto: 1,
 									inputIdProduto: id
 								}
 

@@ -58,7 +58,7 @@ $sql = "SELECT Top 1 isnull(AditiNumero, 0) as Aditivo
        ";
 $result = $conn->query($sql);
 $rowNumero = $result->fetch(PDO::FETCH_ASSOC);
-$iProxAditivo = $rowNumero['Aditivo'] + 1;
+$iProxAditivo = $rowNumero? $rowNumero['Aditivo'] + 1 : 1;
 
 $sql = "SELECT Top 1 FlOpeDataFim as ProxData
         FROM FluxoOperacional
@@ -68,7 +68,7 @@ $result = $conn->query($sql);
 $rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
 $iProxData = date('Y-m-d', strtotime("+1 day", strtotime($rowFluxo['ProxData'])));	//Adiciona 1 dia na data
 
-if ($rowNumero['Aditivo'] > 0) {
+if ($rowNumero && $rowNumero['Aditivo'] > 0) {
 
 	$sql = "SELECT Top 1 isnull(AditiDtFim, '1900-01-01') as ProxData
 	        FROM Aditivo

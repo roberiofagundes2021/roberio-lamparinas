@@ -40,6 +40,21 @@ $result = $conn->query($sql);
 $rowAditivo = $result->fetchAll(PDO::FETCH_ASSOC);
 $countAditivos = count($rowAditivo);
 
+$sql = "SELECT ParamEmpresaPublica
+			FROM Parametro
+			WHERE ParamEmpresa = ". $_SESSION['EmpreId'];
+	$result = $conn->query($sql);
+	$rowParametros = $result->fetch(PDO::FETCH_ASSOC);
+
+	if ($rowParametros['ParamEmpresaPublica']){
+		$fluxo = "CONTRATO";
+		$contrato= "Contrato";
+
+	} else {
+		$fluxo = " ";
+		$contrato= "Nº Fluxo";
+	}
+
 ?>
 
 <!DOCTYPE html>
@@ -146,8 +161,7 @@ $countAditivos = count($rowAditivo);
 
 					<form name="formAditivo" id="formAditivo" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Aditivos - Fluxo Operacional Nº Contrato
-								"<?php echo $row['FlOpeNumContrato']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Aditivos - Fluxo Operacional Nº <?php echo $fluxo; ?> "<?php echo $row['FlOpeNumContrato']; ?>"</h5>
 						</div>
 
 						<input type="hidden" id="inputIdFluxoOperacional" name="inputIdFluxoOperacional"
@@ -191,7 +205,7 @@ $countAditivos = count($rowAditivo);
 										</div>
 									</div>
 									<div class="row">
-										<div class="col-lg-3">
+									<div class="<?php if ($fluxo == 'CONTRATO') { echo "col-lg-3"; } else { echo "col-lg-5"; } ?>">
 											<div class="form-group">
 												<label for="inputCategoriaNome">Categoria</label>
 												<input type="text" id="inputCategoriaNome" name="inputCategoriaNome"
@@ -232,20 +246,24 @@ $countAditivos = count($rowAditivo);
 										</div>
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputContrato">Contrato</label>
+												<label for="inputContrato"><?php echo $contrato; ?></label>
 												<input type="text" id="inputContrato" name="inputContrato"
 													class="form-control" value="<?php echo $row['FlOpeNumContrato']; ?>"
 													readOnly>
 											</div>
 										</div>
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputProcesso">Processo</label>
-												<input type="text" id="inputProcesso" name="inputProcesso"
-													class="form-control" value="<?php echo $row['FlOpeNumProcesso']; ?>"
-													readOnly>
-											</div>
-										</div>
+
+										<?php
+											if ($fluxo == 'CONTRATO'){	
+												print('
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputProcesso">Processo</label>
+													<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="' . $row['FlOpeNumProcesso'] . '" readOnly>
+												</div>
+											</div>	');
+											}										
+									   ?>	
 										<!--<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValor">Valor Total</label>

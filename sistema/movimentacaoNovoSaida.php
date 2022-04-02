@@ -970,10 +970,12 @@ if (isset($_POST['inputData'])) {
 
 			$('#btnAdicionar').click(function() {
 				var val = $('#tabelaProdutoServicoSaida tbody').children()
-				var id = 0
-				$('.produtoSolicitacao').each((i, elemento) => {
-					id = $(elemento).find('td')[$('.produtoSolicitacao').length-1]
-					id = id?parseInt($(id).text()):0
+				var id = 1
+
+				/* percorre todos os "<td>" que possuem classe sorting_1, pegando o ultimo valor para
+				dar continuidade à contagem */
+				$('.sorting_1').each((i, elemento) => {
+					id = parseInt($(elemento).text()) > id?parseInt($(elemento).text()):id
 				})
 				$('#inputNumItens').val(id)
 

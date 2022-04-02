@@ -345,61 +345,133 @@ if (isset($_POST['inputData'])) {
 						let inputSaldo = $('<input type="text">');
 						let inputValidade = $('<input type="text">');
 						let MarcaModeloFabri = ''
+						let Marca = ''
+						let Modelo = ''
+						let Fabri = ''
 
 						let linhaTabela = '';
 
 						tds.each((i, elem) => {
 							var id = $(elem).attr('id')
-							MarcaModeloFabri += id === 'MarcaNome' ? '\n Marca: '+$(elem).val():''
-							MarcaModeloFabri += id === 'ModelNome' ? '\n Modelo: '+$(elem).val():''
-							MarcaModeloFabri += id === 'FabriNome' ? '\n Fabricante: '+$(elem).val():''
 							valores[i] = $(elem).html();
+							Marca = id === 'MarcaNome' && $(elem).val() ? $(elem).val():Marca
+							Modelo = id === 'ModelNome' && $(elem).val() ? $(elem).val():Modelo
+							Fabri = id === 'FabriNome' && $(elem).val() ? $(elem).val():Fabri
 						})
 
 						inputItem.val(valores[0]);
 
 						if (tipoProdutoServico != 'P') {
 
-							cabecalho = `<tr class="bg-slate">
-											<th width="5%">Item</th>
-											<th width="55%">Serviço</th>
-											<th width="20%">Quantidade</th>
-											<th width="20%">Saldo</th>
-										</tr>`;
-
-							linhaTabela = `<tr id='trModal'>
-												<td title='${MarcaModeloFabri}'>${valores[0]}</td>
-												<td title='${MarcaModeloFabri}'>${valores[1]}</td>
-												<td><input id='quantidade' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus></td>
-												<td><input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled></td>
-											</tr>`;
+							HTML = `
+							<div class="row col-lg-12" style="padding:0px; margin:0px;">
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="inputServicoNome">Serviço</label>
+										<input type="text" id="inputServicoNome" name="inputServicoNome" class="form-control" value="${valores[1]}" disabled>
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputMarcaNome">Marca</label>
+										<input type="text" id="inputMarcaNome" name="inputMarcaNome" class="form-control" value="${Marca}" disabled>
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputModeloNome">Modelo</label>
+										<input type="text" id="inputModeloNome" name="inputModeloNome" class="form-control" value="${Modelo}" disabled>
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputFabriNome">Fabricante</label>
+										<input type="text" id="inputFabriNome" name="inputFabriNome" class="form-control" value="${Fabri}" disabled>
+									</div>
+								</div>
+								<div class="col-lg-1">
+									<div class="form-group">
+										<label for="saldo">Saldo</label>
+										<input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled>
+									</div>
+								</div>
+								<div class="col-lg-1">
+									<div class="form-group">
+										<label for="quantidade">Quantidade</label>
+										<input id='quantidade' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus>
+									</div>
+								</div>
+							</div>`;
 						} else {
-							cabecalho = `<tr class="bg-slate">
-											<th width='5%'>Item</th>
-											<th width='65%'">Produto</th>
-											<th width='5%'>Quantidade</th>
-											<th width='5%'>Saldo</th>
-											<th width='5%'>Lote</th>
-											<th width='5%'>Nº Série/Chassi</th>
-											<th width='5%'>Fabricação</th>
-											<th width='5%'>Validade</th>
-										</tr>`;
-
-							linhaTabela = `<tr id='trModal'>
-												<td title='${MarcaModeloFabri}' >${valores[0]}</td>
-												<td title='${MarcaModeloFabri}' >${valores[1]}</td>
-												<td><input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus></td>
-												<td><input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center"  disabled></td>
-												<td><input id='lote' type="text" class="form-control" value="" style="text-align: center"></td>
-												<td><input id='numSerie' type="text" class="form-control" value="" style="text-align: center"></td>
-												<td><input id='fabricacao' type="date" class="form-control" value="" style="text-align: center"></td>
-												<td ><input id='validade' type="date" class="form-control" value="" style="text-align: center"></td>
-											</tr>`;
+							HTML = `
+							<div class="row col-lg-12" style="padding:0px; margin:0px;">
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label for="inputProdutoNome">Produto</label>
+										<input type="text" id="inputProdutoNome" name="inputProdutoNome" class="form-control" value="${valores[1]}" disabled>
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputMarcaNome">Marca</label>
+										<input type="text" id="inputMarcaNome" name="inputMarcaNome" class="form-control" value="${Marca}" disabled>
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputModeloNome">Modelo</label>
+										<input type="text" id="inputModeloNome" name="inputModeloNome" class="form-control" value="${Modelo}" disabled>
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputFabriNome">Fabricante</label>
+										<input type="text" id="inputFabriNome" name="inputFabriNome" class="form-control" value="${Fabri}" disabled>
+									</div>
+								</div>
+							</div>
+							
+							<div class="row col-lg-12" style="padding:0px; margin:0px;">
+								<div class="col-lg-1">
+									<div class="form-group">
+										<label for="saldo">Saldo</label>
+										<input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center" disabled>
+									</div>
+								</div>
+								<div class="col-lg-1">
+									<div class="form-group">
+										<label for="quantidade">Quantidade</label>
+										<input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus>
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="lote">Lote</label>
+										<input id='lote' type="text" class="form-control" value="" style="text-align: center">
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="numSerie">Nº Série/Chassi</label>
+										<input id='numSerie' type="text" class="form-control" value="" style="text-align: center">
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="fabricacao">Fabricação</label>
+										<input id='fabricacao' type="date" class="form-control" value="" style="text-align: center">
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="validade">Validade</label>
+										<input id='validade' type="date" class="form-control" value="" style="text-align: center">
+									</div>
+								</div>
+							</div>`;
 						}
 
-						$('#thead-modal').html(cabecalho);
-
-						$('#tbody-modal').html(linhaTabela);
+						$('#thead-modal').html(HTML);
 
 						// Esta função não permite que o valor digitado pelo usuário seja maior que o valor de saldo.
 						function validaQuantInputModal(quantMax) {
@@ -921,7 +993,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputTotalOrdemCompraCartaContrato">Total (R$) Ordem de Compra/Carta Contrato</label>
-												<input type="text" id="inputTotalOrdemCompraCartaContrato" name="inputTotalOrdemCompraCartaContrato" class="form-control" onKeyUp="moeda(this)" maxLength="11">
+												<input type="text" id="inputTotalOrdemCompraCartaContrato" name="inputTotalOrdemCompraCartaContrato" class="form-control" onKeyUp="moeda(this)" maxLength="16">
 											</div>
 										</div>
 									</div> <!-- row -->
@@ -951,7 +1023,7 @@ if (isset($_POST['inputData'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorTotal">Total (R$) Nota Fiscal<span style="color: red">*</span></label>
-												<input type="text" id="inputValorTotal" name="inputValorTotal" class="form-control" onKeyUp="moeda(this)" maxLength="11" required>
+												<input type="text" id="inputValorTotal" name="inputValorTotal" class="form-control" onKeyUp="moeda(this)" maxLength="16" required>
 											</div>
 										</div>
 
@@ -1101,14 +1173,9 @@ if (isset($_POST['inputData'])) {
 								<i class=""></i>
 							</div>
 							<div class="card-footer mt-2 d-flex flex-column" style="width:100%">
-								<table class="table table-modal">
-									<thead id="thead-modal">
-
-									</thead>
-									<tbody id="tbody-modal">
-
-									</tbody>
-								</table>
+								<div class="" style="width:100%" id="thead-modal">
+									
+								</div>
 								<div class="row" style="margin-top: 10px;">
 									<div class="col-lg-12">
 										<div class="form-group">

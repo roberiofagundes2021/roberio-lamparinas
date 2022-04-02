@@ -30,13 +30,12 @@ $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, 
         LEFT JOIN Marca on MarcaId = SrXFaMarca
         LEFT JOIN Modelo on ModelId = SrXFaModelo
         LEFT JOIN Fabricante on FabriId = SrXFaFabricante
-        WHERE ServiUnidade = $iUnidade and OCXSrOrdemCompra = $ordemCompra";
+        WHERE ServiUnidade = $iUnidade and OCXSrOrdemCompra = $ordemCompra
+        ORDER BY nome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
-//print($sql);
-//var_dump($row);
-//Verifica se já existe esse registro (se existir, retorna true )
+
 $output = '';
 $totalGeral = 0;
 
@@ -81,7 +80,7 @@ if ($countMovimentAprovada) {
         ';
         $output .= '<tbody>';
 
-        foreach (array_reverse($row) as $item) {
+        foreach ($row as $item) {
 
             if ($item['tipo'] == 'P') {
                 $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Saldo
@@ -110,16 +109,16 @@ if ($countMovimentAprovada) {
             $marca .= $item['ModelNome'] ?  ' MODELO: '. $item['ModelNome'] : '';
             $marca .= $item['FabriNome'] ?  ' FABRICANTE: '. $item['FabriNome'] : '';
 
-            $output .=  "<tr class='trGrid' id='row' . $numItens . ''>
-						 <td title='' . $item[detalhamento] . $marca . '' data-popup='tooltip' style='text-align: center'>' . $numItens . '</td>
-						 <td title='' . $item[detalhamento] . $marca . '' data-popup='tooltip'>' . $item[nome] . '</td>
-						 <td title='' . $item[detalhamento] . $marca . '' data-popup='tooltip' style='text-align: center'>' . $item[UnMedSigla] . '</td>
-                         <td title='' . $item[detalhamento] . $marca . '' data-popup='tooltip' style='text-align: center'>0</td>
-                         <td title='' . $item[detalhamento] . $marca . '' data-popup='tooltip' style='text-align: center'>' . $saldo[Saldo] . '</td>
-						 <td title='' . $item[detalhamento] . $marca . '' data-popup='tooltip' style='text-align: right'>' . $valorCusto . '</td>
-                         <td title='' . $item[detalhamento] . $marca . '' data-popup='tooltip' class='valorTotal' style='text-align: right'>R$ 0, 00</td> <!-- esse campo é calculado depois na função recalcValorTotal() -->
-                         <td title='' . $item[detalhamento] . $marca . '' data-popup='tooltip' style='text-align: center'></td>
-                         <td style='text-align: center'><i idInput='campo' . $numItens . '' idRow='row' . $numItens . '' class='icon-file-check btn-acoes' style='cursor: pointer'></i></td>
+            $output .=  "<tr class='trGrid' id='row$numItens'>
+						 <td title='$item[detalhamento]$marca' data-popup='tooltip' style='text-align: center'>$numItens</td>
+						 <td title='$item[detalhamento]$marca' data-popup='tooltip'>$item[nome]</td>
+						 <td title='$item[detalhamento]$marca' data-popup='tooltip' style='text-align: center'>$item[UnMedSigla]</td>
+                         <td title='$item[detalhamento]$marca' data-popup='tooltip' style='text-align: center'>0</td>
+                         <td title='$item[detalhamento]$marca' data-popup='tooltip' style='text-align: center'>$saldo[Saldo]</td>
+						 <td title='$item[detalhamento]$marca' data-popup='tooltip' style='text-align: right'>$valorCusto</td>
+                         <td title='$item[detalhamento]$marca' data-popup='tooltip' class='valorTotal' style='text-align: right'>R$ 0, 00</td>
+                         <td title='$item[detalhamento]$marca' data-popup='tooltip' style='text-align: center'></td>
+                         <td style='text-align: center'><i idInput='campo$numItens' idRow='row$numItens' class='icon-file-check btn-acoes' style='cursor: pointer'></i></td>
                          <input type='hidden' tipo='$item[tipo]' id='campo$numItens' idLinha='row$numItens' quantInicial='$saldo[Quantidade]' saldoInicial='$saldo[Saldo]'  name='campo$numItens' value='$item[tipo]#$item[id]#$item[valorCusto]#0#0#0#0'>
                          <input id='MarcaNome' type='hidden' value='$item[MarcaNome]' />
                          <input id='ModelNome' type='hidden' value='$item[ModelNome]' />
@@ -184,7 +183,7 @@ if ($countMovimentAprovada) {
         ';
         $output .= '<tbody>';
 
-        foreach (array_reverse($row) as $item) {
+        foreach ($row as $item) {
 
             if ($item['tipo'] == 'P') {
                 $sql = "SELECT  dbo.fnQuantidadeEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Quantidade, dbo.fnSaldoEntrada(OrComUnidade, OrComId, " . $item['id'] . ", 'P') as Saldo
