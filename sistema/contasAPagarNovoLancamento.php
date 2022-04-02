@@ -615,9 +615,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                     $percentualAPagarParcialmente = ($valorAPagarParcialmente * 100) / $totalParcialmente;
                     $percentualPagoParcialmente = ($valorPagoParcialmente * 100) / $totalParcialmente;
 
-                    alerta('Percentual pago: '.$percentualPagoParcialmente);
-                    alerta('Percentual a pagar: '.$percentualAPagarParcialmente);
-                    
                     $registros = intval($_POST['totalRegistros']);
                     for($x=0; $x < $registros; $x++){
                         //$keyNome = 'inputCentroNome-'.$x;
@@ -629,8 +626,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                         $valor = ($percentualAPagarParcialmente / 100) * $valor;
                         $valor;
 
-                        alerta('Valor: '.$valor.' Porcentagem: '.$percentualAPagarParcialmente);
-    
                         $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
                                 VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
                         $result = $conn->prepare($sql);
@@ -655,8 +650,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                         $valor = ($percentualPagoParcialmente / 100) * $valor;
                         $valor;
 
-                        alerta('Valor: '.$valor.' Porcentagem: '.$percentualPagoParcialmente);
-    
                         $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
                                 VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
                         $result = $conn->prepare($sql);
@@ -670,8 +663,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ));
                     }
                 }else {
-                    alerta('ID único: '.$idContaAPagar.' Valor: '.floatval(gravaValor($_POST['inputValor'])).' Status:'.$situacao['SituaId']);
-    
                     $registros = intval($_POST['totalRegistros']);
                     for($x=0; $x < $registros; $x++){
                         //$keyNome = 'inputCentroNome-'.$x;
