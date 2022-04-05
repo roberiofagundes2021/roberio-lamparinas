@@ -85,7 +85,7 @@ function queryPesquisa(){
         foreach ($rowData as $item) {
             $cont++;
 
-            $idPatrimonio = "<idPatrimonio=".$item['PatriId'].'#'.$item['ProduId'].'#'.$item['PrXFaId']." editado='0'>";
+            $idPatrimonio = "$item[PatriId]#$item[ProduId]#$item[PrXFaId]";
 
             $contador = $cont;  
 
@@ -115,9 +115,10 @@ function queryPesquisa(){
 
             $numeroSerie = $item['PatriNumSerie'];
 
-            $estadoConservacao = $item['PatriEstadoConservacao'];
+            $estadoConservacao = isset($item['PatriNumSerie'])? "$item[PatriNumSerie]" : "";
+            $estadoConservacao .= isset($item['PatriEstadoConservacao'])? "#$item[PatriEstadoConservacao]" : "";
 
-            $fabricante = $item['PrXFaMarca']? "$item[PrXFaMarca]#$item[PrXFaModelo]#$item[PrXFaFabricante]" : "";
+            $marcModelFabConser = $item['PrXFaMarca']? "$item[PrXFaMarca]#$item[PrXFaModelo]#$item[PrXFaFabricante]" : "";
            
             $array = [
                 'data'=>[
@@ -137,7 +138,7 @@ function queryPesquisa(){
                     isset($empenhos) ? $empenhos : null,  
                     isset($numeroSerie) ? $numeroSerie : null, 
                     isset($estadoConservacao) ? $estadoConservacao : null,
-                    $fabricante
+                    $marcModelFabConser,
                 ],
                 'identify'=>[
                    isset($idPatrimonio) ? $idPatrimonio : null

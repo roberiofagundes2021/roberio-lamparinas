@@ -26,11 +26,31 @@ $sql = "SELECT OrComTipo, OrComNumero, OrComDtEmissao, OrComLote, OrComNumAta, O
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
-if ($row['OrComTipo'] == 'O'){
-	$sTipo = "Ordem de Compra";
-} else{
-	$sTipo = "Carta Contrato";
+$sql = "SELECT ParamEmpresaPublica
+		FROM Parametro
+		WHERE ParamEmpresa = ". $_SESSION['EmpreId'];
+$result = $conn->query($sql);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+
+if ($rowParametro['ParamEmpresaPublica']){
+	$ordemCompra = "CARTA CONTRATO";
+	$contrato = "Nº Contrato
+	";
+} else {
+	$ordemCompra = "ORDEM DE COMPRA";
+	$contrato = "Nº Fluxo";
 }
+
+if ($ordemCompra == "CARTA CONTRATO"){
+	if ($row['OrComTipo'] == 'O'){
+		$sTipo = "Ordem de Compra";
+	} else{
+		$sTipo = "Carta Contrato";
+	}
+} else{
+	$sTipo = "Ordem de Compra";
+}
+
 
 try {
 	$mpdf = new mPDF([
@@ -102,16 +122,20 @@ try {
 	$html .= '
 	<table style="width:100%; border-collapse: collapse;"> 
 		<tr>
-			<td colspan="1" style="width:25%; font-size:12px;">Nº Contrato:<br>'. $row['FlOpeNumContrato'].'</td>	
+			<td colspan="1" style="width:25%; font-size:12px;">'.$contrato.':<br>'. $row['FlOpeNumContrato'].'</td>	
 			<td colspan="1" style="width:25%; font-size:12px;">Data Emissão:<br>'. mostraData($row['OrComDtEmissao']).'</td>';
+			if ($ordemCompra == "CARTA CONTRATO"){
+				if ($row['OrComTipo'] == 'O'){		
+					$html .= '<td colspan="1" style="width:25%; font-size:12px;">Lote:<br>'. $row['OrComLote'].'</td>';
+				} else {
+					$html .= '<td colspan="1" style="width:25%; font-size:12px;">Nº Ata Registro:<br>'. $row['OrComNumAta'].'</td>';
+				}
 
-	if ($row['OrComTipo'] == 'O'){		
-		$html .= '<td colspan="1" style="width:25%; font-size:12px;">Lote:<br>'. $row['OrComLote'].'</td>';
-	} else {
-		$html .= '<td colspan="1" style="width:25%; font-size:12px;">Nº Ata Registro:<br>'. $row['OrComNumAta'].'</td>';
-	}
-
-	$html .= '<td colspan="1" style="width:25%; font-size:12px;">Nº Processo:<br>'. $row['OrComNumProcesso'].'</td>
+				$html .= '<td colspan="1" style="width:25%; font-size:12px;">Nº Processo:<br>'. $row['OrComNumProcesso'].'</td>';
+			}else{
+				$html .= '<td style="width:50%; font-size:12px;">Categoria:<br>'.$row['CategNome'].'</td>';
+			}
+				$html .= '
 		</tr>
 	</table>
 	<table style="width:100%; border-collapse: collapse;">
@@ -125,9 +149,11 @@ try {
 		</tr>
 	</table>
 	<table style="width:100%; border-collapse: collapse;">
-		<tr>
-			<td style="width:100%; font-size:12px;">Categoria:<br>'.$row['CategNome'].'</td>
-		</tr>
+		<tr>';
+		if ($ordemCompra == "CARTA CONTRATO"){
+			$html .= '<td style="width:100%; font-size:12px;">Categoria:<br>'.$row['CategNome'].'</td>';
+		}
+		$html .= '</tr>
 	</table>';
 	
 	$html .= '
