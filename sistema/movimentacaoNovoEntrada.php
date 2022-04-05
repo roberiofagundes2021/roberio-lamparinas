@@ -277,338 +277,6 @@ if (isset($_POST['inputData'])) {
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
 
-		function formatDate(data, formato) {
-			if (formato == 'pt-BR') {
-				return (data.substr(0, 10).split('-').reverse().join('/'));
-			} else {
-				return (data.substr(0, 10).split('/').reverse().join('-'));
-			}
-		}
-
-		function produtosOrdemCompra(ordemCompra) {
-			let inputLote = $('#inputLote').val();
-
-			$.ajax({
-				type: "POST",
-				url: "movimentacaoAddProdutoOrdemCompra.php",
-				data: {
-					ordemCompra: ordemCompra,
-					lote: inputLote
-				},
-				success: function(resposta) {
-					$("#tabelaProdutoServico").html(resposta);
-
-					let total = $('#total').html();
-
-					$("#inputTotal").val(total);
-					modalAcoes()
-					mudarValores()
-
-					let todasLinhas = $('.trGrid')
-					$('#inputNumItens').val(todasLinhas.length)
-				}
-
-			});
-
-			$.ajax({
-				type: "POST",
-				url: "movimentacaoSaldoOrdemCompra.php",
-				data: {
-					ordemCompra: ordemCompra,
-				},
-				success: function(resposta) {
-					$("#inputTotalOrdemCompraCartaContrato").val(float2moeda(resposta)).attr('disabled', '').attr('valor', resposta);
-				}
-			})
-		}
-
-		function modalAcoes() {
-
-			$('.btn-acoes').each((i, elem) => {
-				$(elem).on('click', function() {
-					$('#page-modal').fadeIn(200);
-
-					let linha = $(elem).parent().parent()
-					let todasLinhas = $(elem).parent().parent().parent()
-					let saldoinicialModal = $(elem).parent().next().attr('saldoInicial') // selecionando o valor do input hidden
-
-					if ($(elem).attr('idRow') == linha.attr('id')) {
-						let tds = linha.children();
-						let tipoProdutoServico = $(tds[9]).attr('tipo');
-						$('#tipo').val(tipoProdutoServico)
-
-						let valores = [];
-
-						let inputItem = $('<td></td>');
-						let inputProdutoServico = $('<input type="text">');
-						let inputQuantidade = $('<input type="text">');
-						let inputSaldo = $('<input type="text">');
-						let inputValidade = $('<input type="text">');
-						let MarcaModeloFabri = ''
-						let Marca = ''
-						let Modelo = ''
-						let Fabri = ''
-
-						let linhaTabela = '';
-
-						tds.each((i, elem) => {
-							var id = $(elem).attr('id')
-							valores[i] = $(elem).html();
-							Marca = id === 'MarcaNome' && $(elem).val() ? $(elem).val():Marca
-							Modelo = id === 'ModelNome' && $(elem).val() ? $(elem).val():Modelo
-							Fabri = id === 'FabriNome' && $(elem).val() ? $(elem).val():Fabri
-						})
-
-						inputItem.val(valores[0]);
-
-						if (tipoProdutoServico != 'P') {
-
-							HTML = `
-							<div class="row col-lg-12" style="padding:0px; margin:0px;">
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputServicoNome">Serviço</label>
-										<input type="text" id="inputServicoNome" name="inputServicoNome" class="form-control" value="${valores[1]}" disabled>
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputMarcaNome">Marca</label>
-										<input type="text" id="inputMarcaNome" name="inputMarcaNome" class="form-control" value="${Marca}" disabled>
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputModeloNome">Modelo</label>
-										<input type="text" id="inputModeloNome" name="inputModeloNome" class="form-control" value="${Modelo}" disabled>
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputFabriNome">Fabricante</label>
-										<input type="text" id="inputFabriNome" name="inputFabriNome" class="form-control" value="${Fabri}" disabled>
-									</div>
-								</div>
-								<div class="col-lg-1">
-									<div class="form-group">
-										<label for="saldo">Saldo</label>
-										<input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled>
-									</div>
-								</div>
-								<div class="col-lg-1">
-									<div class="form-group">
-										<label for="quantidade">Quantidade</label>
-										<input id='quantidade' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus>
-									</div>
-								</div>
-							</div>`;
-						} else {
-							HTML = `
-							<div class="row col-lg-12" style="padding:0px; margin:0px;">
-								<div class="col-lg-6">
-									<div class="form-group">
-										<label for="inputProdutoNome">Produto</label>
-										<input type="text" id="inputProdutoNome" name="inputProdutoNome" class="form-control" value="${valores[1]}" disabled>
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputMarcaNome">Marca</label>
-										<input type="text" id="inputMarcaNome" name="inputMarcaNome" class="form-control" value="${Marca}" disabled>
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputModeloNome">Modelo</label>
-										<input type="text" id="inputModeloNome" name="inputModeloNome" class="form-control" value="${Modelo}" disabled>
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputFabriNome">Fabricante</label>
-										<input type="text" id="inputFabriNome" name="inputFabriNome" class="form-control" value="${Fabri}" disabled>
-									</div>
-								</div>
-							</div>
-							
-							<div class="row col-lg-12" style="padding:0px; margin:0px;">
-								<div class="col-lg-1">
-									<div class="form-group">
-										<label for="saldo">Saldo</label>
-										<input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center" disabled>
-									</div>
-								</div>
-								<div class="col-lg-1">
-									<div class="form-group">
-										<label for="quantidade">Quantidade</label>
-										<input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="" onkeypress="return onlynumber(event)" style="text-align: center" autofocus>
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="lote">Lote</label>
-										<input id='lote' type="text" class="form-control" value="" style="text-align: center">
-									</div>
-								</div>
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="numSerie">Nº Série/Chassi</label>
-										<input id='numSerie' type="text" class="form-control" value="" style="text-align: center">
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="fabricacao">Fabricação</label>
-										<input id='fabricacao' type="date" class="form-control" value="" style="text-align: center">
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="validade">Validade</label>
-										<input id='validade' type="date" class="form-control" value="" style="text-align: center">
-									</div>
-								</div>
-							</div>`;
-						}
-
-						$('#thead-modal').html(HTML);
-
-						// Esta função não permite que o valor digitado pelo usuário seja maior que o valor de saldo.
-						function validaQuantInputModal(quantMax) {
-							$('#quantidade').on('keyup', function() {
-								if (parseInt($('#quantidade').val()) > parseInt(quantMax)) {
-									$('#quantidade').val(quantMax)
-								}
-							})
-						}
-
-						validaQuantInputModal($('#saldo').val())
-
-						$('#quantidade').focus()
-					}
-				})
-			})
-
-			$('#modal-close').on('click', function() {
-				$('#page-modal').fadeOut(200);
-				$('body').css('overflow', 'scroll');
-			})
-		}
-
-		function mudarValores() {
-			$('#salvar').on('click', () => {
-
-				let grid = $('.trGrid')
-				let tdsModal = $('#trModal').children()
-
-				grid.each((i1, elem1) => { // each sobre a grid
-					let tr = $(elem1).children() // colocando todas as linhas em um 
-
-					let td = tr.first()
-					let indiceLinha = td.html()
-					// console.log(elem1)
-
-					tdsModal.each((i, elem2) => {
-						let indiceProdutoModal = $(elem2).html()
-						let inputHiddenProdutoServico = $(`#campo${indiceLinha}`)
-						let tipo = inputHiddenProdutoServico.attr('tipo')
-
-						if (i == 0 && indiceProdutoModal == indiceLinha) {
-
-							let novaQuantidade = ($(tdsModal[2]).children().val()? $(tdsModal[2]).children().val(): '') // pegando a quantidade digitada pelo usuário
-							let saldo = ($(tdsModal[3]).children().val()? $(tdsModal[3]).children().val(): '') // pegando o saldo do produto
-							let lote = ($(tdsModal[4]).children().val()? $(tdsModal[4]).children().val(): '') // pegando o lote digitado pelo usuário
-							let numSerie = ($(tdsModal[5]).children().val()? $(tdsModal[5]).children().val(): '') // pegando o Nº Serie digitado pelo usuário
-							let fabricacao = ($(tdsModal[6]).children().val()? $(tdsModal[6]).children().val(): '') // pegando ano de fabricação digitado pelo usuário
-							let validade = ($(tdsModal[7]).children().val()? $(tdsModal[7]).children().val(): '') // pegando a validade digitada pelo usuário
-
-							let inputProdutoGridValores = inputHiddenProdutoServico.val()
-							let arrayValInput = inputProdutoGridValores.split('#')
-
-							// adicionando  novos dados no array
-							arrayValInput[3] = novaQuantidade
-							arrayValInput[4] = saldo
-							arrayValInput[5] = lote
-							arrayValInput[6] = validade
-							arrayValInput[7] = numSerie
-							arrayValInput[8] = fabricacao
-
-							var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
-
-							var stringVallnput = arrayValInput.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
-
-							inputHiddenProdutoServico.val(stringVallnput) // colocando a nova string com os valores no input do produto/servico.
-
-							let quantInicial = inputHiddenProdutoServico.attr('quantInicial')
-							let saldoInicial = inputHiddenProdutoServico.attr('saldoInicial')
-
-							let novosValores = recalcValores(quantInicial, novaQuantidade, saldoInicial, arrayValInput[2])
-
-							$(tr[3]).html(novosValores.quantAtualizada)
-							$(tr[4]).html(novosValores.novoSaldo)
-							$(tr[6]).html("R$ " + novosValores.valorTotal)
-							$(tr[6]).attr('valorTotalSomaGeral', novosValores.somaTotalValorGeral)
-							$(tr[7]).html(formatDate(validade, 'pt-BR'))
-
-							$('#inputNumItens').val()
-							stringVallnput = ''
-
-							// O input itemEditadoquantidade recebe como valor a ultima quantidade editada, para garantir que pelo menos uma quantidade de produtos ou serviços foi editada 
-							$('#itemEditadoquantidade').val(novaQuantidade)
-							$('#validadeNaoInformada').val(validade)
-
-						}
-					})
-				})
-				$('#page-modal').fadeOut(200);
-				$('body').css('overflow', 'scroll');
-
-				recalcValorTotal()
-				calcSaldoOrdemCompra()
-			})
-		}
-
-		function recalcValores(quantInicial, novaQuantidade, saldoInicial, valorUni) {
-
-			let valorTotal = 0
-			let novoSaldo = 0
-			let quantAtualizada = 0
-
-			novoSaldo = saldoInicial - novaQuantidade;
-
-			//quantAtualizada = parseInt(novaQuantidade) + parseInt(quantInicial)
-
-			return {
-				quantAtualizada: novaQuantidade,
-				valorTotal: float2moeda(novaQuantidade * valorUni),
-				somaTotalValorGeral: novaQuantidade * valorUni,
-				novoSaldo: novoSaldo
-			};
-		}
-
-		function recalcValorTotal() {
-			let novoTotalGeral = 0
-			let velhoTotalGeral = $('#total').attr('valorTotalGeral')
-			$('.trGrid').each((i, elem) => {
-				$(elem).children().each((i, elem) => {
-					if ($(elem).hasClass('valorTotal')) {
-
-						if ($(elem).attr('valorTotalSomaGeral')) {
-							novoTotalGeral += parseFloat($(elem).attr('valorTotalSomaGeral'))
-
-							//$('#total').attr('valorTotalGeral', `${novoTotalGeral}`)
-						}
-					}
-				})
-			})
-
-			$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`).attr('valor', novoTotalGeral)
-		}
-
-		function inputsModal() {
-			$('#tbody-modal')
-		}
-
 		$(document).ready(function() {
 
 			function verificaTotalNotaFiscal() {
@@ -639,7 +307,7 @@ if (isset($_POST['inputData'])) {
 				$('#totalSaldo').html('R$ ' + float2moeda(calcSaldoAtual)).attr('valor', calcSaldoAtual)
 
 				return true;
-			}			
+			}
 
 			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbFornecedor').on('change', function(e) {
@@ -776,70 +444,357 @@ if (isset($_POST['inputData'])) {
 				$('#enviar').prop("disabled", true);
 
 				$("#formMovimentacao").submit();
-
-				//console.log(inputTipo)
 			});
 
 			function FiltraOrdensCompra() {
 				$('#cmbOrdemCompra').empty().append('<option value="">Filtrando...</option>');
 			}
 
+			function formatDate(data, formato) {
+				if (formato == 'pt-BR') {
+					return (data.substr(0, 10).split('-').reverse().join('/'));
+				} else {
+					return (data.substr(0, 10).split('/').reverse().join('-'));
+				}
+			}
+
+			function produtosOrdemCompra(ordemCompra) {
+				let inputLote = $('#inputLote').val();
+
+				$.ajax({
+					type: "POST",
+					url: "movimentacaoAddProdutoOrdemCompra.php",
+					data: {
+						ordemCompra: ordemCompra,
+						lote: inputLote
+					},
+					success: function(resposta) {
+						$("#tabelaProdutoServico").html(resposta);
+
+						let total = $('#total').html();
+
+						$("#inputTotal").val(total);
+						modalAcoes()
+						mudarValores()
+
+						let todasLinhas = $('.trGrid')
+						$('#inputNumItens').val(todasLinhas.length)
+					}
+
+				});
+
+				$.ajax({
+					type: "POST",
+					url: "movimentacaoSaldoOrdemCompra.php",
+					data: {
+						ordemCompra: ordemCompra,
+					},
+					success: function(resposta) {
+						$("#inputTotalOrdemCompraCartaContrato").val(float2moeda(resposta)).attr('disabled', '').attr('valor', resposta);
+					}
+				})
+			}
+
+			function modalAcoes() {
+
+				$('.btn-acoes').each((i, elem) => {
+					$(elem).on('click', function() {
+						let linha = $(elem).parent().parent()
+						let todasLinhas = $(elem).parent().parent().parent()
+						let saldoinicialModal = $(elem).parent().next().attr('saldoInicial') // selecionando o valor do input hidden
+
+						if ($(elem).attr('idRow') == linha.attr('id')) {
+							let tds = linha.children();
+							let tipoProdutoServico = $(tds[9]).attr('tipo');
+							$('#tipo').val(tipoProdutoServico)
+
+							let valores = [];
+
+							let Marca = ''
+							let Modelo = ''
+							let Fabri = ''
+
+							let linhaTabela = ''
+
+							let idTd = $(tds[0]).text()
+							let valorCampo = $(`#campo${idTd}`).val()
+							valorCampo = valorCampo.split('#')
+
+							console.log(valorCampo)
+
+							let quantidade = parseInt(valorCampo[3]) < parseInt(valorCampo[4])? valorCampo[3] : valorCampo[4]
+							let lote = valorCampo[5] && valorCampo[5] != '0'? valorCampo[5]: ''
+							let validade = valorCampo[6] && valorCampo[6] != '0'? valorCampo[6]: ''
+							let numSerie = valorCampo[7] && valorCampo[7] != '0'? valorCampo[7]: ''
+							let fabricacao = valorCampo[8] && valorCampo[8] != '0'? valorCampo[8]: ''
+
+							tds.each((i, elem) => {
+								let id = $(elem).attr('id')
+								valores[i] = $(elem).html();
+								Marca = id === 'MarcaNome' && $(elem).val() ? $(elem).val():Marca
+								Modelo = id === 'ModelNome' && $(elem).val() ? $(elem).val():Modelo
+								Fabri = id === 'FabriNome' && $(elem).val() ? $(elem).val():Fabri
+							})
+
+							if (tipoProdutoServico != 'P') {
+								HTML = `
+								<div class="row col-lg-12" style="padding:0px; margin:0px;">
+									<div class="col-lg-4">
+										<label for="inputServicoNome">Serviço</label>
+										<input type="text" id="inputServicoNome" name="inputServicoNome" class="form-control" value="${valores[1]}" disabled>
+									</div>
+									<div class="col-lg-2">
+										<label for="inputMarcaNome">Marca</label>
+										<input type="text" id="inputMarcaNome" name="inputMarcaNome" class="form-control" value="${Marca}" disabled>
+									</div>
+									<div class="col-lg-2">
+										<label for="inputModeloNome">Modelo</label>
+										<input type="text" id="inputModeloNome" name="inputModeloNome" class="form-control" value="${Modelo}" disabled>
+									</div>
+									<div class="col-lg-2">
+										<label for="inputFabriNome">Fabricante</label>
+										<input type="text" id="inputFabriNome" name="inputFabriNome" class="form-control" value="${Fabri}" disabled>
+									</div>
+									<div class="col-lg-1">
+										<label for="saldo">Saldo</label>
+										<input id='saldo' class="form-control" style="text-align: center"  value="${saldoinicialModal}" disabled>
+									</div>
+									<div class="col-lg-1">
+										<label for="quantidade">Quantidade</label>
+										<input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="${quantidade}" onkeypress="return onlynumber(event)" style="text-align: center" autofocus>
+									</div>
+									<div class="d-none">
+										<input id='idModal' type="hidden" value="${idTd}">
+									</div>
+								</div>`;
+							} else {
+								HTML = `
+								<div class="row col-lg-12" style="padding:0px; margin:0px;">
+									<div class="col-lg-6">
+										<label for="inputProdutoNome">Produto</label>
+										<input type="text" id="inputProdutoNome" name="inputProdutoNome" class="form-control" value="${valores[1]}" disabled>
+									</div>
+									<div class="col-lg-2">
+										<label for="inputMarcaNome">Marca</label>
+										<input type="text" id="inputMarcaNome" name="inputMarcaNome" class="form-control" value="${Marca}" disabled>
+									</div>
+									<div class="col-lg-2">
+										<label for="inputModeloNome">Modelo</label>
+										<input type="text" id="inputModeloNome" name="inputModeloNome" class="form-control" value="${Modelo}" disabled>
+									</div>
+									<div class="col-lg-2">
+										<label for="inputFabriNome">Fabricante</label>
+										<input type="text" id="inputFabriNome" name="inputFabriNome" class="form-control" value="${Fabri}" disabled>
+									</div>
+								</div>
+								
+								<div class="row col-lg-12" style="padding:0px; margin:0px;">
+									<div class="col-lg-1">
+										<label for="saldo">Saldo</label>
+										<input id='saldo' type="text" class="form-control" value="${saldoinicialModal}" style="text-align: center" disabled>
+									</div>
+									<div class="col-lg-1">
+										<label for="quantidade">Quantidade</label>
+										<input id='quantidade' quantMax='${valores[4]}' type="text" class="form-control" value="${quantidade}" onkeypress="return onlynumber(event)" style="text-align: center" autofocus>
+									</div>
+									<div class="col-lg-2">
+										<label for="lote">Lote</label>
+										<input id='lote' type="text" class="form-control" value="${lote}" style="text-align: center">
+									</div>
+									<div class="col-lg-4">
+										<label for="numSerie">Nº Série/Chassi</label>
+										<input id='numSerie' type="text" class="form-control" value="${numSerie}" style="text-align: center">
+									</div>
+									<div class="col-lg-2">
+										<label for="fabricacao">Fabricação</label>
+										<input id='fabricacao' type="date" class="form-control" value="${fabricacao}" style="text-align: center">
+									</div>
+									<div class="col-lg-2">
+										<label for="validade">Validade</label>
+										<input id='validade' type="date" class="form-control" value="${validade}" style="text-align: center">
+									</div>
+									<div class="d-none">
+										<input id='idModal' type="hidden" value="${idTd}">
+									</div>
+								</div>`;
+							}
+
+							$('#thead-modal').html(HTML);
+
+							// Esta função não permite que o valor digitado pelo usuário seja maior que o valor de saldo.
+							function validaQuantInputModal(quantMax) {
+								$('#quantidade').on('keyup', function() {
+									if (parseInt($('#quantidade').val()) > parseInt(quantMax)) {
+										$('#quantidade').val(quantMax)
+									}
+								})
+							}
+
+							validaQuantInputModal($('#saldo').val())
+
+							$('#quantidade').focus()
+						}
+						$('#page-modal').fadeIn(200);
+					})
+				})
+
+				$('#modal-close').on('click', function() {
+					$('#page-modal').fadeOut(200);
+					$('body').css('overflow', 'scroll');
+				})
+			}
+
+			function mudarValores() {
+				$('#salvar').on('click', () => {
+
+					var id = $('#idModal').val()
+					var saldo = $('#saldo').val()
+					var lote = $('#lote').val()
+					var quantidade = $('#quantidade').val()
+					var numSerie = $('#numSerie').val()
+					var fabricacao = $('#fabricacao').val()
+					var validade = $('#validade').val()
+
+					let inputHiddenProdutoServico = $(`#campo${id}`)
+					let arrayValInput = inputHiddenProdutoServico.val().split('#')
+
+					// adicionando  novos dados no array
+					arrayValInput[3] = quantidade
+					arrayValInput[4] = saldo
+					arrayValInput[5] = lote
+					arrayValInput[6] = validade
+					arrayValInput[7] = numSerie
+					arrayValInput[8] = fabricacao
+
+					var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
+					var stringVallnput = arrayValInput.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
+					
+					inputHiddenProdutoServico.val(stringVallnput)// colocando a nova string com os valores no input do produto/servico.
+
+					let quantInicial = inputHiddenProdutoServico.attr('quantInicial')
+					let saldoInicial = inputHiddenProdutoServico.attr('saldoInicial')
+
+					let novosValores = recalcValores(quantInicial, quantidade, saldoInicial, arrayValInput[2])
+
+					var tds = $(`#row${id}`).find('td')
+
+					$(tds[3]).html(novosValores.quantAtualizada)
+					$(tds[4]).html(novosValores.novoSaldo)
+					$(tds[6]).html("R$ " + novosValores.valorTotal)
+					$(tds[6]).attr('valorTotalSomaGeral', novosValores.somaTotalValorGeral)
+					$(tds[7]).html(validade?formatDate(validade, 'pt-BR'):'')
+
+					$('#inputNumItens').val()
+					stringVallnput = ''
+
+					// O input itemEditadoquantidade recebe como valor a ultima quantidade editada, para garantir que pelo menos uma quantidade de produtos ou serviços foi editada 
+					$('#itemEditadoquantidade').val(quantidade)
+					$('#validadeNaoInformada').val(validade)
+
+					$('#page-modal').fadeOut(200);
+					$('body').css('overflow', 'scroll');
+
+					recalcValorTotal()
+					calcSaldoOrdemCompra()
+				})
+			}
+
+			function recalcValores(quantInicial, novaQuantidade, saldoInicial, valorUni) {
+
+				let valorTotal = 0
+				let novoSaldo = 0
+				let quantAtualizada = 0
+
+				novoSaldo = saldoInicial - novaQuantidade;
+
+				//quantAtualizada = parseInt(novaQuantidade) + parseInt(quantInicial)
+
+				return {
+					quantAtualizada: novaQuantidade,
+					valorTotal: float2moeda(novaQuantidade * valorUni),
+					somaTotalValorGeral: novaQuantidade * valorUni,
+					novoSaldo: novoSaldo
+				};
+			}
+
+			function recalcValorTotal() {
+				let novoTotalGeral = 0
+				let velhoTotalGeral = $('#total').attr('valorTotalGeral')
+				$('.trGrid').each((i, elem) => {
+					$(elem).children().each((i, elem) => {
+						if ($(elem).hasClass('valorTotal')) {
+
+							if ($(elem).attr('valorTotalSomaGeral')) {
+								novoTotalGeral += parseFloat($(elem).attr('valorTotalSomaGeral'))
+
+								//$('#total').attr('valorTotalGeral', `${novoTotalGeral}`)
+							}
+						}
+					})
+				})
+
+				$('#total').html(`R$ ${float2moeda(novoTotalGeral)}`).attr('valor', novoTotalGeral)
+			}
+
+			function inputsModal() {
+				$('#tbody-modal')
+			}
+
+			Array.prototype.remove = function(start, end) {
+				this.splice(start, end);
+				return this;
+			}
+
+			Array.prototype.insert = function(pos, item) {
+				this.splice(pos, 0, item);
+				return this;
+			}
+
+			function selecionaTipo(tipo) {
+
+				// $('#divConteudo').css({
+				// 	"background-color": "#eeeded",
+				// 	"box-shadow": "none"
+				// });
+				// $('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
+				
+				// setTimeout(() => {
+				// }, 3000);
+				if (tipo == 'E') {
+					location.href = 'movimentacaoNovoEntrada.php';
+				} else if (tipo == 'S') {
+					location.href = 'movimentacaoNovoSaida.php';
+				} else {
+					location.href = 'movimentacaoNovoTransferencia.php';
+				}
+			}
+
+			function float2moeda(num) {
+
+				x = 0;
+
+				if (num < 0) {
+					num = Math.abs(num);
+					x = 1;
+				}
+				if (isNaN(num)) num = "0";
+				cents = Math.floor((num * 100 + 0.5) % 100);
+
+				num = Math.floor((num * 100 + 0.5) / 100).toString();
+
+				if (cents < 10) cents = "0" + cents;
+				for (var i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++)
+					num = num.substring(0, num.length - (4 * i + 3)) + '.' +
+					num.substring(num.length - (4 * i + 3));
+				ret = num + ',' + cents;
+				if (x == 1) ret = ' - ' + ret;
+
+				return ret;
+
+			}
+
 		}); //document.ready
-
-		Array.prototype.remove = function(start, end) {
-			this.splice(start, end);
-			return this;
-		}
-
-		Array.prototype.insert = function(pos, item) {
-			this.splice(pos, 0, item);
-			return this;
-		}
-
-		function selecionaTipo(tipo) {
-
-			// $('#divConteudo').css({
-			// 	"background-color": "#eeeded",
-			// 	"box-shadow": "none"
-			// });
-			// $('#divConteudo').html('<div style="text-align:center;"><img src="global_assets/images/lamparinas/loader-transparente.gif" width="200" /></div>');
-			
-			// setTimeout(() => {
-			// }, 3000);
-			if (tipo == 'E') {
-				location.href = 'movimentacaoNovoEntrada.php';
-			} else if (tipo == 'S') {
-				location.href = 'movimentacaoNovoSaida.php';
-			} else {
-				location.href = 'movimentacaoNovoTransferencia.php';
-			}
-		}
-
-		function float2moeda(num) {
-
-			x = 0;
-
-			if (num < 0) {
-				num = Math.abs(num);
-				x = 1;
-			}
-			if (isNaN(num)) num = "0";
-			cents = Math.floor((num * 100 + 0.5) % 100);
-
-			num = Math.floor((num * 100 + 0.5) / 100).toString();
-
-			if (cents < 10) cents = "0" + cents;
-			for (var i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++)
-				num = num.substring(0, num.length - (4 * i + 3)) + '.' +
-				num.substring(num.length - (4 * i + 3));
-			ret = num + ',' + cents;
-			if (x == 1) ret = ' - ' + ret;
-
-			return ret;
-
-		}
 	</script>
-
 </head>
 
 <body class="navbar-top">
