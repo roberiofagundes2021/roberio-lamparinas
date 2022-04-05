@@ -1262,7 +1262,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                     <div class="d-flex flex-row ">
                                         <div class='col-lg-4'>
                                             <div class="form-group">
-                                                <label for="cmbPatriMarcaEdita">Marca</label>
+                                                <label for="cmbPatriMarcaEdita">Marca <span class="text-danger">*</span></label>
                                                 <select id="cmbPatriMarcaEdita" name="cmbPatriMarcaEdita" class="form-control select-search">
                                                     <option value="">Selecione</option>
                                                     <?php
@@ -1283,7 +1283,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                         </div>
                                         <div class='col-lg-4'>
                                             <div class="form-group">
-                                                <label for="cmbPatriModeloEdita">Modelo</label>
+                                                <label for="cmbPatriModeloEdita">Modelo <span class="text-danger">*</span></label>
                                                 <select id="cmbPatriModeloEdita" name="cmbPatriModeloEdita" class="form-control select-search">
                                                     <option value="">Selecione</option>
                                                     <?php
@@ -1304,7 +1304,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                         </div>
                                         <div class='col-lg-4'>
                                             <div class="form-group">
-                                                <label for="cmbPatriFabricanteEdita">Fabricante</label>
+                                                <label for="cmbPatriFabricanteEdita">Fabricante <span class="text-danger">*</span></label>
                                                 <select id="cmbPatriFabricanteEdita" name="cmbPatriFabricanteEdita" class="form-control select-search">
                                                     <option value="">Selecione</option>
                                                     <?php
