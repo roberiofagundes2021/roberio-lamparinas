@@ -381,6 +381,13 @@ $dataFim = date("Y-m-d");
           } else {
             document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraPagamento.php";
           }          
+      } else if (Tipo == 'exclui') {
+          if(Permission){
+              confirmaExclusao(document.formMovimentacaoFinanceira, "Tem certeza que deseja excluir essa Movimentação ?", "movimentacaoFinanceiraExclui.php");
+          } else{
+              alerta('Permissão Negada!','');
+              return false;
+          }
       }else if(Tipo == 'estornar') {
         return false;
       }            
