@@ -120,7 +120,7 @@ include('global_assets/php/conexao.php');
 
             $visibilidade = ($status == 'Pago') ? 'none' : 'block';
 
-            $estornamento =  (!isset($item['CnAPaJustificativaEstorno'])) ? 'none' : 'block';
+            $estornamento =  (!isset($item['CnAPaJustificativaEstorno']) || $status == 'Pago') ? 'none' : 'block';
             $justificativaEstornamento = (isset($item['CnAPaJustificativaEstorno'])) ? $item['CnAPaJustificativaEstorno'] : '';
 
             $checkbox = '<input type="checkbox" id="check'.$cont.'" style="display: '.$visibilidade.';"> <input type="hidden" value="'.$item["CnAPaId"].'">';

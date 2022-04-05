@@ -6,6 +6,10 @@ $_SESSION['PaginaAtual'] = 'Financeiro / Movimentação do Financeiro / Novo Lan
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputPermissionAtualiza'])){
+  $_SESSION['MovFinancPermissionAtualiza'] = $_POST['inputPermissionAtualiza'];
+}
+
 if (isset($_POST['inputDataEmissao'])) {
     if (isset($_POST['inputEditar'])) { //EDIÇÃO
       try {
@@ -363,43 +367,48 @@ $dataInicio = date("Y-m-d");
               <!-- Basic responsive configuration -->
               <div class="card">
                 <div class="card-header header-elements-inline">
-                  <h3 class="card-title">Novo/Editar Lançamento</h3>
-                  <div class="header-elements">
-                    <div class="list-icons">
-                      <a class="list-icons-item" data-action="collapse"></a>
-                      <a href="relatorioMovimentacao.php" class="list-icons-item" data-action="reload"></a>
-                      <!--<a class="list-icons-item" data-action="remove"></a>-->
-                    </div>
-                  </div>
+                  <?php 
+                  if(isset($_SESSION['MovFinancPermissionAtualiza'])) {
+                    echo "<h3 class='card-title'>Editar Lançamento (Transferência)</h3>";
+                  }else {
+                    echo "<h3 class='card-title'>Novo Lançamento</h3>";
+                  }
+                  ?>
                 </div>
 
                 <div class="card-body">
 
-                  <br />
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="form-group">
-                        <div class="form-check form-check-inline">
-                          <label class="form-check-label">
-                            <input type="radio" name="inputTipo" value="P" class="form-input-styled" onclick="selecionaTipo('P')" data-fouc <?php if (isset($lancamento)) echo 'disabled' ?>>
-                            Pagamento
-                          </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                          <label class="form-check-label">
-                            <input type="radio" name="inputTipo" value="R" class="form-input-styled" onclick="selecionaTipo('R')" data-fouc <?php if (isset($lancamento)) echo 'disabled' ?>>
-                            Recebimento
-                          </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                          <label class="form-check-label">
-                            <input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo('T')" data-fouc <?php if (isset($lancamento)) echo 'disabled' ?> checked>
-                            Transferência
-                          </label>
+                 <?php 
+                  if(!isset($lancamento)) {
+                    echo '
+                      <br />
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <div class="form-group">
+                            <div class="form-check form-check-inline">
+                              <label class="form-check-label">
+                                <input type="radio" name="inputTipo" value="P" class="form-input-styled" onclick="selecionaTipo(`P`)" data-fouc>
+                                Pagamento
+                              </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <label class="form-check-label">
+                                <input type="radio" name="inputTipo" value="R" class="form-input-styled" onclick="selecionaTipo(`R`)" data-fouc>
+                                Recebimento
+                              </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <label class="form-check-label">
+                                <input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo(`T`)" data-fouc checked>
+                                Transferência
+                              </label>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    ';
+                  }
+                  ?>
 
                   <br />
 
@@ -578,7 +587,11 @@ $dataInicio = date("Y-m-d");
                     <div class="row">
                       <div class="col-lg-6">
                         <div class="form-group">
-                          <a href="movimentacaoFinanceira.php" class="btn voltar">Voltar</a>
+                          <?php if($_SESSION['Conciliacao'] === true) { ?>
+                            <a href="movimentacaoFinanceiraConciliacao.php" class="btn voltar">Voltar</a>
+                          <?php } else { ?>
+                            <a href="movimentacaoFinanceira.php" class="btn voltar">Voltar</a>
+                          <?php } ?>
                         </div>
                       </div>
 
@@ -588,7 +601,7 @@ $dataInicio = date("Y-m-d");
                     </div>
                   <?php } else { ?>
                   <?php 
-                    if ($_SESSION['MovFinancPermissionAtualiza']) {
+                    if (isset($_SESSION['MovFinancPermissionAtualiza'])) {
                         echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
                     }
                   ?>

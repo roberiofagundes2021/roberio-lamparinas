@@ -619,9 +619,11 @@ if (isset($_POST['inputContasAReceberId']) && $_POST['inputContasAReceberId'] !=
                         CnAReStatus, 
                         CnAReUsuarioAtualizador, 
                         CnAReUnidade,
-                        FrPagChave            
+                        FrPagChave,
+                        SituaNome          
     		       FROM ContasAReceber
                    LEFT JOIN FormaPagamento on FrPagId = CnAReFormaPagamento
+                   JOIN Situacao on SituaId = CnAReStatus
     		       WHERE CnAReUnidade = " . $_SESSION['UnidadeId'] . " and CnAReId = " .$_POST['inputConciliacaoId'] . "";
 
         $result = $conn->query($sql);
@@ -1149,13 +1151,6 @@ $dataInicio = date("Y-m-d");
                             <div class="card">
                                 <div class="card-header header-elements-inline">
                                     <h3 class="card-title"><?php if (!isset($lancamento)) { echo 'Novo'; } else { echo 'Editar'; }  ?> Lançamento - Contas a Receber</h3>
-                                    <div class="header-elements">
-                                        <div class="list-icons">
-                                            <a class="list-icons-item" data-action="collapse"></a>
-                                            <a href="relatorioMovimentacao.php" class="list-icons-item" data-action="reload"></a>
-                                            <!--<a class="list-icons-item" data-action="remove"></a>-->
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div class="card-body">

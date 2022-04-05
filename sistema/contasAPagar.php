@@ -476,6 +476,18 @@ $dataFim = date("Y")."-12-31";
 
             $("#salvarPA").on('click', (e) => {
                 e.preventDefault()
+                if($('#cmbFormaPagamentoPA').val() == '') {
+                    alerta('Atenção', 'Por favor informe a forma do pagamento!', 'error');
+                    $('#cmbFormaPagamentoPA').focus();
+                    return false
+                }
+
+                if($('#cmbContaBancoPA').val() == '') {
+                    alerta('Atenção', 'Por favor informe o banco!', 'error');
+                    $('#cmbContaBancoPA').focus();
+                    return false
+                }
+
                 if($('#inputDescricaoPA').val() == '') {
                     alerta('Atenção', 'A descrição é obrigatória!', 'error');
                     $('#inputDescricaoPA').focus();
@@ -792,6 +804,7 @@ $dataFim = date("Y")."-12-31";
             document.formContasAPagar.submit();
 		}
 
+        //Essa função preenche o pop-up Justificativa de estorno
         function estornoJustificativa(justificativa) {
             $('#txtJustificativa').val(justificativa);
         }
@@ -1134,7 +1147,7 @@ $dataFim = date("Y")."-12-31";
                                 </div>
                                 <div class="d-flex flex-row">
                                     <div class="col-lg-6">
-                                        <label for="cmbFormaPagamentoPA">Forma Pagamento</label>
+                                        <label for="cmbFormaPagamentoPA">Forma Pagamento <span class="text-danger">*</span></label>
                                         <div class="form-group">
                                             <select id="cmbFormaPagamentoPA" name="cmbFormaPagamentoPA"
                                                 class="form-control form-control-select2">
@@ -1155,7 +1168,7 @@ $dataFim = date("Y")."-12-31";
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <label for="cmbContaBancoPA">Conta/Banco</label>
+                                        <label for="cmbContaBancoPA">Conta/Banco <span class="text-danger">*</span></label>
                                         <div class="form-group">
                                             <select id="cmbContaBancoPA" name="cmbContaBancoPA"
                                                 class="form-control form-control-select2">
