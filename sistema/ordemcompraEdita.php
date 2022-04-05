@@ -14,6 +14,17 @@ $parametroEmp = $resultParametroEmp->fetch(PDO::FETCH_ASSOC);
 
 $empresaType = $parametroEmp['ParamEmpresaPublica'] ? 'publica' : 'privada';
 
+if ($parametroEmp['ParamEmpresaPublica']){
+	$ordemCompra = "/CONTRATO";
+	$lote= "Nº Ata/Lote";
+	$contrato = "Contrato";
+
+} else {
+	$ordemCompra = " ";
+	$lote = "Nº Lote";
+	$contrato = "Nº Fluxo";
+}
+
 
 //Se veio da ordemcompra.php
 if (isset($_POST['inputOrdemCompraId'])) {
@@ -438,7 +449,7 @@ if (isset($_POST['inputTipo'])) {
 					<form name="formOrdemCompra" id="formOrdemCompra" method="post" class="form-validate-jquery">
 					    <input id="disabledForm" type="hidden" class="<?php $movimentacoes >= 1 ? print('disabledForm') : print('') ?>">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Ordem de Compra/Contrato Nº
+							<h5 class="text-uppercase font-weight-bold">Editar Ordem de Compra<?php echo $ordemCompra; ?> Nº
 								"<?php echo $_POST['inputOrdemCompraNumero']; ?>"</h5>
 						</div>
 
@@ -502,7 +513,7 @@ if (isset($_POST['inputTipo'])) {
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="cmbContrato">Contrato<span
+												<label for="cmbContrato"><?php echo $contrato; ?><span
 														class="text-danger">*</span></label>
 												<input type="text" id="cmbContrato" name="cmbContrato" class="form-control"
 													value="<?php echo $row['FlOpeNumContrato']; ?>" readOnly
@@ -518,7 +529,7 @@ if (isset($_POST['inputTipo'])) {
 											</div>
 										</div>
 
-										<div class="col-lg-2">
+										<div class="<?php if ($ordemCompra == "/CONTRATO") { echo "col-lg-2"; } else { echo "col-lg-3"; } ?>">
 											<div class="form-group">
 												<label for="inputNumero">Número <span
 														class="text-danger">*</span></label>
@@ -538,7 +549,7 @@ if (isset($_POST['inputTipo'])) {
 											</div>
 										</div>
 
-										<div class="col-lg-2" id="Lote"
+										<div class="<?php if ($ordemCompra == "/CONTRATO") { echo "col-lg-2"; } else { echo "col-lg-3"; } ?>" id="Lote"
 											style="display: <?php if ($row['OrComTipo'] == 'C') echo 'none' ?>">
 											<div class="form-group">
 												<label for="inputLote">Lote</label>
@@ -548,14 +559,17 @@ if (isset($_POST['inputTipo'])) {
 											</div>
 										</div>
 
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputProcesso">Processo</label>
-												<input type="text" id="inputProcesso" name="inputProcesso"
-													class="form-control" value="<?php echo $row['OrComNumProcesso']; ?>"
-													<?php $movimentacoes >= 1 ? print('readonly') : '' ?>>
-											</div>
-										</div>
+										<?php
+											if ($ordemCompra == "/CONTRATO"){	
+												print('
+											<div class="col-lg-2">
+												<div class="form-group">                               
+													<label for="inputProcesso">Processo</label>       
+													<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" value="' . $row['OrComNumProcesso'] . '"'); if ($movimentacoes >= 1) { echo "readonly"; } else { echo ""; } print(' >
+												</div>
+											</div>	');
+											}										
+									   ?>	
 									</div>
 
 									<div class="row">
