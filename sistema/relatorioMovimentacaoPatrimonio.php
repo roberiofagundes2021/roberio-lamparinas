@@ -329,9 +329,8 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         let data = $(tds[10]).html();
                         let anoFabr = $(tds[11]).html();
                         let empenho = $(tds[12]).html();
-                        let numeroSerie = $(tds[13]).children().first().val();
-                        let estadoConservacao = $(tds[14]).children().first().val();
-                        let arrayProdutoXFabricante = $(tds[15]).text()?$(tds[15]).text().split('#'):[];
+                        let estadoConservacaoNumeroSerie = $(tds[14]).text()? $(tds[14]).text().split('#'):[];
+                        let arrayProdutoXFabricante = $(tds[15]).text()? $(tds[15]).text().split('#'):[];
 
                         const fonte1 = 'style="font-size: 1.1rem"'
                         const fonte2 = 'style="font-size: 0.9rem"'
@@ -341,27 +340,21 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         const styleLabel3 = 'style="min-width: 100px; font-size: 0.9rem"'
                         const marginP = 'style="font-size: 0.9rem; margin-top: 4px"'
 
-                        var NumSerie = numeroSerie ? numeroSerie : ''
-
-                        let marca = ''
-                        let modelo = ''
-                        let fabricante = ''
-
-                        if (arrayProdutoXFabricante.length){
-                            let marca = arrayProdutoXFabricante[0]
-                            let modelo = arrayProdutoXFabricante[1]
-                            let fabricante = arrayProdutoXFabricante[2]
-                        }
-
-                        $('#numeroSerie').val(NumSerie)
-
-                        $('#cmbEstadoConservacao').val((estadoConservacao > 0) ? estadoConservacao : '').change()
+                        let marca = arrayProdutoXFabricante.length?arrayProdutoXFabricante[0]:''
+                        let modelo = arrayProdutoXFabricante.length?arrayProdutoXFabricante[1]:''
+                        let fabricante = arrayProdutoXFabricante.length?arrayProdutoXFabricante[2]:''
+                        let NumSerie = estadoConservacaoNumeroSerie.length?estadoConservacaoNumeroSerie[0]:''
+                        let conservacao = estadoConservacaoNumeroSerie.length?estadoConservacaoNumeroSerie[1]:''
 
                         $('#cmbPatriMarcaEdita').val(marca).change()
 
                         $('#cmbPatriModeloEdita').val(modelo).change()
 
                         $('#cmbPatriFabricanteEdita').val(fabricante).change()
+
+                        $('#numeroSerie').val(NumSerie)
+
+                        $('#cmbEstadoConservacao').val(conservacao).change()
 
                         formModal = `
                                         <div class='row'style="margin-bottom:-10px;">
@@ -656,11 +649,11 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                         table = $('#tblMovimentacao').DataTable()
 
                         let rowNode
-                        console.log(resposta)
 
                         resposta.forEach(item => {
                             rowNode = table.row.add(item.data).draw().node()
                             $(rowNode).attr('idPatrimonio', item.identify[0]);
+                            $(rowNode).attr('editado', 0);
 
                             // adiciona os atributos nas tags <td>
                             $(rowNode).find('td').eq(4).attr('style', 'text-align: right;')
