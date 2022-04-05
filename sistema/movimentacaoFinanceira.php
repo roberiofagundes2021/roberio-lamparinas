@@ -77,43 +77,48 @@ $dataFim = date("Y-m-d");
         paginate: false,
         columnDefs: [{
             orderable: true, //Data
-            width: "10%",
+            width: "8%",
             targets: [0]
           },
           {
             orderable: true, //Histórico
-            width: "20%",
+            width: "18%",
             targets: [1]
           },
           {
-            orderable: true, //Conta Caixa
-            width: "18%",
+            orderable: true, //Cliente/Fornecedor
+            width: "16%",
             targets: [2]
+          },
+          {
+            orderable: true, //Conta Caixa
+            width: "12%",
+            targets: [3]
           },
           {
             orderable: true, //Nª doc
             width: "6%",
-            targets: [3]
-          },
-          {
-            orderable: true, //Entrada
-            width: "14%",
             targets: [4]
           },
           {
-            orderable: true, //Saída
-            width: "14%",
+            orderable: true, //Entrada
+            width: "12%",
             targets: [5]
           },
           {
-            orderable: true, //Saldo
-            width: "14%",
+            orderable: true, //Saída
+            width: "12%",
             targets: [6]
+          },
+          {
+            orderable: true, //Saldo
+            width: "12%",
+            targets: [7]
           },
           {
             orderable: false, //Ações
             width: "4%",
-            targets: [6]
+            targets: [8]
           }
         ],
         dom: '<"datatable-header"fl><"datatable-scroll-wrap"t>',
@@ -231,27 +236,27 @@ $dataFim = date("Y-m-d");
             resposta.forEach(item => {
               rowNode = table.row.add(item.data).draw().node()
 
-              saldo = parseFloat(item.data[6].replace(",", "."));
+              saldo = parseFloat(item.data[7].replace(",", "."));
               
               // adiciona os atributos nas tags <td>
-              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: green;')
-              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;')
+              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;')
+              $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
 
               if(saldo >= 0) {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;')
+                $(rowNode).find('td').eq(7).attr('style', 'text-align: right; color: green;')
               }else {
-                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
+                $(rowNode).find('td').eq(7).attr('style', 'text-align: right; color: red;')
               }
 
-              entrada = (item.data[4] != null) ? item.data[4] : '0,00'
+              entrada = (item.data[5] != null) ? item.data[5] : '0,00'
               entrada = entrada.replace(".", "").replace(",", ".")
               entradaTotal += parseFloat(entrada)
 
-              saida = (item.data[5] != null) ? item.data[5] : '0,00'
+              saida = (item.data[6] != null) ? item.data[6] : '0,00'
               saida = saida.replace(".", "").replace(",", ".")
               saidaTotal += parseFloat(saida)
 
-              saldo = (item.data[6] != null) ? item.data[6] : '0,00'
+              saldo = (item.data[7] != null) ? item.data[7] : '0,00'
               saldo = saldo.replace(".", "").replace(",", ".")
               saldoTotal += parseFloat(saldo)
 
@@ -267,6 +272,7 @@ $dataFim = date("Y-m-d");
 
             total = `
             <tr id="total" role="row" class="even">
+              <td></td>
               <td></td>
               <td></td>
               <td></td>
@@ -660,9 +666,6 @@ $dataFim = date("Y-m-d");
                     <div class="text-right col-lg-4 pt-3">
                       <button id="submitPesquisar" class="btn btn-principal">Pesquisar</button>
 
-                      <a href="#" onclick="atualizaMovimentacaoFinanceira(<?php echo $novo; ?>, 0, 'P', 'novo');"  
-                      class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo Lançamento</a>
-                     
                       <button id="imprimir" class="btn bg-secondary"><i class="icon-printer2"></i></button>
                     </div>
 
@@ -674,6 +677,7 @@ $dataFim = date("Y-m-d");
                     <tr class="bg-slate">
                       <th>Data</th>
                       <th>Histórico</th>
+                      <th>Cliente / Fornecedor</th>
                       <th>Conta / Banco</th>
                       <th>Documento</th>
                       <th style='text-align: right;'>Entrada</th>

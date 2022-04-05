@@ -78,17 +78,17 @@ function queryPesquisa(){
             $argsCp[]  = "CnAPaStatus = 12";
 
         } else if ($status[0] === "14") {
-            $argsCp[]  = "CnAReStatus = 14";
+            $argsCr[]  = "CnAReStatus = 14";
         
         } else if ($status[0] === '16'){
             $argsCr[]  = "CnAReTransferencia > 0";
             $argsCp[]  = "CnAPaTransferencia > 0";
 
-        } else {
-            $argsCr[]  = "CnAReStatus = 14";
-            $argsCp[]  = "CnAPaStatus = 12";
         }
         $_SESSION['MovFinancStatus'] = $_POST['cmbStatus'];
+    }else {
+        $argsCr[]  = "CnAReStatus = 14";
+        $argsCp[]  = "CnAPaStatus = 12";
     }
 
 
@@ -108,14 +108,16 @@ function queryPesquisa(){
         if ($status[0] === "12") {
             $sql = "SELECT CNAPAID AS ID, 
                            CNAPADTEMISSAO AS DATA, 
-                           CNAPADESCRICAO AS HISTORICO, 
+                           CNAPADESCRICAO AS HISTORICO,  
+                           FORNENOME AS FORNECEDOR,
                            CnAPANUMDOCUMENTO AS NUMDOC, 
                            CNAPAVALORPAGO as TOTAL, 
                            TIPO = 'P' ,
                            CODTRANSFREC = 0,
                            CnAPaTransferencia as CODTRANSFPAG,
                            CNAPACONTABANCO AS CONTABANCO
-                    FROM ContasAPagar ";
+                    FROM ContasAPagar  
+                    JOIN FORNECEDOR on FORNEID = CNAPAFORNECEDOR";
                     if (isset($argsCenCustCp)) {
                         $sql .= " $argsCenCustCp ";
                     }
@@ -125,14 +127,16 @@ function queryPesquisa(){
         } else if ($status[0] === "14") {
             $sql = "SELECT CNAREID AS ID, 
                            CNAREDTEMISSAO AS DATA, 
-                           CNAREDESCRICAO AS HISTORICO, 
+                           CNAREDESCRICAO AS HISTORICO,  
+                           CLIENNOME AS CLIENTE, 
                            CnARENUMDOCUMENTO AS NUMDOC, 
                            CNAREVALORRECEBIDO as TOTAL, 
                            TIPO = 'R' , 
                            CnAReTransferencia as CODTRANSFREC, 
                            CODTRANSFPAG = 0,
                            CNARECONTABANCO AS CONTABANCO
-                    FROM ContasAReceber ";
+                    FROM ContasAReceber  
+                    JOIN CLIENTE on CLIENID = CNARECLIENTE";
                     if (isset($argsCenCustCr)) {
                         $sql .= " $argsCenCustCr ";
                     }
@@ -142,14 +146,16 @@ function queryPesquisa(){
         } else {
             $sql = "SELECT CNAREID AS ID, 
                            CNAREDTEMISSAO AS DATA, 
-                           CNAREDESCRICAO AS HISTORICO, 
+                           CNAREDESCRICAO AS HISTORICO,  
+                           CLIENNOME AS CLIENTE,
                            CnARENUMDOCUMENTO AS NUMDOC, 
                            CNAREVALORRECEBIDO as TOTAL, 
                            TIPO = 'R' , 
                            CnAReTransferencia as CODTRANSFREC, 
                            CODTRANSFPAG = 0,
                            CNARECONTABANCO AS CONTABANCO
-                    FROM ContasAReceber ";
+                    FROM ContasAReceber 
+                    JOIN CLIENTE on CLIENID = CNARECLIENTE";
                     if (isset($argsCenCustCr)) {
                         $sql .= " $argsCenCustCr ";
                     }
@@ -158,13 +164,15 @@ function queryPesquisa(){
                     SELECT CNAPAID AS ID, 
                            CNAPADTEMISSAO AS DATA, 
                            CNAPADESCRICAO AS HISTORICO, 
+                           FORNENOME AS FORNECEDOR,
                            CnAPANUMDOCUMENTO AS NUMDOC, 
                            CNAPAVALORPAGO as TOTAL, 
                            TIPO = 'P' ,
                            CODTRANSFREC = 0 ,
                            CnAPaTransferencia as CODTRANSFPAG,
                            CNAPACONTABANCO AS CONTABANCO
-                    FROM ContasAPagar ";
+                    FROM ContasAPagar 
+                    JOIN FORNECEDOR on FORNEID = CNAPAFORNECEDOR";
                     if (isset($argsCenCustCp)) {
                         $sql .= " $argsCenCustCp ";
                     }
@@ -320,6 +328,8 @@ function queryPesquisa(){
                 $historico = "<a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['ID'].", \"P\", \"edita\");'>" . $item['HISTORICO'] . "</a>";
             }
 
+            $ClienteOuFornecedor = (isset($item['CLIENTE'])) ? $item['CLIENTE'] : $item['FORNECEDOR'];
+
             //CONTA CAIXA
             if (isset($item['CONTABANCO']) && $item['CONTABANCO'] != 0) {
                 $sql = "SELECT  CnBanNome
@@ -330,9 +340,9 @@ function queryPesquisa(){
                            AND  SituaChave = 'ATIVO'
                            AND  CnBanId = ". $item['CONTABANCO'] ."";
                 $result = $conn->query($sql);
-                $ContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+                $ContaBanco = $result->fetch(PDO::FETCH_ASSOC);
 
-                $contaCaixa = $ContaBanco[0]['CnBanNome'];
+                $contaCaixa = $ContaBanco['CnBanNome'];
             }
 
             //NUMERO DO DOCUMENTO
@@ -404,6 +414,7 @@ function queryPesquisa(){
                 'data'=>[
                     isset($data) ? $data : null, 
                     isset($historico) ? $historico : null, 
+                    isset($ClienteOuFornecedor) ? $ClienteOuFornecedor : null,
                     isset($contaCaixa) ? $contaCaixa : null, 
                     isset($numeroDocucmento) ? $numeroDocucmento : null, 
                     isset($entrada) ? $entrada : null, 

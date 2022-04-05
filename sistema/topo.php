@@ -99,6 +99,22 @@
 
 
 		<ul class="navbar-nav ml-md-auto">
+			<?php
+				$visibilidade = 'display:none;';
+				if($_SESSION['PaginaAtual'] == 'Relação de Contas à Pagar' || $_SESSION['PaginaAtual'] == 'Novo Lançamento - Contas a Pagar' ||
+				$_SESSION['PaginaAtual'] == 'Relação de Contas à Receber' || $_SESSION['PaginaAtual'] == 'Novo Lançamento - Contas a Receber' ||
+				$_SESSION['PaginaAtual'] == 'Relação de Movimentações Financeiras' || $_SESSION['PaginaAtual'] == 'Financeiro / Movimentação do Financeiro / Novo Lançamento') {
+					
+					$visibilidade = 'display:block;'; 
+				
+				}
+			?>
+
+			<li style="<?php echo $visibilidade; ?>">
+				<a href="#" class="navbar-nav-link sidebar-control sidebar-right-toggle d-none d-md-block">
+					<i class="icon-drag-right"></i>
+				</a>
+			</li>
 
 			<li class="nav-item dropdown" style="display:none;">
 				<a href="#" class="navbar-nav-link dropdown-toggle caret-0" data-toggle="dropdown">

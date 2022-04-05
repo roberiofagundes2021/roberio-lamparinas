@@ -22,7 +22,9 @@ $sqlCentroCusto = "SELECT CAPXCValor, CnCusId, CnCusCodigo, CnCusNome, CnCusDeta
                 FROM  ContasAPagarXCentroCusto 
                 JOIN CentroCusto on CnCusId = CAPXCCentroCusto
                 JOIN Situacao on SituaId = CnCusStatus
-                WHERE CAPXCUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO' and CAPXCContasAPagar = $conta and CAPXCCentroCusto in ".$array;
+                WHERE CAPXCUnidade = ".$_SESSION['UnidadeId']." and 
+                SituaChave = 'ATIVO' and CAPXCContasAPagar = $conta and CAPXCCentroCusto in ".$array."
+                ORDER BY CnCusNome ASC";
 
 $resultCentroCusto = $conn->query($sqlCentroCusto);
 $CentroCustos = $resultCentroCusto->fetchAll(PDO::FETCH_ASSOC);

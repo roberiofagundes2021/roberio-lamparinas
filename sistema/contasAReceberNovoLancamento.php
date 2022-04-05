@@ -843,6 +843,9 @@ $dataInicio = date("Y-m-d");
                 })
 
                 $('#modalCloseParcelar').on('click', function() {
+                    var menssagem = 'Parcelamento cancelado!'
+                    alerta('Atenção', menssagem, 'error')
+
                     $('#pageModalParcelar').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                     $("#parcelasContainer").html("")
@@ -1018,6 +1021,22 @@ $dataInicio = date("Y-m-d");
                 // && cmbContaBanco != '' && cmbFormaPagamento != '' && inputNumeroDocumento != ''
                 if (planoContas != '' && cmbCliente != '' && inputDescricao != '') {
                     if (valorRecebidof < valorTotalf && valorRecebidof) {
+                        if($('#cmbContaBanco').val() == '') {
+                            $("#cmbContaBanco").focus()
+                            var menssagem = 'Por favor informe um banco !'
+                            alerta('Atenção', menssagem, 'error')
+                            
+                            return false
+                        }
+
+                        if($('#cmbFormaPagamento').val() == '') {
+                            $("#cmbFormaPagamento").focus()
+                            var menssagem = 'Por favor informe uma forma de pagamento !'
+                            alerta('Atenção', menssagem, 'error')
+                            
+                            return false
+                        }
+
                         $("#inputRecebimentoParcial").val(valorRestante)
                         $('#inputValor').val(valorRecebido)
 
@@ -1081,6 +1100,16 @@ $dataInicio = date("Y-m-d");
                     "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
                 }else{
                     document.getElementById('btnParcelar').style = "margin-top: 5px";
+                }
+            });
+
+            $("#inputValor").blur(function(){
+                let parcelas = $("#cmbParcelas").val()
+                if(parcelas > 1) {
+                    var menssagem = 'Valor do parcelamento alterado! Clique em OK para confirmar'
+                    alerta('Sucesso', menssagem, 'success')
+                    $('#btnParcelar').click()
+                    $('#gerarParcelas').click()
                 }
             });
         })
@@ -1455,7 +1484,7 @@ $dataInicio = date("Y-m-d");
                                             <div class="form-group">
                                                 <label for="valorTotal">Valor Total</label>
                                                 <div class="input-group">
-                                                    <input type="text" id="valorTotal" onKeyUp="moeda(this)" maxLength="12" name="valorTotal" class="form-control" readOnly>
+                                                    <input type="text" id="valorTotal" onKeyUp="moeda(this)" maxLength="12" name="valorTotal" class="form-control removeValidacao" readOnly>
                                                 </div>
                                             </div>
                                         </div>
