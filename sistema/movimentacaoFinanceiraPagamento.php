@@ -129,7 +129,7 @@ if (isset($_POST['inputDataEmissao'])) {
         }
     }
 
-    irpara("movimentacaoFinanceira.php");
+    irpara("movimentacaoFinanceiraConciliacao.php");
 }
 
 if (isset($_POST['inputMovimentacaoFinanceiraId']) && $_POST['inputMovimentacaoFinanceiraId'] != 0) {
@@ -266,14 +266,6 @@ $dataInicio = date("Y-m-d");
 
 
     $("#salvar").on('click', (e) => {
-      if($('#inputDataPagamento').val() == '') {
-        var menssagem = 'Por favor informe a data do pagamento!';
-        alerta('Atenção', menssagem, 'error');
-        $('#inputDataPagamento').focus();
-
-        return false;
-      }
-
       if($('#inputValorTotal').val() == '0,00' || $('#inputValorTotal').val() == '') {
         var menssagem = 'Por favor informe o Valor Total Pago!';
         alerta('Atenção', menssagem, 'error');
@@ -544,11 +536,11 @@ $dataInicio = date("Y-m-d");
                             <div class="row">
                               <div class="form-group col-6">
                                 <label for="inputDataPagamento">Data do Pagamento <span class="text-danger">*</span></label>
-                                <input type="date" id="inputDataPagamento" name="inputDataPagamento" class="form-control removeValidacao" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDtPagamento'] ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
+                                <input type="date" id="inputDataPagamento" name="inputDataPagamento" class="form-control" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDtPagamento'] ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
                               </div>
                               <div class="form-group col-6">
                                 <label for="inputValorTotal">Valor Total Pago (=) <span class="text-danger">*</span> </label>
-                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotal" name="inputValorTotal" class="form-control removeValidacao" placeholder='0,00' value="<?php if (isset($lancamento)) echo number_format($lancamento['CnAPaValorPago'], 2, ',', '.'); ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
+                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotal" name="inputValorTotal" class="form-control" placeholder='0,00' value="<?php if (isset($lancamento)) echo number_format($lancamento['CnAPaValorPago'], 2, ',', '.'); ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
                               </div>
                             </div>
                           </div>

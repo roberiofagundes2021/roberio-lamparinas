@@ -232,7 +232,7 @@ if (isset($_POST['inputDataEmissao'])) {
       }
     }
 
-  irpara("movimentacaoFinanceira.php");
+  irpara("movimentacaoFinanceiraConciliacao.php");
 }
 
 if (isset($_POST['inputMovimentacaoFinanceiraId'])) {
@@ -323,6 +323,14 @@ $dataInicio = date("Y-m-d");
 
     $("#salvar").on('click', (e) => {
       e.preventDefault();
+      if($('#inputValorTotal').val() == '0,00') {
+        var menssagem = 'Por favor informe o Valor Total Pago!';
+        alerta('Atenção', menssagem, 'error');
+        $('#inputValorTotal').focus();
+
+        return false;
+      }
+
       salvar();
     });
 
