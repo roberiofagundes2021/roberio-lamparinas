@@ -38,7 +38,17 @@ function gerarNumeracao()
 	}
 }
 
-if (isset($_SESSION['Carrinho'])) {
+$newArrayItens = [];
+
+if(isset($_SESSION['Carrinho'])){
+	foreach($_SESSION['Carrinho'] as $key => $value) {
+		if ($value['quantidade'] && $value['quantidade'] > 0) {
+			array_Push($newArrayItens, $value);
+		}
+	}
+}
+
+if (COUNT($newArrayItens)) {
 
 	try {
 
@@ -93,17 +103,19 @@ if (isset($_SESSION['Carrinho'])) {
 
 		$SolicitacaoId = $conn->lastInsertId();
 
-		foreach ($_SESSION['Carrinho'] as $key => $value) {
-			if($value['type']=='P'){
-				$sql = "INSERT INTO SolicitacaoXProduto
-					(SlXPrSolicitacao, SlXPrProduto, SlXPrQuantidade, SlXPrUsuarioAtualizador, SlXPrUnidade)
-					VALUES ($SolicitacaoId, $value[id], $value[quantidade], $_SESSION[UsuarId], $_SESSION[UnidadeId])";
-				$conn->query($sql);
-			}else{
-				$sql = "INSERT INTO SolicitacaoXServico
-					(SlXSrSolicitacao, SlXSrServico, SlXSrQuantidade, SlXSrUsuarioAtualizador, SlXSrUnidade)
-					VALUES ($SolicitacaoId, $value[id], $value[quantidade], $_SESSION[UsuarId], $_SESSION[UnidadeId])";
-				$conn->query($sql);
+		foreach ($newArrayItens as $key => $value) {
+			if($value['quantidade'] != '' && intval($value['quantidade']) > 0){
+				if($value['type']=='P'){
+					$sql = "INSERT INTO SolicitacaoXProduto
+						(SlXPrSolicitacao, SlXPrProduto, SlXPrQuantidade, SlXPrUsuarioAtualizador, SlXPrUnidade)
+						VALUES ($SolicitacaoId, $value[id], $value[quantidade], $_SESSION[UsuarId], $_SESSION[UnidadeId])";
+					$conn->query($sql);
+				}else{
+					$sql = "INSERT INTO SolicitacaoXServico
+						(SlXSrSolicitacao, SlXSrServico, SlXSrQuantidade, SlXSrUsuarioAtualizador, SlXSrUnidade)
+						VALUES ($SolicitacaoId, $value[id], $value[quantidade], $_SESSION[UsuarId], $_SESSION[UnidadeId])";
+					$conn->query($sql);
+				}
 			}
 		}
 
