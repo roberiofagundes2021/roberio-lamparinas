@@ -33,7 +33,7 @@ if(isset($_POST['inputContasAPagarId'])) {
     }
 
     irpara("contasAPagar.php");
-}else {
+}else if(isset($_POST['inputContasAReceberId'])){
     $contaReceberId = $_POST['inputContasAReceberId'];
     $situacao = 13; //Status a receber 
 
@@ -61,5 +61,62 @@ if(isset($_POST['inputContasAPagarId'])) {
     }
 
     irpara("contasAReceber.php");
+}else {
+    $contaId = $_POST['inputMovimentacaoFinanceiraId'];
+    $tipoMovimentacao = $_POST['tipoMov'];
+    
+    if($tipoMovimentacao == 'P') {
+        $situacao = 11; //Status a pagar 
+
+        try {
+            $sql = "UPDATE ContasAPagar SET CnAPaStatus = :iStatus, CnAPaJustificativaEstorno = :sJustificativa
+                    WHERE CnAPaId = $contaId";
+            $result = $conn->prepare($sql);
+    
+            $result->execute(array(
+                ':iStatus' => $situacao,
+                ':sJustificativa' => $justificativa
+            ));
+    
+    
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Conta estornada!!!";
+            $_SESSION['msg']['tipo'] = "success";
+        } catch (PDOException $e) {
+    
+            $_SESSION['msg']['titulo'] = "Erro";
+            $_SESSION['msg']['mensagem'] = "Erro ao estornar conta!!!";
+            $_SESSION['msg']['tipo'] = "error";
+    
+            echo 'Error: ' . $e->getMessage();
+        }
+    }else if($tipoMovimentacao == 'R') {
+        $situacao = 13; //Status a receber
+
+        try {
+            $sql = "UPDATE ContasAReceber SET CnAReStatus = :iStatus, CnAReJustificativaEstorno = :sJustificativa
+                    WHERE CnAReId = $contaId";
+            $result = $conn->prepare($sql);
+    
+            $result->execute(array(
+                ':iStatus' => $situacao,
+                ':sJustificativa' => $justificativa
+            ));
+    
+    
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Conta estornada!!!";
+            $_SESSION['msg']['tipo'] = "success";
+        } catch (PDOException $e) {
+    
+            $_SESSION['msg']['titulo'] = "Erro";
+            $_SESSION['msg']['mensagem'] = "Erro ao estornar conta!!!";
+            $_SESSION['msg']['tipo'] = "error";
+    
+            echo 'Error: ' . $e->getMessage();
+        }
+    }
+
+    irpara("movimentacaoFinanceira.php");
 }
 ?>

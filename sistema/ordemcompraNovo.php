@@ -54,6 +54,18 @@ $parametroEmp = $resultParametroEmp->fetch(PDO::FETCH_ASSOC);
 
 $empresaType = $parametroEmp['ParamEmpresaPublica'] ? 'publica' : 'privada';
 
+
+	if ($parametroEmp['ParamEmpresaPublica']){
+		$ordemCompra = "CONTRATO";
+		$lote= "Nº Ata/Lote";
+		$contrato = "Contrato";
+
+	} else {
+		$ordemCompra = " ";
+		$lote = "Nº Lote";
+		$contrato = "Nº Fluxo";
+	}
+
 if(isset($_POST['inputData'])){
 	
 	try{
@@ -419,9 +431,9 @@ if(isset($_POST['inputData'])){
 									</div>
 
 									<div class="row">
-										<div class="col-lg-3">
+										<div class="<?php if ($ordemCompra == "CONTRATO") { echo "col-lg-3"; } else { echo "col-lg-5"; } ?>">
 											<div class="form-group">
-												<label for="cmbContrato">Nº Contrato <span class="text-danger">*</span></label>
+												<label for="cmbContrato"><?php echo $contrato; ?> <span class="text-danger">*</span></label>
 												<select id="cmbContrato" name="cmbContrato" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php
@@ -446,19 +458,24 @@ if(isset($_POST['inputData'])){
 											</div>
 										</div>										
 										
-										<div class="col-lg-3" id="Lote" style="display:none">
+										<div class="<?php if ($ordemCompra == "CONTRATO") { echo "col-lg-3"; } else { echo "col-lg-5"; } ?>" id="Lote" style="display:none">
 											<div class="form-group">
 												<label for="inputLote">Lote</label>
 												<input type="text" id="inputLote" name="inputLote" class="form-control" readOnly>
 											</div>
 										</div>
-										
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputProcesso">Processo</label>
-												<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" readOnly>
-											</div>
-										</div>
+
+										<?php
+											if ($ordemCompra == "CONTRATO"){	
+												print('
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputProcesso">Processo</label>
+													<input type="text" id="inputProcesso" name="inputProcesso" class="form-control" readOnly>
+												</div>
+											</div>	');
+											}										
+									   ?>	
 									</div>
 
 									<div class="row">

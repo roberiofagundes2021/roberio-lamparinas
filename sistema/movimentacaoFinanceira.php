@@ -388,10 +388,27 @@ $dataFim = date("Y-m-d");
               alerta('Permissão Negada!','');
               return false;
           }
+      }else if(Tipo == 'estornar') {
+        return false;
       }            
 
       document.formMovimentacaoFinanceira.submit();
     }     
+
+    //Essa função dá um submit no formulário de estornar conta
+		function estornaConta() {
+      let justificativa = document.getElementById('inputJustificativa').value 
+
+      if((justificativa) == '') {
+          alerta('Atenção', 'Este campo é obrigatório!', 'error');
+          $('#inputJustificativa').focus()
+          return false
+      }
+
+      document.getElementById('inputContaJustificativa').value = justificativa;
+      document.formMovimentacaoFinanceira.action = "contasEstornar.php";
+      document.formMovimentacaoFinanceira.submit();
+    }
   </script>
 
 </head>
@@ -702,6 +719,33 @@ $dataFim = date("Y-m-d");
           </div>
         </div>
 
+        <!--Modal estornar-->
+        <div id="modal_mini-estornar" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-xs">
+                <div class="modal-content">
+                    <div class="custon-modal-title">
+                        <i class=""></i>
+                        <p class="h3">Estornar conta</p>
+                        <i class=""></i>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="inputJustificativa">Justificativa<span class="text-danger"> *</span></label>
+                            <div class="input-group">
+                                <textarea id="inputJustificativa" class="form-control" name="inputJustificativa" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-basic" data-dismiss="modal">Cancelar</button>
+                        <button onclick= estornaConta() type="button" class="btn bg-slate">Estornar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- /info blocks -->
 
         <form name="formMovimentacaoFinanceira" method="post">
@@ -709,6 +753,7 @@ $dataFim = date("Y-m-d");
           <input type="hidden" id="inputPermissionExclui" name="inputPermissionExclui" value="<?php echo $excluir; ?>" >
           <input type="hidden" id="tipoMov" name="tipoMov">
 					<input type="hidden" id="inputMovimentacaoFinanceiraId" name="inputMovimentacaoFinanceiraId" >
+          <input type="hidden" id="inputContaJustificativa" name="inputContaJustificativa" >
 		
         </form>
 

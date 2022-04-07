@@ -129,7 +129,7 @@ if (isset($_POST['inputDataEmissao'])) {
         }
     }
 
-    irpara("movimentacaoFinanceira.php");
+    irpara("movimentacaoFinanceiraConciliacao.php");
 }
 
 if (isset($_POST['inputMovimentacaoFinanceiraId']) && $_POST['inputMovimentacaoFinanceiraId'] != 0) {
@@ -266,14 +266,6 @@ $dataInicio = date("Y-m-d");
 
 
     $("#salvar").on('click', (e) => {
-      if($('#inputDataPagamento').val() == '') {
-        var menssagem = 'Por favor informe a data do pagamento!';
-        alerta('Atenção', menssagem, 'error');
-        $('#inputDataPagamento').focus();
-
-        return false;
-      }
-
       if($('#inputValorTotal').val() == '0,00' || $('#inputValorTotal').val() == '') {
         var menssagem = 'Por favor informe o Valor Total Pago!';
         alerta('Atenção', menssagem, 'error');
@@ -325,43 +317,48 @@ $dataInicio = date("Y-m-d");
               <!-- Basic responsive configuration -->
               <div class="card">
                 <div class="card-header header-elements-inline">
-                  <h3 class="card-title">Novo/Editar Lançamento</h3>
-                  <div class="header-elements">
-                    <div class="list-icons">
-                      <a class="list-icons-item" data-action="collapse"></a>
-                      <a href="relatorioMovimentacao.php" class="list-icons-item" data-action="reload"></a>
-                      <!--<a class="list-icons-item" data-action="remove"></a>-->
-                    </div>
-                  </div>
+                  <?php 
+                  if(isset($_SESSION['MovFinancPermissionAtualiza'])) {
+                    echo "<h3 class='card-title'>Editar Lançamento (Pagamento)</h3>";
+                  }else {
+                    echo "<h3 class='card-title'>Novo Lançamento</h3>";
+                  }
+                  ?>
                 </div>
 
                 <div class="card-body">
 
-                  <br />
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="form-group">
-                        <div class="form-check form-check-inline">
-                          <label class="form-check-label">
-                            <input type="radio" name="inputTipo" value="P" class="form-input-styled" onclick="selecionaTipo('P')" data-fouc checked>
-                            Pagamento
-                          </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                          <label class="form-check-label">
-                            <input type="radio" name="inputTipo" value="R" class="form-input-styled" onclick="selecionaTipo('R')" data-fouc>
-                            Recebimento
-                          </label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                          <label class="form-check-label">
-                            <input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo('T')" data-fouc>
-                            Transferência
-                          </label>
+                  <?php 
+                  if(!isset($lancamento)) {
+                    echo '
+                      <br />
+                      <div class="row">
+                        <div class="col-lg-12">
+                          <div class="form-group">
+                            <div class="form-check form-check-inline">
+                              <label class="form-check-label">
+                                <input type="radio" name="inputTipo" value="P" class="form-input-styled" onclick="selecionaTipo(`P`)" data-fouc checked>
+                                Pagamento
+                              </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <label class="form-check-label">
+                                <input type="radio" name="inputTipo" value="R" class="form-input-styled" onclick="selecionaTipo(`R`)" data-fouc>
+                                Recebimento
+                              </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                              <label class="form-check-label">
+                                <input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo(`T`)" data-fouc>
+                                Transferência
+                              </label>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    ';
+                  }
+                  ?>
 
                   <br />
 
@@ -539,11 +536,11 @@ $dataInicio = date("Y-m-d");
                             <div class="row">
                               <div class="form-group col-6">
                                 <label for="inputDataPagamento">Data do Pagamento <span class="text-danger">*</span></label>
-                                <input type="date" id="inputDataPagamento" name="inputDataPagamento" class="form-control removeValidacao" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDtPagamento'] ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
+                                <input type="date" id="inputDataPagamento" name="inputDataPagamento" class="form-control" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDtPagamento'] ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
                               </div>
                               <div class="form-group col-6">
                                 <label for="inputValorTotal">Valor Total Pago (=) <span class="text-danger">*</span> </label>
-                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotal" name="inputValorTotal" class="form-control removeValidacao" placeholder='0,00' value="<?php if (isset($lancamento)) echo number_format($lancamento['CnAPaValorPago'], 2, ',', '.'); ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
+                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotal" name="inputValorTotal" class="form-control" placeholder='0,00' value="<?php if (isset($lancamento)) echo number_format($lancamento['CnAPaValorPago'], 2, ',', '.'); ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
                               </div>
                             </div>
                           </div>

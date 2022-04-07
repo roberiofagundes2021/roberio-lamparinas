@@ -398,13 +398,9 @@ function queryPesquisa(){
                            // '<a href="#" idContaExcluir="' . $item["CODTRANSFPAG"] . '" tipo="T" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
                             '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFPAG"].', \'T\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
                         } else if  ($item["TIPO"] === "R"){
-                            $acoes .= 
-                              // '<a href="#" idContaExcluir="' . $item["ID"] . '" tipo="' . $item["TIPO"] . '" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
-                            '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["ID"].', \'R\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
+                            $acoes .= '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'R\', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>';
                         } else if ($item["TIPO"] === "P") {
-                            $acoes .= 
-                            // '<a href="#" idContaExcluir="' . $item["ID"] . '" tipo="' . $item["TIPO"] . '" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
-                            '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["ID"].', \'P\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
+                            $acoes .= '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'P\', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>';
                         }
                     $acoes .= '
                 </div>

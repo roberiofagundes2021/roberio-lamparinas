@@ -24,6 +24,23 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
+	$sql = "SELECT ParamEmpresaPublica
+			FROM Parametro
+			WHERE ParamEmpresa = ". $_SESSION['EmpreId'];
+	$result = $conn->query($sql);
+	$rowParametros = $result->fetch(PDO::FETCH_ASSOC);
+
+	if ($rowParametros['ParamEmpresaPublica']){
+		$ordemCompra = "CONTRATO";
+		$lote= "Nº Ata/Lote";
+		$contrato = "Contrato";
+
+	} else {
+		$ordemCompra = " ";
+		$lote = "Nº Lote";
+		$contrato = "Nº Fluxo";
+	}
+
 ?>
 
 <!DOCTYPE html>
@@ -353,16 +370,20 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								</div>
 							</div>
 
-							<table class="table" id="tblOrdemCompraPublica">
+							<table class="table" id="<?php if ($ordemCompra == 'CONTRATO') { echo "tblOrdemCompraPublica"; } else { echo "tblOrdemCompraPrivada"; } ?>">
 								<thead>
 									<tr class="bg-slate">
 										<th>Data</th>
 										<th>Número</th>
-										<th>Contrato</th>
-										<th>Nº Ata/Lote</th>
+										<th><?php echo $contrato; ?></th>
+										<th><?php echo $lote; ?></th>
 										<th>Tipo</th>
 										<th>Fornecedor</th>
-										<th>Processo</th>
+										<?php
+											if ($ordemCompra == 'CONTRATO'){	
+												print('<th>Processo</th>');
+											}
+										?>			
 										<th>SubCategoria</th>
 										<th>Valor Total</th>
 										<th>Situação</th>
@@ -386,8 +407,10 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$tipo.'</td>
 											<td>'.$item['ForneNome'].'</td>
 										');
-
-										print('<td>'.$item['OrComNumProcesso'].'</td>');
+										
+										if ($ordemCompra == 'CONTRATO'){	
+											print('<td>'.$item['OrComNumProcesso'].'</td>');
+										}
 										
 										print('
 											<td>'.$item['SbCatNome'].'</td>
