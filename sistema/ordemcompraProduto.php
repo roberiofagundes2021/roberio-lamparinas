@@ -11,10 +11,12 @@ if(isset($_POST['inputOrdemCompraId'])){
 	$iOrdemCompra = $_POST['inputOrdemCompraId'];
 	$iFluxo = $_POST['inputOrdemCompraFlOpeId'];
 	$iCategoria = $_POST['inputOrdemCompraCategoria'];
+	$iStatus = $_POST['inputOrdemCompraStatus'];
 } else if (isset($_POST['inputIdOrdemCompra'])){
 	$iOrdemCompra = $_POST['inputIdOrdemCompra'];
 	$iFluxo = $_POST['inputOrdemCompraFlOpeId'];
 	$iCategoria = $_POST['inputIdCategoria'];
+	$iStatus = $_POST['inputOrdemCompraStatus'];
 } else {
 	irpara("ordemcompra.php");
 }
@@ -27,6 +29,13 @@ $sql = "SELECT *
 		WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$iOrdemCompra;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
+
+$sql = "SELECT SituaChave
+		FROM Situacao
+	    WHERE SituaId = '". $iStatus."'";
+$result = $conn->query($sql);
+$rowStatus = $result->fetch(PDO::FETCH_ASSOC);
+$sStatus = $rowStatus['SituaChave'];
 
 //Se está alterando
 if (isset($_POST['inputIdOrdemCompra'])){
@@ -382,6 +391,7 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 						<input type="hidden" id="inputTypeRequest" name="inputTypeRequest" value="submit">
 						<input type="hidden" id="inputIdOrdemCompra" name="inputIdOrdemCompra" value="<?php echo $row['OrComId']; ?>">
 						<input type="hidden" id="inputOrdemCompraFlOpeId" name="inputOrdemCompraFlOpeId" value="<?php echo $iFluxo; ?>">
+						<input type="hidden" id="inputOrdemCompraStatus" name="inputOrdemCompraStatus" value="<?php echo $iStatus; ?>">
 						
 						<div class="card-body">
 								
@@ -655,7 +665,12 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 							<div class="row" style="margin-top: 10px;">
 								<div class="col-lg-12">								
 									<div class="form-group">
-										<button class="btn btn-lg btn-principal" type="submit">Alterar</button>
+										
+										<?php
+										if ( $sStatus!= 'LIBERADOCONTABILIDADE') {
+											echo '<button class="btn btn-lg btn-principal" type="submit">Alterar</button>';
+										}
+										?>
 										<?php
 											// if ($enviar){
 											// 	print('<button class="btn btn-lg btn-default" id="enviar">Enviar para Aprovação</button>');
