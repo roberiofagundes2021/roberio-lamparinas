@@ -611,9 +611,11 @@ try {
 												FROM Servico
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 												LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
-												and SbCatId in (".$sSubCategorias.")
-												ORDER BY SbCatNome, ServiNome ASC";
+												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+												if ($sSubCategorias <> ""){
+													$sql .= " and SbCatId in (".$sSubCategorias.")";
+												}
+												$sql .=" ORDER BY SbCatNome, ServiNome ASC";
 										$result = $conn->query($sql);
 										$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countServico = count($rowServicos);
@@ -625,9 +627,11 @@ try {
 														FROM Servico
 														JOIN Situacao on SituaId = ServiStatus
 														LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-														WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and 
-														ServiSubCategoria in (" .$sSubCategorias. ") and SituaChave = 'ATIVO' 
-														ORDER BY SbCatNome, ServiNome ASC";
+														WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and SituaChave = 'ATIVO'"; 
+														if ($sSubCategorias <> ""){
+															$sql .= " and SbCatId in (".$sSubCategorias.")";
+														}
+														$sql .=" ORDER BY SbCatNome, ServiNome ASC";
 												$result = $conn->query($sql);
 												$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 												$countServico = count($rowServicos);
@@ -642,18 +646,22 @@ try {
 															FROM Servico
 															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = ServiId
-															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia']."
-															and SbCatId in (".$sSubCategorias.")
-															ORDER BY SbCatNome, ServiNome ASC";
+															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia'];
+															if ($sSubCategorias <> ""){
+																$sql .= " and SbCatId in (".$sSubCategorias.")";
+															}
+															$sql .=" ORDER BY SbCatNome, ServiNome ASC";
 												} else { //Se $row['TrRefTabelaServico'] == ServicoOrcamento
 													$sql = "SELECT ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, SbCatNome
 															FROM Servico
 															JOIN ServicoOrcamento on SrOrcServico = ServiId
 															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
-															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia']."
-															and SbCatId in (".$sSubCategorias.")
-															ORDER BY SbCatNome, ServiNome ASC";
+															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia'];
+															if ($sSubCategorias <> ""){
+																$sql .= " and SbCatId in (".$sSubCategorias.")";
+															}
+															$sql .=" ORDER BY SbCatNome, ServiNome ASC";
 												}
 
 												$result = $conn->query($sql);

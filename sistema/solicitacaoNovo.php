@@ -153,7 +153,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 										dataPost,
 										function(data) {
 											if (!data) {
-												$(elemInp).val(1)
+												$(elemInp).val('')
 											} else {
 												$(elemInp).val(data)
 											}
@@ -170,20 +170,17 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 					$('[quantiEstoque]').each((i, elem) => {
 						let quantidadeInicial = $(elem).val()
 						$(elem).on('keyup', () => {
-							let quantidade = $(elem).val()
-							let quantidadeEstoque = $(elem).attr('quantiestoque')
+							let quantidade = $(elem).val() == ''?$(elem).val() : parseInt($(elem).val())
+							let quantidadeEstoque = parseInt($(elem).attr('quantiestoque'))
 							let id = $(elem).attr('idProdu')
 							const url = 'solicitacaoAlteraCarrinho.php'
 
-							if (quantidade != '' && quantidade > 0) {
-								let quantidadeInt = parseInt($(elem).val())
-								let quantidadeEstoqueInt = parseInt($(elem).attr('quantiestoque'))
-                            
-								if (quantidadeInt > parseInt(quantidadeEstoque)) {
-									$(elem).val(quantidadeEstoqueInt)
+							if (quantidade > 0 || quantidade == '') {
+								if (quantidade > quantidadeEstoque) {
+									$(elem).val(quantidadeEstoque)
 
 									let dataPost = {
-										inputQuantidadeProduto: quantidadeEstoqueInt,
+										inputQuantidadeProduto: quantidadeEstoque,
 										inputIdProduto: id
 									}
 
@@ -192,29 +189,32 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 										dataPost,
 										function(data) {
 											if (!data) {
-												$(elem).val(0)
+												$(elem).val('')
 											} else {
 												$(elem).val(data)
 											}
 										}
 									)
 								} else {
-									let dataPost = {
-										inputQuantidadeProduto: quantidadeInt,
-										inputIdProduto: id
-									}
-
-									$.post(
-										url,
-										dataPost,
-										function(data) {
-											if (!data) {
-												$(elem).val(0)
-											} else {
-												$(elem).val(data)
-											}
+									if(quantidade == '' || quantidade > 0){
+										console.log(quantidade)
+										let dataPost = {
+											inputQuantidadeProduto: quantidade,
+											inputIdProduto: id
 										}
-									)
+
+										$.post(
+											url,
+											dataPost,
+											function(data) {
+												if (!data) {
+													$(elem).val('')
+												} else {
+													$(elem).val(data)
+												}
+											}
+										)
+									}
 								}
 							} else {
 								let dataPost = {
@@ -227,7 +227,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 									dataPost,
 									function(data) {
 										if (!data) {
-											$(elem).val(0)
+											$(elem).val('')
 										} else {
 											$(elem).val(data)
 										}

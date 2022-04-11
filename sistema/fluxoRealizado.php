@@ -7,6 +7,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputFluxoOperacionalId'])){
+	$iUnidade = $_SESSION['UnidadeId'];
 	
 	$iFluxoOperacional = $_POST['inputFluxoOperacionalId'];
 	
@@ -86,13 +87,15 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 
 	// Essa parte vai buscar os dados de fluxo Previsto de acordo com as opções selecionadas
 	if($ID[0] == 'P'){
+
 		$sql = 	"SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
 		UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, ProduValorCusto as ValorUnitario, 
 		MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Produto
 		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		LEFT JOIN Marca on MarcaId = ProduMarca
+		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
+		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$ID[1];
 
@@ -127,7 +130,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		'' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Servico
 		JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-		LEFT JOIN Marca on MarcaId = ServiMarca
+		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional
+		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$ID[1];
 
@@ -161,7 +165,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		FROM Produto
 		JOIN AditivoXProduto on AdXPrProduto = ProduId
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		LEFT JOIN Marca on MarcaId = ProduMarca
+		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
+		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and AdXPrAditivo = ".$ID[1];
 		// exit;
@@ -197,7 +202,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		'' as UnidadeMedida, AdXSrQuantidade as Quantidade, AdXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Servico
 		JOIN AditivoXServico on AdXSrServico = ServiId
-		LEFT JOIN Marca on MarcaId = ServiMarca
+		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional
+		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$ID[1];
 
@@ -240,7 +246,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		FROM Produto
 		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		LEFT JOIN Marca on MarcaId = ProduMarca
+		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
+		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$ID[1];
 
@@ -275,7 +282,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		'' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Servico
 		JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-		LEFT JOIN Marca on MarcaId = ServiMarca
+		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional 
+		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$ID[1];
 
@@ -311,7 +319,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		FROM Produto
 		JOIN AditivoXProduto on AdXPrProduto = ProduId
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		LEFT JOIN Marca on MarcaId = ProduMarca
+		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
+		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and AdXPrAditivo = ".$ID[1];
 
@@ -346,7 +355,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		'' as UnidadeMedida, AdXSrQuantidade as Quantidade, AdXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Servico
 		JOIN AditivoXServico on AdXSrServico = ServiId
-		LEFT JOIN Marca on MarcaId = ServiMarca
+		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional 
+		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$ID[1];
 
@@ -390,7 +400,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		FROM Produto
 		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		LEFT JOIN Marca on MarcaId = ProduMarca
+		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
+		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$ID[1].
 		" UNION
@@ -398,7 +409,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		'' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Servico
 		JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-		LEFT JOIN Marca on MarcaId = ServiMarca
+		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional 
+		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$ID[1];
 	} else {
@@ -408,7 +420,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		FROM Produto
 		JOIN AditivoXProduto on AdXPrProduto = ProduId
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		LEFT JOIN Marca on MarcaId = ProduMarca
+		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
+		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and AdXPrAditivo = ".$ID[1].
 		" UNION
@@ -416,7 +429,8 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		'' as UnidadeMedida, AdXSrQuantidade as Quantidade, AdXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Servico
 		JOIN AditivoXServico on AdXSrServico = ServiId
-		LEFT JOIN Marca on MarcaId = ServiMarca
+		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional 
+		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$ID[1];
 	}
@@ -744,7 +758,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
 
-												$iQuantidadeRealizada = $rowMovimentacao['Controle'] != '' ? $rowMovimentacao['Controle'] : 0;
+												$iQuantidadeRealizada = isset($rowMovimentacao['Controle']) ? $rowMovimentacao['Controle'] : 0;
 												$fValorUnitarioRealizado = isset($rowMovimentacao['MvXPrValorUnitario']) ? mostraValor($rowMovimentacao['MvXPrValorUnitario']) : 0;						
 												$fValorTotalRealizado = (isset($iQuantidadeRealizada) and isset($rowMovimentacao['MvXPrValorUnitario'])) ? $iQuantidadeRealizada * $rowMovimentacao['MvXPrValorUnitario'] : 0;
 
@@ -825,7 +839,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 												$result = $conn->query($sql);
 												$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
 
-												$iQuantidadeRealizada = $rowMovimentacao['Controle'] != '' ? $rowMovimentacao['Controle'] : 0;
+												$iQuantidadeRealizada = isset($rowMovimentacao['Controle'])? $rowMovimentacao['Controle'] : 0;
 												$fValorUnitarioRealizado = isset($rowMovimentacao['MvXPrValorUnitario']) ? mostraValor($rowMovimentacao['MvXPrValorUnitario']) : 0;						
 												$fValorTotalRealizado = (isset($iQuantidadeRealizada) and isset($rowMovimentacao['MvXPrValorUnitario'])) ? $iQuantidadeRealizada * $rowMovimentacao['MvXPrValorUnitario'] : 0;
 

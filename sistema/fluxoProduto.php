@@ -629,9 +629,11 @@ try{
 												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 												LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional."
-												and SbCatId in (".$sSubCategorias.")
-												ORDER BY SbCatNome, ProduNome ASC";
+												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+												if ($sSubCategorias <> ""){
+													$sql .= " and SbCatId in (".$sSubCategorias.")";
+												}
+												$sql .=" ORDER BY SbCatNome, ProduNome ASC";
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$countProduto = count($rowProdutos);
@@ -644,9 +646,11 @@ try{
 														JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 														JOIN Situacao on SituaId = ProduStatus
 														LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-														WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and 
-														ProduSubCategoria in (".$sSubCategorias.") and SituaChave = 'ATIVO' 
-														ORDER BY SbCatNome, ProduNome ASC";
+														WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO'";
+														if ($sSubCategorias <> ""){
+															$sql .= " and SbCatId in (".$sSubCategorias.")";
+														}
+														$sql .=" ORDER BY SbCatNome, ProduNome ASC";
 												$result = $conn->query($sql);
 												$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 												$countProduto = count($rowProdutos);
@@ -662,9 +666,11 @@ try{
 															JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
-															and SbCatId in (".$sSubCategorias.")
-															ORDER BY SbCatNome, ProduNome ASC";													
+															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia'];
+															if ($sSubCategorias <> ""){
+																$sql .= " and SbCatId in (".$sSubCategorias.")";
+															}
+															$sql .=" ORDER BY SbCatNome, ProduNome ASC";												
 												} else { //Se $row['TrRefTabelaProduto'] == ProdutoOrcamento
 													$sql = "SELECT ProduId, ProduNome, TRXPrDetalhamento as Detalhamento, UnMedSigla, SbCatNome
 															FROM Produto
@@ -672,9 +678,11 @@ try{
 															JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia']."
-															and SbCatId in (".$sSubCategorias.")
-															ORDER BY SbCatNome, ProduNome ASC";
+															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia'];
+															if ($sSubCategorias <> ""){
+																$sql .= " and SbCatId in (".$sSubCategorias.")";
+															}
+															$sql .=" ORDER BY SbCatNome, ProduNome ASC";
 												}
 
 												$result = $conn->query($sql);
