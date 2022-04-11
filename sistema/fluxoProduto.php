@@ -340,9 +340,9 @@ try{
 				for(i = 0; i <= totalProdutos; i++){
                     var valorTotal = $(`#inputValorTotal${i}`).val()
                     cont = valorTotal == '' ? 0 : 1;
-					if ($(`#inputValorTotal${i}`).val() == '0,00' || $(`#inputMarca${i}`).val() == '' || $(`#inputModelo${i}`).val() == '' || $(`#inputFabricante${i}`).val() == '') {
+					if ($(`#inputValorTotal${i}`).val() == '0,00' || $(`#inputMarca${i}`).val() == '') {
 						if (inputOrigem == 'fluxo.php'){
-							alerta('Atenção', 'Preencha todos os campos dos produtos selecionados ou retire os da lista', 'error');
+							alerta('Atenção', 'Preencha todos os campos dos produtos selecionados ou retire-os da lista', 'error');
 						} else {
 							alerta('Atenção', 'Preencha todos os campos dos produtos', 'error');
 						}
@@ -798,7 +798,7 @@ try{
 													$seleciona = ($resultPrXFa['PrXFaFabricante'] == $itemFabricante['FabriId']) ? "selected " : "";
 												}
 												
-												$HTML_FABRICANTE = '<option value="'.$itemFabricante['FabriId'].'" '.$seleciona.'>'.$itemFabricante['FabriNome'].'</option>';
+												$HTML_FABRICANTE .= '<option value="'.$itemFabricante['FabriId'].'" '.$seleciona.'>'.$itemFabricante['FabriNome'].'</option>';
 											}
 											
 											$iQuantidade = isset($item['FOXPrQuantidade']) ? $item['FOXPrQuantidade'] : '';
