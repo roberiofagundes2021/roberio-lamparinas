@@ -134,6 +134,7 @@ include('global_assets/php/conexao.php');
             
             $estornamento =  (!isset($item['CnAReJustificativaEstorno']) || $status == 'Recebido') ? 'none' : 'block';
             $justificativaEstornamento = (isset($item['CnAReJustificativaEstorno'])) ? $item['CnAReJustificativaEstorno'] : '';
+            $consultaAgrupamento = (isset($item['CnAReAgrupamento'])) ? 'consultaPagamento#'.$item['CnAReAgrupamento'] : '';
 
             $checkbox = '<input type="checkbox" id="check'.$cont.'" style="display: '.$visibilidade.';"> <input type="hidden" value="'.$item["CnAReId"].'">';
             
@@ -149,7 +150,14 @@ include('global_assets/php/conexao.php');
 
             $status = $status;
 
-            $acaoConta = ($status == 'Recebido') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : '<a href="#" onclick="atualizaContasAReceber('.$_POST['permissionExclui'].','.$item["CnAReId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+            if( $item["CnAReAgrupamento"] == '') {
+                $acaoConta = ($status == 'Recebido') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : 
+                                                       '<a href="#" onclick="atualizaContasAReceber('.$_POST['permissionExclui'].','.$item["CnAReId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+            }else {
+                $acaoConta = ($status == 'Recebido') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>
+                                                        <a href="#" data-toggle="modal" data-target="#modal_consultaPagamentoAgrupado" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \''.$consultaAgrupamento.'\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Pagamento agrupado"><i class="icon-stack3"></i></a>' : 
+                                                       '<a href="#" onclick="atualizaContasAReceber('.$_POST['permissionExclui'].','.$item["CnAReId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+            }
 
             $acoes = '
                     <div class="list-icons">

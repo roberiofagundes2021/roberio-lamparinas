@@ -343,7 +343,6 @@ $dataFim = date("Y")."-12-31";
                 $("#select2-cmbFormaPagamentoPA-container").html("Selecionar")
                 $("#cmbContaBancoPA").val('')
                 $("#select2-cmbContaBancoPA-container").html("Selecionar")
-                $("#inputNumeroDocumentoPA").val("")
 
                 $(".clicado").each((i, elem) => {
                     $(elem).removeClass('clicado').prop('checked', false)
@@ -359,6 +358,7 @@ $dataFim = date("Y")."-12-31";
                     let descricaoLink = $(elementosLista[2]).children()[0]
                     let descricao = $(descricaoLink).html()
                     let status = $(elementosLista[6]).html()
+                    let numeroDocumento = $(elementosLista[4]).html()
                     let valor = $(elementosLista[5]).html()
 
                     $(`#check${i}`).on('click', () => {
@@ -371,7 +371,7 @@ $dataFim = date("Y")."-12-31";
                             if (!$(`#check${i}`).hasClass('clicado')) {
                                 $(`#check${i}`).addClass('clicado')
                                 let input =
-                                    `<input type="hidden" name="conta${i}" value="${id}" descricao="${descricao}" valor="${valor}">`
+                                    `<input type="hidden" name="conta${i}" value="${id}" descricao="${descricao}" numeroDocumento="${numeroDocumento}" valor="${valor}">`
                                 $("#pagamentoAgrupadoForm").append(input)
 
                                 let quantInputs = $("#pagamentoAgrupadoForm").children()
@@ -403,9 +403,10 @@ $dataFim = date("Y")."-12-31";
             function pagamentoAgrupadoEnvia() {
                 let pagamentos = $("#pagamentoAgrupadoContainer").children()
                 let dataPagamento = $("#inputDataPagamentoPA").val()
+                let valorTotal = $("#inputValorTotalPA").val()
                 let formaPagamento = $("#cmbFormaPagamentoPA").val()
                 let contaBanco = $("#cmbContaBancoPA").val()
-                let numeroDocumento = $("#inputNumeroDocumentoPA").val()
+                let descricaoGrupo = $("#inputDescricaoGrupoPA").val()
 
                 let pagamentoValores = []
 
@@ -414,17 +415,13 @@ $dataFim = date("Y")."-12-31";
 
                     let id = $(`#idPA${i+1}`).val()
                     let descricao = $(`#inputDescricaoPA${i+1}`).val()
-                    let planoContas = $(`#cmbPlanoContasPA${i+1}`).val()
+                    let numeroDocumento = $(`#inputNumeroDocumentoPA${i+1}`).val()
                     let valor = $(`#inputValorPA${i+1}`).val()
-
-                    if (planoContas == '#') {
-                        countPlanoContas += 1
-                    }
 
                     pagamentoValores[i] = {
                         id: id,
                         descricao: descricao,
-                        planoContas: planoContas,
+                        numeroDocumento: numeroDocumento,
                         valor: valor
                     }
 
@@ -433,9 +430,10 @@ $dataFim = date("Y")."-12-31";
                 data = {
                     valores: pagamentoValores,
                     dataPagamento: dataPagamento,
+                    valorTotal: valorTotal,
                     formaPagamento: formaPagamento,
                     contaBanco: contaBanco,
-                    numeroDocumento: numeroDocumento
+                    descricaoGrupo: descricaoGrupo
                 }
 
                 url = 'contasAPagarPagamentoAgrupado.php'
@@ -488,9 +486,9 @@ $dataFim = date("Y")."-12-31";
                     return false
                 }
 
-                if($('#inputDescricaoPA').val() == '') {
+                if($('#inputDescricaoGrupoPA').val() == '') {
                     alerta('Atenção', 'A descrição é obrigatória!', 'error');
-                    $('#inputDescricaoPA').focus();
+                    $('#inputDescricaoGrupoPA').focus();
                     return false
                 }
                 
@@ -537,44 +535,25 @@ $dataFim = date("Y")."-12-31";
                     linhasSelecionadas.each((i, elem) => {
                         let id = $(elem).val()
                         let descricao = $(elem).attr('descricao')
+                        let numeroDocumento = $(elem).attr('numeroDocumento')
                         let valor = $(elem).attr('valor')
                         let indice = i + 1
 
 
                         valorTotal += parseFloat(valor.replace(".", "").replace(",", "."));
                         let elemNode = `<div class="d-flex flex-row justify-content-center">
-                    <p class="col-1 mt-3">
+                    <p class="col-2 mt-3 text-center">
                         ${indice}
                         <input type="hidden" id="idPA${indice}" value="${id}">
                     </p>
-                    <div class="form-group col-5 p-2">
+                    <div class="form-group col-4 p-2">
                         <input type="text" class="form-control" id="inputDescricaoPA${indice}" name="inputDescricaoPA${indice}" value="${descricao}" readOnly>
                     </div>
                     <div class="form-group col-3 p-2">
-                        <div class="form-group">
-                            <select id="cmbPlanoContasPA${indice}" name="cmbPlanoContasPA${indice}"
-                                class="form-control form-control-select2" required>
-                                <option value="#">Selecionar</option>
-                                <?php
-                                    $sql = "SELECT PlConId, PlConNome
-                                            FROM PlanoConta
-                                            JOIN Situacao on SituaId = PlConStatus
-                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and 
-                                            PlConNatureza = 'D' and SituaChave = 'ATIVO'
-                                            ORDER BY PlConNome ASC";
-                                    $result = $conn->query($sql);
-                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
-                                    
-                                    
-                                    foreach ($rowPlanoContas as $item) {
-                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConNome'] . '</option>');
-                                    }
-                                ?>
-                            </select>
-                        </div>
+                        <input type="text" class="form-control" id="inputNumeroDocumentoPA${indice}" name="inputNumeroDocumentoPA${indice}" value="${numeroDocumento}" readOnly>
                     </div>
                     <div class="form-group col-3 p-2">
-                        <input type="text" class="form-control" id="inputValorPA${indice}" name="inputValorPA${indice}" value="${valor}" readOnly>
+                        <input type="text" class="form-control text-right pr-4" id="inputValorPA${indice}" name="inputValorPA${indice}" value="${valor}" readOnly>
                     </div> 
                 </div>`
 
@@ -764,7 +743,7 @@ $dataFim = date("Y")."-12-31";
                 Filtrar()
             })
 
-            Filtrar()   
+            Filtrar()    
         });
 
         //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -784,10 +763,106 @@ $dataFim = date("Y")."-12-31";
                 }
             }else if (Tipo == 'estornar') {
                 return false
+            }else if (Tipo.slice(0,17) == 'consultaPagamento') {
+                consultaGrupoPagamento(Tipo)
+                return false
             }        
 
             document.formContasAPagar.submit();
         } 
+
+        function consultaGrupoPagamento(agrupamento) {
+            tipoConta = 'P'
+            agrupamento = agrupamento.split("#")
+            agrupamentoId = agrupamento[1]
+
+            let HTML = ''
+            $.ajax({
+                method: "POST",
+                url: "filtraContasAgrupadas.php",
+                data: { 
+                    tipoConta: tipoConta,
+                    agrupamentoId: agrupamentoId
+                },
+                dataType:"json",
+                success: function(response){
+                    if (response.length){
+                        let cabecalho = response[0]
+                        HTML = HTML + `
+                        <div class="d-flex flex-row pt-4">
+                            <div class='col-lg-3'>
+                                <div class="form-group">
+                                    <label for="inputConsultaDataPagamentoPA">Data do Pagamento</label>
+                                    <div class="input-group">
+                                        <input type="date" id="inputConsultaDataPagamentoPA" name="inputConsultaDataPagamentoPA" value="${cabecalho.CnAPaDtPagamento}" class="form-control" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class='col-lg-3'>
+                                <div class="form-group">
+                                    <label for="inputConsultaValorTotalPA">Valor Total</label>
+                                    <div class="input-group">
+                                        <input type="text" id="inputConsultaValorTotalPA" name="inputConsultaValorTotalPA" value="${float2moeda(cabecalho.CnAgrValorTotal)}" class="form-control"
+                                        readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class='col-lg-6'>
+                                <div class="form-group">
+                                    <label for="inputConsultaDescricaoGrupoPA">Descrição do Agrupamento</label>
+                                    <div class="input-group">
+                                        <input type="text" id="inputConsultaDescricaoGrupoPA" name="inputConsultaDescricaoGrupoPA" value="${cabecalho.CnAgrDescricaoAgrupamento}" class="form-control" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-row pt-4">
+                            <div class="col-12 d-flex flex-row justify-content-center">
+                                <p class="col-2 p-2 text-center" style="background-color:#f2f2f2">Item</p>
+                                <p class="col-4 p-2" style="background-color:#f2f2f2">Descrição</p>
+                                <p class="col-3 p-2" style="background-color:#f2f2f2">Nº Documento</p>
+                                <p class="col-3 p-2 text-center" style="background-color:#f2f2f2">Valor</p>
+                                </table>
+                            </div>   
+                        </div>
+                        <div class="d-flex flex-column" style="overflow-Y: scroll; max-height: 200px">`;
+                        for(let x = 0; x < response.length; x++) {
+                            let consulta = response[x]
+
+                            HTML = HTML + `
+                            <div class="d-flex flex-row justify-content-center">
+                                <p class="col-2 mt-3 text-center">
+                                    ${x+1}
+                                    <input type="hidden" id="idPA${x}"">
+                                </p>
+                                <div class="form-group col-4 p-2">
+                                    <input type="text" class="form-control" value="${consulta.CnAPaDescricao}" readonly>
+                                </div>
+                                <div class="form-group col-3 p-2">
+                                    <input type="text" class="form-control" value="${consulta.CnAPaNumDocumento}" readonly>
+                                </div>
+                                <div class="form-group col-3 p-2 pr-4">
+                                    <input type="text" class="form-control text-right" value="${float2moeda(consulta.CnAPaValorPago)}" readonly>
+                                </div> 
+                            </div>`
+                        }
+
+                        HTML = HTML + ` 
+                        </div>`;
+                    }
+                    $('#consultaGrupoPagamentoContent').html(HTML).show();
+                },
+                error: function(e) { 
+                    HTML = HTML + `
+                        <h2>Erro</h2>`;
+
+                    $('#consultaGrupoPagamentoContent').html(HTML).show();
+                }
+            })
+        }
         
         //Essa função dá um submit no formulário de estornar conta
 		function estornaConta() {
@@ -1182,15 +1257,7 @@ $dataFim = date("Y")."-12-31";
 												        $result = $conn->query($sql);
 												        $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 												        foreach ($rowContaBanco as $item) {
-                                                            if(isset($lancamento)){
-                                                                if($lancamento['CnAPaContaBanco'] == $item['CnBanId']){
-                                                                    print('<option value="' . $item['CnBanId'] . '" selected>' . $item['CnBanNome'] . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                                                }
-                                                            } else {
-                                                                print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
-                                                            }
+                                                            print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
 												        }
 												    ?>
                                             </select>
@@ -1198,21 +1265,12 @@ $dataFim = date("Y")."-12-31";
                                     </div>
                                 </div>
                                 <div class="d-flex flex-row">
-                                    <div class='col-lg-7'>
+                                    <div class='col-lg-12'>
                                         <div class="form-group">
-                                            <label for="inputDescricaoPA">Descrição do Agrupamento <span class="text-danger">*</span></label>
+                                            <label for="inputDescricaoGrupoPA">Descrição do Agrupamento <span class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <input type="text" id="inputDescricaoPA" name="inputDescricaoPA"
+                                                <input type="text" id="inputDescricaoGrupoPA" name="inputDescricaoGrupoPA"
                                                     class="form-control">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class='col-lg-5'>
-                                        <div class="form-group">
-                                            <label for="inputNumeroDocumentoPA">Número Documento</label>
-                                            <div class="input-group">
-                                                <input type="text" id="inputNumeroDocumentoPA"
-                                                    name="inputNumeroDocumentoPA" class="form-control">
                                             </div>
                                         </div>
                                     </div>
@@ -1221,12 +1279,12 @@ $dataFim = date("Y")."-12-31";
                                     <div class="col-12 d-flex flex-row justify-content-center">
                                         <p class="col-2 p-2 text-center" style="background-color:#f2f2f2">Item</p>
                                         <p class="col-4 p-2" style="background-color:#f2f2f2">Descrição</p>
-                                        <p class="col-3 p-2" style="background-color:#f2f2f2">Plano de Contas *</p>
-                                        <p class="col-3 p-2" style="background-color:#f2f2f2">Valor</p>
+                                        <p class="col-3 p-2" style="background-color:#f2f2f2">Nº Documento</p>
+                                        <p class="col-3 p-2 text-center" style="background-color:#f2f2f2">Valor</p>
                                         </table>
                                     </div>
                                 </div>
-                                <div id="pagamentoAgrupadoContainer" class="d-flex flex-column px-5"
+                                <div id="pagamentoAgrupadoContainer" class="d-flex flex-column"
                                     style="overflow-Y: scroll; max-height: 200px">
 
                                 </div>
@@ -1241,6 +1299,36 @@ $dataFim = date("Y")."-12-31";
                                         <div class="form-group">
                                             <button class="btn btn-lg btn-success" id="salvarPA">Salvar</button>
                                             <a id="modal-closePA" class="btn btn-basic" role="button">Cancelar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--------------------------------------------------------------------------------------------------->
+                <!--Modal consulta pagamento agrupado-->
+                <div id="modal_consultaPagamentoAgrupado" class="custon-modal">
+                    <div class="custon-modal-container">
+                        <div class="card custon-modal-content">
+                            <div class="custon-modal-title">
+                                <i class=""></i>
+                                <p class="h3">Pagamentos Agrupados</p>
+                                <i class=""></i>
+                            </div>
+                            
+                            <div class="px-5 pt-4">
+                                <div id="consultaGrupoPagamentoContent">
+                                            
+                                </div>
+                            </div>
+
+
+                            <div class="card-footer mt-2 d-flex flex-column">
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <button class="btn btn-lg btn-success"  data-dismiss="modal">Ok</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1275,6 +1363,7 @@ $dataFim = date("Y")."-12-31";
                         </div>
                     </div>
                 </div>
+                <!--------------------------------------------------------------------------------------------------->
                 <!--Modal justificativa de estorno-->
                 <div id="modal_mini-justificativa-estorno" class="modal fade" tabindex="-1">
                     <div class="modal-dialog modal-xs">

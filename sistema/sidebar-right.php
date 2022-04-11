@@ -1,7 +1,7 @@
 <?php
 
-$sql = "SELECT isNull(dbo.fnDebitosDia(".$_SESSION['UnidadeId'].", null, convert(date, getdate())), 0.00) as Debito,
-               isNull(dbo.fnCreditosDia(".$_SESSION['UnidadeId'].", null, convert(date, getdate())), 0.00) as Credito";
+$sql = "SELECT isNull(dbo.fnDebitosDia(".$_SESSION['UnidadeId'].", 0, convert(date, getdate())), 0.00) as Debito,
+               isNull(dbo.fnCreditosDia(".$_SESSION['UnidadeId'].", 0, convert(date, getdate())), 0.00) as Credito";
 $result = $conn->query($sql);
 $rowResumo = $result->fetch(PDO::FETCH_ASSOC);
 

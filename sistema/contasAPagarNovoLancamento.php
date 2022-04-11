@@ -716,7 +716,7 @@ if (isset($_POST['cmbPlanoContas'])) {
 //Se estiver editando entra no IF
 if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) {
     $sql = "SELECT CnAPaId, CnAPaMovimentacao, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
-            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero, SituaNome, SituaChave 
+            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero, SituaChave, SituaChave 
     		FROM ContasAPagar
             LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
             JOIN Situacao on SituaId = CnAPaStatus
@@ -747,7 +747,7 @@ if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) 
     $itemCentroCusto = $resultItemCentroCusto->fetch(PDO::FETCH_ASSOC);
 }else if(isset($_POST['inputConciliacaoId']) && $_POST['inputConciliacaoId']) {
     $sql = "SELECT CnAPaId, CnAPaMovimentacao, CnAPaPlanoContas, CnAPaFornecedor, CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaDescricao, CnAPaDtVencimento, 
-            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero, SituaNome, SituaChave
+            CnAPaValorAPagar, CnAPaDtPagamento, CnAPaValorPago, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento, OrComNumero, SituaChave, SituaChave
     		FROM ContasAPagar
             LEFT JOIN OrdemCompra on OrComId = CnAPaOrdemCompra
             JOIN Situacao on SituaId = CnAPaStatus
@@ -1706,13 +1706,13 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="inputDataEmissao">Data de Emissão</label>
-                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> readOnly>
+                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> readOnly>
                                             </div>
                                         </div>
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
-                                                <select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
+                                                <select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> required>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT ForneId, ForneNome
@@ -1740,7 +1740,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbPlanoContas">Plano de Contas <span class="text-danger">*</span></label>
-                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
+                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> required>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT PlConId, PlConCodigo, PlConNome
@@ -1777,19 +1777,19 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-6">
                                             <div class="form-group">
                                                 <label for="inputDescricao">Descrição <span class="text-danger">*</span></label>
-                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> required>
+                                                <input type="text" id="inputDescricao" class="form-control" name="inputDescricao" rows="3" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDescricao'] ?>" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> required>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputOrdemCarta">Ordem Compra/C. Contrato</label>
-                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> class="form-control" readonly>
+                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> class="form-control" readonly>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputNotaFiscal">Nº Nota Fiscal/Documento</label>
-                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNotaFiscal'] ?>" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> class="form-control">
+                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNotaFiscal'] ?>" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> class="form-control">
                                             </div>
                                         </div>
                                     </div>                              
@@ -1810,11 +1810,11 @@ $dataInicio = date("Y-m-d");
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataVencimento">Data do
                                                                     Vencimento</label>
-                                                                <input type="date" id="inputDataVencimento" value="<?php isset($lancamento) ? print($lancamento['CnAPaDtVencimento']) : print($dataInicio) ?>" name="inputDataVencimento" class="form-control removeValidacao" <?php  if((isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') || isset($lancamento['CnAPaMovimentacao'])) echo 'disabled' ?>>
+                                                                <input type="date" id="inputDataVencimento" value="<?php isset($lancamento) ? print($lancamento['CnAPaDtVencimento']) : print($dataInicio) ?>" name="inputDataVencimento" class="form-control removeValidacao" <?php  if((isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') || isset($lancamento['CnAPaMovimentacao'])) echo 'disabled' ?>>
                                                             </div>
                                                             <div class="form-group col-6">
                                                                 <label for="inputValor">Valor</label>
-                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValor" name="inputValor" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAPaValorAPagar']) ?>" class="form-control removeValidacao" <?php  if((isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') || isset($lancamento['CnAPaMovimentacao'])) echo 'disabled' ?>>
+                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValor" name="inputValor" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAPaValorAPagar']) ?>" class="form-control removeValidacao" <?php  if((isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') || isset($lancamento['CnAPaMovimentacao'])) echo 'disabled' ?>>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1827,7 +1827,7 @@ $dataInicio = date("Y-m-d");
                                                     <h5>Valor Pago</h5>
                                                     <div class="row pr-2" style="margin-top: 5px;">
                                                         <?php  
-                                                        if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] != 'Pago' || !isset($lancamento['SituaNome'])) {
+                                                        if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] != 'PAGO' || !isset($lancamento['SituaChave'])) {
                                                             print('
                                                             <a id="habilitarPagamento" href="#" >Habilitar Pagamento</a>
                                                             <span class="mx-1">|</span>
@@ -1843,12 +1843,12 @@ $dataInicio = date("Y-m-d");
                                                             <div class="form-group col-6">
                                                                 <label for="inputDataPagamento">Data do
                                                                     Pagamento</label>
-                                                                <input type="date" id="inputDataPagamento" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDtPagamento'] ?>" name="inputDataPagamento" class="form-control removeValidacao" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> readOnly>
+                                                                <input type="date" id="inputDataPagamento" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaDtPagamento'] ?>" name="inputDataPagamento" class="form-control removeValidacao" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> readOnly>
                                                             </div>
                                                             <div class="form-group col-6">
                                                                 <label for="inputValorTotalPago">Valor Total
                                                                     Pago</label>
-                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotalPago" name="inputValorTotalPago" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAPaValorPago']) ?>" class="form-control removeValidacao" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?> disabled>
+                                                                <input type="text" onKeyUp="moeda(this)" maxLength="12" id="inputValorTotalPago" name="inputValorTotalPago" value="<?php if (isset($lancamento)) echo mostraValor($lancamento['CnAPaValorPago']) ?>" class="form-control removeValidacao" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> disabled>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1868,7 +1868,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbContaBanco">Conta/Banco <span class="text-danger">*</span></label>
-                                                <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?>>
+                                                <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?>>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT CnBanId, CnBanNome
@@ -1896,7 +1896,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbFormaPagemento">Forma de Pagamento <span class="text-danger">*</span></label>
-                                                <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?>>
+                                                <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?>>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT FrPagId, FrPagNome
@@ -1924,7 +1924,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="inputNumeroDocumento">Nº Documento</label>
-                                                <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNumDocumento'] ?>" class="form-control" placeholder="Nº Documento" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?>>
+                                                <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNumDocumento'] ?>" class="form-control" placeholder="Nº Documento" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?>>
                                             </div>
                                         </div>
                                     </div>
@@ -1933,7 +1933,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-12">
                                             <div class="form-group">
                                                 <label for="inputObservacao">Observação</label>
-                                                <textarea id="inputObservacao" class="form-control" name="inputObservacao" rows="3" <?php  if(isset($lancamento['SituaNome']) && $lancamento['SituaNome'] == 'Pago') echo 'disabled' ?>></textarea>
+                                                <textarea id="inputObservacao" class="form-control" name="inputObservacao" rows="3" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?>></textarea>
                                             </div>
                                         </div>
                                     </div>
