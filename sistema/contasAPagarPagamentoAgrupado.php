@@ -8,31 +8,51 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['valores'])){
     $dados = $_POST['valores'];
     $idsCont = count($_POST['valores']);
-
+               
     $retorno = '';
     $strin = '';
     try{
+        $conn->beginTransaction();
+
+        $sql1 = "SELECT SituaId
+                    FROM Situacao
+                    WHERE SituaChave = 'PAGO'";
+        $result = $conn->query($sql1);
+        $situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+        $valorTotal = str_replace('.', '', $_POST['valorTotal']);
+        $valorTotal = str_replace(',', '.', $valorTotal);
+
+        $sql = "INSERT INTO ContasAgrupadas ( CnAgrDtPagamento, CnAgrValorTotal, CnAgrFormaPagamento, CnAgrContaBanco, CnAgrDescricaoAgrupamento)
+                VALUES ( :dateDtPagamento, :fValorTotal, :iFormaPagamento, :iContaBanco, :sDescricaoAgrupamento)";
+        $result = $conn->prepare($sql);
+                
+        $result->execute(array(
+                        ':dateDtPagamento' => $_POST['dataPagamento'],
+                        ':fValorTotal' => $valorTotal,
+                        ':iFormaPagamento' => $_POST['formaPagamento'],
+                        ':iContaBanco' => $_POST['contaBanco'],
+                        ':sDescricaoAgrupamento' => $_POST['descricaoGrupo']
+                        ));
+
+        $idContaGrupo = $conn->lastInsertId();
+
         for($i = 0; $i < $idsCont; $i++){
-            // var_dump($dados[$i]);
-            $sql1 = "SELECT SituaId
-	    	            FROM Situacao
-	    	            WHERE SituaChave = 'PAGO'";
-            $result = $conn->query($sql1);
-            $situacao = $result->fetch(PDO::FETCH_ASSOC);
+            $valor = str_replace('.', '', $dados[$i]['valor']);
+            $valor = str_replace(',', '.', $valor);
     
-            $sql = "UPDATE ContasAPagar SET CnAPaPlanoContas = :iPlanoContas, CnAPaContaBanco = :iContaBanco, CnAPaFormaPagamento = :iFormaPagamento, CnAPaNumDocumento = :sNumDocumento,
-                                            CnAPaDescricao = :sDescricao, CnAPaDtPagamento = :dateDtPagamento, CnAPaValorPago = :fValorPago, CnAPaStatus = :iStatus, CnAPaUsuarioAtualizador = :iUsuarioAtualizador, CnAPaUnidade = :iUnidade
+            $sql = "UPDATE ContasAPagar SET CnAPaContaBanco = :iContaBanco, CnAPaFormaPagamento = :iFormaPagamento, CnAPaDescricao = :sDescricao, CnAPaDtPagamento = :dateDtPagamento, 
+                                            CnAPaValorPago = :fValorPago, CnAPaAgrupamento = :iAgrupamento, CnAPaStatus = :iStatus, CnAPaUsuarioAtualizador = :iUsuarioAtualizador, CnAPaUnidade = :iUnidade
 		    		WHERE CnAPaId = ".$dados[$i]['id']."";
 		    $result = $conn->prepare($sql);
 		    		
 		    $result->execute(array(
-                                ':iPlanoContas' =>$dados[$i]['planoContas'],
                                 ':iContaBanco' => $_POST['contaBanco'],
                                 ':iFormaPagamento' => $_POST['formaPagamento'],
-                                ':sNumDocumento' => $_POST['numeroDocumento'],
                                 ':sDescricao' => $dados[$i]['descricao'],
                                 ':dateDtPagamento' => $_POST['dataPagamento'],
-                                ':fValorPago' => isset($dados[$i]['valor']) ? floatval($dados[$i]['valor']) : null,
+                                ':fValorPago' => $valor,
+                                ':iAgrupamento' => $idContaGrupo,
                                 ':iStatus' => $situacao['SituaId'],
                                 ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                                 ':iUnidade' => $_SESSION['UnidadeId']
@@ -45,9 +65,12 @@ if(isset($_POST['valores'])){
             }
         }
 
+        $conn->commit();
+        
         echo $retorno;
 
     } catch(PDOException $e) {	
+        $conn->rollback();
         
         echo 'Erro.';
 

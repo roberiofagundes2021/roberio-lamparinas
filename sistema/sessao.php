@@ -146,7 +146,7 @@ $arquivosContasAPagar = array(
 	'contasAPagarFiltra.php', 'contasAPagarExclui.php',
 	'contasAPagarPagamentoAgrupado.php', 'contasAPagarParcelamento.php',
 	'resumoFinanceiroFiltra.php', 'contasEstornar.php', 'filtraCentroCusto.php',
-	'filtraCentroCustoXContasRetorna.php'
+	'filtraCentroCustoXContasRetorna.php', 'filtraContasAgrupadas.php'
 );
 
 if ((array_key_exists('ContPagPeriodoDe', $_SESSION) || array_key_exists('ContPagAte', $_SESSION) || array_key_exists('ContPagFornecedor', $_SESSION) || array_key_exists('ContPagPlanoContas', $_SESSION) || array_key_exists('ContPagStatus', $_SESSION)) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosContasAPagar)) {
@@ -162,7 +162,7 @@ $arquivosContasAReceber = array(
 	'contasAReceber.php', 'contasAReceberNovoLancamento.php',
 	'contasAReceberFiltra.php', 'contasAReceberExclui.php',
 	'contasAReceberRecebimentoAgrupado.php', 'contasAReceberParcelamento.php',
-	'resumoFinanceiroFiltra.php', 'contasEstornar.php'
+	'resumoFinanceiroFiltra.php', 'contasEstornar.php', 'filtraContasAgrupadas.php'
 );
 
 if ((array_key_exists('ContRecPeriodoDe', $_SESSION)

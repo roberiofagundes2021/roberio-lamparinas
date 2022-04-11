@@ -266,7 +266,7 @@ $dataInicio = date("Y-m-d");
 
 
     $("#salvar").on('click', (e) => {
-      if($('#inputValorTotal').val() == '0,00' || $('#inputValorTotal').val() == '') {
+      if($('#inputValorTotal').val() == '0,00') {
         var menssagem = 'Por favor informe o Valor Total Pago!';
         alerta('Atenção', menssagem, 'error');
         $('#inputValorTotal').focus();

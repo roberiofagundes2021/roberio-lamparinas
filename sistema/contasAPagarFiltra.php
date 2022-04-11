@@ -122,6 +122,7 @@ include('global_assets/php/conexao.php');
 
             $estornamento =  (!isset($item['CnAPaJustificativaEstorno']) || $status == 'Pago') ? 'none' : 'block';
             $justificativaEstornamento = (isset($item['CnAPaJustificativaEstorno'])) ? $item['CnAPaJustificativaEstorno'] : '';
+            $consultaAgrupamento = (isset($item['CnAPaAgrupamento'])) ? 'consultaPagamento#'.$item['CnAPaAgrupamento'] : '';
 
             $checkbox = '<input type="checkbox" id="check'.$cont.'" style="display: '.$visibilidade.';"> <input type="hidden" value="'.$item["CnAPaId"].'">';
             
@@ -137,7 +138,15 @@ include('global_assets/php/conexao.php');
 
             $status = $status;
 
-            $acaoConta = ($status == 'Pago') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : '<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+            if( $item["CnAPaAgrupamento"] == '') {
+                $acaoConta = ($status == 'Pago') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : 
+                '<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+            }else {
+                $acaoConta = ($status == 'Pago') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>
+                                                    <a href="#" data-toggle="modal" data-target="#modal_consultaPagamentoAgrupado" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \''.$consultaAgrupamento.'\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Pagamento agrupado"><i class="icon-stack3"></i></a>' : 
+                                                   '<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
+            }
+
 
             $acoes = '
                 <div class="list-icons">
