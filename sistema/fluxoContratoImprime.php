@@ -120,7 +120,7 @@ try {
 			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 					FROM Produto
 					JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-					JOIN ProdutoXFabricante ON PrXFaProduto = ProduId
+					JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
 					JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 					JOIN SubCategoria on SbCatId = ProduSubCategoria
