@@ -27,8 +27,8 @@ function queryPesquisa(){
         empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
         empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
 
-        $argsCr[]  = "CNAREDTEMISSAO BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
-        $argsCp[]  = "CNAPADTEMISSAO BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+        $argsCr[]  = "CNAREDTRECEBIMENTO BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+        $argsCp[]  = "CNAPADTPAGAMENTO BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
 
         if (!empty($_POST['inputPeriodoDe'])) {
             $_SESSION['MovFinancPeriodoDe'] = $_POST['inputPeriodoDe'];
@@ -107,7 +107,7 @@ function queryPesquisa(){
 
         if ($status[0] === "12") {
             $sql = "SELECT CNAPAID AS ID, 
-                           CNAPADTEMISSAO AS DATA, 
+                           CNAPADTPAGAMENTO AS DATA, 
                            CNAPADESCRICAO AS HISTORICO,  
                            FORNENOME AS FORNECEDOR,
                            CnAPANUMDOCUMENTO AS NUMDOC, 
@@ -126,7 +126,7 @@ function queryPesquisa(){
                     
         } else if ($status[0] === "14") {
             $sql = "SELECT CNAREID AS ID, 
-                           CNAREDTEMISSAO AS DATA, 
+                           CNAREDTRECEBIMENTO AS DATA, 
                            CNAREDESCRICAO AS HISTORICO,  
                            CLIENNOME AS CLIENTE, 
                            CnARENUMDOCUMENTO AS NUMDOC, 
@@ -145,7 +145,7 @@ function queryPesquisa(){
                     
         } else {
             $sql = "SELECT CNAREID AS ID, 
-                           CNAREDTEMISSAO AS DATA, 
+                           CNAREDTRECEBIMENTO AS DATA, 
                            CNAREDESCRICAO AS HISTORICO,  
                            CLIENNOME AS CLIENTE,
                            CnARENUMDOCUMENTO AS NUMDOC, 
@@ -162,7 +162,7 @@ function queryPesquisa(){
             $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
                     UNION 
                     SELECT CNAPAID AS ID, 
-                           CNAPADTEMISSAO AS DATA, 
+                           CNAPADTPAGAMENTO AS DATA, 
                            CNAPADESCRICAO AS HISTORICO, 
                            FORNENOME AS FORNECEDOR,
                            CnAPANUMDOCUMENTO AS NUMDOC, 
