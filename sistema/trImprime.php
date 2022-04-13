@@ -3,10 +3,10 @@
 include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
+require_once 'global_assets/php/vendor/autoload.php';
 
 use Mpdf\Mpdf;
 
-require_once 'global_assets/php/vendor/autoload.php';
 
 if (isset($_POST['inputTRId'])){
 	$iTR = $_POST['inputTRId'];
