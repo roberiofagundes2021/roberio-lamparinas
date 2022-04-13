@@ -322,15 +322,20 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 			$('#cmbProduto').empty().append('<option>Sem produto</option>');
 		}
 
-		function reset(id, type){
-			if (type == "all"){
-				var array = [];
-				for(var x=1; x<=id; x++){
-					array.push("inputQuantidade"+x)
+		function reset(id, type, status){
+			console.log(status)
+			if(status != 'LIBERADOCONTABILIDADE'){
+				if (type == "all"){
+					var array = [];
+					for(var x=1; x<=id; x++){
+						array.push("inputQuantidade"+x)
+					}
+					confirmaReset(document.formOrdemCompraProduto, "Tem certeza que deseja resetar TODAS as quantidades ?", "ordemcompraProduto.php", array);
+				}else{
+					confirmaReset(document.formOrdemCompraProduto, "Tem certeza que deseja resetar essa quantidade ?", "ordemcompraProduto.php", id);
 				}
-				confirmaReset(document.formOrdemCompraProduto, "Tem certeza que deseja resetar TODAS as quantidades ?", "ordemcompraProduto.php", array);
-			}else{
-				confirmaReset(document.formOrdemCompraProduto, "Tem certeza que deseja resetar essa quantidade ?", "ordemcompraProduto.php", id);
+			} else {
+				alerta('Atenção','O produto não pode ser resetado pois já passou pelo processo de aprovação.','error');
 			}
 		}
 		
@@ -572,6 +577,9 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 										print('<div id="tabelaProdutos">');
 										
 										$fTotalGeral = 0;
+										$disable = $sStatus == 'LIBERADOCONTABILIDADE'?'readOnly':'';
+										$class = $sStatus == 'LIBERADOCONTABILIDADE'?'form-control-border-off Quantidade text-right pula'
+										:'form-control-border Quantidade text-right pula';
 										
 										foreach ($rowProdutos as $item){
 											$cont++;
@@ -582,39 +590,39 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 											
 											$fTotalGeral += gravaValor($fValorTotal);
 											
-											print('
-											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-5">
-													<div class="row">
-														<div class="col-lg-2" style="max-width:60px">
-															<input type="text" id="inputItem'.$cont.'" name="inputItem'.$cont.'" class="form-control-border-off" value="'.$cont.'" readOnly>
-															<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
+											print("
+											<div class='row' style='margin-top: 8px;'>
+												<div class='col-lg-5'>
+													<div class='row'>
+														<div class='col-lg-2' style='max-width:60px'>
+															<input type='text' id='inputItem$cont' name='inputItem$cont' class='form-control-border-off' value='$cont' readOnly>
+															<input type='hidden' id='inputIdProduto$cont' name='inputIdProduto$cont' value='$item[ProduId]' class='idProduto'>
 														</div>
-														<div class="col-lg-10" style="width:100%">
-															<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['Detalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
-															<input type="hidden" id="inputDetalhamento' . $cont . '" name="inputDetalhamento' . $cont . '" value="' . $item['Detalhamento'] . '">
+														<div class='col-lg-10' style='width:100%'>
+															<input type='text' id='inputProduto$cont' name='inputProduto$cont' class='form-control-border-off' data-popup='tooltip' title='$item[Detalhamento]' value='$item[ProduNome]' readOnly>
+															<input type='hidden' id='inputDetalhamento$cont' name='inputDetalhamento$cont' value='$item[Detalhamento]'>
 														</div>
 													</div>
 												</div>								
-												<div class="col-lg-1">
-													<input type="text" id="inputUnidade'.$cont.'" name="inputUnidade'.$cont.'" class="form-control-border-off" value="'.$item['UnMedSigla'].'" readOnly>
+												<div class='col-lg-1'>
+													<input type='text' id='inputUnidade$cont' name='inputUnidade$cont' class='form-control-border-off' value='$item[UnMedSigla]' readOnly>
 												</div>
-												<div class="col-lg-1">
-													<input type="text" id="inputSaldo'.$cont.'" readOnly name="Saldo'.$cont.'" class="form-control-border-off text-right" value="'.$saldo.'">
+												<div class='col-lg-1'>
+													<input type='text' id='inputSaldo$cont' readOnly name='Saldo$cont' class='form-control-border-off text-right' value='$saldo'>
 												</div>
-												<div class="col-lg-1">
-													<input type="text" class="form-control-border Quantidade text-right pula" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'').' name="inputQuantidade'.$cont.'" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber(), validaQuantInputModal('.$saldo.','.$iQuantidade.',this)" value="'.$iQuantidade.'">
+												<div class='col-lg-1'>
+													<input type='text' $disable class='$class' id='inputQuantidade$cont' name='inputQuantidade$cont' onChange='calculaValorTotal($cont)' onkeypress='return onlynumber(), validaQuantInputModal($saldo,$iQuantidade,this)' value='$iQuantidade'>
 												</div>		
-												<div class="col-lg-1">
-													<input readOnly type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border-off ValorUnitario text-right" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
+												<div class='col-lg-1'>
+													<input readOnly type='text' id='inputValorUnitario$cont' name='inputValorUnitario$cont' class='form-control-border-off ValorUnitario text-right' onChange='calculaValorTotal($cont)' onKeyUp='moeda(this)' maxLength='12' value='$fValorUnitario'>
 												</div>	
-												<div class="col-lg-2">
-													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off text-right" value="'.$fValorTotal.'" readOnly>
+												<div class='col-lg-2'>
+													<input type='text' id='inputValorTotal$cont' name='inputValorTotal$cont' class='form-control-border-off text-right' value='$fValorTotal' readOnly>
 												</div>
-												<div class="col-sm-1 btn" style="text-align:center;" onClick="reset(`inputQuantidade'.$cont.'`, 0)">
-													<i class="icon-reset" title="Resetar"></i>
+												<div class='col-sm-1 btn' style='text-align:center;' onClick='reset(`inputQuantidade$cont`, 0, `$sStatus`)'>
+													<i class='icon-reset' title='Resetar'></i>
 												</div>
-											</div>');
+											</div>");
 										}
 										
 										print('
@@ -644,7 +652,7 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 												<div class="col-lg-2">
 													<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="'.mostraValor($fTotalGeral).'" readOnly>
 												</div>
-												<div class="col-sm-1 btn" style="text-align:center;" onClick="reset('.count($rowProdutos).', `all`)">
+												<div class="col-sm-1 btn" style="text-align:center;" onClick="reset('.count($rowProdutos).', `all`, `'.$sStatus.'`)">
 													<i class="icon-reset" title="Resetar Todos"></i>
 												</div>
 											</div>'										

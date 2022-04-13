@@ -309,15 +309,19 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 			$('#cmbServico').empty().append('<option value="">Filtrando...</option>');
 		}
 
-		function reset(id, type){
-			if (type == "all"){
-				var array = [];
-				for(var x=1; x<=id; x++){
-					array.push("inputQuantidade"+x)
+		function reset(id, type, status){
+			if(status != 'LIBERADOCONTABILIDADE'){
+				if (type == "all"){
+					var array = [];
+					for(var x=1; x<=id; x++){
+						array.push("inputQuantidade"+x)
+					}
+					confirmaReset(document.formOrdemCompraServico, "Tem certeza que deseja resetar TODAS as quantidades ?", "ordemcompraServico.php", array);
+				}else{
+					confirmaReset(document.formOrdemCompraServico, "Tem certeza que deseja resetar essa quantidade ?", "ordemcompraServico.php", id);
 				}
-				confirmaReset(document.formOrdemCompraServico, "Tem certeza que deseja resetar TODAS as quantidades ?", "ordemcompraServico.php", array);
-			}else{
-				confirmaReset(document.formOrdemCompraServico, "Tem certeza que deseja resetar essa quantidade ?", "ordemcompraServico.php", id);
+			} else {
+				alerta('Atenção','O serviço não pode ser resetado pois já passou pelo processo de aprovação.','error');
 			}
 		}
 
@@ -563,6 +567,10 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 										print('<div id="tabelaServicos">');
 										
 										$fTotalGeral = 0;
+										$fTotalGeral = 0;
+										$disable = $sStatus == 'LIBERADOCONTABILIDADE'?'readOnly':'';
+										$class = $sStatus == 'LIBERADOCONTABILIDADE'?'form-control-border-off Quantidade text-right pula'
+										:'form-control-border Quantidade text-right pula';
 										
 										foreach ($rowServicos as $item){
 											
@@ -593,7 +601,7 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 													<input type="text" id="inputSaldo'.$cont.'" readOnly name="Saldo'.$cont.'" class="form-control-border-off text-right" value="'.$saldo.'">
 												</div>
 												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'').' name="inputQuantidade'.$cont.'" onkeypress="validaQuantInputModal('.$saldo.','.$iQuantidade.',this)" class="form-control-border Quantidade text-right pula" onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
+													<input type="text" id="inputQuantidade'.$cont.'" '.($saldo > 0?'':'').' name="inputQuantidade'.$cont.'" onkeypress="validaQuantInputModal('.$saldo.','.$iQuantidade.',this)" class="'.$class.'" '.$disable.' onChange="calculaValorTotal('.$cont.')" onkeypress="return onlynumber();" value="'.$iQuantidade.'">
 												</div>	
 												<div class="col-lg-1">
 													<input readOnly type="text" id="inputValorUnitario'.$cont.'" name="inputValorUnitario'.$cont.'" class="form-control-border-off ValorUnitario text-right" onChange="calculaValorTotal('.$cont.')" onKeyUp="moeda(this)" maxLength="12" value="'.$fValorUnitario.'">
@@ -601,7 +609,7 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 												<div class="col-lg-2">
 													<input type="text" id="inputValorTotal'.$cont.'" name="inputValorTotal'.$cont.'" class="form-control-border-off text-right" value="'.$fValorTotal.'" readOnly>
 												</div>
-												<div class="col-lg-1 btn" style="text-align:center;" onClick="reset(`inputQuantidade'.$cont.'`, 0)">
+												<div class="col-lg-1 btn" style="text-align:center;" onClick="reset(`inputQuantidade'.$cont.'`, 0, `'.$sStatus.'`)">
 													<i class="icon-reset" title="Resetar"></i>
 												</div>
 											</div>');											
@@ -631,7 +639,7 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 										<div class="col-lg-2">
 											<input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="'.mostraValor($fTotalGeral).'" readOnly>
 										</div>
-										<div class="col-lg-1 btn" style="text-align:center;" onClick="reset('.count($rowServicos).',`all`)">
+										<div class="col-lg-1 btn" style="text-align:center;" onClick="reset('.count($rowServicos).',`all`, `'.$sStatus.'`)">
 											<i class="icon-reset" title="Resetar"></i>
 										</div>											
 									</div>'										
