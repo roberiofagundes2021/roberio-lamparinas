@@ -1123,11 +1123,14 @@ $dataFim = date("Y")."-12-31";
 
                                         <div class="text-right col-lg-11 pt-3">
                                             <div>
-                                            <a href="#" onclick="atualizaContasAReceber(<?php echo $novo; ?>, 0, 'novo');"  
-                                                class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo
-                                                    Lançamento</a>
-                                                <button id="efetuarRecebimento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate" disabled>Efetuar Recebimento</button>
-                                                <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
+                                                <?php 
+                                                    echo $inserir?"<a href='#' onclick='atualizaContasAReceber($novo, 0, `novo`);'  
+                                                    class='btn btn-outline bg-slate-600 text-slate-600 border-slate'>Novo Lançamento</a>":"";
+
+                                                    echo $atualizar?"<button id='efetuarRecebimento' class='btn btn-outline bg-slate-600 text-slate-600 border-slate' disabled>Efetuar Recebimento</button>":"";
+
+                                                    echo "<button class='btn bg-secondary'><i class='icon-printer2'></i></button>";
+                                                ?>
                                             </div>
                                         </div>
                                     </div>

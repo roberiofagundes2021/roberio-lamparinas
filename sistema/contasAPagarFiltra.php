@@ -148,12 +148,12 @@ include('global_assets/php/conexao.php');
             }
 
 
-            $acoes = '
+            $acoes = $_POST['permissionAtualiza'] || $_POST['permissionExclui']?'
                 <div class="list-icons">
-                    <div class="list-icons list-icons-extended">
-                        <a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
-                        '.$acaoConta.'
-                        <a href="#" class="list-icons-item" data-toggle="modal" data-target="#modal_mini-justificativa-estorno" onclick="estornoJustificativa(\''.$justificativaEstornamento.'\');"  data-popup="tooltip" data-placement="bottom"title="Motivo do estorno" style="display: '.$estornamento.';"><i class="icon-info3"></i></a>
+                    <div class="list-icons list-icons-extended">'.
+                        ($_POST['permissionAtualiza']?'<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':'')
+                        .($_POST['permissionExclui']?$acaoConta:'').
+                        '<a href="#" class="list-icons-item" data-toggle="modal" data-target="#modal_mini-justificativa-estorno" onclick="estornoJustificativa(\''.$justificativaEstornamento.'\');"  data-popup="tooltip" data-placement="bottom"title="Motivo do estorno" style="display: '.$estornamento.';"><i class="icon-info3"></i></a>
                         <!-- Retirado ícone de parcelar
                         <div class="dropdown" style="display: '.$visibilidade.';">													
                             <a href="#" class="list-icons-item" data-toggle="dropdown">
@@ -164,7 +164,7 @@ include('global_assets/php/conexao.php');
                             </div>
                         </div>-->
                     </div>
-                </div>';
+                </div>':'';
 
             $array = [
                 'data'=>[

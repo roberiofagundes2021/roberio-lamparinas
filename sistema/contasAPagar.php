@@ -1066,13 +1066,16 @@ $dataFim = date("Y")."-12-31";
 
                                         <div class="text-right col-lg-11 pt-3">
                                             <div>
-                                                <a href="#" onclick="atualizaContasAPagar(<?php echo $novo; ?>, 0, 'novo');" 
-                                                    class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo
-                                                    Lançamento</a>
-                                                <button id="efetuarPagamento"
-                                                    class="btn btn-outline bg-slate-600 text-slate-600 border-slate"
-                                                    disabled>Efetuar Pagamento</button>
-                                                <button class="btn bg-secondary"><i class="icon-printer2"></i></button>
+                                                <?php 
+                                                    echo $inserir?"<a href='#' onclick='atualizaContasAPagar($novo, 0, `novo`)' 
+                                                        class='btn btn-outline bg-slate-600 text-slate-600 border-slate'>Novo Lançamento</a>":"";
+
+                                                    echo $atualizar?"<button id='efetuarPagamento'
+                                                    class='btn btn-outline bg-slate-600 text-slate-600 border-slate'
+                                                    disabled>Efetuar Pagamento</button>":"";
+
+                                                    echo "<button class='btn bg-secondary'><i class='icon-printer2'></i></button>";
+                                                ?>
                                             </div>
                                         </div>
                                     </div>
