@@ -89,7 +89,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 	if($ID[0] == 'P'){
 
 		$sql = 	"SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-		UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, ProduValorCusto as ValorUnitario, 
+		UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, 
 		MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Produto
 		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
@@ -160,7 +160,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		}
 	} else {
 		$sql = 	"SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-		UnMedSigla as UnidadeMedida, AdXPrQuantidade as Quantidade, ProduValorCusto as ValorUnitario, 
+		UnMedSigla as UnidadeMedida, AdXPrQuantidade as Quantidade, AdXPrValorUnitario as ValorUnitario, 
 		MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Produto
 		JOIN AditivoXProduto on AdXPrProduto = ProduId
@@ -241,7 +241,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 	// Essa parte vai buscar os dados de fluxo Realizado de acordo com as opções selecionadas
 	if($ID[0] == 'P'){
 		$sql = 	"SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-		UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, ProduValorCusto as ValorUnitario, 
+		UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, 
 		MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Produto
 		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
@@ -314,7 +314,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		}
 	} else {
 		$sql = 	"SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-		UnMedSigla as UnidadeMedida, AdXPrQuantidade as Quantidade, ProduValorCusto as ValorUnitario, 
+		UnMedSigla as UnidadeMedida, AdXPrQuantidade as Quantidade, AdXPrValorUnitario as ValorUnitario, 
 		MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Produto
 		JOIN AditivoXProduto on AdXPrProduto = ProduId
@@ -395,7 +395,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 	// essa parte monta as opções do filtro de itens a serem mostrados em Produto/Serviço de acordo com o termo selecionado
 	if($ID[0] == 'P'){
 		$sqlFilter = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-		UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, ProduValorCusto as ValorUnitario, 
+		UnMedSigla as UnidadeMedida, FOXPrQuantidade as Quantidade, FOXPrValorUnitario as ValorUnitario, 
 		MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Produto
 		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
@@ -415,7 +415,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$ID[1];
 	} else {
 		$sqlFilter = "SELECT ProduId as Id, ProduNome as Nome, ProduDetalhamento as Detalhamento, 
-		UnMedSigla as UnidadeMedida, AdXPrQuantidade as Quantidade, ProduValorCusto as ValorUnitario, 
+		UnMedSigla as UnidadeMedida, AdXPrQuantidade as Quantidade, AdXPrValorUnitario as ValorUnitario, 
 		MarcaNome as Marca, SbCatNome as SubCategoria
 		FROM Produto
 		JOIN AditivoXProduto on AdXPrProduto = ProduId
