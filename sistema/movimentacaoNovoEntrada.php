@@ -739,7 +739,8 @@ if (isset($_POST['inputData'])) {
 			function inputsModal() {
 				$('#tbody-modal')
 			}
-
+		}); //document.ready
+		
 			Array.prototype.remove = function(start, end) {
 				this.splice(start, end);
 				return this;
@@ -793,7 +794,7 @@ if (isset($_POST['inputData'])) {
 
 			}
 
-		}); //document.ready
+		
 	</script>
 </head>
 
