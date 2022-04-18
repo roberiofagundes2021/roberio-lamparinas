@@ -373,6 +373,7 @@ function queryPesquisa(){
                 <div class="list-icons list-icons-extended"> ';
 
                     //BOTAO EDITAR
+                    /*
                     if (intval($item["CODTRANSFREC"]) > 0){
                         //$acoes .= '<a href="movimentacaoFinanceiraTransferencia.php?lancamentoId=' . $item["CODTRANSFREC"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
                         $acoes .= $_POST['permissionAtualiza']?' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["CODTRANSFREC"].', \'T\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':"";
@@ -385,7 +386,7 @@ function queryPesquisa(){
                     } else if ($item["TIPO"] === "P") {
                         //$acoes .= '<a href="movimentacaoFinanceiraPagamento.php?lancamentoId=' . $item["ID"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
                         $acoes .= $_POST['permissionAtualiza']?' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'P\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':"";
-                    }
+                    }*/
                     
                     //BOTAO EXCLUIR
                     if (intval($item["CODTRANSFREC"]) > 0){

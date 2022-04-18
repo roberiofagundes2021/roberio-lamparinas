@@ -53,7 +53,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
 			$result = $conn->query($sql);
 			$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
 
-
+			$data = date('Y-m-d'); //Data provisória
 			/* Insere na Tabela Contas a Pagar */
 			
 			$sql = "INSERT INTO ContasAPagar ( CnAPaMovimentacao, CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,

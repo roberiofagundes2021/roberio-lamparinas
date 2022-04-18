@@ -95,7 +95,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                 ':iContaBanco' => $_POST['cmbContaBanco'],
                 ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
                 ':sNumDocumento' => $_POST['inputNumeroDocumento'],
-                ':sNotaFiscal' => $_POST['inputNotaFiscal'],
+                ':sNotaFiscal' => isset($_POST['inputNotaFiscal']) ? $_POST['inputNotaFiscal'] : null,
                 ':dateDtEmissao' => $_POST['inputDataEmissao'],
                 ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
                 ':sDescricao' => $_POST['inputDescricao'],
@@ -407,101 +407,207 @@ if (isset($_POST['cmbPlanoContas'])) {
 
                 $sql = "SELECT SituaId
                     FROM Situacao
+                    WHERE SituaChave = 'PAGO'
+                    ";
+                $result = $conn->query($sql);
+                $situacaoPago = $result->fetch(PDO::FETCH_ASSOC);
+
+                $sql = "SELECT SituaId
+                    FROM Situacao
                     WHERE SituaChave = 'APAGAR'
                     ";
                 $result = $conn->query($sql);
-                $situacao = $result->fetch(PDO::FETCH_ASSOC);
+                $situacaoPagar = $result->fetch(PDO::FETCH_ASSOC);
 
                 for ($i = 1; $i <= $numParcelas; $i++) {
-
-                    $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
-                                                  CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
-                                                  CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                            VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
-                                    :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :iStatus, :iUsuarioAtualizador, :iUnidade)";
-                    $result = $conn->prepare($sql);
-
-                    $result->execute(array(
-
-                        ':iPlanoContas' => $_POST['cmbPlanoContas'],
-                        ':iFornecedor' => $_POST['cmbFornecedor'],
-                        ':iContaBanco' => $_POST['cmbContaBanco'],
-                        ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-                        ':sNumDocumento' => $_POST['inputNumeroDocumento'],
-                        ':sNotaFiscal' => $_POST['inputNotaFiscal'],
-                        ':dateDtEmissao' => $_POST['inputDataEmissao'],
-                        ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
-                        ':sDescricao' => $_POST['inputParcelaDescricao' . $i . ''],
-                        ':dateDtVencimento' => $_POST['inputParcelaDataVencimento' . $i . ''],
-                        ':fValorAPagar' => floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . ''])),
-                        ':dateDtPagamento' => $_POST['inputDataPagamento'],
-                        ':fValorPago' => isset($_POST['inputValorTotalPago']) ? floatval(gravaValor($_POST['inputValorTotalPago'])) : null,
-                        ':sObservacao' => $_POST['inputObservacao'],
-                        ':iStatus' => $situacao['SituaId'],
-                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-                        ':iUnidade' => $_SESSION['UnidadeId']
-                    ));
-
-                    $idContaAPagar = $conn->lastInsertId();
-
-                    $registros = intval($_POST['totalRegistros']);
-
-                    $proporcaoCentroCusto = 0;
-                    //Para verificar valor do parcelamento
-                    for($x=0; $x < $registros; $x++) {
-                        $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
-                        $valor = str_replace(',', '.', $valor);
-
-                        $valor = mostraValor(($valor) / $numParcelas);
-                        $valor = str_replace('.', '', $valor);
-                        $valor = str_replace(',', '.', $valor);
-
-                        $proporcaoCentroCusto += $valor;
-                    }
-
-                    $proporcaoCentroCustoVerdadeiro = false;
-                    $teste = 0;
-                    if(floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . ''])) != $proporcaoCentroCusto) {
-                        $valParcela = floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . '']));
-                        $diferenca = $valParcela - $proporcaoCentroCusto;
-
-                        $proporcaoCentroCustoVerdadeiro = true;
-                    }
-
-                    for($x=0; $x < $registros; $x++){
-                        $keyNome = 'inputCentroNome-'.$x;
-                        $keyId = 'inputIdCentro-'.$x;
-                        $centroCusto = $_POST[$keyId];
-                        $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
-                        $valor = str_replace(',', '.', $valor);
-
-                        if($proporcaoCentroCustoVerdadeiro) {
-                            $soma = 0;
-                            $soma = ($x == 0) ? $diferenca : 0;
-                            
-                            $valor = mostraValor(($valor) / $numParcelas);
-                            $valor = str_replace('.', '', $valor);
-                            $valor = str_replace(',', '.', $valor);
-                            $valor += $soma;
-                            
-                        }else {
-                            $valor = mostraValor(($valor) / $numParcelas);
-                            $valor = str_replace('.', '', $valor);
-                            $valor = str_replace(',', '.', $valor);
-                        }
-
-                        $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
-                                VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                    if(isset($_POST['checkboxPagamentoParcelaCheck' . $i . ''])) {
+                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                                    CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                                    CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
+                                                    CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                        :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
+                                        :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
                         $result = $conn->prepare($sql);
 
                         $result->execute(array(
 
-                            ':iContasAPagar' => $idContaAPagar,
-                            ':iCentroCusto' => $centroCusto,
-                            ':iValor' => $valor,
+                            ':iPlanoContas' => $_POST['cmbPlanoContas'],
+                            ':iFornecedor' => $_POST['cmbFornecedor'],
+                            ':iContaBanco' => $_POST['cmbPagamentoParcelaContaBanco'],
+                            ':iFormaPagamento' => $_POST['cmbPagamentoParcelaFormaPagamento'],
+                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
+                            ':sNotaFiscal' => $_POST['inputNotaFiscal'],
+                            ':dateDtEmissao' => $_POST['inputDataEmissao'],
+                            ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
+                            ':sDescricao' => $_POST['inputParcelaDescricao' . $i . ''],
+                            ':dateDtVencimento' => $_POST['inputDataVencimento'],
+                            ':fValorAPagar' => floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . ''])),
+                            ':dateDtPagamento' => $_POST['inputDataPagamento'],
+                            ':fValorPago' => floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . ''])),
+                            ':sObservacao' => $_POST['inputObservacao'],
+                            ':sTipoJuros' => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                            ':fJuros' => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                            ':sTipoDesconto' => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                            ':fDesconto' => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                            ':iStatus' => $situacaoPago['SituaId'],
                             ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                             ':iUnidade' => $_SESSION['UnidadeId']
                         ));
+
+                        $idContaAPagar = $conn->lastInsertId();
+                        
+                        $idContaAPagar = $conn->lastInsertId();
+
+                        $registros = intval($_POST['totalRegistros']);
+
+                        $proporcaoCentroCusto = 0;
+                        //Para verificar valor do parcelamento
+                        for($x=0; $x < $registros; $x++) {
+                            $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                            $valor = str_replace(',', '.', $valor);
+
+                            $valor = mostraValor(($valor) / $numParcelas);
+                            $valor = str_replace('.', '', $valor);
+                            $valor = str_replace(',', '.', $valor);
+
+                            $proporcaoCentroCusto += $valor;
+                        }
+
+                        $proporcaoCentroCustoVerdadeiro = false;
+                        $teste = 0;
+                        if(floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . ''])) != $proporcaoCentroCusto) {
+                            $valParcela = floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . '']));
+                            $diferenca = $valParcela - $proporcaoCentroCusto;
+
+                            $proporcaoCentroCustoVerdadeiro = true;
+                        }
+
+                        for($x=0; $x < $registros; $x++){
+                            $keyNome = 'inputCentroNome-'.$x;
+                            $keyId = 'inputIdCentro-'.$x;
+                            $centroCusto = $_POST[$keyId];
+                            $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                            $valor = str_replace(',', '.', $valor);
+
+                            if($proporcaoCentroCustoVerdadeiro) {
+                                $soma = 0;
+                                $soma = ($x == 0) ? $diferenca : 0;
+                                
+                                $valor = mostraValor(($valor) / $numParcelas);
+                                $valor = str_replace('.', '', $valor);
+                                $valor = str_replace(',', '.', $valor);
+                                $valor += $soma;
+                                
+                            }else {
+                                $valor = mostraValor(($valor) / $numParcelas);
+                                $valor = str_replace('.', '', $valor);
+                                $valor = str_replace(',', '.', $valor);
+                            }
+
+                            $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                                    VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                            $result = $conn->prepare($sql);
+
+                            $result->execute(array(
+
+                                ':iContasAPagar' => $idContaAPagar,
+                                ':iCentroCusto' => $centroCusto,
+                                ':iValor' => $valor,
+                                ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                ':iUnidade' => $_SESSION['UnidadeId']
+                            ));
+                        }
+                    }else {
+                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                                                    CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                                    CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                        :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+                        $result = $conn->prepare($sql);
+
+                        $result->execute(array(
+
+                            ':iPlanoContas' => $_POST['cmbPlanoContas'],
+                            ':iFornecedor' => $_POST['cmbFornecedor'],
+                            ':iContaBanco' => $_POST['cmbContaBanco'],
+                            ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
+                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
+                            ':sNotaFiscal' => $_POST['inputNotaFiscal'],
+                            ':dateDtEmissao' => $_POST['inputDataEmissao'],
+                            ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
+                            ':sDescricao' => $_POST['inputParcelaDescricao' . $i . ''],
+                            ':dateDtVencimento' => $_POST['inputParcelaDataVencimento' . $i . ''],
+                            ':fValorAPagar' => floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . ''])),
+                            ':dateDtPagamento' => $_POST['inputDataPagamento'],
+                            ':fValorPago' => null,
+                            ':sObservacao' => $_POST['inputObservacao'],
+                            ':iStatus' => $situacaoPagar['SituaId'],
+                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                            ':iUnidade' => $_SESSION['UnidadeId']
+                        ));
+
+                        $idContaAPagar = $conn->lastInsertId();
+
+                        $registros = intval($_POST['totalRegistros']);
+
+                        $proporcaoCentroCusto = 0;
+                        //Para verificar valor do parcelamento
+                        for($x=0; $x < $registros; $x++) {
+                            $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                            $valor = str_replace(',', '.', $valor);
+
+                            $valor = mostraValor(($valor) / $numParcelas);
+                            $valor = str_replace('.', '', $valor);
+                            $valor = str_replace(',', '.', $valor);
+
+                            $proporcaoCentroCusto += $valor;
+                        }
+
+                        $proporcaoCentroCustoVerdadeiro = false;
+                        $teste = 0;
+                        if(floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . ''])) != $proporcaoCentroCusto) {
+                            $valParcela = floatval(gravaValor($_POST['inputParcelaValorAPagar' . $i . '']));
+                            $diferenca = $valParcela - $proporcaoCentroCusto;
+
+                            $proporcaoCentroCustoVerdadeiro = true;
+                        }
+
+                        for($x=0; $x < $registros; $x++){
+                            $keyNome = 'inputCentroNome-'.$x;
+                            $keyId = 'inputIdCentro-'.$x;
+                            $centroCusto = $_POST[$keyId];
+                            $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                            $valor = str_replace(',', '.', $valor);
+
+                            if($proporcaoCentroCustoVerdadeiro) {
+                                $soma = 0;
+                                $soma = ($x == 0) ? $diferenca : 0;
+                                
+                                $valor = mostraValor(($valor) / $numParcelas);
+                                $valor = str_replace('.', '', $valor);
+                                $valor = str_replace(',', '.', $valor);
+                                $valor += $soma;
+                                
+                            }else {
+                                $valor = mostraValor(($valor) / $numParcelas);
+                                $valor = str_replace('.', '', $valor);
+                                $valor = str_replace(',', '.', $valor);
+                            }
+
+                            $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                                    VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                            $result = $conn->prepare($sql);
+
+                            $result->execute(array(
+
+                                ':iContasAPagar' => $idContaAPagar,
+                                ':iCentroCusto' => $centroCusto,
+                                ':iValor' => $valor,
+                                ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                ':iUnidade' => $_SESSION['UnidadeId']
+                            ));
+                        }
                     }
                 }
             } else {
@@ -777,6 +883,13 @@ if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) 
     $itemCentroCusto = $resultItemCentroCusto->fetch(PDO::FETCH_ASSOC);
 }
 
+$sql = "SELECT ParamEmpresaPublica
+        FROM Parametro
+        WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
+$result = $conn->query($sql);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+
+$empresaPublica = ($rowParametro['ParamEmpresaPublica'] == 1) ? true : false;
 $dataInicio = date("Y-m-d");
 ?>
 
@@ -893,6 +1006,7 @@ $dataInicio = date("Y-m-d");
                     let periodicidade = $("#cmbPeriodicidade").val()
 
                     gerarParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
+                    pagarParcelas(parcelas, valorTotal, dataVencimento, periodicidade)
                 })
             }
             parcelamento()
@@ -924,49 +1038,116 @@ $dataInicio = date("Y-m-d");
                 $("#habilitarPagamento").on('click', (e) => {
                     e.preventDefault()
 
-                    if (!$("#habilitarPagamento").hasClass('clicado')) {
-                        $valorTotalPago = $("#inputValor").val()
-                        $dataPagamento = new Date
-                        $dia = parseInt($dataPagamento.getDate()) <= 9 ?
-                            `0${parseInt($dataPagamento.getDate())}` : parseInt($dataPagamento.getDate())
-                        $mes = parseInt($dataPagamento.getMonth()) + 1 <= 9 ?
-                            `0${parseInt($dataPagamento.getMonth()) + 1}` : parseInt($dataPagamento.getMonth()) + 1
-                        $ano = $dataPagamento.getFullYear()
+                    let parcelas = $("#inputParcelaDescricao2").val()
 
-                        $fullDataPagamento = `${$ano}-${$mes}-${$dia}`
+                    if(parcelas) {
+                        let parcelas = $("#cmbParcelas").val()
+                        let valorTotal = $("#valorTotal").val().replace(".", "").replace(",", ".")
+                        let dataVencimento = $("#inputDataVencimento").val()
+                        let periodicidade = $("#cmbPeriodicidade").val()
 
-                        $("#inputDataPagamento").val($fullDataPagamento)
-                        $("#inputValorTotalPago").val($valorTotalPago).removeAttr('disabled')
-
-                        styleJurosDescontos = document.getElementById('jurusDescontos').style
-
-                        document.getElementById('jurusDescontos').style = "";
-
-                        $("#habilitarPagamento").addClass('clicado')
-                        $("#habilitarPagamento").html('Desabilitar Pagamento')
-                        preencherJurosDescontos()
-
-                        $("#camposPagamento").fadeIn(200);
-
-                    } else {
-
-                        $("#inputDataPagamento").val("")
-                        $("#inputValorTotalPago").val("")
-                        $("#inputValorTotalPago").attr('disabled', '')
-                        document.getElementById('jurusDescontos').style =
-                            "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none;";
-
-                        $("#habilitarPagamento").removeClass('clicado')
-                        $("#habilitarPagamento").html('Habilitar Pagamento')
-                        limparJurosDescontos()
-
-                        $("#camposPagamento").fadeOut(200);
+                        $('#pageModalPagamentoParcelar').fadeIn(200);
+                    }else {
+                        if (!$("#habilitarPagamento").hasClass('clicado')) {
+                            $valorTotalPago = $("#inputValor").val()
+                            $dataPagamento = new Date
+                            $dia = parseInt($dataPagamento.getDate()) <= 9 ?
+                                `0${parseInt($dataPagamento.getDate())}` : parseInt($dataPagamento.getDate())
+                            $mes = parseInt($dataPagamento.getMonth()) + 1 <= 9 ?
+                                `0${parseInt($dataPagamento.getMonth()) + 1}` : parseInt($dataPagamento.getMonth()) + 1
+                            $ano = $dataPagamento.getFullYear()
+    
+                            $fullDataPagamento = `${$ano}-${$mes}-${$dia}`
+    
+                            $("#inputDataPagamento").val($fullDataPagamento)
+                            $("#inputValorTotalPago").val($valorTotalPago).removeAttr('disabled')
+    
+                            styleJurosDescontos = document.getElementById('jurusDescontos').style
+    
+                            document.getElementById('jurusDescontos').style = "";
+    
+                            $("#habilitarPagamento").addClass('clicado')
+                            $("#habilitarPagamento").html('Desabilitar Pagamento')
+                            preencherJurosDescontos()
+    
+                            $("#camposPagamento").fadeIn(200);
+    
+                        } else {
+    
+                            $("#inputDataPagamento").val("")
+                            $("#inputValorTotalPago").val("")
+                            $("#inputValorTotalPago").attr('disabled', '')
+                            document.getElementById('jurusDescontos').style =
+                                "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none;";
+    
+                            $("#habilitarPagamento").removeClass('clicado')
+                            $("#habilitarPagamento").html('Habilitar Pagamento')
+                            limparJurosDescontos()
+    
+                            $("#camposPagamento").fadeOut(200);
+                        }
                     }
-
                 })
                 $("#jurusDescontos")
             }
             habilitarPagamento()
+
+            function pagarParcelas(parcelas, valorTotal, dataVencimento, periodicidade) {
+                $("#pagamentoParcelasContainer").html("")
+                $("#inputPagamentoParcelaValorTotal").val(float2moeda(parseFloat(valorTotal)))
+                $("#cmbPagamentoParcelaParcelas").val(parcelas).change()
+                
+                let descricao = $("#inputDescricao").val()
+
+                let valorParcela = float2moeda(parseFloat(valorTotal) / parcelas)
+                let cont = 0
+                let iAnterior = 0
+                for (let i = 1; i <= parcelas; i++) {
+
+                    let novaDataVencimento = ''
+
+                    let somadorPeriodicidade = periodicidade == 1 ? 0 : periodicidade == 2 ? 2 :
+                        periodicidade == 3 ? 3 : 6
+                    if (i > 1) {
+                        let dataArray = dataVencimento.split("-")
+                        let mes = parseInt(dataArray[1])
+                        let novoMes = 0
+                        let ano = parseInt(dataArray[0])
+
+                        novoMes = mes + i > 9 ? (mes + (i - 1)).toString() : `0${(mes + (i - 1)).toString()}`
+
+                        if (novoMes > 12) {
+                            cont++
+                            ano = ano + 1
+                            novoMes = cont > 9 ? cont : `0${cont}`
+                        }
+
+                        dataArray[1] = novoMes
+                        dataArray[0] = ano
+                        novaDataVencimento = `${dataArray[0]}-${dataArray[1]}-${dataArray[2]}`
+                    } else {
+                        novaDataVencimento = dataVencimento
+                    }
+
+                    let elem = `<div class="d-flex flex-row justify-content-center">
+                                    <p class="col-1 p-2 pl-4">${i}</p>
+                                    <div class="form-group col-5 p-2">
+                                        <input type="text" class="form-control" id="inputPagamentoParcelaDescricao${i}" name="inputPagamentoParcelaDescricao${i}" value="${descricao} ${i}/${parcelas}">
+                                    </div>
+                                    <div class="form-group col-3 p-2">
+                                        <input type="date" class="form-control" id="inputPagamentoParcelaDataVencimento${i}" name="inputPagamentoParcelaDataVencimento${i}" value="${novaDataVencimento}">
+                                    </div>
+                                    <div class="form-group col-2 p-2">
+                                        <input type="text" class="form-control" id="inputPagamentoParcelaValorAPagar${i}" name="inputPagamentoParcelaValorAPagar${i}" value="${valorParcela}">
+                                    </div>
+                                    <div class="form-group col-1 p-2 text-center" style="margin-top: 2%;">
+                                        <input type="checkbox" id="checkboxPagamentoParcelaCheck${i}"  name="checkboxPagamentoParcelaCheck${i}">
+                                    </div> 
+                                </div>`
+
+                    $("#pagamentoParcelasContainer").append(elem)
+                }
+            }
 
             function modalParcelar() {
 
@@ -985,10 +1166,79 @@ $dataInicio = date("Y-m-d");
                     $('#pageModalParcelar').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                     $("#parcelasContainer").html("")
+                    $("#pagamentoParcelasContainer").html("")
+
+                    $("#habilitarPagamento").html('Habilitar Pagamento')
                 })
 
                 $("#salvarParcelas").on('click', function() {
                     $('#pageModalParcelar').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+
+                    let parcelas = $("#cmbParcelas").val()
+                    if(parcelas > 1) {
+                        $("#habilitarPagamento").html('Pagamento de parcelas')
+                        $("#inputValorTotalPago").val('')
+                    }else {
+                        $("#habilitarPagamento").html('Habilitar Pagamento')
+                    }
+                })
+
+                $('#modalClosePagamentoParcela').on('click', function() {
+                    var menssagem = 'Parcelamento cancelado!'
+                    alerta('Atenção', menssagem, 'error')
+
+                    $('#pageModalPagamentoParcelar').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                    $("#parcelasContainer").html("")
+                    $("#pagamentoParcelasContainer").html("")
+
+                    $("#habilitarPagamento").html('Habilitar Pagamento')
+                })
+
+                $("#salvarParcelasPagamentoParcela").on('click', function() {
+                    let parcelas = $("#cmbParcelas").val()
+                    let controle = false
+                    let totalParcelaPagamento = 0
+
+                    for (let i = 1; i <= parcelas; i++) {
+                        if($("#checkboxPagamentoParcelaCheck"+i).is(":checked")) {
+                            totalParcelaPagamento += parseFloat($("#inputPagamentoParcelaValorAPagar"+i).val().replace(".", "").replace(",", "."))
+                            controle = true
+                        }
+                    }
+
+                    if(controle) {
+                        if($('#cmbPagamentoParcelaContaBanco').val() == '') {
+                            $('#cmbPagamentoParcelaContaBanco').focus()
+                            var menssagem = 'Por favor informe uma Conta/Banco!'
+                            alerta('Atenção', menssagem, 'error')
+                            
+                            return false
+                        }
+    
+                        if($('#cmbPagamentoParcelaFormaPagamento').val() == '') {
+                            $('#cmbPagamentoParcelaFormaPagamento').focus()
+                            var menssagem = 'Por favor informe uma Conta/Banco!'
+                            alerta('Atenção', menssagem, 'error')
+                            
+                            return false
+                        }
+
+                        $dataPagamento = new Date
+                        $dia = parseInt($dataPagamento.getDate()) <= 9 ?
+                            `0${parseInt($dataPagamento.getDate())}` : parseInt($dataPagamento.getDate())
+                        $mes = parseInt($dataPagamento.getMonth()) + 1 <= 9 ?
+                            `0${parseInt($dataPagamento.getMonth()) + 1}` : parseInt($dataPagamento.getMonth()) + 1
+                        $ano = $dataPagamento.getFullYear()
+
+                        $fullDataPagamento = `${$ano}-${$mes}-${$dia}`
+                        
+                        $("#inputDataPagamento").val($fullDataPagamento)
+                        $("#inputValorTotalPago").val(float2moeda(totalParcelaPagamento))
+                    }
+
+                    $('#pageModalPagamentoParcelar').fadeOut(200);
                     $('body').css('overflow', 'scroll');
                 })
             }
@@ -1097,6 +1347,15 @@ $dataInicio = date("Y-m-d");
                     return false
                 }
 
+                //Para o formulário fazer a leitura dos campos desabilitados
+                $('#inputDataEmissao').prop('disabled', false);
+                $('#cmbFornecedor').prop('disabled', false);
+                $('#cmbPlanoContas').prop('disabled', false);
+                $('#inputOrdemCompra').prop('disabled', false);
+                $('#inputNotaFiscal').prop('disabled', false);
+                $('#inputDataVencimento').prop('disabled', false);
+                $('#inputValor').prop('disabled', false);
+
                 let valorTotal = $('#inputValor').val()
                 let valorPago = $('#inputValorTotalPago').val()
 
@@ -1117,7 +1376,11 @@ $dataInicio = date("Y-m-d");
                 }
                 // && cmbContaBanco != '' && cmbFormaPagamento != '' && inputNumeroDocumento != ''
                 if (planoContas != '' && cmbFornecedor != '' && inputDescricao != '') {
-                    if (valorPagof < valorTotalf && valorPagof) {
+                    let parcelas = $("#cmbParcelas").val()
+                        
+                    if(parcelas > 1) {
+                        $("#lancamento").submit()
+                    }else if (valorPagof < valorTotalf && valorPagof) {
                         if($('#cmbContaBanco').val() == '') {
                             $("#cmbContaBanco").focus()
                             var menssagem = 'Por favor informe um banco !'
@@ -1706,13 +1969,13 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="inputDataEmissao">Data de Emissão</label>
-                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> readOnly>
+                                                <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO' || isset($lancamento['CnAPaMovimentacao'])) echo 'disabled' ?> readOnly>
                                             </div>
                                         </div>
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbFornecedor">Fornecedor <span class="text-danger">*</span></label>
-                                                <select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> required>
+                                                <select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO' || isset($lancamento['CnAPaMovimentacao'])) echo 'disabled' ?> required>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT ForneId, ForneNome
@@ -1740,7 +2003,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbPlanoContas">Plano de Contas <span class="text-danger">*</span></label>
-                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> required>
+                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO' || isset($lancamento['CnAPaMovimentacao'])) echo 'disabled' ?> required>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT PlConId, PlConCodigo, PlConNome
@@ -1768,7 +2031,7 @@ $dataInicio = date("Y-m-d");
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-2 m-auto">
+                                        <div class="col-lg-2 m-auto text-center">
                                             <button id="centroCusto" type="button" class="btn bg-slate btn-sm">CENTRO DE CUSTO</button>
                                         </div>
                                     </div>
@@ -1783,13 +2046,13 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputOrdemCarta">Ordem Compra/C. Contrato</label>
-                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> class="form-control" readonly>
+                                                <input type="text" id="inputOrdemCompra" name="inputOrdemCompra" value="<?php if (isset($lancamento)) echo $lancamento['OrComNumero'] ?>" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO' || isset($lancamento['CnAPaMovimentacao'])) echo 'disabled' ?> class="form-control" readonly>
                                             </div>
                                         </div>
                                         <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputNotaFiscal">Nº Nota Fiscal/Documento</label>
-                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNotaFiscal'] ?>" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?> class="form-control">
+                                                <input type="text" id="inputNotaFiscal" name="inputNotaFiscal" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNotaFiscal'] ?>" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO' || isset($lancamento['CnAPaMovimentacao'])) echo 'disabled' ?> class="form-control">
                                             </div>
                                         </div>
                                     </div>                              
@@ -2026,6 +2289,117 @@ $dataInicio = date("Y-m-d");
                         </div>
                     </div>
                     <!--------------------------------------------------------------------------------------->
+                    <!--Modal Parcelar-->
+                    <div id="pageModalPagamentoParcelar" class="custon-modal">
+                        <div class="custon-modal-container">
+                            <div class="card custon-modal-content">
+                                <div class="custon-modal-title">
+                                    <i class=""></i>
+                                    <p class="h3">Pagamento de Parcelas</p>
+                                    <i class=""></i>
+                                </div>
+                                <div class="px-5 pt-5">
+                                    <div class="d-flex flex-row p-2">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label for="cmbPagamentoParcelaContaBanco">Conta/Banco <span class="text-danger">*</span></label>
+                                                <select id="cmbPagamentoParcelaContaBanco" name="cmbPagamentoParcelaContaBanco" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?>>
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+                                                    $sql = "SELECT CnBanId, CnBanNome
+												        			FROM ContaBanco
+												        			JOIN Situacao on SituaId = CnBanStatus
+												        			WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+												        			ORDER BY CnBanNome ASC";
+                                                    $result = $conn->query($sql);
+                                                    $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                    foreach ($rowContaBanco as $item) {
+                                                        print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label for="cmbPagamentoParcelaFormaPagamento">Forma de Pagamento <span class="text-danger">*</span></label>
+                                                <select id="cmbPagamentoParcelaFormaPagamento" name="cmbPagamentoParcelaFormaPagamento" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?>>
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+                                                    $sql = "SELECT FrPagId, FrPagNome
+															FROM FormaPagamento
+															JOIN Situacao on SituaId = FrPagStatus
+															WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															ORDER BY FrPagNome ASC";
+                                                    $result = $conn->query($sql);
+                                                    $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                    foreach ($rowFormaPagamento as $item) {
+                                                        print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class='col-lg-3'>
+                                            <div class="form-group">
+                                                <label for="inputPagamentoParcelaValorTotal">Valor Total</label>
+                                                <div class="input-group">
+                                                    <input type="text" id="inputPagamentoParcelaValorTotal" onKeyUp="moeda(this)" maxLength="12" name="inputPagamentoParcelaValorTotal" class="form-control removeValidacao" disabled>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-1">
+                                            <label for="cmbPagamentoParcelaParcelas">Parcelas</label>
+                                            <div class="form-group">
+                                                <select id="cmbPagamentoParcelaParcelas" name="cmbPagamentoParcelaParcelas" class="form-control form-control-select2" disabled>
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                    <option value="3">3</option>
+                                                    <option value="4">4</option>
+                                                    <option value="5">5</option>
+                                                    <option value="6">6</option>
+                                                    <option value="7">7</option>
+                                                    <option value="8">8</option>
+                                                    <option value="9">9</option>
+                                                    <option value="10">10</option>
+                                                    <option value="11">11</option>
+                                                    <option value="12">12</option>
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex flex-row px-5">
+                                    <div class="col-12 d-flex flex-row justify-content-center">
+                                        <p class="col-1 p-2" style="background-color:#f2f2f2">Item</p>
+                                        <p class="col-5 p-2" style="background-color:#f2f2f2">Descrição</p>
+                                        <p class="col-3 p-2" style="background-color:#f2f2f2">Vencimento</p>
+                                        <p class="col-2 p-2" style="background-color:#f2f2f2">Valor</p>
+                                        <p class="col-1 p-2" style="background-color:#f2f2f2">Pagar</p>
+                                    </div>
+                                </div>
+                                <div id="pagamentoParcelasContainer" class="d-flex flex-column px-5" style="overflow-Y: scroll; max-height: 300px">
+
+                                </div>
+                                <div class="card-footer mt-2 d-flex flex-column">
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
+                                                <a class="btn btn-lg btn-principal" id="salvarParcelasPagamentoParcela">OK</a>
+                                                <a id="modalClosePagamentoParcela" class="btn btn-basic" role="button">Cancelar</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--------------------------------------------------------------------------------------->
 
                     <!--------------------------------------------------------------------------------------->
                     <!--Modal Parcelar-->
@@ -2126,7 +2500,7 @@ $dataInicio = date("Y-m-d");
                                                     $result = $conn->query($sql);
                                                     $listCentroCusto = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    $disabled = ((isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') || isset($lancamento['CnAPaMovimentacao']))? 'disabled':'';
+                                                    $disabled = ((isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') || (isset($lancamento['CnAPaMovimentacao']) && $empresaPublica))? 'disabled':'';
 
                                                     $selectCencust = "<select id='cmbCentroCusto' $disabled name='cmbCentroCusto[]' class='form-control select' multiple='multiple' autofocus data-fouc>";
                                                     
