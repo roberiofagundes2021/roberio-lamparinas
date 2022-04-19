@@ -48,12 +48,17 @@ if(isset($_POST['inputContasAPagarId'])) {
 
         }
 
-        $sql = "UPDATE ContasAPagar SET CnAPaStatus = :iStatus, CnAPaAgrupamento = :iAgrupamento, CnAPaJustificativaEstorno = :sJustificativa
+        $sql = "UPDATE ContasAPagar SET CnAPaStatus = :iStatus, CnAPaValorPago = :fValorPago, CnAPaDtPagamento = :sDataPagamento, CnAPaContaBanco = :iContaBanco, 
+                                        CnAPaFormaPagamento = :iFormaPagamento, CnAPaAgrupamento = :iAgrupamento, CnAPaJustificativaEstorno = :sJustificativa
                 WHERE CnAPaId = $contaApagarId";
         $result = $conn->prepare($sql);
 
         $result->execute(array(
             ':iStatus' => $situacao,
+            ':fValorPago' => null,
+            ':sDataPagamento' => null,
+            ':iContaBanco' => null,
+            ':iFormaPagamento' => null,
             ':iAgrupamento' => null,
             ':sJustificativa' => $justificativa
         ));
@@ -117,12 +122,17 @@ if(isset($_POST['inputContasAPagarId'])) {
 
         }
 
-        $sql = "UPDATE ContasAReceber SET CnAReStatus = :iStatus, CnAReAgrupamento = :iAgrupamento, CnAReJustificativaEstorno = :sJustificativa
+        $sql = "UPDATE ContasAReceber SET CnAReStatus = :iStatus, CnAReValorRecebido = :fValorRecebido, CnAReDtRecebimento = :sDataRecebimento, CnAReContaBanco = :iContaBanco, 
+                                          CnAReFormaPagamento = :iFormaPagamento, CnAReAgrupamento = :iAgrupamento, CnAReJustificativaEstorno = :sJustificativa
                 WHERE CnAReId = $contaReceberId";
         $result = $conn->prepare($sql);
 
         $result->execute(array(
             ':iStatus' => $situacao,
+            ':fValorRecebido' => null,
+            ':sDataRecebimento' => null,
+            ':iContaBanco' => null,
+            ':iFormaPagamento' => null,
             ':iAgrupamento' => null,
             ':sJustificativa' => $justificativa
         ));
@@ -186,12 +196,18 @@ if(isset($_POST['inputContasAPagarId'])) {
 
             }
 
-            $sql = "UPDATE ContasAPagar SET CnAPaStatus = :iStatus, CnAPaJustificativaEstorno = :sJustificativa
+            $sql = "UPDATE ContasAPagar SET CnAPaStatus = :iStatus, CnAPaValorPago = :fValorPago, CnAPaDtPagamento = :sDataPagamento, CnAPaContaBanco = :iContaBanco, 
+                                            CnAPaFormaPagamento = :iFormaPagamento, CnAPaAgrupamento = :iAgrupamento, CnAPaJustificativaEstorno = :sJustificativa
                     WHERE CnAPaId = $contaId";
             $result = $conn->prepare($sql);
-    
+
             $result->execute(array(
                 ':iStatus' => $situacao,
+                ':fValorPago' => null,
+                ':sDataPagamento' => null,
+                ':iContaBanco' => null,
+                ':iFormaPagamento' => null,
+                ':iAgrupamento' => null,
                 ':sJustificativa' => $justificativa
             ));
     
@@ -249,12 +265,18 @@ if(isset($_POST['inputContasAPagarId'])) {
 
             }
 
-            $sql = "UPDATE ContasAReceber SET CnAReStatus = :iStatus, CnAReJustificativaEstorno = :sJustificativa
+            $sql = "UPDATE ContasAReceber SET CnAReStatus = :iStatus, CnAReValorRecebido = :fValorRecebido, CnAReDtRecebimento = :sDataRecebimento, CnAReContaBanco = :iContaBanco, 
+                                            CnAReFormaPagamento = :iFormaPagamento, CnAReAgrupamento = :iAgrupamento, CnAReJustificativaEstorno = :sJustificativa
                     WHERE CnAReId = $contaId";
             $result = $conn->prepare($sql);
-    
+
             $result->execute(array(
                 ':iStatus' => $situacao,
+                ':fValorRecebido' => null,
+                ':sDataRecebimento' => null,
+                ':iContaBanco' => null,
+                ':iFormaPagamento' => null,
+                ':iAgrupamento' => null,
                 ':sJustificativa' => $justificativa
             ));
     

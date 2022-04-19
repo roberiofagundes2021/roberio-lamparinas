@@ -204,6 +204,14 @@ if ($totalAcoes) {
 	$totalPorcentagem = 0;
 }
 
+$sql = "SELECT ParamEmpresaPublica
+        FROM Parametro
+        WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
+$result = $conn->query($sql);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+
+$empresaPrivada = ($rowParametro['ParamEmpresaPublica'] != 1) ? true : false;
+
 ?>
 
 <!DOCTYPE html>
@@ -658,10 +666,16 @@ if ($totalAcoes) {
 						document.formBandeja.submit();
 												
 					} else if (Tipo == 'liberar') {
-						document.getElementById('inputMovimentacaoStatus').value = MovimTipo=='E'?'LIBERADOCENTRO':'LIBERADO';
-						document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
-						document.formBandeja.setAttribute("target", "_self");
-						document.formBandeja.submit();
+						let empresaPrivada = "<?php echo $empresaPrivada; ?>"
+
+						if(empresaPrivada) {
+							$('#dataVencimento').click();
+						}else {
+							document.getElementById('inputMovimentacaoStatus').value = MovimTipo=='E'?'LIBERADOCENTRO':'LIBERADO';
+							document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
+							document.formBandeja.setAttribute("target", "_self");
+							document.formBandeja.submit();
+						}
 					} else if (Tipo == 'naoliberar') {
 						bootbox.prompt({
 							title: 'Informe o motivo da não liberação',
@@ -838,6 +852,24 @@ if ($totalAcoes) {
 				}
 			}
 
+			$('#liberarMovimentacaoDataVencimento').on('click', (e) => {
+				let dataVencimento = $('#dataVencimentoModal').val();
+				
+				if(dataVencimento == '') {
+					$('#dataVencimentoModal').focus();
+					var menssagem = 'Por favor informa uma data de vencimento!';
+                    alerta('Atenção', menssagem, 'error');
+					
+					return false;
+				}
+
+				$('#inputDataVencimento').val(dataVencimento);
+
+				document.getElementById('inputMovimentacaoStatus').value = MovimTipo=='E'?'LIBERADOCENTRO':'LIBERADO';
+				document.formBandeja.action = "movimentacaoBandejaMudaSituacao.php";
+				document.formBandeja.setAttribute("target", "_self");
+				document.formBandeja.submit();
+			})
 		}
 	</script>
 
@@ -1021,6 +1053,33 @@ if ($totalAcoes) {
 					</form>
 				</div>
 				<!-- /support tickets -->
+
+				<a id="dataVencimento" href="#" data-toggle="modal" data-target="#modal_mini-data-vencimento" data-popup="tooltip" data-placement="bottom" style="display: none;"></a>
+				<!--Modal estornar-->
+                <div id="modal_mini-data-vencimento" class="modal fade" tabindex="-1">
+                    <div class="modal-dialog modal-xs">
+                        <div class="modal-content">
+                            <div class="custon-modal-title">
+                                <i class=""></i>
+                                <p class="h3">Data de vencimento <span class="text-danger">*</span></p>
+                                <i class=""></i>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="form-group">
+									<div class="input-group">
+										<input type="date" class="form-control" id="dataVencimentoModal" name="dataVencimentoModal" min="1800-01-01" max="2100-12-31">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-basic" data-dismiss="modal">Cancelar</button>
+                                <button id="liberarMovimentacaoDataVencimento" type="button" class="btn bg-slate">Liberar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 				<form name="formBandeja" method="post">
 					<input type="hidden" id="inputBandejaId" name="inputBandejaId">

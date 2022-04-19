@@ -365,22 +365,21 @@ if (isset($_POST['cmbPlanoContas'])) {
                         }
                     }
     
-                    foreach($arrayBancoDeDados as $deletaCentroCusto) {
-                        $sql = "DELETE FROM ContasAPagarXCentroCusto
-                                WHERE CAPXCCentroCusto = :iCentroCusto AND CAPXCContasAPagar = :iContaAPagar";
-                        $result = $conn->prepare($sql);
-                        
-                        $result->execute(array(
-                            ':iCentroCusto' => $deletaCentroCusto,
-                            ':iContaAPagar' => $idContaAPagar
-                        ));
+                    if(isset($arrayBancoDeDados)) {
+                        foreach($arrayBancoDeDados as $deletaCentroCusto) {
+                            $sql = "DELETE FROM ContasAPagarXCentroCusto
+                                    WHERE CAPXCCentroCusto = :iCentroCusto AND CAPXCContasAPagar = :iContaAPagar";
+                            $result = $conn->prepare($sql);
+                            
+                            $result->execute(array(
+                                ':iCentroCusto' => $deletaCentroCusto,
+                                ':iContaAPagar' => $idContaAPagar
+                            ));
+                        }
                     }
                 }
             }
-
-
-            //irpara('contasAPagar.php');
-
+            
             $conn->commit();
 
             $_SESSION['msg']['titulo'] = "Sucesso";
@@ -1451,6 +1450,19 @@ $dataInicio = date("Y-m-d");
                         $("#lancamento").submit()
                     }
                 }
+
+                let empresaPublica = "<?php echo $empresaPublica; ?>";
+
+                if(empresaPublica) {
+                    $('#cmbPlanoContas').prop('disabled', true);
+                }
+                
+                $('#inputDataEmissao').prop('disabled', true);
+                $('#cmbFornecedor').prop('disabled', true);
+                $('#inputOrdemCompra').prop('disabled', true);
+                $('#inputNotaFiscal').prop('disabled', true);
+                $('#inputDataVencimento').prop('disabled', true);
+                $('#inputValor').prop('disabled', true);
             }
 
             $("#salvar").on('click', (e) => {
@@ -2003,7 +2015,7 @@ $dataInicio = date("Y-m-d");
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbPlanoContas">Plano de Contas <span class="text-danger">*</span></label>
-                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO' || isset($lancamento['CnAPaMovimentacao'])) echo 'disabled' ?> required>
+                                                <select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO' || (isset($lancamento['CnAPaMovimentacao']) && $empresaPublica)) echo 'disabled' ?> required>
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT PlConId, PlConCodigo, PlConNome
@@ -2545,7 +2557,19 @@ $dataInicio = date("Y-m-d");
                                 </div>
 
                                 <div class="card-body" id="relacaoCentroCusto" style="<?php echo $visibiçidade = (isset($itemCentroCusto['CAPXCCentroCusto'])) ? 'display: block;' : 'display: none;'; ?>">
-                                    <p class="mb-3">Abaixo estão listados todos os centros de custos selecionados. Para atualizar os valores, basta preencher a coluna <code>Valor</code> e depois clicar em <b>OK</b>.</p>
+                                    <?php
+                                        if(isset($lancamento['CnAPaMovimentacao'])) {
+                                            if(!$empresaPublica) {
+                                                print('<p class="mb-3">Abaixo estão listados todos os centros de custos selecionados. Para atualizar os valores, basta preencher a coluna <code>Valor</code> e depois clicar em <b>OK</b>.</p>');
+                                            }
+                                        }else {
+                                            if(!isset($lancamento['SituaChave'])){
+                                                print('<p class="mb-3">Abaixo estão listados todos os centros de custos selecionados. Para atualizar os valores, basta preencher a coluna <code>Valor</code> e depois clicar em <b>OK</b>.</p>');    
+                                            }else if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] != 'PAGO') {
+                                                print('<p class="mb-3">Abaixo estão listados todos os centros de custos selecionados. Para atualizar os valores, basta preencher a coluna <code>Valor</code> e depois clicar em <b>OK</b>.</p>');
+                                            }
+                                        }
+                                    ?>
 
                                     <div class="row" style="margin-bottom: -20px;">
                                         

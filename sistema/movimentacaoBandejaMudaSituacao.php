@@ -36,7 +36,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
 
 		$empresaPrivada = ($rowParametro['ParamEmpresaPublica']  != 1) ? true : false;
 
-		if($msg = "Movimentação liberada!" && $empresaPrivada) {
+		if($msg == "Movimentação liberada!" && $empresaPrivada) {
 			/* Status do Contas Apagar*/
 			$sql = "SELECT SituaId
 					FROM Situacao
@@ -44,6 +44,8 @@ if (isset($_POST['inputMovimentacaoId'])) {
 			$result = $conn->query($sql);
 			$rowSituaChave = $result->fetch(PDO::FETCH_ASSOC);
 			/* Fim Atualiza */
+
+			$dataVencimento = $_POST['inputDataVencimento'];
 
 			$sql = "SELECT  MovimId, MovimNumRecibo, MovimTipo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal,
 							MovimDestinoSetor, MovimDestinoManual, MovimObservacao, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie,
@@ -53,7 +55,27 @@ if (isset($_POST['inputMovimentacaoId'])) {
 			$result = $conn->query($sql);
 			$rowMovimentacao = $result->fetch(PDO::FETCH_ASSOC);
 
-			$data = date('Y-m-d'); //Data provisória
+			$sql = "UPDATE Movimentacao 
+					SET MovimSituacao = :bStatus, MovimUsuarioAtualizador = :iUsuario
+					WHERE MovimId = :iMovimentacao";
+			$result = $conn->prepare($sql);
+	
+			$result->bindParam(':bStatus', $row['SituaId']);
+			$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
+			$result->bindParam(':iMovimentacao', $iMovimentacao);
+			$result->execute();
+	
+			$sql = "UPDATE Bandeja 
+					SET BandeStatus = :bStatus, BandeMotivo = :sMotivo, BandeUsuarioAtualizador = :iUsuario
+					WHERE BandeId = :iBandeja";
+			$result = $conn->prepare($sql);
+
+			$result->bindParam(':bStatus', $row['SituaId']);
+			$result->bindParam(':sMotivo', $motivo);
+			$result->bindParam(':iUsuario', $_SESSION['UsuarId']);
+			$result->bindParam(':iBandeja', $_POST['inputBandejaId']);
+			$result->execute();
+
 			/* Insere na Tabela Contas a Pagar */
 			
 			$sql = "INSERT INTO ContasAPagar ( CnAPaMovimentacao, CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
@@ -76,7 +98,7 @@ if (isset($_POST['inputMovimentacaoId'])) {
 				':dateDtEmissao' => date('Y-m-d') , //Se for Data da Liquidação ficará assim: $rowMovimentacao['MovimDataEmissao']
 				':iOrdemCompra' => $rowMovimentacao['MovimOrdemCompra'],
 				':sDescricao' => 'Pagamento da NF '.$rowMovimentacao['MovimNotaFiscal'], // Ver com Valma
-				':dateDtVencimento' => $data,
+				':dateDtVencimento' => $dataVencimento,
 				':fValorAPagar' => $rowMovimentacao['MovimValorTotal'],
 				':dateDtPagamento' => null,
 				':fValorPago' => null,
