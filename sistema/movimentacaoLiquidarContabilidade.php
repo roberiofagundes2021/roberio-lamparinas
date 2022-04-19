@@ -111,7 +111,7 @@ try{
                 
         $result->execute(array(
             ':iMovimentacao' => $iMovimentacao,
-            ':iPlanoContas' => null,
+            ':iPlanoContas' => $planoCusto,
             ':iFornecedor' => $rowMovimentacao['MovimFornecedor'],
             ':iContaBanco' => null,
             ':iFormaPagamento' => null,
