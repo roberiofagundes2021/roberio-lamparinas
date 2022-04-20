@@ -753,14 +753,16 @@ try {
 								</div>
 							</div>
 
-							<!-- /card-body -->
+							<!-- /card-body --> 
 							<!---------------------------------------------------------------------------------------------Produtos---------------------------------------------------------------------------------------------------------->
 							<?php
 								$sqlProduto = " SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
 												FROM Produto
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												LEFT JOIN Marca on MarcaId = ProduMarca
 												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+												LEFT JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
+					                            LEFT JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
+												LEFT JOIN Marca on MarcaId = PrXFaMarca
 												WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " AND ProduCategoria = $iCategoria
 												AND FOXPrFluxoOperacional = $iFluxoOperacional";
 								if($sSubCategorias){
