@@ -772,9 +772,12 @@ try {
 								$rowProdutos = $resultProduto->fetchAll(PDO::FETCH_ASSOC);
 								$countProduto = count($rowProdutos);
 
-								$sqlServico = " SELECT Distinct ServiId, ServiNome, ServiDetalhamento
+								$sqlServico = " SELECT Distinct ServiId, ServiNome, ServiDetalhamento, MarcaNome
 												FROM Servico
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+												LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
+					                            LEFT JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
+												LEFT JOIN Marca on MarcaId = SrXFaMarca
 												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " AND ServiCategoria = $iCategoria 
 												AND FOXSrFluxoOperacional = $iFluxoOperacional";
 								if($sSubCategorias){
@@ -1050,7 +1053,7 @@ try {
 															<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
 														</div>
 														<div class="col-lg-3">
-															<input type="text"   class="form-control-border-off" data-popup="tooltip"  readOnly>
+														<input type="text" id="inputMarca' . $cont . '" name="inputMarca' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['MarcaNome'] . '" value="' . $item['MarcaNome'] . '" readOnly>
 														</div>
 													</div>
 												</div>
