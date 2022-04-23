@@ -28,6 +28,7 @@ try{
         $conn->query($sqlMovimentacao);
         $newMovimentacaoId = $conn->lastInsertId();
 
+
         // insere todos os Centro de custos Selecionados em movimentação
 
         $sqlMovimentacaoXCentro = "INSERT INTO MovimentacaoLiquidacaoXCentroCusto
@@ -46,8 +47,6 @@ try{
             }
         }
         $sqlMovimentacaoXCentro = substr($sqlMovimentacaoXCentro,0,-1);
-        // var_dump($sqlMovimentacaoXCentro);
-        // exit;
         $conn->query($sqlMovimentacaoXCentro);
         $sqlMovimentacaoXCentro = $conn->lastInsertId();
         
