@@ -29,7 +29,7 @@ if(isset($_POST['usuario'])){
 	if (isset($_POST['unidade'])){
 		$piUnidade = $_POST['unidade'];
 		$_SESSION['UnidadeId'] = $piUnidade;
-	}	
+	}
 
 	$_SESSION['UsuarLogin'] = $_POST['usuario'];
 	$_SESSION['UsuarSenha'] = $_POST['senha'];
@@ -45,8 +45,6 @@ if(isset($_POST['usuario'])){
 			WHERE UsuarLogin = '$usuario_escape' ";
 	$result = $conn->query($sql);
 	$row = $result->fetch();
-	//echo $sql;die;
-	//	$_SESSION['UsuarLogado'] = 0;
 	
 	$sPerfilChave = $row['PerfiChave'];
 	
@@ -56,49 +54,7 @@ if(isset($_POST['usuario'])){
 		$erro[] = "Esse usuário está desativado.";
 	} else if (strcmp($row['UsuarSenha'], ($psSenha)) != 0){  //"strcmp": compara 2 strings (se for 0 significa que são iguais)
 		$erro[] = "<strong>Senha</strong> incorreta.";
-	} else {	
-		
-	/*	//Se Super Usuário e cadastro ativo, pode acessar qualquer empresa
-		if ($row['PerfiChave'] == 'SUPER' and $row['EXUXPStatus'] == 1){
-			
-			//Se não foi selecionado nenhuma empresa ainda
-			if ($piEmpresa == 0){
-				$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";
-				
-				$_SESSION['EmpreId'] = 99999999;  // Se preferirem deixar pre-selecionado já uma empresa basta trocar o 9999999 por $row[0]['EmpreId']
-				
-				$sql = ("SELECT EmpreId, EmpreNomeFantasia
-						 FROM Empresa
-					     WHERE EmpreStatus = 1");				
-				$result = $conn->query("$sql");
-				while ($linhas = $result->fetch()){
-					$_SESSION['Empresa'][$linhas['EmpreId']] = $linhas['EmpreNomeFantasia'];
-				}				
-			} else {
-				$sql = ("SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave
-						 FROM Usuario
-						 JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-						 JOIN Perfil on PerfiId = EXUXPPerfil
-						 JOIN Empresa on EmpreId = EXUXPEmpresa
-						 WHERE UsuarLogin = '$usuario_escape' and EXUXPStatus = 1 and EmpreId = $piEmpresa
-						 ");
-				$result = $conn->query("$sql");
-				$row = $result->fetch();
-				
-				$_SESSION['UsuarId'] = $row['UsuarId'];
-				$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
-				$_SESSION['UsuarNome'] = $row['UsuarNome'];
-				$_SESSION['PerfiChave'] = $row['PerfiChave'];
-				
-				$_SESSION['EmpreId'] = $row['EmpreId'];
-				$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
-				$_SESSION['UsuarLogado'] = 1;
-				
-				irpara("index.php");
-	
-			}
-		} else { */
-		
+	} else {
 			$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EmpreFoto
 					FROM Usuario
 					JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -110,8 +66,7 @@ if(isset($_POST['usuario'])){
 					";
 			$result = $conn->query($sql);
 			$row = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
-			$count = count($row);		
-			//echo $sql;die;
+			$count = count($row);
 
 			if ($count == 0){
 				$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";			
@@ -132,6 +87,9 @@ if(isset($_POST['usuario'])){
 						JOIN Unidade on UnidaId = UsXUnUnidade
 						WHERE EXUXPUsuario = ".$row[0]['UsuarId']." and EXUXPEmpresa = ".$piEmpresa."
 						";
+				if(isset($_SESSION['UnidadeId'])){
+					$sql .= " and UnidaId = ".$_SESSION['UnidadeId'];
+				}
 				$result = $conn->query($sql);
 				$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
 				$countUnidade = count($rowUnidade);					
@@ -201,7 +159,6 @@ if(isset($_POST['usuario'])){
 					$_SESSION['UnidadeId'] = $rowUnidade['UnidaId'];;
 					$_SESSION['UnidadeNome'] = $rowUnidade['UnidaNome'];
 					$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
-					//$_SESSION['UsuarLogado'] = 1;
 
 					unset($_SESSION['UsuarSenha']);
 
@@ -216,8 +173,7 @@ if(isset($_POST['usuario'])){
 							";
 					$result = $conn->query($sql);
 					$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
-					$countUnidade = count($rowUnidade);	
-					//echo "Entrou aqui: ".$sql;die;
+					$countUnidade = count($rowUnidade);
 					
 					if ($countUnidade == 0){
 						$erro[] = "O usuário está cadastrado em uma empresa, porém não está vinculado a nenhuma unidade. Favor acionar o responsável pelo cadastro na sua empresa.";			
@@ -230,10 +186,9 @@ if(isset($_POST['usuario'])){
 						$_SESSION['EmpreId'] = $row[0]['EmpreId'];
 						$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
 						$_SESSION['EmpreFoto'] = $row[0]['EmpreFoto'];
-						$_SESSION['UnidadeId'] = $rowUnidade[0]['UnidaId'];;
+						$_SESSION['UnidadeId'] = $rowUnidade[0]['UnidaId'];
 						$_SESSION['UnidadeNome'] = $rowUnidade[0]['UnidaNome'];
 						$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
-						//$_SESSION['UsuarLogado'] = 1;
 
 						unset($_SESSION['UsuarSenha']);
 						
@@ -251,7 +206,6 @@ if(isset($_POST['usuario'])){
 					}
 				}				
 			}
-	//	}
 	} 
 }
 
@@ -355,10 +309,8 @@ if(isset($_POST['usuario'])){
 											}
 										}
 										
-										if (isset($_SESSION['EmpreId'])){	
-											
+										if (isset($_SESSION['EmpreId'])){
 											print('
-											
 											<div class="form-group">
 												<select name="empresa" class="form-control select" data-fouc>
 													<option value="0">Selecione uma empresa</option>');
@@ -373,15 +325,12 @@ if(isset($_POST['usuario'])){
 													
 													print('
 												</select>
-											</div>
-											
-											');
+											</div>');
+											unset($_SESSION['EmpreId']);
 										}
 										
-										if (isset($_SESSION['UnidadeId'])){	
-											
+										if (isset($_SESSION['UnidadeId'])){
 											print('
-											
 											<div class="form-group">
 												<select name="unidade" class="form-control select" data-fouc>
 													<option value="0">Selecione uma unidade</option>');
@@ -396,9 +345,8 @@ if(isset($_POST['usuario'])){
 													
 													print('
 												</select>
-											</div>
-											
-											');
+											</div>');
+											unset($_SESSION['UnidadeId']);
 										}									
 									?>							
 									
