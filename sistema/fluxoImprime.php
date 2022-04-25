@@ -252,9 +252,11 @@ try {
 			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 					FROM Produto
 					JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+					LEFT JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
+					LEFT JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 					JOIN SubCategoria on SbCatId = ProduSubCategoria
-					LEFT JOIN Marca on MarcaId = ProduMarca
+					LEFT JOIN Marca on MarcaId = PrXFaMarca
 					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
 					and SbCatId = ".$sbcat['SbCatId']."
 					ORDER BY SbCatNome, ProduNome ASC";	
