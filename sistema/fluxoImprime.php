@@ -344,10 +344,13 @@ try {
 
 			$totalServicos = 0;
 	
-			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
+			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario,MarcaNome
 					FROM Servico
 					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 					JOIN SubCategoria on SbCatId = ServiSubCategoria
+					LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
+					LEFT JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
+					LEFT JOIN Marca on MarcaId = SrXFaMarca
 					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
 					and SbCatId = ".$sbcat['SbCatId']."
 					ORDER BY SbCatNome, ServiNome ASC";
@@ -388,7 +391,7 @@ try {
 					$html .= "
 						<tr>
 							<td style='text-align: center;'>" . $cont . "</td>
-							<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'] . "</td>	
+							<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'] . "<br>Marca: ".$rowServico['MarcaNome']."</td>	
 							<td style='text-align: center;'>" . $rowServico['FOXSrQuantidade'] . "</td>	
 							<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
 							<td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>		
