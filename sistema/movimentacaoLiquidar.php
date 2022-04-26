@@ -24,23 +24,44 @@ $sqlMovimentacao = "SELECT MovimId, MovimNumRecibo, MovimData, MovimValorTotal, 
 $resultMovimentacao = $conn->query($sqlMovimentacao);
 $Movimentacao = $resultMovimentacao->fetch(PDO::FETCH_ASSOC);
 
-if(isset($Movimentacao['SituaChave']) && $Movimentacao['SituaChave'] == 'LIBERADOCONTABILIDADE'){
-    // Se ja estiver liqidado ira buscar os dados da liquidação
-    $sqlLiquidacao = "SELECT MvLiqId, MvLiqMovimentacao, MvLiqData, MvLiqUsuario,
-                    MvLiqUnidade, MvLiqPlanoConta, UsuarNome
-                    FROM MovimentacaoLiquidacao
-                    JOIN Usuario ON UsuarId = MvLiqUsuario
-                    WHERE MvLiqMovimentacao = $inputMovimentacaoId AND MvLiqUnidade = $UnidadeId";
-    $resultLiquidacao = $conn->query($sqlLiquidacao);
-    $MoviLiqui = $resultLiquidacao->fetch(PDO::FETCH_ASSOC);
+// if(isset($Movimentacao['SituaChave']) && ){
+//     // Se ja estiver liquidado ira buscar os dados da liquidação
+//     $sqlLiquidacao = "SELECT MvLiqId, MvLiqMovimentacao, MvLiqData, MvLiqUsuario,
+//                     MvLiqUnidade, MvLiqPlanoConta, UsuarNome
+//                     FROM MovimentacaoLiquidacao
+//                     JOIN Usuario ON UsuarId = MvLiqUsuario
+//                     WHERE MvLiqMovimentacao = $inputMovimentacaoId AND MvLiqUnidade = $UnidadeId";
+//     $resultLiquidacao = $conn->query($sqlLiquidacao);
+//     $MoviLiqui = $resultLiquidacao->fetch(PDO::FETCH_ASSOC);
 
+//     // Buacando centros de custos da movimentação
+//     $sqlMvLiqXCnCus = "SELECT MvLiqXCnCusMovimentacaoLiquidacao, MvLiqXCnCusCentroCusto, CnCusCodigo,
+//                     MvLiqXCnCusUsuarioAtualizador, MvLiqXCnCusValor,MvLiqXCnCusUnidade, CnCusNome, CnCusId
+//                     FROM MovimentacaoLiquidacaoXCentroCusto
+//                     JOIN CentroCusto ON CnCusId = MvLiqXCnCusCentroCusto
+//                     WHERE MvLiqXCnCusMovimentacaoLiquidacao = $MoviLiqui[MvLiqId]
+//                     AND MvLiqXCnCusUnidade = $UnidadeId";
+//     $resultMvLiqXCnCus = $conn->query($sqlMvLiqXCnCus);
+//     $MvLiqXCnCus = $resultMvLiqXCnCus->fetchAll(PDO::FETCH_ASSOC);
+// }
+
+// Se ja estiver liquidado ira buscar os dados da liquidação
+$sqlLiquidacao = "SELECT MvLiqId, MvLiqMovimentacao, MvLiqData, MvLiqUsuario,
+MvLiqUnidade, MvLiqPlanoConta, UsuarNome
+FROM MovimentacaoLiquidacao
+JOIN Usuario ON UsuarId = MvLiqUsuario
+WHERE MvLiqMovimentacao = $inputMovimentacaoId AND MvLiqUnidade = $UnidadeId";
+$resultLiquidacao = $conn->query($sqlLiquidacao);
+$MoviLiqui = $resultLiquidacao->fetch(PDO::FETCH_ASSOC);
+
+if(isset($MoviLiqui['MvLiqId'])){
     // Buacando centros de custos da movimentação
     $sqlMvLiqXCnCus = "SELECT MvLiqXCnCusMovimentacaoLiquidacao, MvLiqXCnCusCentroCusto, CnCusCodigo,
-                    MvLiqXCnCusUsuarioAtualizador, MvLiqXCnCusValor,MvLiqXCnCusUnidade, CnCusNome, CnCusId
-                    FROM MovimentacaoLiquidacaoXCentroCusto
-                    JOIN CentroCusto ON CnCusId = MvLiqXCnCusCentroCusto
-                    WHERE MvLiqXCnCusMovimentacaoLiquidacao = $MoviLiqui[MvLiqId]
-                    AND MvLiqXCnCusUnidade = $UnidadeId";
+    MvLiqXCnCusUsuarioAtualizador, MvLiqXCnCusValor,MvLiqXCnCusUnidade, CnCusNome, CnCusId
+    FROM MovimentacaoLiquidacaoXCentroCusto
+    JOIN CentroCusto ON CnCusId = MvLiqXCnCusCentroCusto
+    WHERE MvLiqXCnCusMovimentacaoLiquidacao = $MoviLiqui[MvLiqId]
+    AND MvLiqXCnCusUnidade = $UnidadeId";
     $resultMvLiqXCnCus = $conn->query($sqlMvLiqXCnCus);
     $MvLiqXCnCus = $resultMvLiqXCnCus->fetchAll(PDO::FETCH_ASSOC);
 }
@@ -57,7 +78,7 @@ $sqlPlanoConta = "SELECT PlConId, PlConCodigo, PlConNome, SituaChave
                   FROM  PlanoConta JOIN Situacao on SituaId = PlConStatus
                   WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
                   AND PlConNatureza = 'D'";
-$sqlPlanoConta .= isset($MoviLiqui)?" and PlConId = $MoviLiqui[MvLiqPlanoConta]":'';
+$sqlPlanoConta .= isset($MoviLiqui['MvLiqId'])?" and PlConId = $MoviLiqui[MvLiqPlanoConta]":'';
 $resultPlanoConta = $conn->query($sqlPlanoConta);
 $PlanoConta = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 
@@ -106,6 +127,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
 
     <script type="text/javascript">
         $(document).ready(function () {
+
             // função que valida a data inserida, deve ser igual ou maior que a data atual
             $('#inputPeriodoDe').on('focusout',  function(e){
                 if ($('#inputPeriodoDe').val()) {
@@ -264,9 +286,9 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
 			return false;
 		}
 
-        function reset(id, val){
+        function reset(id, val, totalRegistros){
             if (id === 'all'){
-                var total = parseFloat($('#totalRegistros').val())
+                var total = totalRegistros?totalRegistros:parseFloat($('#totalRegistros').val())
                 for(var x=0; x<total; x++){
                     $('#inputCentroValor-'+x).val(float2moeda(0))
                 }
@@ -276,18 +298,26 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
             calculaValorTotal()
         }
 
-        function calculaValorTotal(id){
+        function calculaValorTotal(id, totalRegistros){
             var totalNotaFiscal = parseFloat(valorTotal)
             var ValTotal = 0
-            var total = parseFloat($('#totalRegistros').val())
-            var valor = id !== undefined ? parseFloat($('#inputCentroValor-'+id).val().replaceAll('.', '').replace(',', '.')) : 0
+            var total = totalRegistros?totalRegistros:parseFloat($('#totalRegistros').val())
             var cont = 0
+            var valor = 0
+            if(id !== undefined){
+                valor = parseFloat($('#inputCentroValor-'+id).val().replaceAll('.', '').replace(',', '.'))
+                $('#inputCentroValor-'+id).val(float2moeda(valor))
+            }
 
-            $('#inputCentroValor-'+id).val(float2moeda(valor))
+            console.log(totalNotaFiscal)
+            console.log(ValTotal)
+            console.log(total)
+            console.log(valor)
 
             for(var x=0; x<total; x++){
                 ValTotal += parseFloat($(`#inputCentroValor-${x}`).val()) ? parseFloat($(`#inputCentroValor-${x}`).val().replaceAll('.', '').replace(',', '.')) : 0
             }
+            console.log(ValTotal)
 
             if (id !== undefined){
                 if(ValTotal > totalNotaFiscal){
@@ -384,7 +414,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                     <label for="inputPeriodoDe">Data de vencimento <span class='text-danger'>*</span></label>
                                                     <div class="input-group">
                                                         <?php
-                                                            $disabled = isset($MoviLiqui['MvLiqPlanoConta'])? 'disabled':'';
+                                                            $disabled = $Movimentacao['SituaChave'] == 'LIBERADOCONTABILIDADE'? 'disabled':'';
                                                             echo "<input type='date' id='inputPeriodoDe' name='inputPeriodoDe' $disabled class='form-control'  value='".(isset($MoviLiqui['MvLiqData'])?$MoviLiqui['MvLiqData']:'')."' required>";
                                                         ?>
                                                     </div>
@@ -394,7 +424,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                 <div class="form-group">
                                                     <label for="cmbPlanoContaId">Plano de contas <span class='text-danger'>*</span></label>
                                                     <?php
-                                                        $disabled = isset($MoviLiqui['MvLiqPlanoConta'])? 'disabled':'';
+                                                        $disabled = $Movimentacao['SituaChave'] == 'LIBERADOCONTABILIDADE'? 'disabled':'';
                                                         $selected = isset($MoviLiqui['MvLiqPlanoConta'])? 'selected':'';
                                                         $selectPlanCont = "<select id='cmbPlanoContaId' $disabled name='cmbPlanoContaId' class='form-control form-control-select2' required autofocus>
                                                                         <option value=''>Selecione</option>";
@@ -413,7 +443,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                     <label for="cmbCentroCusto">Centro de custos <span class='text-danger'>*</span></label>
                                                     <?php
                                                         $CenCust = isset($MoviLiqui['MvLiqPlanoConta'])? $MvLiqXCnCus:$CentroCustos;
-                                                        $disabled = isset($MoviLiqui['MvLiqPlanoConta'])? 'disabled':'';
+                                                        $disabled = $Movimentacao['SituaChave'] == 'LIBERADOCONTABILIDADE'? 'disabled':'';
 
                                                         $selectCencust = "<select id='cmbCentroCusto' $disabled name='cmbCentroCusto[]' class='form-control select' multiple='multiple' required autofocus data-fouc>";
                                                         foreach($CenCust as $CentroCusto){
@@ -428,8 +458,9 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                     <div class="row" style="width:100%;">
                                         
                                         <?php
-                                            echo !isset($MoviLiqui['MvLiqId']) && ($_SESSION['PerfiChave'] == 'CONTABILIDADE' || $_SESSION['PerfiChave'] == 'SUPER') ?
-                                            "<div><button id='submitForm' class='btn btn-principal'>Liquidar</button></div>":''
+                                            if($Movimentacao['SituaChave'] != 'LIBERADOCONTABILIDADE' && ($_SESSION['PerfiChave'] == 'CONTABILIDADE' || $_SESSION['PerfiChave'] == 'SUPER')){
+                                                echo "<div><button id='submitForm' class='btn btn-principal'>Liquidar</button></div>";
+                                            }
                                         ?>
 
                                         <div>
@@ -523,12 +554,17 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                         <?php
                                             if(isset($MoviLiqui['MvLiqId'])){
                                                 $HTMLCenCust = '';
+                                                $HTMLCenCustValueTotal = 0;
                                                 foreach($MvLiqXCnCus as $key => $CnCus){
-                                                    $HTMLCenCust .= "<div class='row' style='margin-top: 8px;'>
-                                                        <div class='col-lg-10'>
+                                                    $valor = $CnCus['MvLiqXCnCusValor'];
+                                                    $valor = str_replace('.', ',', $valor);
+                                                    $HTMLCenCust .= "
+                                                    <div class='row' style='margin-top: 8px;'>
+                                                        <div class='col-lg-9'>
                                                             <div class='row'>
                                                                 <div class='col-lg-1' style='min-width: 50x'>
                                                                     <input type='text' id='inputItem-$key' name='inputItem1' class='form-control-border-off' value='".($key+1)."' readOnly>
+                                                                    <input type='hidden' id='inputIdCentro-$key' name='inputIdCentro-$key' value='$CnCus[CnCusCodigo]'>
                                                                 </div>
                                                                 <div class='col-lg-2'>
                                                                     <input type='text' id='inputCentroCodigo-$key' name='inputCentroCodigo-$key' class='form-control-border-off' data-popup='tooltip' value='$CnCus[CnCusCodigo]' readOnly>
@@ -540,9 +576,15 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                         </div>
                         
                                                         <div class='col-lg-2'>
-                                                            <input type='' class='form-control-border-off Valor text-right' id='inputCentroValor-$key' name='inputCentroValor-$key' value='$CnCus[MvLiqXCnCusValor]' readOnly>
+                                                            <input type='' id='inputCentroValor-$key' name='inputCentroValor-$key' value='$valor' onChange='calculaValorTotal($key,  ".COUNT($MvLiqXCnCus).")' onkeypress='pula(event)' ".
+                                                            ($Movimentacao['SituaChave'] == 'LIBERADOCONTABILIDADE'?" class='form-control-border-off Valor text-right' readOnly":" class='form-control-border Valor text-right'")."/>
+                                                        </div>
+
+                                                        <div class='col-sm-1 btn' style='text-align:center;' ".($Movimentacao['SituaChave'] == 'LIBERADOCONTABILIDADE'?"":"onClick='reset(`inputCentroValor-$key`, 0)'").">
+                                                            <i class='icon-reset' title='Resetar'></i>
                                                         </div>
                                                     </div>";
+                                                    $HTMLCenCustValueTotal += $valor;
                                                 }
                                                 echo $HTMLCenCust;
                                             }
@@ -552,10 +594,31 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
 
                                     <div id="centroCustoContentTotal" class="row" style="margin-top: 8px;">
                                         <!-- aqui será adicionado o HTML mostrando o valor total dos centros de custos selecionados -->
+                                        <?php 
+                                            if(isset($MoviLiqui['MvLiqId'])){
+                                                $HTMLCenCustTotal = "
+                                                    <div class='col-lg-7'>
+                                                        <div class='row'>
+                                                            <div class='col-lg-1'></div>
+                                                            <div class='col-lg-11'></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class='col-lg-2' style='padding-top: 5px; text-align: right;'>
+                                                        <h5><b>Total:</b></h5>
+                                                    </div>
+                                                    <div class='col-lg-2'>
+                                                        <input type='text' id='inputTotalGeral' name='inputTotalGeral' class='form-control-border-off text-right' value='R$ $HTMLCenCustValueTotal' readOnly>
+                                                    </div>
+                                                    <div class='col-lg-1 btn' style='text-align:center;' ".($Movimentacao['SituaChave'] == 'LIBERADOCONTABILIDADE'?"":" onClick='reset(`all`, 0, ".COUNT($MvLiqXCnCus).")' ").">
+                                                        <i class='icon-reset' title='Resetar Todos'></i>
+                                                    </div>";
+                                                    echo $HTMLCenCustTotal;
+                                            }
+                                        ?>
                                     </div>
 
-                                    <input type="hidden" id="totalRegistros" name="totalRegistros" value="0" >
                                     <?php
+                                        echo "<input type='hidden' id='totalRegistros' name='totalRegistros' value='".($MvLiqXCnCus?COUNT($MvLiqXCnCus):0)."'>";
                                         echo '<input id="inputMovimentacaoId" type="hidden" name="inputMovimentacaoId" value="'.$_POST['inputMovimentacaoId'].'"></input>';
                                     ?>
                                 </div>
