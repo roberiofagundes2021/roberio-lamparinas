@@ -456,7 +456,7 @@ try {
 		/* A marca não deveria ser LEFT JOIN e sim JOIN, já que é um campo obrigatório. Foi feito assim por causa dos cadastro antigos que não tem marca. 
 		Com isso fomos obrigados a usar o DISTINCT */
 		if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaProduto'] != null && $row['TrRefTabelaProduto'] == 'ProdutoOrcamento'){
-			$sql = "SELECT DISTINCT ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome, SbCatNome
+			$sql = "SELECT ProduId, ProduNome, PrOrcDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome, SbCatNome
 					FROM Produto
 					JOIN AditivoXProduto on AdXPrProduto = ProduId
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -465,11 +465,11 @@ try {
 					JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 					LEFT JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
 					LEFT JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
-					LEFT JOIN Marca on MarcaId = PrXFaMarca
+				    JOIN Marca on MarcaId = PrXFaMarca
 					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and AdXPrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		} else {
-			$sql = "SELECT DISTINCT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome, SbCatNome
+			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome, SbCatNome
 					FROM Produto
 					JOIN AditivoXProduto on AdXPrProduto = ProduId
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -477,7 +477,7 @@ try {
 					JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 					LEFT JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
 					LEFT JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
-					LEFT JOIN Marca on MarcaId = PrXFaMarca
+					JOIN Marca on MarcaId = PrXFaMarca
 					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and AdXPrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		}
@@ -488,7 +488,7 @@ try {
 		/* A marca não deveria ser LEFT JOIN e sim JOIN, já que é um campo obrigatório. Foi feito assim por causa dos cadastro antigos que não tem marca. 
 		Com isso fomos obrigados a usar o DISTINCT */
 		if ($row['FlOpeTermoReferencia'] && $row['TrRefTabelaServico'] != null && $row['TrRefTabelaServico'] == 'ServicoOrcamento'){		
-			$sql = "SELECT DISTINCT ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, AdXSrQuantidade, AdXSrValorUnitario, MarcaNome, SbCatNome
+			$sql = "SELECT ServiId, ServiNome, SrOrcDetalhamento as Detalhamento, AdXSrQuantidade, AdXSrValorUnitario, MarcaNome, SbCatNome
 					FROM Servico
 					JOIN AditivoXServico on AdXSrServico = ServiId
 					JOIN SubCategoria on SbCatId = ServiSubCategoria
@@ -496,18 +496,18 @@ try {
 					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 					LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
 					LEFT JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
-					LEFT JOIN Marca on MarcaId = SrXFaMarca
+					JOIN Marca on MarcaId = SrXFaMarca
 					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and AdXSrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		} else {
-			$sql = "SELECT DISTINCT ServiId, ServiNome, ServiDetalhamento as Detalhamento, AdXSrQuantidade, AdXSrValorUnitario, MarcaNome, SbCatNome
+			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, AdXSrQuantidade, AdXSrValorUnitario, MarcaNome, SbCatNome
 					FROM Servico
 					JOIN AditivoXServico on AdXSrServico = ServiId
 					JOIN SubCategoria on SbCatId = ServiSubCategoria
 					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 					LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
 					LEFT JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
-					LEFT JOIN Marca on MarcaId = SrXFaMarca
+					JOIN Marca on MarcaId = SrXFaMarca
 					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and AdXSrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		}
