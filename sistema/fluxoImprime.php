@@ -251,12 +251,12 @@ try {
 	
 			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 					FROM Produto
-					JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+					LEFT JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 					LEFT JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
 					LEFT JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
+					LEFT JOIN Marca on MarcaId = PrXFaMarca
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 					JOIN SubCategoria on SbCatId = ProduSubCategoria
-					LEFT JOIN Marca on MarcaId = PrXFaMarca
 					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
 					and SbCatId = ".$sbcat['SbCatId']."
 					ORDER BY SbCatNome, ProduNome ASC";	
@@ -346,11 +346,11 @@ try {
 	
 			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario,MarcaNome
 					FROM Servico
-					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-					JOIN SubCategoria on SbCatId = ServiSubCategoria
+					LEFT JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 					LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
 					LEFT JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
 					LEFT JOIN Marca on MarcaId = SrXFaMarca
+					JOIN SubCategoria on SbCatId = ServiSubCategoria
 					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
 					and SbCatId = ".$sbcat['SbCatId']."
 					ORDER BY SbCatNome, ServiNome ASC";
@@ -460,7 +460,10 @@ try {
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 					JOIN SubCategoria on SbCatId = ProduSubCategoria
 					JOIN ProdutoOrcamento on PrOrcProduto = ProduId
-					JOIN Marca on MarcaId = ProduMarca
+					LEFT JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+					LEFT JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
+					LEFT JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
+					JOIN Marca on MarcaId = PrXFaMarca
 					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and AdXPrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		} else {
@@ -469,7 +472,10 @@ try {
 					JOIN AditivoXProduto on AdXPrProduto = ProduId
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 					JOIN SubCategoria on SbCatId = ProduSubCategoria
-					JOIN Marca on MarcaId = ProduMarca
+					LEFT JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+					LEFT JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
+					LEFT JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
+					JOIN Marca on MarcaId = PrXFaMarca
 					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and AdXPrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		}
@@ -483,6 +489,9 @@ try {
 					JOIN AditivoXServico on AdXSrServico = ServiId
 					JOIN SubCategoria on SbCatId = ServiSubCategoria
 					JOIN ServicoOrcamento on SrOrcServico = ServiId
+					LEFT JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+					LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
+					LEFT JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
 					JOIN Marca on MarcaId = ServiMarca
 					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and AdXSrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
@@ -491,7 +500,10 @@ try {
 					FROM Servico
 					JOIN AditivoXServico on AdXSrServico = ServiId
 					JOIN SubCategoria on SbCatId = ServiSubCategoria
-					JOIN Marca on MarcaId = ServiMarca
+					LEFT JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+					LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
+					LEFT JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
+					JOIN Marca on MarcaId = SrXFaMarca
 					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and AdXSrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		}
@@ -606,18 +618,18 @@ try {
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
 					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'].
-					"<br>Marca: ".$rowProduto['MarcaNome']."</td>
+					"<br>Marca: ".$rowServico['MarcaNome']."</td>
 					<td style='text-align: center;'>" . $rowServico['AdXSrQuantidade'] . "</td>
 					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
 					<td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>
 				</tr>
 			";
-				} else if ($rowProduto['AdXPrQuantidade'] > 0) {
+				} else if ($rowServico['AdXSrQuantidade'] > 0) {
 					$html .= "
 				<tr>
 					<td style='text-align: center;'>" . $cont . "</td>
 					<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'].
-					"<br>Marca: ".$rowProduto['MarcaNome']."</td>
+					"<br>Marca: ".$rowServico['MarcaNome']."</td>
 					<td style='text-align: center;'>" . $rowServico['AdXSrQuantidade'] . "</td>
 					<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
 					<td style='text-align: right'>" . mostraValor($valorTotal) . "</td>
