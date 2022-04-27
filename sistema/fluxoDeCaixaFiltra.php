@@ -361,7 +361,7 @@ $sql = "SELECT CnCusId, CnCusNome
 $resultCentroDeCusto = $conn->query($sql);
 $rowCentroDeCusto = $resultCentroDeCusto->fetchAll(PDO::FETCH_ASSOC);
 
-$cabecalho = "<div id='carouselExampleControls' class='carousel slide' data-ride='carousel'>
+$print = "<div id='carouselExampleControls' class='carousel slide' data-ride='carousel'>
             <div class='carousel-inner'> ";
 
 $teste = false;
@@ -524,6 +524,91 @@ if($typeFiltro == "D"){
     if($i != $diaInicio)
       $i += 1;
   
+    /* Obs.: utf8_encode é para o servidor da AZURE. Localmente não precisaria, mas para o servidor sim. */  
+    $print .= " <div class='carousel-item ".($i == $diaInicio ? " active":"")."'> 
+                  <div class='row'>
+                    <div class='col-lg-12'>
+                      <!-- Basic responsive configuration -->
+                      <div class='card-body' >
+                        <div class='row'>
+                            
+                          <div class='col-lg-4'>
+                          </div>
+  
+                          <div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-right: 2px; '>
+                            <span><strong>".str_pad($i, 2, '0', STR_PAD_LEFT)." ".utf8_encode(ucfirst(strftime("%B de %Y", strtotime($dataInicio))))."</strong></span>
+                          </div>
+  
+                           ".($segundaColuna ? "<div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-left: 2px;'>
+                            <span><strong>".str_pad($i+1, 2, '0', STR_PAD_LEFT)." ".utf8_encode(ucfirst(strftime("%B de %Y", strtotime($dataInicio ."-".str_pad($i+1, 2, '0', STR_PAD_LEFT)))))."</strong></span>
+                          </div>" : "")."
+
+                          ".($terceiraColuna ? "<div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-left: 2px;'>
+                            <span><strong>".str_pad($i+2, 2, '0', STR_PAD_LEFT)." ".utf8_encode(ucfirst(strftime("%B de %Y", strtotime($dataInicio ."-".str_pad($i+2, 2, '0', STR_PAD_LEFT)))))."</strong></span>
+                          </div>" : "")."                        
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+  
+                  <div class='row' style='margin-bottom: 1rem;'>
+  
+                    <!-- SALDO INICIAL -->
+                    <div class='col-lg-12'>
+                      <!-- Basic responsive configuration -->
+                        <div class='card-body' style='padding-top: 0;'>
+                          <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
+                            <div class='col-lg-4' style='border-right: 1px dotted black;'>
+                              <span><strong>Saldo Inicial</strong></span>
+                            </div>
+  
+                            <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+                              <div class='row'>
+                                <div class='col-md-6'>
+                                  <span>".mostraValor($saldoInicialPrevisto)."</span>
+                                </div>
+  
+                                <div class='col-md-6'>
+                                  <span>".//mostraValor($saldoInicialRealizado).
+                                  "</span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            ".($segundaColuna ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+                                                                  <div class='row'>
+                                                                    <div class='col-md-6'>
+                                                                      <span>".//mostraValor($saldoIni_p2).
+                                                                      "</span>
+                                                                    </div>
+                                      
+                                                                    <div class='col-md-6'>
+                                                                      <span>".//mostraValor($saldoIni_r2).
+                                                                      "</span>
+                                                                    </div>
+                                                                  </div>
+                                                                </div>" : "")."
+
+                            ".($terceiraColuna ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+                                                                  <div class='row'>
+                                                                    <div class='col-md-6'>
+                                                                      <span>".//mostraValor($saldoIni_p3).
+                                                                      "</span>
+                                                                    </div>
+                                     
+                                                                    <div class='col-md-6'>
+                                                                      <span>".//mostraValor($saldoIni_r3).
+                                                                      "</span>
+                                                                    </div>
+                                                                  </div>
+                                                                </div>" : "")."
+  
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                  <!-- SALDO INICIAL -->";
+  
     //------------------------------------------------------------------------------
     // limpa as variaveis que vao receber o plano de 
     // contas e centro de custo das funções    
@@ -653,8 +738,7 @@ if($typeFiltro == "D"){
                                 </div>
   
                                 <div class='col-md-6'>
-                                  <span>".//mostraValor($totalRealizadoPrimeiraColuna).
-                                  "</span>
+                                  <span>".mostraValor($totalRealizadoPrimeiraColuna)."</span>
                                 </div>
                               </div>
                             </div>
@@ -855,101 +939,10 @@ if($typeFiltro == "D"){
                     </div>
                   <!-- TOTAL SAIDA -->
                   <!-- SAIDA -->";
-
-    //O cabeçalho está praticamente no final do loop para que o calculo do saldo inicial seja inserido nas colunas adicionais (segunda e terceira)
-    /* Obs.: utf8_encode é para o servidor da AZURE. Localmente não precisaria, mas para o servidor sim. */  
-    $cabecalho .= " <div class='carousel-item ".($i == $diaInicio ? " active":"")."'> 
-                  <div class='row'>
-                    <div class='col-lg-12'>
-                      <!-- Basic responsive configuration -->
-                      <div class='card-body' >
-                        <div class='row'>
-                            
-                          <div class='col-lg-4'>
-                          </div>
-  
-                          <div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-right: 2px; '>
-                            <span><strong>".str_pad($i, 2, '0', STR_PAD_LEFT)." ".utf8_encode(ucfirst(strftime("%B de %Y", strtotime($dataInicio))))."</strong></span>
-                          </div>
-  
-                           ".($segundaColuna ? "<div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-left: 2px;'>
-                            <span><strong>".str_pad($i+1, 2, '0', STR_PAD_LEFT)." ".utf8_encode(ucfirst(strftime("%B de %Y", strtotime($dataInicio ."-".str_pad($i+1, 2, '0', STR_PAD_LEFT)))))."</strong></span>
-                          </div>" : "")."
-
-                          ".($terceiraColuna ? "<div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-left: 2px;'>
-                            <span><strong>".str_pad($i+2, 2, '0', STR_PAD_LEFT)." ".utf8_encode(ucfirst(strftime("%B de %Y", strtotime($dataInicio ."-".str_pad($i+2, 2, '0', STR_PAD_LEFT)))))."</strong></span>
-                          </div>" : "")."                        
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-  
-                  <div class='row' style='margin-bottom: 1rem;'>
-  
-                    <!-- SALDO INICIAL -->
-                    <div class='col-lg-12'>
-                      <!-- Basic responsive configuration -->
-                        <div class='card-body' style='padding-top: 0;'>
-                          <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
-                            <div class='col-lg-4' style='border-right: 1px dotted black;'>
-                              <span><strong>Saldo Inicial</strong></span>
-                            </div>
-  
-                            <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                              <div class='row'>
-                                <div class='col-md-6'>
-                                  <span>".mostraValor($saldoInicialPrevisto)."</span>
-                                </div>
-  
-                                <div class='col-md-6'>
-                                  <span>".//mostraValor($saldoInicialRealizado).
-                                  "</span>
-                                </div>
-                              </div>
-                            </div>";
-                            
-                          if($segundaColuna) {
-                            $cabecalho .= "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                    <div class='row'>
-                                                                      <div class='col-md-6'>
-                                                                        <span>".//mostraValor($saldoIni_p2).
-                                                                        "</span>
-                                                                      </div>
-                                        
-                                                                      <div class='col-md-6'>
-                                                                        <span>".//mostraValor($saldoIni_r2).
-                                                                        "</span>
-                                                                      </div>
-                                                                    </div>
-                                                                  </div>";
-                          }
-
-                          if($terceiraColuna) {
-                            $cabecalho .= "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                    <div class='row'>
-                                                                      <div class='col-md-6'>
-                                                                        <span>".//mostraValor($saldoIni_p3).
-                                                                        "</span>
-                                                                      </div>
-                                       
-                                                                      <div class='col-md-6'>
-                                                                        <span>".//mostraValor($saldoIni_r3).
-                                                                        "</span>
-                                                                      </div>
-                                                                    </div>
-                                                                  </div>";
-                          }
-
-  
-                          $cabecalho .= "</div>
-                        </div>
-                    </div>
-                  </div>
-                  <!-- SALDO INICIAL -->";
   
     //----------------------------------------------------------------------
     //junta tudo no $print principal
-    $print = $cabecalho . $print_ent . $print_sai. "
+    $print .= $print_ent . $print_sai. "
         
                   <!-- SALDO FINAL -->
                   <div class='row' style='margin-top: 1rem;'>
