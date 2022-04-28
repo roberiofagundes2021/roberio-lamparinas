@@ -14,21 +14,22 @@ $empresas = array();
 $piEmpresa = 0;
 $piUnidade = 0;
 $_SESSION['Permissoes'] = Array();
+$MultEmpresas = false;
+$usuaId = 0;
+
+$usuarioId = isset($_POST['usuarioId'])?$_POST['usuarioId']:false;
 
 // Se a pessoa preencheu o login
 if(isset($_POST['usuario'])){
+	$newUser = false;
 
 	$psUsuario = $_POST['usuario'];
 	$psSenha = md5($_POST['senha']);
 
-	if (isset($_POST['empresa'])){
-		$piEmpresa = $_POST['empresa'];
-		$_SESSION['EmpreId'] = $piEmpresa;
-	}
-
-	if (isset($_POST['unidade'])){
-		$piUnidade = $_POST['unidade'];
-		$_SESSION['UnidadeId'] = $piUnidade;
+	if(isset($_SESSION['UsuarLogin'])){
+		if($_SESSION['UsuarLogin'] != $_POST['usuario']){
+			$newUser = true; // verifica se a pessoa alterou o login para refaze-lo com outro usuário
+		}
 	}
 
 	$_SESSION['UsuarLogin'] = $_POST['usuario'];
@@ -47,166 +48,62 @@ if(isset($_POST['usuario'])){
 	$row = $result->fetch();
 	
 	$sPerfilChave = $row['PerfiChave'];
-	
-	if ($row == 0){	
+	if ($row == 0){
 		$erro[] = "O usuário não está cadastrado.";
 	} else if ($row['SituaChave'] == 'INATIVO'){
 		$erro[] = "Esse usuário está desativado.";
 	} else if (strcmp($row['UsuarSenha'], ($psSenha)) != 0){  //"strcmp": compara 2 strings (se for 0 significa que são iguais)
 		$erro[] = "<strong>Senha</strong> incorreta.";
 	} else {
-			$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EmpreFoto
-					FROM Usuario
-					JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
-					JOIN Situacao on SituaId = EXUXPStatus
-					JOIN Perfil on PerfiId = EXUXPPerfil
-					JOIN Empresa on EmpreId = EXUXPEmpresa
-					WHERE UsuarLogin = '$usuario_escape' and SituaChave = 'ATIVO' and 
-					      EmpreId in (Select LicenEmpresa from Licenca JOIN Situacao on SituaId = LicenStatus where LicenDtFim is null or LicenDtFim > GETDATE() and SituaChave = 'ATIVO')
-					";
-			$result = $conn->query($sql);
-			$row = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
-			$count = count($row);
+		$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EmpreFoto
+				FROM Usuario
+				JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
+				JOIN Situacao on SituaId = EXUXPStatus
+				JOIN Perfil on PerfiId = EXUXPPerfil
+				JOIN Empresa on EmpreId = EXUXPEmpresa
+				WHERE UsuarLogin = '$usuario_escape' and SituaChave = 'ATIVO' and 
+				EmpreId in (Select LicenEmpresa from Licenca JOIN Situacao on SituaId = LicenStatus where LicenDtFim is null or LicenDtFim > GETDATE() and SituaChave = 'ATIVO')";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
+		$count = count($row);
 
-			if ($count == 0){
-				$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";			
-			} else if ($count > 1 and $piEmpresa == 0) {
-				$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";
-				
-				$_SESSION['EmpreId'] = 99999999;  // Se preferirem deixar pre-selecionado já uma empresa basta trocar o 9999999 por $row[0]['EmpreId']
-				
-				$result = $conn->query($sql);
-				while ($linhas = $result->fetch()){
-					$_SESSION['Empresa'][$linhas['EmpreId']] = $linhas['EmpreNomeFantasia'];
-				}
-			} else if ($piEmpresa) {
+		$usuaId = $row[0]['UsuarId'];
 
-				$sql = "SELECT UnidaId, UnidaNome
-						FROM UsuarioXUnidade
-						JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
-						JOIN Unidade on UnidaId = UsXUnUnidade
-						WHERE EXUXPUsuario = ".$row[0]['UsuarId']." and EXUXPEmpresa = ".$piEmpresa."
-						";
-				if(isset($_SESSION['UnidadeId'])){
-					$sql .= " and UnidaId = ".$_SESSION['UnidadeId'];
-				}
-				$result = $conn->query($sql);
-				$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
-				$countUnidade = count($rowUnidade);					
-				
-				if ($countUnidade == 0){
-					$erro[] = "O usuário está cadastrado em uma empresa, porém não está vinculado a nenhuma unidade. Favor acionar o responsável pelo cadastro na sua empresa.";			
-				} else if ($countUnidade == 1) {
-					
-					$sql = "SELECT UsuarId, UsuarLogin, UsuarNome, EmpreId, EmpreNomeFantasia, PerfiChave, EmpreFoto
-							FROM Usuario
-							JOIN EmpresaXUsuarioXPerfil EUP on EXUXPUsuario = UsuarId
-							JOIN Situacao on SituaId = EXUXPStatus
-							JOIN Perfil on PerfiId = EXUXPPerfil
-							JOIN Empresa on EmpreId = EXUXPEmpresa
-							WHERE UsuarLogin = '$usuario_escape' and SituaChave = 'ATIVO' and EmpreId = $piEmpresa and 
-							EmpreId in (Select LicenEmpresa from Licenca JOIN Situacao on SituaId = LicenStatus where LicenDtFim is null or LicenDtFim > GETDATE() and SituaChave = 'ATIVO')
-							";
-					$result = $conn->query($sql);
-					$row = $result->fetch();
-					
-					if ($row > 0){
-						$_SESSION['UsuarId'] = $row['UsuarId'];
-						$_SESSION['UsuarLogin'] = $row['UsuarLogin'];
-						$_SESSION['UsuarNome'] = $row['UsuarNome'];
-						$_SESSION['EmpreId'] = $row['EmpreId'];
-						$_SESSION['EmpreNomeFantasia'] = $row['EmpreNomeFantasia'];
-						$_SESSION['EmpreFoto'] = $row['EmpreFoto'];
-						$_SESSION['UnidadeId'] = $rowUnidade[0]['UnidaId'];
-						$_SESSION['UnidadeNome'] = $rowUnidade[0]['UnidaNome'];
-						$_SESSION['PerfiChave'] = $row['PerfiChave'];
-						//$_SESSION['UsuarLogado'] = 1;
-						
-						unset($_SESSION['UsuarSenha']);
-
-						irpara("index.php");
-					} else {
-						$erro[] = "Login inválido. Verifique se o usuário informado faz parte dessa empresa.";
-					}
-				} else {
-					$erro[] = "Você está vinculado em mais de uma unidade dessa empresa. Informe qual deseja acessar.";
-				
-					$_SESSION['UnidadeId'] = 99999999;  // Se preferirem deixar pre-selecionado já uma empresa basta trocar o 9999999 por $row[0]['EmpreId']
-					
-					$result = $conn->query($sql);
-					while ($linhas = $result->fetch()){
-						$_SESSION['Unidade'][$linhas['UnidaId']] = $linhas['UnidaNome'];
-					}
-				}
-				
-			} else {
-
-				if ($piUnidade){
-
-					$sql = "SELECT UnidaId, UnidaNome
-							FROM Unidade
-							WHERE UnidaId = ".$piUnidade;
-					$result = $conn->query($sql);
-					$rowUnidade = $result->fetch(PDO::FETCH_ASSOC);
-
-					//Pra esse caso aqui só vai vim um registro mesmo, daí precisa do [0] sem fazer o foreach
-					$_SESSION['UsuarId'] = $row[0]['UsuarId'];
-					$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
-					$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
-					$_SESSION['EmpreId'] = $row[0]['EmpreId'];
-					$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
-					$_SESSION['EmpreFoto'] = $row[0]['EmpreFoto'];
-					$_SESSION['UnidadeId'] = $rowUnidade['UnidaId'];;
-					$_SESSION['UnidadeNome'] = $rowUnidade['UnidaNome'];
-					$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
-
-					unset($_SESSION['UsuarSenha']);
-
-					irpara("index.php");					
-
-				} else {
-					$sql = "SELECT UnidaId, UnidaNome
+		if ($count == 0){
+			$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";			
+		} else if ($count > 1 and !isset($_POST['empresa'])){
+			$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";
+		} else {
+				if(!$newUser) {
+					$sql = "SELECT UsuarId, UsuarNome, UsuarLogin, UnidaId, UnidaNome, EmpreId, EmpreNomeFantasia, EmpreFoto,
+							PerfiChave
 							FROM UsuarioXUnidade
 							JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
+							JOIN Empresa on EmpreId = EXUXPEmpresa
 							JOIN Unidade on UnidaId = UsXUnUnidade
-							WHERE EXUXPUsuario = ".$row[0]['UsuarId']." and EXUXPEmpresa = ".$row[0]['EmpreId']."
-							";
+							JOIN Usuario on UsuarId = EXUXPUsuario
+							JOIN Perfil on PerfiId = EXUXPPerfil
+							WHERE EXUXPUsuario = ".$row[0]['UsuarId']." and EXUXPEmpresa = ".$_POST['empresa']." and UnidaId = ".$_POST['unidade'];
 					$result = $conn->query($sql);
-					$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
-					$countUnidade = count($rowUnidade);
-					
-					if ($countUnidade == 0){
-						$erro[] = "O usuário está cadastrado em uma empresa, porém não está vinculado a nenhuma unidade. Favor acionar o responsável pelo cadastro na sua empresa.";			
-					} else if ($countUnidade == 1) {				
-		
-						//Pra esse caso aqui só vai vim um registro mesmo, daí precisa do [0] sem fazer o foreach
-						$_SESSION['UsuarId'] = $row[0]['UsuarId'];
-						$_SESSION['UsuarLogin'] = $row[0]['UsuarLogin'];
-						$_SESSION['UsuarNome'] = $row[0]['UsuarNome'];
-						$_SESSION['EmpreId'] = $row[0]['EmpreId'];
-						$_SESSION['EmpreNomeFantasia'] = $row[0]['EmpreNomeFantasia'];
-						$_SESSION['EmpreFoto'] = $row[0]['EmpreFoto'];
-						$_SESSION['UnidadeId'] = $rowUnidade[0]['UnidaId'];
-						$_SESSION['UnidadeNome'] = $rowUnidade[0]['UnidaNome'];
-						$_SESSION['PerfiChave'] = $row[0]['PerfiChave'];
+					$rowUnidade = $result->fetch(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
+				
+					//Pra esse caso aqui só vai vim um registro mesmo, daí precisa do [0] sem fazer o foreach
+					$_SESSION['UsuarId'] = $rowUnidade['UsuarId'];
+					$_SESSION['UsuarLogin'] = $rowUnidade['UsuarLogin'];
+					$_SESSION['UsuarNome'] = $rowUnidade['UsuarNome'];
+					$_SESSION['EmpreId'] = $rowUnidade['EmpreId'];
+					$_SESSION['EmpreNomeFantasia'] = $rowUnidade['EmpreNomeFantasia'];
+					$_SESSION['EmpreFoto'] = $rowUnidade['EmpreFoto'];
+					$_SESSION['UnidadeId'] = $rowUnidade['UnidaId'];
+					$_SESSION['UnidadeNome'] = $rowUnidade['UnidaNome'];
+					$_SESSION['PerfiChave'] = $rowUnidade['PerfiChave'];
 
-						unset($_SESSION['UsuarSenha']);
-						
-						irpara("index.php");
-
-					} else {
-						$erro[] = "Você está vinculado em mais de uma unidade dessa empresa. Informe qual deseja acessar.";
+					unset($_SESSION['UsuarSenha']);
 					
-						$_SESSION['UnidadeId'] = 99999999;  // Se preferirem deixar pre-selecionado já uma empresa basta trocar o 9999999 por $row[0]['EmpreId']
-						
-						$result = $conn->query($sql);
-						while ($linhas = $result->fetch()){
-							$_SESSION['Unidade'][$linhas['UnidaId']] = $linhas['UnidaNome'];
-						}
-					}
-				}				
+					irpara("index.php");		
 			}
-	} 
+		}
+	}
 }
 
 ?>
@@ -223,21 +120,85 @@ if(isset($_POST['usuario'])){
 
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
-<!--
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+  	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+  	<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
 
 	<script type="text/javascript">
 
 		$(document).ready(function() {
-		
-			$('.carousel').carousel({
-				interval: 3000
-			})
+			$('.divEmpresa').hide();
+			$('.divUnidade').hide();
+
+			if($('#usuarioId').val()){
+				$.ajax({
+					type: "POST",
+					url: "loginFiltraUnidade.php",
+					dataType: "json",
+					data: {
+						usuario: $('#usuarioId').val()
+					},
+					success: function(resposta){
+						if(resposta.length){
+							var HTML = '';
+							var count = resposta.length;
+							for(var i = 0; i < count; i++){
+								HTML += HTML?'<option value="'+resposta[i].EmpreId+'">'+resposta[i].EmpreNomeFantasia+'</option>':'<option selectted value="'+resposta[i].EmpreId+'">'+resposta[i].EmpreNomeFantasia+'</option>';
+							}
+							$('#empresaSelect').html(HTML);
+							$('.divEmpresa').show();
+
+							$.ajax({
+								type: "POST",
+								url: "loginFiltraUnidade.php",
+								dataType: "json",
+								data: {
+									empresa: resposta[0].EmpreId,
+									usuario: $('#usuarioId').val()
+								},
+								success: function(resposta){
+									if(resposta.length){
+										var HTML = '';
+										var count = resposta.length;
+										for(var i = 0; i < count; i++){
+											HTML += HTML?'<option value="'+resposta[i].UnidaId+'">'+resposta[i].UnidaNome+'</option>':'<option selectted value="'+resposta[i].UnidaId+'">'+resposta[i].UnidaNome+'</option>';
+										}
+										$('#unidadeSelect').html(HTML);
+										$('.divUnidade').show();
+									}
+								}
+							})
+						}
+					}
+				})
+			}
+
+			$('#empresaSelect').on('change', function(){
+				$.ajax({
+					type: "POST",
+					url: "loginFiltraUnidade.php",
+					dataType: "json",
+					data: {
+						empresa: $('#empresaSelect').val(),
+						usuario: $('#usuarioId').val()
+					},
+					success: function(resposta){
+						if(resposta.length){
+							var HTML = '';
+							var count = resposta.length;
+							for(var i = 0; i < count; i++){
+								HTML += HTML?'<option value="'+resposta[i].UnidaId+'">'+resposta[i].UnidaNome+'</option>':'<option selectted value="'+resposta[i].UnidaId+'">'+resposta[i].UnidaNome+'</option>';
+							}
+							$('#unidadeSelect').html(HTML);
+							$('.divUnidade').show();
+						}
+					}
+				})
+			});			
 		})
 
-	</script>-->
+	</script>
 </head>
 
 <body>
@@ -250,40 +211,6 @@ if(isset($_POST['usuario'])){
 			<div class="row" style="height:100%">
 				
 				<div class="col-lg-8 login-cover login-banner" style="min-height: 100%">
-					
-					<!--<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-						<!-- Indicators --
-						<ol class="carousel-indicators">
-							<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-							<li data-target="#carousel-example-generic" data-slide-to="1"></li>							
-						</ol>
-
-						<!-- Wrapper for slides --
-						<div class="carousel-inner" role="listbox">
-							<div class="item active">
-								<img src="global_assets/images/login_cover.jpg" alt="Teste1">
-								<div class="carousel-caption">
-									Testando primeiro slide
-								</div>
-							</div>
-							<div class="item">
-								<img src="global_assets/images/login_coverX1.jpg" alt="Teste2">
-								<div class="carousel-caption">
-									Testando segundo slide
-								</div>
-							</div>							
-						</div>
-
-						<!-- Controls --
-						<a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
-							<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-							<span class="sr-only">Anterior</span>
-						</a>
-						<a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
-							<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-							<span class="sr-only">Próximo</span>
-						</a>
-					</div> -->
 				</div>
 				<div class="col-lg-4 col-xs-12">
 
@@ -308,46 +235,20 @@ if(isset($_POST['usuario'])){
 									<?php 
 											}
 										}
+
+										print ("<input type='hidden' name='usuarioId' id='usuarioId' value='$usuaId' />");
+
+										print("
+										<div class='form-group divEmpresa'>
+											<select id='empresaSelect' name='empresa' class='form-control select' data-fouc>
+											</select>
+										</div>");
 										
-										if (isset($_SESSION['EmpreId'])){
-											print('
-											<div class="form-group">
-												<select name="empresa" class="form-control select" data-fouc>
-													<option value="0">Selecione uma empresa</option>');
-													
-													foreach($_SESSION['Empresa'] as $indice => $valor){
-														if ($_SESSION['EmpreId'] == $indice){
-															echo '<option value="'.$indice.'" selected>'.$valor.'</option>';
-														} else {
-															echo '<option value="'.$indice.'">'.$valor.'</option>';
-														}
-													}
-													
-													print('
-												</select>
-											</div>');
-											unset($_SESSION['EmpreId']);
-										}
-										
-										if (isset($_SESSION['UnidadeId'])){
-											print('
-											<div class="form-group">
-												<select name="unidade" class="form-control select" data-fouc>
-													<option value="0">Selecione uma unidade</option>');
-													
-													foreach($_SESSION['Unidade'] as $indice => $valor){
-														if ($_SESSION['UnidadeId'] == $indice){
-															echo '<option value="'.$indice.'" selected>'.$valor.'</option>';
-														} else {
-															echo '<option value="'.$indice.'">'.$valor.'</option>';
-														}
-													}
-													
-													print('
-												</select>
-											</div>');
-											unset($_SESSION['UnidadeId']);
-										}									
+										print('
+										<div class="form-group divUnidade">
+											<select id="unidadeSelect" name="unidade" class="form-control select" data-fouc>
+											</select>
+										</div>');
 									?>							
 									
 									<div class="form-group form-group-feedback form-group-feedback-left">
