@@ -221,8 +221,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 					$("#quantityDays").val(quantityDays)
 					$("#dayInitial").val(dayInitial)
 					$("#dayEnd").val(dayEnd)
-					$("#inputDateInitial").val(`${inputDateInitial.value}-01`)
-					$("#inputDateEnd").val(`${inputDateEnd.value}-01`)
+					$("#inputData").val()
+					$("#inputDataFim").val()
 					$("#inputCentroDeCustos").val(cmbCentroDeCustosReq)
 					$("#inputPlanoContas").val(cmbPlanoContasReq)
 					// console.log($("#cmbPlanoContas").val())
@@ -312,7 +312,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 													<span class="input-group-prepend">
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
-													<input type="date" id="inputDataInicio" name="inputDataInicio" class="form-control" placeholder="Data Início" value="" >
+													<input type="date" id="inputDataInicio" name="inputDataInicio"  min="1800-01-01" max="2100-12-31"  class="form-control" placeholder="Data Início" value="" >
 												</div>
 											</div>
 										</div>
@@ -324,7 +324,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 													<span class="input-group-prepend">
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
-													<input type="date" id="inputDataFim" name="inputDataFim" class="form-control" placeholder="Data Fim" value="" >
+													<input type="date" id="inputDataFim" name="inputDataFim"  min="1800-01-01" max="2100-12-31" class="form-control" placeholder="Data Fim" value="" >
 												</div>
 											</div>
 										</div>
