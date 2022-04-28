@@ -47,7 +47,7 @@ if(isset($_POST['usuario'])){
 	$result = $conn->query($sql);
 	$row = $result->fetch();
 	
-	$sPerfilChave = $row['PerfiChave'];
+	$sPerfilChave = isset($row['PerfiChave'])?$row['PerfiChave']:false;
 	if ($row == 0){
 		$erro[] = "O usuário não está cadastrado.";
 	} else if ($row['SituaChave'] == 'INATIVO'){
