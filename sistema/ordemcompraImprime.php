@@ -8,6 +8,8 @@ use Mpdf\Mpdf;
 
 require_once 'global_assets/php/vendor/autoload.php';
 
+$iFluxoOperacional = $_POST['inputOrdemCompraFlOpeId'];
+
 if (isset($_POST['inputOrdemCompraId'])){
 	$iOrdemCompra = $_POST['inputOrdemCompraId'];
 } else{
@@ -101,18 +103,25 @@ try {
 			FROM Produto
 			JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			LEFT JOIN Marca on MarcaId = ProduMarca
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OCXPrOrdemCompra = ".$iOrdemCompra."
+			JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
+			JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
+			JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
+			JOIN Marca on MarcaId = PrXFaMarca
+			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OCXPrOrdemCompra = ".$iOrdemCompra." and FOXPrFluxoOperacional = " . $iFluxoOperacional."
 			ORDER BY ProduNome ASC";
 
 	$result = $conn->query($sql);
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 	$totalProdutos = count($rowProdutos);
 
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OCXSrQuantidade, OCXSrValorUnitario
+	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OCXSrQuantidade, OCXSrValorUnitario, MarcaNome
 			FROM Servico
 			JOIN OrdemCompraXServico on OCXSrServico = ServiId
-			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and OCXSrOrdemCompra = ".$iOrdemCompra."
+			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
+			JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
+			JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
+			JOIN Marca on MarcaId = SrXFaMarca
+			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and OCXSrOrdemCompra = ".$iOrdemCompra." and FOXSrFluxoOperacional = " . $iFluxoOperacional."
 			ORDER BY ServiNome ASC";
 
 	$result = $conn->query($sql);
@@ -265,7 +274,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']."</td>	
+					<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']."<br>Marca: ".$itemServico['MarcaNome']."</td>	
 					<td style='text-align: center;'>".$itemServico['OCXSrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
 					<td style='text-align: right;'>".mostraValor($valorTotal)."</td>
@@ -275,7 +284,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']."</td>
+					<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']."<br>Marca: ".$itemServico['MarcaNome']."</td>
 					<td style='text-align: center;'>".$itemServico['OCXSrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
 					<td style='text-align: right'>".mostraValor($valorTotal)."</td>
