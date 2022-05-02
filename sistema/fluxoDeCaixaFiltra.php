@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$inicio1 = microtime(true);
+//$inicio1 = microtime(true);
 
 // Para a data ficar em português. Foi usado lá embaixo onde tem strftime (referência: https://www.linhadecomando.com/php/php-funcao-date-para-strftime-em-portugues)
 setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
@@ -1174,7 +1174,7 @@ $print .= "</div>
               <span class='sr-only'>Next</span>
             </a>
           </div>";
-$total1 = microtime(true) - $inicio1;
-		 echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; 
+//$total1 = microtime(true) - $inicio1;
+		 //echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; 
 
 print($print);
