@@ -16,17 +16,28 @@ setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
   ["cmbPlanoContas"]=>string(2) "78"
 */
 
-function retornaBuscaComoArray($datasFiltro ,$plFiltro) {
+function retornaBuscaComoArray($datasFiltro ,$plFiltro, $tipo) {
   include('global_assets/php/conexao.php');
 
-  $sql = "SELECT PlConId, PlConNome,
-                dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConId, '".$datasFiltro['data_inicio_mes']."', '".$datasFiltro['data_fim_mes']."', 'S') as PrevistoSaida,
-                dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConId, '".$datasFiltro['data_inicio_mes']."', '".$datasFiltro['data_fim_mes']."', 'S') as RealizadoSaida
-          FROM PLanoConta
-          WHERE PlConId in ($plFiltro) and PlConNatureza = 'D'
-          ORDER BY PlConNome ASC";
-  $result = $conn->query($sql);
-  $rowPLanoContaPaga = $result->fetchAll(PDO::FETCH_ASSOC);
+  if($tipo == 'E') {
+    $sql = "SELECT PlConId, PlConNome,
+                  dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConId, '".$datasFiltro['data_inicio_mes']."', '".$datasFiltro['data_fim_mes']."', '".$tipo."') as PrevistoSaida,
+                  dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConId, '".$datasFiltro['data_inicio_mes']."', '".$datasFiltro['data_fim_mes']."', '".$tipo."') as RealizadoSaida
+            FROM PLanoConta
+            WHERE PlConId in ($plFiltro) and PlConNatureza = 'R'
+            ORDER BY PlConNome ASC";
+    $result = $conn->query($sql);
+    $rowPLanoContaPaga = $result->fetchAll(PDO::FETCH_ASSOC);
+  }else {
+    $sql = "SELECT PlConId, PlConNome,
+                  dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConId, '".$datasFiltro['data_inicio_mes']."', '".$datasFiltro['data_fim_mes']."', '".$tipo."') as PrevistoSaida,
+                  dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConId, '".$datasFiltro['data_inicio_mes']."', '".$datasFiltro['data_fim_mes']."', '".$tipo."') as RealizadoSaida
+            FROM PLanoConta
+            WHERE PlConId in ($plFiltro) and PlConNatureza = 'D'
+            ORDER BY PlConNome ASC";
+    $result = $conn->query($sql);
+    $rowPLanoContaPaga = $result->fetchAll(PDO::FETCH_ASSOC);
+  }
 
   $regAt = '';
   $cont = 0;
@@ -41,8 +52,8 @@ function retornaBuscaComoArray($datasFiltro ,$plFiltro) {
         //reserva os dados do plano de contas
         $pl[$regAt]['PlConId']              = $rowCC['PlConId']; 
         $pl[$regAt]['PlConNome']            = $rowCC['PlConNome'];
-        $pl[$regAt]['PL_PrevistoSaida']     = $rowCC['PrevistoSaida'];
-        $pl[$regAt]['PL_RealizadoSaida']    = $rowCC['RealizadoSaida'];
+        $pl[$regAt]['PL_Previsto']     = $rowCC['PrevistoSaida'];
+        $pl[$regAt]['PL_Realizado']    = $rowCC['RealizadoSaida'];
       }
   
       $cont++;
@@ -74,9 +85,9 @@ function retornaBuscaComoArray($datasFiltro ,$plFiltro) {
   }
 }
 
-function planoContaEntrada($idPlanoConta, $nome, $segundaColuna, $terceiraColuna, $data1, $data2, $data3) {
+function planoContaEntrada($nome, $valorPrevisto, $valorPrevisto2, $valorPrevisto3, $valorRealizado, $valorRealizado2, $valorRealizado3, $segundaColuna, $terceiraColuna) {
   include('global_assets/php/conexao.php');
-
+  /*
   //Plano Conta Previsto
   $sql = " SELECT dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", $idPlanoConta, '".$data1."',  '".$data1."', 'E') as PrevistoEntrada";
   $result = $conn->query($sql);
@@ -109,13 +120,13 @@ function planoContaEntrada($idPlanoConta, $nome, $segundaColuna, $terceiraColuna
     $sql = " SELECT dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", $idPlanoConta, '".$data3."',  '".$data3."', 'E') as RealizadoEntrada";
     $result = $conn->query($sql);
     $planoContaRealizadoEntrada3 = $result->fetch(PDO::FETCH_ASSOC);
-  }
+  }*/
 
-  $ValorPrimeiraColunaPrevisto = $planoContaPrevisaoEntrada1['PrevistoEntrada'];
+  $ValorPrimeiraColunaPrevisto = $valorPrevisto;
   $valorSegundaColunaPrevisto = 0;
   $valorTerceiraColunaPrevisto = 0;
 
-  $ValorPrimeiraColunaRealizado = $planoContaRealizadoEntrada1['RealizadoEntrada'];
+  $ValorPrimeiraColunaRealizado = $valorRealizado;//planoContaRealizadoEntrada1['RealizadoEntrada'];
   $valorSegundaColunaRealizado = 0;
   $valorTerceiraColunaRealizado = 0;
 
@@ -129,11 +140,11 @@ function planoContaEntrada($idPlanoConta, $nome, $segundaColuna, $terceiraColuna
             <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
               <div class='row'>
                 <div class='col-md-6'>
-                  <span>".mostraValor($planoContaPrevisaoEntrada1['PrevistoEntrada'])."</span>
+                  <span>".mostraValor($valorPrevisto)."</span>
                 </div>
 
                 <div class='col-md-6'>
-                  <span>".mostraValor($planoContaRealizadoEntrada1['RealizadoEntrada'])."</span>
+                  <span>".mostraValor($valorRealizado)."</span>
                 </div>
               </div>
             </div>";
@@ -143,17 +154,17 @@ function planoContaEntrada($idPlanoConta, $nome, $segundaColuna, $terceiraColuna
               <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                 <div class='row'>
                   <div class='col-md-6'>
-                    <span>".mostraValor($planoContaPrevisaoEntrada2['PrevistoEntrada'])."</span>
+                    <span>".mostraValor($valorPrevisto2)."</span>
                   </div>
   
                   <div class='col-md-6'>
-                    <span>".mostraValor($planoContaRealizadoEntrada2['RealizadoEntrada'])."</span>
+                    <span>".mostraValor($valorRealizado2)."</span>
                   </div>
                 </div>
               </div>";
 
-              $valorSegundaColunaPrevisto = $planoContaPrevisaoEntrada2['PrevistoEntrada'];
-              $valorSegundaColunaRealizado = $planoContaRealizadoEntrada2['RealizadoEntrada'];
+              $valorSegundaColunaPrevisto = $valorPrevisto2;
+              $valorSegundaColunaRealizado = $valorRealizado2;
             }
 
             if($terceiraColuna) {
@@ -161,17 +172,17 @@ function planoContaEntrada($idPlanoConta, $nome, $segundaColuna, $terceiraColuna
               <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                 <div class='row'>
                   <div class='col-md-6'>
-                    <span>".mostraValor($planoContaPrevisaoEntrada3['PrevistoEntrada'])."</span>
+                    <span>".mostraValor($valorPrevisto3)."</span>
                   </div>
   
                   <div class='col-md-6'>
-                    <span>".mostraValor($planoContaRealizadoEntrada3['RealizadoEntrada'])."</span>
+                    <span>".mostraValor($valorRealizado3)."</span>
                   </div>
                 </div>
               </div>";
 
-              $valorTerceiraColunaPrevisto = $planoContaPrevisaoEntrada3['PrevistoEntrada'];
-              $valorTerceiraColunaRealizado = $planoContaRealizadoEntrada3['RealizadoEntrada'];
+              $valorTerceiraColunaPrevisto = $valorPrevisto3;
+              $valorTerceiraColunaRealizado = $valorRealizado3;
             }
         $totalValorPrevisto = $ValorPrimeiraColunaPrevisto + $valorSegundaColunaPrevisto + $valorTerceiraColunaPrevisto;
         $totalValorRealizado = $ValorPrimeiraColunaRealizado + $valorSegundaColunaRealizado + $valorTerceiraColunaRealizado;
@@ -429,28 +440,53 @@ if($typeFiltro == "D"){
     // }
     $segundaColuna = false;
     $terceiraColuna = false;
-    //limpa as variaveis
-    if(isset($mes1)) {
-      unset($mes1);
+
+    if(isset($mes1Entrada)) {
+      unset($mes1Entrada);
       //unset($cc1);
-      unset($pl1);
+      unset($pl1Entrada);
       unset($saldoIni_p1);
       unset($saldoIni_r1);
-    } 
+    }
+
+    //limpa as variaveis
+    if(isset($mes1Saida)) {
+      unset($mes1Saida);
+      //unset($cc1);
+      unset($pl1Saida);
+      unset($saldoIni_p1);
+      unset($saldoIni_r1);
+    }
+
+    if(isset($mes2Entrada)) {
+      unset($mes2Entrada);
+      //unset($cc1);
+      unset($pl2Entrada);
+      unset($saldoIni_p1);
+      unset($saldoIni_r1);
+    }
     
     //limpa as variaveis
-    if(isset($mes2)) {
-      unset($mes2);
+    if(isset($mes2Saida)) {
+      unset($mes2Saida);
       //unset($cc2);
-      unset($pl2);
+      unset($pl2Saida);
       unset($saldoIni_p2);
       unset($saldoIni_r2);
     }    
 
-    if(isset($mes3)) {
-      unset($mes3);
+    if(isset($mes3Entrada)) {
+      unset($mes3Entrada);
+      //unset($cc1);
+      unset($pl3Entrada);
+      unset($saldoIni_p1);
+      unset($saldoIni_r1);
+    }
+
+    if(isset($mes3Saida)) {
+      unset($mes3Saida);
       //unset($cc3);
-      unset($pl3);
+      unset($pl3Saida);
       unset($saldoIni_p3);
       //unset($saldoIni_r3);
     }
@@ -482,11 +518,14 @@ if($typeFiltro == "D"){
     $saldoInicialRealizado = $rowSaldoIni_r["SaldoInicialRealizado"];
 
     //Pea TODOS os dads do dia $i
-    $mes1 = retornaBuscaComoArray($datasFiltro,$plFiltro);
+    $mes1Entrada = retornaBuscaComoArray($datasFiltro,$plFiltro, 'E');
+    $mes1Saida = retornaBuscaComoArray($datasFiltro,$plFiltro, 'S');
 
-    $pl1           = $mes1['pl'];
-    $saldoIni_p1   = $mes1['saldoIni_p'][0]['SaldoInicialPrevisto'];
-    $saldoIni_r1   = $mes1['saldoIni_r'][0]['SaldoInicialRealizado'];
+    $pl1Entrada    = $mes1Entrada['pl'];
+    
+    $pl1Saida      = $mes1Saida['pl'];
+    $saldoIni_p1   = $mes1Saida['saldoIni_p'][0]['SaldoInicialPrevisto'];
+    $saldoIni_r1   = $mes1Saida['saldoIni_r'][0]['SaldoInicialRealizado'];
     
    // echo "".$dataFiltro."---".$ccFiltro."---".$plFiltro."<br>";
     if(($i+1) <= $diaFim) {        
@@ -503,8 +542,12 @@ if($typeFiltro == "D"){
       $datasFiltro['data_fim_mes'] = $dataFiltroDiaFim2;
 
      //Pea TODOS os dads do dia $i+1 se ele estiver na faixa de dias do filtro
-      $mes2 = retornaBuscaComoArray($datasFiltro,$plFiltro);
-      $pl2  = $mes2['pl'];
+      $mes2Entrada = retornaBuscaComoArray($datasFiltro,$plFiltro, 'E');
+      $mes2 = retornaBuscaComoArray($datasFiltro,$plFiltro, 'S');
+      
+      $pl2Entrada = $mes2Entrada['pl']; 
+      
+      $pl2Saida  = $mes2['pl'];
       $saldoIni_p2   = $mes2['saldoIni_p'][0]['SaldoInicialPrevisto'];
       $saldoIni_r2   = $mes2['saldoIni_r'][0]['SaldoInicialRealizado'];
 
@@ -525,8 +568,12 @@ if($typeFiltro == "D"){
       $datasFiltro['data_fim_mes'] = $dataFiltroDiaFim3;
 
      //Pea TODOS os dads do dia $i+1 se ele estiver na faixa de dias do filtro
-      $mes3 = retornaBuscaComoArray($datasFiltro,$plFiltro);
-      $pl3           = $mes3['pl'];
+      $mes3Entrada = retornaBuscaComoArray($datasFiltro,$plFiltro, 'E');
+      $mes3 = retornaBuscaComoArray($datasFiltro,$plFiltro, 'S');
+
+      $pl3Entrada = $mes3Entrada['pl']; 
+
+      $pl3Saida           = $mes3['pl'];
       //$cc3           = $mes3['cc'];
       $saldoIni_p3   = $mes3['saldoIni_p'][0]['SaldoInicialPrevisto'];
       $saldoIni_r3   = $mes3['saldoIni_r'][0]['SaldoInicialRealizado'];
@@ -715,6 +762,7 @@ if($typeFiltro == "D"){
     $totalRealizadoPrimeiraColuna = 0;
     $totalRealizadoSegundaColuna = 0;
     $totalRealizadoTerceiraColuna = 0;
+    /*
     foreach($rowPLanoContaRecebe as $planoContaRecebe) {
       $planoContaEntrada = planoContaEntrada($planoContaRecebe['PlConId'], $planoContaRecebe['PlConNome'], $segundaColuna, $terceiraColuna, $data1, $data2, $data3);
       $print_ent .= $planoContaEntrada[0];
@@ -734,6 +782,35 @@ if($typeFiltro == "D"){
       $totalRealizadoPrimeiraColuna += $ValorRealizadoPrimeiraColuna;
       $totalRealizadoSegundaColuna += $valorRealizadoSegundaColuna;
       $totalRealizadoTerceiraColuna += $valorRealizadoTerceiraColuna;
+    }*/
+
+    if(isset($pl1Entrada) && (!empty($pl1Entrada))) {
+      foreach($pl1Entrada as $planoConta){
+        $planoContaEntrada = planoContaEntrada($planoConta["PlConNome"], $planoConta["PL_Previsto"], 
+                                              ($segundaColuna)?$pl2Entrada[$planoConta["PlConId"]]['PL_Previsto']:"",
+                                              ($terceiraColuna)?$pl3Entrada[$planoConta["PlConId"]]['PL_Previsto']:"",
+                                              $planoConta["PL_Realizado"],
+                                              ($segundaColuna)?$pl2Entrada[$planoConta["PlConId"]]['PL_Realizado']:"",
+                                              ($terceiraColuna)?$pl3Entrada[$planoConta["PlConId"]]['PL_Realizado']:"", 
+                                              $segundaColuna, $terceiraColuna);
+        $print_ent .= $planoContaEntrada[0];
+
+        $ValorPrimeiraColuna = $planoContaEntrada[1];
+        $valorSegundaColuna = $planoContaEntrada[2];
+        $valorTerceiraColuna = $planoContaEntrada[3];
+
+        $ValorRealizadoPrimeiraColuna = $planoContaEntrada[4];
+        $valorRealizadoSegundaColuna = $planoContaEntrada[5];
+        $valorRealizadoTerceiraColuna = $planoContaEntrada[6];
+
+        $totalPrevistoPrimeiraColuna += $ValorPrimeiraColuna;
+        $totalPrevistoSegundaColuna += $valorSegundaColuna;
+        $totalPrevistoTerceiraColuna += $valorTerceiraColuna;
+
+        $totalRealizadoPrimeiraColuna += $ValorRealizadoPrimeiraColuna;
+        $totalRealizadoSegundaColuna += $valorRealizadoSegundaColuna;
+        $totalRealizadoTerceiraColuna += $valorRealizadoTerceiraColuna;
+      }    
     }
 
     $totalValorPrevisto = $totalPrevistoPrimeiraColuna + $totalPrevistoSegundaColuna + $totalPrevistoTerceiraColuna;
@@ -890,15 +967,15 @@ if($typeFiltro == "D"){
       $totalRealizadoTerceiraColuna += $valorRealizadoTerceiraColuna;
     }*/
 
-    if(isset($pl1) && (!empty($pl1))) {
-      //var_dump($pl1);
-      foreach($pl1 as $planoConta){
-        $planoContaSaida = planoContaSaida($planoConta["PlConNome"], $planoConta["PL_PrevistoSaida"], 
-                                           ($segundaColuna)?$pl2[$planoConta["PlConId"]]['PL_PrevistoSaida']:"",
-                                           ($terceiraColuna)?$pl3[$planoConta["PlConId"]]['PL_PrevistoSaida']:"",
-                                           $planoConta["PL_RealizadoSaida"], 
-                                           ($segundaColuna)?$pl2[$planoConta["PlConId"]]['PL_RealizadoSaida']:"",
-                                           ($terceiraColuna)?$pl3[$planoConta["PlConId"]]['PL_RealizadoSaida']:"",
+    if(isset($pl1Saida) && (!empty($pl1Saida))) {
+      //var_dump($pl1Saida);
+      foreach($pl1Saida as $planoConta){
+        $planoContaSaida = planoContaSaida($planoConta["PlConNome"], $planoConta["PL_Previsto"], 
+                                           ($segundaColuna)?$pl2Saida[$planoConta["PlConId"]]['PL_Previsto']:"",
+                                           ($terceiraColuna)?$pl3Saida[$planoConta["PlConId"]]['PL_Previsto']:"",
+                                           $planoConta["PL_Realizado"], 
+                                           ($segundaColuna)?$pl2Saida[$planoConta["PlConId"]]['PL_Realizado']:"",
+                                           ($terceiraColuna)?$pl3Saida[$planoConta["PlConId"]]['PL_Realizado']:"",
                                            $rowCentroDeCusto, $segundaColuna, $terceiraColuna);
         $print_sai .= $planoContaSaida[0];
 
