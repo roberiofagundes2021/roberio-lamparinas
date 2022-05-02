@@ -441,6 +441,7 @@ if($typeFiltro == "D"){
     $segundaColuna = false;
     $terceiraColuna = false;
 
+    //limpa as variaveis
     if(isset($mes1Entrada)) {
       unset($mes1Entrada);
       //unset($cc1);
@@ -449,7 +450,6 @@ if($typeFiltro == "D"){
       unset($saldoIni_r1);
     }
 
-    //limpa as variaveis
     if(isset($mes1Saida)) {
       unset($mes1Saida);
       //unset($cc1);
@@ -466,7 +466,6 @@ if($typeFiltro == "D"){
       unset($saldoIni_r1);
     }
     
-    //limpa as variaveis
     if(isset($mes2Saida)) {
       unset($mes2Saida);
       //unset($cc2);
@@ -543,13 +542,13 @@ if($typeFiltro == "D"){
 
      //Pea TODOS os dads do dia $i+1 se ele estiver na faixa de dias do filtro
       $mes2Entrada = retornaBuscaComoArray($datasFiltro,$plFiltro, 'E');
-      $mes2 = retornaBuscaComoArray($datasFiltro,$plFiltro, 'S');
+      $mes2Saida = retornaBuscaComoArray($datasFiltro,$plFiltro, 'S');
       
       $pl2Entrada = $mes2Entrada['pl']; 
       
-      $pl2Saida  = $mes2['pl'];
-      $saldoIni_p2   = $mes2['saldoIni_p'][0]['SaldoInicialPrevisto'];
-      $saldoIni_r2   = $mes2['saldoIni_r'][0]['SaldoInicialRealizado'];
+      $pl2Saida      = $mes2Saida['pl'];
+      $saldoIni_p2   = $mes2Saida['saldoIni_p'][0]['SaldoInicialPrevisto'];
+      $saldoIni_r2   = $mes2Saida['saldoIni_r'][0]['SaldoInicialRealizado'];
 
       $segundaColuna = true;
     }
@@ -569,14 +568,14 @@ if($typeFiltro == "D"){
 
      //Pea TODOS os dads do dia $i+1 se ele estiver na faixa de dias do filtro
       $mes3Entrada = retornaBuscaComoArray($datasFiltro,$plFiltro, 'E');
-      $mes3 = retornaBuscaComoArray($datasFiltro,$plFiltro, 'S');
+      $mes3Saida = retornaBuscaComoArray($datasFiltro,$plFiltro, 'S');
 
       $pl3Entrada = $mes3Entrada['pl']; 
 
-      $pl3Saida           = $mes3['pl'];
-      //$cc3           = $mes3['cc'];
-      $saldoIni_p3   = $mes3['saldoIni_p'][0]['SaldoInicialPrevisto'];
-      $saldoIni_r3   = $mes3['saldoIni_r'][0]['SaldoInicialRealizado'];
+      $pl3Saida      = $mes3Saida['pl'];
+      //$cc3         = $mes3Saida['cc'];
+      $saldoIni_p3   = $mes3Saida['saldoIni_p'][0]['SaldoInicialPrevisto'];
+      $saldoIni_r3   = $mes3Saida['saldoIni_r'][0]['SaldoInicialRealizado'];
 
       $terceiraColuna = true;
     }
@@ -1176,6 +1175,6 @@ $print .= "</div>
             </a>
           </div>";
 $total1 = microtime(true) - $inicio1;
-		 //echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; 
+		 echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; 
 
 print($print);
