@@ -2,6 +2,8 @@
 
 include_once("sessao.php");
 
+$inicio1 = microtime(true);
+
 // Para a data ficar em português. Foi usado lá embaixo onde tem strftime (referência: https://www.linhadecomando.com/php/php-funcao-date-para-strftime-em-portugues)
 setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
 
@@ -13,6 +15,64 @@ setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
   ["cmbCentroDeCustos"]=> string(1) "4"
   ["cmbPlanoContas"]=>string(2) "78"
 */
+
+function retornaBuscaComoArray($datasFiltro ,$plFiltro) {
+  include('global_assets/php/conexao.php');
+
+  $sql = "SELECT PlConId, PlConNome,
+                dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConId, '".$datasFiltro['data_inicio_mes']."', '".$datasFiltro['data_fim_mes']."', 'S') as PrevistoSaida,
+                dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConId, '".$datasFiltro['data_inicio_mes']."', '".$datasFiltro['data_fim_mes']."', 'S') as RealizadoSaida
+          FROM PLanoConta
+          WHERE PlConId in ($plFiltro) and PlConNatureza = 'D'
+          ORDER BY PlConNome ASC";
+  $result = $conn->query($sql);
+  $rowPLanoContaPaga = $result->fetchAll(PDO::FETCH_ASSOC);
+
+  $regAt = '';
+  $cont = 0;
+  
+  if(count($rowPLanoContaPaga) > 0){
+    foreach($rowPLanoContaPaga as $rowCC) {
+      if($regAt != $rowCC['PlConId']) {
+        $regAt = $rowCC['PlConId'];
+  
+        $cont = 0;
+  
+        //reserva os dados do plano de contas
+        $pl[$regAt]['PlConId']              = $rowCC['PlConId']; 
+        $pl[$regAt]['PlConNome']            = $rowCC['PlConNome'];
+        $pl[$regAt]['PL_PrevistoSaida']     = $rowCC['PrevistoSaida'];
+        $pl[$regAt]['PL_RealizadoSaida']    = $rowCC['RealizadoSaida'];
+      }
+  
+      $cont++;
+    }
+  
+    //CV: Essas funções precisam trazer os CC e PL como foi feito com as consultas acima, pois dependerá de quais CC e PL estão sendo mostrados
+  
+    //pega o saldo inicial presumido
+    $sql_saldo_ini_p   = "select dbo.fnFluxoCaixaSaldoInicialPrevisto(".$_SESSION['UnidadeId'].",'".$datasFiltro['data_inicio_mes']."') as SaldoInicialPrevisto";
+    $result_saldo_ini_p = $conn->query($sql_saldo_ini_p);
+    $rowSaldoIni_p      = $result_saldo_ini_p->fetchAll(PDO::FETCH_ASSOC);
+    
+    //echo $sql_saldo_ini_p."<br>";
+  
+    //pega o saldo inicial realizado
+    $sql_saldo_ini_r = "select dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro['data_inicio_mes']."') as SaldoInicialRealizado";
+    $result_saldo_ini_r = $conn->query($sql_saldo_ini_r);
+    $rowSaldoIni_r      = $result_saldo_ini_r->fetchAll(PDO::FETCH_ASSOC);
+      
+    $retorno = array('pl'=>$pl,'saldoIni_p'=>$rowSaldoIni_p,'saldoIni_r'=>$rowSaldoIni_r);
+    
+    unset($pl);
+    unset($result);
+    unset($rowPLanoContaPaga);
+    
+    return $retorno;
+  } else {
+    return false;
+  }
+}
 
 function planoContaEntrada($idPlanoConta, $nome, $segundaColuna, $terceiraColuna, $data1, $data2, $data3) {
   include('global_assets/php/conexao.php');
@@ -141,9 +201,9 @@ function planoContaEntrada($idPlanoConta, $nome, $segundaColuna, $terceiraColuna
     return $resposta;
 }
 
-function planoContaSaida($idPlanoConta, $nome, $consultaCentroDeCusto, $segundaColuna, $terceiraColuna, $data1, $data2, $data3) {
+function planoContaSaida($nome, $valorPrevisto, $valorPrevisto2, $valorPrevisto3, $valorRealizado, $valorRealizado2, $valorRealizado3, $consultaCentroDeCusto, $segundaColuna, $terceiraColuna) {
   include('global_assets/php/conexao.php');
-  
+  /*
   //Plano Conta Previsto
   $sql = " SELECT dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", $idPlanoConta, '".$data1."',  '".$data1."', 'S') as PrevistoSaida";
   $result = $conn->query($sql);
@@ -176,13 +236,13 @@ function planoContaSaida($idPlanoConta, $nome, $consultaCentroDeCusto, $segundaC
     $sql = " SELECT dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", $idPlanoConta, '".$data3."',  '".$data3."', 'S') as RealizadoSaida";
     $result = $conn->query($sql);
     $planoContaRealizadoSaida3 = $result->fetch(PDO::FETCH_ASSOC);
-  }
+  }*/
 
-  $ValorPrimeiraColunaPrevisto = $planoContaPrevistoSaida['PrevistoSaida'];
+  $ValorPrimeiraColunaPrevisto = $valorPrevisto;
   $valorSegundaColunaPrevisto = 0;
   $valorTerceiraColunaPrevisto = 0;
 
-  $ValorPrimeiraColunaRealizado = $planoContaRealizadoSaida1['RealizadoSaida'];
+  $ValorPrimeiraColunaRealizado = $valorRealizado;
   $valorSegundaColunaRealizado = 0;
   $valorTerceiraColunaRealizado = 0;
 
@@ -196,12 +256,11 @@ function planoContaSaida($idPlanoConta, $nome, $consultaCentroDeCusto, $segundaC
             <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
               <div class='row'>
                 <div class='col-md-6'>
-                  <span>".mostraValor($planoContaPrevistoSaida['PrevistoSaida']).//mostraValor($CCPrevisto) .
-                  "</span>
+                  <span>".mostraValor($valorPrevisto)."</span>
                 </div>
 
                 <div class='col-md-6'>
-                  <span>".mostraValor($planoContaRealizadoSaida1['RealizadoSaida'])."</span>
+                  <span>".mostraValor($valorRealizado)."</span>
                 </div>
               </div>
             </div>";
@@ -211,17 +270,17 @@ function planoContaSaida($idPlanoConta, $nome, $consultaCentroDeCusto, $segundaC
               <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                 <div class='row'>
                   <div class='col-md-6'>
-                    <span>".mostraValor($planoContaPrevistoSaida2['PrevistoSaida'])."</span>
+                    <span>".mostraValor($valorPrevisto2)."</span>
                   </div>
   
                   <div class='col-md-6'>
-                    <span>".mostraValor($planoContaRealizadoSaida2['RealizadoSaida'])."</span>
+                    <span>".mostraValor($valorRealizado2)."</span>
                   </div>
                 </div>
               </div>";
 
-        $valorSegundaColunaPrevisto = $planoContaPrevistoSaida2['PrevistoSaida'];
-        $valorSegundaColunaRealizado = $planoContaRealizadoSaida2['RealizadoSaida'];
+        $valorSegundaColunaPrevisto = $valorPrevisto2;
+        $valorSegundaColunaRealizado = $valorRealizado2;
       }
 
       if($terceiraColuna) {
@@ -229,17 +288,17 @@ function planoContaSaida($idPlanoConta, $nome, $consultaCentroDeCusto, $segundaC
               <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                 <div class='row'>
                   <div class='col-md-6'>
-                    <span>".mostraValor($planoContaPrevistoSaida3['PrevistoSaida'])."</span>
+                    <span>".mostraValor($valorPrevisto3)."</span>
                   </div>
   
                   <div class='col-md-6'>
-                    <span>".mostraValor($planoContaRealizadoSaida3['RealizadoSaida'])."</span>
+                    <span>".mostraValor($valorRealizado3)."</span>
                   </div>
                 </div>
               </div>";
 
-        $valorTerceiraColunaPrevisto = $planoContaPrevistoSaida3['PrevistoSaida'];
-        $valorTerceiraColunaRealizado = $planoContaRealizadoSaida3['RealizadoSaida'];
+        $valorTerceiraColunaPrevisto = $valorPrevisto3;
+        $valorTerceiraColunaRealizado = $valorRealizado3;
       }
 
       $totalValorPrevisto = $ValorPrimeiraColunaPrevisto + $valorSegundaColunaPrevisto + $valorTerceiraColunaPrevisto;
@@ -258,8 +317,8 @@ function planoContaSaida($idPlanoConta, $nome, $consultaCentroDeCusto, $segundaC
             </div>
         </div>
       </div>";
-
-    foreach($consultaCentroDeCusto as $centroCusto) {
+    
+     foreach($consultaCentroDeCusto as $centroCusto) {
       $resposta[0]  .= "
         <div class='card-body' style='padding-top: 0; padding-bottom: 0'>
           <div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
@@ -312,10 +371,6 @@ function planoContaSaida($idPlanoConta, $nome, $consultaCentroDeCusto, $segundaC
     return $resposta;
 }
 
-function teste() {
-  return 'a';
-}
-
 //-------------------------------------------------------------------------------------
 // loop dos dias 
 //-------------------------------------------------------------------------------------
@@ -346,14 +401,6 @@ $sql = "SELECT PlConId, PlConNome
 $resultPlanoConta = $conn->query($sql);
 $rowPLanoContaRecebe = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 
-$sql = "SELECT PlConId, PlConNome
-        FROM PlanoConta
-        WHERE PlConId in ($plFiltro) and PlConNatureza = 'D'
-        ORDER BY PlConNome";
-$resultPlanoConta = $conn->query($sql);
-$rowPLanoContaPaga = $resultPlanoConta->fetchAll(PDO::FETCH_ASSOC);
-
-
 $sql = "SELECT CnCusId, CnCusNome
         FROM CentroCusto
         WHERE CnCusId in ($ccFiltro)
@@ -371,47 +418,42 @@ if($typeFiltro == "D"){
   $anoData = $mesArray[0];
   $mesData = (int)$mesArray[1];
 
-  if((($diaFim - $diaInicio) != 0) && (($diaFim - $diaInicio) != 1) && ($diaFim - $diaInicio) != 2){
-    $diaFim = $diaFim - 1;
-  }
+  $controlador = (($diaFim - $diaInicio) < 3 ) ? true : false; 
+  $diaFimControle = $diaFim;
 
   // print($diaFim - $diaInicio);
 
-  for($i = $diaInicio;$i <= $diaFim;$i++) {  
+  for($i = $diaInicio;$i <= $diaFim;$i++) {
     // if(($diaFim - $diaInicio) == 2){
     //   break;
     // }
     $segundaColuna = false;
     $terceiraColuna = false;
-    /*   
     //limpa as variaveis
-    if(isset($mes1))
-    {
+    if(isset($mes1)) {
       unset($mes1);
       //unset($cc1);
-      //unset($pl1);
-      //unset($saldoIni_p1);
-      //unset($saldoIni_r1);
-    }
+      unset($pl1);
+      unset($saldoIni_p1);
+      unset($saldoIni_r1);
+    } 
     
     //limpa as variaveis
-    if(isset($mes2))  
-    {
+    if(isset($mes2)) {
       unset($mes2);
       //unset($cc2);
-      //unset($pl2);
-      //unset($saldoIni_p2);
-      //unset($saldoIni_r2);
+      unset($pl2);
+      unset($saldoIni_p2);
+      unset($saldoIni_r2);
     }    
 
-    if(isset($mes3))  
-    {
+    if(isset($mes3)) {
       unset($mes3);
       //unset($cc3);
-      //unset($pl3);
-      //unset($saldoIni_p3);
+      unset($pl3);
+      unset($saldoIni_p3);
       //unset($saldoIni_r3);
-    }    */
+    }
       
     $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.$i;
     
@@ -425,7 +467,7 @@ if($typeFiltro == "D"){
     $datasFiltro['data_inicio_mes'] = $dataFiltroDiaInicio1;
     $datasFiltro['data_fim_mes'] = $dataFiltroDiaFim1;
 
-     //pega o saldo inicial presumido
+    //pega o saldo inicial presumido
     $sql_saldo_ini_p   = "select dbo.fnFluxoCaixaSaldoInicialPrevisto(".$_SESSION['UnidadeId'].",'".$datasFiltro['data_inicio_mes']."') as SaldoInicialPrevisto";
     $result_saldo_ini_p = $conn->query($sql_saldo_ini_p);
     $rowSaldoIni_p      = $result_saldo_ini_p->fetch(PDO::FETCH_ASSOC);
@@ -440,12 +482,14 @@ if($typeFiltro == "D"){
     $saldoInicialRealizado = $rowSaldoIni_r["SaldoInicialRealizado"];
 
     //Pea TODOS os dads do dia $i
-    //$mes1 = retornaBuscaComoArray($datasFiltro,$ccFiltro,$plFiltro);
+    $mes1 = retornaBuscaComoArray($datasFiltro,$plFiltro);
+
+    $pl1           = $mes1['pl'];
+    $saldoIni_p1   = $mes1['saldoIni_p'][0]['SaldoInicialPrevisto'];
+    $saldoIni_r1   = $mes1['saldoIni_r'][0]['SaldoInicialRealizado'];
     
    // echo "".$dataFiltro."---".$ccFiltro."---".$plFiltro."<br>";
-    
-    if(($i+1) <= $diaFim)
-    {        
+    if(($i+1) <= $diaFim) {        
       $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.($i+1);      
       
       // $ultimo_dia = date("t", mktime(0,0,0,$i+1,'01',$anoData));
@@ -459,33 +503,34 @@ if($typeFiltro == "D"){
       $datasFiltro['data_fim_mes'] = $dataFiltroDiaFim2;
 
      //Pea TODOS os dads do dia $i+1 se ele estiver na faixa de dias do filtro
-      //$mes2 = retornaBuscaComoArray($datasFiltro,$ccFiltro,$plFiltro);
-      
+      $mes2 = retornaBuscaComoArray($datasFiltro,$plFiltro);
+      $pl2  = $mes2['pl'];
+      $saldoIni_p2   = $mes2['saldoIni_p'][0]['SaldoInicialPrevisto'];
+      $saldoIni_r2   = $mes2['saldoIni_r'][0]['SaldoInicialRealizado'];
+
       $segundaColuna = true;
     }
 
-    if(($i+2) <= $diaFim)
-    {
+    if(($i+2) <= $diaFim) {
       $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.($i+1);      
       
       // $ultimo_dia = date("t", mktime(0,0,0,$i+1,'01',$anoData));
-      $dataFiltroDiaInicio2 = $anoData.'-'.$mesData.'-'.($i+1);
-      $dataFiltroDiaFim2 = $anoData.'-'.$mesData.'-'.($i+1);
+      $dataFiltroDiaInicio3 = $anoData.'-'.$mesData.'-'.($i+2);
+      $dataFiltroDiaFim3 = $anoData.'-'.$mesData.'-'.($i+2);
       // print($dataFiltroDiaInicio2);
       // print("###");
       // print($dataFiltroDiaFim2);
       // print("/////");
-      $datasFiltro['data_inicio_mes'] = $dataFiltroDiaInicio2;
-      $datasFiltro['data_fim_mes'] = $dataFiltroDiaFim2;
+      $datasFiltro['data_inicio_mes'] = $dataFiltroDiaInicio3;
+      $datasFiltro['data_fim_mes'] = $dataFiltroDiaFim3;
 
      //Pea TODOS os dads do dia $i+1 se ele estiver na faixa de dias do filtro
-    //$mes3 = retornaBuscaComoArray($datasFiltro,$ccFiltro,$plFiltro);
-      /*
-      $cc3           = $mes3['cc'];
+      $mes3 = retornaBuscaComoArray($datasFiltro,$plFiltro);
       $pl3           = $mes3['pl'];
+      //$cc3           = $mes3['cc'];
       $saldoIni_p3   = $mes3['saldoIni_p'][0]['SaldoInicialPrevisto'];
-      $saldoIni_r3   = $mes3['saldoIni_r'][0]['SaldoInicialRealizado'];*/
-      
+      $saldoIni_r3   = $mes3['saldoIni_r'][0]['SaldoInicialRealizado'];
+
       $terceiraColuna = true;
     }
     
@@ -520,9 +565,6 @@ if($typeFiltro == "D"){
       $saldoIni_r3 = $saldoIni_r3;
     else
       $saldoIni_r3 = 0;*/
-
-    if($i != $diaInicio)
-      $i += 1;
   
     /* Obs.: utf8_encode é para o servidor da AZURE. Localmente não precisaria, mas para o servidor sim. */  
     $print .= " <div class='carousel-item ".($i == $diaInicio ? " active":"")."'> 
@@ -564,41 +606,24 @@ if($typeFiltro == "D"){
   
                             <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                               <div class='row'>
-                                <div class='col-md-6'>
-                                  <span>".mostraValor($saldoInicialPrevisto)."</span>
-                                </div>
-  
-                                <div class='col-md-6'>
-                                  <span>".//mostraValor($saldoInicialRealizado).
-                                  "</span>
+                                <div class='col-md-12'>
+                                  <span>".mostraValor($saldoIni_p1)."</span>
                                 </div>
                               </div>
                             </div>
                             
                             ".($segundaColuna ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                                                                   <div class='row'>
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//mostraValor($saldoIni_p2).
-                                                                      "</span>
-                                                                    </div>
-                                      
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//mostraValor($saldoIni_r2).
-                                                                      "</span>
+                                                                    <div class='col-md-12'>
+                                                                      <span>".mostraValor($saldoIni_p2)."</span>
                                                                     </div>
                                                                   </div>
                                                                 </div>" : "")."
 
                             ".($terceiraColuna ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                                                                   <div class='row'>
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//mostraValor($saldoIni_p3).
-                                                                      "</span>
-                                                                    </div>
-                                     
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//mostraValor($saldoIni_r3).
-                                                                      "</span>
+                                                                    <div class='col-md-12'>
+                                                                      <span>".mostraValor($saldoIni_p3)."</span>
                                                                     </div>
                                                                   </div>
                                                                 </div>" : "")."
@@ -842,9 +867,10 @@ if($typeFiltro == "D"){
 
     $totalRealizadoPrimeiraColuna = 0;
     $totalRealizadoSegundaColuna = 0;
-    $totalRealizadoTerceiraColuna = 0;  
+    $totalRealizadoTerceiraColuna = 0;
+    /*  
     foreach($rowPLanoContaPaga as $planoContaPaga) {
-      $planoContaSaida = planoContaSaida($planoContaPaga['PlConId'], $planoContaPaga['PlConNome'], $rowCentroDeCusto, $segundaColuna, $terceiraColuna, $data1, $data2, $data3);
+      $planoContaSaida = planoContaSaida($planoContaPaga['PlConId'], $planoContaPaga['PlConNome'], $rowCentroDeCusto, $segundaColuna, $terceiraColuna, $data1, $data2, $data3, $planoContaPaga['PrevistoSaida']);
       $print_sai .= $planoContaSaida[0];
 
       $ValorPrimeiraColuna = $planoContaSaida[1];
@@ -862,6 +888,36 @@ if($typeFiltro == "D"){
       $totalRealizadoPrimeiraColuna += $ValorRealizadoPrimeiraColuna;
       $totalRealizadoSegundaColuna += $valorRealizadoSegundaColuna;
       $totalRealizadoTerceiraColuna += $valorRealizadoTerceiraColuna;
+    }*/
+
+    if(isset($pl1) && (!empty($pl1))) {
+      //var_dump($pl1);
+      foreach($pl1 as $planoConta){
+        $planoContaSaida = planoContaSaida($planoConta["PlConNome"], $planoConta["PL_PrevistoSaida"], 
+                                           ($segundaColuna)?$pl2[$planoConta["PlConId"]]['PL_PrevistoSaida']:"",
+                                           ($terceiraColuna)?$pl3[$planoConta["PlConId"]]['PL_PrevistoSaida']:"",
+                                           $planoConta["PL_RealizadoSaida"], 
+                                           ($segundaColuna)?$pl2[$planoConta["PlConId"]]['PL_RealizadoSaida']:"",
+                                           ($terceiraColuna)?$pl3[$planoConta["PlConId"]]['PL_RealizadoSaida']:"",
+                                           $rowCentroDeCusto, $segundaColuna, $terceiraColuna);
+        $print_sai .= $planoContaSaida[0];
+
+        $ValorPrimeiraColuna = $planoContaSaida[1];
+        $valorSegundaColuna = $planoContaSaida[2];
+        $valorTerceiraColuna = $planoContaSaida[3];
+
+        $ValorRealizadoPrimeiraColuna = $planoContaSaida[4];
+        $valorRealizadoSegundaColuna = $planoContaSaida[5];
+        $valorRealizadoTerceiraColuna = $planoContaSaida[6];
+
+        $totalPrevistoPrimeiraColuna += $ValorPrimeiraColuna;
+        $totalPrevistoSegundaColuna += $valorSegundaColuna;
+        $totalPrevistoTerceiraColuna += $valorTerceiraColuna;
+
+        $totalRealizadoPrimeiraColuna += $ValorRealizadoPrimeiraColuna;
+        $totalRealizadoSegundaColuna += $valorRealizadoSegundaColuna;
+        $totalRealizadoTerceiraColuna += $valorRealizadoTerceiraColuna;
+      }    
     }
 
     $totalValorPrevisto = $totalPrevistoPrimeiraColuna + $totalPrevistoSegundaColuna + $totalPrevistoTerceiraColuna;
@@ -956,42 +1012,24 @@ if($typeFiltro == "D"){
   
                           <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                             <div class='row'>
-                              <div class='col-md-6'>
-                                <span>".// mostraValor($tot_geral_previsto1)  .
-                                "</span>
-                              </div>
-  
-                              <div class='col-md-6'>
-                                <span>".// mostraValor($tot_geral_realizado1)  .
-                                "</span>
+                              <div class='col-md-12'>
+                                <span>".mostraValor($saldoIni_r1)."</span>
                               </div>
                             </div>
                           </div>
                             
                           ".($segundaColuna ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                                                                 <div class='row'>
-                                                                  <div class='col-md-6'>
-                                                                    <span>". //mostraValor($tot_geral_previsto2) .
-                                                                    "</span>
-                                                                  </div>
-                                    
-                                                                  <div class='col-md-6'>
-                                                                    <span>". //mostraValor($tot_geral_realizado2)  .
-                                                                    "</span>
+                                                                  <div class='col-md-12'>
+                                                                    <span>". mostraValor($saldoIni_r2)."</span>
                                                                   </div>
                                                                 </div>
                                                               </div>" : "")."
 
                           ".($terceiraColuna ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                                                               <div class='row'>
-                                                                <div class='col-md-6'>
-                                                                  <span>". //mostraValor($tot_geral_previsto3) .
-                                                                  "</span>
-                                                                </div>
-                                  
-                                                                <div class='col-md-6'>
-                                                                  <span>". //mostraValor($tot_geral_realizado3)  .
-                                                                  "</span>
+                                                                <div class='col-md-12'>
+                                                                  <span>". mostraValor($saldoIni_r3)."</span>
                                                                 </div>
                                                               </div>
                                                             </div>" : "")."
@@ -1039,568 +1077,15 @@ if($typeFiltro == "D"){
                   <!-- SALDO FINAL --> 
                 </div>  
                 ";
-    
-    if(($i+1) <= $diaFim)
-    {
-        $i++;
-    }  
-  }
-} else {
-  $data1 = new DateTime( $dataInicio );
-  $data2 = new DateTime( $dataFim );
-
-  $intervaloMeses = $data1->diff( $data2 )->m;
-  if($intervaloMeses == 0){
-    $intervaloMeses = 1;
-  }
-
-  $mesInicioArray = explode('-', $dataInicio);
-  $anoTela = $mesInicioArray[0];
-  $mesInicio = (int)$mesInicioArray[1];
-
-  $mesFimArray = explode('-', $dataFim);
-  $mesFinal = (int)$mesFimArray[1];
-  
-
-  // $intervaloMeses = $mesFinal - $mesInicio;
-  // $intervaloMeses = (($intervaloMeses + 2) / 3);
-
-  $pagina = 0;
-  $numeroPaginasCont = 0;
-  // for($i = $mesInicio; $i <= $mesFinal; $i++)
-  // {  
-
-  if((($mesFinal - $mesInicio) != 0) && (($mesFinal - $mesInicio) != 1) && ($mesFinal - $mesInicio) != 2){
-    // print($diaFim - $diaInicio);
-    $mesFinal = $mesFinal - 1;
-  }
-  
-  // print($diaFim - $diaInicio);
-  
-  for($i = $mesInicio; $i <= $mesFinal; $i++)
-  {
-
-    $teste1 = false;
-    $teste2 = false;   
-    
-    // if($i+$pagina == 13){
-    //   break;
-    // }
-    $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.$i;
-
-    $ultimo_dia = date("t", mktime(0,0,0,($i),'01',$anoTela));
-    $dataFiltroDiaInicioMes1 = $anoTela.'-'.($i).'-01';
-    $dataFiltroDiaFimMes1 = $anoTela.'-'.($i).'-'.$ultimo_dia;
-
-    $datasFiltro['data_inicio_mes'] = $dataFiltroDiaInicioMes1;
-    $datasFiltro['data_fim_mes'] = $dataFiltroDiaFimMes1;
-    
-    ////////////////////////////////////////Dados mês 2
-    if(($i+1) <= $mesFinal)
-    {        
-      $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.(($i+1));
-      
-      $ultimo_dia = date("t", mktime(0,0,0,$i+1,'01',$anoTela));
-      $dataFiltroDiaInicioMes2 = $anoTela.'-'.($i+1).'-01';
-      $dataFiltroDiaFimMes2 = $anoTela.'-'.($i+1).'-'.$ultimo_dia;
-
-      $datasFiltro['data_inicio_mes'] = $dataFiltroDiaInicioMes2;
-      $datasFiltro['data_fim_mes'] = $dataFiltroDiaFimMes2;
-      
-      $teste1 = true;
+    if($controlador) {
+      break;
     }
 
-    if(($i+2) <= $mesFinal)
-    {        
-      $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.(($i+2));
-      
-      $ultimo_dia = date("t", mktime(0,0,0,$i+2,'01',$anoTela));
-      $dataFiltroDiaInicioMes3 = $anoTela.'-'.($i+2).'-01';
-      $dataFiltroDiaFimMes3 = $anoTela.'-'.($i+2).'-'.$ultimo_dia;
-
-      // print($dataFiltroDiaInicioMes3);
-      // print("$$$$$$$$$$$$$");
-      // print($dataFiltroDiaFimMes3);
-      // print("$$$$$$$$$$$$$");
-      $datasFiltro['data_inicio_mes'] = $dataFiltroDiaInicioMes3;
-      $datasFiltro['data_fim_mes'] = $dataFiltroDiaFimMes3;
-      
-      $teste2 = true;
-    }
-
-    // if(isset($saldoIni_r3))
-    //   $saldoIni_r3 = $saldoIni_r3;
-    // else
-    //   $saldoIni_r3 = 0;
-
-    // if($i != $diaInicio)
-    //   $i += 1;
-    if($i != $mesInicio)
-      $i += 1;
-  
-    /* Obs.: utf8_encode é para o servidor da AZURE. Localmente não precisaria, mas para o servidor sim. */  
-    $print .= " <div class='carousel-item ".($i == $mesInicio ? " active":"")."'> 
-                  <div class='row'>
-                    <div class='col-lg-12'>
-                      <!-- Basic responsive configuration -->
-                      <div class='card-body' >
-                        <div class='row'>
-                            
-                          <div class='col-lg-4'>
-                          </div>
-  
-                          <div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-right: 2px; '>
-                            <span><strong>".utf8_encode(ucfirst(strftime("%B de %Y", strtotime($anoTela."-".str_pad($i, 2, '0', STR_PAD_LEFT)))))."</strong></span>
-                          </div>
-                          
-  
-                          ".($teste1 ? "<div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-left: 2px;'>
-                            <span><strong>". utf8_encode(ucfirst(strftime("%B de %Y", strtotime($anoTela."-".str_pad($i+1, 2, '0', STR_PAD_LEFT)))))."</strong></span>
-                          </div>" : "")."
-
-                          ".($teste2 ? "<div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-left: 2px;'>
-                            <span><strong>". utf8_encode(ucfirst(strftime("%B de %Y", strtotime($anoTela."-".str_pad($i+2, 2, '0', STR_PAD_LEFT)))))."</strong></span>
-                          </div>" : "")."
-
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-  
-                  <div class='row' style='margin-bottom: 1rem;'>
-  
-                    <!-- SALDO INICIAL -->
-                    <div class='col-lg-12'>
-                      <!-- Basic responsive configuration -->
-                        <div class='card-body' style='padding-top: 0;'>
-                          <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
-                            <div class='col-lg-4' style='border-right: 1px dotted black;'>
-                              <span><strong>Saldo Inicial</strong></span>
-                            </div>
-  
-                            <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                              <div class='row'>
-                                <div class='col-md-6'>
-                                  <span>".//mostraValor($saldoIni_p1).
-                                  "</span>
-                                </div>
-  
-                                <div class='col-md-6'>
-                                  <span>".//mostraValor($saldoIni_r1).
-                                  "</span>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            ".($teste1 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                  <div class='row'>
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//mostraValor($saldoIni_p2).
-                                                                      "</span>
-                                                                    </div>
-                                      
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//mostraValor($saldoIni_r2).
-                                                                      "</span>
-                                                                    </div>
-                                                                  </div>
-                                                                </div>" : "")."
-
-                            ".($teste2 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                  <div class='row'>
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//mostraValor($saldoIni_p3).
-                                                                      "</span>
-                                                                    </div>
-                                     
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//mostraValor($saldoIni_r3).
-                                                                      "</span>
-                                                                    </div>
-                                                                  </div>
-                                                                </div>" : "")."
-  
-                          </div>
-                        </div>
-                    </div>
-                  </div>
-                  <!-- SALDO INICIAL -->";
-    
-    //------------------------------------------------------------------------------
-    // limpa as variaveis que vao receber o plano de 
-    // contas e centro de custo das funções    
-    // <!--  usei essas variaveis para nao ter q fazer dois loops -->
-    $print_ent = '';
-    $print_sai = '';
-    //==============================================================================
-  
-    //recebe entradas apenas
-    $print_ent .= "<!-- ENTRADA -->
-                  <div class='row'>
-                    <div class='col-lg-12'>
-                      <!-- Basic responsive configuration -->
-                      
-                      <div class='card-body' style='padding-top: 0; padding-bottom: 0'>
-                        <div class='row' style='background: #607D8B; line-height: 3rem; box-sizing:border-box; color:white;'>
-                          <div class='col-lg-4' style='border-right: 1px dotted black;'>
-                              <strong>ENTRADA</strong>
-                          </div> 
-                          
-                          <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                            <div class='row'>
-                              <div class='col-md-6'>
-                                <span><strong>Previsto</strong></span>
-                              </div>
-                              <div class='col-md-6'>
-                                <span><strong>Realizado</strong></span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          ".($teste1 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                <div class='row'>
-                                                                  <div class='col-md-6'>
-                                                                    <span><strong>Previsto</strong></span>
-                                                                  </div>
-                                                                  <div class='col-md-6'>
-                                                                    <span><strong>Realizado</strong></span>
-                                                                  </div>
-                                                                </div>
-                                                               </div>" : "")."
-                          
-                          ".($teste2 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                <div class='row'>
-                                                                  <div class='col-md-6'>
-                                                                    <span><strong>Previsto</strong></span>
-                                                                  </div>
-                                                                  <div class='col-md-6'>
-                                                                    <span><strong>Realizado</strong></span>
-                                                                  </div>
-                                                                </div>
-                                                              </div>" : "")."
-  
-                          <div class='dataOpeningBalance col-lg-2' style='text-align:center;'>
-                            <div class='row'>
-                              <div class='col-md-12'>
-                                <span style='padding:0 px;margin:0px;'><strong style='padding:0px;margin:0px;'>Previsto/Realizado%</strong></span>
-                              </div>
-                            </div>
-                          </div>
-  
-                        </div>
-                      </div> ";
-    
-    //------------------------------------------------------------------------
-    //recebe entradas apenas
-    $print_ent .= "<!-- TOTAL ENTRADA -->
-                  <div class='row'>
-                    <div class='col-lg-12'>
-                      <!-- Basic responsive configuration -->
-                        <div class='card-body' style=''>
-                          <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
-                            <div class='col-lg-4' style='border-right: 1px dotted black;'>
-                            <span><strong>TOTAL</strong></span>
-                            </div>
-  
-                            <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                              <div class='row'>
-                                <div class='col-md-6'>
-                                  <span>".//mostraValor($tot_previsto_entrada1) .
-                                  "</span>
-                                </div>
-  
-                                <div class='col-md-6'>
-                                  <span>".//mostraValor($tot_realizado_entrada1) .
-                                  "</span>
-                                </div>
-                              </div>
-                            </div>
-  
-                            ".($teste1 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                  <div class='row'>
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//($teste1 ? mostraValor($tot_previsto_entrada2) :"") .
-                                                                      "</span>
-                                                                    </div>
-                                      
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//($teste1 ? mostraValor($tot_realizado_entrada2) :"") .
-                                                                      "</span>
-                                                                    </div>
-                                                                  </div>
-                                                                </div>" : "")."
-
-                            ".($teste2 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                  <div class='row'>
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//($teste2 ? mostraValor($tot_previsto_entrada3) :"") .
-                                                                      "</span>
-                                                                    </div>
-                                      
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//($teste2 ? mostraValor($tot_realizado_entrada3) :"") .
-                                                                      "</span>
-                                                                    </div>
-                                                                  </div>
-                                                                </div>" : "")."
-  
-                            <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                <div class='row'>
-                                  <div class='col-md-12'>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                      </div>
-                      </div>
-                      
-                      </div>
-                      </div>
-                  <!-- TOTAL ENTRADA -->
-                  <!-- ENTRADA -->";
-    
-    //------------------------------------------------------------------------
-    //recebe saidas apenas
-    $print_sai .= "<!-- SAIDA -->
-                  <div class='row'>
-                    <div class='col-lg-12'>
-                      <!-- Basic responsive configuration -->
-                      
-                      <div class='card-body' style='padding-top: 0; padding-bottom: 0'>
-                        <div class='row' style='background: #607D8B; line-height: 3rem; box-sizing:border-box; color:white;'>
-                          <div class='col-lg-4' style='border-right: 1px dotted black;'>
-                              <strong>SAIDA</strong>
-                          </div> 
-                          
-                          <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                            <div class='row'>
-                              <div class='col-md-6'>
-                                <span><strong>Previsto</strong></span>
-                              </div>
-                              <div class='col-md-6'>
-                                <span><strong>Realizado</strong></span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          ".($teste1 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                <div class='row'>
-                                                                  <div class='col-md-6'>
-                                                                    <span><strong>Previsto</strong></span>
-                                                                  </div>
-                                                                  <div class='col-md-6'>
-                                                                    <span><strong>Realizado</strong></span>
-                                                                  </div>
-                                                                </div>
-                                                              </div>" : "")."
-                          
-                          ".($teste2 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                              <div class='row'>
-                                                                <div class='col-md-6'>
-                                                                  <span><strong>Previsto</strong></span>
-                                                                </div>
-                                                                <div class='col-md-6'>
-                                                                  <span><strong>Realizado</strong></span>
-                                                                </div>
-                                                              </div>
-                                                            </div>" : "")."
-  
-                          <div class='dataOpeningBalance col-lg-2' style='text-align:center;'>
-                            <div class='row'>
-                              <div class='col-md-12'>
-                                <span><strong>Previsto/Realizado %</strong></span>
-                              </div>
-                            </div>
-                          </div>
-  
-                        </div>
-                      </div>";
-
-    //Dados do numero de meses por pagina
-    $localizacaoPagina = [
-      "i"      => $i,
-      "pagina" => $pagina,
-      "mesFinal"    => $mesFinal
-    ];
-  
-    //------------------------------------------------------------------------
-    //recebe saidas apenas
-    $print_sai .= "<!-- TOTAL SAIDA -->
-                  <div class='row'>
-                    <div class='col-lg-12'>
-                      <!-- Basic responsive configuration -->
-                        <div class='card-body' style=''>
-                          <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
-                            <div class='col-lg-4' style='border-right: 1px dotted black;'>
-                            <span><strong>TOTAL</strong></span>
-                            </div>
-  
-                            <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                              <div class='row'>
-                                <div class='col-md-6'>
-                                  <span>".//mostraValor($tot_previsto_saida1) .
-                                  "</span>
-                                </div>
-  
-                                <div class='col-md-6'>
-                                  <span>".//mostraValor($tot_realizado_saida1) .
-                                  "</span>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            ".($teste1 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                  <div class='row'>
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//($teste1 ? mostraValor($tot_previsto_saida2) :"") .
-                                                                      "</span>
-                                                                    </div>
-                                      
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//($teste1 ? mostraValor($tot_realizado_saida2) :"") .
-                                                                      "</span>
-                                                                    </div>
-                                                                  </div>
-                                                                </div>" : "")."
-                            
-                            ".($teste2 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                  <div class='row'>
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//($teste2 ? mostraValor($tot_previsto_saida3) :"") .
-                                                                      "</span>
-                                                                    </div>
-                                      
-                                                                    <div class='col-md-6'>
-                                                                      <span>".//($teste2 ? mostraValor($tot_realizado_saida3) :"") .
-                                                                      "</span>
-                                                                    </div>
-                                                                  </div>
-                                                                </div>" : "")."
-  
-                            <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                <div class='row'>
-                                  <div class='col-md-12'>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                    </div>
-                    
-                        </div>
-                    </div>
-                  <!-- TOTAL SAIDA -->
-                  <!-- SAIDA -->";
-  
-    //----------------------------------------------------------------------
-    //junta tudo no $print principal
-    $print .= $print_ent . $print_sai. "
-        
-                  <!-- SALDO FINAL -->
-                  <div class='row' style='margin-top: 1rem;'>
-                    <div class='col-lg-12'>
-                      <!-- Basic responsive configuration -->
-                        <div class='card-body' style='padding-top: 0;'>
-                         <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
-                          <div class='col-lg-4' style='border-right: 1px dotted black;'>
-                            <span><strong>SALDO FINAL</strong></span>
-                          </div>
-  
-                          <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                            <div class='row'>
-                              <div class='col-md-6'>
-                                <span>".// mostraValor($tot_geral_previsto1)  .
-                                "</span>
-                              </div>
-  
-                              <div class='col-md-6'>
-                                <span>".// mostraValor($tot_geral_realizado1)  .
-                                "</span>
-                              </div>
-                            </div>
-                          </div>
-                            
-                          ".($teste1 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                                <div class='row'>
-                                                                  <div class='col-md-6'>
-                                                                    <span>". //mostraValor($tot_geral_previsto2) .
-                                                                    "</span>
-                                                                  </div>
-                                    
-                                                                  <div class='col-md-6'>
-                                                                    <span>". //mostraValor($tot_geral_realizado2)  .
-                                                                    "</span>
-                                                                  </div>
-                                                                </div>
-                                                              </div>" : "")."
-
-                          ".($teste2 ? "<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                                                              <div class='row'>
-                                                                <div class='col-md-6'>
-                                                                  <span>". //mostraValor($tot_geral_previsto3) .
-                                                                  "</span>
-                                                                </div>
-                                  
-                                                                <div class='col-md-6'>
-                                                                  <span>". //mostraValor($tot_geral_realizado3)  .
-                                                                  "</span>
-                                                                </div>
-                                                              </div>
-                                                            </div>" : "")."
-  
-                            <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
-                              <div class='row'>
-                                <div class='col-md-6'>
-                                  <span> </span>
-                                </div>
-  
-                                <div class='col-md-6'>
-                                  <span> </span>
-                                </div>
-                              </div>
-                            </div>
-                            
-                          </div>
-                        </div>
-                    </div>
-                    </div>
-                    
-                  
-                  <!-- SALDO FINAL -->
-  
-                  <!-- SALDO FINAL -->
-                  <div class='row' style='margin-top: 2rem;'>
-                    <div class='col-lg-12'>
-                      <!-- Basic responsive configuration -->
-                        <div class='card-body' style='padding-top: 0;'>
-                          <div class='row'>
-                            <div class='col-lg-12' style='background: #607D8B; color:white; line-height: 3rem; box-sizing:border-box'>
-                              <span><strong>COMPARATIVO DO PERÍODO (ENTRADA E SAÍDA): </strong></span>
-                            </div>
-                          </div>
-  
-                          <div class='row col-lg-12' style='background: #fff; line-height: 3rem; box-sizing:border-box'>";
-    
-    $print .= " <span>0,00%</span>";
-  
-    $print .= "           <!--span>TOTAL SAÍDAS / TOTAL ENTRADAS * 100 = 100%</span-->
-                          </div>
-                        </div>
-                    </div>
-                  </div>
-                  <!-- SALDO FINAL --> 
-                </div>  
-                ";
-
-  if(($i+1) <= $mesFinal)
-    {
-        $i++;
-    }  
+    if(($i+1) <= $diaFim) {
+        $i += 2;
+    } 
   }
-}
-
+} 
 
 $print .= "</div>
             <a class='carousel-control-prev' href='#carouselExampleControls' role='button' data-slide='prev' style='color:black;'>
@@ -1613,7 +1098,7 @@ $print .= "</div>
               <span class='sr-only'>Next</span>
             </a>
           </div>";
-
-
+$total1 = microtime(true) - $inicio1;
+		 //echo '<span style="background-color:yellow; padding: 10px; font-size:24px;">Tempo de execução do script: ' . round($total1, 2).' segundos</span>'; 
 
 print($print);
