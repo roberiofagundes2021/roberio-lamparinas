@@ -7,15 +7,29 @@ $_SESSION['PaginaAtual'] = 'Novo Cliente';
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputTipo'])){
+
+	try{		
+		$sql = "SELECT COUNT(isnull(clienCodigo,0)) as Codigo
+				FROM Cliente
+				Where ClienUnidade = ".$_SESSION['UnidadeId']."";
+		//echo $sql;die;
+		$result = $conn->query("$sql");
+		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
+		
+		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
+		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
+	} catch(PDOException $e) {	
+		echo 'Error1: ' . $e->getMessage();die;
+	}
 			
 	try{
 			
-		$sql = "INSERT INTO Cliente (ClienTipo, ClienNome, ClienRazaoSocial, ClienCnpj, ClienInscricaoMunicipal, ClienInscricaoEstadual, 
+		$sql = "INSERT INTO Cliente (clienCodigo, ClienTipo, ClienNome, ClienRazaoSocial, ClienCnpj, ClienInscricaoMunicipal, ClienInscricaoEstadual, 
 									    ClienCpf, ClienRg, ClienOrgaoEmissor, ClienUf, ClienSexo, ClienDtNascimento, ClienNomePai, ClienNomeMae, ClienCartaoSus, 
 										ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
 										ClienEstado, ClienContato, ClienTelefone, ClienCelular, ClienEmail, ClienSite, ClienObservacao,
 									    ClienStatus, ClienUsuarioAtualizador, ClienUnidade)
-				VALUES (:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual,  
+				VALUES (:sCodigo,:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual,  
 						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sCartaoSus, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
 						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, 
 						:bStatus, :iUsuarioAtualizador, :iUnidade)";
@@ -25,6 +39,7 @@ if(isset($_POST['inputTipo'])){
 		$conn->beginTransaction();
 		
 		$result->execute(array(
+			':sCodigo' => $sCodigo,
 			':sTipo' => $_POST['inputTipo'],
 			':sNome' => $_POST['inputTipo'] == 'J' ? $_POST['inputNomePJ'] : $_POST['inputNomePF'],
 			':sRazaoSocial' => $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null,

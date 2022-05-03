@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 
 //Se veio do Cliente.php
 if(isset($_POST['inputClienteId'])){
-	
+	 
 	$iCliente = $_POST['inputClienteId'];
 		
 	$sql = "SELECT *
@@ -32,7 +32,7 @@ if(isset($_POST['inputTipo'])){
 
 		$conn->beginTransaction();
 		
-		$sql = "UPDATE Cliente SET ClienTipo = :sTipo, ClienNome = :sNome, ClienRazaoSocial = :sRazaoSocial, ClienCnpj = :sCnpj, 
+		$sql = "UPDATE Cliente SET 	  ClienCodigo = :sCodigo, ClienTipo = :sTipo, ClienNome = :sNome, ClienRazaoSocial = :sRazaoSocial, ClienCnpj = :sCnpj, 
 									  ClienInscricaoMunicipal = :sInscricaoMunicipal, ClienInscricaoEstadual = :sInscricaoEstadual, 
 									  ClienCpf = :sCpf, ClienRg = :sRg, ClienOrgaoEmissor = :sOrgaoEmissor, ClienUf = :sUf,
 									  ClienSexo = :sSexo, ClienDtNascimento = :dDtNascimento, ClienNomePai = :sNomePai, ClienNomeMae = :sNomeMae,
@@ -45,6 +45,7 @@ if(isset($_POST['inputTipo'])){
 		$result = $conn->prepare($sql);						
 		
 		$result->execute(array(
+			            ':sCodigo' => $_POST['inputCodigo'],
 						':sTipo' => $_POST['inputTipo'],
 						':sNome' => $_POST['inputTipo'] == 'J' ? $_POST['inputNomePJ'] : $_POST['inputNomePF'],
 						':sRazaoSocial' => $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null,
@@ -430,7 +431,13 @@ if(isset($_POST['inputTipo'])){
 								<div class="col-lg-12">
 									<div id="dadosPF">
 										<div class="row">
-											<div class="col-lg-6">
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputCodigo">Código do Cliente</label>
+													<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código Interno" value="<?php echo $row['ClienCodigo']; ?>" readOnly>
+												</div>
+											</div>
+											<div class="col-lg-4">
 												<div class="form-group">
 												<label for="inputNomePF">Nome<span class="text-danger"> *</span></label>
 													<input type="text" id="inputNomePF" name="inputNomePF" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ClienNome']; ?>" required autofocus>
@@ -540,9 +547,15 @@ if(isset($_POST['inputTipo'])){
 									    </div>	
 									</div> <!-- Fim dadosPF -->
 									
-										<div id="dadosPJ">
-												<div class="row">
-											<div class="col-lg-9">
+									<div id="dadosPJ">
+										<div class="row">
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputCodigo">Código do Cliente</label>
+													<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código Interno" value="<?php echo $row['ClienCodigo']; ?>" readOnly>
+												</div>
+											</div>
+											<div class="col-lg-7">
 												<div class="form-group">
 												    <label for="inputNomePJ">Nome<span class="text-danger"> *</span></label>
 													<input type="text" id="inputNomePJ" name="inputNomePJ" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ClienNome']; ?>" required autofocus>
