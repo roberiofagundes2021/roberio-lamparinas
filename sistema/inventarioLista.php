@@ -81,7 +81,7 @@ try {
 				LEFT JOIN Categoria on CategId = ProduCategoria
 				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
-				JOIN Patrimonio on PatriId = MvXPrPatrimonio
+				LEFT JOIN Patrimonio on PatriId = MvXPrPatrimonio
 				JOIN Movimentacao on MovimId = MvXPrMovimentacao
 				LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 				LEFT JOIN Setor on SetorId = MovimDestinoSetor
@@ -138,7 +138,7 @@ try {
 				LEFT JOIN Categoria on CategId = ProduCategoria
 				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
-				JOIN Patrimonio on PatriId = MvXPrPatrimonio
+				LEFT JOIN Patrimonio on PatriId = MvXPrPatrimonio
 				JOIN Movimentacao on MovimId = MvXPrMovimentacao
 				LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 				LEFT JOIN Setor on SetorId = MovimDestinoSetor
