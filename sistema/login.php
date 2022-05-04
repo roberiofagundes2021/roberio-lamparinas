@@ -197,7 +197,12 @@ if(isset($_POST['usuario'])){
 						}
 					}
 				})
-			});			
+			});	
+		
+			// Não permitir aspas no campo usuário.
+			$('#usuario').on('input', function (e) {
+				this.value = this.value.replace(/['"]/g, "");
+			}); 
 		})
 
 	</script>
@@ -254,7 +259,7 @@ if(isset($_POST['usuario'])){
 									?>							
 									
 									<div class="form-group form-group-feedback form-group-feedback-left">
-										<input value="<?php if(isset($_SESSION['UsuarLogin'])) echo $_SESSION['UsuarLogin']; ?>" name="usuario" type="text" class="form-control" placeholder="Usuário..." required <?php if(!isset($_SESSION['UsuarLogin'])) echo "autofocus"; ?>>
+										<input value="<?php if(isset($_SESSION['UsuarLogin'])) echo $_SESSION['UsuarLogin']; ?>" name="usuario" id="usuario" type="text" class="form-control" placeholder="Usuário..." required <?php if(!isset($_SESSION['UsuarLogin'])) echo "autofocus"; ?>>
 										<div class="form-control-feedback">
 											<i class="icon-user text-muted"></i>
 										</div>
