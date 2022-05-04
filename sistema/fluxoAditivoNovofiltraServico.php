@@ -20,7 +20,7 @@ if(isset($_POST['cmbSubCategorias']) && isset($_POST['inputIdCategoria']) && iss
 	}
 	$subCategoriaList  = substr($subCategoriaList, 0, -1);
 
-	$sql = "SELECT DISTINCT ServiId, ServiNome, ServiDetalhamento
+	$sql = "SELECT DISTINCT ServiId, ServiNome, FOXSrDetalhamento
 			FROM Servico
 			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " AND ServiCategoria = $iSubCategoria AND 
@@ -52,7 +52,7 @@ if(isset($_POST['cmbSubCategorias']) && isset($_POST['inputIdCategoria']) && iss
 					<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
 				</div>
 				<div class="col-lg-8">
-					<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+					<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['FOXSrDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
 				</div>
 				<div class="col-lg-3">
 					<input type="text"   class="form-control-border-off" data-popup="tooltip"  readOnly>

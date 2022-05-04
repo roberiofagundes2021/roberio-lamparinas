@@ -641,10 +641,11 @@ try{
 										if ($_POST['inputOrigem'] == 'fluxo.php'){
 
 											if (!$countProduto){
-												$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla
+												$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla
 														FROM Produto
 														JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 														JOIN Situacao on SituaId = ProduStatus
+														LEFT  JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = $iFluxoOperacional
 														LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 														WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO'";
 														if ($sSubCategorias <> ""){
@@ -656,12 +657,12 @@ try{
 												$countProduto = count($rowProdutos);
 											} 
 
-										} else{
+										} else {
 
 											if (!$countProduto) {
 
 												if ($row['TrRefTabelaProduto'] == 'Produto'){
-													$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, SbCatNome
+													$sql = "SELECT ProduId, ProduNome, TRXPrDetalhamento as Detalhamento, UnMedSigla, SbCatNome
 															FROM Produto															
 															JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida

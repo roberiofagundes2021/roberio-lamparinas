@@ -425,7 +425,7 @@ try {
 
                                     <?php
 
-                                    $sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome
+                                    $sql = "SELECT ProduId, ProduNome, AdXPrDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome
 												FROM Produto
 												JOIN AditivoXProduto on AdXPrProduto = ProduId
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -436,10 +436,11 @@ try {
                                     $countProduto = count($rowProdutos);
 
                                     if (!$countProduto) {
-                                        $sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+                                        $sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, MarcaNome
 													FROM Produto
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
                                                     LEFT JOIN Marca on MarcaId = ProduMarca
+                                                    LEFT JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = $iFluxoOperacional
 													JOIN Situacao on SituaId = ProduStatus
 													WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = " . $iCategoria . " and 
 													ProduSubCategoria = " . $iSubCategoria . " and SituaChave = 'ATIVO' ";
@@ -510,7 +511,7 @@ try {
 															<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['ProduId'] . '" class="idProduto">
 														</div>
 														<div class="col-lg-8">
-															<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+															<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['Detalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
 														</div>
 														<div class="col-lg-3">
 															<input type="text" id="inputMarca' . $cont . '" name="inputMarca' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['MarcaNome'] . '" value="' . $item['MarcaNome'] . '" readOnly>

@@ -31,7 +31,7 @@ $sql = "SELECT FlOpeStatus, SituaChave
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
-$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, ProduDetalhamento as Detalhamento,
+$sql = "SELECT ProduId, ProduNome, UnMedSigla, FOXPrDetalhamento as Detalhamento,
 	FOXPrQuantidade, FOXPrValorUnitario
 	FROM Produto
 	JOIN Categoria on CategId = ProduCategoria
@@ -51,9 +51,10 @@ $count = count($rowResult);
 
 if($Origem == 'fluxo.php'){
 	if (!$count){
-		$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, ProduDetalhamento as Detalhamento
+		$sql = "SELECT ProduId, ProduNome, UnMedSigla, FOXPrDetalhamento as Detalhamento
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
+		LEFT JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = $iFluxoOperacional
 		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 		WHERE ProduUnidade = $iUnidade";
 		if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){

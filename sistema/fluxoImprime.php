@@ -249,7 +249,7 @@ try {
 
 			$totalProdutos = 0;
 	
-			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+			$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 					FROM Produto
 					JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 					LEFT JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
@@ -344,7 +344,7 @@ try {
 
 			$totalServicos = 0;
 	
-			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario,MarcaNome
+			$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario,MarcaNome
 					FROM Servico
 					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 					LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
@@ -469,7 +469,7 @@ try {
 					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional." and AdXPrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		} else {
-			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome, SbCatNome
+			$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome, SbCatNome
 					FROM Produto
 					JOIN AditivoXProduto on AdXPrProduto = ProduId
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -500,7 +500,7 @@ try {
 					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional." and AdXSrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		} else {
-			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, AdXSrQuantidade, AdXSrValorUnitario, MarcaNome, SbCatNome
+			$sql = "SELECT ServiId, ServiNome, AdXSrDetalhamento as Detalhamento, AdXSrQuantidade, AdXSrValorUnitario, MarcaNome, SbCatNome
 					FROM Servico
 					JOIN AditivoXServico on AdXSrServico = ServiId
 					JOIN SubCategoria on SbCatId = ServiSubCategoria

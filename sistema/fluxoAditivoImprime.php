@@ -134,7 +134,7 @@ try {
     </table>
 	<br>';
 	
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario
+	$sql = "SELECT ProduId, ProduNome, AdXPrDetalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario
 			FROM Produto
 			JOIN AditivoXProduto on AdXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -144,7 +144,7 @@ try {
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 	$totalProdutos = count($rowProdutos);
 
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, AdXSrQuantidade, AdXSrValorUnitario
+	$sql = "SELECT ServiId, ServiNome, AdXSrDetalhamento, AdXSrQuantidade, AdXSrValorUnitario
 			FROM Servico
 			JOIN AditivoXServico on AdXSrServico = ServiId
 			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$_POST['inputAditivoId']." and AdXSrQuantidade > ' 0 ' ";
@@ -191,7 +191,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$rowProduto['ProduNome'].": ".$rowProduto['ProduDetalhamento']."</td>
+					<td style='text-align: left;'>".$rowProduto['ProduNome'].": ".$rowProduto['FOXPrDetalhamento']."</td>
 					<td style='text-align: center;'>".$rowProduto['UnMedSigla']."</td>					
 					<td style='text-align: center;'>".$rowProduto['AdXPrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
@@ -252,7 +252,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$rowServico['ServiNome'].": ".$rowServico['ServiDetalhamento']."</td>	
+					<td style='text-align: left;'>".$rowServico['ServiNome'].": ".$rowServico['AdXSrDetalhamento']."</td>	
 					<td style='text-align: center;'>".$rowServico['AdXSrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
 					<td style='text-align: right;'>".mostraValor($valorTotal)."</td>

@@ -117,7 +117,7 @@ try {
 
 			$totalProdutos = 0;
 	
-			$sql = "SELECT ProduId, ProduNome, ProduDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+			$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
 					FROM Produto
 					JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 					JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
@@ -212,7 +212,7 @@ try {
 
 			$totalServicos = 0;
 	
-			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
+			$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario
 					FROM Servico
 					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 					JOIN SubCategoria on SbCatId = ServiSubCategoria
