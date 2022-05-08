@@ -23,7 +23,7 @@ if(isset($_POST['inputDataInicio'])) {
 			JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 			JOIN Movimentacao on MovimId = MvXPrMovimentacao
 			JOIN Situacao on SituaId = MovimSituacao
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and MovimTipo = 'S' and SituaChave = 'FINALIZADO' and MovimData between '".$dataInicio."' and '".$dataFim."' ";
+			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and MovimTipo = 'S' and SituaChave = 'LIBERADO' and MovimData between '".$dataInicio."' and '".$dataFim."' ";
 
 	if ($iUnidade != 'NULL'){
 		

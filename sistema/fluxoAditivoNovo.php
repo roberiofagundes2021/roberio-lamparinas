@@ -756,7 +756,7 @@ try {
 							<!-- /card-body --> 
 							<!---------------------------------------------------------------------------------------------Produtos---------------------------------------------------------------------------------------------------------->
 							<?php
-								$sqlProduto = " SELECT Distinct ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+								$sqlProduto = " SELECT Distinct ProduId, ProduNome, FOXPrDetalhamento, UnMedSigla, MarcaNome
 												FROM Produto
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
@@ -772,7 +772,7 @@ try {
 								$rowProdutos = $resultProduto->fetchAll(PDO::FETCH_ASSOC);
 								$countProduto = count($rowProdutos);
 
-								$sqlServico = " SELECT Distinct ServiId, ServiNome, ServiDetalhamento, MarcaNome
+								$sqlServico = " SELECT Distinct ServiId, ServiNome, FOXSrDetalhamento, MarcaNome
 												FROM Servico
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 												LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
@@ -888,7 +888,7 @@ try {
 															<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['ProduId'] . '" class="idProduto">
 														</div>
 														<div class="col-lg-8">
-															<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+															<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['FOXPrDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
 														</div>
 														<div class="col-lg-3">
 															<input type="text" id="inputMarca' . $cont . '" name="inputMarca' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['MarcaNome'] . '" value="' . $item['MarcaNome'] . '" readOnly>
@@ -1050,7 +1050,7 @@ try {
 															<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
 														</div>
 														<div class="col-lg-8">
-															<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ServiDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+															<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['FOXSrDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
 														</div>
 														<div class="col-lg-3">
 														<input type="text" id="inputMarca' . $cont . '" name="inputMarca' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['MarcaNome'] . '" value="' . $item['MarcaNome'] . '" readOnly>

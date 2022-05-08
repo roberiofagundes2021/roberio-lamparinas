@@ -55,9 +55,10 @@ $count = count($rowResult);
 
 if ($Origem == 'fluxo.php'){
 	if (!$count) {
-		$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento
+		$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento
 				FROM Servico
 				JOIN Situacao on SituaId = ServiStatus
+				LEFT JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = $iFluxoOperacional
 				LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 				WHERE ServiUnidade = $iUnidade";
 

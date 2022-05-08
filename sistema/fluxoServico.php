@@ -623,9 +623,10 @@ try {
 										if ($_POST['inputOrigem'] == 'fluxo.php'){
 
 											if (!$countServico) {
-												$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento
+												$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento
 														FROM Servico
 														JOIN Situacao on SituaId = ServiStatus
+														LEFT JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = $iFluxoOperacional
 														LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 														WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and SituaChave = 'ATIVO'"; 
 														if ($sSubCategorias <> ""){
@@ -642,7 +643,7 @@ try {
 											if (!$countServico) {
 
 												if ($row['TrRefTabelaServico'] == 'Servico'){
-													$sql = "SELECT ServiId, ServiNome, ServiDetalhamento as Detalhamento, SbCatNome
+													$sql = "SELECT ServiId, ServiNome, TRXSrDetalhamento as Detalhamento, SbCatNome
 															FROM Servico
 															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = ServiId

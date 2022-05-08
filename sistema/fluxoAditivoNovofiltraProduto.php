@@ -20,7 +20,7 @@ if(isset($_POST['cmbSubCategoria']) && isset($_POST['inputIdCategoria']) && isse
 	}
 	$subCategoriaList  = substr($subCategoriaList, 0, -1);
 
-	$sql = "SELECT DISTINCT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MarcaNome
+	$sql = "SELECT DISTINCT ProduId, ProduNome, FOXPrDetalhamento, UnMedSigla, MarcaNome
 			FROM Produto
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 			LEFT JOIN Marca on MarcaId = ProduMarca
@@ -54,7 +54,7 @@ if(isset($_POST['cmbSubCategoria']) && isset($_POST['inputIdCategoria']) && isse
 					<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['ProduId'] . '" class="idProduto">
 				</div>
 				<div class="col-lg-8">
-					<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['ProduDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+					<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['FOXPrDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
 				</div>
 				<div class="col-lg-3">
 					<input type="text" id="inputMarca' . $cont . '" name="inputMarca' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['MarcaNome'] . '" value="' . $item['MarcaNome'] . '" readOnly>
