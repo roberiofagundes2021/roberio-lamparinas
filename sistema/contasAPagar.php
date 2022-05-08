@@ -22,6 +22,8 @@ $Y = date("Y");
 // $dataInicio = date("Y-m-01"); //30 dias atrás
 $dataInicio = date("Y-m-d");
 $dataFim = date("Y")."-12-31";
+
+$visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['ResumoFinanceiro'] ? 'sidebar-right-visible' : ''; 
 ?>
 
 <!DOCTYPE html>
@@ -887,7 +889,7 @@ $dataFim = date("Y")."-12-31";
 
 </head>
 
-<body class="navbar-top sidebar-right-visible sidebar-xs">
+<body class="navbar-top <?php echo $visibilidadeResumoFinanceiro; ?> sidebar-xs">
 
     <?php include_once("topo.php"); ?>
 

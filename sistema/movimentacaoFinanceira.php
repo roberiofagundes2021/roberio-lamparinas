@@ -29,6 +29,7 @@ $Y = date("Y");
 $dataInicio = date("Y-m-d");
 $dataFim = date("Y-m-d");
 
+$visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['ResumoFinanceiro'] ? 'sidebar-right-visible' : ''; 
 ?>
 
 <!DOCTYPE html>
@@ -70,7 +71,7 @@ $dataFim = date("Y-m-d");
       /* Início: Tabela Personalizada */
       $('#tblMovimentacaoFinanceira').DataTable({
         "order": [
-          [1, "desc"]
+          [0, "asc"]
         ],
         autoWidth: false,
         responsive: true,
@@ -195,7 +196,23 @@ $dataFim = date("Y-m-d");
         const statusArray = $('#cmbStatus').val().split('|');
         const status = statusArray[0];
         const statusTipo = statusArray[1];
-        const url = "movimentacaoFinanceiraFiltra.php";
+        const urlFiltraGrid = "movimentacaoFinanceiraFiltra.php";
+        const urlConsultaSaldoInicial = "consultaSaldoInicial.php";
+
+        var inputsValuesConsulta = {
+          inputData: periodoDe
+        }; 
+
+        //Consulta saldo anterior
+        $.ajax({
+          type: "POST",
+          url: urlConsultaSaldoInicial,
+          dataType: "json",
+          data: inputsValuesConsulta,
+          success: function(resposta) {
+            $("#saldoAnterior").html('<span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">Saldo anteiror: R$ '+resposta+'</span>')
+          }
+        })
 
         inputsValues = {
           inputPeriodoDe: periodoDe,
@@ -208,11 +225,11 @@ $dataFim = date("Y-m-d");
           statusTipo: statusTipo,
           permissionAtualiza: inputPermissionAtualiza,
           permissionExclui: inputPermissionExclui
-        }; 
-
+        };
+        
         $.ajax({
           type: "POST",
-          url: url,
+          url: urlFiltraGrid,
           dataType: "json",
           data: inputsValues,
           success: function(resposta) {
@@ -413,7 +430,7 @@ $dataFim = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top sidebar-right-visible sidebar-xs">
+<body class="navbar-top <?php echo $visibilidadeResumoFinanceiro; ?> sidebar-xs">
   <?php include_once("topo.php"); ?>
 
   <!-- Page content -->
@@ -688,6 +705,9 @@ $dataFim = date("Y-m-d");
 
                   </div>
                 </form>
+
+                <h6 id="saldoAnterior" class="text-right mb-0">
+                </h6>
 
                 <table class="table" id="tblMovimentacaoFinanceira">
                   <thead>

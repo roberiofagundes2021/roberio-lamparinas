@@ -890,6 +890,8 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
 $empresaPublica = ($rowParametro['ParamEmpresaPublica'] == 1) ? true : false;
 $dataInicio = date("Y-m-d");
+
+$visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['ResumoFinanceiro'] ? 'sidebar-right-visible' : ''; 
 ?>
 
 <!DOCTYPE html>
@@ -1935,7 +1937,7 @@ $dataInicio = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top sidebar-right-visible sidebar-xs">
+<body class="navbar-top <?php echo $visibilidadeResumoFinanceiro; ?> sidebar-xs">
 
     <?php include_once("topo.php"); ?>
 

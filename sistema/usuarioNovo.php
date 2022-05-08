@@ -17,13 +17,16 @@ if (isset($_POST['inputCpf'])) {
 	try {
 
 		$conn->beginTransaction();
+		
+		$visibilidadeResumoFinanceiro = isset($_POST['inputVisualisaResumoFinanceiro']) ? true : false;
 
 		//Se for um novo usuário que ainda não estava cadastrado em nenhuma empresa
 		if ($_POST['inputId'] == 0) {
 
+
 			//Passo1: inserir na tabela Usuario
-			$sql = "INSERT INTO Usuario (UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular)
-					VALUES (:sCpf, :sNome, :sLogin, :sSenha, :sEmail, :sTelefone, :sCelular)";
+			$sql = "INSERT INTO Usuario (UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, UsuarResumoFinanceiro)
+					VALUES (:sCpf, :sNome, :sLogin, :sSenha, :sEmail, :sTelefone, :sCelular, :bResumoFinanceiro)";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
@@ -33,7 +36,8 @@ if (isset($_POST['inputCpf'])) {
 				':sSenha' => md5($_POST['inputSenha']),
 				':sEmail' => $_POST['inputEmail'],
 				':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
-				':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular']
+				':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
+				':bResumoFinanceiro' => $visibilidadeResumoFinanceiro
 			));
 			$LAST_ID_USUARIO = $conn->lastInsertId();
 
@@ -71,8 +75,8 @@ if (isset($_POST['inputCpf'])) {
 		} else {
 
 			//Passo1: atualizar o dados do usuário na tabela Usuario
-			$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, 
-						   UsuarSenha = :sSenha, UsuarEmail = :sEmail, UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
+			$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, UsuarSenha = :sSenha, UsuarEmail = :sEmail, 
+									UsuarTelefone = :sTelefone, UsuarCelular = :sCelular, UsuarResumoFinanceiro = :bResumoFinanceiro
 					WHERE UsuarId = :iUsuario";
 			$result = $conn->prepare($sql);
 
@@ -83,7 +87,8 @@ if (isset($_POST['inputCpf'])) {
 				':sEmail' => $_POST['inputEmail'],
 				':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
 				':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
-				':iUsuario' =>  $_POST['inputId']
+				':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
+				':iUsuario' => $_POST['inputId']
 			));
 
 			//Passo2: inserir na tabela EmpresaXUsuarioXPerfil
@@ -99,7 +104,7 @@ if (isset($_POST['inputCpf'])) {
 			));
 			$LAST_ID_EXUXP = $conn->lastInsertId();
 
-			if (!$_SESSION['EmpresaId']){			
+			if (!isset($_SESSION['EmpresaId'])){			
 				
 				//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
 				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnUsuarioAtualizador)
@@ -402,7 +407,7 @@ include_once("topo.php");
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="row">
-										<div class="col-lg-8">
+										<div class="col-lg-5">
 											<div class="form-group">
 												<label for="inputNome">Nome<span class="text-danger"> *</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
@@ -427,6 +432,12 @@ include_once("topo.php");
 													}
 													?>
 												</select>
+											</div>
+										</div>
+										<div class="col-lg-3" style="margin-top: auto; margin-bottom: auto;">
+											<div class="custom-control custom-checkbox">
+												<input type="checkbox" class="custom-control-input" value="1" id="inputVisualisaResumoFinanceiro" name="inputVisualisaResumoFinanceiro">
+												<label class="custom-control-label" for="inputVisualisaResumoFinanceiro">Resumo Financeiro Visível</label>
 											</div>
 										</div>
 									</div>

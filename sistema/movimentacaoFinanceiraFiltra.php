@@ -39,6 +39,11 @@ function queryPesquisa(){
         }
     }
 
+    //pega o saldo inicial realizado
+    $sql_saldoInicial    = "select dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$_POST['inputPeriodoDe']."') as SaldoInicial";
+    $resultSaldoInicial  = $conn->query($sql_saldoInicial);
+    $rowSaldoInicial     = $resultSaldoInicial->fetch(PDO::FETCH_ASSOC);
+
     if (!empty($_POST['cmbContaBanco'])) {
         $argsCr[]  = "CnAReContaBanco = " . $_POST['cmbContaBanco'] . " ";
         $argsCp[]  = "CnAPaContaBanco = " . $_POST['cmbContaBanco'] . " ";
@@ -122,7 +127,7 @@ function queryPesquisa(){
                         $sql .= " $argsCenCustCp ";
                     }
             $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                     ORDER BY DATA DESC";
+                     ORDER BY DATA ASC";
                     
         } else if ($status[0] === "14") {
             $sql = "SELECT CNAREID AS ID, 
@@ -141,7 +146,7 @@ function queryPesquisa(){
                         $sql .= " $argsCenCustCr ";
                     }
             $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
-                    ORDER BY DATA DESC";
+                    ORDER BY DATA ASC";
                     
         } else {
             $sql = "SELECT CNAREID AS ID, 
@@ -177,7 +182,7 @@ function queryPesquisa(){
                         $sql .= " $argsCenCustCp ";
                     }
             $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                    ORDER BY DATA DESC";
+                    ORDER BY DATA ASC";
         }
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -188,7 +193,7 @@ function queryPesquisa(){
     if ($cont == 1) {
         $cont = 0;
         //print('<input type="hidden" id="elementosGrid" value="' . count($rowData) . '">');
-        $saldo = 0;
+        $saldo = $rowSaldoInicial['SaldoInicial'];
 
         $arrayData = [];
         

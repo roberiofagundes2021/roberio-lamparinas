@@ -17,7 +17,7 @@ if (isset($_POST['inputUsuarioId'])) {
 	$iUsuario = $_POST['inputUsuarioId'];
 
 	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, 
-			UsuarTelefone, UsuarCelular, EXUXPId, EXUXPPerfil, PerfiChave
+			UsuarTelefone, UsuarCelular, UsuarResumoFinanceiro, EXUXPId, EXUXPPerfil, PerfiChave
 			FROM Usuario
 			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 			JOIN Perfil on PerfiId = EXUXPPerfil
@@ -53,8 +53,10 @@ if (isset($_POST['inputCpf'])) {
 		$senha = '';
 		$row['UsuarSenha'] == $_POST['inputSenha'] ? $senha = $_POST['inputSenha'] : $senha = md5($_POST['inputSenha']);
 
-		$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, UsuarSenha = :sSenha, 
-								   UsuarEmail = :sEmail, UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
+		$visibilidadeResumoFinanceiro = isset($_POST['inputVisualisaResumoFinanceiro']) ? true : false;
+
+		$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, UsuarSenha = :sSenha, UsuarEmail = :sEmail, 
+								   UsuarTelefone = :sTelefone, UsuarCelular = :sCelular, UsuarResumoFinanceiro = :bResumoFinanceiro
 				WHERE UsuarId = :iUsuario";
 		$result = $conn->prepare($sql);
 
@@ -65,6 +67,7 @@ if (isset($_POST['inputCpf'])) {
 			':sEmail' => $_POST['inputEmail'],
 			':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
 			':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
+			':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
 			':iUsuario' => $_POST['inputUsuarioId']
 		));
 
@@ -297,7 +300,7 @@ include_once("topo.php");
 											<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo formatarCPF_Cnpj($row['UsuarCpf']); ?>" required readOnly>
 										</div>
 									</div>
-									<div class="col-lg-7">
+									<div class="col-lg-4">
 										<div class="form-group">
 											<label for="inputNome">Nome<span class="text-danger"> *</span></label>
 											<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['UsuarNome']; ?>" required>
@@ -323,6 +326,12 @@ include_once("topo.php");
 												}
 												?>
 											</select>
+										</div>
+									</div>
+									<div class="col-lg-3" style="margin-top: auto; margin-bottom: auto;">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" value="1" id="inputVisualisaResumoFinanceiro" name="inputVisualisaResumoFinanceiro" <?php echo isset($row['UsuarResumoFinanceiro']) && $row['UsuarResumoFinanceiro'] ? 'checked' : ''; ?>>
+											<label class="custom-control-label" for="inputVisualisaResumoFinanceiro">Resumo Financeiro Visível</label>
 										</div>
 									</div>
 								</div>
