@@ -210,7 +210,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
           dataType: "json",
           data: inputsValuesConsulta,
           success: function(resposta) {
-            $("#saldoAnterior").html('<span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">Saldo anteiror: R$ '+resposta+'</span>')
+            $("#saldoAnterior").html('<span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">Saldo anterior: R$ '+resposta+'</span>')
           }
         })
 
