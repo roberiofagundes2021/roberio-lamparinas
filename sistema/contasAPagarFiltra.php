@@ -92,7 +92,7 @@ if ($cont == 1) {
         
         $favorecido = $item["ForneNome"];
 
-        $numDoc = $item["CnAPaNumDocumento"];
+        $numDoc = $item["CnAPaNotaFiscal"];
 
         $valorTotal = mostraValor($item["CnAPaValorAPagar"]);
 

@@ -28,11 +28,11 @@ if (isset($_POST['cmbPlanoContas'])) {
                     $result = $conn->query($sql);
                     $situacaoPagamentoParcial = $result->fetch(PDO::FETCH_ASSOC);
 
-                    $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                    $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento,
                                                   CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
                                                   CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
                                                   CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                            VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                            VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
                                     :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
                                     :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
                     $result = $conn->prepare($sql);
@@ -42,7 +42,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':iFornecedor' => $_POST['cmbFornecedor'],
                         ':iContaBanco' => $_POST['cmbContaBanco'],
                         ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-                        ':sNumDocumento' => $_POST['inputNumeroDocumento'],
                         ':sNotaFiscal' => $_POST['inputNotaFiscal'],
                         ':dateDtEmissao' => $_POST['inputDataEmissao'],
                         ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
@@ -82,7 +81,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                 $situacao = $result->fetch(PDO::FETCH_ASSOC);
             }
 
-            $sql = "UPDATE ContasAPagar SET CnAPaPlanoContas = :iPlanoContas, CnAPaFornecedor = :iFornecedor, CnAPaContaBanco = :iContaBanco, CnAPaFormaPagamento = :iFormaPagamento, CnAPaNumDocumento = :sNumDocumento,
+            $sql = "UPDATE ContasAPagar SET CnAPaPlanoContas = :iPlanoContas, CnAPaFornecedor = :iFornecedor, CnAPaContaBanco = :iContaBanco, CnAPaFormaPagamento = :iFormaPagamento,
                                             CnAPaNotaFiscal = :sNotaFiscal, CnAPaDtEmissao = :dateDtEmissao, CnAPaOrdemCompra = :iOrdemCompra, CnAPaDescricao = :sDescricao, CnAPaDtVencimento = :dateDtVencimento, CnAPaValorAPagar = :fValorAPagar,
                                             CnAPaDtPagamento = :dateDtPagamento, CnAPaValorPago = :fValorPago, CnAPaObservacao = :sObservacao, CnAPaStatus = :iStatus, CnAPaUsuarioAtualizador = :iUsuarioAtualizador, CnAPaUnidade = :iUnidade,
                                             CnAPaTipoJuros = :sTipoJuros, CnAPaJuros = :fJuros, CnAPaTipoDesconto = :sTipoDesconto, CnAPaDesconto = :fDesconto
@@ -94,7 +93,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                 ':iFornecedor' => $_POST['cmbFornecedor'],
                 ':iContaBanco' => $_POST['cmbContaBanco'],
                 ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-                ':sNumDocumento' => $_POST['inputNumeroDocumento'],
                 ':sNotaFiscal' => isset($_POST['inputNotaFiscal']) ? $_POST['inputNotaFiscal'] : null,
                 ':dateDtEmissao' => $_POST['inputDataEmissao'],
                 ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
@@ -420,11 +418,11 @@ if (isset($_POST['cmbPlanoContas'])) {
 
                 for ($i = 1; $i <= $numParcelas; $i++) {
                     if(isset($_POST['checkboxPagamentoParcelaCheck' . $i . ''])) {
-                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento,
                                                     CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
                                                     CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
                                                     CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
                                         :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
                                         :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
                         $result = $conn->prepare($sql);
@@ -435,7 +433,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                             ':iFornecedor' => $_POST['cmbFornecedor'],
                             ':iContaBanco' => $_POST['cmbPagamentoParcelaContaBanco'],
                             ':iFormaPagamento' => $_POST['cmbPagamentoParcelaFormaPagamento'],
-                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
                             ':sNotaFiscal' => $_POST['inputNotaFiscal'],
                             ':dateDtEmissao' => $_POST['inputDataEmissao'],
                             ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
@@ -518,10 +515,10 @@ if (isset($_POST['cmbPlanoContas'])) {
                             ));
                         }
                     }else {
-                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento,
                                                     CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
                                                     CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
                                         :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :iStatus, :iUsuarioAtualizador, :iUnidade)";
                         $result = $conn->prepare($sql);
 
@@ -531,7 +528,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                             ':iFornecedor' => $_POST['cmbFornecedor'],
                             ':iContaBanco' => $_POST['cmbContaBanco'],
                             ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
                             ':sNotaFiscal' => $_POST['inputNotaFiscal'],
                             ':dateDtEmissao' => $_POST['inputDataEmissao'],
                             ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
@@ -620,11 +616,11 @@ if (isset($_POST['cmbPlanoContas'])) {
                         $result = $conn->query($sql);
                         $situacaoPagamentoParcial = $result->fetch(PDO::FETCH_ASSOC);
 
-                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                        $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento,
                                                       CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
                                                       CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
                                                       CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
                                         :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
                                         :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
                         $result = $conn->prepare($sql);
@@ -634,7 +630,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                             ':iFornecedor' => $_POST['cmbFornecedor'],
                             ':iContaBanco' => $_POST['cmbContaBanco'],
                             ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-                            ':sNumDocumento' => $_POST['inputNumeroDocumento'],
                             ':sNotaFiscal' => $_POST['inputNotaFiscal'],
                             ':dateDtEmissao' => $_POST['inputDataEmissao'],
                             ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
@@ -675,11 +670,11 @@ if (isset($_POST['cmbPlanoContas'])) {
                     $situacao = $result->fetch(PDO::FETCH_ASSOC);
                 }
 
-                $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, CnAPaNumDocumento,
+                $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento, 
                                               CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
                                               CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
                                               CnAPaTipoDesconto, CnAPaDesconto, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
-                        VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento,:sNumDocumento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                        VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
                                 :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
                                 :sTipoDesconto, :fDesconto, :iStatus, :iUsuarioAtualizador, :iUnidade)";
                 $result = $conn->prepare($sql);
@@ -690,7 +685,6 @@ if (isset($_POST['cmbPlanoContas'])) {
                     ':iFornecedor' => $_POST['cmbFornecedor'],
                     ':iContaBanco' => $_POST['cmbContaBanco'],
                     ':iFormaPagamento' => $_POST['cmbFormaPagamento'],
-                    ':sNumDocumento' => $_POST['inputNumeroDocumento'],
                     ':sNotaFiscal' => $_POST['inputNotaFiscal'],
                     ':dateDtEmissao' => $_POST['inputDataEmissao'],
                     ':iOrdemCompra' => isset($_POST['cmbOrdemCarta']) ? $_POST['cmbOrdemCarta'] : null,
@@ -809,6 +803,8 @@ if (isset($_POST['cmbPlanoContas'])) {
             die;
         }
     }
+
+    die;
 
     if(isset($_POST['inputControlador'])) {
         irpara("movimentacaoFinanceiraConciliacao.php");
@@ -1369,7 +1365,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                 let inputDescricao = $("#inputDescricao").val()
                 let cmbContaBanco = $("#cmbContaBanco").val()
                 let cmbFormaPagamento = $("#cmbFormaPagamento").val()
-                let inputNumeroDocumento = $("#inputNumeroDocumento").val()
+                //let inputNumeroDocumento = $("#inputNumeroDocumento").val()
 
                 if ($("#habilitarPagamento").hasClass('clicado')) {
                     $("#cmbContaBanco").prop('required', true)
@@ -2142,7 +2138,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     }
                                     ?>
                                     <div id="camposPagamento" class="row justify-content-between" <?php echo $mostrar; ?>>
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="cmbContaBanco">Conta/Banco <span class="text-danger">*</span></label>
                                                 <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?>>
@@ -2170,7 +2166,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="cmbFormaPagemento">Forma de Pagamento <span class="text-danger">*</span></label>
                                                 <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?>>
@@ -2196,12 +2192,6 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                     }
                                                     ?>
                                                 </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label for="inputNumeroDocumento">Nº Documento</label>
-                                                <input type="text" id="inputNumeroDocumento" name="inputNumeroDocumento" value="<?php if (isset($lancamento)) echo $lancamento['CnAPaNumDocumento'] ?>" class="form-control" placeholder="Nº Documento" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'PAGO') echo 'disabled' ?>>
                                             </div>
                                         </div>
                                     </div>

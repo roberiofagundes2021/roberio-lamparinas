@@ -8,7 +8,7 @@ $tipoConta = $_POST['tipoConta'];
 $agrupamentoId = $_POST['agrupamentoId'];
 
 if($tipoConta == 'P') {
-    $sqlAgrupamento = "SELECT CnAPaDescricao, CnAPaNumDocumento, CnAPaDtPagamento, CnAPaFormaPagamento, CnAPaContaBanco, CnAPaValorPago,
+    $sqlAgrupamento = "SELECT CnAPaDescricao, CnAPaNotaFiscal, CnAPaDtPagamento, CnAPaFormaPagamento, CnAPaContaBanco, CnAPaValorPago,
                     CnAgrDescricaoAgrupamento, CnAgrValorTotal
                     FROM  ContasAPagar 
                     JOIN ContasAgrupadas on CnAgrId = CnAPaAgrupamento

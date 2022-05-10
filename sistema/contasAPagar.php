@@ -537,7 +537,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     linhasSelecionadas.each((i, elem) => {
                         let id = $(elem).val()
                         let descricao = $(elem).attr('descricao')
-                        let numeroDocumento = $(elem).attr('numeroDocumento')
+                        let numeroDocumento = $(elem).attr('CnAPaNotaFiscal')
                         let valor = $(elem).attr('valor')
                         let indice = i + 1
 
@@ -844,7 +844,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     <input type="text" class="form-control" value="${consulta.CnAPaDescricao}" readonly>
                                 </div>
                                 <div class="form-group col-3 p-2">
-                                    <input type="text" class="form-control" value="${consulta.CnAPaNumDocumento}" readonly>
+                                    <input type="text" class="form-control" value="${consulta.CnAPaNotaFiscal}" readonly>
                                 </div>
                                 <div class="form-group col-3 p-2 pr-4">
                                     <input type="text" class="form-control text-right" value="${float2moeda(consulta.CnAPaValorPago)}" readonly>

@@ -7,7 +7,7 @@ $data = $_POST['date'];
 $conta = $_POST['conta'];
 
 //pega o saldo inicial realizado
-$sql_saldoInicial    = "select dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$data."') as SaldoInicial";
+$sql_saldoInicial    = "select dbo.fnSaldoInicial(".$_SESSION['UnidadeId'].",'".$data."', ".$conta.") as SaldoInicial";
 $resultSaldoInicial  = $conn->query($sql_saldoInicial);
 $rowSaldoInicial     = $resultSaldoInicial->fetch(PDO::FETCH_ASSOC);
 $saldoAnterior = $rowSaldoInicial['SaldoInicial'];
