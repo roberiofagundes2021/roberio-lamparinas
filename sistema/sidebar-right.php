@@ -92,6 +92,11 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
                     <div class="form-group">
                         <input id="inputCredito" name="inputCredito" class="form-control" value="<?php echo $fCredito; ?>" style="font-size: 30px; text-align: right;" readonly>
                         <h3 class="form-text text-right" style="color: #666;">Crédito</h3>
+                    </div>
+                
+                    <div class="form-group">
+                        <input id="inputCredito" name="inputCredito" class="form-control" value="<?php echo $fCredito; ?>" style="font-size: 30px; text-align: right;" readonly>
+                        <h3 class="form-text text-right" style="color: #666;">Crédito</h3>
                     </div> 
     
                     <div class="form-group">
@@ -102,6 +107,11 @@ $fSaldo = mostraValor($rowResumo['Credito'] - $rowResumo['Debito']);
                     <div class="form-group">
                         <input id="inputSaldo" name="inputSaldo" class="form-control" value="<?php echo $fSaldo; ?>" style="font-size: 30px; text-align: right;" readonly>
                         <h3 class="form-text text-right" style="color: #666;"><b>Saldo</b> (Crédito - Débito)</h3>
+                    </div>
+
+                    <div class="form-group">
+                        <input id="inputCredito" name="inputCredito" class="form-control" value="<?php echo $fCredito; ?>" style="font-size: 30px; text-align: right;" readonly>
+                        <h3 class="form-text text-right" style="color: #666;">Saldo Atual</h3>
                     </div>
                 </div>
             </div>

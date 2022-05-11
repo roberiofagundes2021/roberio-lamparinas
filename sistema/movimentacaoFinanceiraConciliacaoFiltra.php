@@ -57,6 +57,11 @@ function queryPesquisa(){
         }
     }
 
+    //pega o saldo inicial realizado
+    $sql_saldoInicial    = "select dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$_POST['inputPeriodoDe']."') as SaldoInicial";
+    $resultSaldoInicial  = $conn->query($sql_saldoInicial);
+    $rowSaldoInicial     = $resultSaldoInicial->fetch(PDO::FETCH_ASSOC);
+    
     if (!empty($_POST['cmbContaBanco'])) {
         $argsCr[]  = "CnAReContaBanco = " . $_POST['cmbContaBanco'] . " ";
         $argsCp[]  = "CnAPaContaBanco = " . $_POST['cmbContaBanco'] . " ";
@@ -127,7 +132,8 @@ function queryPesquisa(){
             $sql = "SELECT CNAPAID AS ID, 
                            CNAPADTEMISSAO AS DATA, 
                            CNAPADESCRICAO AS HISTORICO, 
-                           CnAPANUMDOCUMENTO AS NUMDOC, 
+                           CnAPANUMDOCUMENTO AS NUMDOC,
+                           CnAPAVAlORAPAGAR AS VALOR, 
                            CNAPAVALORPAGO as TOTAL, 
                            TIPO = 'P' ,
                            CODTRANSFREC = 0,
@@ -142,20 +148,21 @@ function queryPesquisa(){
                         $sql .= " $argsCenCustCp ";
                     }
             $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                     ORDER BY DATA DESC";
+                     ORDER BY DATA ASC";
                     
         } else if ($status[0] === "14") {
             $sql = "SELECT CNAREID AS ID, 
                            CNAREDTEMISSAO AS DATA, 
                            CNAREDESCRICAO AS HISTORICO, 
                            CnARENUMDOCUMENTO AS NUMDOC, 
-                           CNAREVALORRECEBIDO as TOTAL, 
+                           CnAREVAlORARECEBER AS VALOR,
+                           CNAREVALORRECEBIDO As TOTAL, 
                            TIPO = 'R' , 
-                           CnAReTransferencia as CODTRANSFREC, 
+                           CnAReTransferencia As CODTRANSFREC, 
                            CODTRANSFPAG = 0,
-                           SituaNome as SITUACAO,
-                           SituaCor as COR,
-                           SituaChave as CHAVE,
+                           SituaNome As SITUACAO,
+                           SituaCor As COR,
+                           SituaChave As CHAVE,
                            CNARECONCILIADO AS CONCILIADO
                     FROM ContasAReceber 
                     JOIN Situacao on SituaId = CnAReStatus";
@@ -163,20 +170,21 @@ function queryPesquisa(){
                         $sql .= " $argsCenCustCr ";
                     }
             $sql .= "WHERE " . $stringCr . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
-                    ORDER BY DATA DESC";
+                    ORDER BY DATA ASC";
                     
         } else {
             $sql = "SELECT CNAREID AS ID, 
                            CNAREDTEMISSAO AS DATA, 
                            CNAREDESCRICAO AS HISTORICO, 
-                           CnARENUMDOCUMENTO AS NUMDOC, 
-                           CNAREVALORRECEBIDO as TOTAL, 
+                           CnARENUMDOCUMENTO AS NUMDOC,
+                           CnAREVAlORARECEBER AS VALOR, 
+                           CNAREVALORRECEBIDO As TOTAL, 
                            TIPO = 'R' , 
-                           CnAReTransferencia as CODTRANSFREC, 
+                           CnAReTransferencia As CODTRANSFREC, 
                            CODTRANSFPAG = 0,
-                           SituaNome as SITUACAO,
-                           SituaCor as COR,
-                           SituaChave as CHAVE,
+                           SituaNome As SITUACAO,
+                           SituaCor As COR,
+                           SituaChave As CHAVE,
                            CNARECONCILIADO AS CONCILIADO
                     FROM ContasAReceber
                     JOIN Situacao on SituaId = CnAReStatus";
@@ -188,7 +196,8 @@ function queryPesquisa(){
                     SELECT CNAPAID AS ID, 
                            CNAPADTEMISSAO AS DATA, 
                            CNAPADESCRICAO AS HISTORICO, 
-                           CnAPANUMDOCUMENTO AS NUMDOC, 
+                           CnAPANUMDOCUMENTO AS NUMDOC,
+                           CnAPAVAlORAPAGAR AS VALOR, 
                            CNAPAVALORPAGO as TOTAL, 
                            TIPO = 'P' ,
                            CODTRANSFREC = 0 ,
@@ -203,7 +212,7 @@ function queryPesquisa(){
                         $sql .= " $argsCenCustCp ";
                     }
             $sql .= "WHERE " . $stringCp . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-                    ORDER BY DATA DESC";
+                    ORDER BY DATA ASC";
         }
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -211,21 +220,20 @@ function queryPesquisa(){
         count($rowData) >= 1 ? $cont = 1 : $cont = 0;
     }
 
-
     if ($cont == 1) {
         $cont = 0;
         //print('<input type="hidden" id="elementosGrid" value="' . count($rowData) . '">');
-        $saldo = 0;
+        $saldo = $rowSaldoInicial['SaldoInicial'];
 
         $arrayData = [];
         
         foreach ($rowData as $item) {
             $cont++;
             if ($item['TIPO'] === 'R'){
-                $saldo += $item['TOTAL'];
+                $saldo += $item['VALOR'];
             }
             else {
-                $saldo -= $item['TOTAL'];
+                $saldo -= $item['VALOR'];
             }
         
             $data = mostraData($item['DATA']);
@@ -346,10 +354,10 @@ function queryPesquisa(){
                     
             if ($item['TIPO'] === 'R'){
                 //ENTRADA
-                $entrada = mostraValor($item['TOTAL']);
+                $entrada = mostraValor($item['VALOR']);
             } else {
                 //SAIDA
-                $saida = mostraValor($item['TOTAL']);
+                $saida = mostraValor($item['VALOR']);
             }
 
             //APLICANDO ESTILO NA COLUNA SALDO

@@ -22,6 +22,8 @@ $Y = date("Y");
 // $dataInicio = date("Y-m-01"); //30 dias atrás
 $dataInicio = date("Y-m-d");
 $dataFim = date("Y")."-12-31";
+
+$visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['ResumoFinanceiro'] ? 'sidebar-right-visible' : ''; 
 ?>
 
 <!DOCTYPE html>
@@ -535,7 +537,7 @@ $dataFim = date("Y")."-12-31";
                     linhasSelecionadas.each((i, elem) => {
                         let id = $(elem).val()
                         let descricao = $(elem).attr('descricao')
-                        let numeroDocumento = $(elem).attr('numeroDocumento')
+                        let numeroDocumento = $(elem).attr('CnAPaNotaFiscal')
                         let valor = $(elem).attr('valor')
                         let indice = i + 1
 
@@ -842,7 +844,7 @@ $dataFim = date("Y")."-12-31";
                                     <input type="text" class="form-control" value="${consulta.CnAPaDescricao}" readonly>
                                 </div>
                                 <div class="form-group col-3 p-2">
-                                    <input type="text" class="form-control" value="${consulta.CnAPaNumDocumento}" readonly>
+                                    <input type="text" class="form-control" value="${consulta.CnAPaNotaFiscal}" readonly>
                                 </div>
                                 <div class="form-group col-3 p-2 pr-4">
                                     <input type="text" class="form-control text-right" value="${float2moeda(consulta.CnAPaValorPago)}" readonly>
@@ -887,7 +889,7 @@ $dataFim = date("Y")."-12-31";
 
 </head>
 
-<body class="navbar-top sidebar-right-visible sidebar-xs">
+<body class="navbar-top <?php echo $visibilidadeResumoFinanceiro; ?> sidebar-xs">
 
     <?php include_once("topo.php"); ?>
 

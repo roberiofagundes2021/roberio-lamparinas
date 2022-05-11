@@ -112,7 +112,7 @@
 
 			<li style="<?php echo $visibilidade; ?>">
 				<a href="#" class="navbar-nav-link sidebar-control sidebar-right-toggle d-none d-md-block">
-					<i class="icon-drag-right"></i>
+					<i class="icon-stats-growth"></i>
 				</a>
 			</li>
 

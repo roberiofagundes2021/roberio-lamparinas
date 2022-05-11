@@ -634,6 +634,8 @@ if (isset($_POST['inputContasAReceberId']) && $_POST['inputContasAReceberId'] !=
 }
 
 $dataInicio = date("Y-m-d");
+
+$visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['ResumoFinanceiro'] ? 'sidebar-right-visible' : ''; 
 ?>
 
 <!DOCTYPE html>
@@ -1119,7 +1121,7 @@ $dataInicio = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top sidebar-right-visible sidebar-xs">
+<body class="navbar-top <?php echo $visibilidadeResumoFinanceiro; ?> sidebar-xs">
 
     <?php include_once("topo.php"); ?>
 
