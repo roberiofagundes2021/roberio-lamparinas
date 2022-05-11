@@ -99,7 +99,7 @@ try {
 	<div style='text-align:center; margin-top: 20px;'><h1>".strtoupper($sTipo)."</h1></div>
 	";
 	
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario, MarcaNome
+	$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, OCXPrQuantidade, OCXPrValorUnitario, MarcaNome
 			FROM Produto
 			JOIN OrdemCompraXProduto on OCXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
@@ -114,7 +114,7 @@ try {
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 	$totalProdutos = count($rowProdutos);
 
-	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OCXSrQuantidade, OCXSrValorUnitario, MarcaNome
+	$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento, OCXSrQuantidade, OCXSrValorUnitario, MarcaNome
 			FROM Servico
 			JOIN OrdemCompraXServico on OCXSrServico = ServiId
 			JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
@@ -204,7 +204,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."<br>Marca: ".$itemProduto['MarcaNome']."</td>
+					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['Detalhamento']."<br>Marca: ".$itemProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>".$itemProduto['UnMedSigla']."</td>					
 					<td style='text-align: center;'>".$itemProduto['OCXPrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
@@ -215,7 +215,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']."<br>Marca: ".$itemProduto['MarcaNome']."</td>
+					<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['Detalhamento']."<br>Marca: ".$itemProduto['MarcaNome']."</td>
 					<td style='text-align: center;'>".$itemProduto['UnMedSigla']."</td>					
 					<td style='text-align: center;'>".$itemProduto['OCXPrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
@@ -274,7 +274,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']."<br>Marca: ".$itemServico['MarcaNome']."</td>	
+					<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['Detalhamento']."<br>Marca: ".$itemServico['MarcaNome']."</td>	
 					<td style='text-align: center;'>".$itemServico['OCXSrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
 					<td style='text-align: right;'>".mostraValor($valorTotal)."</td>
@@ -284,7 +284,7 @@ try {
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']."<br>Marca: ".$itemServico['MarcaNome']."</td>
+					<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['Detalhamento']."<br>Marca: ".$itemServico['MarcaNome']."</td>
 					<td style='text-align: center;'>".$itemServico['OCXSrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
 					<td style='text-align: right'>".mostraValor($valorTotal)."</td>
