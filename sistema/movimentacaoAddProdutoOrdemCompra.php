@@ -7,7 +7,7 @@ include('global_assets/php/conexao.php');
 $ordemCompra = $_POST['ordemCompra'];
 $iUnidade = $_SESSION['UnidadeId'];
 
-$sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento,
+$sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, OCXPrDetalhamento as detalhamento,
         OCXPrValorUnitario as valorCusto, ProduCustoFinal as custoFinal, UnMedSigla, MarcaNome, tipo = 'P',
         MarcaNome, ModelNome, FabriNome
 		FROM OrdemCompraXProduto
@@ -20,7 +20,7 @@ $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, 
         LEFT JOIN Fabricante on FabriId = PrXFaFabricante
         WHERE ProduUnidade = $iUnidade and OCXPrOrdemCompra = $ordemCompra
         UNION
-        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento,
+        SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, OCXSrDetalhamento as detalhamento,
         OCXSrValorUnitario as valorCusto, ServiCustoFinal as custoFinal, '', MarcaNome, tipo = 'S',
         MarcaNome, ModelNome, FabriNome
 		FROM OrdemCompraXServico
@@ -119,7 +119,7 @@ if ($countMovimentAprovada) {
                          <td title='$item[detalhamento]$marca' data-popup='tooltip' class='valorTotal' style='text-align: right'>R$ 0, 00</td>
                          <td title='$item[detalhamento]$marca' data-popup='tooltip' style='text-align: center'></td>
                          <td style='text-align: center'><i idInput='campo$numItens' idRow='row$numItens' class='icon-file-check btn-acoes' style='cursor: pointer'></i></td>
-                         <input type='hidden' tipo='$item[tipo]' id='campo$numItens' idLinha='row$numItens' quantInicial='$saldo[Quantidade]' saldoInicial='$saldo[Saldo]'  name='campo$numItens' value='$item[tipo]#$item[id]#$item[valorCusto]#0#0#0#0'>
+                         <input type='hidden' tipo='$item[tipo]' id='campo$numItens' idLinha='row$numItens' quantInicial='$saldo[Quantidade]' saldoInicial='$saldo[Saldo]'  name='campo$numItens' value='$item[tipo]#$item[id]#$item[valorCusto]#0#0#0#0#0#0#$item[detalhamento]'>
                          <input id='MarcaNome' type='hidden' value='$item[MarcaNome]' />
                          <input id='ModelNome' type='hidden' value='$item[ModelNome]' />
                          <input id='FabriNome' type='hidden' value='$item[FabriNome]' />
@@ -225,12 +225,11 @@ if ($countMovimentAprovada) {
                          <td title='$item[detalhamento]$marca' data-popup='tooltip' class='valorTotal' style='text-align: right'>R$ 0, 00</td>
                          <td title='$item[detalhamento]$marca' data-popup='tooltip' style='text-align: center'></td>
                          <td style='text-align: center'><i idInput='campo$numItens' idRow='row$numItens' class='icon-file-check btn-acoes' style='cursor: pointer'></i></td>
-                         <input type='hidden' tipo='$item[tipo]' id='campo$numItens' idLinha='row$numItens' quantInicial='$saldo[Quantidade]' saldoInicial='$saldo[Saldo]'  name='campo$numItens' value='$item[tipo]#$item[id]#$item[valorCusto]#0#0#0#0'>
+                         <input type='hidden' tipo='$item[tipo]' id='campo$numItens' idLinha='row$numItens' quantInicial='$saldo[Quantidade]' saldoInicial='$saldo[Saldo]'  name='campo$numItens' value='$item[tipo]#$item[id]#$item[valorCusto]#0#0#0#0#0#0#$item[detalhamento]'>
                          <input id='MarcaNome' type='hidden' value='$item[MarcaNome]' />
                          <input id='ModelNome' type='hidden' value='$item[ModelNome]' />
                          <input id='FabriNome' type='hidden' value='$item[FabriNome]' />
 					<tr>";
-            // $output .= "<input type='hidden' tipo='".$item['tipo']."' id='campo".$numItens."' name='campo".$numItens."' value='".$item['id']."#".$item['valorCusto']."'>";
         }
 
         $output .= '</tbody>';

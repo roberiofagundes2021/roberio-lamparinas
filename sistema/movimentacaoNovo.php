@@ -93,8 +93,6 @@ if (isset($_POST['inputData'])) {
 			$tipoDestino = 'DestinoSetor';
 			$idDestino = $_POST['cmbDestinoSetor'];
 		}
-		var_dump($_POST);
-		die;
 
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
@@ -117,14 +115,14 @@ if (isset($_POST['inputData'])) {
 			':sTipo' => $_POST['inputTipo'],
 			':iMotivo' => $iMotivo,
 			':dData' => gravaData($_POST['inputData']),
-			':iFinalidade' => isset($_POST['cmbFinalidade']) && $_POST['cmbFinalidade'] == '#' ? null : isset($_POST['cmbFinalidade']) ? $_POST['cmbFinalidade'] : null,
+			':iFinalidade' => (isset($_POST['cmbFinalidade']) && $_POST['cmbFinalidade'] == '#') ? null : (isset($_POST['cmbFinalidade']) ? $_POST['cmbFinalidade'] : null),
 
-			':iOrigemLocal' => $tipoOrigem == 'Local' ? $idOrigem : $tipoOrigem == 'OrigemLocalTransferencia' ? $idOrigem : null,
+			':iOrigemLocal' => $tipoOrigem == 'Local' ? $idOrigem : ($tipoOrigem == 'OrigemLocalTransferencia' ? $idOrigem : null),
 			':iOrigemSetor' => $tipoOrigem == 'Setor' ? $idOrigem : null,
 
-			':iDestinoLocal' => $tipoDestino == 'Local' ? $idDestino : $tipoDestino == 'DestinoLocal' ? $idDestino : null,
+			':iDestinoLocal' => $tipoDestino == 'Local' ? $idDestino : ($tipoDestino == 'DestinoLocal' ? $idDestino : null),
 
-			':iDestinoSetor' => $tipoDestino == 'Setor' ? $idDestino : $tipoDestino == 'DestinoSetor' ? $idDestino : null,
+			':iDestinoSetor' => $tipoDestino == 'Setor' ? $idDestino : ($tipoDestino == 'DestinoSetor' ? $idDestino : null),
 
 			':sDestinoManual' => $_POST['inputDestinoManual'] == '' ? null : $_POST['inputDestinoManual'],
 			':sObservacao' => $_POST['txtareaObservacao'],
@@ -219,14 +217,15 @@ if (isset($_POST['inputData'])) {
 
 
 										$sql = "INSERT INTO MovimentacaoXProduto
-						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
+						                        (MvXPrMovimentacao, MvXPrProduto, MvXPrDetalhamento, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote, MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio)
 					                            VALUES 
-						                        (:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
+						                        (:iMovimentacao, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao, :iUsuarioAtualizador, :iUnidade, :iPatrimonio)";
 										$result = $conn->prepare($sql);
 
 										$result->execute(array(
 											':iMovimentacao' => $insertId,
 											':iProduto' => $registro[1],
+											':sDetalhamento' => '',
 											':iQuantidade' => (int) $registro[3],
 											':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 											':sLote' => $registro[5],

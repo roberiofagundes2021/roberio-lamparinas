@@ -7,7 +7,6 @@ $_SESSION['PaginaAtual'] = 'Nova Movimentação';
 include('global_assets/php/conexao.php');
 
 if (isset($_POST['inputData'])) {
-
 	try {
 		$sql = "INSERT INTO Movimentacao (MovimTipo, MovimMotivo, MovimData, MovimFinalidade, MovimOrigemLocal, MovimOrigemSetor, MovimDestinoLocal, MovimDestinoSetor, MovimDestinoManual, 
 										  MovimObservacao, MovimFornecedor, MovimOrdemCompra, MovimNotaFiscal, MovimDataEmissao, MovimNumSerie, MovimValorTotal, 
@@ -16,14 +15,6 @@ if (isset($_POST['inputData'])) {
 						:sObservacao, :iFornecedor, :iOrdemCompra, :sNotaFiscal, :dDataEmissao, :sNumSerie, :fValorTotal, 
 						:sChaveAcesso, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
-
-		/*echo $sql;
-		echo "<br>";
-		var_dump($_POST['inputTipo'], $_POST['cmbClassificacao'], gravaData($_POST['inputData']), $_POST['cmbDestinoLocal'],
-		 $_POST['txtareaObservacao'], $_POST['cmbFornecedor'], $_POST['cmbOrdemCompra'], $_POST['inputNotaFiscal'],
-		 gravaData($_POST['inputDataEmissao']), $_POST['inputNumSerie'], gravaValor($_POST['inputValorTotal']), $_POST['inputChaveAcesso'],
-		 $_POST['cmbSituacao'], $_SESSION['UsuarId'], $_SESSION['EmpreId']);
-		die;*/
 
 		$conn->beginTransaction();
 
@@ -115,17 +106,18 @@ if (isset($_POST['inputData'])) {
 
 					if ((int) $registro[3] > 0) {
 						$sql = "INSERT INTO MovimentacaoXProduto
-								(MvXPrMovimentacao, MvXPrProduto, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote,
+								(MvXPrMovimentacao, MvXPrProduto, MvXPrDetalhamento, MvXPrQuantidade, MvXPrValorUnitario, MvXPrLote,
 								MvXPrValidade, MvXPrClassificacao, MvXPrUsuarioAtualizador, MvXPrUnidade, MvXPrPatrimonio,
 								MvXPrAnoFabricacao, MvXPrNumSerie, MvXPrReferencia)
 								VALUES
-								(:iMovimentacao, :iProduto, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao,
+								(:iMovimentacao, :iProduto, :sDetalhamento, :iQuantidade, :fValorUnitario, :sLote, :dValidade, :iClassificacao,
 								:iUsuarioAtualizador, :iUnidade, :iPatrimonio, :iFabricacao, :iNumSerie, :sReferencia)";
 						$result = $conn->prepare($sql);
 
 						$result->execute(array(
 							':iMovimentacao' => $insertId,
 							':iProduto' => $registro[1],
+							':sDetalhamento' => $registro[9],
 							':iQuantidade' => (int) $registro[3],
 							':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 							':sLote' => $registro[5],
@@ -141,14 +133,15 @@ if (isset($_POST['inputData'])) {
 					}
 				} else {
 					$sql = "INSERT INTO MovimentacaoXServico
-							(MvXSrMovimentacao, MvXSrServico, MvXSrQuantidade, MvXSrValorUnitario, MvXSrUsuarioAtualizador, MvXSrUnidade, MvXSrReferencia)
+							(MvXSrMovimentacao, MvXSrServico, MvXSrDetalhamento, MvXSrQuantidade, MvXSrValorUnitario, MvXSrUsuarioAtualizador, MvXSrUnidade, MvXSrReferencia)
 							VALUES
-							(:iMovimentacao, :iServico, :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade, :sReferencia)";
+							(:iMovimentacao, :iServico, :sDetalhamento,  :iQuantidade, :fValorUnitario, :iUsuarioAtualizador, :iUnidade, :sReferencia)";
 					$result = $conn->prepare($sql);
 
 					$result->execute(array(
 						':iMovimentacao' => $insertId,
 						':iServico' => $registro[1],
+						':sDetalhamento' => $registro[9],
 						':iQuantidade' => (int) $registro[3],
 						':fValorUnitario' => isset($registro[2]) ? (float) $registro[2] : null,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -353,6 +346,7 @@ if (isset($_POST['inputData'])) {
 
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e) {
+				console.log('entrou no click');
 
 				// close modal
 				$('#page-modal').fadeOut(200);
@@ -521,6 +515,7 @@ if (isset($_POST['inputData'])) {
 							valorCampo = valorCampo.split('#')
 
 							console.log(valorCampo)
+							// value='$item[tipo] # $item[id] # $item[valorCusto] # 0 # 0 # 0 # 0 # $item[detalhamento]'
 
 							let quantidade = parseInt(valorCampo[3]) < parseInt(valorCampo[4])? valorCampo[3] : valorCampo[4]
 							let lote = valorCampo[5] && valorCampo[5] != '0'? valorCampo[5]: ''
@@ -665,6 +660,8 @@ if (isset($_POST['inputData'])) {
 					arrayValInput[6] = validade
 					arrayValInput[7] = numSerie
 					arrayValInput[8] = fabricacao
+
+					// ['S', '58', '100.00', '0', '0', '0', '0', 'Detalhamento do servico']
 
 					var virgula = eval('/' + ',' + '/g') // buscando na string as ocorrências da ','
 					var stringVallnput = arrayValInput.toString().replace(virgula, '#') // transformando novamente em string, e trocando as virgulas por #.
@@ -1083,17 +1080,6 @@ if (isset($_POST['inputData'])) {
 															print('<input name="cmbSituacao" value="' . $item['SituaId'] . '" type="hidden" />');
 														}
 													}
-
-													// print('<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" disabled>');
-													// print('<option value="#">Selecione</option>');
-
-													// foreach ($row as $item) {
-													// 	if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCENTRO') {
-													// 		print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
-													// 	} else if ($item['SituaChave'] == 'LIBERADO') {
-													// 		print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
-													// 	}
-													// }
 												}
 												?>
 												</select>
