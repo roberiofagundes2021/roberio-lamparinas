@@ -31,7 +31,7 @@ if (isset($_POST['produtos']) and $_POST['produtos'] != ''){
 	$lista = 0;
 }
 
-$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OCXPrQuantidade, FOXPrValorUnitario,
+$sql = "SELECT ProduId, ProduNome, OCXPrDetalhamento as Detalhamento, UnMedSigla, OCXPrQuantidade, FOXPrValorUnitario,
 				dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxoOp', ProduId, 'P') as SaldoOrdemCompra
 				FROM Produto
 				JOIN Situacao on SituaId = ProduStatus
@@ -50,7 +50,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 
 if(!$count>0){
-	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, FOXPrValorUnitario,
+	$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrValorUnitario,
 					dbo.fnSaldoOrdemCompra($_SESSION[UnidadeId], '$iFluxoOp', ProduId, 'P') as SaldoOrdemCompra
 					FROM Produto
 					JOIN Categoria on CategId = ProduCategoria
@@ -91,7 +91,7 @@ foreach ($row as $item){
 												<input type="hidden" id="inputIdProduto'.$cont.'" name="inputIdProduto'.$cont.'" value="'.$item['ProduId'].'" class="idProduto">
 											</div>
 											<div class="col-lg-10" style="width:100%">
-												<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['ProduDetalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
+												<input type="text" id="inputProduto'.$cont.'" name="inputProduto'.$cont.'" class="form-control-border-off" data-popup="tooltip" title="'.$item['Detalhamento'].'" value="'.$item['ProduNome'].'" readOnly>
 											</div>
 										</div>
 									</div>								

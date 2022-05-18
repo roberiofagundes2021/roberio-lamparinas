@@ -82,7 +82,7 @@ try {
 	<div style='text-align:center; margin-top: 20px;'><h1>ENTRADA DE MERCADORIA</h1></div>
 	";
 	
-    $sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, MvXPrQuantidade, MvXPrValorUnitario,
+    $sql = "SELECT ProduId, ProduNome, MvXPrDetalhamento, UnMedSigla, MvXPrQuantidade, MvXPrValorUnitario,
 						(SELECT MarcaNome FROM Marca WHERE MarcaId = ProduMarca) as Marca, MvXPrLote, MvXPrValidade
             FROM Produto
             JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
@@ -92,7 +92,7 @@ try {
     $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
     $totalProdutos = count($rowProdutos);
 
-    $sql = "SELECT ServiId, ServiNome, ServiDetalhamento, MvXSrQuantidade, MvXSrValorUnitario,
+    $sql = "SELECT ServiId, ServiNome, MvXSrDetalhamento, MvXSrQuantidade, MvXSrValorUnitario,
 						(SELECT MarcaNome FROM Marca WHERE MarcaId = ServiMarca) as Marca
             FROM Servico
             JOIN MovimentacaoXServico on MvXSrServico = ServiId
@@ -163,7 +163,7 @@ try {
 				$html .= "
 					<tr>
 						<td style='text-align: center;'>".$cont."</td>
-						<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['ProduDetalhamento']
+						<td style='text-align: left;'>".$itemProduto['ProduNome'].": ".$itemProduto['MvXPrDetalhamento']
 						.($itemProduto['Marca']!=''?"<br>Marca: ".$itemProduto['Marca']:'')
 						.($itemProduto['MvXPrLote']!=''?"<br>Lote: ".$itemProduto['MvXPrLote']:'')
 						.($itemProduto['MvXPrValidade']!=''?"<br>Validade: ".mostraData($itemProduto['MvXPrValidade']):'').
@@ -222,7 +222,7 @@ try {
 				$html .= "
 					<tr>
 						<td style='text-align: center;'>".$cont."</td>
-						<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['ServiDetalhamento']
+						<td style='text-align: left;'>".$itemServico['ServiNome'].": ".$itemServico['MvXSrDetalhamento']
 						.($itemServico['Marca']!=''?"<br>Marca: ".$itemServico['Marca']:'').
 						"</td>
 						<td style='text-align: center;'>".$itemServico['MvXSrQuantidade']."</td>
