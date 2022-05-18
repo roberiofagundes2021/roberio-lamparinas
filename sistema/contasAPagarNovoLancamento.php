@@ -804,8 +804,6 @@ if (isset($_POST['cmbPlanoContas'])) {
         }
     }
 
-    die;
-
     if(isset($_POST['inputControlador'])) {
         irpara("movimentacaoFinanceiraConciliacao.php");
     }else {
