@@ -13,6 +13,8 @@ function queryPesquisa()
     $args = [];
 	
     if (!empty($_POST['cmbUnidade'])) {
+		$args[]  = "ProduUnidade = " . $_POST['cmbUnidade'] . " ";
+		$iUnidade = $_POST['cmbUnidade'];
 		
 		if (!empty($_POST['cmbSetor'])) {
 			$args[]  = "MovimDestinoSetor = " . $_POST['cmbSetor'] . " ";
