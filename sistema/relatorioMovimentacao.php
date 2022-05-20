@@ -500,7 +500,7 @@ $dataFim = date("Y-m-d");
 										</div>
 									</div>
 									<div class="row">
-										<div class="col-lg-4">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputDataInicio">Data Início</label>
 												<div class="input-group">
@@ -511,7 +511,7 @@ $dataFim = date("Y-m-d");
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-4">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputDataFim">Data Fim</label>
 												<div class="input-group">
@@ -522,7 +522,7 @@ $dataFim = date("Y-m-d");
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-4">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="cmbTipo">Tipo</label>
 												<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2">
@@ -532,52 +532,7 @@ $dataFim = date("Y-m-d");
 													<option value="T">Transferência</option>
 												</select>
 											</div>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-													<option value="">Todas</option>
-													<?php
-													$sql = "SELECT CategId, CategNome
-																FROM Categoria
-																JOIN Situacao on SituaId = CategStatus
-																WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY CategNome ASC";
-													$result = $conn->query($sql);
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowCategoria as $item) {
-														print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
-													}
-
-													?>
-												</select>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="">Todas</option>
-													<?php
-													$sql = "SELECT SbCatId, SbCatNome
-																	FROM SubCategoria
-																	JOIN Situacao on SituaId = SbCatStatus
-																	WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																	ORDER BY SbCatNome ASC";
-													$result = $conn->query($sql);
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($row as $item) {
-														print('<option value="' . $item['SbCatId'] . '">' . $item['SbCatNome'] . '</option>');
-													}
-													?>
-												</select>
-											</div>
-										</div>
+										</div>	
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbOrigem">Origem</label>
@@ -637,7 +592,52 @@ $dataFim = date("Y-m-d");
 													?>
 												</select>
 											</div>
-                                   		</div>					 
+                                   		</div>	
+									</div>
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbCategoria">Categoria</label>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+													<option value="">Todas</option>
+													<?php
+													$sql = "SELECT CategId, CategNome
+																FROM Categoria
+																JOIN Situacao on SituaId = CategStatus
+																WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY CategNome ASC";
+													$result = $conn->query($sql);
+													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowCategoria as $item) {
+														print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
+													}
+
+													?>
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbSubCategoria">SubCategoria</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+													<option value="">Todas</option>
+													<?php
+													$sql = "SELECT SbCatId, SbCatNome
+																	FROM SubCategoria
+																	JOIN Situacao on SituaId = SbCatStatus
+																	WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY SbCatNome ASC";
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($row as $item) {
+														print('<option value="' . $item['SbCatId'] . '">' . $item['SbCatNome'] . '</option>');
+													}
+													?>
+												</select>
+											</div>
+										</div>			 
 									</div>
 									<div class="row">
 										<div class="col-lg-2">
