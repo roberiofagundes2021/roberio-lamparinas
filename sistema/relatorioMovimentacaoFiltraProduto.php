@@ -23,10 +23,6 @@ function queryPesquisa()
         $args[]  = "MovimTipo = '" . $_POST['cmbTipo'] . "' ";
     }
 
-    if (!empty($_POST['cmbFornecedor'])) {
-        $args[]  = "MovimFornecedor = " . $_POST['cmbFornecedor'] . " ";
-    }
-
     if (!empty($_POST['cmbCategoria']) && $_POST['cmbCategoria'] != 'Sem Categoria' && $_POST['cmbCategoria'] != "Filtrando...") {
         $args[]  = "ProduCategoria = " . $_POST['cmbCategoria'] . " ";
     }
@@ -88,7 +84,7 @@ function queryPesquisa()
                     WHEN MovimDestinoLocal IS NULL THEN ISNULL(SetorD.SetorNome, MovimDestinoManual)
                 ELSE LocalD.LcEstNome
                 END as Destino, 
-                MvXPrQuantidade, ProduNome, CategNome, ForneNome
+                MvXPrQuantidade, ProduNome, CategNome, ProduEstoqueMinimo, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', MovimDestinoLocal) as Saldo
             FROM Movimentacao   
             JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
             JOIN Produto on ProduId = MvXPrProduto
@@ -98,7 +94,6 @@ function queryPesquisa()
             LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
             LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
             LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
-            LEFT JOIN Fornecedor on ForneId = MovimFornecedor
             LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
             WHERE " . $string . " MovimUnidade = " . $_SESSION['UnidadeId'] . " and 
             SituaChave in ('LIBERADO', 'LIBERADOCENTRO', 'AGUARDANDOLIBERACAOCONTABILIDADE', 'LIBERADOCONTABILIDADE')
@@ -123,7 +118,6 @@ function queryPesquisa()
                 <td class='even' style='text-align: center'>" . $item['MovimTipo'] . "</td>
                 <td class='odd'>" . $item['ProduNome'] . "</td>
                 <td class='even'>" . $item['CategNome'] . "</td>
-                <td class='odd'>" . $item['ForneNome'] . "</td>
                 <td class='odd' style='text-align: center'>" . $item['MvXPrQuantidade'] . "</td>
                 <td class='odd'>" . $item['Origem']  . "</td>
                 <td class='even'>" . $item['Destino'] . "</td>
@@ -138,9 +132,11 @@ function queryPesquisa()
 
             $nomeCategoria = $item['CategNome'];
 
-            $nomeFornecedor = $item['ForneNome'];
-
             $quantidade = $item['MvXPrQuantidade'];
+
+            $estoqueMinimo = $item['ProduEstoqueMinimo'];
+
+            $saldo = $item['Saldo'];
 
             $origem = $item['Origem'];
 
@@ -152,8 +148,9 @@ function queryPesquisa()
                     isset($tipo) ? $tipo : null, 
                     isset($nomeProduto) ? $nomeProduto : null,
                     isset($nomeCategoria) ? $nomeCategoria : null, 
-                    isset($nomeFornecedor) ? $nomeFornecedor : null, 
                     isset($quantidade) ? $quantidade : null, 
+                    isset($estoqueMinimo) ? $estoqueMinimo : null,
+                    isset($saldo) ? $saldo : null,
                     isset($origem) ? $origem : null, 
                     isset($destino) ? $destino : null 
                     
