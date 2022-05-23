@@ -37,9 +37,173 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('.form-check-label > input[type="checkbox"][value="multiselect-all"]').prop( "checked", true );
-		 });
+		});
 
+		//A função .on("click"): trabalha dinâmicamente, ou seja, funciona msm dps q o objeto é carregado na página
+		$(document).on("click", ".planoConta", function(){
+			let planoConta = $(this).attr('id');
+			let indice = planoConta.replace(/[^0-9]/g,''); //Pega apenas o número da string
+			let idPlanoContaPai1 = $("#idPlanoConta"+indice).val();
 
+			if ( $('#'+planoConta ).is( ".visivel" ) ) {
+				$('#'+planoConta).removeClass("visivel");
+				$('#'+planoConta).addClass("minimizado");
+				
+				$("#planoContaPai"+indice).html('')
+				$('#simbolo'+indice).html('( + ) ')
+				$('#simbolo'+indice).css("color","#607D8B")
+			}else {
+				$('#'+planoConta).removeClass("minimizado");
+				$('#'+planoConta).addClass("visivel");
+			
+				let HTML = '';
+
+				const urlConsultaPlanoConta = "consultaPlanoConta.php";
+
+				var inputsValuesConsulta = {
+					inputPlanoConta1: idPlanoContaPai1
+				}; 
+
+				const msg = $('<div class="text-center"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></div>');
+				$("#planoContaPai"+indice).html(msg)
+
+				//Consulta saldo anterior
+				$.ajax({
+					type: "POST",
+					url: urlConsultaPlanoConta,
+					dataType: "json",
+					data: inputsValuesConsulta,
+					success: function(resposta) {
+						if(resposta[0]) {
+							for(let x = 0; x < resposta.length; x++) {
+								let planoConta1 = resposta[x]
+								
+								HTML = HTML + `
+										<div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
+											<div id='planoContaFilho`+planoConta1.PlConId+`' class='col-lg-4 planoContaFilho' style='padding-left: 20px; border-right: 1px dotted black; cursor:pointer;'>
+												<span title=''><span id='simboloFilho`+planoConta1.PlConId+`'' style='font-weight: bold; color: #607D8B;'>( + ) </span>`+planoConta1.PlConNome+`</span>
+											</div>
+									
+											<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+												<div class='row'>
+												<div class='col-md-6'>
+													<span></span>
+												</div>
+									
+												<div class='col-md-6'>
+													<span></span>
+												</div>
+												</div>
+											</div>
+										</div>
+										<div id='centroCusto`+planoConta1.PlConId+`'>
+										</div>`;
+							}
+
+						}else {
+							HTML = HTML + `
+									<div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
+										<div class='col-lg-12 text-center'>
+											<span title=''>Vazio</span>
+										</div>
+									</div>`;
+						}
+
+						$("#planoContaPai"+indice).html(HTML)
+					}
+				})
+
+				$('#simbolo'+indice).html('( - ) ')
+				$('#simbolo'+indice).css("color","red")
+			}
+		});
+
+		$(document).on("click", ".planoContaFilho", function(){
+			let planoContaFilho = $(this).attr('id');
+			let indice = planoContaFilho.replace(/[^0-9]/g,''); //Pega apenas o número da string
+			let idPlanoContaFilho1 = 'teste'
+
+			if ( $('#'+planoContaFilho ).is( ".visivel" ) ) {
+				$('#'+planoContaFilho).removeClass("visivel");
+				$('#'+planoContaFilho).addClass("minimizado");
+				
+				$("#centroCusto"+indice).html('')
+				$('#simboloFilho'+indice).html('( + ) ')
+				$('#simboloFilho'+indice).css("color","#607D8B")
+			}else {
+				$('#'+planoContaFilho).removeClass("minimizado");
+				$('#'+planoContaFilho).addClass("visivel");
+			
+				let HTML = '';
+
+				const urlConsultaPlanoConta = "consultaCentroCusto.php";
+
+				var inputsValuesConsulta = {
+					inputPlanoConta1: idPlanoContaFilho1
+				}; 
+
+				const msg = $('<div class="text-center"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></div>');
+				$("#centroCusto"+indice).html(msg)
+				
+				//Consulta saldo anterior
+				$.ajax({
+					type: "POST",
+					url: urlConsultaPlanoConta,
+					dataType: "json",
+					data: inputsValuesConsulta,
+					success: function(resposta) {
+						/*
+						if(resposta[0]) {
+							for(let x = 0; x < resposta.length; x++) {
+								let planoConta1 = resposta[x]
+								
+								HTML = HTML + `
+										<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
+											<div id='planoContaFilho`+planoConta1.PlConId+`' class='col-lg-4 planoContaFilho' style='padding-left: 40px; border-right: 1px dotted black;'>
+												<span title=''>`+planoConta1.PlConNome+`</span>
+											</div>
+									
+											<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+												<div class='row'>
+												<div class='col-md-6'>
+													<span></span>
+												</div>
+									
+												<div class='col-md-6'>
+													<span></span>
+												</div>
+												</div>
+											</div>
+										</div>
+										<div id='centroCusto`+planoConta1.PlConId+`'>
+										</div>`;
+							}
+
+						}else {
+							HTML = HTML + `
+									<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
+										<div class='col-lg-12 text-center'>
+											<span title=''>Vazio</span>
+										</div>
+									</div>`;
+						}*/
+
+						HTML = HTML + `
+									<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
+										<div class='col-lg-12 text-center'>
+											<span title=''>Parte em desenvolvimento</span>
+										</div>
+									</div>`;
+
+						$("#centroCusto"+indice).html(HTML)
+					}
+				})
+
+				$('#simboloFilho'+indice).html('( - ) ')
+				$('#simboloFilho'+indice).css("color","red")
+			}
+		});
+		
 		document.addEventListener('DOMContentLoaded', () => {
 			// Atribuição dos campos de filtro da tela
 			const buttonDay = document.querySelector('#submitDay');
@@ -48,7 +212,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			const inputDateEnd = document.querySelector('#inputDataFim');
 			const submitPesquisar = document.querySelector('#submitPesquisar');
 			const cmbCentroDeCustosItens = $(".centroDeCustosClass");
-/////////////////////////////////////
+			/////////////////////////////////////
 			cmbCentroDeCustosItens.each((i, element) => {
 				
 				if($(element).hasClass('multiselect-item')){

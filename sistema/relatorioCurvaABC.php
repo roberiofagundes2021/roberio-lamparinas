@@ -108,6 +108,8 @@ $dataFim = date('Y-m-d');
 		$(document).ready(function() {	
 
 			$('#grafico').hide();
+
+			FiltraSetor();
 		
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e){
@@ -137,24 +139,6 @@ $dataFim = date('Y-m-d');
 			$('#cmbUnidade').on('change', function(e){
 				
 				FiltraSetor();
-				
-				var cmbUnidade = $('#cmbUnidade').val();
-
-				$.getJSON('filtraSetor.php?idUnidade='+cmbUnidade, function (dados){
-					
-					var option = '<option value="">Selecione o Setor</option>';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SetorId+'">'+obj.SetorNome+'</option>';
-						});						
-						
-						$('#cmbSetor').html(option).show();
-					} else {
-						ResetSetor();
-					}					
-				});				
 			});	
 			
 			Ladda.bind('.btn-ladda-progress1', {
@@ -607,7 +591,27 @@ $dataFim = date('Y-m-d');
 
 		//Mostra o "Filtrando..." na combo Setor
 		function FiltraSetor(){
+
 			$('#cmbSetor').empty().append('<option value="">Filtrando...</option>');
+
+			var cmbUnidade = $('#cmbUnidade').val();
+
+			$.getJSON('filtraSetor.php?idUnidade='+cmbUnidade, function (dados){
+				
+				var option = '<option value="">Selecione o Setor</option>';
+				
+				if (dados.length){						
+					
+					$.each(dados, function(i, obj){
+						option += '<option value="'+obj.SetorId+'">'+obj.SetorNome+'</option>';
+					});						
+					
+					$('#cmbSetor').html(option).show();
+				} else {
+					ResetSetor();
+				}					
+			});		
+
 		}
 
 		function ResetSubCategoria(){
@@ -687,7 +691,7 @@ $dataFim = date('Y-m-d');
 											<div class="form-group">
 												<label for="cmbUnidade">Unidade</label>
 												<select id="cmbUnidade" name="cmbUnidade" class="form-control form-control-select2">
-													<option value="">Selecione</option>
+													
 													<?php 
 														$sql = "SELECT UnidaId, UnidaNome
 																FROM Unidade
@@ -698,8 +702,11 @@ $dataFim = date('Y-m-d');
 														$rowUnidade = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($rowUnidade as $item){
-															//$seleciona = $item['UnidaId'] == $row['FlOpeFornecedor'] ? "selected" : "";
-															print('<option value="'.$item['UnidaId'].'">'.$item['UnidaNome'].'</option>');
+															if($item['UnidaId'] == $_SESSION['UnidadeId']){
+																print('<option value="' . $item['UnidaId'] . '" selected>' . $item['UnidaNome'] . '</option>');   
+															} else {
+																print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
+															}
 														}
 													
 													?>

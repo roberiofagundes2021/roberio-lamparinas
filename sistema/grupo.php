@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Grupo Conta';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT GrConId, GrConNome, GrConStatus, SituaNome, SituaCor, SituaChave
+$sql = "SELECT GrConId, GrConCodigo, GrConNome, GrConStatus, SituaNome, SituaCor, SituaChave
 		FROM GrupoConta
 		JOIN Situacao on SituaId = GrConStatus
 	    WHERE GrConUnidade = ". $_SESSION['UnidadeId'] ."
@@ -15,71 +15,6 @@ $sql = "SELECT GrConId, GrConNome, GrConStatus, SituaNome, SituaCor, SituaChave
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
-
-//Se estiver editando
-if(isset($_POST['inputGrupoContaId']) && $_POST['inputGrupoContaId']){
-
-	//Essa consulta é para preencher o campo Nome com o grupo conta a ser editar
-	$sql = "SELECT GrConId, GrConNome
-			FROM GrupoConta
-			WHERE GrConId = " . $_POST['inputGrupoContaId'];
-	$result = $conn->query($sql);
-	$rowGrupoConta = $result->fetch(PDO::FETCH_ASSOC);
-		
-	$_SESSION['msg'] = array();
-} 
-
-//Se estiver gravando (inclusão ou edição)
-if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
-
-	try{
-
-		//Edição
-		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
-			
-			$sql = "UPDATE GrupoConta SET GrConNome = :sNome, GrConUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE GrConId = :iGrupoConta";
-			$result = $conn->prepare($sql);
-					
-			$result->execute(array(
-							':sNome' => $_POST['inputNome'],
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iGrupoConta' => $_POST['inputGrupoContaId']
-							));
-	
-			$_SESSION['msg']['mensagem'] = "Grupo Conta alterada!!!";
-	
-		} else { //inclusão
-		
-			$sql = "INSERT INTO GrupoConta (GrConNome, GrConStatus, GrConUsuarioAtualizador, GrConUnidade)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
-			$result = $conn->prepare($sql);
-					
-			$result->execute(array(
-							':sNome' => $_POST['inputNome'],
-							':bStatus' => 1,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId'],
-							));
-	
-			$_SESSION['msg']['mensagem'] = "Grupo Conta incluída!!!";
-					
-		}
-	
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['tipo'] = "success";
-					
-	} catch(PDOException $e) {
-		
-		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro reportado com o Grupo Conta!!!";
-		$_SESSION['msg']['tipo'] = "error";	
-		
-		echo 'Error: ' . $e->getMessage();
-	}
-
-	irpara("grupo.php");
-}
 
 ?>
 
@@ -119,19 +54,24 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				responsive: true,
 			    columnDefs: [
 				{
-					orderable: true,   //Grupo Conta
-					width: "80%",
+					orderable: true,   //Código
+					width: "10%",
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Situação
-					width: "10%",
+					orderable: true,   //Grupo Conta
+					width: "70%",
 					targets: [1]
+				},
+				{ 
+					orderable: false,   //Situação
+					width: "10%",
+					targets: [2]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [2]
+					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -213,8 +153,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				document.getElementById('inputGrupoContaStatus').value = GrConStatus;
 						
 				if (Tipo == 'edita'){	
-					document.getElementById('inputEstadoAtual').value = "EDITA";
-					document.formGrupoConta.action = "grupo.php";		
+					//document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formGrupoConta.action = "grupoEdita.php";		
 				} else if (Tipo == 'exclui'){
 					confirmaExclusao(document.formGrupoConta, "Tem certeza que deseja excluir esse grupo conta?", "grupoExclui.php");
 				} else if (Tipo == 'mudaStatus'){
@@ -258,6 +198,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								<h3 class="card-title">Relação de Grupo Conta</h3>
 							</div>
 
+							<!--
 							<div class="card-body">
 
 								<form name="formGrupoConta" id="formGrupoConta" method="post" class="form-validate-jquery">
@@ -277,25 +218,26 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										<div class="col-lg-6">
 											<div class="form-group" style="padding-top:25px;">
 												<?php
-
+													/*
 													//editando
 													if (isset($_POST['inputGrupoContaId'])){
 														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
 														print('<a href="grupo.php" class="btn btn-basic" role="button">Cancelar</a>');
 													} else{ //inserindo
 														print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
-													}
+													}*/
 
 												?>
 											</div>
 										</div>
 									</div>
 								</form>
-							</div>
+							</div>-->
 							
 							<table id="tblGrupoConta" class="table">
 								<thead>
 									<tr class="bg-slate">
+										<th>Código</th>
 										<th>Grupo Conta</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
@@ -311,6 +253,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										
 										print('
 										<tr>
+											<td>'.$item['GrConCodigo'].'</td>
 											<td>'.$item['GrConNome'].'</td>
 											');
 										
@@ -320,7 +263,6 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
 														<a href="#" onclick="atualizaGrupoConta(1,'.$item['GrConId'].', \''.addslashes($item['GrConNome']).'\','.$item['GrConStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaGrupoConta(1,'.$item['GrConId'].', \''.addslashes($item['GrConNome']).'\','.$item['GrConStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>
@@ -337,6 +279,12 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				</div>				
 				
 				<!-- /info blocks -->
+
+				<form name="formGrupoConta" method="post">
+					<input type="hidden" id="inputGrupoContaId" name="inputGrupoContaId" value="<?php if (isset($_POST['inputGrupoContaId'])) echo $_POST['inputGrupoContaId']; ?>" >
+					<input type="hidden" id="inputGrupoContaNome" name="inputGrupoContaNome" value="<?php if (isset($_POST['inputGrupoContaNome'])) echo $_POST['inputGrupoContaNome']; ?>" >
+					<input type="hidden" id="inputGrupoContaStatus" name="inputGrupoContaStatus" >
+				</form>
 
 			</div>
 			<!-- /content area -->

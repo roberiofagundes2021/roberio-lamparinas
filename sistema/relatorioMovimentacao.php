@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Relatório de Movimentação';
+$_SESSION['PaginaAtual'] = 'Movimentação do Estoque';
 
 include('global_assets/php/conexao.php');
 
@@ -16,11 +16,10 @@ $sql = "SELECT MovimData, MovimTipo,
 		ELSE LocalD.LcEstNome
 		END as Destino, 
 		MovimNotaFiscal, MvXPrQuantidade, MvXPrLote,
-		MvXPrValidade, MvXPrValorUnitario, ProduNome, ForneNome, ClassNome
+		MvXPrValidade, MvXPrValorUnitario, ProduNome, ClassNome, ProduEstoqueMinimo
 		FROM Movimentacao
 		JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
 		JOIN Produto on ProduId = MvXPrProduto
-		LEFT JOIN Fornecedor on ForneId = MovimFornecedor
 		LEFT JOIN LocalEstoque LocalO on LocalO.LcEstId = MovimOrigemLocal 
 		LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
 		LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
@@ -30,16 +29,6 @@ $sql = "SELECT MovimData, MovimTipo,
 		";
 $result = $conn->query($sql);
 $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
-
-
-$sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
-		FROM Fornecedor
-		JOIN Categoria on CategId = ForneCategoria
-	    WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . "
-		ORDER BY ForneNome ASC";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
-//$count = count($row);
 
 $d = date("d");
 $m = date("m");
@@ -57,7 +46,7 @@ $dataFim = date("Y-m-d");
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Relatório de Movimentação</title>
+	<title>Lamparinas | Movimentação do Estoque</title>
 
 	<?php include_once("head.php"); ?>
 
@@ -104,7 +93,7 @@ $dataFim = date("Y-m-d");
 					},
 					{
 						orderable: true, //Produto
-						width: "20%",
+						width: "15%",
 						targets: [2]
 					},
 					{
@@ -113,24 +102,29 @@ $dataFim = date("Y-m-d");
 						targets: [3]
 					},
 					{
-						orderable: true, //Fornecedor
-						width: "15%",
+						orderable: true, //Quantidade
+						width: "10%",
 						targets: [4]
 					},
 					{
-						orderable: true, //Quantidade
+						orderable: true, //Estoque Mínimo
 						width: "10%",
 						targets: [5]
 					},
 					{
-						orderable: true, //Origem
+						orderable: true, //Saldo
 						width: "10%",
 						targets: [6]
 					},
 					{
-						orderable: true, //Destino
+						orderable: true, //Origem
 						width: "10%",
 						targets: [7]
+					},
+					{
+						orderable: true, //Destino
+						width: "10%",
+						targets: [8]
 					}
 				],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -164,85 +158,6 @@ $dataFim = date("Y-m-d");
 
 			_componentSelect2();
 			/* Fim: Tabela Personalizada */
-
-			//Ao mudar o fornecedor, filtra a categoria, subcategoria e produto via ajax (retorno via JSON)
-			$('#cmbFornecedor').on('change', function(e) {
-
-				var cmbTipo = $('#cmbTipo').val();
-				var inputFornecedor = $('#inputFornecedor').val();
-				var cmbFornecedor = $('#cmbFornecedor').val();
-
-				$('#inputFornecedor').val(cmbFornecedor);
-
-				FiltraCategoria();
-				Filtrando();
-				FiltraServico();
-
-				$.getJSON('filtraCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
-
-					var option = '<option value="">Selecione a Categoria</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.CategId + '">' + obj.CategNome + '</option>';
-						});
-
-						$('#cmbCategoria').html(option).show();
-					} else {
-						ResetCategoria();
-					}
-				});
-
-				$.getJSON('filtraSubCategoria.php?idFornecedor=' + cmbFornecedor, function(dados) {
-
-					var option = '<option value="">Selecione a SubCategoria</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
-						});
-
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						ResetSubCategoria();
-					}
-				});
-
-				$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor, function(dados) {
-
-					var option = '<option value="" "selected">Selecione o Produto</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.ProduId + '">' + obj.ProduNome + '</option>';
-						});
-
-						$('#cmbProduto').html(option).show();
-					} else {
-						ResetProduto();
-					}
-				});
-
-				$.getJSON('filtraServico.php?idFornecedor=' + cmbFornecedor, function(dados) {
-
-					var option = '<option value="" "selected">Selecione o Serviço</option>';
-
-					if (dados.length) {
-
-						$.each(dados, function(i, obj) {
-							option += '<option value="' + obj.ServiId + '">' + obj.ServiNome + '</option>';
-						});
-
-						$('#cmbServico').html(option).show();
-					} else {
-						ResetServico();
-					}
-				});
-
-			});
 
 			//Ao mudar a categoria, filtra a subcategoria e produto via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e) {
@@ -291,31 +206,10 @@ $dataFim = date("Y-m-d");
 				FiltraProduto();
 
 				var cmbTipo = $('#cmbTipo').val();
-				var cmbFornecedor = $('#cmbFornecedor').val();
 				var cmbCategoria = $('#cmbCategoria').val();
 				var cmbSubCategoria = $('#cmbSubCategoria').val();
 
-				if (cmbTipo == 'S' || cmbTipo == 'T') {
-					cmbFornecedor = '#';
-				}
-
-				if (cmbFornecedor !='#' && cmbFornecedor != '') {
-					$.getJSON('filtraProduto.php?idFornecedor=' + cmbFornecedor + '&idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
-
-						var option = '<option value="#" "selected">Selecione o Produto</option>';
-
-						if (dados.length) {
-
-							$.each(dados, function(i, obj) {
-								option += '<option value="' + obj.ProduId + '">' + obj.ProduNome + '</option>';
-							});
-
-							$('#cmbProduto').html(option).show();
-						} else {
-							ResetProduto();
-						}
-					});
-				} else if (cmbCategoria != '#' && cmbCategoria != '') {
+				if (cmbCategoria != '#' && cmbCategoria != '') {
 					$.getJSON('filtraProduto.php?idCategoria=' + cmbCategoria + '&idSubCategoria=' + cmbSubCategoria, function(dados) {
 
 						var option = '<option value="#" "selected">Selecione o Produto</option>';
@@ -407,7 +301,6 @@ $dataFim = date("Y-m-d");
 					let dataDe = $('#inputDataDe').val()
 					let dataAte = $('#inputDataAte').val()
 					let tipo = $('#cmbTipo').val()
-					let fornecedor = $('#cmbFornecedor').val()
 					let categoria = $('#cmbCategoria').val()
 					let subCategoria = $('#cmbSubCategoria').val()
 					let inputProduto = $('#cmbProduto').val()
@@ -424,7 +317,6 @@ $dataFim = date("Y-m-d");
 						inputDataDe: dataDe,
 						inputDataAte: dataAte,
 						cmbTipo: tipo,
-						cmbFornecedor: fornecedor,
 						cmbCategoria: categoria,
 						cmbSubCategoria: subCategoria,
 						cmbProduto: inputProduto,
@@ -472,7 +364,9 @@ $dataFim = date("Y-m-d");
 									
 								// adiciona os atributos nas tags <td>
 								$(rowNode).find('td').eq(1).attr('style', 'text-align: center;') 
+								$(rowNode).find('td').eq(4).attr('style', 'text-align: center;')
 								$(rowNode).find('td').eq(5).attr('style', 'text-align: center;')
+								$(rowNode).find('td').eq(6).attr('style', 'text-align: center;')
 							
 
 							})
@@ -507,7 +401,6 @@ $dataFim = date("Y-m-d");
 						$('#inputDataDe_imp').val(inputsValues.inputDataDe)
 						$('#inputDataAte_imp').val(inputsValues.inputDataAte)
 						$('#cmbTipo_imp').val(inputsValues.cmbTipo)
-						$('#cmbFornecedor_imp').val(inputsValues.cmbFornecedor)
 						$('#cmbCategoria_imp').val(inputsValues.cmbCategoria)
 						$('#cmbSubCategoria_imp').val(inputsValues.cmbSubCategoria)
 						$('#cmbProduto_imp').val(inputsValues.cmbProduto)
@@ -528,32 +421,6 @@ $dataFim = date("Y-m-d");
 
 		});
 
-		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaFornecedor(ForneId, ForneNome, ForneStatus, Tipo) {
-
-			if (Tipo == 'imprime') {
-
-				document.getElementById('inputFornecedorCategoria').value = document.getElementById('cmbCategoria').value;
-
-				document.formFornecedor.action = "fornecedorImprime.php";
-				document.formFornecedor.setAttribute("target", "_blank");
-			} else {
-				document.getElementById('inputFornecedorId').value = ForneId;
-				document.getElementById('inputFornecedorNome').value = ForneNome;
-				document.getElementById('inputFornecedorStatus').value = ForneStatus;
-
-				if (Tipo == 'edita') {
-					document.formFornecedor.action = "fornecedorEdita.php";
-				} else if (Tipo == 'exclui') {
-					confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?", "fornecedorExclui.php");
-				} else if (Tipo == 'mudaStatus') {
-					document.formFornecedor.action = "fornecedorMudaSituacao.php";
-				}
-			}
-
-			document.formFornecedor.submit();
-		}
-
 		function selecionaTipo(tipo) {
 			if (tipo == 'P') {
 				document.getElementById('Produto').style.display = "block";
@@ -567,7 +434,7 @@ $dataFim = date("Y-m-d");
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>
 
@@ -590,7 +457,7 @@ $dataFim = date("Y-m-d");
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relatório de Movimentação</h3>
+								<h3 class="card-title">Movimentação do Estoque</h3>
 							</div>
 
 							<div class="card-body">
@@ -603,7 +470,6 @@ $dataFim = date("Y-m-d");
 									<input id="inputDataDe_imp" type="hidden" name="inputDataDe_imp"></input>
 									<input id="inputDataAte_imp" type="hidden" name="inputDataAte_imp"></input>
 									<input id="cmbTipo_imp" type="hidden" name="cmbTipo_imp"></input>
-									<input id="cmbFornecedor_imp" type="hidden" name="cmbFornecedor_imp"></input>
 									<input id="cmbCategoria_imp" type="hidden" name="cmbCategoria_imp"></input>
 									<input id="cmbSubCategoria_imp" type="hidden" name="cmbSubCategoria_imp"></input>
 									<input id="cmbProduto_imp" type="hidden" name="cmbProduto_imp"></input>
@@ -666,74 +532,7 @@ $dataFim = date("Y-m-d");
 													<option value="T">Transferência</option>
 												</select>
 											</div>
-										</div>
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="cmbFornecedor">Fornecedor</label>
-												<select id="cmbFornecedor" name="cmbFornecedor" class="form-control form-control-select2">
-													<option value="">Todos</option>
-													<?php
-													$sql = "SELECT ForneId, ForneNome
-																FROM Fornecedor
-																JOIN Situacao on SituaId = ForneStatus
-																WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY ForneNome ASC";
-													$result = $conn->query($sql);
-													$rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowFornecedor as $item) {
-														print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
-													}
-
-													?>
-												</select>
-											</div>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="cmbCategoria">Categoria</label>
-												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-													<option value="">Todas</option>
-													<?php
-													$sql = "SELECT CategId, CategNome
-																FROM Categoria
-																JOIN Situacao on SituaId = CategStatus
-																WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY CategNome ASC";
-													$result = $conn->query($sql);
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowCategoria as $item) {
-														print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
-													}
-
-													?>
-												</select>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="cmbSubCategoria">SubCategoria</label>
-												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
-													<option value="">Todas</option>
-													<?php
-													$sql = "SELECT SbCatId, SbCatNome
-																	FROM SubCategoria
-																	JOIN Situacao on SituaId = SbCatStatus
-																	WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																	ORDER BY SbCatNome ASC";
-													$result = $conn->query($sql);
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($row as $item) {
-														print('<option value="' . $item['SbCatId'] . '">' . $item['SbCatNome'] . '</option>');
-													}
-													?>
-												</select>
-											</div>
-										</div>
+										</div>	
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbOrigem">Origem</label>
@@ -793,7 +592,52 @@ $dataFim = date("Y-m-d");
 													?>
 												</select>
 											</div>
-                                   		</div>					 
+                                   		</div>	
+									</div>
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbCategoria">Categoria</label>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+													<option value="">Todas</option>
+													<?php
+													$sql = "SELECT CategId, CategNome
+																FROM Categoria
+																JOIN Situacao on SituaId = CategStatus
+																WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY CategNome ASC";
+													$result = $conn->query($sql);
+													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowCategoria as $item) {
+														print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
+													}
+
+													?>
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbSubCategoria">SubCategoria</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control form-control-select2">
+													<option value="">Todas</option>
+													<?php
+													$sql = "SELECT SbCatId, SbCatNome
+																	FROM SubCategoria
+																	JOIN Situacao on SituaId = SbCatStatus
+																	WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																	ORDER BY SbCatNome ASC";
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($row as $item) {
+														print('<option value="' . $item['SbCatId'] . '">' . $item['SbCatNome'] . '</option>');
+													}
+													?>
+												</select>
+											</div>
+										</div>			 
 									</div>
 									<div class="row">
 										<div class="col-lg-2">
@@ -905,8 +749,9 @@ $dataFim = date("Y-m-d");
 												<th style='text-align: center'>Tipo</th>
 												<th>Produto</th> <!-- O Hint deve aparecer Código, Patrimônio e Detalhamento -->
 												<th>Categoria</th>
-												<th>Fornecedor</th>
 												<th>Quantidade</th>
+												<th>Estoque Mínimo</th>
+												<th>Saldo</th>
 												<th>Origem</th>
 												<th>Destino</th>
 											</tr>
