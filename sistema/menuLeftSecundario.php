@@ -133,7 +133,7 @@
 									<?php 
 										echo $countUsuario;
 										
-										if ($rowLimite['Limite']){
+										if (isset($rowLimite['Limite'])){
 											echo "/".$rowLimite['Limite'];
 										}
 									?>

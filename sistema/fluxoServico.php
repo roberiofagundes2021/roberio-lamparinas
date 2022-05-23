@@ -325,7 +325,7 @@ try {
 				for (i = 0; i <= totalServicos; i++) {
 					var valorTotal = $(`#inputValorTotal${i}`).val()
 					cont = valorTotal == '' ? 0 : 1;
-					if ($(`#inputValorTotal${i}`).val() == '0,00' || $(`#inputMarca${i}`).val() == '' || $(`#inputModelo${i}`).val() == '' || $(`#inputFabricante${i}`).val() == '') {
+					if ($(`#inputValorTotal${i}`).val() == '0,00' || $(`#inputMarca${i}`).val() == '') {
 						if (inputOrigem == 'fluxo.php'){
 							alerta('Atenção', 'Preencha todas as quantidades e valores dos serviços selecionados ou retire da lista', 'error');
 						} else {
