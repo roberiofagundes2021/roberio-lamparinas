@@ -130,7 +130,6 @@ if (isset($_POST['inputNome'])) {
 					if (inputSenha != inputConfirmaSenha) {
 						alerta('Atenção', 'A confirmação de senha não confere!', 'error');
 						$('#inputConfirmaSenha').focus();
-						$("#formPerfil").submit();
 						return false;
 					}
 				}
