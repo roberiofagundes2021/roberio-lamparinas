@@ -4,7 +4,7 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$_SESSION['PaginaAtual'] = 'Editar Usuário';
+$_SESSION['PaginaAtual'] = 'Perfil';
 
 if (isset($_SESSION['EmpresaId'])) {
 	$EmpresaId = $_SESSION['EmpresaId'];
@@ -66,14 +66,14 @@ if (isset($_POST['inputNome'])) {
 		$conn->commit();
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Usuário alterado!!!";
+		$_SESSION['msg']['mensagem'] = "Perfil alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 	} catch (PDOException $e) {
 
 		$conn->rollback();
 
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar usuário!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar perfil!!!";
 		$_SESSION['msg']['tipo'] = "error";
 
 		echo 'Error: ' . $e->getMessage();
@@ -92,7 +92,7 @@ if (isset($_POST['inputNome'])) {
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Usuário</title>
+	<title>Lamparinas | Perfil</title>
 
 	<?php include_once("head.php"); ?>
 
@@ -114,7 +114,6 @@ if (isset($_POST['inputNome'])) {
 		
 		$(document).ready(function() {
 
-			//Tela de usuário acessada pelo Configurador/Usuário
 			$('#enviar').on('click', function(e) {
 
 				e.preventDefault();
@@ -141,8 +140,6 @@ if (isset($_POST['inputNome'])) {
 			
 
 			$('#cancelar').on('click', function(e) {
-
-				//$('#cmbEmpresa').prop("disabled", false);
 
 				$(window.document.location).attr('href', "meuPerfil.php");
 			});
@@ -189,7 +186,7 @@ include_once("topo.php");
 
 				<form name="formPerfil" id="formPerfil" method="post" class="form-validate-jquery" action="meuPerfil.php">
 					<div class="card-header header-elements-inline">
-						<h5 class="text-uppercase font-weight-bold">Editar Usuário "<?php echo $row['UsuarNome']; ?>"</h5>
+						<h5 class="text-uppercase font-weight-bold">Editar Perfil "<?php echo $row['UsuarNome']; ?>"</h5>
 					</div>
 
 					<input type="hidden" id="inputUsuarioId" name="inputUsuarioId" value="<?php echo $row['UsuarId']; ?>">
