@@ -191,7 +191,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 									<div class="col-lg-3">
 										<div class="text-right">
 											<div class="p-0" style="float:right; margin-left: 5px;">										
-												<a href="#" onclick="atualizaCliente(0, '','', 'imprime');" class="form-control btn bg-slate-700 btn-icon" role="button" data-placement="bottom" data-container="body">
+												<a href="#" onclick="atualizaCliente(1, 0, '','', 'imprime');" class="form-control btn bg-slate-700 btn-icon" role="button" data-placement="bottom" data-container="body">
 													<i class="icon-printer2"></i>
 												</a>
 											</div>

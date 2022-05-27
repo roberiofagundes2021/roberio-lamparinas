@@ -25,12 +25,12 @@ if(isset($_POST['inputTipo'])){
 	try{
 			
 		$sql = "INSERT INTO Cliente (clienCodigo, ClienTipo, ClienNome, ClienRazaoSocial, ClienCnpj, ClienInscricaoMunicipal, ClienInscricaoEstadual, 
-									    ClienCpf, ClienRg, ClienOrgaoEmissor, ClienUf, ClienSexo, ClienDtNascimento, ClienNomePai, ClienNomeMae, ClienCartaoSus, 
-										ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
+									    ClienCpf, ClienRg, ClienOrgaoEmissor, ClienUf, ClienSexo, ClienDtNascimento, ClienNomePai, ClienNomeMae,
+										 ClienProfissao, ClienCartaoSus, ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
 										ClienEstado, ClienContato, ClienTelefone, ClienCelular, ClienEmail, ClienSite, ClienObservacao,
 									    ClienStatus, ClienUsuarioAtualizador, ClienUnidade)
 				VALUES (:sCodigo,:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual,  
-						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sCartaoSus, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
+						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sProfissao, :sCartaoSus, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
 						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, 
 						:bStatus, :iUsuarioAtualizador, :iUnidade)";
 							   
@@ -54,6 +54,7 @@ if(isset($_POST['inputTipo'])){
 			':dDtNascimento' => $_POST['inputTipo'] == 'F' ? ($_POST['inputDtNascimento'] == '' ? null : $_POST['inputDtNascimento']) : null,
 			':sNomePai' => $_POST['inputTipo'] == 'F' ? $_POST['inputNomePai'] : null,
 			':sNomeMae' => $_POST['inputTipo'] == 'F' ? $_POST['inputNomeMae'] : null,
+			':sProfissao' => $_POST['inputTipo'] == 'F' ? $_POST['cmbProfissao'] : null,
 			':sCartaoSus' => $_POST['inputTipo'] == 'F' ? $_POST['inputCartaoSus'] : null,
 			':sCep' => $_POST['inputCep'],
 			':sEndereco' => $_POST['inputEndereco'],
@@ -434,8 +435,8 @@ if(isset($_POST['inputTipo'])){
 
 											<div class="col-lg-3">
 												<div class="form-group">
-													<label for="inputCartaoSus">Cartão SUS</label>
-													<input type="text" id="inputCartaoSus" name="inputCartaoSus" class="form-control" placeholder="Cartão SUS">
+													<label for="inputCartaoSus">CNS</label>
+													<input type="text" id="inputCartaoSus" name="inputCartaoSus" class="form-control" placeholder="Cartão do SUS">
 												</div>
 											</div>		
 										</div>
@@ -526,6 +527,31 @@ if(isset($_POST['inputTipo'])){
 												</div>
 											</div>
 										</div>
+										
+										<div class="row">	
+											<div class="col-lg-12">
+												<div class="form-group">
+													<label for="cmbProfissao">Profissão</label>
+													<select id="cmbProfissao" name="cmbProfissao" class="form-control form-control-select2">
+														<option value="">Seleciona uma profissão</option>
+														<?php
+														$sql = "SELECT ProfiId, ProfiNome
+																		FROM Profissao
+																		JOIN Situacao on SituaId = ProfiStatus
+																		WHERE ProfiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																		ORDER BY ProfiNome ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($row as $item) {
+															print('<option value="' . $item['ProfiId'] . '">' . $item['ProfiNome'] . '</option>');
+														}
+														?>
+													</select>
+												</div>
+											</div>
+										</div>
+										
 									</div> <!-- Fim dadosPF -->
 									
 									<div id="dadosPJ" style="display:none">
