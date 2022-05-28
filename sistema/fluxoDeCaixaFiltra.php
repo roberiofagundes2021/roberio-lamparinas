@@ -84,7 +84,7 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3 ,$plFi
   }
 }
 
-function planoContaEntrada($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $valorPrevisto3, $valorRealizado, $valorRealizado2, $valorRealizado3, 
+function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $valorPrevisto3, $valorRealizado, $valorRealizado2, $valorRealizado3, 
                            $segundaColuna, $terceiraColuna, $data, $codigoGrupo, $indice) {
   include('global_assets/php/conexao.php');
 
@@ -347,11 +347,11 @@ if($typeFiltro == "D"){
     // limpa as variaveis que vao receber o plano de 
     // contas e centro de custo das funções    
     // <!--  usei essas variaveis para nao ter q fazer dois loops -->
-    $print_ent = '';
+    $print_corpo = '';
     $print_sai = '';
     //==============================================================================
     
-    $print_ent .= "
+    $print_corpo .= "
       <div class='card-body' style='padding-top: 0;'>
         <div class='row' style='background: #607D8B; line-height: 3rem; box-sizing:border-box; color:white;'>
           <div class='col-lg-4' style='border-right: 1px dotted black;'>
@@ -507,7 +507,7 @@ if($typeFiltro == "D"){
         $totalRealizadoTerceiraColuna -= $totalRealizado3;
       }
      
-      $print_ent .= "<!-- ENTRADA -->
+      $print_corpo .= "<!-- ENTRADA -->
       <div class='row'>
         <div class='col-lg-12'>
           <!-- Basic responsive configuration -->
@@ -572,14 +572,14 @@ if($typeFiltro == "D"){
 
         if(isset($pl1Entrada) && (!empty($pl1Entrada))) {
           foreach($pl1Entrada as $planoConta){
-            $planoContaEntrada = planoContaEntrada($planoConta["PlConId"], $planoConta["PlConNome"], $planoConta["PL_Previsto"], 
+            $planoContaEntrada = planoConta($planoConta["PlConId"], $planoConta["PlConNome"], $planoConta["PL_Previsto"], 
                                             ($segundaColuna)?$planoConta['PL_Previsto2']:"",
                                             ($terceiraColuna)?$planoConta['PL_Previsto3']:"",
                                             $planoConta["PL_Realizado"],
                                             ($segundaColuna)?$planoConta['PL_Realizado2']:"",
                                             ($terceiraColuna)?$planoConta['PL_Realizado3']:"", 
                                             $segundaColuna, $terceiraColuna, $dataFiltroDiaInicio1, $grupo['GrConCodigo'], $indice);
-            $print_ent .= $planoContaEntrada[0];
+            $print_corpo .= $planoContaEntrada[0];
 
             $indice++;
           }   
@@ -608,7 +608,7 @@ if($typeFiltro == "D"){
           $percentualRealizado1 = is_float($percentualRealizado1) ? number_format($percentualRealizado1, 1, '.', '') : $percentualRealizado1;
         }
         
-        $print_ent .= "
+        $print_corpo .= "
           </div>
             <div class='row'>
               <div class='col-lg-12'>
@@ -616,7 +616,7 @@ if($typeFiltro == "D"){
                   <div class='card-body' style=''>";
         
         if($total != 'sem rodape') {
-          $print_ent .="
+          $print_corpo .="
                     <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
                       <div class='col-lg-4' style='border-right: 1px dotted black;'>
                         <span><strong>(=) ".$total."</strong></span>
@@ -644,7 +644,7 @@ if($typeFiltro == "D"){
           }
 
 
-          $print_ent .="
+          $print_corpo .="
                       <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                         <div class='row'>
                           <div class='col-md-6'>
@@ -668,7 +668,7 @@ if($typeFiltro == "D"){
           }
 
 
-          $print_ent .= "
+          $print_corpo .= "
                       <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                         <div class='row'>
                           <div class='col-md-6'>
@@ -682,7 +682,7 @@ if($typeFiltro == "D"){
                       </div>";
         }
           
-        $print_ent .= " </div>
+        $print_corpo .= " </div>
   
                     <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
                       <div class='col-lg-4' style='border-right: 1px dotted black;'>
@@ -729,7 +729,7 @@ if($typeFiltro == "D"){
                     </div>";
         }
       
-        $print_ent .= "        
+        $print_corpo .= "        
                   </div>
                 </div>
                 </div>
@@ -744,7 +744,7 @@ if($typeFiltro == "D"){
 
         //----------------------------------------------------------------------
         //junta tudo no $print principal
-        $print .= $print_ent . "
+        $print .= $print_corpo . "
             <!-- SALDO FINAL -->
             <div class='row' style='margin-top: 1rem;'>
               <div class='col-lg-12'>
