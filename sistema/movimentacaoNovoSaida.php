@@ -974,7 +974,7 @@ if (isset($_POST['inputData'])) {
 
 				/* percorre todos os "<td>" que possuem classe sorting_1, pegando o ultimo valor para
 				dar continuidade à contagem */
-				$('.sorting_1').each((i, elemento) => {
+				$('.trGrid').each((i, elemento) => {
 					id = parseInt($(elemento).text()) > id?parseInt($(elemento).text()):id
 				})
 				$('#inputNumItens').val(id)

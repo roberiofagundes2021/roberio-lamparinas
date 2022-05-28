@@ -35,8 +35,8 @@ if(isset($_POST['inputTipo'])){
 		$sql = "UPDATE Cliente SET 	  ClienCodigo = :sCodigo, ClienTipo = :sTipo, ClienNome = :sNome, ClienRazaoSocial = :sRazaoSocial, ClienCnpj = :sCnpj, 
 									  ClienInscricaoMunicipal = :sInscricaoMunicipal, ClienInscricaoEstadual = :sInscricaoEstadual, 
 									  ClienCpf = :sCpf, ClienRg = :sRg, ClienOrgaoEmissor = :sOrgaoEmissor, ClienUf = :sUf,
-									  ClienSexo = :sSexo, ClienDtNascimento = :dDtNascimento, ClienNomePai = :sNomePai, ClienNomeMae = :sNomeMae,
-									  ClienCartaoSus = :sCartaoSus, ClienCep = :sCep, ClienEndereco = :sEndereco, 
+									  ClienSexo = :sSexo, ClienDtNascimento = :dDtNascimento, ClienNomePai = :sNomePai, ClienNomeMae = :sNomeMae, 
+									  ClienProfissao = :sProfissao, ClienCartaoSus = :sCartaoSus, ClienCep = :sCep, ClienEndereco = :sEndereco, 
 									  ClienNumero = :sNumero, ClienComplemento = :sComplemento, ClienBairro = :sBairro, 
 									  ClienCidade = :sCidade, ClienEstado = :sEstado, ClienContato = :sContato, ClienTelefone = :sTelefone, 
 									  ClienCelular = :sCelular, ClienEmail = :sEmail, ClienSite = :sSite, ClienObservacao = :sObservacao,
@@ -60,6 +60,7 @@ if(isset($_POST['inputTipo'])){
 						':dDtNascimento' => $_POST['inputTipo'] == 'F' ? ($_POST['inputDtNascimento'] == '' ? null : $_POST['inputDtNascimento']) : null,
 						':sNomePai' => $_POST['inputTipo'] == 'F' ? $_POST['inputNomePai'] : null,
 						':sNomeMae' => $_POST['inputTipo'] == 'F' ? $_POST['inputNomeMae'] : null,
+						':sProfissao' => $_POST['inputTipo'] == 'F' ? $_POST['cmbProfissao'] : null,
 						':sCartaoSus' => $_POST['inputTipo'] == 'F' ? $_POST['inputCartaoSus'] : null,
 						':sCep' => trim($_POST['inputCep']) == "" ? null : $_POST['inputCep'],
 						':sEndereco' => $_POST['inputEndereco'],
@@ -433,8 +434,8 @@ if(isset($_POST['inputTipo'])){
 										<div class="row">
 											<div class="col-lg-2">
 												<div class="form-group">
-													<label for="inputCodigo">Código do Cliente</label>
-													<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código Interno" value="<?php echo $row['ClienCodigo']; ?>" readOnly>
+													<label for="inputCodigo">Prontuário</label>
+													<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Prontuário Eletônico" value="<?php echo $row['ClienCodigo']; ?>" readOnly>
 												</div>
 											</div>
 											<div class="col-lg-4">
@@ -453,8 +454,8 @@ if(isset($_POST['inputTipo'])){
 
 											<div class="col-lg-3">
 												<div class="form-group">
-													<label for="inputCartaoSus">Cartao SUS</label>
-													<input type="text" id="inputCartaoSus" name="inputCartaoSus" class="form-control" placeholder="Cartão SUS" value="<?php echo $row['ClienCartaoSus']; ?>">
+													<label for="inputCartaoSus">CNS</label>
+													<input type="text" id="inputCartaoSus" name="inputCartaoSus" class="form-control" placeholder="Cartão do SUS" value="<?php echo $row['ClienCartaoSus']; ?>">
 												</div>
 											</div>	
 										</div>	
@@ -544,7 +545,31 @@ if(isset($_POST['inputTipo'])){
 												   <input type="text" id="inputNomeMae" name="inputNomeMae" class="form-control" placeholder="Nome da Mãe" value="<?php echo $row['ClienNomeMae']; ?>">
 											    </div>
 										    </div>
-									    </div>	
+									    </div>
+										
+										<div class="row">
+											<div class="col-lg-12">
+												<label for="cmbProfissao">Profissão</label>
+												<select id="cmbProfissao" name="cmbProfissao" class="form-control form-control-select2">
+													<option value="">Selecione uma profissão</option>
+													<?php 
+														$sql = "SELECT ProfiId, ProfiNome
+																FROM Profissao
+																JOIN Situacao on SituaId = ProfiStatus
+																WHERE ProfiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY ProfiNome ASC";
+														$result = $conn->query($sql);
+														$rowProfissao = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($rowProfissao as $item){
+															$seleciona = $item['ProfiId'] == $row['ClienProfissao'] ? "selected" : "";
+															print('<option value="'.$item['ProfiId'].'" '. $seleciona .'>'. $item['ProfiNome']. '</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>
 									</div> <!-- Fim dadosPF -->
 									
 									<div id="dadosPJ">

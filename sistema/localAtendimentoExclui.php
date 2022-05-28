@@ -4,16 +4,16 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputLocalAtendimentoId'])){
+if(isset($_POST['inputAtendimentoLocalId'])){
 	
-	$iLocalAtendimento = $_POST['inputLocalAtendimentoId'];
+	$iAtendimentoLocal = $_POST['inputAtendimentoLocalId'];
         	
 	try{
 		
-		$sql = "DELETE FROM LocalAtendimento
-				WHERE LcAteId = :id";
+		$sql = "DELETE FROM AtendimentoLocal
+				WHERE AtLocId = :id";
 		$result = $conn->prepare("$sql");
-		$result->bindParam(':id', $iLocalAtendimento); 
+		$result->bindParam(':id', $iAtendimentoLocal); 
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

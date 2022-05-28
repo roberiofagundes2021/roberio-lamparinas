@@ -83,19 +83,29 @@ try {
 	";
 	
     $sql = "SELECT ProduId, ProduNome, MvXPrDetalhamento, UnMedSigla, MvXPrQuantidade, MvXPrValorUnitario,
-						(SELECT MarcaNome FROM Marca WHERE MarcaId = ProduMarca) as Marca, MvXPrLote, MvXPrValidade
+			MarcaNome as Marca, MvXPrLote, MvXPrValidade
             FROM Produto
             JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
             JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+            JOIN Movimentacao on MovimId = $iMovimentacao
+            JOIN OrdemCompra on OrComId = MovimOrdemCompra
+            JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
+            JOIN ProdutoXFabricante on PrXFaFluxoOperacional = FlOpeId
+            LEFT JOIN Marca on MarcaId = PrXFaMarca
             WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and MvXPrMovimentacao = ".$iMovimentacao." and MvXPrQuantidade <> 0";
     $result = $conn->query($sql);
     $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
     $totalProdutos = count($rowProdutos);
 
     $sql = "SELECT ServiId, ServiNome, MvXSrDetalhamento, MvXSrQuantidade, MvXSrValorUnitario,
-						(SELECT MarcaNome FROM Marca WHERE MarcaId = ServiMarca) as Marca
+			MarcaNome as Marca
             FROM Servico
             JOIN MovimentacaoXServico on MvXSrServico = ServiId
+			JOIN Movimentacao on MovimId = $iMovimentacao
+            JOIN OrdemCompra on OrComId = MovimOrdemCompra
+            JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
+            JOIN ServicoXFabricante on SrXFaFluxoOperacional = FlOpeId
+			LEFT JOIN Marca on MarcaId = SrXFaMarca
             WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and MvXSrMovimentacao = ".$iMovimentacao." and MvXSrQuantidade <> 0";
     $result = $conn->query($sql);
     $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);

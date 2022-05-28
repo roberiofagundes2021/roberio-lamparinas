@@ -4,37 +4,46 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputUnidadeId'])){
-	
-	$iUnidade = $_POST['inputUnidadeId'];
-        	
+if(isset($_POST['inputUnidadeId'])){        	
 	try{
+		$conn->beginTransaction();
+
+		$iUnidade = $_POST['inputUnidadeId'];
+
 		$sql = "DELETE FROM PadraoPerfilXPermissao WHERE PaPrXPeUnidade = $iUnidade";
-		$conn->query($sql);
+		$result = $conn->query($sql);
+		$result = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "DELETE FROM PerfilXPermissao WHERE PrXPeUnidade = $iUnidade";
-		$conn->query($sql);
+		$result = $conn->query($sql);
+		$result = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "DELETE FROM Perfil WHERE PerfiUnidade = $iUnidade";
-		$conn->query($sql);
+		$result = $conn->query($sql);
+		$result = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "DELETE FROM LocalEstoque WHERE LcEstUnidade = $iUnidade";
-		$conn->query($sql);
+		$result = $conn->query($sql);
+		$result = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "DELETE FROM FormaPagamento WHERE FrPagUnidade = $iUnidade";
-		$conn->query($sql);
+		$result = $conn->query($sql);
+		$result = $result->fetch(PDO::FETCH_ASSOC);
+
+		$sql = "DELETE FROM GrupoConta WHERE GrConUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$result = $result->fetch(PDO::FETCH_ASSOC);
 		
-		$sql = "DELETE FROM Unidade
-				WHERE UnidaId = :id";
-		$result = $conn->prepare($sql);
-		$result->bindParam(':id', $iUnidade); 
-		$result->execute();
+		$sql = "DELETE FROM Unidade WHERE UnidaId = $iUnidade";
+		$result = $conn->query($sql);
+		$result = $result->fetch(PDO::FETCH_ASSOC);
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Unidade excluída!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
+		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Não é possível excluir essa unidade, pois existem registros ligados a ela!!!";

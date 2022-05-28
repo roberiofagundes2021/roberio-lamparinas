@@ -55,7 +55,7 @@ if(isset($_POST['inputNome'])){
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
-							':iData' => $_POST['inputData'],
+							':iData' => gravaData($_POST['inputData']),
 							':sNome' => $_POST['inputNome'],
 							':iArquivo' => $nome_final,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -69,7 +69,7 @@ if(isset($_POST['inputNome'])){
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
-							':iData' => $_POST['inputData'],
+							':iData' => gravaData($_POST['inputData']),
 							':sNome' => $_POST['inputNome'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iClienteAnexo' => $_POST['inputClienteAnexoId']

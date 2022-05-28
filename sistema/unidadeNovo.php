@@ -119,7 +119,46 @@ if(isset($_POST['inputNome'])){
     }
 
     // FIM---------------------------------------------------------------------------------------------
-    
+
+    // Alimentando GrupoConta com dados da tabela GrupoContaPadrao
+
+    $sql = "SELECT ParamEmpresaPublica FROM Parametro WHERE ParamEmpresa = ".$_SESSION['EmpresaId'];
+    $result = $conn->query($sql);
+    $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+
+    $sql = "SELECT GrCoPId, GrCoPCodigo, GrCoPNomePublico, GrCoPNomePrivado, GrCoPStatus
+    FROM GrupoContaPadrao";
+    $result = $conn->query($sql);
+    $rowGrupoConta = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    if(COUNT($rowGrupoConta)){
+      $sql = "INSERT INTO GrupoConta(GrConCodigo,GrConNome,GrConStatus,
+      GrConUsuarioAtualizador,GrConUnidade) VALUES ";
+      $count = 0;
+  
+      foreach($rowGrupoConta as $GrupoConta){
+        $codigo = $GrupoConta['GrCoPCodigo'];
+        $nome = $rowParametro['ParamEmpresaPublica']==1?$GrupoConta['GrCoPNomePublico']:$GrupoConta['GrCoPNomePrivado'];
+        $status = $GrupoConta['GrCoPStatus'];
+        $usuario = $_SESSION['UsuarId'];
+  
+        $sql .= "($codigo, '$nome', $status, $usuario, $unidadeIdNovo),";
+        $count++;
+  
+        if($count > 800){
+          $sql = substr_replace($sql ,"", -1);
+          $conn->query($sql);
+          $sql = "INSERT INTO GrupoConta(GrConCodigo,GrConNome,GrConStatus,
+          GrConUsuarioAtualizador,GrConUnidade) VALUES ";
+          $count = 0;
+        }
+      }
+      if($count<=800){
+        $sql = substr_replace($sql ,"", -1);
+        $conn->query($sql);
+      }
+    }
+
     /* Após criar a Unidade deve se cadastrar o Local de Estoque Padrão para essa Unidade nova criada */
     $sql = "INSERT INTO LocalEstoque (LcEstNome, LcEstChave, LcEstStatus, LcEstUsuarioAtualizador, LcEstUnidade)
 					VALUES (:sNome, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
