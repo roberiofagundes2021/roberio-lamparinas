@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Profissão';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT ProfiId, ProfiNome, ProfiStatus, SituaNome, SituaCor, SituaChave
+$sql = "SELECT ProfiId, ProfiNome, ProfiCbo, ProfiStatus, SituaNome, SituaCor, SituaChave
 		FROM Profissao
 		JOIN Situacao on SituaId = ProfiStatus
 	    WHERE ProfiUnidade = ". $_SESSION['UnidadeId'] ."
@@ -20,7 +20,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 if(isset($_POST['inputProfissaoId']) && $_POST['inputProfissaoId']){
 
 	//Essa consulta é para preencher o campo Nome com a profissao a ser editar
-	$sql = "SELECT ProfiId, ProfiNome
+	$sql = "SELECT ProfiId, ProfiNome, ProfiCbo
 			FROM Profissao
 			WHERE ProfiId = " . $_POST['inputProfissaoId'];
 	$result = $conn->query($sql);
@@ -37,12 +37,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
-			$sql = "UPDATE Profissao SET ProfiNome = :sNome, ProfiUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE Profissao SET ProfiNome = :sNome, ProfiCbo = :sCbo, ProfiUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE ProfiId = :iProfissao";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sCbo' => $_POST['inputCbo'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iProfissao' => $_POST['inputProfissaoId']
 							));
@@ -51,12 +52,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO Profissao (ProfiNome, ProfiStatus, ProfiUsuarioAtualizador, ProfiUnidade)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO Profissao (ProfiNome, ProfiCbo, ProfiStatus, ProfiUsuarioAtualizador, ProfiUnidade)
+					VALUES (:sNome, :sCbo, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sCbo' => $_POST['inputCbo'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId'],
@@ -120,18 +122,23 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			    columnDefs: [
 				{
 					orderable: true,   //Profissão
-					width: "80%",
+					width: "50%",
 					targets: [0]
+				},
+				{
+					orderable: true,   //Profissão
+					width: "30%",
+					targets: [1]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "10%",
-					targets: [1]
+					targets: [2]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [2]
+					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -267,6 +274,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 									<input type="hidden" id="inputProfissaoId" name="inputProfissaoId" value="<?php if (isset($_POST['inputProfissaoId'])) echo $_POST['inputProfissaoId']; ?>" >
 									<input type="hidden" id="inputProfissaoNome" name="inputProfissaoNome" value="<?php if (isset($_POST['inputProfissaoNome'])) echo $_POST['inputProfissaoNome']; ?>" >
+									<input type="hidden" id="inputProfissaoNome" name="inputProfissaoCbo" value="<?php if (isset($_POST['inputProfissaoCbo'])) echo $_POST['inputProfissaoCbo']; ?>" >
 									<input type="hidden" id="inputProfissaoStatus" name="inputProfissaoStatus" >
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
@@ -277,7 +285,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Profissão" value="<?php if (isset($_POST['inputProfissaoId'])) echo $rowProfissao['ProfiNome']; ?>" required autofocus>
 											</div>
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputCbo">CBO </label>
+												<input type="text" id="inputCbo" name="inputCbo" class="form-control" placeholder="CBO" value="<?php if (isset($_POST['inputCbo'])) echo $rowProfissao['ProfiCbo']; ?>" autofocus>
+											</div>
+										</div>
+										<div class="col-lg-3">
 											<div class="form-group" style="padding-top:25px;">
 												<?php
 
@@ -300,6 +314,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								<thead>
 									<tr class="bg-slate">
 										<th>Profissão</th>
+										<th>CBO</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -315,6 +330,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										print('
 										<tr>
 											<td>'.$item['ProfiNome'].'</td>
+											<td>'.$item['ProfiCbo'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaProfi(1,'.$item['ProfiId'].', \''.addslashes($item['ProfiNome']).'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
