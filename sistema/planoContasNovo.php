@@ -79,7 +79,7 @@ if(isset($_POST['inputNome'])){
 				
 				e.preventDefault();
 				
-				var inputNome    = $('#inputNome').val();
+				var inputNome = $('#inputNome').val();
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
@@ -106,10 +106,49 @@ if(isset($_POST['inputNome'])){
 				var tipo = $(this).find(":selected").val();
 				
 				if(tipo == 'S') {
-					$('#inputNome').css('text-transform', 'uppercase')
+					$('#inputNome').css('text-transform', 'uppercase');
 				}else {
-					$('#inputNome').css('text-transform', '')
+					$('#inputNome').css('text-transform', '');
 				}
+			});
+
+			$('#cmbGrupo').on('change', function() {
+				let arrayNomeGrupo = ($(this).find(":selected").text()).split(' ');
+				let codigo = arrayNomeGrupo[0];
+				
+				const urlConsultaPlanoConta = "filtraPlanoContaPai.php";
+				
+				var inputsValuesConsulta = {
+					inputCodigo: codigo
+				}; 
+				
+				let HTML = ``;
+				//Consulta planos de conta com o código inicial do grupo selecionado
+				$.ajax({
+					type: "POST",
+					url: urlConsultaPlanoConta,
+					dataType: "json",
+					data: inputsValuesConsulta,
+					success: function(resposta) {
+						if(resposta[0]) {
+							HTML = HTML +  `<option value="">Selecione</option>`;
+
+							resposta.forEach(function(planoConta) {
+								HTML = HTML + `
+									<option value="` + planoConta.PlConId + `">` + planoConta.PlConCodigo + ` - ` + planoConta.PlConNome + `</option>`;
+							});
+						}else {
+							HTML = HTML +  `<option value="">Nenhum Plano Conta Pai encontrado</option>`;
+						}
+
+						$("#cmbPlanoContaPai").html(HTML)
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) { 
+						HTML = HTML +  `<option value="">Erro ao filtrar - verifique sua conexão com a internet</option>`;
+
+						$("#cmbPlanoContaPai").html(HTML)
+					}
+				})
 			});
 		})
 	</script>
@@ -140,7 +179,7 @@ if(isset($_POST['inputNome'])){
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Plano de Contas</h5>
 						</div>
 						
-						<div class="card-body">								
+						<div class="card-body">						
 							<div class="row">
 								<div class="col-lg-2">
 									<div class="form-group">
@@ -178,20 +217,6 @@ if(isset($_POST['inputNome'])){
 									<label for="cmbPlanoContaPai">Plano de Contas</label>
 									<select id="cmbPlanoContaPai" name="cmbPlanoContaPai" class="form-control form-control-select2" >
 										<option value="">Selecione </option>
-										<?php 
-											$sql = "SELECT PlConId, PlConCodigo, PlConNome
-													FROM PlanoConta
-													JOIN Situacao on SituaId = PlConStatus
-													WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO' and PlConTipo = 'S'
-													ORDER BY PlConCodigo ASC";
-											$result = $conn->query($sql);
-											$row = $result->fetchAll(PDO::FETCH_ASSOC);
-											
-											foreach ($row as $item){
-												print('<option value="'.$item['PlConId'].'">'.$item['PlConCodigo'].' - '.$item['PlConNome'].'</option>');
-											}
-										
-										?>
 									</select>
 								</div>
 								<div class="col-lg-2">

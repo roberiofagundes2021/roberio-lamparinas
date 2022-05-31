@@ -131,8 +131,103 @@ if(isset($_POST['inputNome'])){
 
 			let tipoPlanoConta = "<?php echo $row['PlConTipo']; ?>"
 
-			if(tipoPlanoConta == 'S')
-				$('#inputNome').css('text-transform', 'uppercase')
+			function verificaTipoConta() {
+				if(tipoPlanoConta == 'S')
+					$('#inputNome').css('text-transform', 'uppercase')
+			}
+
+			verificaTipoConta();
+
+			function selecionaPlanoConta() {
+				let idPlanoContaPai = "<?php echo $row['PlConPlanoContaPai']; ?>";
+				let arrayCodigoPlanoConta = ("<?php echo $row['PlConCodigo']; ?>").split('.');
+				let codigo = arrayCodigoPlanoConta[0]; 
+
+				const urlConsultaPlanoConta = "filtraPlanoContaPai.php";
+				
+				var inputsValuesConsulta = {
+					inputCodigo: codigo
+				}; 
+				
+				let HTML = ``;
+				//Consulta planos de conta com o código inicial do grupo selecionado
+				$.ajax({
+					type: "POST",
+					url: urlConsultaPlanoConta,
+					dataType: "json",
+					data: inputsValuesConsulta,
+					success: function(resposta) {
+						if(resposta[0]) {
+							let seleciona = '';
+
+							HTML = HTML +  `<option value="">Selecione</option>`;
+							
+							resposta.forEach(function(planoConta) {
+								seleciona = planoConta.PlConId == idPlanoContaPai ? "selected" : "";
+
+								HTML = HTML + `
+									<option value="` + planoConta.PlConId + `"` + seleciona + `>` + planoConta.PlConCodigo + ` - ` + planoConta.PlConNome + `</option>`;
+							});
+						}else {
+							HTML = HTML +  `<option value="">Nenhum Plano Conta Pai encontrado</option>`;
+						}
+
+						$("#cmbPlanoContaPai").html(HTML)
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) { 
+						HTML = HTML +  `<option value="">Erro ao filtrar - verifique sua conexão com a internet</option>`;
+
+						$("#cmbPlanoContaPai").html(HTML)
+					}
+				})
+			}
+
+			selecionaPlanoConta()
+
+			/*
+			foreach ($rowPlanoContas as $item){
+				$seleciona = $item['PlConId'] == $row['PlConPlanoContaPai'] ? "selected" : "";
+				print('<option value="'.$item['PlConId'].'" '. $seleciona .'>'.$item['PlConCodigo'].' - '.$item['PlConNome'].'</option>');
+			}
+			*/
+			$('#cmbGrupo').on('change', function() {
+				let arrayNomeGrupo = ($(this).find(":selected").text()).split(' ');
+				let codigo = arrayNomeGrupo[0];
+				
+				const urlConsultaPlanoConta = "filtraPlanoContaPai.php";
+				
+				var inputsValuesConsulta = {
+					inputCodigo: codigo
+				}; 
+				
+				let HTML = ``;
+				//Consulta planos de conta com o código inicial do grupo selecionado
+				$.ajax({
+					type: "POST",
+					url: urlConsultaPlanoConta,
+					dataType: "json",
+					data: inputsValuesConsulta,
+					success: function(resposta) {
+						if(resposta[0]) {
+							HTML = HTML +  `<option value="">Selecione</option>`;
+
+							resposta.forEach(function(planoConta) {
+								HTML = HTML + `
+									<option value="` + planoConta.PlConId + `">` + planoConta.PlConCodigo + ` - ` + planoConta.PlConNome + `</option>`;
+							});
+						}else {
+							HTML = HTML +  `<option value="">Nenhum Plano Conta Pai encontrado</option>`;
+						}
+
+						$("#cmbPlanoContaPai").html(HTML)
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) { 
+						HTML = HTML +  `<option value="">Erro ao filtrar - verifique sua conexão com a internet</option>`;
+
+						$("#cmbPlanoContaPai").html(HTML)
+					}
+				})
+			});
 		})
 	</script>
 </head>
@@ -204,21 +299,6 @@ if(isset($_POST['inputNome'])){
 									<label for="cmbPlanoContaPai">Plano de Conta</label>
 									<select id="cmbPlanoContaPai" name="cmbPlanoContaPai" class="form-control form-control-select2">
 										<option value="">Selecione</option>
-										<?php 
-											$sql = "SELECT PlConId, PlConCodigo, PlConNome
-													FROM PlanoConta
-													JOIN Situacao on SituaId = PlConStatus
-													WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
-													ORDER BY PlConCodigo ASC";
-											$result = $conn->query($sql);
-											$rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
-											
-											foreach ($rowPlanoContas as $item){
-												$seleciona = $item['PlConId'] == $row['PlConPlanoContaPai'] ? "selected" : "";
-												print('<option value="'.$item['PlConId'].'" '. $seleciona .'>'.$item['PlConCodigo'].' - '.$item['PlConNome'].'</option>');
-											}
-										
-										?>
 									</select>
 								</div>
 								<div class="col-lg-2">
