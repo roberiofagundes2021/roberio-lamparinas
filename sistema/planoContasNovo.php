@@ -9,6 +9,7 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputNome'])){
 
 	try{
+		$nome = $_POST['cmbTipo'] == 'S' ? mb_strtoupper($_POST['inputNome']) : $_POST['inputNome'];
 		
 		$sql = "INSERT INTO PlanoConta (PlConCodigo, PlConNome, PlConTipo, PlConNatureza, PlConGrupo, PlConDetalhamento, PlConPlanoContaPai, PlConStatus, PlConUsuarioAtualizador, PlConUnidade)
 				VALUES (:iCodigo, :sNome, :sTipo, :sNatureza, :sGrupo, :sDetalhamento, :sPlanoContaPai, :bStatus, :iUsuarioAtualizador, :iUnidade)";
@@ -16,7 +17,7 @@ if(isset($_POST['inputNome'])){
 				
 		$result->execute(array(
 						':iCodigo' => $_POST['inputCodigo'],
-						':sNome' => $_POST['inputNome'],
+						':sNome' => $nome,
 						':sTipo' => $_POST['cmbTipo'],
 						':sNatureza' => $_POST['cmbNatureza'],
 						':sGrupo' => $_POST['cmbGrupo'],
@@ -55,17 +56,19 @@ if(isset($_POST['inputNome'])){
 
 	<?php include_once("head.php"); ?>
 	
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<!--Obs: Os links de validação foram colocados na parte superior porque este link está sobreescrevendo a função de pesquisa do form-control-select2-->
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+	<!--/ Validação -->
+
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<!-- /theme JS files -->
-
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 	<script type="text/javascript" >
 
@@ -98,6 +101,16 @@ if(isset($_POST['inputNome'])){
 					}
 				})
 			})
+			
+			$('#cmbTipo').on('change', function() {
+				var tipo = $(this).find(":selected").val();
+				
+				if(tipo == 'S') {
+					$('#inputNome').css('text-transform', 'uppercase')
+				}else {
+					$('#inputNome').css('text-transform', '')
+				}
+			});
 		})
 	</script>
 </head>
@@ -131,61 +144,37 @@ if(isset($_POST['inputNome'])){
 							<div class="row">
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputCodigo">Código<span class="text-danger"> *</span></label>
-										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" required autofocus>
-									</div>
-								</div>
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputNome">Título<span class="text-danger"> *</span></label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Título" required>
-									</div>
-								</div>
-								<div class="col-lg-3">
-									<div class="form-group">
 										<label for="cmbTipo">Tipo<span class="text-danger"> *</span></label>
-										<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2" required>
+										<select id="cmbTipo" name="cmbTipo" class="form-control form-control-select2" required autofocus>
 											<option value="">Selecione </option>
 											<option value="A">Analítico</option>
 											<option value="S">Sintético</option>
 										</select>
 									</div>
 								</div>
-								<div class="col-lg-3">
-									<div class="form-group">
-										<label for="cmbNatureza">Natureza<span class="text-danger"> *</span></label>
-										<select id="cmbNatureza" name="cmbNatureza" class="form-control form-control-select2" required>
-											<option value="">Selecione </option>
-											<option value="D">Despesa </option>
-											<option value="R">Receita</option>
-										</select>
-									</div>
-								</div>
-								
-							</div>
-							<div class="row">
-								
 								<div class="col-lg-4">
 									<label for="cmbGrupo">Grupo de Conta<span class="text-danger"> *</span></label>
 									<select id="cmbGrupo" name="cmbGrupo" class="form-control form-control-select2" required>
 										<option value="">Selecione </option>
 										<?php 
-											$sql = "SELECT GrConId, GrConNome
+											$sql = "SELECT GrConId, GrConCodigo, GrConNome, GrConNomePersonalizado
 													FROM GrupoConta
 													JOIN Situacao on SituaId = GrConStatus
 													WHERE GrConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
-													ORDER BY GrConNome ASC";
+													ORDER BY GrConCodigo ASC";
 											$result = $conn->query($sql);
 											$row = $result->fetchAll(PDO::FETCH_ASSOC);
 											
 											foreach ($row as $item){
-												print('<option value="'.$item['GrConId'].'">'.$item['GrConNome'].'</option>');
+												$nome = $item['GrConNomePersonalizado'] != '' ? $item['GrConNomePersonalizado'] : $item['GrConNome']; 
+												
+												print('<option value="'.$item['GrConId'].'">'.$item['GrConCodigo'].' - '.$nome.'</option>');
 											}
 										
 										?>
 									</select>
 								</div>
-								<div class="col-lg-5">
+								<div class="col-lg-4">
 									<label for="cmbPlanoContaPai">Plano de Contas</label>
 									<select id="cmbPlanoContaPai" name="cmbPlanoContaPai" class="form-control form-control-select2" >
 										<option value="">Selecione </option>
@@ -193,7 +182,7 @@ if(isset($_POST['inputNome'])){
 											$sql = "SELECT PlConId, PlConCodigo, PlConNome
 													FROM PlanoConta
 													JOIN Situacao on SituaId = PlConStatus
-													WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+													WHERE PlConUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO' and PlConTipo = 'S'
 													ORDER BY PlConCodigo ASC";
 											$result = $conn->query($sql);
 											$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -204,6 +193,30 @@ if(isset($_POST['inputNome'])){
 										
 										?>
 									</select>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputCodigo">Código<span class="text-danger"> *</span></label>
+										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" required>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-lg-5">
+									<div class="form-group">
+										<label for="inputNome">Título<span class="text-danger"> *</span></label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Título" required>
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="cmbNatureza">Natureza<span class="text-danger"> *</span></label>
+										<select id="cmbNatureza" name="cmbNatureza" class="form-control form-control-select2" required>
+											<option value="">Selecione </option>
+											<option value="D">Despesa </option>
+											<option value="R">Receita</option>
+										</select>
+									</div>
 								</div>
 								<div class="col-lg-3">
 									<div class="form-group">

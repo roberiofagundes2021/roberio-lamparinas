@@ -16,6 +16,7 @@ setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
   ["cmbPlanoContas"]=>string(2) "78"
 */
 
+//Gerar os planos de Contas Sintéticos
 function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3 ,$plFiltro, $grupoPlanoConta, $tipo) {
   include('global_assets/php/conexao.php');
 
@@ -84,6 +85,7 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3 ,$plFi
   }
 }
 
+//Gerar os planos de Contas Analíticos
 function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $valorPrevisto3, $valorRealizado, $valorRealizado2, $valorRealizado3, 
                            $segundaColuna, $terceiraColuna, $data, $codigoGrupo, $indice) {
   include('global_assets/php/conexao.php');
@@ -102,6 +104,9 @@ function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $val
     $dia3 = $arrayData3[2] + 2;
     $data3 = $arrayData3[0]."-".$arrayData3[1]."-".$dia3;
   }
+
+  //Foi inserido os inputs de datas para a primeira e segunda coluna para ser feito a consulta através dela quando for consultar na página de Fluxo de Caixa
+  //A segunda e terceira coluna são o segundo e terceiro dia que é mostrado em cada paginação do Fluxo de Caixa
 
   $resposta[0] = "
     <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box;'>
@@ -164,6 +169,7 @@ function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $val
     return $resposta;
 }
 
+//Gera o saldo Inicial e Final - previsto e realizado
 function retornoSaldo($datasFiltro, $datasFiltro2, $datasFiltro3) {
   include('global_assets/php/conexao.php');
 
@@ -207,6 +213,7 @@ $typeFiltro   = $_POST["typeDate"];
 $ccFiltro   = rtrim(implode(',', $_POST["cmbCentroDeCustos"]));
 $plFiltro   = rtrim(implode(',', $_POST["cmbPlanoContas"]));
 
+//Consulta os grupos dos planos de contas
 $sql = "SELECT GrConId, GrConNome, GrConNomePersonalizado, GrConCodigo, SituaChave
 		FROM GrupoConta
 		JOIN Situacao on SituaId = GrConStatus
@@ -219,13 +226,13 @@ $print = "
   <div id='carouselExampleControls' class='carousel slide' data-ride='carousel'>
     <div class='carousel-inner'> ";
 
+//Filtra por dia
 if($typeFiltro == "D"){
   $mesArray = explode('-', $dataInicio);
   $anoData = $mesArray[0];
   $mesData = (int)$mesArray[1];
 
   $controlador = (($diaFim - $diaInicio) < 3 ) ? true : false; 
-  // print($diaFim - $diaInicio);
 
   $data = explode('-', $dataInicio);
   $dataFormatado = $data[0].'-'.$data[1].'-'.$data[2];
@@ -234,16 +241,12 @@ if($typeFiltro == "D"){
   $indice = 1;
   $receitaTotal = 0;
   for($i = $diaInicio;$i <= $diaFim;$i++) {
-    // if(($diaFim - $diaInicio) == 2){
-    //   break;
-    // }
     $segundaColuna = false;
     $terceiraColuna = false;
 
     //limpa as variaveis
     if(isset($mes1)) {
       unset($mes1);
-      //unset($cc1);
       unset($saldoIni_p1);
       unset($saldoIni_r1);
       unset($saldoIni_p2);
@@ -344,8 +347,7 @@ if($typeFiltro == "D"){
         </div>";
   
     //------------------------------------------------------------------------------
-    // limpa as variaveis que vao receber o plano de 
-    // contas e centro de custo das funções    
+    // limpa as variaveis que vao receber o plano de contas
     // <!--  usei essas variaveis para nao ter q fazer dois loops -->
     $print_corpo = '';
     $print_sai = '';
@@ -558,7 +560,7 @@ if($typeFiltro == "D"){
           
           <div class='card-body' style='padding-top: 0;padding-bottom: 0'>";
 
-        //Somente o grupo na ordem 1 é composto de receita, o restante é apenas despesa
+        //Somente o grupo na ordem 1 é composto de receita, o restante é apenas despesas
         if($grupo['GrConCodigo'] == 1) {
           $mes1 = retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3,$plFiltro, $grupo['GrConId'], 'E');
         }else {
@@ -585,19 +587,20 @@ if($typeFiltro == "D"){
           }   
         }
 
-        $total = 'sem rodape';
+        //Os totalizadores só aparecem em alguns grupos específicos
+        $tituloTotalizador = 'sem rodape';
         if($grupo['GrConCodigo'] == 1) {
-          $total = 'Receita operacional líquida';
+          $tituloTotalizador = 'Receita operacional líquida';
 
           $receitaTotal1 = isset($rowTotalGrupo['PrevistoSaidaGrupo1']) ? $rowTotalGrupo['PrevistoSaidaGrupo1'] : 0;
           $receitaTotal2 = isset($rowTotalGrupo['PrevistoSaidaGrupo2']) ? $rowTotalGrupo['PrevistoSaidaGrupo2'] : 0;
           $receitaTotal3 = isset($rowTotalGrupo['PrevistoSaidaGrupo3']) ? $rowTotalGrupo['PrevistoSaidaGrupo3'] : 0;
         } else if($grupo['GrConCodigo'] == 5) {
-          $total = 'Margem de contribuição';
+          $tituloTotalizador = 'Margem de contribuição';
         }else if($grupo['GrConCodigo'] == 6) {
-          $total = 'Resultado Operacional';
+          $tituloTotalizador = 'Resultado Operacional';
         }else if($grupo['GrConCodigo'] == 7) {
-          $total = 'Variação de caixa';
+          $tituloTotalizador = 'Variação de caixa';
         }
 
         if($receitaTotal1 != 0) {
@@ -615,11 +618,11 @@ if($typeFiltro == "D"){
                 <!-- Basic responsive configuration -->
                   <div class='card-body' style=''>";
         
-        if($total != 'sem rodape') {
+        if($tituloTotalizador != 'sem rodape') {
           $print_corpo .="
                     <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
                       <div class='col-lg-4' style='border-right: 1px dotted black;'>
-                        <span><strong>(=) ".$total."</strong></span>
+                        <span><strong>(=) ".$tituloTotalizador."</strong></span>
                       </div>
   
                       <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -686,7 +689,7 @@ if($typeFiltro == "D"){
   
                     <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
                       <div class='col-lg-4' style='border-right: 1px dotted black;'>
-                        <span style='padding-left: 20px;'><strong>".$total." (%)</strong></span>
+                        <span style='padding-left: 20px;'><strong>".$tituloTotalizador." (%)</strong></span>
                       </div>
   
                       <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -814,10 +817,12 @@ if($typeFiltro == "D"){
           "; 
         */
     
+    //Usado para ele não criar uma coluna extra
     if($controlador) {
       break;
     }
 
+    //Usado para consultar pelas datas corretas de acordo com a coluna (primeira, segunda, terceira...)
     if(($i+1) <= $diaFim) {
         $i += 2;
     } 
