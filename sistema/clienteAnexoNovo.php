@@ -39,7 +39,7 @@ if(isset($_POST['inputData'])){
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
-							':iData' => $_POST['inputData'],
+							':iData' => gravaData($_POST['inputData']),
 							':sNome' => $_POST['inputNome'],
 							':iArquivo' => $nome_final,
 							':iCliente' => $_SESSION['idCliente'],

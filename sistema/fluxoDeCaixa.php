@@ -44,8 +44,12 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			let planoConta = $(this).attr('id');
 			let indice = planoConta.replace(/[^0-9]/g,''); //Pega apenas o número da string
 			let idPlanoContaPai1 = $("#idPlanoConta"+indice).val();
+			let data1 = $('#data'+indice).val();
+			let data2 = $('#dataSegundaColuna'+indice).val();
+			let data3 = $('#dataTerceiraColuna'+indice).val();
 
-			if ( $('#'+planoConta ).is( ".visivel" ) ) {
+
+			if ($('#'+planoConta).is( ".visivel" ) ) {
 				$('#'+planoConta).removeClass("visivel");
 				$('#'+planoConta).addClass("minimizado");
 				
@@ -61,7 +65,10 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 				const urlConsultaPlanoConta = "consultaPlanoConta.php";
 
 				var inputsValuesConsulta = {
-					inputPlanoConta1: idPlanoContaPai1
+					inputPlanoConta1: idPlanoContaPai1,
+					inputData1: data1,
+					inputData2: data2,
+					inputData3: data3
 				}; 
 
 				const msg = $('<div class="text-center"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></div>');
@@ -74,29 +81,74 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 					dataType: "json",
 					data: inputsValuesConsulta,
 					success: function(resposta) {
-						if(resposta[0]) {
-							for(let x = 0; x < resposta.length; x++) {
-								let planoConta1 = resposta[x]
+						if(resposta[0][0]) {
+							for(let x = 0; x < resposta[0].length; x++) {
+								let planoConta = resposta[0][x]
 								
-								HTML = HTML + `
-										<div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
-											<div id='planoContaFilho`+planoConta1.PlConId+`' class='col-lg-4 planoContaFilho' style='padding-left: 20px; border-right: 1px dotted black; cursor:pointer;'>
-												<span title=''><span id='simboloFilho`+planoConta1.PlConId+`'' style='font-weight: bold; color: #607D8B;'>( + ) </span>`+planoConta1.PlConNome+`</span>
-											</div>
+								HTML = HTML + ` 
+										<div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>`;
+								
+								let arrayCodigo = planoConta.PlConCodigo.split('');
+
+								if(arrayCodigo[0] == '1') {
+									HTML = HTML + 
+												`<div id='planoContaFilho`+planoConta.PlConId+indice+`' indice='`+indice+`' idPlanoContaFilho='`+planoConta.PlConId+`' class='col-lg-4' style='padding-left: 20px; border-right: 1px dotted black;'>
+													<span title=''>`+planoConta.PlConNome+`</span>
+												</div>`;
+								}else {
+									HTML = HTML + 
+												`<div id='planoContaFilho`+planoConta.PlConId+indice+`' indice='`+indice+`' idPlanoContaFilho='`+planoConta.PlConId+`' class='col-lg-4 planoContaFilho' style='padding-left: 20px; border-right: 1px dotted black; cursor:pointer;'>
+													<span title=''><span id='simboloFilho`+planoConta.PlConId+indice+`' style='font-weight: bold; color: #607D8B;'>( + ) </span>`+planoConta.PlConNome+`</span>
+												</div>`;
+								}
 									
-											<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+								HTML = HTML + 
+											`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 												<div class='row'>
 												<div class='col-md-6'>
-													<span></span>
+													<span>`+float2moeda(planoConta.Previsto)+`</span>
 												</div>
 									
 												<div class='col-md-6'>
-													<span></span>
+													<span>`+float2moeda(planoConta.Realizado)+`</span>
 												</div>
 												</div>
-											</div>
-										</div>
-										<div id='centroCusto`+planoConta1.PlConId+`'>
+											</div>`;
+								
+								if(resposta[1] != '') {
+									HTML = HTML + 
+												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+													<div class='row'>
+													<div class='col-md-6'>
+														<span>`+float2moeda(planoConta.Previsto2)+`</span>
+													</div>
+										
+													<div class='col-md-6'>
+														<span>`+float2moeda(planoConta.Realizado2)+`</span>
+													</div>
+													</div>
+												</div>`;
+								}
+
+								if(resposta[2] != '') {
+									HTML = HTML + 
+												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+													<div class='row'>
+													<div class='col-md-6'>
+														<span>`+float2moeda(planoConta.Previsto3)+`</span>
+													</div>
+										
+													<div class='col-md-6'>
+														<span>`+float2moeda(planoConta.Realizado3)+`</span>
+													</div>
+													</div>
+												</div>`;
+								}
+								
+								HTML = HTML + 
+										`</div>
+
+										<div id='centroCusto`+planoConta.PlConId+indice+`'>
 										</div>`;
 							}
 
@@ -120,16 +172,21 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 		$(document).on("click", ".planoContaFilho", function(){
 			let planoContaFilho = $(this).attr('id');
-			let indice = planoContaFilho.replace(/[^0-9]/g,''); //Pega apenas o número da string
-			let idPlanoContaFilho1 = 'teste'
+			let idPlanoConta = $(this).attr('idPlanoContaFilho');
+			let idPlanoContaFilho1 = idPlanoConta;
+			let indicePlanoConta = planoContaFilho.replace(/[^0-9]/g,''); //Pega apenas o número da string
+			let indice = $(this).attr('indice');
+			let data1 = $('#data'+indice).val();
+			let data2 = $('#dataSegundaColuna'+indice).val();
+			let data3 = $('#dataTerceiraColuna'+indice).val();
 
-			if ( $('#'+planoContaFilho ).is( ".visivel" ) ) {
+			if ($('#'+planoContaFilho ).is( ".visivel" ) ) {
 				$('#'+planoContaFilho).removeClass("visivel");
 				$('#'+planoContaFilho).addClass("minimizado");
 				
-				$("#centroCusto"+indice).html('')
-				$('#simboloFilho'+indice).html('( + ) ')
-				$('#simboloFilho'+indice).css("color","#607D8B")
+				$("#centroCusto"+indicePlanoConta).html('')
+				$('#simboloFilho'+indicePlanoConta).html('( + ) ')
+				$('#simboloFilho'+indicePlanoConta).css("color","#607D8B")
 			}else {
 				$('#'+planoContaFilho).removeClass("minimizado");
 				$('#'+planoContaFilho).addClass("visivel");
@@ -139,11 +196,14 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 				const urlConsultaPlanoConta = "consultaCentroCusto.php";
 
 				var inputsValuesConsulta = {
-					inputPlanoConta1: idPlanoContaFilho1
+					inputPlanoConta1: idPlanoContaFilho1,
+					inputData1: data1,
+					inputData2: data2,
+					inputData3: data3
 				}; 
 
 				const msg = $('<div class="text-center"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></div>');
-				$("#centroCusto"+indice).html(msg)
+				$("#centroCusto"+indicePlanoConta).html(msg)
 				
 				//Consulta saldo anterior
 				$.ajax({
@@ -152,31 +212,60 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 					dataType: "json",
 					data: inputsValuesConsulta,
 					success: function(resposta) {
-						/*
-						if(resposta[0]) {
-							for(let x = 0; x < resposta.length; x++) {
-								let planoConta1 = resposta[x]
+						if(resposta[0][0]) {
+							for(let x = 0; x < resposta[0].length; x++) {
+								let centroCusto = resposta[0][x]
 								
 								HTML = HTML + `
 										<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
-											<div id='planoContaFilho`+planoConta1.PlConId+`' class='col-lg-4 planoContaFilho' style='padding-left: 40px; border-right: 1px dotted black;'>
-												<span title=''>`+planoConta1.PlConNome+`</span>
+											<div class='col-lg-4 planoContaFilho' style='padding-left: 40px; border-right: 1px dotted black;'>
+												<span title=''>`+centroCusto.CnCusNome+`</span>
 											</div>
 									
 											<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 												<div class='row'>
-												<div class='col-md-6'>
-													<span></span>
+													<div class='col-md-6'>
+														<span>`+float2moeda(centroCusto.Previsto)+`</span>
+													</div>
+										
+													<div class='col-md-6'>
+														<span>`+float2moeda(centroCusto.Realizado)+`</span>
+													</div>
 												</div>
-									
-												<div class='col-md-6'>
-													<span></span>
-												</div>
-												</div>
-											</div>
-										</div>
-										<div id='centroCusto`+planoConta1.PlConId+`'>
-										</div>`;
+											</div>`;
+								
+								if(resposta[1] != '') {
+									HTML = HTML + 
+												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+													<div class='row'>
+													<div class='col-md-6'>
+														<span>`+float2moeda(centroCusto.Previsto2)+`</span>
+													</div>
+										
+													<div class='col-md-6'>
+														<span>`+float2moeda(centroCusto.Realizado2)+`</span>
+													</div>
+													</div>
+												</div>`;
+								}
+
+								if(resposta[2] != '') {
+									HTML = HTML + 
+												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+													<div class='row'>
+													<div class='col-md-6'>
+														<span>`+float2moeda(centroCusto.Previsto3)+`</span>
+													</div>
+										
+													<div class='col-md-6'>
+														<span>`+float2moeda(centroCusto.Realizado3)+`</span>
+													</div>
+													</div>
+												</div>`;
+								}
+								
+								HTML = HTML + 
+										`</div>`;
 							}
 
 						}else {
@@ -186,21 +275,14 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 											<span title=''>Vazio</span>
 										</div>
 									</div>`;
-						}*/
+						}
 
-						HTML = HTML + `
-									<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
-										<div class='col-lg-12 text-center'>
-											<span title=''>Parte em desenvolvimento</span>
-										</div>
-									</div>`;
-
-						$("#centroCusto"+indice).html(HTML)
+						$("#centroCusto"+indicePlanoConta).html(HTML)
 					}
 				})
 
-				$('#simboloFilho'+indice).html('( - ) ')
-				$('#simboloFilho'+indice).css("color","red")
+				$('#simboloFilho'+indicePlanoConta).html('( - ) ')
+				$('#simboloFilho'+indicePlanoConta).css("color","red")
 			}
 		});
 		
@@ -324,13 +406,6 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 				buttonDay.style.color = 'black';
 				buttonDay.classList.remove('active');
 			});
-
-
-			//cmbCentroDeCustos
-			$("#cmbCentroDeCustos").click(e => {
-				console.log('teste')
-			})
-
 
 			submitPesquisar.addEventListener('click', (e) => {
 				e.preventDefault();

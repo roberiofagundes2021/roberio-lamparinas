@@ -6,10 +6,10 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['msg'] = array();
 
-if(isset($_POST['inputLocalAtendimentoId'])){
+if(isset($_POST['inputAtendimentoLocalId'])){
 	
-	$iLocalAtendimento = $_POST['inputLocalAtendimentoId'];
-	$sStatus = $_POST['inputLocalAtendimentoStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
+	$iAtendimentoLocal = $_POST['inputAtendimentoLocalId'];
+	$sStatus = $_POST['inputAtendimentoLocalStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
         	
 	try{
 		
@@ -20,11 +20,11 @@ if(isset($_POST['inputLocalAtendimentoId'])){
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iStatus = $row['SituaId'];
 
-		$sql = "UPDATE LocalAtendimento SET LcAteStatus = :bStatus
-				WHERE LcAteId = :id";
+		$sql = "UPDATE AtendimentoLocal SET AtLocStatus = :bStatus
+				WHERE AtLocId = :id";
 		$result = $conn->prepare("$sql");
 		$result->bindParam(':bStatus', $iStatus); 
-		$result->bindParam(':id', $iLocalAtendimento); 
+		$result->bindParam(':id', $iAtendimentoLocal); 
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

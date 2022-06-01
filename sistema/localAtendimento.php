@@ -7,24 +7,24 @@ $_SESSION['PaginaAtual'] = 'Local de Atendimento';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT LcAteId, LcAteNome, LcAteStatus, SituaNome, SituaCor, SituaChave
-		FROM LocalAtendimento
-		JOIN Situacao on SituaId = LcAteStatus
-	    WHERE LcAteUnidade = ". $_SESSION['UnidadeId'] ."
-		ORDER BY LcAteNome ASC";
+$sql = "SELECT AtLocId, AtLocNome, AtLocStatus, SituaNome, SituaCor, SituaChave
+		FROM AtendimentoLocal
+		JOIN Situacao on SituaId = AtLocStatus
+	    WHERE AtLocUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY AtLocNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
 //Se estiver editando
-if(isset($_POST['inputLocalAtendimentoId']) && $_POST['inputLocalAtendimentoId']){
+if(isset($_POST['inputAtendimentoLocalId']) && $_POST['inputAtendimentoLocalId']){
 
 	//Essa consulta é para preencher o campo Nome com o local de atendimento a ser editar
-	$sql = "SELECT LcAteId, LcAteNome
-			FROM LocalAtendimento
-			WHERE LcAteId = " . $_POST['inputLocalAtendimentoId'];
+	$sql = "SELECT AtLocId, AtLocNome
+			FROM AtendimentoLocal
+			WHERE AtLocId = " . $_POST['inputAtendimentoLocalId'];
 	$result = $conn->query($sql);
-	$rowLocalAtendimento = $result->fetch(PDO::FETCH_ASSOC);
+	$rowAtendimentoLocal = $result->fetch(PDO::FETCH_ASSOC);
 		
 	$_SESSION['msg'] = array();
 } 
@@ -37,21 +37,21 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
-			$sql = "UPDATE LocalAtendimento SET LcAteNome = :sNome, LcAteUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE LcAteId = :iLocalAtendimento";
+			$sql = "UPDATE AtendimentoLocal SET AtLocNome = :sNome, AtLocUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE AtLocId = :iAtendimentoLocal";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iLocalAtendimento' => $_POST['inputLocalAtendimentoId']
+							':iAtendimentoLocal' => $_POST['inputAtendimentoLocalId']
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Local de Atendimento alterado!!!";
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO LocalAtendimento (LcAteNome, LcAteStatus, LcAteUsuarioAtualizador, LcAteUnidade)
+			$sql = "INSERT INTO AtendimentoLocal (AtLocNome, AtLocStatus, AtLocUsuarioAtualizador, AtLocUnidade)
 					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
@@ -113,7 +113,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<script type="text/javascript">
 
 		$(document).ready(function (){	
-			$('#tblLocalAtendimento').DataTable( {
+			$('#tblAtendimentoLocal').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
@@ -168,7 +168,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				e.preventDefault();
 				
 				var inputNomeNovo = $('#inputNome').val();
-				var inputNomeVelho = $('#inputLocalAtendimentoNome').val();
+				var inputNomeVelho = $('#inputAtendimentoLocalNome').val();
 				var inputEstadoAtual = $('#inputEstadoAtual').val();
 				
 				//remove os espaços desnecessários antes e depois
@@ -177,7 +177,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				//Se o usuário preencheu com espaços em branco ou não preencheu nada
 				if (inputNome == ''){
 					$('#inputNome').val('');
-					$("#formLocalAtendimento").submit();
+					$("#formAtendimentoLocal").submit();
 				} else {
 					//Esse ajax está sendo usado para verificar no banco se o registro já existe
 					$.ajax({
@@ -197,7 +197,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
 							}
 							
-							$( "#formLocalAtendimento" ).submit();
+							$( "#formAtendimentoLocal" ).submit();
 						}
 					})
 				}
@@ -205,26 +205,26 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaLocalAtendimento(Permission, LcAteId, LcAteNome, LcAteStatus, Tipo){
+		function atualizaAtendimentoLocal(Permission, AtLocId, AtLocNome, AtLocStatus, Tipo){
 		
 			if (Permission == 1){
-				document.getElementById('inputLocalAtendimentoId').value = LcAteId;
-				document.getElementById('inputLocalAtendimentoNome').value = LcAteNome;
-				document.getElementById('inputLocalAtendimentoStatus').value = LcAteStatus;
+				document.getElementById('inputAtendimentoLocalId').value = AtLocId;
+				document.getElementById('inputAtendimentoLocalNome').value = AtLocNome;
+				document.getElementById('inputAtendimentoLocalStatus').value = AtLocStatus;
 						
 				if (Tipo == 'edita'){	
 					document.getElementById('inputEstadoAtual').value = "EDITA";
-					document.formLocalAtendimento.action = "localAtendimento.php";		
+					document.formAtendimentoLocal.action = "localAtendimento.php";		
 				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formLocalAtendimento, "Tem certeza que deseja excluir esse local de atendimento?", "localAtendimentoExclui.php");
+					confirmaExclusao(document.formAtendimentoLocal, "Tem certeza que deseja excluir esse local de atendimento?", "localAtendimentoExclui.php");
 				} else if (Tipo == 'mudaStatus'){
-					document.formLocalAtendimento.action = "localAtendimentoMudaSituacao.php";
+					document.formAtendimentoLocal.action = "localAtendimentoMudaSituacao.php";
 				} else if (Tipo == 'imprime'){
-					document.formLocalAtendimento.action = "localAtendimentoImprime.php";
-					document.formLocalAtendimento.setAttribute("target", "_blank");
+					document.formAtendimentoLocal.action = "localAtendimentoImprime.php";
+					document.formAtendimentoLocal.setAttribute("target", "_blank");
 				}
 			
-				document.formLocalAtendimento.submit();
+				document.formAtendimentoLocal.submit();
 			} else{
 				alerta('Permissão Negada!','');
 			}
@@ -263,18 +263,18 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 							<div class="card-body">
 
-								<form name="formLocalAtendimento" id="formLocalAtendimento" method="post" class="form-validate-jquery">
+								<form name="formAtendimentoLocal" id="formAtendimentoLocal" method="post" class="form-validate-jquery">
 
-									<input type="hidden" id="inputLocalAtendimentoId" name="inputLocalAtendimentoId" value="<?php if (isset($_POST['inputLocalAtendimentoId'])) echo $_POST['inputLocalAtendimentoId']; ?>" >
-									<input type="hidden" id="inputLocalAtendimentoNome" name="inputLocalAtendimentoNome" value="<?php if (isset($_POST['inputLocalAtendimentoNome'])) echo $_POST['inputLocalAtendimentoNome']; ?>" >
-									<input type="hidden" id="inputLocalAtendimentoStatus" name="inputLocalAtendimentoStatus" >
+									<input type="hidden" id="inputAtendimentoLocalId" name="inputAtendimentoLocalId" value="<?php if (isset($_POST['inputAtendimentoLocalId'])) echo $_POST['inputAtendimentoLocalId']; ?>" >
+									<input type="hidden" id="inputAtendimentoLocalNome" name="inputAtendimentoLocalNome" value="<?php if (isset($_POST['inputAtendimentoLocalNome'])) echo $_POST['inputAtendimentoLocalNome']; ?>" >
+									<input type="hidden" id="inputAtendimentoLocalStatus" name="inputAtendimentoLocalStatus" >
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputNome">Nome do Local de Atendimento <span class="text-danger"> *</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local de Atendimento" value="<?php if (isset($_POST['inputLocalAtendimentoId'])) echo $rowLocalAtendimento['LcAteNome']; ?>" required autofocus>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local de Atendimento" value="<?php if (isset($_POST['inputAtendimentoLocalId'])) echo $rowAtendimentoLocal['AtLocNome']; ?>" required autofocus>
 											</div>
 										</div>
 										<div class="col-lg-6">
@@ -282,7 +282,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 												<?php
 
 													//editando
-													if (isset($_POST['inputLocalAtendimentoId'])){
+													if (isset($_POST['inputAtendimentoLocalId'])){
 														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
 														print('<a href="localAtendimento.php" class="btn btn-basic" role="button">Cancelar</a>');
 													} else{ //inserindo
@@ -296,7 +296,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								</form>
 							</div>
 							
-							<table id="tblLocalAtendimento" class="table">
+							<table id="tblAtendimentoLocal" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th>Local de Atendimento</th>
@@ -308,22 +308,22 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['LcAteStatus'] == 1 ? 'Ativo' : 'Inativo';
+										$situacao = $item['AtLocStatus'] == 1 ? 'Ativo' : 'Inativo';
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
 										
 										print('
 										<tr>
-											<td>'.$item['LcAteNome'].'</td>
+											<td>'.$item['AtLocNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaLocalAtendimento(1,'.$item['LcAteId'].', \''.addslashes($item['LcAteNome']).'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaAtendimentoLocal(1,'.$item['AtLocId'].', \''.addslashes($item['AtLocNome']).'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaLocalAtendimento(1,'.$item['LcAteId'].', \''.addslashes($item['LcAteNome']).'\','.$item['LcAteStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaLocalAtendimento(1,'.$item['LcAteId'].', \''.addslashes($item['LcAteNome']).'\','.$item['LcAteStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaAtendimentoLocal(1,'.$item['AtLocId'].', \''.addslashes($item['AtLocNome']).'\','.$item['AtLocStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaAtendimentoLocal(1,'.$item['AtLocId'].', \''.addslashes($item['AtLocNome']).'\','.$item['AtLocStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Grupo Conta';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT GrConId, GrConCodigo, GrConNome, GrConStatus, SituaNome, SituaCor, SituaChave
+$sql = "SELECT GrConId, GrConCodigo, GrConNome, GrConNomePersonalizado, GrConStatus, SituaNome, SituaCor, SituaChave
 		FROM GrupoConta
 		JOIN Situacao on SituaId = GrConStatus
 	    WHERE GrConUnidade = ". $_SESSION['UnidadeId'] ."
@@ -246,7 +246,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<tbody>
 								<?php
 									foreach ($row as $item){
-										
+										$nome = $item['GrConNomePersonalizado'] != '' ? $item['GrConNomePersonalizado'] : $item['GrConNome'];
 										$situacao = $item['GrConStatus'] == 1 ? 'Ativo' : 'Inativo';
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
@@ -254,7 +254,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('
 										<tr>
 											<td>'.$item['GrConCodigo'].'</td>
-											<td>'.$item['GrConNome'].'</td>
+											<td>'.$nome.'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaGrupoConta(1,'.$item['GrConId'].', \''.addslashes($item['GrConNome']).'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
