@@ -197,14 +197,13 @@ if(isset($_POST['inputNome'])){
 			}
 			
 			
-			//Valida Registro Duplicado
 			$('#cancelar').on('click', function(e){
 				
 				e.preventDefault();		
 				
 				$(window.document.location).attr('href',"servicoVenda.php");
 				
-			}); // cancelar		
+			}); 		
 		});		
 		
 	</script>
