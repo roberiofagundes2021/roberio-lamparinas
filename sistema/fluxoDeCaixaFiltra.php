@@ -822,7 +822,8 @@ if($typeFiltro == "D"){
       break;
     }
 
-    //Usado para consultar pelas datas corretas de acordo com a coluna (primeira, segunda, terceira...)
+    //Usado para q o loop para depois que todos os dias sejam mostradados, pois sempre está acrescentando valores ao índice
+    //evitando inclusive alguns bugs como uma coluna extra
     if(($i+1) <= $diaFim) {
         $i += 2;
     } 

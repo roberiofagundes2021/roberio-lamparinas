@@ -40,6 +40,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 		});
 
 		//A função .on("click"): trabalha dinâmicamente, ou seja, funciona msm dps q o objeto é carregado na página
+		//Carrega os planos de contas sintéticos
 		$(document).on("click", ".planoConta", function(){
 			let planoConta = $(this).attr('id');
 			let indice = planoConta.replace(/[^0-9]/g,''); //Pega apenas o número da string
@@ -90,6 +91,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								
 								let arrayCodigo = planoConta.PlConCodigo.split('');
 
+								/*Planos de contas q começam com o código 1 são receitas, portanto no momento ainda não possuem centros de custo*/
 								if(arrayCodigo[0] == '1') {
 									HTML = HTML + 
 												`<div id='planoContaFilho`+planoConta.PlConId+indice+`' indice='`+indice+`' idPlanoContaFilho='`+planoConta.PlConId+`' class='col-lg-4' style='padding-left: 20px; border-right: 1px dotted black;'>
@@ -170,6 +172,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			}
 		});
 
+		//Carrega os planos de contas analíticos
 		$(document).on("click", ".planoContaFilho", function(){
 			let planoContaFilho = $(this).attr('id');
 			let idPlanoConta = $(this).attr('idPlanoContaFilho');
@@ -205,7 +208,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 				const msg = $('<div class="text-center"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></div>');
 				$("#centroCusto"+indicePlanoConta).html(msg)
 				
-				//Consulta saldo anterior
+				//Consulta os centros de custo
 				$.ajax({
 					type: "POST",
 					url: urlConsultaPlanoConta,
