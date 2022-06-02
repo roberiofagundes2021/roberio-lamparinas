@@ -112,7 +112,7 @@ if(isset($_POST['inputNome'])){
 			$("#inputNome").on('blur', function(e){
 
 				var inputNome = $('#inputNome').val();
-
+			
 				inputNome = inputNome.trim();
 				
 				if (inputNome.length == 0){
@@ -122,10 +122,33 @@ if(isset($_POST['inputNome'])){
 		
 		
 		
-			$('#alterar').on('click', (e)=>{
-				e.preventDefault()
+			$('#alterar').on('click', function(e) {
 
-				$('#formProtocoloManchester').submit()
+				e.preventDefault();
+
+				var inputNomeNovo = $('#inputNome').val();
+				var inputNomeVelho = $('#inputProtocoloNome').val();
+				
+
+				//remove os espaços desnecessários antes e depois
+				inputNomeNovo = inputNomeNovo.trim();
+
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "protocoloManchesterValida.php",
+					data: ('nomeNovo=' + inputNomeNovo + '&nomeVelho=' + inputNomeVelho),
+					success: function(resposta) {
+
+					if (resposta == 1) {
+						alerta('Atenção', 'Esse registro já existe!', 'error');
+						return false;
+					}
+
+					$("#formProtocoloManchester").submit();
+					}
+				})
+
 			})
 		
 		});
@@ -159,6 +182,7 @@ if(isset($_POST['inputNome'])){
 						</div>
 						
 						<input type="hidden" id="inputProtocoloManchesterId" name="inputProtocoloManchesterId" value="<?php echo $row['AtPrMId']; ?>" >
+						<input type="hidden" id="inputProtocoloNome" name="inputProtocoloNome" value="<?php echo $row['AtPrMNome']; ?>">
 						<input type="hidden" id="inputProtocoloManchesterStatus" name="inputProtocoloManchesterStatus" value="<?php echo $row['SituaChave']; ?>" >
 						
 						<div class="card-body">

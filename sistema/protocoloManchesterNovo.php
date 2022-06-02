@@ -86,14 +86,35 @@ if(isset($_POST['inputNome'])){
 			});        	
 			
 			
-			$('#cancelar').on('click', function(e){
+			$('#enviar').on('click', function(e){
 				
-				e.preventDefault();		
+				e.preventDefault();	
 				
-				$(window.document.location).attr('href',"protocoloManchester.php");
+				var inputNome = $('#inputNome').val();
+
+				inputNome = inputNome.trim();
 				
-			}); // cancelar		
-		});		
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "protocoloManchesterValida.php",
+					data: {
+					nome: inputNome
+					},
+					success: function(resposta) {
+						if (resposta == '1') {
+							alerta('Atenção', 'Esse registro já existe !', 'error');
+							return false;
+						} else {
+							$("#formProtocoloManchester").submit();
+						}
+					}
+				})
+				
+			}); 
+		});	
+
+
 		
 	</script>
 	
@@ -169,7 +190,7 @@ if(isset($_POST['inputNome'])){
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-										<a href="protocoloManchester.php" class="btn btn-lg" id="cancelar">Cancelar</a>
+										<a href="protocoloManchester.php" class="btn btn-lg" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>

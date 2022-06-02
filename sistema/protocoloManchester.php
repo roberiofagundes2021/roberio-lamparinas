@@ -110,7 +110,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						document.formProtocoloManchester.action = "protocoloManchesterMudaSituacao.php";
 				 	} else if (Tipo == 'exclui'){
 						if(Permission){
-							confirmaExclusao(document.formProtocoloManchester, "Tem certeza que deseja excluir esse protoco loManchester?", "protocoloManchesterExclui.php");
+							confirmaExclusao(document.formProtocoloManchester, "Tem certeza que deseja excluir esse protocolo Manchester?", "protocoloManchesterExclui.php");
 						}	else{
 							alerta('Permissão Negada!','');
 							return false;
