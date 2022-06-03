@@ -48,6 +48,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			let data1 = $('#data'+indice).val();
 			let data2 = $('#dataSegundaColuna'+indice).val();
 			let data3 = $('#dataTerceiraColuna'+indice).val();
+			let data4 = $('#dataQuartaColuna'+indice).val();
 
 
 			if ($('#'+planoConta).is( ".visivel" ) ) {
@@ -69,7 +70,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 					inputPlanoConta1: idPlanoContaPai1,
 					inputData1: data1,
 					inputData2: data2,
-					inputData3: data3
+					inputData3: data3,
+					inputData4: data4
 				}; 
 
 				const msg = $('<div class="text-center"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></div>');
@@ -85,6 +87,9 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 						if(resposta[0][0]) {
 							for(let x = 0; x < resposta[0].length; x++) {
 								let planoConta = resposta[0][x]
+								let segundaColuna = resposta[1];
+								let terceiraColuna = resposta[2];
+								let quartaColuna = resposta[3];
 								
 								HTML = HTML + ` 
 										<div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>`;
@@ -94,12 +99,12 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								/*Planos de contas q começam com o código 1 são receitas, portanto no momento ainda não possuem centros de custo*/
 								if(arrayCodigo[0] == '1') {
 									HTML = HTML + 
-												`<div id='planoContaFilho`+planoConta.PlConId+indice+`' indice='`+indice+`' idPlanoContaFilho='`+planoConta.PlConId+`' class='col-lg-4' style='padding-left: 20px; border-right: 1px dotted black;'>
+												`<div id='planoContaFilho`+planoConta.PlConId+indice+`' indice='`+indice+`' idPlanoContaFilho='`+planoConta.PlConId+`' class='col-lg-3' style='padding-left: 20px; border-right: 1px dotted black;'>
 													<span title=''>`+planoConta.PlConNome+`</span>
 												</div>`;
 								}else {
 									HTML = HTML + 
-												`<div id='planoContaFilho`+planoConta.PlConId+indice+`' indice='`+indice+`' idPlanoContaFilho='`+planoConta.PlConId+`' class='col-lg-4 planoContaFilho' style='padding-left: 20px; border-right: 1px dotted black; cursor:pointer;'>
+												`<div id='planoContaFilho`+planoConta.PlConId+indice+`' indice='`+indice+`' idPlanoContaFilho='`+planoConta.PlConId+`' class='col-lg-3 planoContaFilho' style='padding-left: 20px; border-right: 1px dotted black; cursor:pointer;'>
 													<span title=''><span id='simboloFilho`+planoConta.PlConId+indice+`' style='font-weight: bold; color: #607D8B;'>( + ) </span>`+planoConta.PlConNome+`</span>
 												</div>`;
 								}
@@ -117,7 +122,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 												</div>
 											</div>`;
 								
-								if(resposta[1] != '') {
+								if(segundaColuna != '') {
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 													<div class='row'>
@@ -132,7 +137,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 												</div>`;
 								}
 
-								if(resposta[2] != '') {
+								if(terceiraColuna != '') {
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 													<div class='row'>
@@ -142,6 +147,21 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 										
 													<div class='col-md-6'>
 														<span>`+float2moeda(planoConta.Realizado3)+`</span>
+													</div>
+													</div>
+												</div>`;
+								}
+
+								if(quartaColuna != '') {
+									HTML = HTML + 
+												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+													<div class='row'>
+													<div class='col-md-6'>
+														<span>`+float2moeda(planoConta.Previsto4)+`</span>
+													</div>
+										
+													<div class='col-md-6'>
+														<span>`+float2moeda(planoConta.Realizado4)+`</span>
 													</div>
 													</div>
 												</div>`;
@@ -182,6 +202,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			let data1 = $('#data'+indice).val();
 			let data2 = $('#dataSegundaColuna'+indice).val();
 			let data3 = $('#dataTerceiraColuna'+indice).val();
+			let data4 = $('#dataQuartaColuna'+indice).val();
 
 			if ($('#'+planoContaFilho ).is( ".visivel" ) ) {
 				$('#'+planoContaFilho).removeClass("visivel");
@@ -202,7 +223,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 					inputPlanoConta1: idPlanoContaFilho1,
 					inputData1: data1,
 					inputData2: data2,
-					inputData3: data3
+					inputData3: data3,
+					inputData4: data4
 				}; 
 
 				const msg = $('<div class="text-center"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></div>');
@@ -217,11 +239,14 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 					success: function(resposta) {
 						if(resposta[0][0]) {
 							for(let x = 0; x < resposta[0].length; x++) {
-								let centroCusto = resposta[0][x]
+								let centroCusto = resposta[0][x];
+								let segundaColuna = resposta[1];
+								let terceiraColuna = resposta[2];
+								let quartaColuna = resposta[3];
 								
 								HTML = HTML + `
 										<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
-											<div class='col-lg-4 planoContaFilho' style='padding-left: 40px; border-right: 1px dotted black;'>
+											<div class='col-lg-3 planoContaFilho' style='padding-left: 40px; border-right: 1px dotted black;'>
 												<span title=''>`+centroCusto.CnCusNome+`</span>
 											</div>
 									
@@ -237,7 +262,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 												</div>
 											</div>`;
 								
-								if(resposta[1] != '') {
+								if(segundaColuna != '') {
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 													<div class='row'>
@@ -252,7 +277,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 												</div>`;
 								}
 
-								if(resposta[2] != '') {
+								if(terceiraColuna != '') {
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 													<div class='row'>
@@ -262,6 +287,21 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 										
 													<div class='col-md-6'>
 														<span>`+float2moeda(centroCusto.Realizado3)+`</span>
+													</div>
+													</div>
+												</div>`;
+								}
+
+								if(quartaColuna != '') {
+									HTML = HTML + 
+												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+													<div class='row'>
+													<div class='col-md-6'>
+														<span>`+float2moeda(centroCusto.Previsto4)+`</span>
+													</div>
+										
+													<div class='col-md-6'>
+														<span>`+float2moeda(centroCusto.Realizado4)+`</span>
 													</div>
 													</div>
 												</div>`;
