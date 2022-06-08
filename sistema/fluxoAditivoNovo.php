@@ -449,11 +449,9 @@ try {
 					url: "fluxoAditivoNovofiltraProduto.php",
 					data: {cmbSubCategoria: cmbSubCategoria, inputIdCategoria: inputIdCategoria, iFluxoOperacional: iFluxoOperacional},
 					success: function(resposta){
-						if (resposta !== null){
+						if (resposta != null){
 							$("#tabelaProdutos").html(resposta).show();
-
 							pular();
-
 							return false;
 						} else {
 							ResetProduto()
@@ -479,13 +477,12 @@ try {
 				$.ajax({
 					type: "POST",
 					url: "fluxoAditivoNovofiltraServico.php",
+					dataType: "json",
 					data: {cmbSubCategorias: cmbSubCategorias, inputIdCategoria: inputIdCategoria, iFluxoOperacional: iFluxoOperacional},
 					success: function(resposta){
 						if (resposta !== null){
 							$("#tabelaServicos").html(resposta).show();
-							
 							pular();
-							
 							return false;
 						} else {
 							ResetServico()
@@ -764,13 +761,15 @@ try {
 							<!-- /card-body --> 
 							<!---------------------------------------------------------------------------------------------Produtos---------------------------------------------------------------------------------------------------------->
 							<?php
-								$sqlProduto = " SELECT Distinct ProduId, ProduNome, FOXPrDetalhamento, UnMedSigla, MarcaNome
+								$sqlProduto = " SELECT Distinct ProduId, ProduNome, FOXPrDetalhamento, UnMedSigla,
+												MarcaNome, ModelNome, FabriNome
 												FROM Produto
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-												LEFT JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
-					                            LEFT JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
+												LEFT JOIN ProdutoXFabricante ON PrXFaProduto = ProduId and PrXFaFluxoOperacional = FOXPrFluxoOperacional
 												LEFT JOIN Marca on MarcaId = PrXFaMarca
+												LEFT JOIN Modelo on ModelId = PrXFaModelo
+												LEFT JOIN Fabricante on FabriId = PrXFaFabricante
 												WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " AND ProduCategoria = $iCategoria
 												AND FOXPrFluxoOperacional = $iFluxoOperacional";
 								if($sSubCategorias){
@@ -780,12 +779,13 @@ try {
 								$rowProdutos = $resultProduto->fetchAll(PDO::FETCH_ASSOC);
 								$countProduto = count($rowProdutos);
 
-								$sqlServico = " SELECT Distinct ServiId, ServiNome, FOXSrDetalhamento, MarcaNome
+								$sqlServico = " SELECT Distinct ServiId, ServiNome, FOXSrDetalhamento, MarcaNome, ModelNome, FabriNome
 												FROM Servico
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-												LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
-					                            LEFT JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
+												LEFT JOIN ServicoXFabricante ON SrXFaServico = ServiId and SrXFaFluxoOperacional = FOXSrFluxoOperacional
 												LEFT JOIN Marca on MarcaId = SrXFaMarca
+												LEFT JOIN Modelo on ModelId = SrXFaModelo
+												LEFT JOIN Fabricante on FabriId = SrXFaFabricante
 												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " AND ServiCategoria = $iCategoria 
 												AND FOXSrFluxoOperacional = $iFluxoOperacional";
 								if($sSubCategorias){
@@ -842,11 +842,17 @@ try {
 													<div class="col-lg-1">
 														<label for="inputCodigo"><strong>Item</strong></label>
 													</div>
-													<div class="col-lg-8">
+													<div class="col-lg-5">
 														<label for="inputProduto"><strong>Produto</strong></label>
 													</div>
-													<div class="col-lg-3">
+													<div class="col-lg-2">
 														<label for="inputMarca"><strong>Marca</strong></label>
+													</div>
+													<div class="col-lg-2">
+														<label for="inputMarca"><strong>Modelo</strong></label>
+													</div>
+													<div class="col-lg-2">
+														<label for="inputMarca"><strong>Fabricante</strong></label>
 													</div>
 												</div>
 											</div>												
@@ -872,7 +878,7 @@ try {
 											</div>											
 										</div>');
 
-										print('<div id="tabelaProdutos">');
+										print("<div id='tabelaProdutos'>");
 
 										$fTotalGeral = 0;
 
@@ -885,80 +891,81 @@ try {
 											$fValorTotal = (isset($item['AdXPrQuantidade']) and isset($item['AdXPrValorUnitario'])) ? mostraValor($item['AdXPrQuantidade'] * $item['AdXPrValorUnitario']) : '';
 
 											$fTotalGeral += (isset($item['AdXPrQuantidade']) and isset($item['AdXPrValorUnitario'])) ? $item['AdXPrQuantidade'] * $item['AdXPrValorUnitario'] : 0;
+											$detalhamento = $item['FOXPrDetalhamento']?$item['FOXPrDetalhamento']:$item['ProduNome'];
 
-
-											print('
-											<div class="row" style="margin-top: 8px;" >
-												<div class="col-lg-7">
-													<div class="row">
-														<div class="col-lg-1">
-															<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
-															<input type="hidden" id="inputIdProduto' . $cont . '" name="inputIdProduto' . $cont . '" value="' . $item['ProduId'] . '" class="idProduto">
+											print("
+											<div class='row' style='margin-top: 8px;' >
+												<div class='col-lg-7'>
+													<div class='row'>
+														<div class='col-lg-1'>
+															<input type='text' id='inputItem$cont' name='inputItem$cont' class='form-control-border-off' value='$cont' readOnly>
+															<input type='hidden' id='inputIdProduto$cont' name='inputIdProduto$cont' value='$item[ProduId]' class='idProduto'>
 														</div>
-														<div class="col-lg-8">
-															<input type="text" id="inputProduto' . $cont . '" name="inputProduto' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['FOXPrDetalhamento'] . '" value="' . $item['ProduNome'] . '" readOnly>
+														<div class='col-lg-5'>
+															<input type='text' id='inputProduto$cont' name='inputProduto$cont' class='form-control-border-off' data-popup='tooltip' title='$detalhamento' value='$item[ProduNome]' readOnly>
 														</div>
-														<div class="col-lg-3">
-															<input type="text" id="inputMarca' . $cont . '" name="inputMarca' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['MarcaNome'] . '" value="' . $item['MarcaNome'] . '" readOnly>
+														<div class='col-lg-2'>
+															<input type='text' id='inputMarca$cont' name='inputMarca$cont' class='form-control-border-off' data-popup='tooltip' title='$item[MarcaNome]' value='$item[MarcaNome]' readOnly>
+														</div>
+														<div class='col-lg-2'>
+															<input type='text' id='inputModelo$cont' name='inputModelo$cont' class='form-control-border-off' data-popup='tooltip' title='$item[ModelNome]' value='$item[ModelNome]' readOnly>
+														</div>
+														<div class='col-lg-2'>
+															<input type='text' id='inputFabricante$cont' name='inputFabricante$cont' class='form-control-border-off' data-popup='tooltip' title='$item[FabriNome]' value='$item[FabriNome]' readOnly>
 														</div>
 													</div>
 												</div>								
-												<div class="col-lg-1">
-													<input type="text" id="inputUnidade' . $cont . '" name="inputUnidade' . $cont . '" class="form-control-border-off" value="' . $item['UnMedSigla'] . '" readOnly>
+												<div class='col-lg-1'>
+													<input type='text' id='inputUnidade$cont' name='inputUnidade$cont' class='form-control-border-off' value='$item[UnMedSigla]' readOnly>
 												</div>
-												<div class="col-lg-1">
-													<input type="text" id="inputQuantidade' . $cont . '" name="inputQuantidade' . $cont . '" class="form-control-border Quantidade pula" onChange="calculaValorTotal(' . $cont . ')" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+												<div class='col-lg-1'>
+													<input type='text' id='inputQuantidade$cont' name='inputQuantidade$cont' class='form-control-border Quantidade pula' onChange='calculaValorTotal($cont)' onkeypress='return onlynumber();' value='$iQuantidade'>
 												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitario' . $cont . '" name="inputValorUnitario' . $cont . '" class="form-control-border ValorUnitario pula text-right" onChange="calculaValorTotal(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
+												<div class='col-lg-1'>
+													<input type='text' id='inputValorUnitario$cont' name='inputValorUnitario$cont' class='form-control-border ValorUnitario pula' onChange='calculaValorTotal($cont)' onKeyUp='moeda(this)' maxLength='12' value='$fValorUnitario'>
 												</div>	
-												<div class="col-lg-2">
-													<input type="text" id="inputValorTotal' . $cont . '" name="inputValorTotal' . $cont . '" class="form-control-border-off text-right text-right" value="' . $fValorTotal . '" readOnly>
+												<div class='col-lg-2'>
+													<input type='text' id='inputValorTotal$cont' name='inputValorTotal$cont' class='form-control-border-off text-right' value='$fValorTotal' readOnly>
 												</div>											
-											</div>');
+											</div>");
 										}
 										
 
 									
-										print('
-										<div class="row" style="margin-top: 8px;">
-											<div class="col-lg-7">
-												<div class="row">
-													<div class="col-lg-1">
+										print("
+										<div class='row' style='margin-top: 8px;'>
+											<div class='col-lg-7'>
+												<div class='row'>
+													<div class='col-lg-1'>
 														
 													</div>
-													<div class="col-lg-8">
+													<div class='col-lg-8'>
 														
 													</div>
-													<div class="col-lg-3">
+													<div class='col-lg-3'>
 														
 													</div>
 												</div>
 											</div>								
-											<div class="col-lg-1">
+											<div class='col-lg-1'>
 												
 											</div>
-											<div class="col-lg-1">
+											<div class='col-lg-1'>
 												
 											</div>	
-											<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
-												<h5><b>Total:</b></h5>
+											<div class='col-lg-1' style='padding-top: 5px; text-align: right;'>
+												<h3><b>Total:</b></h3>
 											</div>	
-											<div class="col-lg-2">
-												<input type="text" id="inputTotalGeralProduto" name="inputTotalGeralProduto" class="form-control-border-off text-right" value="' . mostraValor($fTotalGeral) . '" readOnly>
+											<div class='col-lg-2'>
+												<input type='text' id='inputTotalGeralProduto' name='inputTotalGeralProduto' class='form-control-border-off' value='".mostraValor($fTotalGeral)."' readOnly>
 											</div>											
-										</div>');
+										</div>");
 
-										print('<input type="hidden" id="totalRegistros" name="totalRegistros" value="' . $cont . '" >');
+										print("<input type='hidden' id='totalRegistros' name='totalRegistros' value='$cont' >");
 									
-										print('</div>');
+										print("</div>");
 									
-									}
-
-
-
-									?>
-
+									}?>
 								</div>
 							</div>
 							<!------------------------------Se não existirem serviços ou se a requisição não estiver vindo do lugar certo-------------------------------------->
@@ -1002,39 +1009,45 @@ try {
 									$cont = 0;
 									if (isset($_POST['inputDataInicio'])) {
 
-										print('
-										<div class="row" style="margin-bottom: -20px;">
-											<div class="col-lg-8">
-												<div class="row">
-													<div class="col-lg-1">
-														<label for="inputCodigo"><strong>Item</strong></label>
+										print("
+										<div class='row' style='margin-bottom: -20px;'>
+											<div class='col-lg-8'>
+												<div class='row'>
+													<div class='col-lg-1'>
+														<label for='inputCodigo'><strong>Item</strong></label>
 													</div>
-													<div class="col-lg-8">
-														<label for="inputServico"><strong>Servico</strong></label>
+													<div class='col-lg-5'>
+														<label for='inputServico'><strong>Servico</strong></label>
 													</div>
-													<div class="col-lg-3">
-														<label for="inputMarca"><strong>Marca</strong></label>
+													<div class='col-lg-2'>
+														<label for='inputMarca'><strong>Marca</strong></label>
+													</div>
+													<div class='col-lg-2'>
+														<label for='inputMarca'><strong>Modelo</strong></label>
+													</div>
+													<div class='col-lg-2'>
+														<label for='inputMarca'><strong>Fabricante</strong></label>
 													</div>
 												</div>
 											</div>												
-											<div class="col-lg-1">
-												<div class="form-group">
-													<label for="inputQuantidade"><strong>Quantidade</strong></label>
+											<div class='col-lg-1'>
+												<div class='form-group'>
+													<label for='inputQuantidade'><strong>Quantidade</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-1">
-												<div class="form-group">
-													<label for="inputValorUnitario" title="Valor Unitário"><strong>Valor Unit.</strong></label>
+											<div class='col-lg-1'>
+												<div class='form-group'>
+													<label for='inputValorUnitario' title='Valor Unitário'><strong>Valor Unit.</strong></label>
 												</div>
 											</div>	
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputValorTotal"><strong>Valor Total</strong></label>
+											<div class='col-lg-2'>
+												<div class='form-group'>
+													<label for='inputValorTotal'><strong>Valor Total</strong></label>
 												</div>
 											</div>											
-										</div>');
+										</div>");
 
-										print('<div id="tabelaServicos">');
+										print("<div id='tabelaServicos'>");
 
 										$fTotalGeral = 0;
 
@@ -1049,65 +1062,70 @@ try {
 											$fTotalGeral += (isset($item['FOXSrQuantidade']) and isset($item['FOXSrValorUnitario'])) ? $item['FOXSrQuantidade'] * $item['FOXSrValorUnitario'] : 0;
 
 
-											print('
-											<div class="row" style="margin-top: 8px;">
-												<div class="col-lg-8">
-													<div class="row">
-														<div class="col-lg-1">
-															<input type="text" id="inputItem' . $cont . '" name="inputItem' . $cont . '" class="form-control-border-off" value="' . $cont . '" readOnly>
-															<input type="hidden" id="inputIdServico' . $cont . '" name="inputIdServico' . $cont . '" value="' . $item['ServiId'] . '" class="idServico">
+											print("
+											<div class='row' style='margin-top: 8px;' >
+												<div class='col-lg-8'>
+													<div class='row'>
+														<div class='col-lg-1'>
+															<input type='text' id='inputItem$cont' name='inputItem$cont' class='form-control-border-off' value='$cont' readOnly>
+															<input type='hidden' id='inputIdServico$cont' name='inputIdServico$cont' value='$item[ServiId]' class='idServico'>
 														</div>
-														<div class="col-lg-8">
-															<input type="text" id="inputServico' . $cont . '" name="inputServico' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['FOXSrDetalhamento'] . '" value="' . $item['ServiNome'] . '" readOnly>
+														<div class='col-lg-5'>
+															<input type='text' id='inputServico$cont' name='inputServico$cont' class='form-control-border-off' data-popup='tooltip' title='$item[FOXSrDetalhamento]' value='$item[ServiNome]' readOnly>
 														</div>
-														<div class="col-lg-3">
-														<input type="text" id="inputMarca' . $cont . '" name="inputMarca' . $cont . '" class="form-control-border-off" data-popup="tooltip" title="' . $item['MarcaNome'] . '" value="' . $item['MarcaNome'] . '" readOnly>
+														<div class='col-lg-2'>
+															<input type='text' id='inputMarca$cont' name='inputMarca$cont' class='form-control-border-off' data-popup='tooltip' title='$item[MarcaNome]' value='$item[MarcaNome]' readOnly>
+														</div>
+														<div class='col-lg-2'>
+															<input type='text' id='inputModelo$cont' name='inputModelo$cont' class='form-control-border-off' data-popup='tooltip' title='$item[ModelNome]' value='$item[ModelNome]' readOnly>
+														</div>
+														<div class='col-lg-2'>
+															<input type='text' id='inputFabricante$cont' name='inputFabricante$cont' class='form-control-border-off' data-popup='tooltip' title='$item[FabriNome]' value='$item[FabriNome]' readOnly>
 														</div>
 													</div>
-												</div>
-												<div class="col-lg-1">
-													<input type="text" id="inputQuantidadeServico' . $cont . '" name="inputQuantidadeServico' . $cont . '" class="form-control-border Quantidade pula" onChange="calculaValorTotalServico(' . $cont . ')" onkeypress="return onlynumber();" value="' . $iQuantidade . '">
+												</div>						
+												<div class='col-lg-1'>
+													<input type='text' id='inputQuantidadeServico$cont' name='inputQuantidadeServico$cont' class='form-control-border Quantidade pula' onChange='calculaValorTotalServico($cont)' onkeypress='return onlynumber();' value='$iQuantidade'>
 												</div>	
-												<div class="col-lg-1">
-													<input type="text" id="inputValorUnitarioServico' . $cont . '" name="inputValorUnitarioServico' . $cont . '" class="form-control-border ValorUnitario pula text-right" onChange="calculaValorTotalServico(' . $cont . ')" onKeyUp="moeda(this)" maxLength="12" value="' . $fValorUnitario . '">
+												<div class='col-lg-1'>
+													<input type='text' id='inputValorUnitarioServico$cont' name='inputValorUnitarioServico$cont' class='form-control-border ValorUnitario pula text-right' onChange='calculaValorTotalServico($cont)' onKeyUp='moeda(this)' maxLength='12' value='$fValorUnitario'>
 												</div>	
-												<div class="col-lg-2">
-													<input type="text" id="inputValorTotalServico' . $cont . '" name="inputValorTotalServico' . $cont . '" class="form-control-border-off text-right" value="' . $fValorTotal . '" readOnly>
-												</div>											
-											</div>');
+												<div class='col-lg-2'>
+													<input type='text' id='inputValorTotalServico$cont' name='inputValorTotalServico$cont' class='form-control-border-off text-right' value='$fValorTotal' readOnly>
+												</div>												
+											</div>");
 										}
 											
-										print('
-										<div class="row" style="margin-top: 8px;">
-											<div class="col-lg-8">
-												<div class="row">
-													<div class="col-lg-1">
+										print("
+										<div class='row' style='margin-top: 8px;'>
+											<div class='col-lg-8'>
+												<div class='row'>
+													<div class='col-lg-1'>
 														
 													</div>
-													<div class="col-lg-8">
+													<div class='col-lg-8'>
 														
 													</div>
-													<div class="col-lg-3">
+													<div class='col-lg-3'>
 														
 													</div>
 												</div>
-											</div>
-											<div class="col-lg-1">
+												</div>
+												<div class='col-lg-1'>
+									
 											</div>	
-											<div class="col-lg-1" style="padding-top: 5px; text-align: right;">
-												<h5><b>Total:</b></h5>
-											</div>	
-											<div class="col-lg-2">
-												<input type="text" id="inputTotalGeralServico" name="inputTotalGeralServico" class="form-control-border-off text-right" value="' . mostraValor($fTotalGeral) . '" readOnly>
-											</div>											
-										</div>');
+												<div class='col-lg-1' style='padding-top: 5px; text-align: right;'>
+													<h5><b>Total:</b></h5>
+												</div>	
+												<div class='col-lg-2'>
+													<input type='text' id='inputTotalGeralServico' name='inputTotalGeralServico' class='form-control-border-off text-right' value='".mostraValor($fTotalGeral)."' readOnly>
+												</div>											
+										</div>");
 
-										print('<input type="hidden" id="totalRegistrosServicos" name="totalRegistrosServicos" value="' . $cont . '" >');
+										print("<input type='hidden' id='totalRegistrosServicos' name='totalRegistrosServicos' value='$cont'>");
 										
-										print('</div>');
-									}
-
-									?>
+										print("</div>");
+									}?>
 								</div>
 								<!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 							</div>
