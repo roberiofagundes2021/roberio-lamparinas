@@ -1180,7 +1180,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                                 FROM PlanoConta
                                                                 JOIN Situacao  ON SituaId = PlConStatus
                                                                 WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and
-                                                                PlConNatureza = 'R'  and SituaChave = 'ATIVO'
+                                                                PlConNatureza = 'R' and PlConTipo = 'A' and SituaChave = 'ATIVO'
                                                                 ORDER BY PlConCodigo ASC";
                                                         $result = $conn->query($sql);
                                                         $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);

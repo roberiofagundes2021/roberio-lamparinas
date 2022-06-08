@@ -3,14 +3,13 @@
 include_once("sessao.php"); 
 include('global_assets/php/conexao.php');
 
-$_SESSION['PaginaAtual'] = 'Serviço';
+$_SESSION['PaginaAtual'] = 'Protocolo Manchester';
 
-$sql = "SELECT SrVenId, SrVenNome, SrVenStatus, PlConNome, SituaNome, SituaChave, SituaCor
-		FROM ServicoVenda
-		JOIN PlanoConta ON PlConId = SrVenPlanoConta
-		JOIN Situacao ON SituaId = SrVenStatus
-	    WHERE SrVenUnidade = ". $_SESSION['UnidadeId'] ."
-		ORDER BY SrVenNome ASC";
+$sql = "SELECT AtPrMId, AtPrMNome, AtPrMTempo, AtPrMCor, AtPrMDeterminantes, AtPrMStatus, SituaNome, SituaChave, SituaCor
+		FROM AtendimentoProtocoloManchester
+		JOIN Situacao ON SituaId = AtPrMStatus
+	    WHERE AtPrMUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY AtPrMNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -23,7 +22,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Serviço</title>
+	<title>Lamparinas | Protocolo Manchester</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -46,29 +45,24 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		$(document).ready(function() {		
 			
 			/* Início: Tabela Personalizada */
-			$('#tblServico').DataTable( {
+			$('#tblProtocoloManchester').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{ 
-					orderable: true,   //Serviço
-					width: "45%",
+					orderable: true,   //Protocolo
+					width: "70%",
 					targets: [0]
 				},				
 				{ 
-					orderable: true,   //Plano de Conta
-					width: "45%",
+					orderable: true,   //Situação
+					width: "15%",
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Situação
-					width: "5%",
-					targets: [2]
-				},
-				{ 
 					orderable: false,  //Ações
-					width: "5%",
-					targets: [3]
+					width: "15%",
+					targets: [2]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -100,24 +94,23 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 		});		
 			
 			//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-			function atualizaServico(Permission,ServicoId, ServicoNome, ServicoStatus, Tipo){
+			function atualizaProtocoloManchester(Permission,ProtocoloManchesterId, ProtocoloManchesterNome, ProtocoloManchesterStatus, Tipo){
 
 				document.getElementById('inputPermission').value = Permission;
-				document.getElementById('inputServicoId').value = ServicoId;
-				document.getElementById('inputServicoNome').value = ServicoNome;
-				document.getElementById('inputServicoStatus').value = ServicoStatus;
+				document.getElementById('inputProtocoloManchesterId').value = ProtocoloManchesterId;
+				document.getElementById('inputProtocoloManchesterNome').value = ProtocoloManchesterNome;
+				document.getElementById('inputProtocoloManchesterStatus').value = ProtocoloManchesterStatus;
 
-				
 
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 
 					if (Tipo == 'edita'){	
-						document.formServico.action = "servicoVendaEdita.php";
+						document.formProtocoloManchester.action = "protocoloManchesterEdita.php";
 					} else if (Tipo == 'mudaStatus'){
-						document.formServico.action = "servicoVendaMudaSituacao.php";
-					}	else if (Tipo == 'exclui'){
+						document.formProtocoloManchester.action = "protocoloManchesterMudaSituacao.php";
+				 	} else if (Tipo == 'exclui'){
 						if(Permission){
-							confirmaExclusao(document.formServico, "Tem certeza que deseja excluir esse serviço?", "servicoVendaExclui.php");
+							confirmaExclusao(document.formProtocoloManchester, "Tem certeza que deseja excluir esse protocolo Manchester?", "protocoloManchesterExclui.php");
 						}	else{
 							alerta('Permissão Negada!','');
 							return false;
@@ -125,7 +118,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					}  
 				
 				
-				document.formServico.submit();
+				document.formProtocoloManchester.submit();
 				
 			}	
 			
@@ -156,27 +149,26 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Serviços</h3>
+								<h3 class="card-title">Relação de Protocolos Manchester</h3>
 							</div>
 
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-9">
-									<p class="font-size-lg">A relação abaixo faz referência aos serviços da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+									<p class="font-size-lg">A relação abaixo faz referência aos Protocolos Manchester da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>
                                     <div class="col-lg-3">
 										<div class="text-right">
-											<a href="servicoVendaNovo.php" class="btn btn-principal" role="button">Novo Serviço</a>
+											<a href="protocoloManchesterNovo.php" class="btn btn-principal" role="button">Novo Protocolo Manchester</a>
 										</div>
 									</div>
 								</div>
 							</div>
 							
-							<table class="table" id="tblServico">
+							<table class="table" id="tblProtocoloManchester">
 								<thead>
 									<tr class="bg-slate">
-										<th>Servico</th>
-										<th>Plano de Conta</th>
+										<th>Nome</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -190,17 +182,16 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										
 										print('
 										<tr>
-											<td>'.$item['SrVenNome'].'</td>
-											<td>'.$item['PlConNome'].'</td>
+											<td>'.$item['AtPrMNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaServico(1,'.$item['SrVenId'].', \''.$item['SrVenNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');" data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaProtocoloManchester(1,'.$item['AtPrMId'].', \''.$item['AtPrMNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');" data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaServico( 1 ,'.$item['SrVenId'].', \''.$item['SrVenNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Serviço"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaServico( 1 ,'.$item['SrVenId'].', \''.$item['SrVenNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Excluir Serviço"><i class="icon-bin"></i></a>
+														<a href="#" onclick="atualizaProtocoloManchester( 1 ,'.$item['AtPrMId'].', \''.$item['AtPrMNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Protocolo Manchester"><i class="icon-pencil7"></i></a>
+														<a href="#" onclick="atualizaProtocoloManchester( 1 ,'.$item['AtPrMId'].', \''.$item['AtPrMNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Excluir Protocolo Manchester"><i class="icon-bin"></i></a>
 													</div>
 												</div>
 											</td>
@@ -218,11 +209,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				
 				<!-- /info blocks -->
 				
-				<form name="formServico" method="post">
+				<form name="formProtocoloManchester" method="post">
 					<input type="hidden" id="inputPermission" name="inputPermission" >
-					<input type="hidden" id="inputServicoId" name="inputServicoId" >
-					<input type="hidden" id="inputServicoNome" name="inputServicoNome" >
-					<input type="hidden" id="inputServicoStatus" name="inputServicoStatus" >
+					<input type="hidden" id="inputProtocoloManchesterId" name="inputProtocoloManchesterId" >
+					<input type="hidden" id="inputProtocoloManchesterNome" name="inputProtocoloManchesterNome" >
+					<input type="hidden" id="inputProtocoloManchesterStatus" name="inputProtocoloManchesterStatus" >
 				</form>
 
 			</div>

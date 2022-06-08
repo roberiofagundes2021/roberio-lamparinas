@@ -17,7 +17,7 @@ setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
 */
 
 //Gerar os planos de Contas Sintéticos
-function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3 ,$plFiltro, $grupoPlanoConta, $tipo) {
+function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $datasFiltro4, $plFiltro, $grupoPlanoConta, $tipo) {
   include('global_assets/php/conexao.php');
 
   if($tipo == 'E') {
@@ -27,7 +27,9 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3 ,$plFi
                   dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro2['data_inicio_mes']."', '".$datasFiltro2['data_fim_mes']."', '".$tipo."') as PrevistoSaida2,
                   dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro2['data_inicio_mes']."', '".$datasFiltro2['data_fim_mes']."', '".$tipo."') as RealizadoSaida2,
                   dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro3['data_inicio_mes']."', '".$datasFiltro3['data_fim_mes']."', '".$tipo."') as PrevistoSaida3,
-                  dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro3['data_inicio_mes']."', '".$datasFiltro3['data_fim_mes']."', '".$tipo."') as RealizadoSaida3
+                  dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro3['data_inicio_mes']."', '".$datasFiltro3['data_fim_mes']."', '".$tipo."') as RealizadoSaida3,
+                  dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro4['data_inicio_mes']."', '".$datasFiltro4['data_fim_mes']."', '".$tipo."') as PrevistoSaida4,
+                  dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro4['data_inicio_mes']."', '".$datasFiltro4['data_fim_mes']."', '".$tipo."') as RealizadoSaida4
             FROM PlanoConta
             WHERE PlConId in ($plFiltro) and PlConNatureza = 'R' AND PlConGrupo = $grupoPlanoConta AND PlConTipo = 'S'
             ORDER BY PlConNome ASC";
@@ -40,8 +42,10 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3 ,$plFi
                   dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro2['data_inicio_mes']."', '".$datasFiltro2['data_fim_mes']."', '".$tipo."') as PrevistoSaida2,
                   dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro2['data_inicio_mes']."', '".$datasFiltro2['data_fim_mes']."', '".$tipo."') as RealizadoSaida2,
                   dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro3['data_inicio_mes']."', '".$datasFiltro3['data_fim_mes']."', '".$tipo."') as PrevistoSaida3,
-                  dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro3['data_inicio_mes']."', '".$datasFiltro3['data_fim_mes']."', '".$tipo."') as RealizadoSaida3
-            FROM PLanoConta
+                  dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro3['data_inicio_mes']."', '".$datasFiltro3['data_fim_mes']."', '".$tipo."') as RealizadoSaida3,
+                  dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro4['data_inicio_mes']."', '".$datasFiltro4['data_fim_mes']."', '".$tipo."') as PrevistoSaida4,
+                  dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro4['data_inicio_mes']."', '".$datasFiltro4['data_fim_mes']."', '".$tipo."') as RealizadoSaida4
+            FROM PlanoConta
             WHERE PlConId in ($plFiltro) and PlConNatureza = 'D' AND PlConGrupo = $grupoPlanoConta AND PlConTipo = 'S'
             ORDER BY PlConNome ASC";
     $result = $conn->query($sql);
@@ -67,6 +71,8 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3 ,$plFi
         $pl[$regAt]['PL_Realizado2']   = $rowCC['RealizadoSaida2'];
         $pl[$regAt]['PL_Previsto3']    = $rowCC['PrevistoSaida3'];
         $pl[$regAt]['PL_Realizado3']   = $rowCC['RealizadoSaida3'];
+        $pl[$regAt]['PL_Previsto4']    = $rowCC['PrevistoSaida4'];
+        $pl[$regAt]['PL_Realizado4']   = $rowCC['RealizadoSaida4'];
         
       }
   
@@ -85,13 +91,14 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3 ,$plFi
   }
 }
 
-//Gerar os planos de Contas Analíticos
-function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $valorPrevisto3, $valorRealizado, $valorRealizado2, $valorRealizado3, 
-                           $segundaColuna, $terceiraColuna, $data, $codigoGrupo, $indice) {
+//Gerar os planos de Contas Sintéticos
+function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $valorPrevisto3, $valorPrevisto4, $valorRealizado, $valorRealizado2, $valorRealizado3, $valorRealizado4, 
+                           $segundaColuna, $terceiraColuna, $quartaColuna, $data, $codigoGrupo, $indice) {
   include('global_assets/php/conexao.php');
 
   $data2 = '';
   $data3 = '';
+  $data4 = '';
 
   if($segundaColuna) {
     $arrayData2 = explode('-', $data);
@@ -105,16 +112,23 @@ function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $val
     $data3 = $arrayData3[0]."-".$arrayData3[1]."-".$dia3;
   }
 
-  //Foi inserido os inputs de datas para a primeira e segunda coluna para ser feito a consulta através dela quando for consultar na página de Fluxo de Caixa
+  if($quartaColuna) {
+    $arrayData4 = explode('-', $data);
+    $dia4 = $arrayData4[2] + 3;
+    $data4 = $arrayData4[0]."-".$arrayData4[1]."-".$dia4;
+  }
+
+  //Foi inserido os inputs de datas para a primeira, segunda... coluna para ser feito a consulta através dela quando for consultar na página de Fluxo de Caixa
   //A segunda e terceira coluna são o segundo e terceiro dia que é mostrado em cada paginação do Fluxo de Caixa
 
   $resposta[0] = "
     <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box;'>
-      <div id='planoConta".$indice."' class='col-lg-4 planoConta' style='border-right: 1px dotted black; cursor:pointer;'>
+      <div id='planoConta".$indice."' class='col-lg-3 planoConta' style='border-right: 1px dotted black; cursor:pointer;'>
         <input type='hidden' id='idPlanoConta".$indice."' value='".$idPlanoConta1."'>
         <input type='hidden' id='data".$indice."' value='".$data."'>
         <input type='hidden' id='dataSegundaColuna".$indice."' value='".$data2."'>
         <input type='hidden' id='dataTerceiraColuna".$indice."' value='".$data3."'>
+        <input type='hidden' id='dataQuartaColuna".$indice."' value='".$data4."'>
         <span><span id='simbolo".$indice."' style='font-weight: bold; color: #607D8B;'>( + ) </span>".$nome."</span>
       </div>
 
@@ -160,6 +174,21 @@ function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $val
       </div>";
     }
 
+    if($quartaColuna) {
+      $resposta[0] .= "
+      <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+        <div class='row'>
+          <div class='col-md-6'>
+            <span>".mostraValor($valorPrevisto4)."</span>
+          </div>
+
+          <div class='col-md-6'>
+            <span>".mostraValor($valorRealizado4)."</span>
+          </div>
+        </div>
+      </div>";
+    }
+
     $resposta[0] .= "  
     </div>
 
@@ -170,20 +199,23 @@ function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $val
 }
 
 //Gera o saldo Inicial e Final - previsto e realizado
-function retornoSaldo($datasFiltro, $datasFiltro2, $datasFiltro3) {
+function retornoSaldo($datasFiltro, $datasFiltro2, $datasFiltro3, $datasFiltro4) {
   include('global_assets/php/conexao.php');
 
   //Pega o saldo inicial e final
   $sql_saldo_ini_p    = "select dbo.fnFluxoCaixaSaldoInicialPrevisto(".$_SESSION['UnidadeId'].",'".$datasFiltro['data_inicio_mes']."') as SaldoInicialPrevisto,
                                 dbo.fnFluxoCaixaSaldoInicialPrevisto(".$_SESSION['UnidadeId'].",'".$datasFiltro2['data_inicio_mes']."') as SaldoInicialPrevisto2,
                                 dbo.fnFluxoCaixaSaldoInicialPrevisto(".$_SESSION['UnidadeId'].",'".$datasFiltro3['data_inicio_mes']."') as SaldoInicialPrevisto3,
+                                dbo.fnFluxoCaixaSaldoInicialPrevisto(".$_SESSION['UnidadeId'].",'".$datasFiltro4['data_inicio_mes']."') as SaldoInicialPrevisto4,
                                 dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro['data_inicio_mes']."') as SaldoInicialRealizado,
                                 dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro2['data_inicio_mes']."') as SaldoInicialRealizado2,
                                 dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro3['data_inicio_mes']."') as SaldoInicialRealizado3,
+                                dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro4['data_inicio_mes']."') as SaldoInicialRealizado4,
                                 
                                 dbo.fnFluxoCaixaSaldoFinal(".$_SESSION['UnidadeId'].",'".$datasFiltro['data_inicio_mes']."') as SaldoFinal,
                                 dbo.fnFluxoCaixaSaldoFinal(".$_SESSION['UnidadeId'].",'".$datasFiltro2['data_inicio_mes']."') as SaldoFinal2,
-                                dbo.fnFluxoCaixaSaldoFinal(".$_SESSION['UnidadeId'].",'".$datasFiltro3['data_inicio_mes']."') as SaldoFinal3";
+                                dbo.fnFluxoCaixaSaldoFinal(".$_SESSION['UnidadeId'].",'".$datasFiltro3['data_inicio_mes']."') as SaldoFinal3,
+                                dbo.fnFluxoCaixaSaldoFinal(".$_SESSION['UnidadeId'].",'".$datasFiltro4['data_inicio_mes']."') as SaldoFinal4";
   $resultSaldo = $conn->query($sql_saldo_ini_p);
   $saldo = $resultSaldo->fetch(PDO::FETCH_ASSOC);
 
@@ -243,6 +275,7 @@ if($typeFiltro == "D"){
   for($i = $diaInicio;$i <= $diaFim;$i++) {
     $segundaColuna = false;
     $terceiraColuna = false;
+    $quartaColuna = false;
 
     //limpa as variaveis
     if(isset($mes1)) {
@@ -267,6 +300,9 @@ if($typeFiltro == "D"){
     
     $dataFiltroDiaInicio3 = '';
     $dataFiltroDiaFim3 = '';
+
+    $dataFiltroDiaInicio4 = '';
+    $dataFiltroDiaFim4 = '';
     
     $datasFiltro['data_inicio_mes'] = $dataFiltroDiaInicio1;
     $datasFiltro['data_fim_mes'] = $dataFiltroDiaFim1;
@@ -274,6 +310,8 @@ if($typeFiltro == "D"){
     $datasFiltro2['data_fim_mes'] = '';
     $datasFiltro3['data_inicio_mes'] = '';
     $datasFiltro3['data_fim_mes'] = '';
+    $datasFiltro4['data_inicio_mes'] = '';
+    $datasFiltro4['data_fim_mes'] = '';
     
     if(($i+1) <= $diaFim) {
       $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.($i+1);      
@@ -301,17 +339,33 @@ if($typeFiltro == "D"){
       $terceiraColuna = true;
     }
 
-    $arraySaldo  = retornoSaldo($datasFiltro, $datasFiltro2, $datasFiltro3);
+    if(($i+3) <= $diaFim)  {
+      $dataFiltro = trim(date('Y-m',strtotime($dataInicio))).'-'.($i+1);      
+  
+      // $ultimo_dia = date("t", mktime(0,0,0,$i+1,'01',$anoData));
+      $dataFiltroDiaInicio4 = $anoData.'-'.$mesData.'-'.($i+3);
+      $dataFiltroDiaFim4 = $anoData.'-'.$mesData.'-'.($i+3);
+      
+      $datasFiltro4['data_inicio_mes'] = $dataFiltroDiaInicio4;
+      $datasFiltro4['data_fim_mes'] = $dataFiltroDiaFim4;
+
+      $quartaColuna = true;
+    }
+
+    $arraySaldo  = retornoSaldo($datasFiltro, $datasFiltro2, $datasFiltro3, $datasFiltro4);
     $saldoIni_p1 = $arraySaldo['SaldoInicialPrevisto'];
     $saldoIni_r1 = $arraySaldo['SaldoInicialRealizado'];
     $saldoIni_p2 = $arraySaldo['SaldoInicialPrevisto2'];
     $saldoIni_r2 = $arraySaldo['SaldoInicialRealizado2'];
     $saldoIni_p3 = $arraySaldo['SaldoInicialPrevisto3'];
     $saldoIni_r3 = $arraySaldo['SaldoInicialRealizado3']; 
+    $saldoIni_p4 = $arraySaldo['SaldoInicialPrevisto4'];
+    $saldoIni_r4 = $arraySaldo['SaldoInicialRealizado4']; 
 
     $saldoFin_p1 = $arraySaldo['SaldoFinal'];
     $saldoFin_p2 = $arraySaldo['SaldoFinal2'];
     $saldoFin_p3 = $arraySaldo['SaldoFinal3'];
+    $saldoFin_p4 = $arraySaldo['SaldoFinal4'];
 
     //Por padrão a data estava vindo com um valor a mais, porém isso foi corrigido logo abaixo
     $data = explode('-', $dataInicio);
@@ -327,7 +381,7 @@ if($typeFiltro == "D"){
             <div class='card-body' >
               <div class='row'>
                   
-                <div class='col-lg-4'>
+                <div class='col-lg-3'>
                 </div>
 
                 <div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-right: 2px; '>
@@ -340,7 +394,11 @@ if($typeFiltro == "D"){
 
                 ".($terceiraColuna ? "<div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-left: 2px;'>
                   <span><strong>".str_pad($i+2, 2, '0', STR_PAD_LEFT)." ".utf8_encode(ucfirst(strftime("%B de %Y", strtotime($anoMesFormatado ."-".str_pad($i+2, 2, '0', STR_PAD_LEFT)))))."</strong></span>
-                </div>" : "")."                        
+                </div>" : "")." 
+                
+                ".($quartaColuna ? "<div class='col-lg-2' style='text-align:center; border-top: 2px solid #ccc; padding-top: 1rem; margin-left: 2px;'>
+                  <span><strong>".str_pad($i+3, 2, '0', STR_PAD_LEFT)." ".utf8_encode(ucfirst(strftime("%B de %Y", strtotime($anoMesFormatado ."-".str_pad($i+3, 2, '0', STR_PAD_LEFT)))))."</strong></span>
+                </div>" : "")." 
               </div>
             </div>
           </div>
@@ -356,7 +414,7 @@ if($typeFiltro == "D"){
     $print_corpo .= "
       <div class='card-body' style='padding-top: 0;'>
         <div class='row' style='background: #607D8B; line-height: 3rem; box-sizing:border-box; color:white;'>
-          <div class='col-lg-4' style='border-right: 1px dotted black;'>
+          <div class='col-lg-3' style='border-right: 1px dotted black;'>
               <strong></strong>
           </div> 
           
@@ -395,6 +453,18 @@ if($typeFiltro == "D"){
             </div>
           </div>" : "")."
 
+          ".($quartaColuna ? "
+          <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+            <div class='row'>
+              <div class='col-md-6'>
+                <span><strong>Previsto</strong></span>
+              </div>
+              <div class='col-md-6'>
+                <span><strong>Realizado</strong></span>
+              </div>
+            </div>
+          </div>" : "")."
+
         </div>
       </div>
       
@@ -404,7 +474,7 @@ if($typeFiltro == "D"){
           <!-- Basic responsive configuration -->
             <div class='card-body' style='padding-top: 0;'>
               <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
-                <div class='col-lg-4' style='border-right: 1px dotted black;'>
+                <div class='col-lg-3' style='border-right: 1px dotted black;'>
                   <span><strong>Saldo Inicial</strong></span>
                 </div>
 
@@ -442,6 +512,19 @@ if($typeFiltro == "D"){
 
                   <div class='col-md-6'>
                     <span><b>".mostraValor($saldoIni_r3)."</b></span>
+                  </div>
+                  </div>
+                </div>" : "")."
+
+                ".($quartaColuna ? "
+                <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+                  <div class='row'>
+                    <div class='col-md-6'>
+                    <span><b>".mostraValor($saldoIni_p4)."</b></span>
+                  </div>
+
+                  <div class='col-md-6'>
+                    <span><b>".mostraValor($saldoIni_r4)."</b></span>
                   </div>
                   </div>
                 </div>" : "")."
@@ -516,7 +599,7 @@ if($typeFiltro == "D"){
           
           <div class='card-body' style='padding-top: 0; padding-bottom: 0'>
             <div class='row' style='background: #607D8B; line-height: 3rem; box-sizing:border-box; color:white;'>
-              <div class='col-lg-4' style='border-right: 1px dotted black;'>
+              <div class='col-lg-3' style='border-right: 1px dotted black;'>
                   <strong>".$nomeGrupo."</strong>
               </div> 
               
@@ -555,6 +638,18 @@ if($typeFiltro == "D"){
                 </div>
               </div>" : "")."
 
+              ".($quartaColuna ? "
+              <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+                <div class='row'>
+                  <div class='col-md-6'>
+                    <span><strong>".mostraValor($totalPrevisto3)."</strong></span>
+                  </div>
+                  <div class='col-md-6'>
+                        <span><strong>".mostraValor($totalRealizado3)."</strong></span>
+                  </div>
+                </div>
+              </div>" : "")."
+
             </div>
           </div> 
           
@@ -562,9 +657,9 @@ if($typeFiltro == "D"){
 
         //Somente o grupo na ordem 1 é composto de receita, o restante é apenas despesas
         if($grupo['GrConCodigo'] == 1) {
-          $mes1 = retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3,$plFiltro, $grupo['GrConId'], 'E');
+          $mes1 = retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $datasFiltro4, $plFiltro, $grupo['GrConId'], 'E');
         }else {
-          $mes1 = retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3,$plFiltro, $grupo['GrConId'], 'S');
+          $mes1 = retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $datasFiltro4, $plFiltro, $grupo['GrConId'], 'S');
         }
 
         $datasFiltro['data_inicio_mes'] = $dataFiltroDiaInicio1;
@@ -577,10 +672,12 @@ if($typeFiltro == "D"){
             $planoContaEntrada = planoConta($planoConta["PlConId"], $planoConta["PlConNome"], $planoConta["PL_Previsto"], 
                                             ($segundaColuna)?$planoConta['PL_Previsto2']:"",
                                             ($terceiraColuna)?$planoConta['PL_Previsto3']:"",
+                                            ($quartaColuna)?$planoConta['PL_Previsto4']:"",
                                             $planoConta["PL_Realizado"],
                                             ($segundaColuna)?$planoConta['PL_Realizado2']:"",
                                             ($terceiraColuna)?$planoConta['PL_Realizado3']:"", 
-                                            $segundaColuna, $terceiraColuna, $dataFiltroDiaInicio1, $grupo['GrConCodigo'], $indice);
+                                            ($quartaColuna)?$planoConta['PL_Realizado4']:"", 
+                                            $segundaColuna, $terceiraColuna, $quartaColuna, $dataFiltroDiaInicio1, $grupo['GrConCodigo'], $indice);
             $print_corpo .= $planoContaEntrada[0];
 
             $indice++;
@@ -621,7 +718,7 @@ if($typeFiltro == "D"){
         if($tituloTotalizador != 'sem rodape') {
           $print_corpo .="
                     <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
-                      <div class='col-lg-4' style='border-right: 1px dotted black;'>
+                      <div class='col-lg-3' style='border-right: 1px dotted black;'>
                         <span><strong>(=) ".$tituloTotalizador."</strong></span>
                       </div>
   
@@ -684,11 +781,35 @@ if($typeFiltro == "D"){
                         </div>
                       </div>";
         }
+
+        if($quartaColuna) {
+          if($receitaTotal3 != 0) {
+            $percentualPrevisto3 = ($totalPrevistoTerceiraColuna * 100) / $receitaTotal3;
+            $percentualRealizado3 = ($totalRealizadoTerceiraColuna * 100) / $receitaTotal3;
+  
+            $percentualPrevisto3 = is_float($percentualPrevisto3) ? number_format($percentualPrevisto3, 1, '.', '') : $percentualPrevisto3;
+            $percentualRealizado3 = is_float($percentualRealizado3) ? number_format($percentualRealizado3, 1, '.', '') : $percentualRealizado3;
+          }
+
+
+          $print_corpo .= "
+                      <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+                        <div class='row'>
+                          <div class='col-md-6'>
+                            <span>".mostraValor($totalPrevistoTerceiraColuna)."</span>
+                          </div>
+
+                          <div class='col-md-6'>
+                            <span>".mostraValor($totalRealizadoTerceiraColuna)."</span>
+                          </div>
+                        </div>
+                      </div>";
+        }
           
         $print_corpo .= " </div>
   
                     <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
-                      <div class='col-lg-4' style='border-right: 1px dotted black;'>
+                      <div class='col-lg-3' style='border-right: 1px dotted black;'>
                         <span style='padding-left: 20px;'><strong>".$tituloTotalizador." (%)</strong></span>
                       </div>
   
@@ -729,6 +850,19 @@ if($typeFiltro == "D"){
                           </div>
                         </div>
                       </div>" : "")."
+
+                      ".($quartaColuna ? "
+                      <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+                        <div class='row'>
+                          <div class='col-md-6'>
+                            <span>".$percentualPrevisto3."%</span>
+                          </div>
+    
+                          <div class='col-md-6'>
+                              <span>".$percentualRealizado3."%</span>
+                          </div>
+                        </div>
+                      </div>" : "")."
                     </div>";
         }
       
@@ -754,7 +888,7 @@ if($typeFiltro == "D"){
                 <!-- Basic responsive configuration -->
                   <div class='card-body' style='padding-top: 0;'>
                   <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
-                    <div class='col-lg-4' style='border-right: 1px dotted black;'>
+                    <div class='col-lg-3' style='border-right: 1px dotted black;'>
                       <span><strong>SALDO FINAL</strong></span>
                     </div>
 
@@ -780,6 +914,15 @@ if($typeFiltro == "D"){
                     <div class='row'>
                       <div class='col-md-12'>
                         <span>".mostraValor($saldoFin_p3)."</span>
+                      </div>
+                    </div>
+                  </div>" : "")."
+
+                  ".($quartaColuna ? "
+                    <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
+                    <div class='row'>
+                      <div class='col-md-12'>
+                        <span>".mostraValor($saldoFin_p4)."</span>
                       </div>
                     </div>
                   </div>" : "")."
@@ -822,9 +965,10 @@ if($typeFiltro == "D"){
       break;
     }
 
-    //Usado para consultar pelas datas corretas de acordo com a coluna (primeira, segunda, terceira...)
+    //Usado para q o loop para depois que todos os dias sejam mostradados, pois sempre está acrescentando valores ao índice
+    //evitando inclusive alguns bugs como uma coluna extra
     if(($i+1) <= $diaFim) {
-        $i += 2;
+        $i += 3;
     } 
   }
 }
