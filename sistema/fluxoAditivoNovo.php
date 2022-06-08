@@ -23,12 +23,14 @@ if (isset($_POST['inputIdFluxoOperacional'])) {
 $bFechado = 0;
 $countProduto = 0;
 
-$sql = "SELECT FlOpeValor, FlOpeStatus
+$sql = "SELECT FlOpeValor, FlOpeStatus, FlOpeConteudoInicio, FlOpeConteudoFim
 		FROM FluxoOperacional
 		Where FlOpeId = " . $iFluxoOperacional;
 $result = $conn->query($sql);
 $rowFluxo = $result->fetch(PDO::FETCH_ASSOC);
 $TotalFluxo = $rowFluxo['FlOpeValor'];
+
+$rowFluxoConteudo = $rowFluxo;
 
 $sql = "SELECT isnull(SUM(FOXPrQuantidade * FOXPrValorUnitario),0) as TotalProduto
 		FROM FluxoOperacionalXProduto
@@ -727,7 +729,10 @@ try {
 									<div class="form-group">
 										<label for="txtareaConteudoInicio">Conteúdo Personalizado - Introdução</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="txtareaConteudoInicio" name="txtareaConteudoInicio" placeholder="Corpo do Aditivo (informe aqui o texto que você queira que apareça no Aditivo)"><?php isset($_POST['inputDataInicio']) ? print($_POST['txtareaConteudoInicio']) : print('')  ?></textarea>
+										<?php
+											$conteudoInicio = isset($_POST['inputDataInicio']) ? $_POST['txtareaConteudoInicio'] : ($rowFluxoConteudo['FlOpeConteudoInicio']?$rowFluxoConteudo['FlOpeConteudoInicio']:'');
+											echo "<textarea rows='5' cols='5' class='form-control' id='txtareaConteudoInicio' name='txtareaConteudoInicio' placeholder='Corpo do Aditivo (informe aqui o texto que você queira que apareça no Aditivo)'>$conteudoInicio</textarea>"
+										?>
 									</div>
 								</div>
 							</div>
@@ -738,7 +743,10 @@ try {
 									<div class="form-group">
 										<label for="txtareaConteudoFim">Conteúdo Personalizado - Finalização</label>
 										<!--<div id="summernote" name="txtareaConteudo"></div>-->
-										<textarea rows="5" cols="5" class="form-control" id="txtareaConteudoFim" name="txtareaConteudoFim" placeholder="Considerações Finais do Aditivo (informe aqui o texto que você queira que apareça no término do Aditivo)"><?php isset($_POST['inputDataInicio']) ? print($_POST['txtareaConteudoFim']) : print('')  ?></textarea>
+										<?php
+											$conteudoFim = isset($_POST['txtareaConteudoFim']) ? $_POST['txtareaConteudoFim'] : ($rowFluxoConteudo['FlOpeConteudoFim']?$rowFluxoConteudo['FlOpeConteudoFim']:'');
+											echo "<textarea rows='5' cols='5' class='form-control' id='txtareaConteudoFim' name='txtareaConteudoFim' placeholder='Considerações Finais do Aditivo (informe aqui o texto que você queira que apareça no término do Aditivo)'>$conteudoFim</textarea>"
+										?>
 									</div>
 								</div>
 							</div>
