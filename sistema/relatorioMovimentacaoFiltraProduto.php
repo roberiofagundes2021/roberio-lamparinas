@@ -134,9 +134,9 @@ function queryPesquisa()
 
             $quantidade = $item['MvXPrQuantidade'];
 
-            $estoqueMinimo = $item['ProduEstoqueMinimo'];
-
             $saldo = $item['Saldo'];
+
+            $estoqueMinimo = mostraValor( ($saldo / $item['ProduEstoqueMinimo']-1)*100 );
 
             $origem = $item['Origem'];
 
@@ -148,9 +148,9 @@ function queryPesquisa()
                     isset($tipo) ? $tipo : null, 
                     isset($nomeProduto) ? $nomeProduto : null,
                     isset($nomeCategoria) ? $nomeCategoria : null, 
-                    isset($quantidade) ? $quantidade : null, 
+                    isset($quantidade) ? $quantidade : null,
+                    isset($saldo) ? $saldo : null, 
                     isset($estoqueMinimo) ? $estoqueMinimo : null,
-                    isset($saldo) ? $saldo : null,
                     isset($origem) ? $origem : null, 
                     isset($destino) ? $destino : null 
                     
