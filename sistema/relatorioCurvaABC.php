@@ -615,7 +615,7 @@ $dataFim = date('Y-m-d');
 												<select id="cmbClassificacao" name="cmbClassificacao/Bens" class="form-control form-control-select2" >
 													<option value="">Selecione</option>
 													<?php 
-														$sql = "SELECT ClassId, ClassNome
+														$sql = "SELECT ClassId, ClassNome, ClassChave
 																FROM Classificacao
 																JOIN Situacao on SituaId = ClassStatus
 																WHERE SituaChave = 'ATIVO'
@@ -623,8 +623,17 @@ $dataFim = date('Y-m-d');
 														$result = $conn->query($sql);
 														$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 														
+														$seleciona = "";
+
 														foreach ($rowClassificacao as $item){
-															print('<option value="'.$item['ClassId'].'">'.$item['ClassNome'].'</option>');
+															
+															//Seta o Material de Consumo como padrão no filtro
+															if ($item['ClassChave'] == 'CONSUMO'){
+																$seleciona = "selected";
+															} else{
+																$seleciona = "";
+															}
+															print('<option value="'.$item['ClassId'].'" '.$seleciona.'>'.$item['ClassNome'].'</option>');
 														}
 													
 													?>

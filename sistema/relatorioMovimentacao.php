@@ -107,12 +107,12 @@ $dataFim = date("Y-m-d");
 						targets: [4]
 					},
 					{
-						orderable: true, //Estoque Mínimo
+						orderable: true, //Saldo
 						width: "10%",
 						targets: [5]
 					},
 					{
-						orderable: true, //Saldo
+						orderable: true, //Estoque Mínimo
 						width: "10%",
 						targets: [6]
 					},
@@ -750,8 +750,8 @@ $dataFim = date("Y-m-d");
 												<th>Produto</th> <!-- O Hint deve aparecer Código, Patrimônio e Detalhamento -->
 												<th>Categoria</th>
 												<th>Quantidade</th>
-												<th>Estoque Mínimo</th>
 												<th>Saldo</th>
+												<th>Estoque Mínimo (%)</th>
 												<th>Origem</th>
 												<th>Destino</th>
 											</tr>

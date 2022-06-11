@@ -326,12 +326,15 @@ try {
 	
 				$totalProdutos = 0;
 		
-				$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario, MarcaNome
+				$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, FOXPrQuantidade, FOXPrValorUnitario,
+						MarcaNome, ModelNome, FabriNome
 						FROM Produto
 						JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 						LEFT JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
 						LEFT JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
 						LEFT JOIN Marca on MarcaId = PrXFaMarca
+						LEFT JOIN Modelo on ModelId = PrXFaModelo
+						LEFT JOIN Fabricante on FabriId = PrXFaFabricante
 						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 						JOIN SubCategoria on SbCatId = ProduSubCategoria
 						WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
@@ -371,11 +374,19 @@ try {
 							$valorUnitario = 0;
 							$valorTotal = 0;
 						}
+
+						$MarcaModeloFabricante = '';
+
+						$MarcaModeloFabricante .= $rowProduto['MarcaNome']?'<br>MARCA: '.$rowProduto['MarcaNome']:'';
+						$MarcaModeloFabricante .= $rowProduto['ModelNome']?'<br>MODELO: '.$rowProduto['ModelNome']:'';
+						$MarcaModeloFabricante .= $rowProduto['FabriNome']?'<br>FABRICANTE: '.$rowProduto['FabriNome']:'';
+
+						$detalhamento = $rowProduto['Detalhamento']?' : '.$rowProduto['Detalhamento']:'';
 						
 						$html .= "
 							<tr>
 								<td style='text-align: center;'>" . $cont . "</td>
-								<td style='text-align: left;'>" . $rowProduto['ProduNome'] . ": " . $rowProduto['Detalhamento'] . "<br>Marca: ".$rowProduto['MarcaNome']."</td>
+								<td style='text-align: left;'>" . $rowProduto['ProduNome'] . "$detalhamento $MarcaModeloFabricante</td>
 								<td style='text-align: center;'>" . $rowProduto['UnMedSigla'] . "</td>					
 								<td style='text-align: center;'>" . $rowProduto['FOXPrQuantidade'] . "</td>	
 								<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
@@ -422,12 +433,15 @@ try {
 		if(!COUNT($rowSubCategoria)){
 			$totalServicos = 0;
 		
-			$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario,MarcaNome
+			$sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento, FOXSrQuantidade, FOXSrValorUnitario,
+					MarcaNome, ModelNome, FabriNome
 					FROM Servico
 					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 					LEFT JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
 					LEFT JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
 					LEFT JOIN Marca on MarcaId = SrXFaMarca
+					LEFT JOIN Modelo on ModelId = SrXFaModelo
+					LEFT JOIN Fabricante on FabriId = SrXFaFabricante
 					JOIN SubCategoria on SbCatId = ServiSubCategoria
 					WHERE FOXSrFluxoOperacional = $iFluxoOperacional and ServiUnidade = " . $_SESSION['UnidadeId'] . " ORDER BY SbCatNome, ServiNome ASC";
 			$result = $conn->query($sql);
@@ -464,11 +478,19 @@ try {
 						$valorUnitario = 0;
 						$valorTotal = 0;
 					}
+
+					$MarcaModeloFabricante = '';
+
+					$MarcaModeloFabricante .= $rowServico['MarcaNome']?'<br>MARCA: '.$rowServico['MarcaNome']:'';
+					$MarcaModeloFabricante .= $rowServico['ModelNome']?'<br>MODELO: '.$rowServico['ModelNome']:'';
+					$MarcaModeloFabricante .= $rowServico['FabriNome']?'<br>FABRICANTE: '.$rowServico['FabriNome']:'';
+
+					$detalhamento = $rowServico['Detalhamento']?' : '.$rowServico['Detalhamento']:'';
 					
 					$html .= "
 						<tr>
 							<td style='text-align: center;'>" . $cont . "</td>
-							<td style='text-align: left;'>" . $rowServico['ServiNome'] . ": " . $rowServico['Detalhamento'] . "<br>Marca: ".$rowServico['MarcaNome']."</td>	
+							<td style='text-align: left;'>" . $rowServico['ServiNome'] . "$detalhamento $MarcaModeloFabricante</td>	
 							<td style='text-align: center;'>" . $rowServico['FOXSrQuantidade'] . "</td>	
 							<td style='text-align: right;'>" . mostraValor($valorUnitario) . "</td>
 							<td style='text-align: right;'>" . mostraValor($valorTotal) . "</td>		

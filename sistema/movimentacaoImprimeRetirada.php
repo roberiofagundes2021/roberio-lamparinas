@@ -13,10 +13,11 @@ if (isset($_POST['inputMovimentacaoId'])) {
 
     $iMovimentacao = $_POST['inputMovimentacaoId'];
 
-    $sql = "SELECT MovimTipo, MovimData, MovimNumRecibo, MovimObservacao, ParamValorObsImpreRetirada
+    $sql = "SELECT MovimTipo, MovimData, MovimNumRecibo, MovimObservacao, ParamValorObsImpreRetirada, MotivNome
             FROM Movimentacao
             JOIN Unidade on UnidaId = MovimUnidade
             JOIN Parametro on ParamEmpresa = UnidaEmpresa
+            LEFT JOIN Motivo on MotivId = MovimMotivo
             WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = ". $iMovimentacao;
     $result = $conn->query($sql);
     $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -125,6 +126,8 @@ try {
         return;
     }
 
+    $titulo = $row['MovimTipo'] == 'S' ? 'RECIBO DE RETIRADA' : ($row['MovimTipo'] == 'T'?'RECIBO DE TRANSFERÊNCIA':'');
+
     $html = "
     <style>
         th{
@@ -153,22 +156,21 @@ try {
         </div> 
     </div>
 
-    <div style='text-align:center; margin-top: 20px;'><h1>RECIBO DE RETIRADA</h1></div>
+    <div style='text-align:center; margin-top: 20px;'><h1>$titulo</h1></div>
     ";
 
     //"Bens não patrimoniados" tem quantidade e não tem patrimônio, já os "Bens patrimoniados" não tem quantidade e tem patrimônio
-    $html .= '<br>
-    <table style="width:100%;">
+    $html .= "<br>
+    <table style='width:100%;'>
         <tr>                                
-            <td style="width:25%">Data: ' . mostraData($row['MovimData']) . '</td>
-            <td style="width:25%; text-align: center; background-color: #d8d8d8;">Nº: '.$row['MovimNumRecibo'].'</td>
-            <td colspan="2" style="width:50%; border: none;"></td>
+            <td style='width:25%'>Data: " . mostraData($row['MovimData']) . "</td>
+            <td style='width:25%; text-align: center; background-color: #d8d8d8;'>Nº: $row[MovimNumRecibo]</td>
+            <td style='width:50%'>Motivo: $row[MotivNome]</td>
         </tr>
         <tr>
-            <td colspan="2" style="width:50%">Origem:<br>'. $Origem .'</td>
-            <td colspan="2" style="width:50%">Destino:<br>'.$Destino.'</td>
-        </tr>
-    ';
+            <td colspan='2' style='width:50%'>Origem:<br>$Origem</td>
+            <td colspan='2' style='width:50%'>Destino:<br>$Destino</td>
+        </tr>";
 
     if ($row['ParamValorObsImpreRetirada'] == 1) {
 

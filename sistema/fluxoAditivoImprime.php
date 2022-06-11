@@ -24,7 +24,9 @@ if(isset($_POST['inputAditivoId'])){
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);*/
 
-$sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, AditiValor, AditiConteudoInicio, AditiConteudoFim, FlOpeId, FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, CategNome, SbCatNome,
+$sql = "SELECT AditiId, AditiNumero, AditiDtCelebracao, AditiDtInicio, AditiDtFim, AditiValor, 
+AditiConteudoInicio, AditiConteudoFim, FlOpeId, FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, 
+FlOpeDataInicio, FlOpeDataFim, CategNome, SbCatNome,
 		ForneNome, ForneCelular, ForneEmail
 		FROM Aditivo
 		JOIN FluxoOperacional on FlOpeId = AditiFluxoOperacional
@@ -134,21 +136,30 @@ try {
     </table>
 	<br>';
 	
-	$sql = "SELECT ProduId, ProduNome, AdXPrDetalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario
+	$sql = "SELECT ProduId, ProduNome, AdXPrDetalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario,
+			MarcaNome, ModelNome, FabriNome
 			FROM Produto
 			JOIN AditivoXProduto on AdXPrProduto = ProduId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
+			LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaFluxoOperacional = $row[FlOpeId]
+			LEFT JOIN Marca on MarcaId = PrXFaMarca
+			LEFT JOIN Modelo on ModelId = PrXFaModelo
+			LEFT JOIN Fabricante on FabriId = PrXFaFabricante
 			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and AdXPrAditivo = ".$_POST['inputAditivoId']." and AdXPrQuantidade > ' 0 ' ";
 
 	$result = $conn->query($sql);
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 	$totalProdutos = count($rowProdutos);
 
-	$sql = "SELECT ServiId, ServiNome, AdXSrDetalhamento, AdXSrQuantidade, AdXSrValorUnitario
+	$sql = "SELECT ServiId, ServiNome, AdXSrDetalhamento, AdXSrQuantidade, AdXSrValorUnitario,
+			MarcaNome, ModelNome, FabriNome
 			FROM Servico
 			JOIN AditivoXServico on AdXSrServico = ServiId
+			LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaFluxoOperacional = $row[FlOpeId]
+			LEFT JOIN Marca on MarcaId = SrXFaMarca
+			LEFT JOIN Modelo on ModelId = SrXFaModelo
+			LEFT JOIN Fabricante on FabriId = SrXFaFabricante
 			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$_POST['inputAditivoId']." and AdXSrQuantidade > ' 0 ' ";
-
 	$result = $conn->query($sql);
 	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 	$totalServicos = count($rowServicos);
@@ -168,7 +179,7 @@ try {
 			<tr>
 				<th style="text-align: center; width:8%">Item</th>
 				<th style="text-align: left; width:40%">Produto</th>
-				<th style="text-align: center; width:10%">Unidade</th>				
+				<th style="text-align: center; width:10%">Unidade</th>
 				<th style="text-align: center; width:12%">Quant.</th>
 				<th style="text-align: center; width:15%">V. Unit.</th>
 				<th style="text-align: center; width:15%">V. Total</th>
@@ -187,12 +198,20 @@ try {
 				$valorTotal = 0;
 			}
 
+			$MarcaModeloFabricante = '';
+
+			$MarcaModeloFabricante .= $rowProduto['MarcaNome']?'<br>MARCA: '.$rowProduto['MarcaNome']:'';
+			$MarcaModeloFabricante .= $rowProduto['ModelNome']?'<br>MODELO: '.$rowProduto['ModelNome']:'';
+			$MarcaModeloFabricante .= $rowProduto['FabriNome']?'<br>FABRICANTE: '.$rowProduto['FabriNome']:'';
+
+			$detalhamento = $rowProduto['FOXPrDetalhamento']?' : '.$rowProduto['FOXPrDetalhamento']:'';
+
 			
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$rowProduto['ProduNome'].": ".$rowProduto['FOXPrDetalhamento']."</td>
-					<td style='text-align: center;'>".$rowProduto['UnMedSigla']."</td>					
+					<td style='text-align: left;'>".$rowProduto['ProduNome']."$detalhamento $MarcaModeloFabricante</td>
+					<td style='text-align: center;'>".$rowProduto['UnMedSigla']."</td>
 					<td style='text-align: center;'>".$rowProduto['AdXPrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
 					<td style='text-align: right;'>".mostraValor($valorTotal)."</td>
@@ -248,11 +267,19 @@ try {
 				$valorTotal = "";
 			}
 
+			$MarcaModeloFabricante = '';
+
+			$MarcaModeloFabricante .= $rowServico['MarcaNome']?'<br>MARCA: '.$rowServico['MarcaNome']:'';
+			$MarcaModeloFabricante .= $rowServico['ModelNome']?'<br>MODELO: '.$rowServico['ModelNome']:'';
+			$MarcaModeloFabricante .= $rowServico['FabriNome']?'<br>FABRICANTE: '.$rowServico['FabriNome']:'';
+
+			$detalhamento = $rowServico['AdXSrDetalhamento']?' : '.$rowServico['AdXSrDetalhamento']:'';
+
 			
 				$html .= "
 				<tr>
 					<td style='text-align: center;'>".$cont."</td>
-					<td style='text-align: left;'>".$rowServico['ServiNome'].": ".$rowServico['AdXSrDetalhamento']."</td>	
+					<td style='text-align: left;'>".$rowServico['ServiNome']."$detalhamento $MarcaModeloFabricante</td>	
 					<td style='text-align: center;'>".$rowServico['AdXSrQuantidade']."</td>
 					<td style='text-align: right;'>".mostraValor($valorUnitario)."</td>
 					<td style='text-align: right;'>".mostraValor($valorTotal)."</td>

@@ -79,7 +79,7 @@ try {
 		</div> 
 	</div>
 
-	<div style='text-align:center; margin-top: 20px;'><h1>ENTRADA DE MERCADORIA</h1></div>
+	<div style='text-align:center; margin-top: 20px;'><h1>ENTRADA DE PRODUTOS/SERVIÇOS</h1></div>
 	";
 	
     $sql = "SELECT ProduId, ProduNome, MvXPrDetalhamento, UnMedSigla, MvXPrQuantidade, MvXPrValorUnitario,

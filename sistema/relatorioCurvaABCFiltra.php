@@ -95,9 +95,9 @@ function queryPesquisa()
 		<div class="col-lg-12">
 
 			<div class="card">
-				<div class="card-header bg-light pb-0 pt-sm-0 header-elements-sm-inline">
+				<div class="card-header bg-light pb-1 pt-2 header-elements-sm-inline">
 					<h6 class="card-title">Resultado da Pesquisa</h6>
-					<div class="header-elements">
+					<!--<div class="header-elements">
 						<ul class="nav nav-tabs nav-tabs-highlight card-header-tabs">
 							<li class="nav-item">
 								<a href="#card-tab1" class="nav-link active" data-toggle="tab">
@@ -105,14 +105,14 @@ function queryPesquisa()
 									Grid
 								</a>
 							</li>
-							<!--<li class="nav-item">
+							<li class="nav-item">
 								<a href="#card-tab2" class="nav-link" data-toggle="tab">
 									<i class="icon-stats-bars mr-2"></i>
 									Gráfico
 								</a>
-							</li>-->
+							</li>
 						</ul>
-                	</div>
+                	</div>-->
 	            </div>
 
 				<div class="card-body tab-content">
