@@ -84,7 +84,9 @@ function queryPesquisa()
                     WHEN MovimDestinoLocal IS NULL THEN ISNULL(SetorD.SetorNome, MovimDestinoManual)
                 ELSE LocalD.LcEstNome
                 END as Destino, 
-                MvXPrQuantidade, ProduNome, CategNome, ProduEstoqueMinimo, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', MovimDestinoLocal) as Saldo
+                MvXPrQuantidade, ProduNome, CategNome, 
+                IsNull(ProduEstoqueMinimo, 0) as EstoqueMinimo,
+                dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', MovimDestinoLocal) as Saldo
             FROM Movimentacao   
             JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
             JOIN Produto on ProduId = MvXPrProduto
@@ -104,25 +106,13 @@ function queryPesquisa()
         count($rowData) >= 1 ? $cont = 1 : $cont = 0;
     }
 
+    
     if ($cont == 1) {
         $cont = 0;
 
         $arrayData = [];
         foreach ($rowData as $item) {
             $cont++;     
-
-           /* print("
-            
-            <tr>
-                <td class='even'>" . mostraData($item['MovimData']) . "</td>
-                <td class='even' style='text-align: center'>" . $item['MovimTipo'] . "</td>
-                <td class='odd'>" . $item['ProduNome'] . "</td>
-                <td class='even'>" . $item['CategNome'] . "</td>
-                <td class='odd' style='text-align: center'>" . $item['MvXPrQuantidade'] . "</td>
-                <td class='odd'>" . $item['Origem']  . "</td>
-                <td class='even'>" . $item['Destino'] . "</td>
-            </tr>
-            ");*/
 
             $datas = mostraData($item['MovimData']);
 
@@ -132,11 +122,22 @@ function queryPesquisa()
 
             $nomeCategoria = $item['CategNome'];
 
-            $quantidade = $item['MvXPrQuantidade'];
+            $quantidade = $item['EstoqueMinimo'];
 
             $saldo = $item['Saldo'];
+            
+            if ($item['EstoqueMinimo']){
+                
+                if ($saldo < $item['EstoqueMinimo']){
+                    $estoque = ($saldo / $item['EstoqueMinimo']) - 1;
+                } else{
+                    $estoque = $saldo / $item['EstoqueMinimo'];
+                }
 
-            $estoqueMinimo = mostraValor( ($saldo / $item['ProduEstoqueMinimo']-1)*100 );
+                $estoqueMinimo = mostraValor( ($estoque ) * 100 );
+            } else{
+                $estoqueMinimo = 0;
+            }           
 
             $origem = $item['Origem'];
 
@@ -165,7 +166,9 @@ function queryPesquisa()
         }
 
          print(json_encode($arrayData));
+         //print(json_encode($sql));
     }
 }
 
 queryPesquisa();
+
