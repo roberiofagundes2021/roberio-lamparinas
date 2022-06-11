@@ -16,7 +16,7 @@ setlocale(LC_ALL, 'pt_BR', 'pt_BR.utf-8', 'pt_BR.utf-8', 'portuguese');
   ["cmbPlanoContas"]=>string(2) "78"
 */
 
-//Gerar os planos de Contas Sintéticos
+//Consulta os planos de Contas  que pertecem ao  determinado grupo
 function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $datasFiltro4, $plFiltro, $grupoPlanoConta, $tipo) {
   include('global_assets/php/conexao.php');
 
@@ -34,7 +34,7 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $data
             WHERE PlConId in ($plFiltro) and PlConNatureza = 'R' AND PlConGrupo = $grupoPlanoConta AND PlConTipo = 'S'
             ORDER BY PlConNome ASC";
     $result = $conn->query($sql);
-    $rowPLanoContaPaga = $result->fetchAll(PDO::FETCH_ASSOC);
+    $rowPlanoContaSintetica = $result->fetchAll(PDO::FETCH_ASSOC);
   }else {
     $sql = "SELECT PlConId, PlConNome,
                   dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConCodigo, '".$datasFiltro['data_inicio_mes']."', '".$datasFiltro['data_fim_mes']."', '".$tipo."') as PrevistoSaida,
@@ -49,14 +49,14 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $data
             WHERE PlConId in ($plFiltro) and PlConNatureza = 'D' AND PlConGrupo = $grupoPlanoConta AND PlConTipo = 'S'
             ORDER BY PlConNome ASC";
     $result = $conn->query($sql);
-    $rowPLanoContaPaga = $result->fetchAll(PDO::FETCH_ASSOC);
+    $rowPlanoContaSintetica = $result->fetchAll(PDO::FETCH_ASSOC);
   }
 
   $regAt = '';
   $cont = 0;
   
-  if(count($rowPLanoContaPaga) > 0){
-    foreach($rowPLanoContaPaga as $rowCC) {
+  if(count($rowPlanoContaSintetica) > 0){
+    foreach($rowPlanoContaSintetica as $rowCC) {
       if($regAt != $rowCC['PlConId']) {
         $regAt = $rowCC['PlConId'];
   
@@ -83,7 +83,7 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $data
     
     unset($pl);
     unset($result);
-    unset($rowPLanoContaPaga);
+    unset($rowPlanoContaSintetica);
     
     return $retorno;
   } else {
@@ -91,7 +91,7 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $data
   }
 }
 
-//Gerar os planos de Contas Sintéticos
+//Gerar os dados dos planos de Contas Sintéticos
 function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $valorPrevisto3, $valorPrevisto4, $valorRealizado, $valorRealizado2, $valorRealizado3, $valorRealizado4, 
                            $segundaColuna, $terceiraColuna, $quartaColuna, $data, $codigoGrupo, $indice) {
   include('global_assets/php/conexao.php');
@@ -278,8 +278,8 @@ if($typeFiltro == "D"){
     $quartaColuna = false;
 
     //limpa as variaveis
-    if(isset($mes1)) {
-      unset($mes1);
+    if(isset($mes)) {
+      unset($mes);
       unset($saldoIni_p1);
       unset($saldoIni_r1);
       unset($saldoIni_p2);
@@ -368,7 +368,6 @@ if($typeFiltro == "D"){
     $saldoFin_p4 = $arraySaldo['SaldoFinal4'];
 
     //Por padrão a data estava vindo com um valor a mais, porém isso foi corrigido logo abaixo
-    $data = explode('-', $dataInicio);
     $dataFormatado = $data[0].'-'.$data[1].'-'.$data[2];
     $anoMesFormatado = $data[0].'-'.$data[1];
     
@@ -535,15 +534,18 @@ if($typeFiltro == "D"){
       </div>
       <!-- SALDO INICIAL -->";
 
+    //Primeiro o tipo de grupo é definido como entrada, pois sempre começa pela receita, dps dentro do próprio loop ele se torna 'S' para trazer a saída
     $tipoGrupo = 'E';
 
     $totalPrevistoPrimeiraColuna = 0;
     $totalPrevistoSegundaColuna = 0;
     $totalPrevistoTerceiraColuna = 0;
+    $totalPrevistoQuartaColuna = 0;
 
     $totalRealizadoPrimeiraColuna = 0;
     $totalRealizadoSegundaColuna = 0;
     $totalRealizadoTerceiraColuna = 0;
+    $totalRealizadoQuartaColuna = 0;
 
     $percentual = 0;
     $percentualPrevisto1 = 0;
@@ -552,17 +554,20 @@ if($typeFiltro == "D"){
     $percentualRealizado2 = 0;
     $percentualPrevisto3 = 0;
     $percentualRealizado3 = 0;
+    $percentualPrevisto4 = 0;
+    $percentualRealizado4 = 0;
 
     foreach($rowGrupo as $grupo) {
       $nomeGrupo = $grupo['GrConNomePersonalizado'] != '' ? $grupo['GrConNomePersonalizado'] :  $grupo['GrConNome'];
-      $vouMudarDepois = 0;
       
       $sql = "SELECT dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", ".$grupo['GrConCodigo'].", '".$dataFiltroDiaInicio1."', '".$dataFiltroDiaFim1."', '".$tipoGrupo."') as PrevistoSaidaGrupo1,
                      dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", ".$grupo['GrConCodigo'].", '".$dataFiltroDiaInicio1."', '".$dataFiltroDiaFim1."', '".$tipoGrupo."') as RealizadoSaidaGrupo1,
                      dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", ".$grupo['GrConCodigo'].", '".$dataFiltroDiaInicio2."', '".$dataFiltroDiaFim2."', '".$tipoGrupo."') as PrevistoSaidaGrupo2,
                      dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", ".$grupo['GrConCodigo'].", '".$dataFiltroDiaInicio2."', '".$dataFiltroDiaFim2."', '".$tipoGrupo."') as RealizadoSaidaGrupo2,
                      dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", ".$grupo['GrConCodigo'].", '".$dataFiltroDiaInicio3."', '".$dataFiltroDiaFim3."', '".$tipoGrupo."') as PrevistoSaidaGrupo3,
-                     dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", ".$grupo['GrConCodigo'].", '".$dataFiltroDiaInicio3."', '".$dataFiltroDiaFim3."', '".$tipoGrupo."') as RealizadoSaidaGrupo3";
+                     dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", ".$grupo['GrConCodigo'].", '".$dataFiltroDiaInicio3."', '".$dataFiltroDiaFim3."', '".$tipoGrupo."') as RealizadoSaidaGrupo3,
+                     dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", ".$grupo['GrConCodigo'].", '".$dataFiltroDiaInicio4."', '".$dataFiltroDiaFim4."', '".$tipoGrupo."') as PrevistoSaidaGrupo4,
+                     dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", ".$grupo['GrConCodigo'].", '".$dataFiltroDiaInicio4."', '".$dataFiltroDiaFim4."', '".$tipoGrupo."') as RealizadoSaidaGrupo4";
       $resultGrupo = $conn->query($sql);
       $rowTotalGrupo = $resultGrupo->fetch(PDO::FETCH_ASSOC);
 
@@ -573,23 +578,29 @@ if($typeFiltro == "D"){
       $totalRealizado2 = $rowTotalGrupo['RealizadoSaidaGrupo2'];
       $totalPrevisto3 = $rowTotalGrupo['PrevistoSaidaGrupo3'];
       $totalRealizado3 = $rowTotalGrupo['RealizadoSaidaGrupo3'];
+      $totalPrevisto4 = $rowTotalGrupo['PrevistoSaidaGrupo4'];
+      $totalRealizado4 = $rowTotalGrupo['RealizadoSaidaGrupo4'];
 
       if($tipoGrupo == 'E') {
         $totalPrevistoPrimeiraColuna = $totalPrevisto1;
         $totalPrevistoSegundaColuna = $totalPrevisto2;
         $totalPrevistoTerceiraColuna = $totalPrevisto3;
+        $totalPrevistoQuartaColuna = $totalPrevisto4;
 
         $totalRealizadoPrimeiraColuna = $totalRealizado1;
         $totalRealizadoSegundaColuna = $totalRealizado2;
         $totalRealizadoTerceiraColuna = $totalRealizado3;
+        $totalRealizadoQuartaColuna = $totalRealizado4;
       }else {
         $totalPrevistoPrimeiraColuna -= $totalPrevisto1;
         $totalPrevistoSegundaColuna -= $totalPrevisto2;
         $totalPrevistoTerceiraColuna -= $totalPrevisto3;
+        $totalPrevistoQuartaColuna -= $totalPrevisto4;
 
         $totalRealizadoPrimeiraColuna -= $totalRealizado1;
         $totalRealizadoSegundaColuna -= $totalRealizado2;
         $totalRealizadoTerceiraColuna -= $totalRealizado3;
+        $totalRealizadoQuartaColuna -= $totalRealizado4;
       }
      
       $print_corpo .= "<!-- ENTRADA -->
@@ -642,10 +653,10 @@ if($typeFiltro == "D"){
               <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                 <div class='row'>
                   <div class='col-md-6'>
-                    <span><strong>".mostraValor($totalPrevisto3)."</strong></span>
+                    <span><strong>".mostraValor($totalPrevisto4)."</strong></span>
                   </div>
                   <div class='col-md-6'>
-                        <span><strong>".mostraValor($totalRealizado3)."</strong></span>
+                        <span><strong>".mostraValor($totalRealizado4)."</strong></span>
                   </div>
                 </div>
               </div>" : "")."
@@ -655,21 +666,16 @@ if($typeFiltro == "D"){
           
           <div class='card-body' style='padding-top: 0;padding-bottom: 0'>";
 
-        //Somente o grupo na ordem 1 é composto de receita, o restante é apenas despesas
-        if($grupo['GrConCodigo'] == 1) {
-          $mes1 = retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $datasFiltro4, $plFiltro, $grupo['GrConId'], 'E');
-        }else {
-          $mes1 = retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $datasFiltro4, $plFiltro, $grupo['GrConId'], 'S');
-        }
+        $mes = retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $datasFiltro4, $plFiltro, $grupo['GrConId'], $tipoGrupo);
 
         $datasFiltro['data_inicio_mes'] = $dataFiltroDiaInicio1;
         $datasFiltro['data_fim_mes'] = $dataFiltroDiaFim1;
         
-        $pl1Entrada = isset($mes1['pl']) ? $mes1['pl'] : null;
+        $arrayPlanoConta = isset($mes['pl']) ? $mes['pl'] : null;
 
-        if(isset($pl1Entrada) && (!empty($pl1Entrada))) {
-          foreach($pl1Entrada as $planoConta){
-            $planoContaEntrada = planoConta($planoConta["PlConId"], $planoConta["PlConNome"], $planoConta["PL_Previsto"], 
+        if(isset($arrayPlanoConta) && (!empty($arrayPlanoConta))) {
+          foreach($arrayPlanoConta as $planoConta){
+            $resultadoPlanoConta = planoConta($planoConta["PlConId"], $planoConta["PlConNome"], $planoConta["PL_Previsto"], 
                                             ($segundaColuna)?$planoConta['PL_Previsto2']:"",
                                             ($terceiraColuna)?$planoConta['PL_Previsto3']:"",
                                             ($quartaColuna)?$planoConta['PL_Previsto4']:"",
@@ -678,7 +684,7 @@ if($typeFiltro == "D"){
                                             ($terceiraColuna)?$planoConta['PL_Realizado3']:"", 
                                             ($quartaColuna)?$planoConta['PL_Realizado4']:"", 
                                             $segundaColuna, $terceiraColuna, $quartaColuna, $dataFiltroDiaInicio1, $grupo['GrConCodigo'], $indice);
-            $print_corpo .= $planoContaEntrada[0];
+            $print_corpo .= $resultadoPlanoConta[0];
 
             $indice++;
           }   
@@ -692,6 +698,7 @@ if($typeFiltro == "D"){
           $receitaTotal1 = isset($rowTotalGrupo['PrevistoSaidaGrupo1']) ? $rowTotalGrupo['PrevistoSaidaGrupo1'] : 0;
           $receitaTotal2 = isset($rowTotalGrupo['PrevistoSaidaGrupo2']) ? $rowTotalGrupo['PrevistoSaidaGrupo2'] : 0;
           $receitaTotal3 = isset($rowTotalGrupo['PrevistoSaidaGrupo3']) ? $rowTotalGrupo['PrevistoSaidaGrupo3'] : 0;
+          $receitaTotal4 = isset($rowTotalGrupo['PrevistoSaidaGrupo4']) ? $rowTotalGrupo['PrevistoSaidaGrupo4'] : 0;
         } else if($grupo['GrConCodigo'] == 5) {
           $tituloTotalizador = 'Margem de contribuição';
         }else if($grupo['GrConCodigo'] == 6) {
@@ -783,12 +790,12 @@ if($typeFiltro == "D"){
         }
 
         if($quartaColuna) {
-          if($receitaTotal3 != 0) {
-            $percentualPrevisto3 = ($totalPrevistoTerceiraColuna * 100) / $receitaTotal3;
-            $percentualRealizado3 = ($totalRealizadoTerceiraColuna * 100) / $receitaTotal3;
+          if($receitaTotal4 != 0) {
+            $percentualPrevisto4 = ($totalPrevistoQuartaColuna * 100) / $receitaTotal4;
+            $percentualRealizado4 = ($totalRealizadoQuartaColuna * 100) / $receitaTotal4;
   
-            $percentualPrevisto3 = is_float($percentualPrevisto3) ? number_format($percentualPrevisto3, 1, '.', '') : $percentualPrevisto3;
-            $percentualRealizado3 = is_float($percentualRealizado3) ? number_format($percentualRealizado3, 1, '.', '') : $percentualRealizado3;
+            $percentualPrevisto4 = is_float($percentualPrevisto4) ? number_format($percentualPrevisto4, 1, '.', '') : $percentualPrevisto4;
+            $percentualRealizado4 = is_float($percentualRealizado4) ? number_format($percentualRealizado4, 1, '.', '') : $percentualRealizado4;
           }
 
 
@@ -796,11 +803,11 @@ if($typeFiltro == "D"){
                       <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                         <div class='row'>
                           <div class='col-md-6'>
-                            <span>".mostraValor($totalPrevistoTerceiraColuna)."</span>
+                            <span>".mostraValor($totalPrevistoQuartaColuna)."</span>
                           </div>
 
                           <div class='col-md-6'>
-                            <span>".mostraValor($totalRealizadoTerceiraColuna)."</span>
+                            <span>".mostraValor($totalRealizadoQuartaColuna)."</span>
                           </div>
                         </div>
                       </div>";
@@ -855,11 +862,11 @@ if($typeFiltro == "D"){
                       <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
                         <div class='row'>
                           <div class='col-md-6'>
-                            <span>".$percentualPrevisto3."%</span>
+                            <span>".$percentualPrevisto4."%</span>
                           </div>
     
                           <div class='col-md-6'>
-                              <span>".$percentualRealizado3."%</span>
+                              <span>".$percentualRealizado4."%</span>
                           </div>
                         </div>
                       </div>" : "")."
