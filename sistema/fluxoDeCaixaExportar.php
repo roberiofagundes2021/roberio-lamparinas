@@ -189,6 +189,7 @@ function retornaBuscaComoArray($datasFiltro, $plFiltro, $grupoPlanoConta, $tipo)
           $pl[$regAt]['PL_Previsto']     = $rowCC['PrevistoSaida'];
           $pl[$regAt]['PL_Realizado']    = $rowCC['RealizadoSaida'];
 
+          /*
           //Traz os filhos do plano de conta sintético
           if($tipo == 'E') {
             $sql = "SELECT PlConId, PlConNome,
@@ -210,7 +211,7 @@ function retornaBuscaComoArray($datasFiltro, $plFiltro, $grupoPlanoConta, $tipo)
             $rowPLanoContaAnalitica = $result->fetchAll(PDO::FETCH_ASSOC);
           }
 
-          $pl[$regAt]['planosContaFilho'] = $rowPLanoContaAnalitica;
+          $pl[$regAt]['planosContaFilho'] = $rowPLanoContaAnalitica;*/
         }
     
         $cont++;
@@ -361,7 +362,7 @@ if($typeFiltro == "D"){
             $indicePlanoConta = 0;
             foreach($arrayPlanoContaSintetico as $consultaPlanoContaSintetico){
                 $nomePlanoContaSintetico = $consultaPlanoContaSintetico['PlConNome'];
-                $arrayPlanoContaAnalitico[$indicePlanoConta] = $consultaPlanoContaSintetico['planosContaFilho'];
+                //$teste = $consultaPlanoContaSintetico['planosContaFilho'];
 
                 $arrayNomePlanoContaSintetico[$indicePlanoConta] = $nomePlanoContaSintetico;
 
@@ -389,18 +390,13 @@ if($typeFiltro == "D"){
             $planoContaSintetico .=      $arrayPlanoContaPrevisto[$indiceGeraTabelaPlanoContaSintetico];
             $planoContaSintetico .= "  </tr>";
 
-            foreach($arrayPlanoContaAnalitico[$indiceGeraTabelaPlanoContaSintetico] as $resultadoPlanoContaAnalitico) {
-                $planoContaAnalítico .= "  <tr>";
-                $planoContaAnalítico .= "    <td scope='col' bgcolor='#CCCCCC'>&nbsp;&nbsp;&nbsp;&nbsp;".$resultadoPlanoContaAnalitico['PlConNome']."</td>";
-                $planoContaAnalítico .= "    <td scope='col' bgcolor='#CCCCCC'>".mostraValor(0)."</td><td scope='col' bgcolor='#CCCCCC'>".mostraValor(0)."</td>";
-                $planoContaAnalítico .= "  </tr>";
-            }
+            $controlePlanoContaAnalitico = true;
 
             $planoContaSintetico .= $planoContaAnalítico;
 
             $indiceGeraTabelaPlanoContaSintetico++;
-            $planoContaAnalítico = '';
-        }
+          }
+          $planoContaAnalítico = '';
 
         $controlador = false;
 
