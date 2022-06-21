@@ -5,7 +5,7 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['PaginaAtual'] = 'Classificação do Atendimento';
 
-$sql = "SELECT AtClaId, AtClaNome, AtClaNomePersonalizado, AtClaModelo, AtClaStatus, SituaNome, SituaChave, SituaCor
+$sql = "SELECT AtClaId, AtClaNome, AtClaNomePersonalizado, AtClaModelo, AtClaChave, AtClaStatus, SituaNome, SituaChave, SituaCor
 		FROM AtendimentoClassificacao
 		JOIN Situacao ON SituaId = AtClaStatus
 	    WHERE AtClaUnidade = ". $_SESSION['UnidadeId'] ."
@@ -186,10 +186,25 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										
+										if ($item['AtClaChave'] != null){
+											$nome = $item['AtClaNome'];
+										} else {
+											$nome = $item['AtClaNomePersonalizado'];
+										}
+										
+										
+										if ($item['AtClaModelo'] == 'A'){
+											$modelo = 'Ambulatorial';
+										} else if ($item['AtClaModelo'] == 'E'){
+											$modelo = 'Eletivo';
+										} else if  ($item['AtClaModelo'] == 'I'){
+											$modelo = 'Internação';
+										}
+										
 										print('
 										<tr>
-											<td>'.$item['AtClaNome'].'</td>
-                                            <td>'.$item['AtClaNomePersonalizado'].'</td>
+											<td>'.$nome.'</td>
+											<td>'.$modelo.'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaAtendimentoClassificacao(1,'.$item['AtClaId'].', \''.$item['AtClaNome'].'\',\''.$item['SituaChave'].'\', \'mudaStatus\');" data-popup="tooltip" data-placement="bottom" title="Mudar Situação"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
@@ -197,9 +212,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaAtendimentoClassificacao( 1 ,'.$item['AtClaId'].', \''.$item['AtClaNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Classificação do Atendimento"><i class="icon-pencil7"></i></a>
-														<a href="#" onclick="atualizaAtendimentoClassificacao( 1 ,'.$item['AtClaId'].', \''.$item['AtClaNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Excluir Classificação do Atendimento"><i class="icon-bin"></i></a>
-													</div>
+														<a href="#" onclick="atualizaAtendimentoClassificacao( 1 ,'.$item['AtClaId'].', \''.$item['AtClaNome'].'\',\''.$item['SituaChave'].'\', \'edita\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Editar Classificação do Atendimento"><i class="icon-pencil7"></i></a> ');
+
+														if ($item['AtClaChave'] == null)  {
+
+															print('<a href="#" onclick="atualizaAtendimentoClassificacao( 1 ,'.$item['AtClaId'].', \''.$item['AtClaNome'].'\',\''.$item['SituaChave'].'\', \'exclui\');" class="list-icons-item" data-popup="tooltip" data-placement="bottom" title="Excluir Classificação do Atendimento"><i class="icon-bin"></i></a> ');
+														}
+
+													print('	</div>
 												</div>
 											</td>
 										</tr>');

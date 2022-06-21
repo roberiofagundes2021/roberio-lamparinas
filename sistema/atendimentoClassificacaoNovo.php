@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Nova Classificação do Atendimento';
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputNome'])){
+if(isset($_POST['inputNomePersonalizado'])){
 	
 	try{
 		
@@ -16,7 +16,7 @@ if(isset($_POST['inputNome'])){
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
-						':sNome' => $_POST['inputNome'],
+						':sNome' => $_POST['inputNomePersonalizado'],
 						':sNomePersonalizado' => $_POST['inputNomePersonalizado'],
 						':sModelo' => $_POST['inputModelo'],
 						':bStatus' => 1,
@@ -121,24 +121,20 @@ if(isset($_POST['inputNome'])){
 									<div class="row">	
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNome">Título Eletivo<span class="text-danger">*</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Título Eletivo" required>
-											</div>
-										</div>
-										<div class="col-lg-6">
-											<div class="form-group">
-												<label for="inputNomePersonalizado">Título Personalizado</label>
-												<input type="text" id="inputNomePersonalizado" name="inputNomePersonalizado" class="form-control" placeholder="Título Personalizado">
+												<label for="inputNomePersonalizado">Título<span class="text-danger">*</span></label>
+												<input type="text" id="inputNomePersonalizado" name="inputNomePersonalizado" class="form-control" placeholder="Título" required>
 											</div>
 										</div>
 										
 									</div>
+
+									<br>
 									
-									<div class="row">
+									<div class="row" style="text-align:center">
 										<div class="col-lg-4">
 											<div class="form-group">								
 												<div class="form-check form-check-inline">
-													<label class="form-check-label">
+													<label class="form-check-label" >
 														<input type="radio" id="inputModelo" name="inputModelo" value="E" class="form-input-styled" checked>
 														Eletivo
 													</label>
@@ -161,9 +157,25 @@ if(isset($_POST['inputNome'])){
 													<label class="form-check-label">
 														<input type="radio" id="inputModelo" name="inputModelo" value="I" class="form-input-styled" >
 														Internação
-													</label>
+													</label> 
 												</div>									
 											</div>			
+										</div>
+										
+										<div class="col-lg-4" style="text-align:center;">
+											<div>										
+												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											</div>
+										</div>
+										<div class="col-lg-4" style="text-align:center;">
+											<div>										
+												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											</div>
+										</div>
+										<div class="col-lg-4" style="text-align:center;">
+											<div>										
+												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											</div>		
 										</div>
 									</div>
 																		

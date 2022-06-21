@@ -13,7 +13,7 @@ if(isset($_POST['inputAtendimentoClassificacaoId'])){
 	
 	try{
 	
-		$sql = "SELECT AtClaId, AtClaNome,  AtClaNomePersonalizado, AtClaModelo, SituaChave
+		$sql = "SELECT AtClaId, AtClaNome,  AtClaNomePersonalizado, AtClaModelo, AtClaChave, SituaChave
 				FROM AtendimentoClassificacao
 				JOIN Situacao on SituaId = AtClaStatus
 				WHERE AtClaId = $iAtendimentoClassificacao ";
@@ -33,20 +33,19 @@ if(isset($_POST['inputAtendimentoClassificacaoId'])){
 }
 
 
-if(isset($_POST['inputNome'])){
+if(isset($_POST['inputNomePersonalizado'])){
 		
 	try{
 
 		$conn->beginTransaction();
 		
-		$sql = "UPDATE AtendimentoClassificacao SET AtClaNome = :sNome, AtClaNomePersonalizado = :sNomePersonalizado, AtClaModelo = :sModelo, 
+		$sql = "UPDATE AtendimentoClassificacao SET AtClaNomePersonalizado = :sNomePersonalizado, AtClaModelo = :sModelo, 
 		              AtClaUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE AtClaId = :iAtendimentoClassificacao ";
 
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
-						':sNome' => $_POST['inputNome'],
 						':sNomePersonalizado' => $_POST['inputNomePersonalizado'],
 						':sModelo' => $_POST['inputModelo'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -158,27 +157,46 @@ if(isset($_POST['inputNome'])){
 
                                     <div class="row">
 
-                                        <div class="col-lg-6">
+									<?php
+										if ($row['AtClaChave'] != null)  {
+
+											print('<div class="col-lg-6">
                                             <div class="form-group">
-                                                <label for="inputNome">Título Eletivo <span class="text-danger">*</span></label>
-                                                <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Título Eletivo" value="<?php echo $row['AtClaNome']; ?>" required>
-                                            </div>
-                                        </div>
+                                                <label for="inputNome">Título(Sugerido pelo sistema) <span class="text-danger">*</span></label>
+                                                <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Título Eletivo" value=' .$row['AtClaNome']. ' readOnly>
+                                            </div>                                                                                                        
+                                        </div> ');
+										}
+										?>
 										<div class="col-lg-6">
-                                            <div class="form-group">
-                                                <label for="inputNomePersonalizado">Título Personalizado </label>
-                                                <input type="text" id="inputNomePersonalizado" name="inputNomePersonalizado" class="form-control" placeholder="Título Personalizado" value="<?php echo $row['AtClaNomePersonalizado']; ?>">
+											<div class="form-group">
+												<?php
+													if ($row['AtClaChave'] != null)  {
+
+														print('<label for="inputNomePersonalizado">Título(Nome personalizado) </label> 
+															   <input type="text" id="inputNomePersonalizado" name="inputNomePersonalizado" class="form-control" placeholder="Título " value='.$row['AtClaNomePersonalizado'].'>
+														');
+													}else{
+
+														print('<label for="inputNomePersonalizado">Título <span class="text-danger">*</span></label> 
+														       <input type="text" id="inputNomePersonalizado" name="inputNomePersonalizado" class="form-control" placeholder="Título " value='.$row['AtClaNomePersonalizado'].' required>
+														');
+													}
+												?>
+                                                
                                             </div>
                                         </div>
                                                                                                                             
                                     </div>
 
-                                    <div class="row">
+									<br>
+
+                                    <div class="row" style="text-align:center;">
 										<div class="col-lg-4">
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputModelo" name="inputModelo" value="E" class="form-input-styled" <?php if ($row['AtClaModelo'] == 'E') echo "checked"; ?>>
+														<input type="radio" id="inputModelo" name="inputModelo" value="E" class="form-input-styled" <?php if ($row['AtClaModelo'] == 'E') echo "checked"; ?> <?php if ($row['AtClaChave'] != null) echo "disabled"; ?>>
 														Eletivo
 													</label>
 												</div>
@@ -188,7 +206,7 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputModelo" name="inputModelo" value="A" class="form-input-styled" <?php if ($row['AtClaModelo'] == 'A') echo "checked"; ?>>
+														<input type="radio" id="inputModelo" name="inputModelo" value="A" class="form-input-styled" <?php if ($row['AtClaModelo'] == 'A') echo "checked"; ?> <?php if ($row['AtClaChave'] != null) echo "disabled"; ?>>
 														Ambulatorial
 													</label>
 												</div>
@@ -198,14 +216,30 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">		
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputModelo" name="inputModelo" value="I" class="form-input-styled" <?php if ($row['AtClaModelo'] == 'I') echo "checked"; ?>>
+														<input type="radio" id="inputModelo" name="inputModelo" value="I" class="form-input-styled" <?php if ($row['AtClaModelo'] == 'I') echo "checked"; ?> <?php if ($row['AtClaChave'] != null) echo "disabled"; ?>>
 														Internação
 													</label>
 												</div>									
 											</div>			
 										</div>
-									</div>
 
+										<div class="col-lg-4" style="text-align:center;">
+											<div >										
+												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											</div>
+										</div>
+										<div class="col-lg-4" style="text-align:center;">
+											<div >										
+												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											</div>
+										</div>
+										<div class="col-lg-4" style="text-align:center;">
+											<div >										
+												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											</div>		
+										</div>
+									</div>
+								
                                 </div> <!-- media-body -->																
 									
 							</div> <!-- media -->
