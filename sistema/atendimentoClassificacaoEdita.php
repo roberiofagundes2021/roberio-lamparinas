@@ -47,7 +47,7 @@ if(isset($_POST['inputNomePersonalizado'])){
 				
 		$result->execute(array(
 						':sNomePersonalizado' => $_POST['inputNomePersonalizado'],
-						':sModelo' => $_POST['inputModelo'],
+						':sModelo' => isset($_POST['inputModelo']) ? $_POST['inputModelo'] : $row['AtClaModelo'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iAtendimentoClassificacao' => $_POST['inputAtendimentoClassificacaoId']
 						));				
