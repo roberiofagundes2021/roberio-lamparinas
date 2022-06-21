@@ -61,6 +61,8 @@ if(isset($_POST['inputNomePersonalizado'])){
 	
 	<!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
 
+	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
+
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -72,6 +74,10 @@ if(isset($_POST['inputNomePersonalizado'])){
 
         $(document).ready(function() {	 	
 			
+			//Aqui sou obrigado a instanciar a utilização do fancybox
+			$(".fancybox").fancybox({
+				// options
+			});	
 			
 			$('#enviar').on('click', function(e){
 				
@@ -81,8 +87,6 @@ if(isset($_POST['inputNomePersonalizado'])){
 				
 			}); 
 		});	
-
-
 		
 	</script>
 	
@@ -164,17 +168,23 @@ if(isset($_POST['inputNomePersonalizado'])){
 										
 										<div class="col-lg-4" style="text-align:center;">
 											<div>										
-												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+												</a>
 											</div>
 										</div>
 										<div class="col-lg-4" style="text-align:center;">
-											<div>										
-												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											<div>	
+												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">									
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+												</a>
 											</div>
 										</div>
 										<div class="col-lg-4" style="text-align:center;">
-											<div>										
-												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											<div>		
+												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">								
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+												</a>
 											</div>		
 										</div>
 									</div>
