@@ -93,6 +93,8 @@ if(isset($_POST['inputNomePersonalizado'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
+	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
+
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -102,10 +104,13 @@ if(isset($_POST['inputNomePersonalizado'])){
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 		
-		
 
         $(document).ready(function() {
 	
+			//Aqui sou obrigado a instanciar a utilização do fancybox
+			$(".fancybox").fancybox({
+				// options
+			});	
 		
 			$('#alterar').on('click', function(e) {
 
@@ -224,18 +229,24 @@ if(isset($_POST['inputNomePersonalizado'])){
 										</div>
 
 										<div class="col-lg-4" style="text-align:center;">
-											<div >										
-												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											<div>										
+												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+												</a>
 											</div>
 										</div>
 										<div class="col-lg-4" style="text-align:center;">
-											<div >										
-												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											<div>	
+												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">									
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+												</a>
 											</div>
 										</div>
 										<div class="col-lg-4" style="text-align:center;">
-											<div >										
-												<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+											<div>		
+												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">								
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+												</a>
 											</div>		
 										</div>
 									</div>
