@@ -167,7 +167,7 @@ if(isset($_POST['inputNomePersonalizado'])){
 
 											print('<div class="col-lg-6">
                                             <div class="form-group">
-                                                <label for="inputNome">Título(Sugerido pelo sistema) <span class="text-danger">*</span></label>
+                                                <label for="inputNome">Título (Sugerido pelo sistema) <span class="text-danger">*</span></label>
                                                 <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Título Eletivo" value=' .$row['AtClaNome']. ' readOnly>
                                             </div>                                                                                                        
                                         </div> ');
@@ -178,7 +178,7 @@ if(isset($_POST['inputNomePersonalizado'])){
 												<?php
 													if ($row['AtClaChave'] != null)  {
 
-														print('<label for="inputNomePersonalizado">Título(Nome personalizado) </label> 
+														print('<label for="inputNomePersonalizado">Título (Nome personalizado) </label> 
 															   <input type="text" id="inputNomePersonalizado" name="inputNomePersonalizado" class="form-control" placeholder="Título " value='.$row['AtClaNomePersonalizado'].'>
 														');
 													}else{

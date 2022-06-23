@@ -515,7 +515,7 @@ if(isset($_POST['inputTipo'])){
                                                 <h5 class="mb-0 font-weight-semibold">Dados Profissionais</h5>
                                                 <br>
                                                 <div class="row">								
-                                                    <div class="col-lg-4">
+                                                    <div class="col-lg-3">
                                                         <label for="cmbProfissao">Profissão</label>
                                                         <select id="cmbProfissao" name="cmbProfissao" class="form-control form-control-select2">
                                                             <option value="#">Seleciona uma profissão</option>
@@ -534,10 +534,18 @@ if(isset($_POST['inputTipo'])){
                                                             ?>
                                                         </select>
                                                     </div>
+
+													<div class="col-lg-2">
+                                                        <label for="cmbConselho">Conselho</label>
+                                                        <select id="cmbConselho" name="cmbConselho" class="form-control form-control-select2">
+                                                            <option value="#">Seleciona </option>
+                                                           
+                                                        </select>
+                                                    </div>
                                                     
                                                     <div class="col-lg-2">
                                                         <div class="form-group">
-                                                            <label for="inputNumConselho">Nº do Conselho</label>
+                                                            <label for="inputNumConselho">Nº do Conselho/UF</label>
                                                             <input type="text" id="inputNumConselho" name="inputNumConselho" class="form-control" placeholder="CRM/Outros" >
                                                         </div>
                                                     </div>
@@ -549,7 +557,7 @@ if(isset($_POST['inputTipo'])){
                                                         </div>
                                                     </div>
                                                 
-                                                    <div class="col-lg-4">
+                                                    <div class="col-lg-3">
                                                         <label for="cmbEspecialidade">Especialidades</label>
                                                         <select id="cmbEspecialidade" name="cmbEspecialidade" class="form-control form-control-select2">
                                                             <option value="#">Seleciona uma especialidade</option>

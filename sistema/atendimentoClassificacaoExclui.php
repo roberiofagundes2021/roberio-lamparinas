@@ -17,7 +17,7 @@ if(isset($_POST['inputAtendimentoClassificacaoId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Classificação do atendimento excluído!!!";
+		$_SESSION['msg']['mensagem'] = "Classificação do atendimento excluída!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
