@@ -33,10 +33,14 @@ if(isset($_POST['inputUnidadeId'])){
 		$sql = "DELETE FROM GrupoConta WHERE GrConUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$result = $result->fetch(PDO::FETCH_ASSOC);
+
+		$sql = "DELETE FROM AtendimentoClassificacao WHERE AtClaId = $iUnidade";
+		$result = $conn->prepare($sql);
+		$result = $result->fetch(PDO::FETCH_ASSOC);
 		
 		$sql = "DELETE FROM Unidade WHERE UnidaId = $iUnidade";
 		$result = $conn->query($sql);
-		$result = $result->fetch(PDO::FETCH_ASSOC);
+		$result = $result->fetch(PDO::FETCH_ASSOC); 
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Unidade excluída!!!";

@@ -122,7 +122,7 @@ function queryPesquisa()
 
             $nomeCategoria = $item['CategNome'];
 
-            $quantidade = $item['EstoqueMinimo'];
+            $quantidade = $item['MvXPrQuantidade'];
 
             $saldo = $item['Saldo'];
             

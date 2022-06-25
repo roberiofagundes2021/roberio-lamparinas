@@ -2,11 +2,11 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Atendimento';
+$_SESSION['PaginaAtual'] = 'Agendamentos';
 
 include('global_assets/php/conexao.php');
 
-// a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
+// a requisição é feita ao carregar a página via AJAX no arquivo filtraAgendamentos.php
 
 ?>
 
@@ -16,7 +16,7 @@ include('global_assets/php/conexao.php');
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Atendimentos</title>
+	<title>Lamparinas | Agendamentos</title>
 
 	<?php include_once("head.php"); ?>
 	<style>
@@ -24,16 +24,18 @@ include('global_assets/php/conexao.php');
 			padding: 1rem !important;
 		}
 	</style>
-	
+
 	<!-- Theme JS files -->
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
+	<script src="global_assets/js/demo_pages/picker_date.js"></script>
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
     <script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
     <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-    <script src="global_assets/js/demo_pages/form_layouts.js"></script>
-    <script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-    <script src="global_assets/js/demo_pages/form_select2.js"></script>
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 
 	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
 	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
@@ -48,15 +50,15 @@ include('global_assets/php/conexao.php');
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	
 	<script type="text/javascript" >
-		// buscar todos os atendimento ao entrar na pagina
-		getAtendimentos();
+		// buscar todos os agendamentos ao entrar na pagina
+		getAgendamentos();
 			
 		$(document).ready(function() {
 			
 			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
 			
 			/* Início: Tabela Personalizada do Setor Publico */
-			$('#AtendimentoTable').DataTable({
+			$('#AgendamentoTable').DataTable({
 				"order": [[ 0, "desc" ]],
 			    autoWidth: false,
 				responsive: true,
@@ -139,7 +141,7 @@ include('global_assets/php/conexao.php');
 			/* Fim: Tabela Personalizada */
 
 			$('#modal-close-x').on('click', ()=>{
-				$('#iAtendimento').val('')
+				$('#iAgendamentos').val('')
 				$('#page-modal-situacao').fadeOut(200);
 			})
 
@@ -151,52 +153,52 @@ include('global_assets/php/conexao.php');
 			$('#mudarSituacao').on('click', ()=>{
 				$.ajax({
 				type: 'POST',
-				url: 'filtraAtendimento.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'MUDARSITUACAO',
-					'iAtendimento': $('#iAtendimento').val(),
+					'iAgendamento': $('#iAgendamento').val(),
 					'iSituacao': $('#cmbSituacao').val()
 				},
 				success: function(response) {
 					alerta(response.titulo, response.menssagem, response.tipo);
-					$('#iAtendimento').val('')
+					$('#iAgendamento').val('')
 					$('#page-modal-situacao').fadeOut(200);
-					getAtendimentos();
+					getAgendamentos();
 				},
 				error: function(response) {
 					alerta(response.titulo, response.menssagem, response.tipo);
-					$('#iAtendimento').val('')
+					$('#iAgendamento').val('')
 					$('#page-modal-situacao').fadeOut(200);
-					getAtendimentos();
+					getAgendamentos();
 				}
 			});
 			})
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function getAtendimentos(){
+		function getAgendamentos(){
 			$.ajax({
 				type: 'POST',
-				url: 'filtraAtendimento.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data:{
-					'tipoRequest': 'ATENDIMENTOS'
+					'tipoRequest': 'AGENDAMENTOS'
 				},
 				success: function(response) {
 					//|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
 
-					let table = $('#AtendimentoTable').DataTable().clear().draw()
+					let table = $('#AgendamentoTable').DataTable().clear().draw()
 
-					table = $('#AtendimentoTable').DataTable()
+					table = $('#AgendamentoTable').DataTable()
 					let rowNode
 
 					response.forEach(item => {
 						rowNode = table.row.add(item.data).draw().node()
 						$(rowNode).attr('class', 'text-center')
-						$(rowNode).attr('data-atendimento', item.identify.iAtendimento)
+						$(rowNode).attr('data-agendamento', item.identify.iAgendamento)
 						$(rowNode).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-						$(rowNode).find('td:eq(7)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+						$(rowNode).find('td:eq(7)').attr('data-agendamento', `${item.identify.iAgendamento}`)
 					})
 				}
 			});
@@ -204,13 +206,13 @@ include('global_assets/php/conexao.php');
 		function alteraSituacao(situacao, element){
 			$.ajax({
 				type: 'POST',
-				url: 'filtraAtendimento.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'SITUACOES'
 				},
 				success: function(response) {
-					$('#iAtendimento').val($(element).data('atendimento'))
+					$('#iAgendamento').val($(element).data('agendamento'))
 					$('#cmbSituacao').empty()
 					response.forEach(item => {
 						let opt = item.SituaChave === situacao? `<option selected value="${item.SituaId}">${item.SituaNome}</option>`:`<option value="${item.SituaId}">${item.SituaNome}</option>`
@@ -247,7 +249,7 @@ include('global_assets/php/conexao.php');
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h5 class="card-title">Relação de Atendimentos</h5>
+								<h5 class="card-title">Relação de Agendamentos</h5>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
@@ -259,16 +261,18 @@ include('global_assets/php/conexao.php');
 
 							<div class="card-body">
 								<div class="row">
-									<div class="col-lg-9">
-										 A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
+									<div class="col-lg-8">
+										 A relação abaixo faz referência aos agendamentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
 									</div>
-									<div class="col-lg-3">
-										<div class="text-right"><a href="atendimentoNovo.php" class="btn btn-principal" role="button">Novo Atendimento</a></div>
-									</div>
+								</div>
+								<div class="col-lg-12 row text-right p-0">
+									<div class="text-right col-sm-8 p-0"><!-- EESPASSO --></div>
+									<div class="text-right col-sm-2 p-0"><a href="agendamentoNovo.php" class="btn btn-principal" role="button">Novo Agendamento</a></div>
+									<div class="text-right col-sm-2 p-0"><a href="#" class="btn bg-secondary" role="button">Imprimir Relação</a></div>
 								</div>
 							</div>
 
-							<table class="table" id="AtendimentoTable">
+							<table class="table" id="AgendamentoTable">
 								<thead>
 									<tr class="bg-slate text-center">
 										<th>Data</th>
@@ -282,7 +286,7 @@ include('global_assets/php/conexao.php');
 										<th class="text-center">Ações</th>
 									</tr>
 								</thead>
-								<tbody id="dataAtendimentos">
+								<tbody id="dataAgendamentos">
 
 								</tbody>
 							</table>
@@ -322,7 +326,7 @@ include('global_assets/php/conexao.php');
 			<!-- /content area -->
 
 			<!-- inf block -->
-			<input id="iAtendimento" name="iAtendimento" type="hidden" value="" />
+			<input id="iAgendamento" name="iAgendamento" type="hidden" value="" />
 			
 			<?php include_once("footer.php"); ?>
 

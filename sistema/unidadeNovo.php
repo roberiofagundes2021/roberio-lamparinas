@@ -212,7 +212,38 @@ if(isset($_POST['inputNome'])){
       ':bStatus' => 1,
       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
       ':iUnidade' => $unidadeIdNovo
-    ));							
+    ));		
+    
+    /* Após criar a Unidade deve se cadastrar as classificação do atendimento Padrão para essa Unidade nova criada */
+
+    $sql = "INSERT INTO AtendimentoClassificacao (AtClaNome, AtClaModelo, AtClaChave, AtClaStatus, AtClaUsuarioAtualizador, AtClaUnidade) 
+				    VALUES ( :sNome, :sModelo, :sChave, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+		$result = $conn->prepare($sql);
+        
+    $result->execute(array(
+      ':sNome' => 'Ambulatorial',
+      ':sModelo' => 'A',
+      ':sChave' => 'AMBULATORIAL',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Eletivo',
+      ':sModelo' => 'E',
+      ':sChave' => 'ELETIVO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));				
+    $result->execute(array(
+      ':sNome' => 'Internação',
+      ':sModelo' => 'I',
+      ':sChave' => 'INTERNACAO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
 					
 		$conn->commit();			
 
