@@ -8,7 +8,7 @@ $data2 = $_POST['inputData2'];
 $data3 = $_POST['inputData3'];
 $data4 = $_POST['inputData4'];
 
-$sql = "SELECT PlConId, PlConCodigo, PlConNome, 
+$sql = "SELECT PlConId, PlConCodigo, PlConNome, PlConNatureza,
                dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConCodigo, '".$data1."', '".$data1."', PlConNatureza)  as Previsto,
                dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConCodigo, '".$data1."', '".$data1."', PlConNatureza)  as Realizado,
                dbo.fnPlanoContasPrevisto(".$_SESSION['UnidadeId'].", PlConCodigo, '".$data2."', '".$data2."', PlConNatureza)  as Previsto2,

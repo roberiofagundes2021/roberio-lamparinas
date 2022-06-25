@@ -90,6 +90,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								let segundaColuna = resposta[1];
 								let terceiraColuna = resposta[2];
 								let quartaColuna = resposta[3];
+								let cor = '';
 								
 								HTML = HTML + ` 
 										<div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>`;
@@ -108,60 +109,74 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 													<span title=''><span id='simboloFilho`+planoConta.PlConId+indice+`' style='font-weight: bold; color: #607D8B;'>( + ) </span>`+planoConta.PlConNome+`</span>
 												</div>`;
 								}
+
+								/*Todas as contas que não tenham o primeiro código como 1, ou seja despesas, devem ser da cor vermelha*/
+								cor = (arrayCodigo[0] != '1') ? ' style="color: red;"' : '';
 									
+								sinalPrevisto1 = planoConta.Previsto > 0 ? ' - ' : '';
+								sinalRealizado1 = planoConta.Realizado > 0 ? ' - ' : '';
 								HTML = HTML + 
 											`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 												<div class='row'>
 												<div class='col-md-6'>
-													<span>`+float2moeda(planoConta.Previsto)+`</span>
+													<span `+cor+`>`+sinalPrevisto1+float2moeda(planoConta.Previsto)+`</span>
 												</div>
 									
 												<div class='col-md-6'>
-													<span>`+float2moeda(planoConta.Realizado)+`</span>
+													<span `+cor+`>`+sinalRealizado1+float2moeda(planoConta.Realizado)+`</span>
 												</div>
 												</div>
 											</div>`;
 								
 								if(segundaColuna != '') {
+									sinalPrevisto2 = planoConta.Previsto2 > 0 ? ' - ' : '';
+									sinalRealizado2 = planoConta.Realizado2 > 0 ? ' - ' : '';
+
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 													<div class='row'>
 													<div class='col-md-6'>
-														<span>`+float2moeda(planoConta.Previsto2)+`</span>
+														<span `+cor+`>`+sinalPrevisto2+float2moeda(planoConta.Previsto2)+`</span>
 													</div>
 										
 													<div class='col-md-6'>
-														<span>`+float2moeda(planoConta.Realizado2)+`</span>
+														<span `+cor+`>`+sinalRealizado2+float2moeda(planoConta.Realizado2)+`</span>
 													</div>
 													</div>
 												</div>`;
 								}
 
 								if(terceiraColuna != '') {
+									sinalPrevisto3 = planoConta.Previsto3 > 0 ? ' - ' : '';
+									sinalRealizado3 = planoConta.Realizado3 > 0 ? ' - ' : '';
+
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 													<div class='row'>
 													<div class='col-md-6'>
-														<span>`+float2moeda(planoConta.Previsto3)+`</span>
+														<span `+cor+`>`+sinalPrevisto3+float2moeda(planoConta.Previsto3)+`</span>
 													</div>
 										
 													<div class='col-md-6'>
-														<span>`+float2moeda(planoConta.Realizado3)+`</span>
+														<span `+cor+`>`+sinalRealizado3+float2moeda(planoConta.Realizado3)+`</span>
 													</div>
 													</div>
 												</div>`;
 								}
 
 								if(quartaColuna != '') {
+									sinalPrevisto4 = planoConta.Previsto4 > 0 ? ' - ' : '';
+									sinalRealizado4 = planoConta.Realizado4 > 0 ? ' - ' : '';
+
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 													<div class='row'>
 													<div class='col-md-6'>
-														<span>`+float2moeda(planoConta.Previsto4)+`</span>
+														<span `+cor+`>`+sinalPrevisto4+float2moeda(planoConta.Previsto4)+`</span>
 													</div>
 										
 													<div class='col-md-6'>
-														<span>`+float2moeda(planoConta.Realizado4)+`</span>
+														<span `+cor+`>`+sinalRealizado4+float2moeda(planoConta.Realizado4)+`</span>
 													</div>
 													</div>
 												</div>`;
@@ -243,6 +258,12 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								let segundaColuna = resposta[1];
 								let terceiraColuna = resposta[2];
 								let quartaColuna = resposta[3];
+
+								/*No momento só há Centros de Custos nas despesas, então estão todos em vermelho*/
+								cor = ' style="color: red;"';
+
+								sinalPrevisto1 = centroCusto.Previsto > 0 ? '-' : '';
+								sinalRealizado1 = centroCusto.Realizado > 0 ? '-' : '';
 								
 								HTML = HTML + `
 										<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
@@ -253,55 +274,64 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 											<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 												<div class='row'>
 													<div class='col-md-6'>
-														<span>`+float2moeda(centroCusto.Previsto)+`</span>
+														<span `+cor+`>`+sinalPrevisto1+float2moeda(centroCusto.Previsto)+`</span>
 													</div>
 										
 													<div class='col-md-6'>
-														<span>`+float2moeda(centroCusto.Realizado)+`</span>
+														<span `+cor+`>`+sinalRealizado1+float2moeda(centroCusto.Realizado)+`</span>
 													</div>
 												</div>
 											</div>`;
 								
 								if(segundaColuna != '') {
+									sinalPrevisto2 = centroCusto.Previsto2 > 0 ? '-' : '';
+									sinalRealizado2 = centroCusto.Realizado2 > 0 ? '-' : '';
+								
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 													<div class='row'>
 													<div class='col-md-6'>
-														<span>`+float2moeda(centroCusto.Previsto2)+`</span>
+														<span `+cor+`>`+sinalPrevisto2+float2moeda(centroCusto.Previsto2)+`</span>
 													</div>
 										
 													<div class='col-md-6'>
-														<span>`+float2moeda(centroCusto.Realizado2)+`</span>
+														<span `+cor+`>`+sinalRealizado2+float2moeda(centroCusto.Realizado2)+`</span>
 													</div>
 													</div>
 												</div>`;
 								}
 
 								if(terceiraColuna != '') {
+									sinalPrevisto3 = centroCusto.Previsto3 > 0 ? '-' : '';
+									sinalRealizado3 = centroCusto.Realizado3 > 0 ? '-' : '';
+								
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 													<div class='row'>
 													<div class='col-md-6'>
-														<span>`+float2moeda(centroCusto.Previsto3)+`</span>
+														<span `+cor+`>`+sinalPrevisto3+float2moeda(centroCusto.Previsto3)+`</span>
 													</div>
 										
 													<div class='col-md-6'>
-														<span>`+float2moeda(centroCusto.Realizado3)+`</span>
+														<span `+cor+`>`+sinalRealizado3+float2moeda(centroCusto.Realizado3)+`</span>
 													</div>
 													</div>
 												</div>`;
 								}
 
 								if(quartaColuna != '') {
+									sinalPrevisto4 = centroCusto.Previsto4 > 0 ? '-' : '';
+									sinalRealizado4 = centroCusto.Realizado4 > 0 ? '-' : '';
+								
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 													<div class='row'>
 													<div class='col-md-6'>
-														<span>`+float2moeda(centroCusto.Previsto4)+`</span>
+														<span `+cor+`>`+sinalPrevisto4+float2moeda(centroCusto.Previsto4)+`</span>
 													</div>
 										
 													<div class='col-md-6'>
-														<span>`+float2moeda(centroCusto.Realizado4)+`</span>
+														<span `+cor+`>`+sinalRealizado4+float2moeda(centroCusto.Realizado4)+`</span>
 													</div>
 													</div>
 												</div>`;
