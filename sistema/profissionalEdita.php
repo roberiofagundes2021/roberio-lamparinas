@@ -35,7 +35,7 @@ if(isset($_POST['inputTipo'])){
 		$sql = "UPDATE Profissional SET ProfiCodigo = :sCodigo, ProfiTipo = :sTipo, ProfiNome = :sNome, ProfiRazaoSocial = :sRazaoSocial, ProfiCnpj = :sCnpj, 
                       ProfiInscricaoMunicipal = :sInscricaoMunicipal, ProfiInscricaoEstadual = :sInscricaoEstadual, 
                       ProfiCpf = :sCpf, ProfiRg = :sRg, ProfiOrgaoEmissor = :sOrgaoEmissor, ProfiUf = :sUf, ProfiSexo = :sSexo, ProfiDtNascimento = :dDtNascimento, 
-                      ProfiProfissao = :sProfissao, ProfiNumConselho = :sNumConselho, ProfiCNES =  :sCnes, ProfiEspecialidade = :sEspecialidade, 
+                      ProfiProfissao = :sProfissao, ProfiConselho = :sConselho, ProfiNumConselho = :sNumConselho, ProfiCNES =  :sCnes, ProfiEspecialidade = :sEspecialidade, 
                       ProfiCep = :sCep, ProfiEndereco = :sEndereco, ProfiNumero = :sNumero, ProfiComplemento = :sComplemento, ProfiBairro = :sBairro, 
                       ProfiCidade = :sCidade, ProfiEstado = :sEstado, ProfiContato = :sContato, ProfiTelefone = :sTelefone, 
                       ProfiCelular = :sCelular, ProfiEmail = :sEmail, ProfiSite = :sSite, ProfiObservacao = :sObservacao, ProfiBanco = :sBanco, 
@@ -58,6 +58,7 @@ if(isset($_POST['inputTipo'])){
 						':sSexo' => $_POST['inputTipo'] == 'J' || $_POST['cmbSexo'] == '#' ? null : $_POST['cmbSexo'],
                         ':dDtNascimento' => $_POST['inputTipo'] == 'F' ? ($_POST['inputDtNascimento'] == '' ? null : $_POST['inputDtNascimento']) : null,
 						':sProfissao' => $_POST['inputTipo'] || $_POST['cmbProfissao'] == '#' ? null : $_POST['cmbProfissao'],
+						':sConselho' => $_POST['inputTipo'] == 'F' ? ($_POST['cmbConselho'] == '#' ? null : $_POST['cmbConselho']) : null,
                         ':sNumConselho' => $_POST['inputTipo'] == 'F' ? $_POST['inputNumConselho'] : null,
                         ':sCnes' => $_POST['inputTipo']  == 'J' ? $_POST['inputCnesPJ'] : $_POST['inputCnesPF'],
                         ':sEspecialidade' => $_POST['inputTipo']  || $_POST['cmbEspecialidade'] == '#' ? null : $_POST['cmbEspecialidade'],
@@ -558,6 +559,21 @@ if(isset($_POST['inputTipo'])){
                                                         <label for="cmbConselho">Conselho</label>
                                                         <select id="cmbConselho" name="cmbConselho" class="form-control form-control-select2">
                                                             <option value="#">Selecione </option>
+															 <?php 
+                                                                $sql = "SELECT PrConId, PrConNome
+                                                                        FROM ProfissionalConselho
+                                                                        JOIN Situacao on SituaId = PrConStatus
+                                                                        WHERE SituaChave = 'ATIVO'
+                                                                        ORDER BY PrConNome ASC";
+                                                                $result = $conn->query($sql);
+                                                                $rowConselho = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                                
+                                                                foreach ($rowConselho as $item){
+                                                                    $seleciona = $item['PrConId'] == $row['ProfiConselho'] ? "selected" : "";
+                                                                    print('<option value="'.$item['PrConId'].'" '. $seleciona .'>'. $item['PrConNome']. '</option>');
+                                                                }
+                                                            
+                                                            ?>
                                                            
                                                         </select>
                                                     </div>
