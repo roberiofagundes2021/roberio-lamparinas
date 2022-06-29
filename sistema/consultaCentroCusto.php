@@ -2,6 +2,7 @@
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
+$filtroCentroCusto = implode(', ',$_POST['inputFiltroCentroCusto']);
 $planoConta = $_POST['inputPlanoConta1'];
 $data1 = $_POST['inputDataInicial1'];
 $dataFinal1 = $_POST['inputDataFinal1'];
@@ -24,7 +25,7 @@ $sql = "SELECT DISTINCT CnCusId, CnCusNome,
         FROM CentroCusto
         JOIN ContasAPagarXCentroCusto ON CAPXCCentroCusto = CnCusId
         JOIN ContasAPagar ON CnAPaId = CAPXCContasAPagar
-        WHERE CnAPaPlanoContas = $planoConta AND CAPXCUnidade = $_SESSION[UnidadeId]
+        WHERE CnAPaPlanoContas = $planoConta AND CAPXCUnidade = $_SESSION[UnidadeId] and CnCusId in (".$filtroCentroCusto.")
         ORDER BY CnCusNome ASC";
 $result = $conn->query($sql);
 $rowCentroCusto = $result->fetchAll(PDO::FETCH_ASSOC);

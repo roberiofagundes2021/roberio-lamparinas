@@ -2,6 +2,7 @@
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
+$filtroPlanoConta = implode(', ',$_POST['inputFiltroPlanoConta']);
 $planoConta1 = $_POST['inputPlanoConta1'];
 $data1 = $_POST['inputDataInicial1'];
 $dataFinal1 = $_POST['inputDataFinal1'];
@@ -23,7 +24,7 @@ $sql = "SELECT PlConId, PlConCodigo, PlConNome, PlConNatureza,
                dbo.fnPlanoContasRealizado(".$_SESSION['UnidadeId'].", PlConCodigo, '".$data4."', '".$dataFinal4."', PlConNatureza)  as Realizado4
         FROM PlanoConta
         JOIN Situacao on SituaId = PlConStatus
-        WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and PlConPlanoContaPai = $planoConta1
+        WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and PlConPlanoContaPai = $planoConta1 and PlConId in (".$filtroPlanoConta.")
         ORDER BY PlConCodigo ASC";
 $result = $conn->query($sql);
 $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);

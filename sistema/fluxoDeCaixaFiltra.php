@@ -1807,14 +1807,15 @@ if($typeFiltro == "D"){
   }
 } 
 
+//O data-interval='0' é para desativar o giro automático (a página mudava automaticamente)
 $print .= "
   </div>
-    <a class='carousel-control-prev' href='#carouselExampleControls' role='button' data-slide='prev' style='color:black;'>
+    <a class='carousel-control-prev' href='#carouselExampleControls' role='button' data-slide='prev' style='color:black;' data-interval='0'>
       <span class='carousel-control-prev-icon' aria-hidden='true' ><img src='global_assets/images/lamparinas/seta-left.png' width='32' /></span>
       <span class='sr-only'>Previous</span>
     </a>
 
-    <a class='carousel-control-next' href='#carouselExampleControls' role='button' data-slide='next' style='color:black;'>
+    <a class='carousel-control-next' href='#carouselExampleControls' role='button' data-slide='next' style='color:black;' data-interval='0'>
       <span class='carousel-control-next-icon' aria-hidden='true'><img src='global_assets/images/lamparinas/seta-right.png' width='32' /></span>
       <span class='sr-only'>Next</span>
     </a>

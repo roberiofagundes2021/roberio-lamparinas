@@ -45,6 +45,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			let planoConta = $(this).attr('id');
 			let indice = planoConta.replace(/[^0-9]/g,''); //Pega apenas o número da string
 			let idPlanoContaPai1 = $("#idPlanoConta"+indice).val();
+			let filtroPlanoConta = $('#cmbPlanoContas').val();
 			let data1 = $('#dataInicial'+indice).val();
 			let dataFinal1 = $('#dataFinal'+indice).val();
 			let data2 = $('#dataInicialSegundaColuna'+indice).val();
@@ -53,7 +54,6 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			let dataFinal3 = $('#dataFinalTerceiraColuna'+indice).val();
 			let data4 = $('#dataInicialQuartaColuna'+indice).val();
 			let dataFinal4 = $('#dataFinalQuartaColuna'+indice).val();
-
 
 			if ($('#'+planoConta).is( ".visivel" ) ) {
 				$('#'+planoConta).removeClass("visivel");
@@ -72,6 +72,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 				var inputsValuesConsulta = {
 					inputPlanoConta1: idPlanoContaPai1,
+					inputFiltroPlanoConta: filtroPlanoConta,
 					inputDataInicial1: data1,
 					inputDataFinal1: dataFinal1,
 					inputDataInicial2: data2,
@@ -222,6 +223,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			let idPlanoContaFilho1 = idPlanoConta;
 			let indicePlanoConta = planoContaFilho.replace(/[^0-9]/g,''); //Pega apenas o número da string
 			let indice = $(this).attr('indice');
+			let filtroCentroCusto = $('#cmbCentroDeCustos').val();
 			let data1 = $('#dataInicial'+indice).val();
 			let dataFinal1 = $('#dataFinal'+indice).val();
 			let data2 = $('#dataInicialSegundaColuna'+indice).val();
@@ -248,6 +250,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 				var inputsValuesConsulta = {
 					inputPlanoConta1: idPlanoContaFilho1,
+					inputFiltroCentroCusto: filtroCentroCusto,
 					inputDataInicial1: data1,
 					inputDataFinal1: dataFinal1,
 					inputDataInicial2: data2,
