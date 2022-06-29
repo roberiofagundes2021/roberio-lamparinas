@@ -39,16 +39,20 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			$('.form-check-label > input[type="checkbox"][value="multiselect-all"]').prop( "checked", true );
 		});
 
-		//A função .on("click"): trabalha dinâmicamente, ou seja, funciona msm dps q o objeto é carregado na página
+		//A função .on("click"): trabalha dinâmicamente, ou seja, funciona antes q o objeto seja carregado na página
 		//Carrega os planos de contas sintéticos
 		$(document).on("click", ".planoConta", function(){
 			let planoConta = $(this).attr('id');
 			let indice = planoConta.replace(/[^0-9]/g,''); //Pega apenas o número da string
 			let idPlanoContaPai1 = $("#idPlanoConta"+indice).val();
-			let data1 = $('#data'+indice).val();
-			let data2 = $('#dataSegundaColuna'+indice).val();
-			let data3 = $('#dataTerceiraColuna'+indice).val();
-			let data4 = $('#dataQuartaColuna'+indice).val();
+			let data1 = $('#dataInicial'+indice).val();
+			let dataFinal1 = $('#dataFinal'+indice).val();
+			let data2 = $('#dataInicialSegundaColuna'+indice).val();
+			let dataFinal2 = $('#dataFinalSegundaColuna'+indice).val();
+			let data3 = $('#dataInicialTerceiraColuna'+indice).val();
+			let dataFinal3 = $('#dataFinalTerceiraColuna'+indice).val();
+			let data4 = $('#dataInicialQuartaColuna'+indice).val();
+			let dataFinal4 = $('#dataFinalQuartaColuna'+indice).val();
 
 
 			if ($('#'+planoConta).is( ".visivel" ) ) {
@@ -68,16 +72,20 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 				var inputsValuesConsulta = {
 					inputPlanoConta1: idPlanoContaPai1,
-					inputData1: data1,
-					inputData2: data2,
-					inputData3: data3,
-					inputData4: data4
+					inputDataInicial1: data1,
+					inputDataFinal1: dataFinal1,
+					inputDataInicial2: data2,
+					inputDataFinal2: dataFinal2,
+					inputDataInicial3: data3,
+					inputDataFinal3: dataFinal3,
+					inputDataInicial4: data4,
+					inputDataFinal4: dataFinal4
 				}; 
 
 				const msg = $('<div class="text-center"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></div>');
 				$("#planoContaPai"+indice).html(msg)
 
-				//Consulta saldo anterior
+				//Consulta Plano Conta Analítico
 				$.ajax({
 					type: "POST",
 					url: urlConsultaPlanoConta,
@@ -93,7 +101,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								let cor = '';
 								
 								HTML = HTML + ` 
-										<div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>`;
+										<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>`;
 								
 								let arrayCodigo = planoConta.PlConCodigo.split('');
 
@@ -113,8 +121,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								/*Todas as contas que não tenham o primeiro código como 1, ou seja despesas, devem ser da cor vermelha*/
 								cor = (arrayCodigo[0] != '1') ? ' style="color: red;"' : '';
 									
-								sinalPrevisto1 = planoConta.Previsto > 0 ? ' - ' : '';
-								sinalRealizado1 = planoConta.Realizado > 0 ? ' - ' : '';
+								sinalPrevisto1 = planoConta.Previsto > 0 && arrayCodigo[0] != '1' ? ' - ' : '';
+								sinalRealizado1 = planoConta.Realizado > 0 && arrayCodigo[0] != '1' ? ' - ' : '';
 								HTML = HTML + 
 											`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
 												<div class='row'>
@@ -129,8 +137,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 											</div>`;
 								
 								if(segundaColuna != '') {
-									sinalPrevisto2 = planoConta.Previsto2 > 0 ? ' - ' : '';
-									sinalRealizado2 = planoConta.Realizado2 > 0 ? ' - ' : '';
+									sinalPrevisto2 = planoConta.Previsto2 > 0 && arrayCodigo[0] != '1' ? ' - ' : '';
+									sinalRealizado2 = planoConta.Realizado2 > 0 && arrayCodigo[0] != '1' ? ' - ' : '';
 
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -147,8 +155,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								}
 
 								if(terceiraColuna != '') {
-									sinalPrevisto3 = planoConta.Previsto3 > 0 ? ' - ' : '';
-									sinalRealizado3 = planoConta.Realizado3 > 0 ? ' - ' : '';
+									sinalPrevisto3 = planoConta.Previsto3 > 0 && arrayCodigo[0] != '1' ? ' - ' : '';
+									sinalRealizado3 = planoConta.Realizado3 > 0 && arrayCodigo[0] != '1' ? ' - ' : '';
 
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -165,8 +173,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								}
 
 								if(quartaColuna != '') {
-									sinalPrevisto4 = planoConta.Previsto4 > 0 ? ' - ' : '';
-									sinalRealizado4 = planoConta.Realizado4 > 0 ? ' - ' : '';
+									sinalPrevisto4 = planoConta.Previsto4 > 0 && arrayCodigo[0] != '1' ? ' - ' : '';
+									sinalRealizado4 = planoConta.Realizado4 > 0 && arrayCodigo[0] != '1' ? ' - ' : '';
 
 									HTML = HTML + 
 												`<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -191,7 +199,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 						}else {
 							HTML = HTML + `
-									<div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
+									<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
 										<div class='col-lg-12 text-center'>
 											<span title=''>Vazio</span>
 										</div>
@@ -214,10 +222,14 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			let idPlanoContaFilho1 = idPlanoConta;
 			let indicePlanoConta = planoContaFilho.replace(/[^0-9]/g,''); //Pega apenas o número da string
 			let indice = $(this).attr('indice');
-			let data1 = $('#data'+indice).val();
-			let data2 = $('#dataSegundaColuna'+indice).val();
-			let data3 = $('#dataTerceiraColuna'+indice).val();
-			let data4 = $('#dataQuartaColuna'+indice).val();
+			let data1 = $('#dataInicial'+indice).val();
+			let dataFinal1 = $('#dataFinal'+indice).val();
+			let data2 = $('#dataInicialSegundaColuna'+indice).val();
+			let dataFinal2 = $('#dataFinalSegundaColuna'+indice).val();
+			let data3 = $('#dataInicialTerceiraColuna'+indice).val();
+			let dataFinal3 = $('#dataFinalTerceiraColuna'+indice).val();
+			let data4 = $('#dataInicialQuartaColuna'+indice).val();			
+			let dataFinal4 = $('#dataFinalQuartaColuna'+indice).val();
 
 			if ($('#'+planoContaFilho ).is( ".visivel" ) ) {
 				$('#'+planoContaFilho).removeClass("visivel");
@@ -236,10 +248,14 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 				var inputsValuesConsulta = {
 					inputPlanoConta1: idPlanoContaFilho1,
-					inputData1: data1,
-					inputData2: data2,
-					inputData3: data3,
-					inputData4: data4
+					inputDataInicial1: data1,
+					inputDataFinal1: dataFinal1,
+					inputDataInicial2: data2,
+					inputDataFinal2: dataFinal2,
+					inputDataInicial3: data3,
+					inputDataFinal3: dataFinal3,
+					inputDataInicial4: data4,
+					inputDataFinal4: dataFinal4
 				}; 
 
 				const msg = $('<div class="text-center"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></div>');
@@ -266,7 +282,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								sinalRealizado1 = centroCusto.Realizado > 0 ? '-' : '';
 								
 								HTML = HTML + `
-										<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
+										<div class='row' style='background: #f8f8f8; line-height: 3rem; box-sizing:border-box'>
 											<div class='col-lg-3 planoContaFilho' style='padding-left: 40px; border-right: 1px dotted black;'>
 												<span title=''>`+centroCusto.CnCusNome+`</span>
 											</div>
@@ -343,7 +359,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 
 						}else {
 							HTML = HTML + `
-									<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
+									<div class='row' style='background: #f8f8f8; line-height: 3rem; box-sizing:border-box'>
 										<div class='col-lg-12 text-center'>
 											<span title=''>Vazio</span>
 										</div>
@@ -570,6 +586,9 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 		});
 
 		function exportarTabelaExcel() {
+			document.getElementById('inputDateInitial').value = document.getElementById('inputDataInicio').value;
+			document.getElementById('inputDateEnd').value = document.getElementById('inputDataFim').value;
+
             document.formFluxoDeCaixaExportar.action = "fluxoDeCaixaExportar.php";
 			document.formFluxoDeCaixaExportar.submit();
 		}

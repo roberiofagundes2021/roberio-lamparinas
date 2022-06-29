@@ -93,30 +93,8 @@ function retornaBuscaComoArray($datasFiltro, $datasFiltro2, $datasFiltro3, $data
 
 //Gerar os dados dos planos de Contas Sintéticos
 function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $valorPrevisto3, $valorPrevisto4, $valorRealizado, $valorRealizado2, $valorRealizado3, $valorRealizado4, 
-                           $segundaColuna, $terceiraColuna, $quartaColuna, $data, $codigoGrupo, $tipoGrupo, $indice) {
+                           $segundaColuna, $terceiraColuna, $quartaColuna, $data, $data2, $data3, $data4, $codigoGrupo, $tipoGrupo, $indice) {
   include('global_assets/php/conexao.php');
-
-  $data2 = '';
-  $data3 = '';
-  $data4 = '';
-
-  if($segundaColuna) {
-    $arrayData2 = explode('-', $data);
-    $dia2 = $arrayData2[2] + 1;
-    $data2 = $arrayData2[0]."-".$arrayData2[1]."-".$dia2;
-  }
-
-  if($terceiraColuna) {
-    $arrayData3 = explode('-', $data);
-    $dia3 = $arrayData3[2] + 2;
-    $data3 = $arrayData3[0]."-".$arrayData3[1]."-".$dia3;
-  }
-
-  if($quartaColuna) {
-    $arrayData4 = explode('-', $data);
-    $dia4 = $arrayData4[2] + 3;
-    $data4 = $arrayData4[0]."-".$arrayData4[1]."-".$dia4;
-  }
 
   //Definindo a cor vermelha para as despesas
   $cor = $tipoGrupo != 'E' ? ' style="color: red;"' : '';
@@ -129,17 +107,28 @@ function planoConta($idPlanoConta1, $nome, $valorPrevisto, $valorPrevisto2, $val
   $sinalValorPrevisto4 = $tipoGrupo != 'E' && $valorPrevisto4 > 0 ? '-' : '';
   $sinalValorRealizado4 = $tipoGrupo != 'E' &&  $valorRealizado4 > 0 ? '-' : '';
 
+  $dataInicial2 = isset($data2['data_inicio_mes']) ? $data2['data_inicio_mes'] : "";
+  $dataFinal2 = isset($data2['data_fim_mes']) ? $data2['data_fim_mes'] : "";
+  $dataInicial3 = isset($data3['data_inicio_mes']) ? $data3['data_inicio_mes'] : "";
+  $dataFinal3 = isset($data3['data_fim_mes']) ? $data3['data_fim_mes'] : "";
+  $dataInicial4 = isset($data4['data_inicio_mes']) ? $data4['data_inicio_mes'] : "";
+  $dataFinal4 = isset($data4['data_fim_mes']) ? $data4['data_fim_mes'] : "";
+
   //Foi inserido os inputs de datas para a primeira, segunda... coluna para ser feito a consulta através dela quando for consultar na página de Fluxo de Caixa
   //A segunda e terceira coluna são o segundo e terceiro dia que é mostrado em cada paginação do Fluxo de Caixa
 
   $resposta[0] = "
-    <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box;'>
+    <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box;'>
       <div id='planoConta".$indice."' class='col-lg-3 planoConta' style='border-right: 1px dotted black; cursor:pointer;'>
         <input type='hidden' id='idPlanoConta".$indice."' value='".$idPlanoConta1."'>
-        <input type='hidden' id='data".$indice."' value='".$data."'>
-        <input type='hidden' id='dataSegundaColuna".$indice."' value='".$data2."'>
-        <input type='hidden' id='dataTerceiraColuna".$indice."' value='".$data3."'>
-        <input type='hidden' id='dataQuartaColuna".$indice."' value='".$data4."'>
+        <input type='hidden' id='dataInicial".$indice."' value='".$data['data_inicio_mes']."'>
+        <input type='hidden' id='dataFinal".$indice."' value='".$data['data_fim_mes']."'>
+        <input type='hidden' id='dataInicialSegundaColuna".$indice."' value='".$dataInicial2."'>
+        <input type='hidden' id='dataFinalSegundaColuna".$indice."' value='".$dataFinal2."'>
+        <input type='hidden' id='dataInicialTerceiraColuna".$indice."' value='".$dataInicial3."'>
+        <input type='hidden' id='dataFinalTerceiraColuna".$indice."' value='".$dataFinal3."'>
+        <input type='hidden' id='dataInicialQuartaColuna".$indice."' value='".$dataInicial4."'>
+        <input type='hidden' id='dataFinalQuartaColuna".$indice."' value='".$dataFinal4."'>
         <span><span id='simbolo".$indice."' style='font-weight: bold; color: #607D8B;'>( + ) </span>".$nome."</span>
       </div>
 
@@ -234,10 +223,10 @@ function retornoSaldo($datasFiltro, $datasFiltro2, $datasFiltro3, $datasFiltro4,
                                   dbo.fnFluxoCaixaSaldoInicialPrevisto(".$_SESSION['UnidadeId'].",'".$datasFiltro2['data_fim_mes']."') as SaldoInicialPrevisto2,
                                   dbo.fnFluxoCaixaSaldoInicialPrevisto(".$_SESSION['UnidadeId'].",'".$datasFiltro3['data_fim_mes']."') as SaldoInicialPrevisto3,
                                   dbo.fnFluxoCaixaSaldoInicialPrevisto(".$_SESSION['UnidadeId'].",'".$datasFiltro4['data_fim_mes']."') as SaldoInicialPrevisto4,
-                                  dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro['data_fim_mes']."') as SaldoInicialRealizado,
-                                  dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro2['data_fim_mes']."') as SaldoInicialRealizado2,
-                                  dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro3['data_fim_mes']."') as SaldoInicialRealizado3,
-                                  dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro4['data_fim_mes']."') as SaldoInicialRealizado4,
+                                  dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro['data_inicio_mes']."') as SaldoInicialRealizado,
+                                  dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro2['data_inicio_mes']."') as SaldoInicialRealizado2,
+                                  dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro3['data_inicio_mes']."') as SaldoInicialRealizado3,
+                                  dbo.fnFluxoCaixaSaldoInicialRealizado(".$_SESSION['UnidadeId'].",'".$datasFiltro4['data_inicio_mes']."') as SaldoInicialRealizado4,
                                   
                                   dbo.fnFluxoCaixaSaldoFinal(".$_SESSION['UnidadeId'].",'".$datasFiltro['data_fim_mes']."') as SaldoFinal,
                                   dbo.fnFluxoCaixaSaldoFinal(".$_SESSION['UnidadeId'].",'".$datasFiltro2['data_fim_mes']."') as SaldoFinal2,
@@ -500,20 +489,20 @@ if($typeFiltro == "D"){
         <div class='col-lg-12'>
           <!-- Basic responsive configuration -->
             <div class='card-body' style='padding-top: 0;'>
-              <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
+              <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
                 <div class='col-lg-3' style='border-right: 1px dotted black;'>
                   <span><strong>Saldo Inicial</strong></span>
                 </div>";
 
-    $corSaldoPrevisto1 = ($saldoIni_p1 <= 0) ? 'style = "color: red;"' : '';
-    $corSaldoPrevisto2 = ($saldoIni_p2 <= 0 && $segundaColuna) ? 'style = "color: red;"' : '';
-    $corSaldoPrevisto3 = ($saldoIni_p3 <= 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
-    $corSaldoPrevisto4 = ($saldoIni_p4 <= 0 && $quartaColuna) ? 'style = "color: red;"' : '';
+    $corSaldoPrevisto1 = ($saldoIni_p1 < 0) ? 'style = "color: red;"' : '';
+    $corSaldoPrevisto2 = ($saldoIni_p2 < 0 && $segundaColuna) ? 'style = "color: red;"' : '';
+    $corSaldoPrevisto3 = ($saldoIni_p3 < 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
+    $corSaldoPrevisto4 = ($saldoIni_p4 < 0 && $quartaColuna) ? 'style = "color: red;"' : '';
 
-    $corSaldoRealizado1 = ($saldoIni_r1 <= 0) ? 'style = "color: red;"' : '';
-    $corSaldoRealizado2 = ($saldoIni_r2 <= 0 && $segundaColuna) ? 'style = "color: red;"' : '';
-    $corSaldoRealizado3 = ($saldoIni_r3 <= 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
-    $corSaldoRealizado4 = ($saldoIni_r4 <= 0 && $quartaColuna) ? 'style = "color: red;"' : '';
+    $corSaldoRealizado1 = ($saldoIni_r1 < 0) ? 'style = "color: red;"' : '';
+    $corSaldoRealizado2 = ($saldoIni_r2 < 0 && $segundaColuna) ? 'style = "color: red;"' : '';
+    $corSaldoRealizado3 = ($saldoIni_r3 < 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
+    $corSaldoRealizado4 = ($saldoIni_r4 < 0 && $quartaColuna) ? 'style = "color: red;"' : '';
 
     $print_corpo .= "
                 <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -722,7 +711,12 @@ if($typeFiltro == "D"){
                                             ($segundaColuna)?$planoConta['PL_Realizado2']:"",
                                             ($terceiraColuna)?$planoConta['PL_Realizado3']:"", 
                                             ($quartaColuna)?$planoConta['PL_Realizado4']:"", 
-                                            $segundaColuna, $terceiraColuna, $quartaColuna, $dataFiltroDiaInicio1, $grupo['GrConCodigo'], $tipoGrupo, $indice);
+                                            $segundaColuna, $terceiraColuna, $quartaColuna, 
+                                            $datasFiltro, 
+                                            ($segundaColuna)?$datasFiltro2:"",
+                                            ($terceiraColuna)?$datasFiltro3:"",
+                                            ($quartaColuna)?$datasFiltro4:"", 
+                                            $grupo['GrConCodigo'], $tipoGrupo, $indice);
             $print_corpo .= $resultadoPlanoConta[0];
 
             $indice++;
@@ -761,15 +755,15 @@ if($typeFiltro == "D"){
                 <!-- Basic responsive configuration -->
                   <div class='card-body' style=''>";
 
-        $corTotalPrevisto1 = ($totalPrevistoPrimeiraColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-        $corTotalRealizado1 = ($totalRealizadoPrimeiraColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+        $corTotalPrevisto1 = ($totalPrevistoPrimeiraColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+        $corTotalRealizado1 = ($totalRealizadoPrimeiraColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
         
-        $corPercentualPrevisto1 = ($percentualPrevisto1 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-        $corPercentualRealizado1 = ($percentualRealizado1 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+        $corPercentualPrevisto1 = ($percentualPrevisto1 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+        $corPercentualRealizado1 = ($percentualRealizado1 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
         
         if($tituloTotalizador != 'sem rodape') {
           $print_corpo .="
-                    <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
+                    <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
                       <div class='col-lg-3' style='border-right: 1px dotted black;'>
                         <span><strong>(=) ".$tituloTotalizador."</strong></span>
                       </div>
@@ -795,11 +789,11 @@ if($typeFiltro == "D"){
             $percentualRealizado2 = is_float($percentualRealizado2) ? number_format($percentualRealizado2, 1, '.', '') : $percentualRealizado2;
           }
 
-          $corTotalPrevisto2 = ($totalPrevistoSegundaColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-          $corTotalRealizado2 = ($totalRealizadoSegundaColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corTotalPrevisto2 = ($totalPrevistoSegundaColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corTotalRealizado2 = ($totalRealizadoSegundaColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
         
-          $corPercentualPrevisto2 = ($percentualPrevisto2 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-          $corPercentualRealizado2 = ($percentualRealizado2 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corPercentualPrevisto2 = ($percentualPrevisto2 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corPercentualRealizado2 = ($percentualRealizado2 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
 
           $print_corpo .="
                       <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -824,11 +818,11 @@ if($typeFiltro == "D"){
             $percentualRealizado3 = is_float($percentualRealizado3) ? number_format($percentualRealizado3, 1, '.', '') : $percentualRealizado3;
           }
 
-          $corTotalPrevisto3 = ($totalPrevistoTerceiraColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-          $corTotalRealizado3 = ($totalRealizadoTerceiraColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corTotalPrevisto3 = ($totalPrevistoTerceiraColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corTotalRealizado3 = ($totalRealizadoTerceiraColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
           
-          $corPercentualPrevisto3 = ($percentualPrevisto3 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-          $corPercentualRealizado3 = ($percentualRealizado3 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corPercentualPrevisto3 = ($percentualPrevisto3 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corPercentualRealizado3 = ($percentualRealizado3 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
 
           
           $print_corpo .= "
@@ -854,11 +848,11 @@ if($typeFiltro == "D"){
             $percentualRealizado4 = is_float($percentualRealizado4) ? number_format($percentualRealizado4, 1, '.', '') : $percentualRealizado4;
           }
 
-          $corTotalPrevisto4 = ($totalPrevistoQuartaColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-          $corTotalRealizado4 = ($totalRealizadoQuartaColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corTotalPrevisto4 = ($totalPrevistoQuartaColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corTotalRealizado4 = ($totalRealizadoQuartaColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
           
-          $corPercentualPrevisto4 = ($percentualPrevisto4 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-          $corPercentualRealizado4 = ($percentualRealizado4 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corPercentualPrevisto4 = ($percentualPrevisto4 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corPercentualRealizado4 = ($percentualRealizado4 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
 
           $print_corpo .= "
                       <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -876,7 +870,7 @@ if($typeFiltro == "D"){
           
         $print_corpo .= " </div>
   
-                    <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
+                    <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
                       <div class='col-lg-3' style='border-right: 1px dotted black;'>
                         <span style='padding-left: 20px;'><strong>".$tituloTotalizador." (%)</strong></span>
                       </div>
@@ -955,16 +949,16 @@ if($typeFiltro == "D"){
               <div class='col-lg-12'>
                 <!-- Basic responsive configuration -->
                   <div class='card-body' style='padding-top: 0;'>
-                  <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
+                  <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
                     <div class='col-lg-3' style='border-right: 1px dotted black;'>
                       <span><strong>SALDO FINAL</strong></span>
                     </div>";
 
           //Caso o valor seja igual ou menor a zero os valores ficam vermelhos
-          $corSaldoFinal1 = ($saldoFin1 <= 0) ? 'style = "color: red;"' : '';
-          $corSaldoFinal2 = ($saldoFin2 <= 0 && $segundaColuna) ? 'style = "color: red;"' : '';
-          $corSaldoFinal3 = ($saldoFin3 <= 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
-          $corSaldoFinal4 = ($saldoFin4 <= 0 && $quartaColuna) ? 'style = "color: red;"' : '';
+          $corSaldoFinal1 = ($saldoFin1 < 0) ? 'style = "color: red;"' : '';
+          $corSaldoFinal2 = ($saldoFin2 < 0 && $segundaColuna) ? 'style = "color: red;"' : '';
+          $corSaldoFinal3 = ($saldoFin3 < 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
+          $corSaldoFinal4 = ($saldoFin4 < 0 && $quartaColuna) ? 'style = "color: red;"' : '';
         
           $print .= "
                     <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -1066,13 +1060,15 @@ if($typeFiltro == "D"){
   $mesInicioArray = explode('-', $dataInicio);
   $anoTela = $mesInicioArray[0];
   $mesInicio = (int)$mesInicioArray[1];
-  $mesInicio = str_pad($mesInicio, 2, '0', STR_PAD_LEFT);
-
+  
   $mesFimArray = explode('-', $dataFim);
   $mesFinal = (int)$mesFimArray[1];
-
-  $controlador = (($mesInicio - $mesFinal) < 3 ) ? true : false; 
-
+  
+  $controlador = (($mesFinal - $mesInicio) < 3 ) ? true : false; 
+  
+  //Formatando os números abaixo de dez
+  $mesInicio = str_pad($mesInicio, 2, '0', STR_PAD_LEFT);
+  
   $pagina = 0;
   $numeroPaginasCont = 0;
   
@@ -1260,20 +1256,20 @@ if($typeFiltro == "D"){
         <div class='col-lg-12'>
           <!-- Basic responsive configuration -->
             <div class='card-body' style='padding-top: 0;'>
-              <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
+              <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
                 <div class='col-lg-3' style='border-right: 1px dotted black;'>
                   <span><strong>Saldo Inicial</strong></span>
                 </div>";
 
-            $corSaldoPrevisto1 = ($saldoIni_p1 <= 0) ? 'style = "color: red;"' : '';
-            $corSaldoPrevisto2 = ($saldoIni_p2 <= 0 && $segundaColuna) ? 'style = "color: red;"' : '';
-            $corSaldoPrevisto3 = ($saldoIni_p3 <= 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
-            $corSaldoPrevisto4 = ($saldoIni_p4 <= 0 && $quartaColuna) ? 'style = "color: red;"' : '';
+            $corSaldoPrevisto1 = ($saldoIni_p1 < 0) ? 'style = "color: red;"' : '';
+            $corSaldoPrevisto2 = ($saldoIni_p2 < 0 && $segundaColuna) ? 'style = "color: red;"' : '';
+            $corSaldoPrevisto3 = ($saldoIni_p3 < 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
+            $corSaldoPrevisto4 = ($saldoIni_p4 < 0 && $quartaColuna) ? 'style = "color: red;"' : '';
 
-            $corSaldoRealizado1 = ($saldoIni_r1 <= 0) ? 'style = "color: red;"' : '';
-            $corSaldoRealizado2 = ($saldoIni_r2 <= 0 && $segundaColuna) ? 'style = "color: red;"' : '';
-            $corSaldoRealizado3 = ($saldoIni_r3 <= 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
-            $corSaldoRealizado4 = ($saldoIni_r4 <= 0 && $quartaColuna) ? 'style = "color: red;"' : '';
+            $corSaldoRealizado1 = ($saldoIni_r1 < 0) ? 'style = "color: red;"' : '';
+            $corSaldoRealizado2 = ($saldoIni_r2 < 0 && $segundaColuna) ? 'style = "color: red;"' : '';
+            $corSaldoRealizado3 = ($saldoIni_r3 < 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
+            $corSaldoRealizado4 = ($saldoIni_r4 < 0 && $quartaColuna) ? 'style = "color: red;"' : '';
 
             $print_corpo .= "
                 <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -1482,7 +1478,10 @@ if($typeFiltro == "D"){
                                               ($segundaColuna)?$planoConta['PL_Realizado2']:"",
                                               ($terceiraColuna)?$planoConta['PL_Realizado3']:"", 
                                               ($quartaColuna)?$planoConta['PL_Realizado4']:"", 
-                                              $segundaColuna, $terceiraColuna, $quartaColuna, $dataFiltroDiaInicioMes1, $grupo['GrConCodigo'], $tipoGrupo, $indice);
+                                              $segundaColuna, $terceiraColuna, $quartaColuna, $datasFiltro, 
+                                              ($segundaColuna)?$datasFiltro2:"",
+                                              ($terceiraColuna)?$datasFiltro3:"",
+                                              ($quartaColuna)?$datasFiltro4:"", $grupo['GrConCodigo'], $tipoGrupo, $indice);
               $print_corpo .= $resultadoPlanoConta[0];
   
               $indice++;
@@ -1521,15 +1520,15 @@ if($typeFiltro == "D"){
                   <!-- Basic responsive configuration -->
                     <div class='card-body' style=''>";
 
-          $corTotalPrevisto1 = ($totalPrevistoPrimeiraColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-          $corTotalRealizado1 = ($totalRealizadoPrimeiraColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corTotalPrevisto1 = ($totalPrevistoPrimeiraColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corTotalRealizado1 = ($totalRealizadoPrimeiraColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
           
-          $corPercentualPrevisto1 = ($percentualPrevisto1 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-          $corPercentualRealizado1 = ($percentualRealizado1 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corPercentualPrevisto1 = ($percentualPrevisto1 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+          $corPercentualRealizado1 = ($percentualRealizado1 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
           
           if($tituloTotalizador != 'sem rodape') {
             $print_corpo .="
-                      <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
+                      <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
                         <div class='col-lg-3' style='border-right: 1px dotted black;'>
                           <span><strong>(=) ".$tituloTotalizador."</strong></span>
                         </div>
@@ -1555,11 +1554,11 @@ if($typeFiltro == "D"){
               $percentualRealizado2 = is_float($percentualRealizado2) ? number_format($percentualRealizado2, 1, '.', '') : $percentualRealizado2;
             }
 
-            $corTotalPrevisto2 = ($totalPrevistoSegundaColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-            $corTotalRealizado2 = ($totalRealizadoSegundaColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corTotalPrevisto2 = ($totalPrevistoSegundaColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corTotalRealizado2 = ($totalRealizadoSegundaColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
 
-            $corPercentualPrevisto2 = ($percentualPrevisto2 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-            $corPercentualRealizado2 = ($percentualRealizado2 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corPercentualPrevisto2 = ($percentualPrevisto2 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corPercentualRealizado2 = ($percentualRealizado2 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
   
             $print_corpo .="
                         <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -1584,11 +1583,11 @@ if($typeFiltro == "D"){
               $percentualRealizado3 = is_float($percentualRealizado3) ? number_format($percentualRealizado3, 1, '.', '') : $percentualRealizado3;
             }
 
-            $corTotalPrevisto3 = ($totalPrevistoTerceiraColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-            $corTotalRealizado3 = ($totalRealizadoTerceiraColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corTotalPrevisto3 = ($totalPrevistoTerceiraColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corTotalRealizado3 = ($totalRealizadoTerceiraColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
 
-            $corPercentualPrevisto3 = ($percentualPrevisto3 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-            $corPercentualRealizado3 = ($percentualRealizado3 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';  
+            $corPercentualPrevisto3 = ($percentualPrevisto3 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corPercentualRealizado3 = ($percentualRealizado3 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';  
   
             $print_corpo .= "
                         <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -1613,11 +1612,11 @@ if($typeFiltro == "D"){
               $percentualRealizado4 = is_float($percentualRealizado4) ? number_format($percentualRealizado4, 1, '.', '') : $percentualRealizado4;
             }
 
-            $corTotalPrevisto4 = ($totalPrevistoQuartaColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-            $corTotalRealizado4 = ($totalRealizadoQuartaColuna <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corTotalPrevisto4 = ($totalPrevistoQuartaColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corTotalRealizado4 = ($totalRealizadoQuartaColuna < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
             
-            $corPercentualPrevisto4 = ($percentualPrevisto4 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
-            $corPercentualRealizado4 = ($percentualRealizado4 <= 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corPercentualPrevisto4 = ($percentualPrevisto4 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
+            $corPercentualRealizado4 = ($percentualRealizado4 < 0 && $tituloTotalizador != 'Receita operacional líquida') ? 'style = "color: red;"' : '';
   
             $print_corpo .= "
                         <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -1635,7 +1634,7 @@ if($typeFiltro == "D"){
             
           $print_corpo .= " </div>
     
-                      <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
+                      <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
                         <div class='col-lg-3' style='border-right: 1px dotted black;'>
                           <span style='padding-left: 20px;'><strong>".$tituloTotalizador." (%)</strong></span>
                         </div>
@@ -1714,16 +1713,16 @@ if($typeFiltro == "D"){
               <div class='col-lg-12'>
                 <!-- Basic responsive configuration -->
                   <div class='card-body' style='padding-top: 0;'>
-                  <div class='row' style='background: #a3a3a3; line-height: 3rem; box-sizing:border-box'>
+                  <div class='row' style='background: #CCCCCC; line-height: 3rem; box-sizing:border-box'>
                     <div class='col-lg-3' style='border-right: 1px dotted black;'>
                       <span><strong>SALDO FINAL</strong></span>
                     </div>;";
 
         //Caso o valor seja igual ou menor a zero os valores ficam vermelhos
-        $corSaldoFinal1 = ($saldoFin1 <= 0) ? 'style = "color: red;"' : '';
-        $corSaldoFinal2 = ($saldoFin2 <= 0 && $segundaColuna) ? 'style = "color: red;"' : '';
-        $corSaldoFinal3 = ($saldoFin3 <= 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
-        $corSaldoFinal4 = ($saldoFin4 <= 0 && $quartaColuna) ? 'style = "color: red;"' : '';
+        $corSaldoFinal1 = ($saldoFin1 < 0) ? 'style = "color: red;"' : '';
+        $corSaldoFinal2 = ($saldoFin2 < 0 && $segundaColuna) ? 'style = "color: red;"' : '';
+        $corSaldoFinal3 = ($saldoFin3 < 0 && $terceiraColuna) ? 'style = "color: red;"' : '';
+        $corSaldoFinal4 = ($saldoFin4 < 0 && $quartaColuna) ? 'style = "color: red;"' : '';
         
         $print .= "
                     <div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
