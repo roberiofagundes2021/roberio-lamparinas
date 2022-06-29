@@ -1,17 +1,18 @@
-<?php 
+<?php  
 
 include_once("sessao.php"); 
 
 include('global_assets/php/conexao.php');
 
-$sql = "INSERT INTO Unidade (UnidaNome, UnidaCep, UnidaEndereco, UnidaNumero, UnidaComplemento, UnidaBairro, 
+$sql = "INSERT INTO Unidade (UnidaNome, UnidaCNES UnidaCep, UnidaEndereco, UnidaNumero, UnidaComplemento, UnidaBairro, 
 UnidaCidade, UnidaEstado, UnidaStatus, UnidaUsuarioAtualizador, UnidaEmpresa)
-VALUES (:sNome, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
+VALUES (:sNome, :sCNES, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
 :sCidade, :sEstado, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 $result = $conn->prepare($sql);
 
 $result->execute(array(
 	':sNome' => $_POST['nome'],
+	':sCNES' => $_POST['cnes'] == '' ? null : $_POST['cnes'],
 	':sCep' => $_POST['cep'],
 	':sEndereco' => $_POST['endereco'],
 	':sNumero' => $_POST['numero'],

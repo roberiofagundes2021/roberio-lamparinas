@@ -32,7 +32,7 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE Unidade SET UnidaNome = :sNome, UnidaCep = :sCep, UnidaEndereco = :sEndereco, UnidaNumero = :sNumero, 
+		$sql = "UPDATE Unidade SET UnidaNome = :sNome, UnidaCNES = :sCNES, UnidaCep = :sCep, UnidaEndereco = :sEndereco, UnidaNumero = :sNumero, 
 								   UnidaComplemento = :sComplemento, UnidaBairro = :sBairro, UnidaCidade = :sCidade, 
 								   UnidaEstado = :sEstado, UnidaUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE UnidaId = :iUnidade";
@@ -40,6 +40,7 @@ if(isset($_POST['inputNome'])){
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
+            ':sCNES' => $_POST['inputCNES'] == "" ? null : $_POST['inputCNES'],
 						':sCep' => trim($_POST['inputCep']) == "" ? null : $_POST['inputCep'],
 						':sEndereco' => $_POST['inputEndereco'],
 						':sNumero' => $_POST['inputNumero'],
@@ -231,10 +232,16 @@ if(isset($_POST['inputNome'])){
 
             <div class="card-body">
               <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-8">
                   <div class="form-group">
                     <label for="inputNome">Nome da Unidade <span class='text-danger'>*</span></label>
                     <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Unidade" value="<?php echo $row['UnidaNome']; ?>" required autofocus>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="inputCNES">CNES</label>
+                    <input type="text" id="inputCNES" name="inputCNES" class="form-control" placeholder="CNES" value="<?php echo $row['UnidaCNES']; ?>" >
                   </div>
                 </div>
               </div>

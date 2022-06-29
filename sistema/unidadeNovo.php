@@ -12,14 +12,15 @@ if(isset($_POST['inputNome'])){
 		
 		$conn->beginTransaction();
 
-		$sql = "INSERT INTO Unidade (UnidaNome, UnidaCep, UnidaEndereco, UnidaNumero, UnidaComplemento, UnidaBairro, 
+		$sql = "INSERT INTO Unidade (UnidaNome, UnidaCNES, UnidaCep, UnidaEndereco, UnidaNumero, UnidaComplemento, UnidaBairro, 
                       UnidaCidade, UnidaEstado, UnidaStatus, UnidaUsuarioAtualizador, UnidaEmpresa)
-            VALUES (:sNome, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
+            VALUES (:sNome, :sCNES, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
                 :sCidade, :sEstado, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
       ':sNome' => $_POST['inputNome'],
+      ':sCNES' => $_POST['inputCNES'] == '' ? null : $_POST['inputCNES'],
       ':sCep' => $_POST['inputCep'],
       ':sEndereco' => $_POST['inputEndereco'],
       ':sNumero' => $_POST['inputNumero'],
@@ -436,6 +437,7 @@ if(isset($_POST['inputNome'])){
                 $("#inputCep").val(cep)
 
                 let inputNome = $('#inputNome').val();
+                let inputCNES = $('#inputCNES').val();
                 let inputCep = $('#inputCep').val();
                 let inputEndereco = $('#inputEndereco').val();
                 let inputNumero = $('#inputNumero').val();
@@ -462,6 +464,7 @@ if(isset($_POST['inputNome'])){
                   url: "unidadeGrava.php",
                   data: {
                     nome: inputNome,
+                    cnes: inputCNES,
                     cep: inputCep,
                     endereco: inputEndereco,
                     numero: inputNumero,
@@ -751,10 +754,16 @@ if(isset($_POST['inputNome'])){
 						<fieldset>
               <div class="card-body">
                 <div class="row">
-                  <div class="col-lg-12">
+                  <div class="col-lg-8">
                     <div class="form-group">
                       <label for="inputNome">Nome da Unidade <span class='text-danger'>*</span></label>
                       <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Unidade" required autofocus>
+                    </div>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group">
+                      <label for="inputCNES">CNES </label>
+                      <input type="text" id="inputCNES" name="inputCNES" class="form-control" placeholder="CNES">
                     </div>
                   </div>
                 </div>
