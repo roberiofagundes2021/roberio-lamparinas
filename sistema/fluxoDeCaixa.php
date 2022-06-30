@@ -666,7 +666,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 										<div class="col-lg-2">
 											<div class="form-group container-cmbCentroDeCustos" >
 												<label for="cmbCentroDeCustos">Centro de Custos</label>
-												<select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control multiselect-select-all" multiple="multiple" data-fouc>
+												<select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control multiselect-select-all-filtering" multiple="multiple" data-fouc>
 													<?php
 														$sql = "SELECT CnCusId,
 																	CnCusNome
@@ -690,7 +690,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 										<div class="col-lg-2">
 											<div class="form-group container-cmbPlanoContas">
 												<label for="cmbPlanoContas">Plano de Contas</label>
-												<select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control multiselect-select-all" multiple="multiple" data-fouc>
+												<select id="cmbPlanoContas" name="cmbPlanoContas" class="form-control multiselect-select-all-filtering" multiple="multiple" data-fouc>
 													<?php
 														$sql = "SELECT PlConId, PlConNome
 																FROM PlanoConta
