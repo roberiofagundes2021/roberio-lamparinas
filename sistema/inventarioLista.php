@@ -24,7 +24,7 @@ $sql = "SELECT InvenNumero, InvenCategoria, InvenObservacao, InvenUnidade, Categ
 		 FROM Inventario
 		 JOIN InventarioXSetor on InXSeInventario = InvenId
 		 JOIN Setor on SetorId = InXSeSetor
-		 JOIN Categoria on CategId = InvenCategoria
+		 LEFT JOIN Categoria on CategId = InvenCategoria
 		 Where InvenId = " . $iInventario . "
 		";
 $result = $conn->query($sql);
@@ -56,21 +56,6 @@ try {
 
 	foreach ($rowLocalEstoque as $item) {
 
-		$html .= '
-		<br>
-		<div style="font-weight: bold; position:relative; margin-top: 50px; background-color:#ccc; padding: 5px;">Local: ' . $item['LcEstNome'] . '</div>
-		<br>
-		<table style="width:100%; border-collapse: collapse;">
-			<tr>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Patrimônio</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:30%">Produto</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:28%">Categoria</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">1ª Contagem</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">2ª Contagem</th>
-			</tr>
-		';
-
 		$iCategoria = $item['InvenCategoria'];
 		$iLocal = $item['InXLELocal'];
 
@@ -89,44 +74,50 @@ try {
 				WHERE ProduUnidade = " . $item['InvenUnidade'] . " and ProduStatus = 1 and
 					  MovimDestinoLocal = (" . $iLocal . ") and SituaChave = 'LIBERADO'
 				 ";
-		if ($icategoria){
+		if ($iCategoria){
 			$sql .= " and ProduCategoria = " . $iCategoria;
 		}
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+		$count = count($rowProdutos);
 
-		foreach ($rowProdutos as $itemProduto) {
-
-			$html .= "
+		if ($count){
+			$html .= '
+			<br>
+			<div style="font-weight: bold; position:relative; margin-top: 50px; background-color:#ccc; padding: 5px;">Local: ' . $item['LcEstNome'] . '</div>
+			<br>
+			<table style="width:100%; border-collapse: collapse;">
 				<tr>
-					<td style='padding-top: 8px;'>" . formatarNumero($itemProduto['PatriNumero']) . "</td>
-					<td style='padding-top: 8px;'>" . $itemProduto['ProduNome'] . "</td>
-					<td style='padding-top: 8px;'>" . $itemProduto['UnMedSigla'] . "</td>
-					<td style='padding-top: 8px;'>" . $itemProduto['CategNome'] . "</td>
-					<td style='padding-top: 8px;'>__________________</td>
-					<td style='padding-top: 8px;'>__________________</td>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Patrimônio</th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:30%">Produto</th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:28%">Categoria</th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">1ª Contagem</th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:1%"></th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:11%">2ª Contagem</th>
 				</tr>
-			";
+			';
+	
+			foreach ($rowProdutos as $itemProduto) {
+	
+				$html .= "
+					<tr>
+						<td style='padding-top: 8px;'>" . formatarNumero($itemProduto['PatriNumero']) . "</td>
+						<td style='padding-top: 8px;'>" . $itemProduto['ProduNome'] . "</td>
+						<td style='padding-top: 8px;'>" . $itemProduto['UnMedSigla'] . "</td>
+						<td style='padding-top: 8px;'>" . $itemProduto['CategNome'] . "</td>
+						<td style='padding-top: 8px; border-bottom: 1px solid #666;'></td>
+						<td></td>
+						<td style='padding-top: 8px; border-bottom: 1px solid #666;'></td>
+					</tr>
+				";
+			}
+	
+			$html .= "</table>";	
 		}
-
-		$html .= "</table>";
 	}
 
 	foreach ($rowSetor as $item) {
-		$html .= '
-		<br>
-		<div style="font-weight: bold; position:relative; margin-top: 50px; background-color:#ccc; padding: 5px;">Setor: ' . $item['SetorNome'] . '</div>
-		<br>
-		<table style="width:100%; border-collapse: collapse;">
-			<tr>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Patrimônio</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:30%">Produto</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:28%">Categoria</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">1ª Contagem</th>
-				<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">2ª Contagem</th>
-			</tr>
-		';
 
 		$iCategoria = $item['InvenCategoria'];
 		$iSetor = $item['InXSeSetor'];
@@ -146,27 +137,47 @@ try {
 				WHERE ProduUnidade = " . $item['InvenUnidade'] . " and ProduStatus = 1 and
 					  MovimDestinoSetor = $iSetor and SituaChave = 'LIBERADO'
 				 ";
-		if ($icategoria){
+		if ($iCategoria){
 			$sql .= " and ProduCategoria = " . $iCategoria;
-		}				 
+		}	
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+		$count = count($rowProdutos);
 
-		foreach ($rowProdutos as $itemProduto) {
-
-			$html .= "
+		if ($count){
+			$html .= '
+			<br>
+			<div style="font-weight: bold; position:relative; margin-top: 50px; background-color:#ccc; padding: 5px;">Setor: ' . $item['SetorNome'] . '</div>
+			<br>
+			<table style="width:100%; border-collapse: collapse;">
 				<tr>
-					<td style='padding-top: 8px;'>" . formatarNumero($itemProduto['PatriNumero']) . "</td>
-					<td style='padding-top: 8px;'>" . $itemProduto['ProduNome'] . "</td>
-					<td style='padding-top: 8px;'>" . $itemProduto['UnMedSigla'] . "</td>
-					<td style='padding-top: 8px;'>" . $itemProduto['CategNome'] . "</td>
-					<td style='padding-top: 8px;'>__________________</td>
-					<td style='padding-top: 8px;'>__________________</td>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:10%">Patrimônio</th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:30%">Produto</th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:8%">Unidade</th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:28%">Categoria</th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:12%">1ª Contagem</th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:1%"></th>
+					<th style="text-align: left; border-bottom: 1px solid #333; padding-top: 7px; padding-bottom: 7px; width:11%">2ª Contagem</th>
 				</tr>
-			";
+			';
+	
+			foreach ($rowProdutos as $itemProduto) {
+	
+				$html .= "
+					<tr>
+						<td style='padding-top: 8px;'>" . formatarNumero($itemProduto['PatriNumero']) . "</td>
+						<td style='padding-top: 8px;'>" . $itemProduto['ProduNome'] . "</td>
+						<td style='padding-top: 8px;'>" . $itemProduto['UnMedSigla'] . "</td>
+						<td style='padding-top: 8px;'>" . $itemProduto['CategNome'] . "</td>
+						<td style='padding-top: 8px; border-bottom: 1px solid #666;'></td>
+						<td></td>
+						<td style='padding-top: 8px; border-bottom: 1px solid #666;'></td>
+					</tr>
+				";
+			}
+	
+			$html .= "</table>";	
 		}
-
-		$html .= "</table>";
 	}
 
 	$html .= '			
