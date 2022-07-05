@@ -25,7 +25,7 @@ if(isset($_POST['inputNomePersonalizado'])){
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Classificação do Atendimento incluído!!!";
+		$_SESSION['msg']['mensagem'] = "Classificação do Atendimento incluída!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {		

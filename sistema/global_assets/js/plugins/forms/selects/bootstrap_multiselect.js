@@ -405,7 +405,7 @@
             maxHeight: false,
             includeSelectAllOption: false,
             includeSelectAllIfMoreThan: 0,
-            selectAllText: ' Select all',
+            selectAllText: ' Selecionar todos',
             selectAllValue: 'multiselect-all',
             selectAllName: false,
             selectAllNumber: true,

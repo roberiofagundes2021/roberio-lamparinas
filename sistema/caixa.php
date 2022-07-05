@@ -6,17 +6,80 @@ $_SESSION['PaginaAtual'] = 'Caixa';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT CaixaId,CaixaNome,CaixaConta,CaixaOperador,CaixaStatus,UsuarNome,CnBanNome,SituaNome, SituaCor, SituaChave
-       FROM Caixa
-       JOIN ContaBanco on CnBanId = CaixaConta
-       JOIN Usuario on UsuarId = CaixaOperador
-       JOIN Situacao on SituaId = CaixaStatus
-	   WHERE CaixaUnidade = ". $_SESSION['UnidadeId'] ."
-	   ORDER BY CaixaNome ASC";
-	
+//Essa consulta é para preencher a grid
+$sql = "SELECT CaixaId, CaixaNome, CaixaStatus, SituaNome, SituaCor, SituaChave
+		FROM Caixa
+		JOIN Situacao on SituaId = CaixaStatus
+	    WHERE CaixaUnidade = ". $_SESSION['UnidadeId'] ."
+		ORDER BY CaixaNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
+
+//Se estiver editando
+if(isset($_POST['inputCaixaId']) && $_POST['inputCaixaId']){
+
+	//Essa consulta é para preencher o campo Nome com a caixa a ser editar
+	$sql = "SELECT CaixaId, CaixaNome
+			FROM Caixa
+			WHERE CaixaId = " . $_POST['inputCaixaId'];
+	$result = $conn->query($sql);
+	$rowCaixa = $result->fetch(PDO::FETCH_ASSOC);
+		
+	$_SESSION['msg'] = array();
+} 
+
+//Se estiver gravando (inclusão ou edição)
+if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5) == 'GRAVA'){
+
+	try{
+
+		//Edição
+		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
+			
+			$sql = "UPDATE Caixa SET CaixaNome = :sNome, CaixaUsuarioAtualizador = :iUsuarioAtualizador
+					WHERE CaixaId = :iCaixa";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iCaixa' => $_POST['inputCaixaId']
+							));
+	
+			$_SESSION['msg']['mensagem'] = "Caixa alterada!!!";
+	
+		} else { //inclusão
+		
+			$sql = "INSERT INTO Caixa (CaixaNome, CaixaStatus, CaixaUsuarioAtualizador, CaixaUnidade)
+					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$result = $conn->prepare($sql);
+					
+			$result->execute(array(
+							':sNome' => $_POST['inputNome'],
+							':bStatus' => 1,
+							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+							':iUnidade' => $_SESSION['UnidadeId'],
+							));
+	
+			$_SESSION['msg']['mensagem'] = "Caixa incluído!!!";
+					
+		}
+	
+		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['tipo'] = "success";
+					
+	} catch(PDOException $e) {
+		
+		$_SESSION['msg']['titulo'] = "Erro";
+		$_SESSION['msg']['mensagem'] = "Erro reportado com o caixa!!!";
+		$_SESSION['msg']['tipo'] = "error";	
+		
+		echo 'Error: ' . $e->getMessage();
+	}
+
+	irpara("caixa.php");
+}
 
 ?>
 
@@ -33,18 +96,23 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-
+	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	<!-- /theme JS files -->	
+
+	<!-- Não permite que o usuário retorne para o EDITAR -->
+	<script src="global_assets/js/lamparinas/stop-back.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 	
 	<script type="text/javascript">
 
-		$(document).ready(function (){
-			
-			/* Início: Tabela Personalizada */
+		$(document).ready(function (){	
 			$('#tblCaixa').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
@@ -52,28 +120,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   //Caixa
-					width: "30%",
+					width: "80%",
 					targets: [0]
-				},	
-				{
-					orderable: true,   //Conta
-					width: "30%",
-					targets: [1]
-				},
-                {
-					orderable: true,   //Usuário
-					width: "30%",
-					targets: [2]
 				},
 				{ 
 					orderable: true,   //Situação
-					width: "5%",
-					targets: [3]
+					width: "10%",
+					targets: [1]
 				},
 				{ 
 					orderable: false,   //Ações
-					width: "5%",
-					targets: [4]
+					width: "10%",
+					targets: [2]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -101,11 +159,53 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			_componentSelect2();
 			
-			/* Fim: Tabela Personalizada */				
+			/* Fim: Tabela Personalizada */
+
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+				
+				var inputNomeNovo = $('#inputNome').val();
+				var inputNomeVelho = $('#inputCaixaNome').val();
+				var inputEstadoAtual = $('#inputEstadoAtual').val();
+				
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNomeNovo.trim();
+				
+				//Se o usuário preencheu com espaços em branco ou não preencheu nada
+				if (inputNome == ''){
+					$('#inputNome').val('');
+					$("#formCaixa").submit();
+				} else {
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "caixaValida.php",
+						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
+						success: function(resposta){
+
+							if(resposta == 1){
+								alerta('Atenção','Esse registro já existe!','error');
+								return false;
+							}
+
+							if (resposta == 'EDITA'){
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
+							} else{
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
+							}
+							
+							$( "#formCaixa" ).submit();
+						}
+					})
+				}
+			})				
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaCaixa(Permission, CaixaId,CaixaNome, CaixaStatus, Tipo){
+		function atualizaCaixa(Permission, CaixaId, CaixaNome, CaixaStatus, Tipo){
 		
 			if (Permission == 1){
 				document.getElementById('inputCaixaId').value = CaixaId;
@@ -113,17 +213,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				document.getElementById('inputCaixaStatus').value = CaixaStatus;
 						
 				if (Tipo == 'edita'){	
-					document.formCaixa.action = "caixaEdita.php";		
+					document.getElementById('inputEstadoAtual').value = "EDITA";
+					document.formCaixa.action = "caixa.php";		
 				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formCaixa, "Tem certeza que deseja excluir esse Caixa?", "caixaExclui.php");
+					confirmaExclusao(document.formCaixa, "Tem certeza que deseja excluir essa caixa?", "caixaExclui.php");
 				} else if (Tipo == 'mudaStatus'){
 					document.formCaixa.action = "caixaMudaSituacao.php";
 				}
-				
+			
 				document.formCaixa.submit();
 			} else{
 				alerta('Permissão Negada!','');
 			}
+		
 		}		
 			
 	</script>
@@ -154,32 +256,47 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação dos Caixas</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="subcategoria.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
-								<div class="row">
-									<div class="col-lg-9">
-										<p class="font-size-lg">A relação abaixo faz referência aos Caixas da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+
+								<form name="formCaixa" id="formCaixa" method="post" class="form-validate-jquery">
+
+									<input type="hidden" id="inputCaixaId" name="inputCaixaId" value="<?php if (isset($_POST['inputCaixaId'])) echo $_POST['inputCaixaId']; ?>" >
+									<input type="hidden" id="inputCaixaNome" name="inputCaixaNome" value="<?php if (isset($_POST['inputCaixaNome'])) echo $_POST['inputCaixaNome']; ?>" >
+									<input type="hidden" id="inputCaixaStatus" name="inputCaixaStatus" >
+									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
+
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="inputNome">Nome do Caixa <span class="text-danger"> *</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Caixa" value="<?php if (isset($_POST['inputCaixaId'])) echo $rowCaixa['CaixaNome']; ?>" required autofocus>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group" style="padding-top:25px;">
+												<?php
+
+													//editando
+													if (isset($_POST['inputCaixaId'])){
+														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
+														print('<a href="caixa.php" class="btn btn-basic" role="button">Cancelar</a>');
+													} else{ //inserindo
+														print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
+													}
+
+												?>
+											</div>
+										</div>
 									</div>
-									<div class="col-lg-3">	
-										<div class="text-right"><a href="caixaNovo.php" class="btn btn-principal" role="button">Novo Caixa</a></div>
-									</div>
-								</div>
+								</form>
 							</div>
 							
 							<table id="tblCaixa" class="table">
 								<thead>
 									<tr class="bg-slate">
 										<th>Caixa</th>
-										<th>Conta</th>
-                                        <th>Operador</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -188,24 +305,22 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<?php
 									foreach ($row as $item){
 										
-										$situacao = $item['SituaNome'];
+										$situacao = $item['CaixaStatus'] == 1 ? 'Ativo' : 'Inativo';
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
 										
 										print('
 										<tr>
 											<td>'.$item['CaixaNome'].'</td>
-											<td>'.$item['CnBanNome'].'</td>
-											<td>'.$item['UsuarNome'].'</td>
 											');
 										
-										print('<td><a href="#" onclick="atualizaCaixa(1,'.$item['CaixaId'].', \''.$item['CaixaNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										print('<td><a href="#" onclick="atualizaCaixa(1,'.$item['CaixaId'].', \''.addslashes($item['CaixaNome']).'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCaixa('.$atualizar.','.$item['CaixaId'].', \''.$item['CaixaNome'].'\','.$item['CaixaStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCaixa('.$excluir.','.$item['CaixaId'].', \''.$item['CaixaNome'].'\','.$item['CaixaStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<a href="#" onclick="atualizaCaixa(1,'.$item['CaixaId'].', \''.addslashes($item['CaixaNome']).'\','.$item['CaixaStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaCaixa(1,'.$item['CaixaId'].', \''.addslashes($item['CaixaNome']).'\','.$item['CaixaStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>
@@ -222,12 +337,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				</div>				
 				
 				<!-- /info blocks -->
-				
-				<form name="formCaixa" method="post">
-					<input type="hidden" id="inputCaixaId" name="inputCaixaId" >
-					<input type="hidden" id="inputCaixaNome" name="inputCaixaNome" >
-					<input type="hidden" id="inputCaixaStatus" name="inputCaixaStatus" >
-				</form>
 
 			</div>
 			<!-- /content area -->

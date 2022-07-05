@@ -216,7 +216,7 @@ if (isset($_POST['inputData'])) {
 
 			$destinoChave = '';
 
-			if ($rowSituacao['SituaChave'] == 'AGUARDANDOLIBERACAO') $destinoChave = 'CENTROADMINISTRATIVO';
+			if ($rowSituacao['SituaChave'] == 'AGUARDANDOLIBERACAOCENTRO') $destinoChave = 'CENTROADMINISTRATIVO';
 			if ($rowSituacao['SituaChave'] == 'PENDENTE') $destinoChave = 'ALMOXARIFADO';
 
 			if ($rowSituacao['SituaChave'] != 'LIBERADO') {
@@ -1488,8 +1488,8 @@ if (isset($_POST['inputData'])) {
 													print('<option value="#">Selecione</option>');
 
 													foreach ($row as $item) {
-														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
-															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAO') {
+														if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCENTRO' || $item['SituaChave'] == 'PENDENTE' || $item['SituaChave'] == 'LIBERADO') {
+															if ($item['SituaChave'] == 'AGUARDANDOLIBERACAOCENTRO') {
 																print('<option value="' . $item['SituaId'] . '" selected>' . $item['SituaNome'] . '</option>');
 															} else {
 																print('<option value="' . $item['SituaId'] . '">' . $item['SituaNome'] . '</option>');
