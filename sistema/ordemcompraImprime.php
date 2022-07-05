@@ -8,17 +8,17 @@ use Mpdf\Mpdf;
 
 require_once 'global_assets/php/vendor/autoload.php';
 
-$iFluxoOperacional = $_POST['inputOrdemCompraFlOpeId'];
+$iFluxoOperacional = isset($_POST['inputOrdemCompraFlOpeId'])?$_POST['inputOrdemCompraFlOpeId']:null;
 
 if (isset($_POST['inputOrdemCompraId'])){
 	$iOrdemCompra = $_POST['inputOrdemCompraId'];
 } else{
 	print('<script>
 				window.close();
-		   </script> ');
+		   </script>');
 }
 
-$sql = "SELECT OrComTipo, OrComNumero, OrComDtEmissao, OrComLote, OrComNumAta, OrComNumProcesso, 
+$sql = "SELECT OrComTipo, OrComNumero, OrComFluxoOperacional, OrComDtEmissao, OrComLote, OrComNumAta, OrComNumProcesso, 
 		OrComConteudoInicio, OrComConteudoFim, ForneCnpj, ForneNome, ForneCelular, ForneEmail, CategNome, FlOpeNumContrato
 		FROM OrdemCompra
 		JOIN Fornecedor on ForneId = OrComFornecedor
@@ -27,6 +27,8 @@ $sql = "SELECT OrComTipo, OrComNumero, OrComDtEmissao, OrComLote, OrComNumAta, O
 		WHERE OrComUnidade = ". $_SESSION['UnidadeId'] ." and OrComId = ".$iOrdemCompra;
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
+
+$iFluxoOperacional = $iFluxoOperacional?$iFluxoOperacional:$row['OrComFluxoOperacional'];
 
 $sql = "SELECT ParamEmpresaPublica
 		FROM Parametro
