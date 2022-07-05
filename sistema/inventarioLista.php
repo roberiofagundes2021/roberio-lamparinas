@@ -59,20 +59,19 @@ try {
 		$iCategoria = $item['InvenCategoria'];
 		$iLocal = $item['InXLELocal'];
 
-		$sql = "SELECT Distinct ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, 
+		$sql = "SELECT Distinct ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal,
 				dbo.fnSaldoEstoque(" . $item['InvenUnidade'] . ", ProduId, 'P', MovimDestinoLocal) as Saldo, 
 				LcEstNome
 				FROM Produto
 				LEFT JOIN Categoria on CategId = ProduCategoria
 				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
-				LEFT JOIN Patrimonio on PatriId = MvXPrPatrimonio
 				JOIN Movimentacao on MovimId = MvXPrMovimentacao
 				LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 				LEFT JOIN Setor on SetorId = MovimDestinoSetor
 				JOIN Situacao on SituaId = MovimSituacao
 				WHERE ProduUnidade = " . $item['InvenUnidade'] . " and ProduStatus = 1 and
-					  MovimDestinoLocal = (" . $iLocal . ") and SituaChave = 'LIBERADO'
+					  MovimDestinoLocal = (" . $iLocal . ") and SituaChave in ('LIBERADO', 'LIBERADOCONTABILIDADE')
 				 ";
 		if ($iCategoria){
 			$sql .= " and ProduCategoria = " . $iCategoria;
@@ -102,7 +101,7 @@ try {
 	
 				$html .= "
 					<tr>
-						<td style='padding-top: 8px;'>" . formatarNumero($itemProduto['PatriNumero']) . "</td>
+						<td style='padding-top: 8px;'></td>
 						<td style='padding-top: 8px;'>" . $itemProduto['ProduNome'] . "</td>
 						<td style='padding-top: 8px;'>" . $itemProduto['UnMedSigla'] . "</td>
 						<td style='padding-top: 8px;'>" . $itemProduto['CategNome'] . "</td>
