@@ -48,7 +48,8 @@ try{
 				],
 				'identify' => [
 					'situacao' => $item['SituaChave'],
-					'iAtendimento' => $item['AtendId']
+					'iAtendimento' => $item['AtendId'],
+					'sObservacao' => $item['AtendObservacao']
 				]
 			]);
 		}
@@ -65,14 +66,27 @@ try{
 	} elseif ($tipoRequest === 'MUDARSITUACAO'){
 		$iAtendimento = $_POST['iAtendimento'];
 		$iSituacao = $_POST['iSituacao'];
+		$sObservacao = $_POST['sObservacao'];
 	
-		$sql = "UPDATE Atendimento set AtendSituacao = $iSituacao WHERE AtendId = $iAtendimento";
+		$sql = "UPDATE Atendimento set AtendSituacao = $iSituacao, AtendObservacao = '$sObservacao'
+		WHERE AtendId = $iAtendimento";
 		$result = $conn->query($sql);
 
 		echo json_encode([
 			'titulo' => 'Alterar Situação',
 			'tipo' => 'success',
 			'menssagem' => 'Situação alterada com sucesso!!!',
+		]);
+	} elseif ($tipoRequest == 'EXCLUI'){
+		$iAtendimento = $_POST['iAtendimento'];
+	
+		$sql = "DELETE FROM Atendimento WHERE AtendId = $iAtendimento";
+		$result = $conn->query($sql);
+
+		echo json_encode([
+			'titulo' => 'Excluir atendimento',
+			'tipo' => 'success',
+			'menssagem' => 'Atendimento excluido com sucesso!!!',
 		]);
 	}
 }catch(PDOException $e) {
@@ -81,6 +95,7 @@ try{
 		case 'ATENDIMENTOS': $msg = 'Erro ao carregar atendimentos';break;
 		case 'SITUACOES': $msg = 'Erro ao carregar situações';break;
 		case 'MUDARSITUACAO': $msg = 'Erro ao atualizar situação do atendimentos';break;
+		case 'EXCLUI': $msg = 'Erro ao excluir atendimento';break;
 		default: $msg = 'Erro ao executar ação';break;
 	}
 	echo json_encode([

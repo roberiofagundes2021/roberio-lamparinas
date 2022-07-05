@@ -156,17 +156,20 @@ include('global_assets/php/conexao.php');
 				data:{
 					'tipoRequest': 'MUDARSITUACAO',
 					'iAtendimento': $('#iAtendimento').val(),
-					'iSituacao': $('#cmbSituacao').val()
+					'iSituacao': $('#cmbSituacao').val(),
+					'sObservacao': $('#observacaoModal').val()
 				},
 				success: function(response) {
 					alerta(response.titulo, response.menssagem, response.tipo);
 					$('#iAtendimento').val('')
+					$('#observacaoModal').val('')
 					$('#page-modal-situacao').fadeOut(200);
 					getAtendimentos();
 				},
 				error: function(response) {
 					alerta(response.titulo, response.menssagem, response.tipo);
 					$('#iAtendimento').val('')
+					$('#observacaoModal').val('')
 					$('#page-modal-situacao').fadeOut(200);
 					getAtendimentos();
 				}
@@ -194,9 +197,9 @@ include('global_assets/php/conexao.php');
 					response.forEach(item => {
 						rowNode = table.row.add(item.data).draw().node()
 						$(rowNode).attr('class', 'text-center')
-						$(rowNode).attr('data-atendimento', item.identify.iAtendimento)
 						$(rowNode).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						$(rowNode).find('td:eq(7)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+						$(rowNode).find('td:eq(7)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})
 				}
 			});
@@ -210,12 +213,19 @@ include('global_assets/php/conexao.php');
 					'tipoRequest': 'SITUACOES'
 				},
 				success: function(response) {
-					$('#iAtendimento').val($(element).data('atendimento'))
 					$('#cmbSituacao').empty()
+					// primeiro limpa os valores para adicionar novos evitando duplicação
+					$('#cmbSituacao').empty()
+					$('#iAtendimento').val('')
+					$('#observacaoModal').val('')
+
 					response.forEach(item => {
 						let opt = item.SituaChave === situacao? `<option selected value="${item.SituaId}">${item.SituaNome}</option>`:`<option value="${item.SituaId}">${item.SituaNome}</option>`
 						$('#cmbSituacao').append(opt)
 					})
+					$('#iAtendimento').val($(element).data('atendimento'))
+					$('#observacaoModal').val($(element).data('observacao'))
+
 					$('#page-modal-situacao').fadeIn(200);
 				}
 			});
@@ -296,24 +306,40 @@ include('global_assets/php/conexao.php');
                 <div id="page-modal-situacao" class="custon-modal">
                     <div class="custon-modal-container" style="max-width: 300px;">
                         <div class="card custon-modal-content">
-                            <div class="custon-modal-title mb-2">
-                                <p class="h3">Dados Produto</p>
+                            <div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+                                <p class="h5">Situação do Atendimento</p>
                                 <i id="modal-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
                             </div>
-							<form id="editaSituacao" name="incluirProduto" method="POST" class="form-validate-jquery">
-								<div class="px-3 ">
-									<div class="d-flex flex-row ">
-										<div class="col-lg-12">
-											<label for="cmbSituacao">Situação <span class="text-danger">*</span></label>
+							<div class="px-0">
+								<div class="d-flex flex-row">
+									<div class="col-lg-12">
+										<form id="editaSituacao" name="alterarSituacao" method="POST" class="form-validate-jquery">
 											<div class="form-group">
-												<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" required>
-													<!--  -->
-												</select>
+												<div class="col-lg-12 mt-2">
+													<div class="col-lg-12">
+														<label for="cmbSituacao">Situação <span class="text-danger">*</span></label>
+													</div>
+													<div class="col-lg-12">
+														<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" required>
+															<!--  -->
+														</select>
+													</div>
+												</div>
+												<div class="col-lg-12 mt-4">
+													<!-- titulos -->
+													<div class="col-lg-12">
+														<label>Observação <span class="text-danger">*</span></label>
+													</div>
+
+													<!-- campos -->
+													<div class="col-lg-12">
+														<textarea id="observacaoModal" name="observacaoModal" class="form-control" placeholder="Observações"></textarea>
+													</div>
+												</div>
 											</div>
-										</div>
+										</form>
 									</div>
 								</div>
-							</form>
 							<div class="text-right m-2"><button id="mudarSituacao" class="btn btn-principal" role="button">Confirmar</button></div>
                         </div>
                     </div>
