@@ -20,7 +20,7 @@ if (isset($_SESSION['EmpresaId'])){
 	$_SESSION['UC'] = 'Usuario';
 }
 
-$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPId, EXUXPStatus, PerfiNome, PerfiChave, 
+$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarCelular, EXUXPId, EXUXPStatus, PerfiNome, PerfiChave, 
                EmpreNomeFantasia, SituaNome, SituaChave, SituaCor, UsXUnOperadorCaixa
 		FROM Usuario
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -257,9 +257,13 @@ $unidadeUser = $resultUnidade->fetch(PDO::FETCH_ASSOC);
 										<th>Login</th>
 										<th>CPF</th>
 										<th>Perfil</th>
-										<?php if (!isset($_SESSION['EmpresaId'])){ ?>
-										<th>Operador de Caixa</th>
-										<?php } ?>
+										<?php 
+											if (!isset($_SESSION['EmpresaId'])){
+												print('<th>Operador de Caixa</th>');
+										 	} else {
+												print('<th>Celular</th>');
+											}
+										?>
 										<th>Situação</th>										
 										<th class="text-center">Ações</th>
 									</tr>
@@ -281,7 +285,9 @@ $unidadeUser = $resultUnidade->fetch(PDO::FETCH_ASSOC);
 											<td>'.$item['PerfiNome'].'</td>');
 											if (!isset($_SESSION['EmpresaId'])){ 
 												print('<td class="text-center">'. $operadorCaixa .'</td>');
-											} 
+											} else{
+												print('<td>'.$item['UsuarCelular'].'</td>');
+											}
 										if ($_SESSION['UsuarId'] != $item['UsuarId']) {
 											print('<td><a href="#" onclick="atualizaUsuario(1,'.$item['UsuarId'].', \''.$item['UsuarNome'].'\', \''.$item['SituaChave'].'\', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										} else {

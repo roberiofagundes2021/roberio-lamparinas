@@ -304,7 +304,7 @@ include_once("topo.php");
 											<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo formatarCPF_Cnpj($row['UsuarCpf']); ?>" required readOnly>
 										</div>
 									</div>
-									<div class="col-lg-3">
+									<div class="col-lg-4">
 										<div class="form-group">
 											<label for="inputNome">Nome<span class="text-danger"> *</span></label>
 											<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['UsuarNome']; ?>" required>
@@ -333,13 +333,12 @@ include_once("topo.php");
 										</div>
 									</div>
 									<?php if (!isset($_SESSION['EmpresaId'])){ ?>
-									<div class="col-lg-3" style="margin-top: auto; margin-bottom: auto;">
+									<div class="col-lg-4" style="margin-top: auto; margin-bottom: auto;">
 										<div class="custom-control custom-checkbox">
 											<input type="checkbox" class="custom-control-input" value="1" id="inputVisualisaResumoFinanceiro" name="inputVisualisaResumoFinanceiro" <?php echo isset($row['UsXUnResumoFinanceiro']) && $row['UsXUnResumoFinanceiro'] ? 'checked' : ''; ?>>
 											<label class="custom-control-label" for="inputVisualisaResumoFinanceiro">Resumo Financeiro Visível</label>
 										</div>
-									</div>
-									<div class="col-lg-2" style="margin-top: auto; margin-bottom: auto;">
+
 										<div class="custom-control custom-checkbox">
 											<input type="checkbox" class="custom-control-input" value="1" id="inputOperadorCaixa" name="inputOperadorCaixa" <?php echo isset($row['UsXUnOperadorCaixa']) && $row['UsXUnOperadorCaixa'] ? 'checked' : ''; ?>>
 											<label class="custom-control-label" for="inputOperadorCaixa">Operador de Caixa</label>
