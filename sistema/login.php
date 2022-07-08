@@ -75,7 +75,7 @@ if(isset($_POST['usuario'])){
 			$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";
 		} else {
 				if(!$newUser) {
-					$sql = "SELECT UsuarId, UsuarNome, UsuarLogin, UnidaId, UnidaNome, UsuarResumoFinanceiro, EmpreId, EmpreNomeFantasia, EmpreFoto,
+					$sql = "SELECT UsuarId, UsuarNome, UsuarLogin, UnidaId, UnidaNome, UsXUnResumoFinanceiro, EmpreId, EmpreNomeFantasia, EmpreFoto,
 							PerfiChave
 							FROM UsuarioXUnidade
 							JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
@@ -99,7 +99,7 @@ if(isset($_POST['usuario'])){
 					$_SESSION['UnidadeId'] = $rowUnidade['UnidaId'];
 					$_SESSION['UnidadeNome'] = $rowUnidade['UnidaNome'];
 					$_SESSION['PerfiChave'] = $rowUnidade['PerfiChave'];
-					$_SESSION['ResumoFinanceiro'] = $rowUnidade['UsuarResumoFinanceiro'];
+					$_SESSION['ResumoFinanceiro'] = $rowUnidade['UsXUnResumoFinanceiro'];
 
 					unset($_SESSION['UsuarSenha']);
 					

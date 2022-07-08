@@ -20,7 +20,7 @@ $sql = "SELECT InvenNumero, InvenCategoria, InXLELocal, LcEstNome, InvenUnidade
 $result = $conn->query($sql);
 $rowLocalEstoque = $result->fetchAll(PDO::FETCH_ASSOC);
 
-$sql = "SELECT InvenNumero, InvenCategoria, InvenObservacao, InvenUnidade, CategNome, InXSeSetor, SetorNome
+$sql = "SELECT InvenNumero, InvenClassificacao, InvenCategoria, InvenObservacao, InvenUnidade, CategNome, InXSeSetor, SetorNome
 		 FROM Inventario
 		 JOIN InventarioXSetor on InXSeInventario = InvenId
 		 JOIN Setor on SetorId = InXSeSetor
@@ -119,6 +119,7 @@ try {
 	foreach ($rowSetor as $item) {
 
 		$iCategoria = $item['InvenCategoria'];
+		$iClassificacao = $item['InvenClassificacao'];
 		$iSetor = $item['InXSeSetor'];
 
 		$sql = "SELECT ProduCodigo, ProduNome, UnMedSigla, CategNome, ProduCustoFinal, PatriNumero, 
@@ -137,8 +138,13 @@ try {
 					  MovimDestinoSetor = $iSetor and SituaChave = 'LIBERADO'
 				 ";
 		if ($iCategoria){
-			$sql .= " and ProduCategoria = " . $iCategoria;
-		}	
+			$sql .= " and ProduCategoria = " . $iCategoria; 
+		}
+		
+		if ($iClassificacao){
+			$sql .= " and MvXPrClassificacao = " . $iClassificacao; 
+		}
+
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 		$count = count($rowProdutos);
