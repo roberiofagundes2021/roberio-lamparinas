@@ -17,10 +17,11 @@ if (isset($_POST['inputUsuarioId'])) {
 	$iUsuario = $_POST['inputUsuarioId'];
 
 	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, 
-			UsuarTelefone, UsuarCelular, UsuarResumoFinanceiro, EXUXPId, EXUXPPerfil, PerfiChave
+			UsuarTelefone, UsuarCelular, EXUXPId, EXUXPPerfil, PerfiChave, UsXUnResumoFinanceiro, UsXUnOperadorCaixa
 			FROM Usuario
 			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 			JOIN Perfil on PerfiId = EXUXPPerfil
+			LEFT JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
 			WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -55,8 +56,10 @@ if (isset($_POST['inputCpf'])) {
 
 		$visibilidadeResumoFinanceiro = isset($_POST['inputVisualisaResumoFinanceiro']) ? true : false;
 
+		$operadorCaixa = isset($_POST['inputOperadorCaixa']) ? true : false;
+
 		$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, UsuarSenha = :sSenha, UsuarEmail = :sEmail, 
-								   UsuarTelefone = :sTelefone, UsuarCelular = :sCelular, UsuarResumoFinanceiro = :bResumoFinanceiro
+								   UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
 				WHERE UsuarId = :iUsuario";
 		$result = $conn->prepare($sql);
 
@@ -67,7 +70,6 @@ if (isset($_POST['inputCpf'])) {
 			':sEmail' => $_POST['inputEmail'],
 			':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
 			':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
-			':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
 			':iUsuario' => $_POST['inputUsuarioId']
 		));
 
@@ -91,7 +93,7 @@ if (isset($_POST['inputCpf'])) {
 			$rowPerfilChave = $result->fetch(PDO::FETCH_ASSOC);
 
 			//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
-			$sql = "UPDATE UsuarioXUnidade SET UsXUnSetor = :iSetor, UsXUnLocalEstoque = :iLocalEstoque, UsXUnUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE UsuarioXUnidade SET UsXUnSetor = :iSetor, UsXUnLocalEstoque = :iLocalEstoque, UsXUnResumoFinanceiro = :bResumoFinanceiro, UsXUnOperadorCaixa = :bOperadorCaixa, UsXUnUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE UsXUnEmpresaUsuarioPerfil = :iEmpresaUsarioPerfil and UsXUnUnidade = :iUnidade";
 			$result = $conn->prepare($sql);
 
@@ -104,6 +106,8 @@ if (isset($_POST['inputCpf'])) {
 			$result->execute(array(
 				':iSetor' => $_POST['cmbSetor'],
 				':iLocalEstoque' => $localEstoque,
+				':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
+				':bOperadorCaixa' => $operadorCaixa,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 				':iEmpresaUsarioPerfil' => $row['EXUXPId'],
 				':iUnidade' => $_SESSION['UnidadeId']
@@ -300,13 +304,13 @@ include_once("topo.php");
 											<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo formatarCPF_Cnpj($row['UsuarCpf']); ?>" required readOnly>
 										</div>
 									</div>
-									<div class="col-lg-4">
+									<div class="col-lg-3">
 										<div class="form-group">
 											<label for="inputNome">Nome<span class="text-danger"> *</span></label>
 											<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['UsuarNome']; ?>" required>
 										</div>
 									</div>
-									<div class="col-lg-3">
+									<div class="col-lg-2">
 										<div class="form-group">
 											<label for="cmbPerfil">Perfil<span class="text-danger"> *</span></label>
 											<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2" required>
@@ -328,12 +332,20 @@ include_once("topo.php");
 											</select>
 										</div>
 									</div>
+									<?php if (!isset($_SESSION['EmpresaId'])){ ?>
 									<div class="col-lg-3" style="margin-top: auto; margin-bottom: auto;">
 										<div class="custom-control custom-checkbox">
-											<input type="checkbox" class="custom-control-input" value="1" id="inputVisualisaResumoFinanceiro" name="inputVisualisaResumoFinanceiro" <?php echo isset($row['UsuarResumoFinanceiro']) && $row['UsuarResumoFinanceiro'] ? 'checked' : ''; ?>>
+											<input type="checkbox" class="custom-control-input" value="1" id="inputVisualisaResumoFinanceiro" name="inputVisualisaResumoFinanceiro" <?php echo isset($row['UsXUnResumoFinanceiro']) && $row['UsXUnResumoFinanceiro'] ? 'checked' : ''; ?>>
 											<label class="custom-control-label" for="inputVisualisaResumoFinanceiro">Resumo Financeiro Visível</label>
 										</div>
 									</div>
+									<div class="col-lg-2" style="margin-top: auto; margin-bottom: auto;">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" value="1" id="inputOperadorCaixa" name="inputOperadorCaixa" <?php echo isset($row['UsXUnOperadorCaixa']) && $row['UsXUnOperadorCaixa'] ? 'checked' : ''; ?>>
+											<label class="custom-control-label" for="inputOperadorCaixa">Operador de Caixa</label>
+										</div>
+									</div>
+									<?php } ?>
 								</div>
 							</div>
 						</div>

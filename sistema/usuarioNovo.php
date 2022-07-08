@@ -20,13 +20,15 @@ if (isset($_POST['inputCpf'])) {
 		
 		$visibilidadeResumoFinanceiro = isset($_POST['inputVisualisaResumoFinanceiro']) ? true : false;
 
+		$operadorCaixa = isset($_POST['inputOperadorCaixa']) ? true : false;
+
 		//Se for um novo usuário que ainda não estava cadastrado em nenhuma empresa
 		if ($_POST['inputId'] == 0) {
 
 
 			//Passo1: inserir na tabela Usuario
-			$sql = "INSERT INTO Usuario (UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular, UsuarResumoFinanceiro)
-					VALUES (:sCpf, :sNome, :sLogin, :sSenha, :sEmail, :sTelefone, :sCelular, :bResumoFinanceiro)";
+			$sql = "INSERT INTO Usuario (UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, UsuarTelefone, UsuarCelular)
+					VALUES (:sCpf, :sNome, :sLogin, :sSenha, :sEmail, :sTelefone, :sCelular)";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
@@ -36,8 +38,7 @@ if (isset($_POST['inputCpf'])) {
 				':sSenha' => md5($_POST['inputSenha']),
 				':sEmail' => $_POST['inputEmail'],
 				':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
-				':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
-				':bResumoFinanceiro' => $visibilidadeResumoFinanceiro
+				':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular']
 			));
 			$LAST_ID_USUARIO = $conn->lastInsertId();
 
@@ -58,8 +59,8 @@ if (isset($_POST['inputCpf'])) {
 			if (!isset($_SESSION['EmpresaId'])){
 				
 				//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
-				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnUsuarioAtualizador)
-						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :iUsuarioAtualizador)";
+				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnResumoFinanceiro, UsXUnOperadorCaixa, UsXUnUsuarioAtualizador)
+						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :bResumoFinanceiro, :bOperadorCaixa, :iUsuarioAtualizador)";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
@@ -68,6 +69,8 @@ if (isset($_POST['inputCpf'])) {
 					':iSetor' => $_POST['cmbSetor'],
 					':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] != '' ? $_POST['cmbLocalEstoque'] : null,
 					':PermissaoPerfil' => 1,
+					':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
+					':bOperadorCaixa' => $operadorCaixa,
 					':iUsuarioAtualizador' => $_SESSION['UsuarId']
 					));
 			}
@@ -76,7 +79,7 @@ if (isset($_POST['inputCpf'])) {
 
 			//Passo1: atualizar o dados do usuário na tabela Usuario
 			$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, UsuarSenha = :sSenha, UsuarEmail = :sEmail, 
-									UsuarTelefone = :sTelefone, UsuarCelular = :sCelular, UsuarResumoFinanceiro = :bResumoFinanceiro
+									UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
 					WHERE UsuarId = :iUsuario";
 			$result = $conn->prepare($sql);
 
@@ -87,7 +90,6 @@ if (isset($_POST['inputCpf'])) {
 				':sEmail' => $_POST['inputEmail'],
 				':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
 				':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
-				':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
 				':iUsuario' => $_POST['inputId']
 			));
 
@@ -107,8 +109,8 @@ if (isset($_POST['inputCpf'])) {
 			if (!isset($_SESSION['EmpresaId'])){			
 				
 				//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
-				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnUsuarioAtualizador)
-							VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :iUsuarioAtualizador)";
+				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnResumoFinanceiro, UsXUnOperadorCaixa, UsXUnUsuarioAtualizador)
+							VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :bResumoFinanceiro, :bOperadorCaixa, :iUsuarioAtualizador )";
 				$result = $conn->prepare($sql);
 
 				$result->execute(array(
@@ -117,6 +119,8 @@ if (isset($_POST['inputCpf'])) {
 					':iSetor' => $_POST['cmbSetor'],
 					':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] != '' ? $_POST['cmbLocalEstoque'] : null,
 					':PermissaoPerfil' => 1,
+					':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
+					':bOperadorCaixa' => $operadorCaixa,
 					':iUsuarioAtualizador' => $_SESSION['UsuarId']
 					));
 			}
@@ -407,13 +411,13 @@ include_once("topo.php");
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="row">
-										<div class="col-lg-5">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputNome">Nome<span class="text-danger"> *</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbPerfil">Perfil<span class="text-danger"> *</span></label>
 												<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2" required>
@@ -434,12 +438,20 @@ include_once("topo.php");
 												</select>
 											</div>
 										</div>
+										<?php if (!isset($_SESSION['EmpresaId'])){ ?>
 										<div class="col-lg-3" style="margin-top: auto; margin-bottom: auto;">
 											<div class="custom-control custom-checkbox">
 												<input type="checkbox" class="custom-control-input" value="1" id="inputVisualisaResumoFinanceiro" name="inputVisualisaResumoFinanceiro">
 												<label class="custom-control-label" for="inputVisualisaResumoFinanceiro">Resumo Financeiro Visível</label>
 											</div>
 										</div>
+										<div class="col-lg-2" style="margin-top: auto; margin-bottom: auto;">
+											<div class="custom-control custom-checkbox">
+												<input type="checkbox" class="custom-control-input" value="1" id="inputOperadorCaixa" name="inputOperadorCaixa">
+												<label class="custom-control-label" for="inputOperadorCaixa">Operador de Caixa</label>
+											</div>
+										</div>
+										<?php } ?>
 									</div>
 								</div>
 							</div>

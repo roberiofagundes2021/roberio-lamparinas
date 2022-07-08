@@ -17,10 +17,11 @@ if (isset($_SESSION['UsuarId'])) {
 	$iUsuario = $_SESSION['UsuarId'];
 
 	$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, UsuarSenha, UsuarEmail, PerfiNome,
-			UsuarTelefone, UsuarCelular, UsuarResumoFinanceiro, EXUXPId, EXUXPPerfil, PerfiChave
+			UsuarTelefone, UsuarCelular, EXUXPId, EXUXPPerfil, PerfiChave, UsXUnResumoFinanceiro, UsXUnOperadorCaixa
 			FROM Usuario
 			JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 			JOIN Perfil on PerfiId = EXUXPPerfil
+			LEFT JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId 
 			WHERE UsuarId = $iUsuario and EXUXPEmpresa = $EmpresaId ";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -34,6 +35,8 @@ if (isset($_POST['inputNome'])) {
 
 		$conn->beginTransaction();
 
+		$visibilidadeResumoFinanceiro = isset($_POST['inputVisualisaResumoFinanceiro']) ? true : false;
+
 		$sql = "SELECT EXUXPId, UsuarSenha
 				FROM Usuario
 				JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
@@ -45,10 +48,8 @@ if (isset($_POST['inputNome'])) {
 		$senha = '';
 		$row['UsuarSenha'] == $_POST['inputSenha'] ? $senha = $_POST['inputSenha'] : $senha = md5($_POST['inputSenha']);
 
-		$visibilidadeResumoFinanceiro = isset($_POST['inputVisualisaResumoFinanceiro']) ? true : false;
-
 		$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, UsuarSenha = :sSenha, UsuarEmail = :sEmail, 
-								   UsuarTelefone = :sTelefone, UsuarCelular = :sCelular, UsuarResumoFinanceiro = :bResumoFinanceiro
+								   UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
 				WHERE UsuarId = :iUsuario";
 		$result = $conn->prepare($sql);
 
@@ -59,9 +60,20 @@ if (isset($_POST['inputNome'])) {
 			':sEmail' => $_POST['inputEmail'],
 			':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
 			':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
-			':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
 			':iUsuario' => $_SESSION['UsuarId']
 		));	
+
+		$sql = "UPDATE UsuarioXUnidade SET  UsXUnResumoFinanceiro = :bResumoFinanceiro, UsXUnUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE UsXUnEmpresaUsuarioPerfil = :iEmpresaUsarioPerfil and UsXUnUnidade = :iUnidade";
+		$result = $conn->prepare($sql);
+
+
+		$result->execute(array(	
+			':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
+			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+			':iEmpresaUsarioPerfil' => $row['EXUXPId'],
+			':iUnidade' => $_SESSION['UnidadeId']
+		));
 
 		$conn->commit();
 
@@ -195,13 +207,13 @@ include_once("topo.php");
 						<div class="row">
 							<div class="col-lg-12">
 								<div class="row">
-									<div class="col-lg-5">
+									<div class="col-lg-4">
 										<div class="form-group">
 											<label for="inputNome">Nome<span class="text-danger"> *</span></label>
 											<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['UsuarNome']; ?>" required readOnly>
 										</div>
 									</div>
-									<div class="col-lg-4">
+									<div class="col-lg-3">
 										<div class="form-group">
 											<label for="cmbPerfil">Perfil<span class="text-danger"> *</span></label>
 											<input type="text" id="cmbPerfil" name="cmbPerfil" class="form-control" value="<?php echo $row['PerfiNome']; ?>" readOnly>
@@ -209,8 +221,15 @@ include_once("topo.php");
 									</div>
 									<div class="col-lg-3" style="margin-top: auto; margin-bottom: auto;">
 										<div class="custom-control custom-checkbox">
-											<input type="checkbox" class="custom-control-input" value="1" id="inputVisualisaResumoFinanceiro" name="inputVisualisaResumoFinanceiro" <?php echo isset($row['UsuarResumoFinanceiro']) && $row['UsuarResumoFinanceiro'] ? 'checked' : ''; ?>>
+											<input type="checkbox" class="custom-control-input" value="1" id="inputVisualisaResumoFinanceiro" name="inputVisualisaResumoFinanceiro" <?php echo isset($row['UsXUnResumoFinanceiro']) && $row['UsXUnResumoFinanceiro'] ? 'checked' : ''; ?>>
 											<label class="custom-control-label" for="inputVisualisaResumoFinanceiro">Resumo Financeiro Visível</label>
+										</div>
+									</div>
+
+									<div class="col-lg-2" style="margin-top: auto; margin-bottom: auto;">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox" class="custom-control-input" value="1" id="inputOperadorCaixa" name="inputOperadorCaixa" <?php echo isset($row['UsXUnOperadorCaixa']) && $row['UsXUnOperadorCaixa'] ? 'checked' : ''; ?> disabled>
+											<label class="custom-control-label" for="inputOperadorCaixa">Operado de Caixa</label>
 										</div>
 									</div>
 								</div>

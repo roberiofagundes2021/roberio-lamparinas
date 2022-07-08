@@ -20,11 +20,13 @@ if (isset($_SESSION['EmpresaId'])){
 	$_SESSION['UC'] = 'Usuario';
 }
 
-$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPId, EXUXPStatus, PerfiNome, PerfiChave, EmpreNomeFantasia, SituaNome, SituaChave, SituaCor
+$sql = "SELECT UsuarId, UsuarCpf, UsuarNome, UsuarLogin, EXUXPId, EXUXPStatus, PerfiNome, PerfiChave, 
+               EmpreNomeFantasia, SituaNome, SituaChave, SituaCor, UsXUnOperadorCaixa
 		FROM Usuario
 		JOIN EmpresaXUsuarioXPerfil on EXUXPUsuario = UsuarId
 		JOIN Empresa on EXUXPEmpresa = EmpreId
 		JOIN Perfil on PerfiId = EXUXPPerfil
+		LEFT JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
 		JOIN Situacao on SituaId =  EXUXPStatus
 		Where EmpreId = ".$EmpresaId."
 		ORDER BY UsuarNome ASC";
@@ -100,18 +102,23 @@ $unidadeUser = $resultUnidade->fetch(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,		//Perfil
-					width: "20%",
+					width: "15%",
 					targets: [3]
 				},
 				{ 
-					orderable: true,		//Situação
-					width: "10%",
+					orderable: true,		//Operador de Caixa
+					width: "15%",
 					targets: [4]
 				},
 				{ 
-					orderable: false,		//Ações
-					width: "10%",
+					orderable: true,		//Situação
+					width: "5%",
 					targets: [5]
+				},
+				{ 
+					orderable: false,		//Ações
+					width: "5%",
+					targets: [6] 
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -250,6 +257,9 @@ $unidadeUser = $resultUnidade->fetch(PDO::FETCH_ASSOC);
 										<th>Login</th>
 										<th>CPF</th>
 										<th>Perfil</th>
+										<?php if (!isset($_SESSION['EmpresaId'])){ ?>
+										<th>Operador de Caixa</th>
+										<?php } ?>
 										<th>Situação</th>										
 										<th class="text-center">Ações</th>
 									</tr>
@@ -260,6 +270,8 @@ $unidadeUser = $resultUnidade->fetch(PDO::FETCH_ASSOC);
 										
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
+										$operadorCaixa = $item['UsXUnOperadorCaixa'] == 1 ? 'SIM' :  'NÃO';
+										
 										
 										print('
 										<tr>
@@ -267,7 +279,9 @@ $unidadeUser = $resultUnidade->fetch(PDO::FETCH_ASSOC);
 											<td>'.$item['UsuarLogin'].'</td>
 											<td>'.formatarCPF_Cnpj($item['UsuarCpf']).'</td>
 											<td>'.$item['PerfiNome'].'</td>');
-											
+											if (!isset($_SESSION['EmpresaId'])){ 
+												print('<td class="text-center">'. $operadorCaixa .'</td>');
+											} 
 										if ($_SESSION['UsuarId'] != $item['UsuarId']) {
 											print('<td><a href="#" onclick="atualizaUsuario(1,'.$item['UsuarId'].', \''.$item['UsuarNome'].'\', \''.$item['SituaChave'].'\', \''.$item['PerfiChave'].'\', '.$item['EXUXPId'].', \'mudaStatus\')"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
 										} else {

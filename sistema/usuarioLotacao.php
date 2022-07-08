@@ -50,6 +50,10 @@
 
 		try{
 
+			$visibilidadeResumoFinanceiro = isset($_POST['inputVisualisaResumoFinanceiro']) ? true : false;
+
+			$operadorCaixa = isset($_POST['inputOperadorCaixa']) ? true : false;
+
 			if (isset($_SESSION['EmpresaId'])){
 				$iUnidade = $_POST['cmbUnidade'];
 			} else{
@@ -57,8 +61,8 @@
 			}
 
 			//echo $_POST['cmbUnidade'];die;
-			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnUsuarioAtualizador)
-						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :iUsuarioAtualizador)";
+			$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnResumoFinanceiro, UsXUnOperadorCaixa, UsXUnUsuarioAtualizador)
+						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :bResumoFinanceiro, :bOperadorCaixa, :iUsuarioAtualizador)";
 			$result = $conn->prepare($sql);
 	
 			$result->execute(array(
@@ -67,6 +71,8 @@
 				':iSetor' => $_POST['cmbSetor'],
 				':iLocalEstoque' => isset($_POST['cmbLocalEstoque']) && $_POST['cmbLocalEstoque'] != '' ? $_POST['cmbLocalEstoque'] : null,
 				':PermissaoPerfil' => 1,
+				':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
+				':bOperadorCaixa' => $operadorCaixa,
 				':iUsuarioAtualizador' => $_SESSION['UsuarId']
 				));
 			
@@ -374,7 +380,7 @@
 											if (isset($_SESSION['EmpresaId'])){
 											
 												print('
-												<div class="col-lg-4">
+												<div class="col-lg-3">
 													<div class="form-group">
 														<label for="cmbUnidade">Unidade<span class="text-danger"> *</span></label>
 														<select name="cmbUnidade" id="cmbUnidade" class="form-control form-control-select2" required>
@@ -403,7 +409,7 @@
 											}
 											?>
 
-											<div class="col-lg-4">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
 													<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
@@ -427,7 +433,7 @@
 													?>
 													</select>
 												</div>
-											</div>	
+											</div>
 											
 											<?php 
 											if ($_SESSION['UsuarioPerfil'] == 'ALMOXARIFADO'){
@@ -460,8 +466,21 @@
 											<?php
 											}
 											?>
+
+											<div class="col-lg-2" style="margin-top: auto; margin-bottom: auto;">
+												<div class="custom-control custom-checkbox">
+													<input type="checkbox" class="custom-control-input" value="1" id="inputVisualisaResumoFinanceiro" name="inputVisualisaResumoFinanceiro">
+													<label class="custom-control-label" for="inputVisualisaResumoFinanceiro">Resumo Financeiro Visível</label>
+												</div>
+											</div>
+											<div class="col-lg-2" style="margin-top: auto; margin-bottom: auto;">
+												<div class="custom-control custom-checkbox">
+													<input type="checkbox" class="custom-control-input" value="1" id="inputOperadorCaixa" name="inputOperadorCaixa">
+													<label class="custom-control-label" for="inputOperadorCaixa">Operador de Caixa</label>
+												</div>
+											</div>
 									
-											<div class="col-lg-3" style="margin-top: 20px;">
+											<div class="col-lg-2" style="margin-top: 20px;">
 												<div class="form-group">
 													<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
 												</div>
