@@ -18,12 +18,24 @@ try{
 	$usuarioId = $_SESSION['UsuarId'];
 
 	if($tipoRequest == 'AGENDAMENTOS'){
+		// $sql = "SELECT AgendId,AgendDataRegistro,AgendCliente,AgendModalidade,AgendClienteResponsavel,
+		// AgendObservacao,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor
+		// FROM Agendamento
+		// JOIN AtendimentoModalidade ON AtModId = AgendModalidade
+		// JOIN Situacao ON SituaId = AgendSituacao
+		// JOIN Cliente ON ClienId = AgendCliente
+		// WHERE AgendUnidade = $iUnidade";
 		$sql = "SELECT AgendId,AgendDataRegistro,AgendCliente,AgendModalidade,AgendClienteResponsavel,
-		AgendObservacao,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor
-		FROM Agendamento
+		AgendObservacao,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
+		AgXSeServico,ProfiNome,AgXSeData,AgXSeHorario,AtLocNome, SrVenNome
+		FROM AgendamentoXServico
+		JOIN Agendamento ON AgendId = AgXSeAgendamento
 		JOIN AtendimentoModalidade ON AtModId = AgendModalidade
 		JOIN Situacao ON SituaId = AgendSituacao
 		JOIN Cliente ON ClienId = AgendCliente
+		JOIN Profissional ON ProfiId = AgXSeProfissional
+		JOIN AtendimentoLocal ON AtLocId = AgXSeAtendimentoLocal
+		JOIN ServicoVenda ON SrVenId = AgXSeServico
 		WHERE AgendUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -40,11 +52,11 @@ try{
 			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
 			array_push($array, [
 				'data' => [
-					mostraData($item['AgendDataRegistro']),
-					'14:00**',
+					mostraData($item['AgXSeData']),
+					$item['AgXSeHorario'],
 					$item['ClienNome'],
-					$item['AgendClienteResponsavel'],
-					'Procedimento**',
+					$item['ProfiNome'],
+					$item['SrVenNome'],
 					$item['AtModNome'],
 					$contato,
 					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",
@@ -62,11 +74,20 @@ try{
 	} elseif ($tipoRequest == 'SITUACOES'){
 		$sql = "SELECT SituaId,SituaNome,SituaChave,SituaStatus,SituaUsuarioAtualizador,SituaCor
 		FROM Situacao
-		WHERE SituaChave in ('AGENDADO','CONFIRMADO','CANCELADO') and ";
+		WHERE SituaChave in ('AGENDADO','CONFIRMADO','CANCELADO')";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['SituaId'],
+				'nome' => $item['SituaNome'],
+				'SituaChave' => $item['SituaChave'],
+			]);
+		}
 	
-		echo json_encode($row);
+		echo json_encode($array);
 	} elseif ($tipoRequest == 'MUDARSITUACAO'){
 		$iAgendamento = $_POST['iAgendamento'];
 		$iSituacao = $_POST['iSituacao'];
@@ -161,7 +182,7 @@ try{
 		// FROM Servico WHERE SrVenUnidade = $iUnidade";
 
 		$sql = "SELECT SrVenId,SrVenNome
-		FROM ServicoVenda WHERE SrVenUnidade = $iUnidade";
+		FROM ServicoVenda WHERE SrVenUnidade != $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];
@@ -195,7 +216,7 @@ try{
 		ProfiNumero,ProfiComplemento,ProfiBairro,ProfiCidade,ProfiEstado,ProfiContato,ProfiTelefone,
 		ProfiCelular,ProfiEmail,ProfiSite,ProfiObservacao,ProfiBanco,ProfiAgencia,ProfiConta,
 		ProfiInformacaoAdicional,ProfiStatus,ProfiUsuarioAtualizador,ProfiUnidade
-		FROM Profissional WHERE ProfiUnidade = $iUnidade";
+		FROM Profissional WHERE ProfiUnidade != $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];
@@ -356,29 +377,30 @@ try{
 
 		$iServico = $_POST['servico'];
 		$iMedico = $_POST['medico'];
-		$sData = $_POST['data'];
+		$sData = explode('/',$_POST['data']);
+		$sData = $sData[2].'-'.$sData[1].'-'.$sData[0];
 		$sHora = $_POST['hora'];
 		$iLocal = $_POST['local'];
 
 		// $sqlServico = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorCusto,SrVenUnidade
 		// FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
-		$sqlServico = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorVenda,SrVenUnidade
-		FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
-		$resultServico = $conn->query($sqlServico);
+		$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorVenda,SrVenUnidade
+		FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade != $iUnidade";
+		$resultServico = $conn->query($sql);
 		$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
 
 		// $sqlMedico = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
 		// FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
-		$sqlMedico = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
-		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
-		$resultMedico = $conn->query($sqlMedico);
+		$sql = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
+		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade != $iUnidade";
+		$resultMedico = $conn->query($sql);
 		$resultMedico = $resultMedico->fetch(PDO::FETCH_ASSOC);
 
 		// $sqlLocal = "SELECT AtLocId,AtLocNome
 		// FROM AtendimentoLocal WHERE AtLocId = $iLocal and AtLocUnidade = $iUnidade";
-		$sqlLocal = "SELECT AtLocId,AtLocNome
+		$sql = "SELECT AtLocId,AtLocNome
 		FROM AtendimentoLocal WHERE AtLocId = $iLocal and AtLocUnidade = $iUnidade";
-		$resultLocal = $conn->query($sqlLocal);
+		$resultLocal = $conn->query($sql);
 		$resultLocal = $resultLocal->fetch(PDO::FETCH_ASSOC);
 
 		$valorTotal = 0;
@@ -499,6 +521,62 @@ try{
 				break;
 			}
 		}
+	} elseif ($tipoRequest == 'SETDATAPROFISSIONAL'){
+		$iMedico = $_POST['iMedico'];
+
+		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
+		FROM ProfissionalAgenda WHERE PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$arrayData = [true];
+		foreach($row as $item){
+			$data = explode('-', $item['PrAgeData']);
+			
+			array_push($arrayData,
+			[
+				intval($data[0]),
+				intval($data[1])-1,
+				intval($data[2])
+			]);
+		}
+
+		echo json_encode([
+			'arrayData' => $arrayData,
+			'status' => 'success',
+			'titulo' => 'Data',
+			'menssagem' => 'Data do profissional selecionado!!!',
+		]);
+	} elseif ($tipoRequest == 'SETHORAPROFISSIONAL'){
+		$iMedico = $_POST['iMedico'];
+		$data = $_POST['data'];
+		$data = explode('/', $data); // dd/mm/yyyy
+		$data = $data[2].'-'.$data[1].'-'.$data[0]; // yyyy-mm-dd
+
+		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
+		FROM ProfissionalAgenda
+		WHERE PrAgeData = '$data' and PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$arrayHora = [true,];
+		foreach($row as $item){
+			$horaI = explode(':', $item['PrAgeHoraInicio']);
+			$horaF = explode(':', $item['PrAgeHoraFim']);
+			
+			array_push($arrayHora,
+			[
+				'from' => [intval($horaI[0]), intval($horaI[1])],
+				'to' => [intval($horaF[0]), intval($horaF[1])],
+			]);
+		}
+
+		echo json_encode([
+			'arrayHora' => $arrayHora,
+			'status' => 'success',
+			'titulo' => 'Data',
+			'menssagem' => 'Hora do profissional selecionado!!!',
+		]);
 	}
 }catch(PDOException $e) {
 	$msg = '';

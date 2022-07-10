@@ -47,16 +47,24 @@ if(isset($_POST['iAgendamento'])){
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<script src="global_assets/js/demo_pages/picker_date.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
     <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+	
+	<script src="global_assets/js/plugins/ui/moment/moment.min.js"></script>
+	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>
+	<script src="global_assets/js/plugins/pickers/anytime.min.js"></script>
+	<script src="global_assets/js/plugins/pickers/pickadate/picker.js"></script>
+	<script src="global_assets/js/plugins/pickers/pickadate/picker.date.js"></script>
+	<script src="global_assets/js/demo_pages/picker_date.js"></script>
+	<script src="global_assets/js/plugins/pickers/pickadate/picker.time.js"></script>
+	<script src="global_assets/js/plugins/pickers/pickadate/legacy.js"></script>
+	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
 
 	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
 	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
@@ -84,12 +92,17 @@ if(isset($_POST['iAgendamento'])){
 	
 	<script type="text/javascript" >
 		$(document).ready(function() {
+			alteraSituacao();
+			getCmbs();
+			// setDataProfissional();
+			// setHoraProfissional();
 			// se existir agendamento os dados serão preenchidos ao carregar a página
 			if(agendamento){
 				$('#data').val(agendamento.AgendDataRegistro)
 				$('#observacao').val(agendamento.AgendObservacao)
 				$('#tipoRequest').val('EDITAR')
 				checkServicos(agendamento.AgendId)
+				alteraSituacao(agendamento.SituaChave);
 			}
 
 			$('#salvarPaciente').on('click', function(e){
@@ -142,6 +155,34 @@ if(isset($_POST['iAgendamento'])){
 				});
 			})
 
+			$('#medico').on('change', function(){
+				let iMedico = $(this).val()
+
+				if(!iMedico){
+					setHoraProfissional()
+					setDataProfissional()
+					return
+				}
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAgendamento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'SETDATAPROFISSIONAL',
+						'iMedico': iMedico,
+					},
+					success: function(response) {
+						if(response.status == 'success'){
+							setDataProfissional(response.arrayData)
+							$('#dataAtendimento').focus()
+
+						} else {
+							alerta(response.titulo, response.menssagem, response.status)
+						}
+					}
+				});
+			})
+
 			$('#inserirServico').on('click', function(e){
 				e.preventDefault()
 				// vai preencher a tabela servico e inseri-lo no array de servicos
@@ -153,11 +194,11 @@ if(isset($_POST['iAgendamento'])){
 				let local = $('#localAtendimento').val()
 
 				switch(menssageError){
-					case servico: menssageError = 'informe o servico'; break;
-					case medico: menssageError = 'informe o médico'; break;
-					case data: menssageError = 'informe uma data'; break;
-					case hora: menssageError = 'informe o horário'; break;
-					case local: menssageError = 'informe o local de atendimento'; break;
+					case servico: menssageError = 'informe o servico'; $('#servico').focus();break;
+					case medico: menssageError = 'informe o médico'; $('#medico').focus();break;
+					case data: menssageError = 'informe uma data'; $('#dataAtendimento').focus();break;
+					case hora: menssageError = 'informe o horário'; $('#horaAtendimento').focus();break;
+					case local: menssageError = 'informe o local de atendimento'; $('#localAtendimento').focus();break;
 					default: menssageError = ''; break;
 				}
 
@@ -264,9 +305,6 @@ if(isset($_POST['iAgendamento'])){
 				$('#page-modal-paciente').fadeOut(200);
 			})
 		});
-
-		alteraSituacao();
-		getCmbs();
 		// essa funcao vai checar se ja exixte algo no array de servicos
 		// (para quando atualizar a página não sumir da grid)
 
@@ -304,6 +342,132 @@ if(isset($_POST['iAgendamento'])){
 					$('#servicoValorTotal').html(`VALOR TOTAL: R$ ${float2moeda(response.valorTotal)}`).show();
 					$('#dataServico').html(HTML).show();
 				}
+			});
+		}
+
+		function setHoraProfissional(array){
+			$('#modalHora').html('').show();
+			$('#modalHora').html("<input id='horaAtendimento' name='horaAtendimento' type='text' class='form-control horaAtendimento' readonly aria-haspopup='true' aria-expanded='false' aria-readonly='false' aria-owns='P1503001435_root'>").show();
+
+			// doc: https://amsul.ca/pickadate.js/time/
+			$('.horaAtendimento').pickatime({
+				// Regras
+				interval: 30,
+				disable: array?array:undefined,
+				// disable: [
+				// 	[1,30],
+				// ],
+
+				// Formats
+				format: 'HH:i',
+				formatLabel: undefined,
+				formatSubmit: undefined,
+				hiddenPrefix: undefined,
+				hiddenSuffix: '_submit',
+				
+				// Time limits
+				min: undefined,
+				max: undefined,
+				
+				// Close on a user action
+				closeOnSelect: true,
+				closeOnClear: true,
+
+				// eventos
+				onSet: function(context) {
+					// let hora = context.select
+					let data = $('#dataAtendimento').val()
+					let hora = $('#horaAtendimento').val()
+
+					// data: DD/MM/YYYY => MM/DD/YYYY
+					data = `${data.split('/')[1]}/${data.split('/')[0]}/${data.split('/')[2]}`
+
+					// dataHora: MM/DD/YYYY HH:MM:SS
+					let dataHora = `${data} ${hora}`
+
+					// somente para atribuir à variável "dataHora" um valor do tipo DataTime
+					dataHora = new Date(dataHora).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+					console.log(dataHora)
+				},
+				onStart: undefined,
+				onRender: undefined,
+				onOpen: undefined,
+				onClose: undefined,
+				onStop: undefined,
+			});
+		}
+
+		function setDataProfissional(array){
+			$('#modalData').html('').show();
+			$('#modalData').html("<input id='dataAtendimento' name='dataAtendimento' type='text' class='form-control dataAtendimento' readonly aria-haspopup='true' aria-expanded='false' aria-readonly='false' aria-owns='P1503001435_root'>").show();
+			
+			let arrayData = array?array:undefined;
+			// doc: https://amsul.ca/pickadate.js/date/#disable-dates
+			$('.dataAtendimento').pickadate({
+				// regras. OBS: a data mínima é a data atual.
+				// o mes começa em "0" ou seja: Janeiro => 0, Fevereiro => 1, etc.
+				min: undefined,
+				max: undefined,
+				disable: arrayData,
+				// disable: [true,[2022,6,20],[2022,6,22]],
+				
+				// strings
+				monthsFull: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+				monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 't', 'Out', 'Nov', 'Dez'],
+				weekdaysFull: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+				weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+
+				// botões
+				today: 'Hoje',
+				clear: '',
+				close: '',
+
+				// Labels
+				labelMonthNext: 'Seguinte',
+				labelMonthPrev: 'Anterior',
+				labelMonthSelect: 'Selecionar Mes',
+				labelYearSelect: 'Selecionar ano',
+
+				// Formats
+				format: 'dd/mm/yyyy',
+				formatSubmit: undefined,
+				hiddenPrefix: undefined,
+				hiddenSuffix: '_submit',
+				hiddenName: undefined,
+
+				// ações
+				onClose: function() {
+					$('#horaAtendimento').focus()
+				},
+				onSet: function(context) {
+					let data = new Date(context.select).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+					data = data.split(' ')[0]; // Formatando a string padrão: "dd/mm/yyyy HH:MM:SS" => "dd/mm/yyyy"
+					let iMedico = $('#medico').val();
+					console.log(data)
+					$.ajax({
+						type: 'POST',
+						url: 'filtraAgendamento.php',
+						dataType: 'json',
+						data:{
+							'tipoRequest': 'SETHORAPROFISSIONAL',
+							'data': data,
+							'iMedico': iMedico
+						},
+						success: function(response) {
+							if(response.status == 'success'){
+								setHoraProfissional(response.arrayHora)
+								$('#horaAtendimento').focus()
+							} else {
+								alerta(response.titulo, response.menssagem, response.status)
+							}
+						}
+					});
+					$('#horaAtendimento').focus()
+				},
+				onStart: undefined,
+				onRender: undefined,
+				onOpen: undefined,
+				onStop: undefined,
 			});
 		}
 
@@ -496,7 +660,7 @@ if(isset($_POST['iAgendamento'])){
 					$('#cmbSituacao').empty()
 					$('#cmbSituacao').append("<option selected value=''>selecione</option>")
 					response.forEach(item => {
-						let opt = item.SituaChave === situacao? `<option selected value="${item.SituaId}">${item.SituaNome}</option>`:`<option value="${item.SituaId}">${item.SituaNome}</option>`
+						let opt = item.SituaChave === situacao? `<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#cmbSituacao').append(opt)
 					})
 				}
@@ -582,35 +746,41 @@ if(isset($_POST['iAgendamento'])){
 									<div class="col-lg-2">
 										<label>Médicos <span class="text-danger">*</span></label>
 									</div>
-									<div class="col-lg-2">
+									<div class="col-lg-3">
 										<label>Data do Atendimento <span class="text-danger">*</span></label>
 									</div>
 									<div class="col-lg-2">
 										<label>Horário <span class="text-danger">*</span></label>
 									</div>
-									<div class="col-lg-3">
+									<div class="col-lg-2">
 										<label>Local do Atendimento <span class="text-danger">*</span></label>
 									</div>
 
 									<!-- campos -->
 									<div class="col-lg-3">
-										<select id="servico" name="servico" class="select-search">
+										<select id="servico" name="servico" class="select-search" required>
 											<!--  -->
 										</select>
 									</div>
 									<div class="col-lg-2">
-										<select id="medico" name="medico" class="select-search">
+										<select id="medico" name="medico" class="select-search" required>
 											<!--  -->
 										</select>
 									</div>
-									<div class="col-lg-2">
-										<input id="dataAtendimento" name="dataAtendimento" type="date" class="form-control">
+									<div id="modalData" class="col-lg-3">
+										<input id="dataAtendimento" name="dataAtendimento" type="text"
+										class="form-control dataAtendimento" readonly aria-haspopup="true" aria-expanded="false"
+										aria-readonly="false" aria-owns="P1503001435_root">
+										<!-- <input id="dataAtendimento" name="dataAtendimento" type="date" class="form-control" required> -->
+									</div>
+									<div id="modalHora" class="col-lg-2">
+										<input id="horaAtendimento" name="horaAtendimento" type="text"
+										class="form-control horaAtendimento" readonly 
+										aria-haspopup="true" aria-expanded="false" aria-readonly="false" aria-owns="P1503001435_root">
+										<!-- <input id="horaAtendimento" type="time" class="form-control" value="" required> -->
 									</div>
 									<div class="col-lg-2">
-										<input id="horaAtendimento" type="time" class="form-control" value="">
-									</div>
-									<div class="col-lg-3">
-										<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2">
+										<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2" required>
 											<!--  -->
 										</select>
 									</div>

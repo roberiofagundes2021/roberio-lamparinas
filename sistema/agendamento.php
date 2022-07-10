@@ -222,7 +222,7 @@ include('global_assets/php/conexao.php');
 					$('#observacaoModal').val('')
 
 					response.forEach(item => {
-						let opt = item.SituaChave === situacao? `<option selected value="${item.SituaId}">${item.SituaNome}</option>`:`<option value="${item.SituaId}">${item.SituaNome}</option>`
+						let opt = item.SituaChave === situacao? `<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#cmbSituacao').append(opt)
 					})
 					$('#iAgendamento').val($(element).data('agendamento'))
