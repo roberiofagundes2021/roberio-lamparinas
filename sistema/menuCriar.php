@@ -4,6 +4,7 @@ include_once("sessao.php");
 
 if(isset($_POST['id'])){
 	$id = $_POST['id'];
+
 	$sql = "SELECT MenuId,MenuNome,MenuUrl,MenuIco,ModulNome,MenuModulo,MenuModulo,MenuPai,MenuLevel,MenuOrdem,MenuSubMenu,MenuSetorPublico,
 	MenuSetorPrivado,MenuPosicao,MenuUsuarioAtualizador,MenuStatus
 	FROM Menu
@@ -49,59 +50,130 @@ if(isset($_POST['id'])){
         }); // document.ready
 
 		function alterar(){
+			$('#btnAlterar').attr("onclick", "")
+			$('#btnAlterar').html("Alterando... <img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px'>")
+			let msg = ''
+			let idMenu = $('#idMenu').val()
+			let tipo = 'ATUALIZAR'
+			let inputNome = $('#inputNome').val()
+			let url = $('#url').val()
+			let icone = $('#icone').val()
+			let cmbModulo = $('#cmbModulo').val()
+			let menuPai = $('#cmbMenuPai').val()
+			let nivel = $('#nivel').val()
+			let ordem = $('#ordem').val()
+			let subMenu = $('#subMenu').is(":checked")?1:0
+			let publico = $('#publico').is(":checked")?1:0
+			let privado = $('#privado').is(":checked")?1:0
+			let posicao = $('#cmbPosicao').val()
+
+			switch(msg){
+				case inputNome: msg = 'Informe nome do menu'; break;
+				case url: msg = 'Informe a URL de destino'; break;
+				case cmbModulo: msg = 'Informe o módulo que o menu irá pertencer'; break;
+				case posicao: msg = 'Informe a posição do menu'; break;
+				default: msg = ''; break;
+			}
+
+			if(msg){
+				alerta('Informação obrigatória', msg, 'error')
+				$('#btnAlterar').html("Alterar")
+				$('#btnAlterar').attr("onclick", "alterar()")
+				return
+			}
+
 			$.ajax({
 				type: 'POST',
 				url: 'menuFiltra.php',
 				dataType: 'json',
 				data:{
-					'tipo': 'ATUALIZAR',
-					'idMenu': $('#idMenu').val(),
-					'inputNome': $('#inputNome').val(),
-					'url': $('#url').val(),
-					'icone': $('#icone').val(),
-					'cmbModulo': $('#cmbModulo').val(),
-					'menuPai': $('#cmbMenuPai').val(),
-					'nivel': $('#nivel').val(),
-					'ordem': $('#ordem').val(),
-					'subMenu': $('#subMenu').is(":checked")?1:0,
-					'publico': $('#publico').is(":checked")?1:0,
-					'privado': $('#privado').is(":checked")?1:0,
-					'posicao': $('#cmbPosicao').val()
+					'tipo': tipo,
+					'idMenu': idMenu,
+					'inputNome': inputNome,
+					'url': url,
+					'icone': icone,
+					'cmbModulo': cmbModulo,
+					'menuPai': menuPai,
+					'nivel': nivel,
+					'ordem': ordem,
+					'subMenu': subMenu,
+					'publico': publico,
+					'privado': privado,
+					'posicao': posicao
 				},
 				success: function(response) {
 					alerta(response.titulo, response.menssagem, response.tipo);
+					$('#btnAlterar').html("Alterar")
+					$('#btnAlterar').attr("onclick", "alterar()")
 					window.location.href = 'menuLista.php'
 				},
 				error: function(response) {
 					alerta(response.titulo, response.menssagem, response.tipo);
+					$('#btnAlterar').html("Alterar")
+					$('#btnAlterar').attr("onclick", "alterar()")
 				}
 			});
 		}
 		function inserir(){
+			$('#btnInserir').attr('onclick', '')
+			$('#btnInserir').html("Inserindo... <img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px'>")			
+			let msg = ''
+			let tipo = 'CRIAR'
+			let inputNome = $('#inputNome').val()
+			let url = $('#url').val()
+			let icone = $('#icone').val()
+			let cmbModulo = $('#cmbModulo').val()
+			let menuPai = $('#cmbMenuPai').val()
+			let nivel = $('#nivel').val()
+			let ordem = $('#ordem').val()
+			let subMenu = $('#subMenu').is(":checked")?1:0
+			let publico = $('#publico').is(":checked")?1:0
+			let privado = $('#privado').is(":checked")?1:0
+			let posicao = $('#cmbPosicao').val()
+
+			switch(msg){
+				case inputNome: msg = 'Informe nome do menu'; break;
+				case url: msg = 'Informe a URL de destino'; break;
+				case cmbModulo: msg = 'Informe o módulo que o menu irá pertencer'; break;
+				case posicao: msg = 'Informe a posição do menu'; break;
+				default: msg = ''; break;
+			}
+
+			if(msg){
+				alerta('Informação obrigatória', msg, 'error')
+				$('#btnInserir').html('Inserir')
+				$('#btnInserir').attr('onclick', 'inserir()')
+				return
+			}
+
 			$.ajax({
 				type: 'POST',
 				url: 'menuFiltra.php',
 				dataType: 'json',
 				data:{
-					'tipo': 'CRIAR',
-					'inputNome': $('#inputNome').val(),
-					'url': $('#url').val(),
-					'icone': $('#icone').val(),
-					'cmbModulo': $('#cmbModulo').val(),
-					'menuPai': $('#cmbMenuPai').val(),
-					'nivel': $('#nivel').val(),
-					'ordem': $('#ordem').val(),
-					'subMenu': $('#subMenu').is(":checked")?1:0,
-					'publico': $('#publico').is(":checked")?1:0,
-					'privado': $('#privado').is(":checked")?1:0,
-					'posicao': $('#cmbPosicao').val()
+					'tipo': tipo,
+					'inputNome': inputNome,
+					'url': url,
+					'icone': icone,
+					'cmbModulo': cmbModulo,
+					'menuPai': menuPai,
+					'nivel': nivel,
+					'ordem': ordem,
+					'subMenu': subMenu,
+					'publico': publico,
+					'privado': privado,
+					'posicao': posicao
 				},
 				success: function(response) {
 					alerta(response.titulo, response.menssagem, response.tipo);
+					$('#btnInserir').html('Inserir')
+					$('#btnInserir').attr('onclick', 'inserir()')
 					window.location.href = 'menuLista.php'
 				},
 				error: function(response) {
 					alerta(response.titulo, response.menssagem, response.tipo);
+					$('#btnInserir').html('Inserir')
+					$('#btnInserir').attr('onclick', 'inserir()')
 				}
 			});
 		}
@@ -172,15 +244,15 @@ if(isset($_POST['id'])){
 									$MenuPai = isset($_POST['id'])?$rowMenu['MenuPai']:'';
 									$MenuLevel = isset($_POST['id'])?$rowMenu['MenuLevel']:1;
 									$MenuOrdem = isset($_POST['id'])?$rowMenu['MenuOrdem']:1;
-									$MenuSubMenu = isset($_POST['id'])?($rowMenu['MenuSubMenu']?'checked':''):'checked';
+									$MenuSubMenu = isset($_POST['id'])?($rowMenu['MenuSubMenu']?'checked':''):'';
 									$MenuSetorPublico = isset($_POST['id'])?($rowMenu['MenuSetorPublico']?'checked':''):'checked';
 									$MenuSetorPrivado = isset($_POST['id'])?($rowMenu['MenuSetorPrivado']?'checked':''):'checked';
 									$MenuPosicao = isset($_POST['id'])?$rowMenu['MenuPosicao']:'';
 									$MenuUsuarioAtualizador = isset($_POST['id'])?$rowMenu['MenuUsuarioAtualizador']:'';
 									$MenuStatus = isset($_POST['id'])?$rowMenu['MenuStatus']:1;
 
-									$optionsModulo = "<option  value=''>selecione</option>";
-									$optionsMenu = "<option  value=''>selecione</option>";
+									$optionsModulo = "<option value=''>selecione</option>";
+									$optionsMenu = "<option value=''>selecione</option>";
 									foreach($rowModuloSelect as $modulo){
 										$nome = $modulo['ModulNome'];
 										$id = $modulo['ModulId'];
@@ -196,11 +268,18 @@ if(isset($_POST['id'])){
 
 										$optionsMenu .= "<option $options value='$id'>$nome</option>";
 									}
-									$optionsPosicao = "
-									<option value=''>Selecione</option>
-									<option value='CONFIGURADOR'>CONFIGURADOR</option>
-									<option value='PRINCIPAL'>PRINCIPAL</option>
-									<option value='APOIO'>APOIO</option>";
+									$optionsPosicao = "<option value=''>Selecione</option>";
+									if(isset($_POST['id'])){
+										$optionsPosicao .= $rowMenu['MenuPosicao'] == 'CONFIGURADOR'?"<option selected value='CONFIGURADOR'>CONFIGURADOR</option>":"<option value='CONFIGURADOR'>CONFIGURADOR</option>";
+										$optionsPosicao .= $rowMenu['MenuPosicao'] == 'PRINCIPAL'?"<option selected value='PRINCIPAL'>PRINCIPAL</option>":"<option value='PRINCIPAL'>PRINCIPAL</option>";
+										$optionsPosicao .= $rowMenu['MenuPosicao'] == 'APOIO'?"<option selected value='APOIO'>APOIO</option>":"<option value='APOIO'>APOIO</option>";
+									} else {
+										$optionsPosicao = "
+										<option value=''>Selecione</option>
+										<option value='CONFIGURADOR'>CONFIGURADOR</option>
+										<option value='PRINCIPAL'>PRINCIPAL</option>
+										<option value='APOIO'>APOIO</option>";
+									}
 
 									if(isset($_POST['id'])){
 										echo "<input type='hidden' id='idMenu' name='idMenu' value='$MenuId'>";
@@ -232,7 +311,7 @@ if(isset($_POST['id'])){
 												<label for='inputNome'>Ordem</label>
 											</div>
 											<div class='col-lg-1 text-center'>
-												<label for='inputNome'>SubMenu</label>
+												<label for='inputNome'>SubMenu?</label>
 											</div>
 											<div class='col-lg-2 text-center'>
 												<label for='inputNome'>Setor Público</label>
@@ -278,7 +357,7 @@ if(isset($_POST['id'])){
 						<div class="col-lg-12">								
 							<div class="form-group">
 								<?php
-									echo isset($_POST['id'])?'<button onclick="alterar()" class="btn btn-lg btn-principal" type="submit">Alterar</button>':'<button onclick="inserir()" class="btn btn-lg btn-principal" type="submit">Inserir</button>';
+									echo isset($_POST['id'])?'<button id="btnAlterar" onclick="alterar()" class="btn btn-lg btn-principal" type="submit">Alterar</button>':'<button id="btnInserir" onclick="inserir()" class="btn btn-lg btn-principal" type="submit">Inserir</button>';
 								?>	
 								<a href="menuLista.php" class="btn btn-basic" role="button">Cancelar</a>
 							</div>

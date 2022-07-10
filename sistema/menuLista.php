@@ -2,15 +2,6 @@
 
 include_once("sessao.php");
 
-$sql = "SELECT MenuId,MenuNome,MenuUrl,MenuIco,ModulNome,MenuModulo,MenuPai,MenuLevel,MenuOrdem,MenuSubMenu,MenuSetorPublico,
-MenuSetorPrivado,MenuPosicao,MenuUsuarioAtualizador,MenuStatus
-FROM Menu
-JOIN Situacao ON SituaId = MenuStatus
-JOIN Modulo ON ModulId = MenuModulo
-WHERE SituaChave = 'ATIVO'";
-$result = $conn->query($sql);
-$rowMenu = $result->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 
 <!DOCTYPE html>
@@ -46,6 +37,8 @@ $rowMenu = $result->fetchAll(PDO::FETCH_ASSOC);
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
+		getAllMenus()
+
         $(document).ready(function() {
         	$('#tblMenu').DataTable({
 				"order": [
@@ -90,18 +83,23 @@ $rowMenu = $result->fetchAll(PDO::FETCH_ASSOC);
 					},
 					{
 						orderable: false, //Publico
-						width: "10%",
+						width: "5%",
 						targets: [7]
+					},
+					{
+						orderable: false, //Privado
+						width: "5%",
+						targets: [8]
 					},
 					{
 						orderable: false, //Posição
 						width: "10%",
-						targets: [8]
+						targets: [9]
 					},
 					{
 						orderable: false, //Ações
 						width: "5%",
-						targets: [9]
+						targets: [10]
 					}
 				],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -138,19 +136,53 @@ $rowMenu = $result->fetchAll(PDO::FETCH_ASSOC);
 			/* Fim: Tabela Personalizada */
         }); // document.ready
 
-		function atualizaMenu(tipo, id){
-			if(tipo == 'ATUALIZAR'){
-				$('#tipo').val('ATUALIZAR')
-				$('#id').val(id)
-				$('#formMenu').submit()
-			} else {
-				$('#tipo').val('EXCLUIR')
-				$('#id').val(id)
-				$('#formMenu').submit()
-			}
+		function atualizaMenu(id){
+			$('#id').val(id)
+			$('#formMenu').submit()
 		}
-    </script>	
-	
+		function excluirMenu(id){
+			$.ajax({
+				type: 'POST',
+				url: 'menuFiltra.php',
+				dataType: 'json',
+				data:{
+					'tipo': 'EXCLUIR',
+					'idMenu': id
+				},
+				success: function(response) {
+					alerta(response.titulo, response.menssagem, response.tipo);
+					getAllMenus()
+				},
+				error: function(response) {
+					alerta(response.titulo, response.menssagem, response.tipo);
+				}
+			});
+		}
+
+		function getAllMenus(){
+			// #tblMenu
+			$.ajax({
+				type: 'POST',
+				url: 'menuFiltra.php',
+				dataType: 'json',
+				data:{
+					'tipo': 'ALL'
+				},
+				success: function(response) {
+					let table = $('#tblMenu').DataTable().clear().draw()
+
+					table = $('#tblMenu').DataTable()
+					let rowNode
+
+					response.forEach(item => {
+						rowNode = table.row.add(item.data).draw().node()
+						// $(rowNode).attr('class', 'text-center')
+						// $(rowNode).find('td:eq(7)').attr('data-agendamento', `${item.identify.iAgendamento}`)
+					})
+				}
+			});
+		}
+    </script>
 </head>
 
 <body id="body" class="navbar-top">
@@ -197,45 +229,17 @@ $rowMenu = $result->fetchAll(PDO::FETCH_ASSOC);
 									<th>Ordem</th>
 									<th>SubMenu</th>
 									<th>Setor Publico</th>
+									<th>Setor Privado</th>
 									<th>Posição</th>
 									<th class="text-center">Ações</th>
 								</tr>
 							</thead>
 							<tbody>
-								<?php
-									foreach ($rowMenu as $item) {
-										$publico = $item['MenuSetorPublico']?'SIM': 'NÃO';
-										$subMenu = $item['MenuSubMenu']?'SIM': 'NÃO';
-										$atualiza = "$item[MenuId]";
-										print("
-											<tr>
-												<td>$item[MenuNome]</td>
-												<td>$item[MenuUrl]</td>
-												<td>$item[MenuIco]</td>
-												<td>$item[ModulNome]</td>
-												<td>$item[MenuLevel]</td>
-												<td>$item[MenuOrdem]</td>
-												<td>$subMenu</td>
-												<td>$publico</td>
-												<td>$item[MenuPosicao]</td>
-												<td>
-													<div class='list-icons'>
-														<div class='list-icons list-icons-extended'>
-															<a href='#' onclick='atualizaMenu(\"ATUALIZAR\",\"$atualiza\")' class='list-icons-item' data-popup='tooltip' data-placement='bottom' title='Editar Produto'><i class='icon-pencil7'></i></a>
-															<a href='#' onclick='atualizaMenu(\"EXCLUIR\",\"$atualiza\")' class='list-icons-item'  data-popup='tooltip' data-placement='bottom' title='Excluir Produto'><i class='icon-bin'></i></a>
-														</div>
-													</div>
-												</td>
-											</tr>
-										");
-									}
-								?>
 							</tbody>
 						</table>
 					</div>
 					<form name="formMenu" id="formMenu" method="post" action="menuCriar.php">
-						<input id="tipo" type="hidden" name="tipo" value="ATUALIZAR">
-						<input id="id" type="hidden" name="id" value="">
+						<input id='id' type='hidden' name='id' value=''>
 					</form>
 				</div>
 			</div>
