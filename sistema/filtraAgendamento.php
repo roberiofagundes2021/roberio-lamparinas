@@ -182,7 +182,7 @@ try{
 		// FROM Servico WHERE SrVenUnidade = $iUnidade";
 
 		$sql = "SELECT SrVenId,SrVenNome
-		FROM ServicoVenda WHERE SrVenUnidade != $iUnidade";
+		FROM ServicoVenda WHERE SrVenUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];
@@ -216,7 +216,7 @@ try{
 		ProfiNumero,ProfiComplemento,ProfiBairro,ProfiCidade,ProfiEstado,ProfiContato,ProfiTelefone,
 		ProfiCelular,ProfiEmail,ProfiSite,ProfiObservacao,ProfiBanco,ProfiAgencia,ProfiConta,
 		ProfiInformacaoAdicional,ProfiStatus,ProfiUsuarioAtualizador,ProfiUnidade
-		FROM Profissional WHERE ProfiUnidade != $iUnidade";
+		FROM Profissional WHERE ProfiUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];
@@ -405,14 +405,14 @@ try{
 		// $sqlServico = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorCusto,SrVenUnidade
 		// FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
 		$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorVenda,SrVenUnidade
-		FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade != $iUnidade";
+		FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
 		$resultServico = $conn->query($sql);
 		$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
 
 		// $sqlMedico = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
 		// FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 		$sql = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
-		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade != $iUnidade";
+		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 		$resultMedico = $conn->query($sql);
 		$resultMedico = $resultMedico->fetch(PDO::FETCH_ASSOC);
 
