@@ -250,6 +250,26 @@ try{
 		$cmbSituacao = $_POST['cmbSituacao'];
 		$servicos = $_SESSION['SERVICOS'];
 
+		foreach($servicos as $item){
+			$iMedico = $item['iMedico'];
+			$data = $item['data'];
+			$hora = $item['hora'];
+
+			$sql = "SELECT AgXSeId FROM AgendamentoXServico 
+			WHERE AgXSeData = '$data' and AgXSeHorario = '$hora' and AgXSeProfissional = '$iMedico'";
+			$result = $conn->query($sql);
+			$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+			if(COUNT($row)){
+				echo json_encode([
+					'titulo' => 'Conflito de serviço',
+					'status' => 'error',
+					'menssagem' => 'Um dos serviços já possui cadastro com o mesmo Profissional, data e horário',
+				]);
+				exit;
+			}
+		}
+
 		if(!isset($_POST['isUpdate'])){
 			$tipoRequest = 'ATTAGENDAMENTO';
 			$sql = "INSERT INTO Agendamento(AgendDataRegistro,AgendCliente,AgendModalidade,
