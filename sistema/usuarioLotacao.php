@@ -26,7 +26,7 @@
 	}
 
 	//Essa consulta é para preencher a grid usando a coluna Unidade
-	$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome, EmpreNomeFantasia
+	$sql = "SELECT UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UnidaNome, SetorNome, LcEstNome, EmpreNomeFantasia, UsXUnOperadorCaixa
 			FROM UsuarioXUnidade
 			JOIN Unidade ON UnidaId = UsXUnUnidade
 			JOIN Setor ON SetorId = UsXUnSetor
@@ -210,18 +210,23 @@
 			    columnDefs: [
 				{ 
 					orderable: true,   //Setor
-					width: "65%",
+					width: "45%",
 					targets: [0]
 				},
 				{ 
 					orderable: true,   //Local Estoque
 					width: "30%",
 					targets: [1]
+				},
+				{ 
+					orderable: true,   //Operador de Caixa
+					width: "20%",
+					targets: [2]
 				},								
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [2]
+					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -239,12 +244,12 @@
 			    columnDefs: [
 				{ 
 					orderable: true,   //Empresa
-					width: "30%",
+					width: "20%",
 					targets: [0]
 				},
 				{ 
 					orderable: true,   //Unidade
-					width: "30%",
+					width: "20%",
 					targets: [1]
 				},
 				{ 
@@ -256,11 +261,16 @@
 					orderable: true,   //Local Estoque
 					width: "20%",
 					targets: [3]
+				},
+				{ 
+					orderable: true,   //Operador de Caixa
+					width: "15%",
+					targets: [4]
 				},								
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [4]
+					targets: [5]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -508,12 +518,15 @@
 									?>
 									<th >Setor</th>
 									<th >Local de Estoque</th>
+									<th >Operado de Caixa</th>
 									<th class="text-center">Ações</th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php
 									foreach ($row as $item){
+
+										$operadorCaixa = $item['UsXUnOperadorCaixa'] == 1 ? 'SIM' :  'NÃO';
 										
 										print('
 										<tr>
@@ -526,6 +539,7 @@
 											print('
 											<td>'.$item['SetorNome'].'</td>
 											<td>'.$item['LcEstNome'].'</td>
+											<td class="text-center">'.$operadorCaixa.'</td>
 											');
 
 											print('<td class="text-center">                             
