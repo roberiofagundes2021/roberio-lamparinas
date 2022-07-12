@@ -25,6 +25,7 @@ try{
 		// JOIN Situacao ON SituaId = AgendSituacao
 		// JOIN Cliente ON ClienId = AgendCliente
 		// WHERE AgendUnidade = $iUnidade";
+		
 		$sql = "SELECT AgendId,AgendDataRegistro,AgendCliente,AgendModalidade,AgendClienteResponsavel,
 		AgendObservacao,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 		AgXSeServico,ProfiNome,AgXSeData,AgXSeHorario,AtLocNome, SrVenNome
@@ -74,7 +75,7 @@ try{
 	} elseif ($tipoRequest == 'SITUACOES'){
 		$sql = "SELECT SituaId,SituaNome,SituaChave,SituaStatus,SituaUsuarioAtualizador,SituaCor
 		FROM Situacao
-		WHERE SituaChave in ('AGENDADO','CONFIRMADO','CANCELADO')";
+		WHERE SituaChave in ('AGENDADOVENDA','CONFIRMADO','CANCELADO')";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
