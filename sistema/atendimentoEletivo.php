@@ -263,7 +263,7 @@ if (isset($_POST['txtareaConteudo']) ){
 									</div>
 									<div class="row">
 										<div class="col-lg-6">
-											<p class="font-size-lg"><b><?php echo $row['ClienNome']; ?></b></p>
+											<p class="font-size-lg"><b><?php strtoupper($row['ClienNome']); ?></b></p>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
