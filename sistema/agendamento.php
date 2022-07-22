@@ -1,5 +1,8 @@
 <?php 
 
+// OBS.: Alterar linha de serviço(colocar em uma nova linha: Data, Hora e Botão)
+// Alterar insert no banco, vai inserir, para cada serviço, um novo atendimento alterando apenas dados do seviço.
+
 include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Agendamentos';
@@ -368,18 +371,18 @@ include('global_assets/php/conexao.php');
 										</form>
 									</div>
 								</div>
-							<div class="text-right m-2"><button id="mudarSituacao" class="btn btn-principal" role="button">Confirmar</button></div>
-                        </div>
-                    </div>
-                </div>
-			</div>
-			<!-- /content area -->
+								<div class="text-right m-2"><button id="mudarSituacao" class="btn btn-principal" role="button">Confirmar</button></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- /content area -->
 
-			<!-- inf block -->
-			<form id="formEdita" method="POST" action="agendamentoNovo.php">
-				<input id="iAgendamento" name="iAgendamento" type="hidden" value="" />
-			</form>
-			
+				<!-- inf block -->
+				<form id="formEdita" method="POST" action="agendamentoNovo.php">
+					<input id="iAgendamento" name="iAgendamento" type="hidden" value="" />
+				</form>
+			</div>			
 			<?php include_once("footer.php"); ?>
 
 		</div>

@@ -6,15 +6,28 @@ $_SESSION['PaginaAtual'] = 'Anamnese';
 
 include('global_assets/php/conexao.php');
 
-$iAtendimentoId = '3';
-$iAtendimentoEletivoId = '24';
+$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
+
+if(!$iAtendimentoId){
+	irpara("atendimento.php");
+}
+
+$sql = "SELECT TOP(1) AtEleId
+FROM AtendimentoEletivo
+WHERE AtEleAtendimento = $iAtendimentoId
+ORDER BY AtEleId DESC";
+$result = $conn->query($sql);
+$rowEletivo = $result->fetch(PDO::FETCH_ASSOC);
+
+$iAtendimentoEletivoId = $rowEletivo?$rowEletivo['AtEleId']:null;
+
 $userId = $_SESSION['UsuarId'];
 
 
 //Essa consulta é para verificar  o profissional
 $sql = "SELECT UsuarNome
 		FROM Usuario
-		WHERE UsuarId = $userId ";
+		WHERE UsuarId = $userId";
 $result = $conn->query($sql);
 $rowUser = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -33,7 +46,6 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoCliente = $row['AtendCliente'] ;
 $iAtendimentoId = $row['AtendId'];
-
 
 //Essa consulta é para preencher o sexo
 if ($row['ClienSexo'] == 'F'){
@@ -66,17 +78,11 @@ if(isset($iAtendimentoEletivoId ) && $iAtendimentoEletivoId ){
 	$HoraFim = date("H:i", $Fim);
 
 } 
-
-
-
 //Se estiver gravando (inclusão ou edição)
 if (isset($_POST['txtareaConteudo']) ){
-
 	try{
-	
-
 		//Edição
-		if (isset($iAtendimentoEletivoId ) <> ''){
+		if ($iAtendimentoEletivoId){
 		
 			$sql = "UPDATE AtendimentoEletivo SET AtEleAtendimento = :sAtendimento, AtEleData = :dData, AtEleHoraInicio = :sHoraInicio,
 						   AtEleHoraFim  = :sHoraFim, AtEleProfissional = :sProfissional, AtEleAnamnese = :sAnamnese, AtEleUnidade = :iUnidade
@@ -99,7 +105,7 @@ if (isset($_POST['txtareaConteudo']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoEletivo (AtEleAtendimento, AtEleData, AtEleHoraInicio, AtEleHoraFim, AtEleProfissional, AtEleAnamnese, AtEleUnidade)
+			$sql = "INSERT INTO AtendimentoEletivo(AtEleAtendimento, AtEleData, AtEleHoraInicio, AtEleHoraFim, AtEleProfissional, AtEleAnamnese, AtEleUnidade)
 						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional,:sAnamnese, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
@@ -118,6 +124,7 @@ if (isset($_POST['txtareaConteudo']) ){
 		}
 	
 		$_SESSION['msg']['titulo'] = "Sucesso";
+		$_SESSION['msg']['mensagem'] = "Anamnese salva!!";
 		$_SESSION['msg']['tipo'] = "success";
 					
 	} catch(PDOException $e) {
@@ -165,21 +172,16 @@ if (isset($_POST['txtareaConteudo']) ){
 	
 	<script type="text/javascript">
 
-		$(document).ready(function() {	
+		$(document).ready(function() {
 
 			$('#summernote').summernote();
 			
+			$('#enviar').on('click', function(e){
+				e.preventDefault();
+				$( "#formAtendimentoEletivo" ).submit();
+			})
 		}); //document.ready
         
-		$('#enviar').on('click', function(e){
-			
-			e.preventDefault();
-	
-
-			$( "#formAtendimentoEletivo" ).submit();
-				
-			
-		})
 			
 		// Calculo da idade do paciente.
 		
@@ -188,21 +190,21 @@ if (isset($_POST['txtareaConteudo']) ){
 			$date2 = new DateTime();
 			$interval = $date1->diff($date2); 
 		?>
-
-
-
 	</script>
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
 	<!-- Page content -->
 	<div class="page-content">
 		
-		<?php include_once("menu-left.php"); ?>
+		<?php
+			include_once("menu-left.php");
+			include_once("menuLeftSecundarioVenda.php");
+		?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -216,10 +218,16 @@ if (isset($_POST['txtareaConteudo']) ){
 				<div class="row">
 					
 					<div class="col-lg-12">
-							<!-- Basic responsive configuration -->
-
+						<form id='dadosPost'>
+							<?php
+								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+							?>
+						</form>
+						<!-- Basic responsive configuration -->
 						<form name="formAtendimentoEletivo" id="formAtendimentoEletivo" method="post" class="form-validate-jquery">
-						<input type="hidden" id="inputAtendimentoEletivoId" name="inputAtendimentoEletivoId" value="<?php if (isset($iAtendimentoEletivoId )) echo $iAtendimentoEletivoId ; ?>" >
+							<?php
+								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+							?>
 							<div class="card">
 								<div class="card-header header-elements-inline">
 									<h3 class="card-title">ANAMNESE</h3>
@@ -343,8 +351,7 @@ if (isset($_POST['txtareaConteudo']) ){
 									
 								</div>
 							</div>
-						</form>	
-
+						</form>
 							<!-- /basic responsive configuration -->
 					</div>
 					
