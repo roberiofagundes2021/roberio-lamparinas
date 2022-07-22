@@ -21,8 +21,7 @@ $m = date("m");
 $Y = date("Y");
 
 // $dataInicio = date("Y-m-01"); //30 dias atrás
-$dataInicio = date("Y-m-d");
-$dataFim = date("Y")."-12-31";
+$data = date("Y-m-d");
 
 $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['ResumoFinanceiro'] ? 'sidebar-right-visible' : ''; 
 ?>
@@ -65,45 +64,42 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
                 "order": [
-                    [1, "desc"],
-                    [2, "asc"]
+                    [0, "asc"]
                 ],
-                autoWidth: false,
                 responsive: true,
-                paginate: false,
                 columnDefs: [{
-                        orderable: false, //selecionar
-                        width: "5%",
+                        orderable: true, //Nº registro
+                        width: "15%",
                         targets: [0]
                     },
                     {
-                        orderable: true, //Vencimento
-                        width: "7%",
+                        orderable: true, //Data Hora
+                        width: "16%",
                         targets: [1]
                     },
                     {
-                        orderable: true, //Descrição
-                        width: "22%",
+                        orderable: true, //Histórico
+                        width: "20%",
                         targets: [2]
                     },
                     {
-                        orderable: true, //Favorecido
-                        width: "25%",
+                        orderable: true, //Tipo
+                        width: "10%",
                         targets: [3]
                     },
                     {
-                        orderable: true, //Número Doc.
-                        width: "13%",
+                        orderable: true, //Forma de Rec/Pag
+                        width: "18%",
                         targets: [4]
                     },
                     {
                         orderable: true, //Valor Total
-                        width: "15%",
+                        width: "12%",
                         targets: [5]
                     },
                     {
                         orderable: true, //Status
-                        width: "9%",
+                        width: "5%",
                         targets: [6]
                     },
                     {
@@ -112,21 +108,62 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                         targets: [7]
                     }
                 ],
-                dom: '<"datatable-header"fl><"datatable-scroll-wrap"t>',
+                dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
-                    decimal: ",",
-                    thousands: ".",
                     search: '<span>Filtro:</span> _INPUT_',
                     searchPlaceholder: 'filtra qualquer coluna...',
                     lengthMenu: '<span>Mostrar:</span> _MENU_',
-                    paginate: {
-                        'first': 'Primeira',
-                        'last': 'Última',
-                        'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-                        'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-                    }
+                    paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
                 }
             });
+
+            function filtra() {
+                let urlConsultaAberturaCaixa = "caixaMovimentacaoFiltra.php";
+                let idAtendimento = 5;
+
+                let inputsValuesConsulta = {
+                    inputAtendimentoId: idAtendimento
+                }; 
+
+                //Verifica se deverá ou não abrir o caixa
+                $.ajax({
+                    type: "POST",
+                    url: urlConsultaAberturaCaixa,
+                    dataType: "json",
+                    data: inputsValuesConsulta,
+                    success: function(resposta) {
+                        //|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
+                        let table 
+                        table = $('#tblMovimentacao').DataTable()
+                        table = $('#tblMovimentacao').DataTable().clear().draw()
+                        //--|
+
+                        table = $('#tblMovimentacao').DataTable()
+
+                        let rowNode
+
+                        let valorTotal = null;
+                        let descontoTotal = null;
+
+                        resposta.forEach(item => {
+                            rowNode = table.row.add(item.data).draw().node()
+
+                            $(rowNode).find('td').eq(5).attr('style', 'text-align: right;')
+                        })
+
+                        valorFinal = valorTotal - descontoTotal;
+                        valorFinal = (valorFinal != null && valorFinal > 0) ?  float2moeda(valorFinal) : null;
+                        valorTotal = (valorTotal != null) ?  float2moeda(valorTotal) : null;
+                        descontoTotal = (descontoTotal != null) ?  float2moeda(descontoTotal) : null;
+                        
+                        $("#inputValorTotal").val(valorTotal);
+                        $("#inputDesconto").val(descontoTotal);
+                        $("#inputValorFinal").val(valorFinal);
+                    }
+                })
+            }
+
+            filtra();
 
             $("#cmbCaixa").on("change", function() {
                 let nomeCaixa = $(this).find('option').filter(':selected').text();
@@ -205,7 +242,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     //$("#formCaixaPDV").submit();
                                     document.formCaixaPDV.submit();
                                 }else {
-                                    alert('Fechar caixa')
+                                    alert("Fechar caixa");
                                 }
                             }
                         }
@@ -307,7 +344,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                                 class="icon-calendar22"></i></span>
                                                     </span>
                                                     <input type="date" id="inputPeriodoDe" name="inputPeriodoDe" min="1800-01-01" max="2100-12-12"
-                                                        class="form-control" value="<?php if(isset($_SESSION['ContPagPeriodoDe'])) echo $_SESSION['ContPagPeriodoDe'];  else echo $dataInicio; ?>">
+                                                        class="form-control" value="<?php if(isset($_SESSION['ContPagPeriodoDe'])) echo $_SESSION['ContPagPeriodoDe'];  else echo $data; ?>">
                                                 </div>
                                             </div>
                                         </div>
@@ -321,12 +358,12 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                                 class="icon-calendar22"></i></span>
                                                     </span>
                                                     <input type="date" id="inputAte" name="inputAte" min="1800-01-01" max="2100-12-12"
-                                                        class="form-control" value="<?php if(isset($_SESSION['ContPagAte'])) echo $_SESSION['ContPagAte'];  else echo $dataFim; ?>">
+                                                        class="form-control" value="<?php if(isset($_SESSION['ContPagAte'])) echo $_SESSION['ContPagAte'];  else echo $data; ?>">
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="cmbClientes">Clientes</label>
                                                 <select id="cmbClientes" name="cmbClientes" class="form-control form-control-select2">
@@ -367,7 +404,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="cmbPlanoContas">Forma de Rec/Pag</label>
                                                 <select id="cmbPlanoContas" nCaixanoContas"
@@ -405,38 +442,25 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                 <label for="cmbStatus">Status</label>
                                                 <select id="cmbStatus" name="cmbStatus"
                                                     class="form-control form-control-select2">
+                                                    <option value="">Todos</option>
                                                     <?php
                                                         $sql = "SELECT SituaId, SituaNome, SituaChave
                                                                 FROM Situacao
-                                                                WHERE SituaStatus = 1
+                                                                WHERE SituaStatus = 1 and (SituaChave = 'PAGO' or SituaChave = 'RECEBIDO')
                                                                 ORDER BY SituaNome ASC";
                                                         $result = $conn->query($sql);
                                                         $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
     
                                                         foreach ($rowSituacao as $item) {
-                                                            if($item['SituaChave'] == 'APAGAR' || $item['SituaChave'] == 'PAGO'){
-                                                                if(isset($_SESSION['ContPagStatus'])){
-                                                                    if($item['SituaId'] == $_SESSION['ContPagStatus']){
-                                                                        print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
-                                                                    } else {
-                                                                        print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
-                                                                    }
-                                                                } else {
-                                                                    print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
-                                                                }
-                                                            }
+                                                            print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
                                                         }
                                                     ?>
                                                 </select>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="row">
-                                        <div class="text-right col-12 pt-3">
-                                            <div>
-                                                <button id="submitFiltro" class="btn btn-principal">Pesquisar</button>
-                                            </div>
+                                        <div class="col-lg-2 m-auto text-center">
+                                            <button id="submitFiltro" class="btn btn-principal">Pesquisar</button>
                                         </div>
                                     </div>
                                 </form>
@@ -444,13 +468,13 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                 <table class="table" id="tblMovimentacao">
                                     <thead>
                                         <tr class="bg-slate">
-                                            <th></th>
                                             <th id='dataGrid'>Nº registro</th>
                                             <th>Data/Hora</th>
                                             <th>Histórico</th>
                                             <th>Tipo</th>
                                             <th>Forma de Rec/Pag</th>
                                             <th>Valor Total</th>
+                                            <th>Status</th>
                                             <th style="text-align: center;">Ações</th>
                                         </tr>
                                     </thead>
@@ -484,6 +508,70 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Abertura de Caixa</h5>
+                        </div>
+
+                        <form id="formAbrirCaixa" method="POST" action="caixaPdv.php">
+                            <input type="hidden" id="inputCaixaNome" name="inputCaixaNome" value="">
+
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        Data: <?php echo date('d/m/Y'); ?>
+                                    </div>
+    
+                                    <div class="col-lg-6">
+                                        Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?>
+                                    </div>
+                                </div>
+    
+                                <div class="form-group mt-3">
+                                    <!--Input para controle, para que caso acesse o PDV pela abertura de caixa ele fará o cadastro da nova abertura de caixa-->
+                                    <input type="hidden" id="inputAbrirCaixa" name="inputAbrirCaixa" value="" class="form-control removeValidacao">
+
+                                    <label for="cmbCaixa">Caixa <span class="text-danger">*</span></label>
+                                    <select id="cmbCaixa" name="cmbCaixa" class="form-control form-control-select2 select2-hidden-accessible" required="" tabindex="-1" aria-hidden="true">
+                                        <option value="">Selecionar</option>
+                                        <?php
+                                        
+                                        $sql = "SELECT CaixaId, CaixaNome, SituaNome
+                                                FROM Caixa
+                                                JOIN Situacao on SituaId = CaixaStatus
+                                                WHERE CaixaUnidade = " . $_SESSION['UnidadeId'] . " 
+                                                      and CaixaId not in (SELECT CxAbeCaixa 
+                                                                          FROM CaixaAbertura
+                                                                          WHERE CxAbeUnidade = " . $_SESSION['UnidadeId'] . " and CxAbeDataHoraFechamento is NULL)
+                                                ORDER BY CaixaNome ASC";
+                                        $result = $conn->query($sql);
+                                        $rowCaixa = $result->fetchAll(PDO::FETCH_ASSOC);
+    
+                                        foreach ($rowCaixa as $item) {
+                                            print('<option value="' . $item['CaixaId'] . '">'. $item['CaixaNome'] . '</option>');
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+    
+                                <div class="form-group mt-2">
+                                    <!--Se informar depois sobre o saldo, como irá funcionar-->
+                                    <label for="inputSaldoInicial">Saldo Inicial</label>
+                                    <input type="text" id="inputSaldoInicial" name="inputSaldoInicial" value="" class="form-control removeValidacao" readonly>
+                                </div>
+                            </div>
+    
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-basic legitRipple" data-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn bg-slate legitRipple">Abrir Caixa</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="modal_small_fechamento_caixa" class="modal fade" tabindex="-1">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Fechamento de Caixa</h5>
                         </div>
 
                         <form id="formAbrirCaixa" method="POST" action="caixaPdv.php">
