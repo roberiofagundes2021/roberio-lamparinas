@@ -546,7 +546,7 @@ if(isset($_POST['inputTipo'])){
                                                 <div class="row">								
                                                     <div class="col-lg-3">
                                                         <label for="cmbProfissao">Profissão</label>
-                                                        <select id="cmbProfissao" name="cmbProfissao" class="form-control form-control-select2">
+                                                        <select id="cmbProfissao" name="cmbProfissao" class="form-control select-search">
                                                             <option value="#">Seleciona uma profissão</option>
                                                             <?php
                                                             $sql = "SELECT ProfiId, ProfiNome
@@ -566,7 +566,7 @@ if(isset($_POST['inputTipo'])){
 
 													<div class="col-lg-2">
                                                         <label for="cmbConselho">Conselho</label>
-                                                        <select id="cmbConselho" name="cmbConselho" class="form-control form-control-select2">
+                                                        <select id="cmbConselho" name="cmbConselho" class="form-control select-search">
                                                             <option value="#">Seleciona </option>
 
 															<?php
@@ -602,7 +602,7 @@ if(isset($_POST['inputTipo'])){
                                                 
                                                     <div class="col-lg-3">
                                                         <label for="cmbEspecialidade">Especialidades</label>
-                                                        <select id="cmbEspecialidade" name="cmbEspecialidade" class="form-control form-control-select2">
+                                                        <select id="cmbEspecialidade" name="cmbEspecialidade" class="form-control select-search">
                                                             <option value="#">Seleciona uma especialidade</option>
                                                             <?php
                                                             $sql = "SELECT EspecId, EspecNome
@@ -820,7 +820,7 @@ if(isset($_POST['inputTipo'])){
 									<div class="row">								
 										<div class="col-lg-4">
                                             <label for="cmbBanco">Banco</label>
-                                            <select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2">
+                                            <select id="cmbBanco" name="cmbBanco" class="form-control select-search">
                                                 <option value="">Selecione</option>
                                                 <?php 
                                                     $sql = "SELECT CnBanId, CnBanNome
