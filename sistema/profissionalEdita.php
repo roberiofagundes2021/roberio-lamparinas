@@ -39,7 +39,7 @@ if(isset($_POST['inputTipo'])){
                       ProfiCep = :sCep, ProfiEndereco = :sEndereco, ProfiNumero = :sNumero, ProfiComplemento = :sComplemento, ProfiBairro = :sBairro, 
                       ProfiCidade = :sCidade, ProfiEstado = :sEstado, ProfiContato = :sContato, ProfiTelefone = :sTelefone, 
                       ProfiCelular = :sCelular, ProfiEmail = :sEmail, ProfiSite = :sSite, ProfiObservacao = :sObservacao, ProfiBanco = :sBanco, 
-                      ProfiAgencia = :sAgencia, ProfiConta = :sConta,ProfiInformacaoAdicional = :sInformacaoAdicional, ProfiUsuarioAtualizador = :iUsuarioAtualizador
+                      ProfiAgencia = :sAgencia, ProfiConta = :sConta,ProfiInformacaoAdicional = :sInformacaoAdicional, ProfiUsuario = :iUsuario, ProfiUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE ProfiId = :iProfissional";
 		$result = $conn->prepare($sql);						
 		
@@ -57,11 +57,11 @@ if(isset($_POST['inputTipo'])){
 						':sUf' => $_POST['inputTipo'] == 'J' || $_POST['cmbUf'] == '#' ? null : $_POST['cmbUf'],
 						':sSexo' => $_POST['inputTipo'] == 'J' || $_POST['cmbSexo'] == '#' ? null : $_POST['cmbSexo'],
                         ':dDtNascimento' => $_POST['inputTipo'] == 'F' ? ($_POST['inputDtNascimento'] == '' ? null : $_POST['inputDtNascimento']) : null,
-						':sProfissao' => $_POST['inputTipo'] || $_POST['cmbProfissao'] == '#' ? null : $_POST['cmbProfissao'],
+						':sProfissao' => $_POST['inputTipo'] == 'F'? ($_POST['cmbProfissao'] == '#' ? null : $_POST['cmbProfissao']) : NULL,
 						':sConselho' => $_POST['inputTipo'] == 'F' ? ($_POST['cmbConselho'] == '#' ? null : $_POST['cmbConselho']) : null,
                         ':sNumConselho' => $_POST['inputTipo'] == 'F' ? $_POST['inputNumConselho'] : null,
                         ':sCnes' => $_POST['inputTipo']  == 'J' ? $_POST['inputCnesPJ'] : $_POST['inputCnesPF'],
-                        ':sEspecialidade' => $_POST['inputTipo']  || $_POST['cmbEspecialidade'] == '#' ? null : $_POST['cmbEspecialidade'],
+                        ':sEspecialidade' => $_POST['inputTipo'] == 'F' ? ($_POST['cmbEspecialidade'] == '#' ? null : $_POST['cmbEspecialidade']) : NULL,
 						':sCep' => trim($_POST['inputCep']) == "" ? null : $_POST['inputCep'],
 						':sEndereco' => $_POST['inputEndereco'],
 						':sNumero' => $_POST['inputNumero'],
@@ -78,7 +78,8 @@ if(isset($_POST['inputTipo'])){
                         ':sBanco' => $_POST['cmbBanco'],
                         ':sAgencia' => $_POST['inputAgencia'],
                         ':sConta' => $_POST['inputConta'],
-                        ':sInformacaoAdicional' => $_POST['inputInformacaoAdicional'],					
+                        ':sInformacaoAdicional' => $_POST['inputInformacaoAdicional'],
+						':iUsuario' => $_POST['cmbUsuario'],					
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iProfissional'	=> $_POST['inputProfissionalId']
 						));
@@ -428,6 +429,32 @@ if(isset($_POST['inputTipo'])){
 										</div>										
 									</div>									
 								</div>
+								<div class="col-lg-4">									
+								</div>
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="cmbUsuario">Usuário <span class="text-danger">*</span></label>
+										<select id="cmbUsuario" name="cmbUsuario" class="form-control select-search" required>
+											<option value="">Selecione o usuário referente ao profissional</option>
+											<?php
+												$sql = "SELECT UsuarId, UsuarNome
+														FROM Usuario
+														JOIN EmpresaXUsuarioXPerfil ON EXUXPUsuario = UsuarId
+														JOIN UsuarioXUnidade on UsXUnEmpresaUsuarioPerfil = EXUXPId
+														JOIN Situacao on SituaId = EXUXPStatus
+														WHERE UsXUnUnidade = " . $_SESSION['UnidadeId'] . " AND SituaChave = 'ATIVO'
+														ORDER BY UsuarNome ASC";
+												$result = $conn->query($sql);
+												$rowUsuario = $result->fetchAll(PDO::FETCH_ASSOC);
+
+												foreach ($rowUsuario as $item){
+													$seleciona = $item['UsuarId'] == $row['ProfiUsuario'] ? "selected" : "";
+													print('<option value="'.$item['UsuarId'].'" '. $seleciona .'>'. $item['UsuarNome']. '</option>');
+												}
+											?>
+										</select>
+									</div>
+								</div>
 							</div>
 							
 							<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
@@ -535,7 +562,7 @@ if(isset($_POST['inputTipo'])){
                                                 <div class="row">								
                                                     <div class="col-lg-3">
                                                         <label for="cmbProfissao">Profissão</label>
-                                                        <select id="cmbProfissao" name="cmbProfissao" class="form-control form-control-select2">
+                                                        <select id="cmbProfissao" name="cmbProfissao" class="form-control select-search">
                                                             <option value="#">Selecione uma profissão</option>
                                                             <?php 
                                                                 $sql = "SELECT ProfiId, ProfiNome
@@ -557,7 +584,7 @@ if(isset($_POST['inputTipo'])){
 
 													<div class="col-lg-2">
                                                         <label for="cmbConselho">Conselho</label>
-                                                        <select id="cmbConselho" name="cmbConselho" class="form-control form-control-select2">
+                                                        <select id="cmbConselho" name="cmbConselho" class="form-control select-search">
                                                             <option value="#">Selecione </option>
 															 <?php 
                                                                 $sql = "SELECT PrConId, PrConNome
@@ -594,7 +621,7 @@ if(isset($_POST['inputTipo'])){
                                                 
                                                     <div class="col-lg-3">
                                                         <label for="cmbEspecialidade">Especialidades</label>
-                                                        <select id="cmbEspecialidade" name="cmbEspecialidade" class="form-control form-control-select2">
+                                                        <select id="cmbEspecialidade" name="cmbEspecialidade" class="form-control select-search">
                                                             <option value="#">Seleciona uma especialidade</option>
                                                             <?php
                                                             $sql = "SELECT EspecId, EspecNome
@@ -815,7 +842,7 @@ if(isset($_POST['inputTipo'])){
                                             <div class="row">								
                                                 <div class="col-lg-4">
                                                     <label for="cmbBanco">Banco</label>
-                                                    <select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2">
+                                                    <select id="cmbBanco" name="cmbBanco" class="form-control select-search">
                                                         <option value="">Selecione</option>
                                                         <?php 
                                                             $sql = "SELECT CnBanId, CnBanNome

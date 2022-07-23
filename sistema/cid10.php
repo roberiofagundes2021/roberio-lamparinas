@@ -321,12 +321,6 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 													<option value="XX" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'XX') echo "selected"; }?> >XX</option>
 													<option value="XXI" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'XXI') echo "selected"; }?> >XXI</option>
 													<option value="XXII" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'XXII') echo "selected"; }?> >XXII</option>
-													<option value="XXIII" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'XXIII') echo "selected"; }?> >XXIII</option>
-													<option value="XXIV" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'XXIV') echo "selected"; }?> >XXIV</option>
-													<option value="XXV" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'XXV') echo "selected"; }?> >XXV</option>
-													<option value="XXVI" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'XXVI') echo "selected"; }?> >XXVI</option>
-													<option value="XXVII" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'XXVII') echo "selected"; }?> >XXVII</option>
-													<option value="XXVIII" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'XXVIII') echo "selected"; }?> >XXVIII</option>
 												</select>
 											</div>
 										</div>

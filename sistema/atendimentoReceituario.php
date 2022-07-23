@@ -6,8 +6,25 @@ $_SESSION['PaginaAtual'] = 'Receituário';
 
 include('global_assets/php/conexao.php');
 
-$iAtendimentoId = '3';
-$iAtendimentoReceituarioId = '1';
+$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
+
+if(!$iAtendimentoId){
+	irpara("atendimento.php");
+}
+
+$sql = "SELECT TOP(1) AtRecId
+FROM AtendimentoReceituario
+WHERE AtRecAtendimento = $iAtendimentoId
+ORDER BY AtRecId DESC";
+$result = $conn->query($sql);
+$rowReceituario= $result->fetch(PDO::FETCH_ASSOC);
+
+$iAtendimentoReceituarioId = $rowReceituario?$rowReceituario['AtRecId']:null;
+
+// essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
+
+$ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
+$ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
 $userId = $_SESSION['UsuarId'];
 
 
@@ -71,12 +88,9 @@ if(isset($iAtendimentoReceituarioId ) && $iAtendimentoReceituarioId ){
 
 //Se estiver gravando (inclusão ou edição)
 if (isset($_POST['txtareaConteudo']) ){
-
 	try{
-	
-
 		//Edição
-		if (isset($iAtendimentoReceituarioId ) <> ''){
+		if ($iAtendimentoReceituarioId){
 		
 			$sql = "UPDATE AtendimentoReceituario SET AtRecAtendimento = :sAtendimento, AtRecData = :dData, AtRecHoraInicio = :sHoraInicio,
 						   AtRecHoraFim  = :sHoraFim, AtRecProfissional = :sProfissional, AtRecReceituario = :sReceituario, AtRecUnidade = :iUnidade
@@ -195,14 +209,17 @@ if (isset($_POST['txtareaConteudo']) ){
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
 	<!-- Page content -->
 	<div class="page-content">
 		
-		<?php include_once("menu-left.php"); ?>
+		<?php
+			include_once("menu-left.php");
+			include_once("menuLeftSecundarioVenda.php");
+		?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -216,10 +233,16 @@ if (isset($_POST['txtareaConteudo']) ){
 				<div class="row">
 					
 					<div class="col-lg-12">
-							<!-- Basic responsive configuration -->
-
+						<form id='dadosPost'>
+							<?php
+								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+							?>
+						</form>
+						<!-- Basic responsive configuration -->
 						<form name="formAtendimentoReceituario" id="formAtendimentoReceituario" method="post" class="form-validate-jquery">
-						<input type="hidden" id="inputAtendimentoReceituarioId" name="inputAtendimentoReceituarioId" value="<?php if (isset($iAtendimentoReceituarioId )) echo $iAtendimentoReceituarioId ; ?>" >
+							<?php
+								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+							?>
 							<div class="card">
 								<div class="card-header header-elements-inline">
 									<h3 class="card-title">Receituário</h3>
@@ -255,7 +278,7 @@ if (isset($_POST['txtareaConteudo']) ){
 									</div>
 									<div class="row">
 										<div class="col-lg-6">
-											<p class="font-size-lg"><b><?php echo $row['ClienNome']; ?></b></p>
+											<p class="font-size-lg"><b><?php echo strtoupper($row['ClienNome']); ?></b></p>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">

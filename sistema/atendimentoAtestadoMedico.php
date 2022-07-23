@@ -7,16 +7,17 @@ $_SESSION['PaginaAtual'] = 'Atestado Médico';
 include('global_assets/php/conexao.php');
 
 $iAtendimentoId = '3';
-$iAtendimentoAtestadoMedicoId = '1';
-$userId = $_SESSION['UsuarId'];
+$iAtendimentoAtestadoMedicoId = '4';
 
 
 //Essa consulta é para verificar  o profissional
-$sql = "SELECT UsuarNome
+$sql = "SELECT UsuarId, ProfiUsuario, ProfiId, ProfiNome
 		FROM Usuario
-		WHERE UsuarId = $userId ";
+		JOIN Profissional ON ProfiUsuario = UsuarId
+		WHERE UsuarId =  ". $_SESSION['UsuarId'] . " ";
 $result = $conn->query($sql);
 $rowUser = $result->fetch(PDO::FETCH_ASSOC);
+$userId = $rowUser['ProfiId'];
 
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
@@ -46,7 +47,7 @@ if ($row['ClienSexo'] == 'F'){
 if(isset($iAtendimentoAtestadoMedicoId ) && $iAtendimentoAtestadoMedicoId ){
 
 	//Essa consulta é para preencher o campo Atestado Médico ao editar
-	$sql = "SELECT AtAMeAtestadoMedico, AtAMeHoraFim, AtAMeHoraInicio, AtAMeData
+	$sql = "SELECT AtAMeAtestadoMedico, AtAMeHoraFim, AtAMeHoraInicio, AtAMeData, AtAMeCid10
 			FROM AtendimentoAtestadoMedico
 			WHERE AtAMeId = " . $iAtendimentoAtestadoMedicoId ;
 	$result = $conn->query($sql);
@@ -79,7 +80,7 @@ if (isset($_POST['txtareaConteudo']) ){
 		if (isset($iAtendimentoAtestadoMedicoId ) <> ''){
 		
 			$sql = "UPDATE AtendimentoAtestadoMedico SET AtAMeAtendimento = :sAtendimento, AtAMeData = :dData, AtAMeHoraInicio = :sHoraInicio,
-						   AtAMeHoraFim  = :sHoraFim, AtAMeProfissional = :sProfissional, AtAMeAtestadoMedico = :sAtestadoMedico, AtAMeUnidade = :iUnidade
+						   AtAMeHoraFim  = :sHoraFim, AtAMeProfissional = :sProfissional, AtAMeCid10 = :iCid10, AtAMeAtestadoMedico = :sAtestadoMedico, AtAMeUnidade = :iUnidade
 					WHERE AtAMeId = :iAtendimentoAtestadoMedico";
 			$result = $conn->prepare($sql);
 					
@@ -89,6 +90,7 @@ if (isset($_POST['txtareaConteudo']) ){
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => $_POST['inputFim'],
 				':sProfissional' => $userId,
+				':iCid10' => $_POST['cmbCid10'],
 				':sAtestadoMedico' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],
 				':iAtendimentoAtestadoMedico' => $iAtendimentoAtestadoMedicoId 
@@ -99,8 +101,8 @@ if (isset($_POST['txtareaConteudo']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoAtestadoMedico (AtAMeAtendimento, AtAMeData, AtAMeHoraInicio, AtAMeHoraFim, AtAMeProfissional, AtAMeAtestadoMedico, AtAMeUnidade)
-						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional,:sAtestadoMedico, :iUnidade)";
+			$sql = "INSERT INTO AtendimentoAtestadoMedico (AtAMeAtendimento, AtAMeData, AtAMeHoraInicio, AtAMeHoraFim, AtAMeProfissional, AtAMeCid10, AtAMeAtestadoMedico, AtAMeUnidade)
+						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional, :iCid10, :sAtestadoMedico, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -109,6 +111,7 @@ if (isset($_POST['txtareaConteudo']) ){
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,
+				':iCid10' => $_POST['cmbCid10'],
 				':sAtestadoMedico' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],
 			));
@@ -255,7 +258,7 @@ if (isset($_POST['txtareaConteudo']) ){
 									</div>
 									<div class="row">
 										<div class="col-lg-6">
-											<p class="font-size-lg"><b><?php echo $row['ClienNome']; ?></b></p>
+											<p class="font-size-lg"><b><?php echo strtoupper($row['ClienNome']); ?></b></p>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
@@ -314,7 +317,7 @@ if (isset($_POST['txtareaConteudo']) ){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputProfissional">Profissional</label>
-												<input type="text" id="inputProfissional" name="inputProfissional" class="form-control"  value="<?php echo $rowUser['UsuarNome']; ?>" readOnly>
+												<input type="text" id="inputProfissional" name="inputProfissional" class="form-control"  value="<?php echo $rowUser['ProfiNome']; ?>" readOnly>
 											</div>
 										</div>
 									</div>
@@ -325,6 +328,34 @@ if (isset($_POST['txtareaConteudo']) ){
 
 								<div class="card-body">
 
+									<div class="col-lg-12">
+										<div class="form-group">
+											<label for="cmbCid10">CID-10<span class="text-danger">*</span></label>
+											<select id="cmbCid10" name="cmbCid10" class="form-control select-search" required>
+												<option value="">Selecione</option>
+												<?php 
+													$sql = "SELECT Cid10Id,Cid10Capitulo, Cid10Codigo, Cid10Descricao
+															FROM Cid10
+															JOIN Situacao on SituaId = Cid10Status
+															WHERE SituaChave = 'ATIVO'
+															ORDER BY Cid10Codigo ASC";
+													$result = $conn->query($sql);
+													$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													//foreach ($row as $item){
+													//	print('<option value="'.$item['Cid10Id'].'">'.$item['Cid10Capitulo'] . ' - '.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
+													//}
+
+													foreach ($row as $item){
+														$seleciona = $item['Cid10Id'] == $rowAtestadoMedico['AtAMeCid10'] ? "selected" : "";
+														print('<option value="'.$item['Cid10Id'].'" '. $seleciona .'>'.$item['Cid10Capitulo'] . ' - '.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
+													}
+												
+												?>
+											</select>
+										</div>
+									</div>
+									<br>
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group">
