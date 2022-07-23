@@ -133,7 +133,7 @@ try{
 		// insere o novo usuário no banco
 		$sql = "INSERT INTO  Cliente(ClienNome,ClienTelefone,ClienCelular,ClienEmail,ClienObservacao,
 		ClienTipo,ClienStatus,ClienUnidade,ClienUsuarioAtualizador)
-		VALUES ('$nomePaciente','$telefone','$celular','$email','$observacao','J',1,$iUnidade,$usuarioId)";
+		VALUES ('$nomePaciente','$telefone','$celular','$email','$observacao','F',1,$iUnidade,$usuarioId)";
 		$conn->query($sql);
 
 		$lestIdCliente = $conn->lastInsertId();
