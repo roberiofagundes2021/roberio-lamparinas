@@ -5,7 +5,7 @@ include('global_assets/php/conexao.php');
 //$usuarioId = $_POST['inputUsuarioId'];
 
 //Para pegar a última consulta
-$sql_saldoInicial    = "SELECT CxAbeId, CaixaNome, CxAbeDataHoraAbertura, CxAbeDataHoraFechamento FROM CaixaAbertura
+$sql_saldoInicial    = "SELECT CxAbeId, CaixaNome, CxAbeCaixa, CxAbeDataHoraAbertura, CxAbeDataHoraFechamento FROM CaixaAbertura
                         JOIN Caixa on CaixaId = CxAbeCaixa
                         WHERE CxAbeOperador = ".$_SESSION['UsuarId']." ORDER BY CxAbeId DESC";
 $resultSaldoInicial  = $conn->query($sql_saldoInicial);

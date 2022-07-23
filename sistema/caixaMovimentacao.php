@@ -3,7 +3,7 @@
 include_once("sessao.php");
 
 //Fazer alteração posteriormente
-$_SESSION['PaginaAtual'] = 'Relação de Contas à Pagar';
+$_SESSION['PaginaAtual'] = 'Movimentação do Caixa';
 
 include('global_assets/php/conexao.php');
 
@@ -16,11 +16,6 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
-$d = date("d");
-$m = date("m");
-$Y = date("Y");
-
-// $dataInicio = date("Y-m-01"); //30 dias atrás
 $data = date("Y-m-d");
 
 $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['ResumoFinanceiro'] ? 'sidebar-right-visible' : ''; 
@@ -64,7 +59,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
                 "order": [
-                    [0, "asc"]
+                    [0, "desc"]
                 ],
                 responsive: true,
                 columnDefs: [{
@@ -79,7 +74,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     },
                     {
                         orderable: true, //Histórico
-                        width: "20%",
+                        width: "18%",
                         targets: [2]
                     },
                     {
@@ -94,7 +89,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     },
                     {
                         orderable: true, //Valor Total
-                        width: "12%",
+                        width: "14%",
                         targets: [5]
                     },
                     {
@@ -197,7 +192,6 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                 })
             })
 
-
             $("#btnPdv").on('click', () => {
                 let urlConsultaAberturaCaixa = "consultaAberturaCaixa.php";
                 let idOperador = "<?php echo $_SESSION['UsuarId']; ?>"
@@ -239,13 +233,38 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     $("#inputAberturaCaixaId").val(resposta.CxAbeId);
                                     $("#inputAberturaCaixaNome").val(resposta.CaixaNome);
 
-                                    //$("#formCaixaPDV").submit();
-                                    document.formCaixaPDV.submit();
+                                    document.formCaixaAberturaId.action = "caixaPDV.php";
+                                    document.formCaixaAberturaId.submit();
                                 }else {
                                     alert("Fechar caixa");
                                 }
                             }
                         }
+                    }
+                })
+            }) 
+
+            $("#btnFechamento").on('click', () => {
+                let urlConsultaAberturaCaixa = "consultaAberturaCaixa.php";
+                let idOperador = "<?php echo $_SESSION['UsuarId']; ?>"
+
+                let inputsValuesConsulta = {
+                    inputUsuarioId: idOperador
+                }; 
+
+                //Verifica se deverá ou não abrir o caixa
+                $.ajax({
+                    type: "POST",
+                    url: urlConsultaAberturaCaixa,
+                    dataType: "json",
+                    data: inputsValuesConsulta,
+                    success: function(resposta) {
+                        $("#inputAberturaCaixaId").val(resposta.CxAbeId);                    
+                        $("#inputCaixaId").val(resposta.CxAbeCaixa);
+                        $("#inputAberturaCaixaNome").val(resposta.CaixaNome);
+
+                        document.formCaixaAberturaId.action = "caixaFechamento.php";
+                        document.formCaixaAberturaId.submit();
                     }
                 })
             }) 
@@ -411,15 +430,20 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                     class="form-control form-control-select2">
                                                     <option value="">Todos</option>
                                                     <?php
-                                                    $sql = "SELECT PlConId, PlConCodigo, PlConNome
-                                                            FROM PlanoConta
-                                                            JOIN Situacao on SituaId = PlConStatus
-                                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and 
-                                                            PlConNatureza = 'D'  and SituaChave = 'ATIVO'
-                                                            ORDER BY PlConCodigo ASC";
+                                                    $sql = "SELECT FrPagId, FrPagNome, FrPagChave
+                                                            FROM FormaPagamento
+                                                            JOIN Situacao on SituaId = FrPagStatus
+                                                            WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                            ORDER BY FrPagNome ASC";
+                                    
                                                     $result = $conn->query($sql);
-                                                    $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                    $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                    foreach ($rowFormaPagamento as $item) {
+                                                        print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
+                                                    }
 
+                                                    //Para consulta
+                                                    /*
                                                     foreach ($rowPlanoContas as $item) {
                                                         if(isset($_SESSION['ContPagPlanoContas'])){
                                                             if($item['PlConId'] == $_SESSION['ContPagPlanoContas']){
@@ -431,7 +455,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                             print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');                                                            
                                                         }
                                                     }
-
+                                                    */
                                                     ?>
                                                 </select>
                                             </div>
@@ -446,7 +470,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                     <?php
                                                         $sql = "SELECT SituaId, SituaNome, SituaChave
                                                                 FROM Situacao
-                                                                WHERE SituaStatus = 1 and (SituaChave = 'PAGO' or SituaChave = 'RECEBIDO')
+                                                                WHERE SituaStatus = 1 and (SituaChave = 'PAGO' or SituaChave = 'RECEBIDO' or SituaChave = 'ESTORNADO')
                                                                 ORDER BY SituaNome ASC";
                                                         $result = $conn->query($sql);
                                                         $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -493,8 +517,9 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     </div>
                 </div>
                 
-                <form name="formCaixaPDV" method="post" action="caixaPDV.php">
+                <form name="formCaixaAberturaId" method="post">
 					<input type="hidden" id="inputAberturaCaixaId" name="inputAberturaCaixaId" value="">
+                    <input type="hidden" id="inputCaixaId" name="inputCaixaId" value="">
                     <input type="hidden" id="inputAberturaCaixaNome" name="inputAberturaCaixaNome" value="">
 				</form>
 
@@ -506,8 +531,10 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
             <div id="modal_small_abertura_caixa" class="modal fade" tabindex="-1">
                 <div class="modal-dialog modal-sm">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Abertura de Caixa</h5>
+                        <div class="custon-modal-title">
+                            <i class=""></i>
+                            <h2 class="modal-title p-2">Abertura de Caixa</h2>
+                            <i class=""></i>
                         </div>
 
                         <form id="formAbrirCaixa" method="POST" action="caixaPdv.php">
@@ -516,11 +543,11 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                             <div class="modal-body">
                                 <div class="row">
                                     <div class="col-lg-6">
-                                        Data: <?php echo date('d/m/Y'); ?>
+                                        <h5>Data: <?php echo date('d/m/Y'); ?></h5>
                                     </div>
     
                                     <div class="col-lg-6">
-                                        Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?>
+                                        <h5>Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?></h5>
                                     </div>
                                 </div>
     
@@ -528,7 +555,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     <!--Input para controle, para que caso acesse o PDV pela abertura de caixa ele fará o cadastro da nova abertura de caixa-->
                                     <input type="hidden" id="inputAbrirCaixa" name="inputAbrirCaixa" value="" class="form-control removeValidacao">
 
-                                    <label for="cmbCaixa">Caixa <span class="text-danger">*</span></label>
+                                    <label for="cmbCaixa" class="font-size-lg">Caixa <span class="text-danger">*</span></label>
                                     <select id="cmbCaixa" name="cmbCaixa" class="form-control form-control-select2 select2-hidden-accessible" required="" tabindex="-1" aria-hidden="true">
                                         <option value="">Selecionar</option>
                                         <?php
@@ -553,68 +580,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
     
                                 <div class="form-group mt-2">
                                     <!--Se informar depois sobre o saldo, como irá funcionar-->
-                                    <label for="inputSaldoInicial">Saldo Inicial</label>
-                                    <input type="text" id="inputSaldoInicial" name="inputSaldoInicial" value="" class="form-control removeValidacao" readonly>
-                                </div>
-                            </div>
-    
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-basic legitRipple" data-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn bg-slate legitRipple">Abrir Caixa</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div id="modal_small_fechamento_caixa" class="modal fade" tabindex="-1">
-                <div class="modal-dialog modal-sm">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Fechamento de Caixa</h5>
-                        </div>
-
-                        <form id="formAbrirCaixa" method="POST" action="caixaPdv.php">
-                            <input type="hidden" id="inputCaixaNome" name="inputCaixaNome" value="">
-
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        Data: <?php echo date('d/m/Y'); ?>
-                                    </div>
-    
-                                    <div class="col-lg-6">
-                                        Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?>
-                                    </div>
-                                </div>
-    
-                                <div class="form-group mt-3">
-                                    <!--Input para controle, para que caso acesse o PDV pela abertura de caixa ele fará o cadastro da nova abertura de caixa-->
-                                    <input type="hidden" id="inputAbrirCaixa" name="inputAbrirCaixa" value="" class="form-control removeValidacao">
-
-                                    <label for="cmbCaixa">Caixa <span class="text-danger">*</span></label>
-                                    <select id="cmbCaixa" name="cmbCaixa" class="form-control form-control-select2 select2-hidden-accessible" required="" tabindex="-1" aria-hidden="true">
-                                        <option value="">Selecionar</option>
-                                        <?php
-                                        $sql = "SELECT CaixaId, CaixaNome, SituaNome
-                                                FROM Caixa
-                                                JOIN Situacao on SituaId = CaixaStatus
-                                                WHERE CaixaUnidade = " . $_SESSION['UnidadeId'] . "
-                                                ORDER BY CaixaNome ASC";
-                                        $result = $conn->query($sql);
-                                        $rowCaixa = $result->fetchAll(PDO::FETCH_ASSOC);
-    
-    
-                                        foreach ($rowCaixa as $item) {
-                                            print('<option value="' . $item['CaixaId'] . '">'. $item['CaixaNome'] . '</option>');
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
-    
-                                <div class="form-group mt-2">
-                                    <!--Se informar depois sobre o saldo, como irá funcionar-->
-                                    <label for="inputSaldoInicial">Saldo Inicial</label>
+                                    <label for="inputSaldoInicial" class="font-size-lg">Saldo Inicial</label>
                                     <input type="text" id="inputSaldoInicial" name="inputSaldoInicial" value="" class="form-control removeValidacao" readonly>
                                 </div>
                             </div>

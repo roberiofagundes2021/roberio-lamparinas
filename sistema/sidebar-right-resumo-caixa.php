@@ -60,9 +60,9 @@
                     </div>
 
                     <div class="col-6">
-                        <button type="button" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple" style="width: 100%; margin-top: 10px;">
+                        <a href="caixaMovimentacao.php" type="button" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple" style="width: 100%; margin-top: 10px;">
                             <span style="font-size: 11px;">Movimentação</span>
-                        </button>   
+                        </a>   
                     </div>
                 </div>
 
@@ -74,7 +74,7 @@
                     </div>
                      
                     <div class="col-6">
-                        <button id="btnFechamento" data-toggle="modal" data-target="#modal_small_fechamento_caixa" type="button" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple" style="width: 100%; margin-top: 10px;">
+                        <button id="btnFechamento" type="button" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple" style="width: 100%; margin-top: 10px;">
                             <span style="font-size: 11px;">Fechamento</span>
                         </button>   
                     </div>                    

@@ -4,20 +4,23 @@ include('global_assets/php/conexao.php');
 
 //$atendimentoId = $_POST['inputAtendimentoId'];
 $atendimentoId = 5;
+$operadorId = $_SESSION['UsuarId'];
 
-$sql_atendimento    = "SELECT AtendNumRegistro, ClienNome, CxRecDataHora, CxRecAtendimento, FrPagNome, 
-                              CxRecValor, CxRecValorTotal, SituaNome, 'Recebimento' as Tipo
+//Falta colocar o CaixaFechamento
+$sql_movimentacao    = "SELECT AtendNumRegistro, ClienNome, CxRecDataHora, CxRecAtendimento, FrPagNome, 
+                              CxRecValor, CxRecValorTotal, SituaNome, SituaChave, 'Recebimento' as Tipo
                        FROM CaixaRecebimento
+                       JOIN CaixaAbertura on CxAbeId = CxRecCaixaAbertura
                        JOIN FormaPagamento on FrPagId = CxRecFormaPagamento
                        JOIN Atendimento on AtendId = CxRecAtendimento
                        JOIN Cliente on ClienId = AtendCliente
                        JOIN Situacao on SituaId = CxRecStatus
-                       WHERE CxRecUnidade = " . $_SESSION['UnidadeId'] . "";
-$resultAtendimento  = $conn->query($sql_atendimento);
-$rowSaldoInicial = $resultAtendimento->fetchAll(PDO::FETCH_ASSOC);
+                       WHERE CxAbeOperador = " . $operadorId . " and CxRecUnidade = " . $_SESSION['UnidadeId'] . "";
+$resultMovimentacao  = $conn->query($sql_movimentacao);
+$rowMovimentacao = $resultMovimentacao->fetchAll(PDO::FETCH_ASSOC);
 
 $arrayData = [];
-foreach ($rowSaldoInicial as $item) {
+foreach ($rowMovimentacao as $item) {
     $numeroRegistro = $item["AtendNumRegistro"];
     $dataHora = mostraDataHora($item["CxRecDataHora"]);
     $historico = $item["ClienNome"];
@@ -26,19 +29,15 @@ foreach ($rowSaldoInicial as $item) {
     $valorFinal = mostraValor($item["CxRecValorTotal"]);
     $status = $item["SituaNome"];
 
+    $iconeVizivel = $item["SituaChave"] == 'ESTORNADO' ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$item['AtendNumRegistro'].','.$item["ClienNome"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar"><i class="icon-info3"></i></a>' :
+                                                         '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$item['AtendNumRegistro'].','.$item["ClienNome"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar"><i class="icon-undo2"></i></a>';
+
     $acoes = '
             <div class="list-icons">
                 <div class="list-icons list-icons-extended">
-                    <a href="#" onclick="atualizaContasAPagar('.$item['AtendNumRegistro'].','.$item["ClienNome"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
-                    <a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$item['AtendNumRegistro'].','.$item["ClienNome"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>
-                    <div class="dropdown"">													
-                        <a href="#" class="list-icons-item" data-toggle="dropdown">
-                            <i class="icon-menu9"></i>
-                
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a href="#" class="dropdown-item btnParcelar"  data-popup="tooltip" data-placement="bottom" title="Parcelar"><i class="icon-file-text2"></i> Parcelar</a>
-                        </div>
-                    </div>
+                    <a href="#" onclick="atualizaContasAPagar('.$item['AtendNumRegistro'].','.$item["ClienNome"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Detalhamento"><i class="icon-file-text2"></i></a>
+                    '.$iconeVizivel.'
+                    <a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$item['AtendNumRegistro'].','.$item["ClienNome"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Imprimir"><i class="icon-printer2"></i></a>
                 </div>
             </div>';
 

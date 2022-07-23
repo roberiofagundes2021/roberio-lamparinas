@@ -17,14 +17,15 @@ if(isset($_POST['inputAbrirCaixa'])) {
     $result = $conn->prepare($sql);
 
     $result->execute(array(
-                    ':iCaixa' => $_POST['cmbCaixa'],
-                    ':sDataHoraAbertura' => $dataHorAtual,
-                    ':iOperador' => $_SESSION['UsuarId'],
-                    ':bSaldoInicial' => $saldoInicial,
-                    ':iStatus' => 1,
-                    ':iUnidade' => $_SESSION['UnidadeId']
-                    )); //Depois se informar a respeito do status
+        ':iCaixa' => $_POST['cmbCaixa'],
+        ':sDataHoraAbertura' => $dataHorAtual,
+        ':iOperador' => $_SESSION['UsuarId'],
+        ':bSaldoInicial' => $saldoInicial,
+        ':iStatus' => 1,
+        ':iUnidade' => $_SESSION['UnidadeId']
+    )); //Depois se informar a respeito do status
 
+    $aberturaCaixaId = $conn->lastInsertId();;
     $nomeCaixa = $_POST['inputCaixaNome'];
 }
 
@@ -112,7 +113,7 @@ if(isset($_POST['inputAtendimentoId'])) {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Lamparinas | Movimentação do Caixa</title>
+    <title>Lamparinas | PDV do Caixa</title>
 
     <?php include_once("head.php"); ?>
 
@@ -182,10 +183,6 @@ if(isset($_POST['inputAtendimentoId'])) {
             };	
 
             _componentSelect2();
-
-            //Apenas para deixar em azul o botão de PDV do resumo financeiro, já que é a página atual
-            $('#btnPdv').removeClass()
-            $('#btnPdv').addClass('btn bg-slate legitRipple');
             
             /* Fim: Tabela Personalizada */
 
@@ -285,6 +282,31 @@ if(isset($_POST['inputAtendimentoId'])) {
                 }
             })
 
+            $("#btnFechamento").on('click', () => {
+                let urlConsultaAberturaCaixa = "consultaAberturaCaixa.php";
+                let idOperador = "<?php echo $_SESSION['UsuarId']; ?>"
+
+                let inputsValuesConsulta = {
+                    inputUsuarioId: idOperador
+                }; 
+
+                //Verifica se deverá ou não abrir o caixa
+                $.ajax({
+                    type: "POST",
+                    url: urlConsultaAberturaCaixa,
+                    dataType: "json",
+                    data: inputsValuesConsulta,
+                    success: function(resposta) {
+                        $("#inputAberturaCaixaId").val(resposta.CxAbeId);               
+                        $("#inputCaixaId").val(resposta.CxAbeCaixa);
+                        $("#inputAberturaCaixaNome").val(resposta.CaixaNome);
+
+                        document.formCaixaAberturaId.action = "caixaFechamento.php";
+                        document.formCaixaAberturaId.submit();
+                    }
+                })
+            }) 
+
             $("#btnFinalizarRecebimento").on('click', () => {
                 
                 let idAtendimento = $("#cmbAtendimento").val();
@@ -342,11 +364,11 @@ if(isset($_POST['inputAtendimentoId'])) {
                             <div class="card-header header-elements">
                                 <div class="row">
                                     <div class="col-4">
-                                        <h4 class="m-auto">PDV: 005 - Mudar dps</h4>
+                                        <h4 class="m-auto">PDV: <?php echo $nomeCaixa; ?></h4>
                                     </div>
 
                                     <div class="col-4">
-                                        <h4 class="m-auto">Caixa: <?php echo $nomeCaixa; ?></h4>
+                                        <h4 class="m-auto">Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?></h4>
                                     </div>
 
                                     <div class="col-4 text-right">
@@ -360,20 +382,12 @@ if(isset($_POST['inputAtendimentoId'])) {
                             </div>
 
                             <div class="card-body">
-                                <?php
-                                if (isset($lancamento)) {
-                                    echo '<input type="hidden" name="inputEditar" value="sim">';
-                                    echo '<input type="hidden" name="inputContaId" value="' . $lancamento['CnAPaId'] . '">';
-                                }
-
-                                ?>
-                            
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="cmbAtendimento">Atendimento <span class="text-danger">*</span></label>
                                             <select id="cmbAtendimento" name="cmbAtendimento" class="form-control form-control-select2" required>
-                                                <option value="">Todos</option>
+                                                <option value="">Selecionar</option>
                                                 <?php
                                                 $sql = "SELECT AtendId, ClienNome
                                                         FROM Atendimento
@@ -440,7 +454,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                                     <div class="col-lg-12">
                                         <div class="text-right">
                                             <div>
-                                                <a href="caixaMovimentacao.php" class="btn legitRipple">Fechar</a>
+                                                <a href="caixaMovimentacao.php" class="btn legitRipple">Movimentação</a>
                                                 <button id="btnFinalizar" class="btn btn-principal legitRipple">Finalizar</button>
                                             </div>
                                         </div>
@@ -464,6 +478,12 @@ if(isset($_POST['inputAtendimentoId'])) {
                     <input type="hidden" id="inputFormaPagamento" name="inputFormaPagamento">
                     <input type="hidden" id="inputParcelas" name="inputParcelas">
                 </form>
+
+                <form name="formCaixaAberturaId" method="post">
+					<input type="hidden" id="inputAberturaCaixaId" name="inputAberturaCaixaId" value="">
+                    <input type="hidden" id="inputCaixaId" name="inputCaixaId" value="">
+                    <input type="hidden" id="inputAberturaCaixaNome" name="inputAberturaCaixaNome" value="">
+				</form>
             </div>
             <!-- /content area -->
 
@@ -476,14 +496,16 @@ if(isset($_POST['inputAtendimentoId'])) {
             <div id="modal_small_Recebimento" class="modal fade" tabindex="-1">
                 <div class="modal-dialog modal-sm">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Finalização do recebimento</h5>
+                        <div class="custon-modal-title">
+                            <i class=""></i>
+                            <h2 class="modal-title p-2">Finalização do recebimento</h2>
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <i class=""></i>
                         </div>
 
                         <div class="modal-body">
-                            <div class="form-group mt-3">
-                                <label for="cmbFormaPagamento">Forma de Pagamento <span class="text-danger">*</span></label>
+                            <div class="form-group mt-2">
+                                <label for="cmbFormaPagamento" class="font-size-lg">Forma de Pagamento <span class="text-danger">*</span></label>
                                 <select id="cmbFormaPagamento" name="cmbFormaPagamento" class="form-control form-control-select2 select2-hidden-accessible" required="" tabindex="-1" aria-hidden="true">
                                     <option value="">Selecionar</option>
                                     <?php
@@ -505,7 +527,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="form-group mt-2">
-                                        <label for="cmbParcela">Parcelas</label>
+                                        <label for="cmbParcela" class="font-size-lg">Parcelas</label>
                                         <select id="cmbParcela" name="cmbParcela" class="form-control form-control-select2 select2-hidden-accessible" required="" tabindex="-1" aria-hidden="true">
                                             <option value="">Selecionar</option>
                                             <option value="1">1</option>
@@ -526,7 +548,7 @@ if(isset($_POST['inputAtendimentoId'])) {
 
                                 <div class="col-lg-8">
                                     <div class="form-group mt-2">
-                                        <label for="valorPorParcela">Valor por parcela</label>
+                                        <label for="valorPorParcela" class="font-size-lg">Valor por parcela</label>
                                         <input type="text" id="valorPorParcela" name="valorPorParcela" class="form-control removeValidacao" readonly>
                                     </div>
                                 </div>
@@ -544,24 +566,16 @@ if(isset($_POST['inputAtendimentoId'])) {
             <div id="modal_small_detalhamento_cheque" class="modal fade" tabindex="-1">
                 <div class="modal-dialog modal-sm">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Abertura de Caixa</h5>
+                        <div class="custon-modal-title">
+                            <i class=""></i>
+                            <h2 class="modal-title p-2">Detalhamento de Cheque</h2>
+                            <i class=""></i>
                         </div>
 
                         <form id="formAbrirCaixa" method="POST" action="caixaPdv.php">
                             <input type="hidden" id="inputCaixaNome" name="inputCaixaNome" value="">
 
                             <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        Data: <?php echo date('d/m/Y'); ?>
-                                    </div>
-    
-                                    <div class="col-lg-6">
-                                        Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?>
-                                    </div>
-                                </div>
-    
                                 <div class="form-group mt-3">
                                     <!--Input para controle, para que caso acesse o PDV pela abertura de caixa ele fará o cadastro da nova abertura de caixa-->
                                     <input type="hidden" id="inputAbrirCaixa" name="inputAbrirCaixa" value="" class="form-control removeValidacao">
@@ -607,8 +621,6 @@ if(isset($_POST['inputAtendimentoId'])) {
 
         </div>
         <!-- /main content -->
-
-        <?php include_once("sidebar-right-resumo-caixa.php"); ?>
 
     </div>
     <!-- /page content -->

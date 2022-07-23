@@ -25,8 +25,9 @@ function mostraData($data)
 	if ($data <> '0000-00-00 00:00:00' and $data <> ''){
 		$dataHora = explode(" ", $data);
 		$data = explode("-", $dataHora[0]);
+		$hora = explode(".", $dataHora[1]); //Caso a hora venha do banco de dados no seguinte formato. H:i:s.000
 		$dataformatada = array();
-		@$dataformatada = date("d/m/Y", mktime(0,0,0, $data[1] , $data[2] , $data[0] )) . " " . $dataHora[1];
+		@$dataformatada = date("d/m/Y", mktime(0,0,0, $data[1] , $data[2] , $data[0] )) . " " . $hora[0];
 	} 
 	else{
 		$dataformatada = '';
