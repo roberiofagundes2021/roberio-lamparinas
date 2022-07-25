@@ -232,10 +232,15 @@ try{
 		echo json_encode($row);
 	} elseif ($tipoRequest === 'MUDARSITUACAO'){
 		$iAtendimento = $_POST['iAtendimento'];
-		$iSituacao = $_POST['iSituacao'];
-		$sObservacao = $_POST['sObservacao'];
+		$situacao = isset($_POST['sSituacao'])?$_POST['sSituacao']:'';
+
+		$sql = "SELECT SituaId
+		FROM Situacao WHERE SituaChave = '$situacao'";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+		$situacao = $row['SituaId'];
 	
-		$sql = "UPDATE Atendimento set AtendSituacao = $iSituacao, AtendObservacao = '$sObservacao'
+		$sql = "UPDATE Atendimento set AtendSituacao = $situacao
 		WHERE AtendId = $iAtendimento";
 		$result = $conn->query($sql);
 

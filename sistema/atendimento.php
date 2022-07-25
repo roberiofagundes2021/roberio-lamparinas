@@ -10,7 +10,7 @@ include('global_assets/php/conexao.php');
 // que podem ver a tela de atendimento na visão do atendente ou profissional respectivamente
 
 $visaoAtendente = [
-	'SUPER',
+	'SUPERR',
 	'RECEPCAO'
 ];
 
@@ -312,44 +312,6 @@ switch($row['PerfiChave']){
 			_componentSelect2();
 			
 			/* Fim: Tabela Personalizada */
-
-			$('#modal-close-x').on('click', ()=>{
-				$('#iAtendimento').val('')
-				$('#page-modal-situacao').fadeOut(200);
-			})
-
-			$('#cmbSituacao').on('change', ()=>{
-				let cmbSituacao = $('#cmbSituacao').val();
-				$('iSituacao').val(cmbSituacao)
-			})
-
-			$('#mudarSituacao').on('click', ()=>{
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimento.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'MUDARSITUACAO',
-						'iAtendimento': $('#iAtendimento').val(),
-						'iSituacao': $('#cmbSituacao').val(),
-						'sObservacao': $('#observacaoModal').val()
-					},
-					success: function(response) {
-						alerta(response.titulo, response.menssagem, response.tipo);
-						$('#iAtendimento').val('')
-						$('#observacaoModal').val('')
-						$('#page-modal-situacao').fadeOut(200);
-						getAtendimentos();
-					},
-					error: function(response) {
-						alerta(response.titulo, response.menssagem, response.tipo);
-						$('#iAtendimento').val('')
-						$('#observacaoModal').val('')
-						$('#page-modal-situacao').fadeOut(200);
-						getAtendimentos();
-					}
-				});
-			})
 		});
 
 		function setAttributs(){
@@ -413,8 +375,6 @@ switch($row['PerfiChave']){
 						response.dataEspera.forEach(item => {
 							rowNodeE = tableE.row.add(item.data).draw().node()
 							$(rowNodeE).attr('class', 'text-center')
-							$(rowNodeE).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeE).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 							$(rowNodeE).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeE).find('td:eq(9)').attr('data-observacao', `${item.identify.sObservacao}`)
 						})
@@ -429,32 +389,6 @@ switch($row['PerfiChave']){
 	
 					}
 					setAttributs()
-				}
-			});
-		}
-		function alteraSituacao(situacao, element){
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'SITUACOES'
-				},
-				success: function(response) {
-					$('#cmbSituacao').empty()
-					// primeiro limpa os valores para adicionar novos evitando duplicação
-					$('#cmbSituacao').empty()
-					$('#iAtendimento').val('')
-					$('#observacaoModal').val('')
-
-					response.forEach(item => {
-						let opt = item.SituaChave === situacao? `<option selected value="${item.SituaId}">${item.SituaNome}</option>`:`<option value="${item.SituaId}">${item.SituaNome}</option>`
-						$('#cmbSituacao').append(opt)
-					})
-					$('#iAtendimento').val($(element).data('atendimento'))
-					$('#observacaoModal').val($(element).data('observacao'))
-
-					$('#page-modal-situacao').fadeIn(200);
 				}
 			});
 		}
@@ -509,7 +443,7 @@ switch($row['PerfiChave']){
 										</div>
 										<div class="col-lg-12 row text-right p-0">
 											<div class="text-right col-sm-8 p-0"><!-- EESPASSO --></div>
-											<div class="text-right col-sm-2 p-0"><a href="atendimentoNovo.php" class="btn btn-principal" role="button">Novo Agendamento</a></div>
+											<div class="text-right col-sm-2 p-0"><a href="atendimentoNovo.php" class="btn btn-principal" role="button">Novo Atendimento</a></div>
 											<div class="text-right col-sm-2 p-0"><a href="#" class="btn bg-secondary" role="button">Imprimir Relação</a></div>
 										</div>
 									</div>
