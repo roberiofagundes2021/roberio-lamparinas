@@ -21,15 +21,14 @@ $rowEletivo = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoEletivoId = $rowEletivo?$rowEletivo['AtEleId']:null;
 
-$userId = $_SESSION['UsuarId'];
-
-
 //Essa consulta é para verificar  o profissional
-$sql = "SELECT UsuarNome
+$sql = "SELECT UsuarId, ProfiUsuario, ProfiId, ProfiNome
 		FROM Usuario
-		WHERE UsuarId = $userId";
+		JOIN Profissional ON ProfiUsuario = UsuarId
+		WHERE UsuarId =  ". $_SESSION['UsuarId'] . " ";
 $result = $conn->query($sql);
 $rowUser = $result->fetch(PDO::FETCH_ASSOC);
+$userId = $rowUser['ProfiId'];
 
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
@@ -263,7 +262,7 @@ if (isset($_POST['txtareaConteudo']) ){
 									</div>
 									<div class="row">
 										<div class="col-lg-6">
-											<p class="font-size-lg"><b><?php strtoupper($row['ClienNome']); ?></b></p>
+											<p class="font-size-lg"><b><?php echo strtoupper($row['ClienNome']); ?></b></p>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
@@ -322,7 +321,7 @@ if (isset($_POST['txtareaConteudo']) ){
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputProfissional">Profissional</label>
-												<input type="text" id="inputProfissional" name="inputProfissional" class="form-control"  value="<?php echo $rowUser['UsuarNome']; ?>" readOnly>
+												<input type="text" id="inputProfissional" name="inputProfissional" class="form-control"  value="<?php echo $rowUser['ProfiNome']; ?>" readOnly>
 											</div>
 										</div>
 									</div>
@@ -345,6 +344,7 @@ if (isset($_POST['txtareaConteudo']) ){
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
 												<button class="btn btn-lg btn-principal" id="enviar">Salvar</button>
+												<a href="atendimento.php" class="btn btn-basic" role="button">Cancelar</a>
 											</div>
 										</div>
 									</div>    

@@ -219,6 +219,8 @@ if(isset($_POST['inputTipo'])){
 				var inputNomePJ = $('#inputNomePJ').val();
 				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputCnpj = $('#inputCnpj').val().replace(/[^\d]+/g,'');
+				var cmbUsuario = $('#cmbUsuario').val();
+
 
 				if (inputTipo == 'F'){ 
 					inputNome = inputNomePF; 
@@ -267,7 +269,24 @@ if(isset($_POST['inputTipo'])){
 						
 						$('#formProfissional').submit();
 					}
+
 				}); //ajax
+
+
+				//Esse ajax está sendo usado para verificar o usuário já é vinculado a um profissional 
+				$.ajax({
+					type: "POST",
+					url: "profissionalUsuarioValida.php",
+					data: ('nomeNovo=' + cmbUsuario),
+					success: function(resposta) {
+
+						if (resposta == 1) {
+							alerta('Atenção', 'Esse usuário já é vinculado a um profissional!', 'error');
+							return false;
+						}
+						
+					}
+				}) 
 				
 			}); // enviar
 			

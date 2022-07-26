@@ -4,11 +4,27 @@ include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Atestado Médico';
 
-include('global_assets/php/conexao.php');
+include('global_assets/php/conexao.php'); 
 
-$iAtendimentoId = '3';
-$iAtendimentoAtestadoMedicoId = '4';
+$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
+if(!$iAtendimentoId){
+	irpara("atendimento.php");
+}
+
+$sql = "SELECT TOP(1) AtAMeId
+FROM AtendimentoAtestadoMedico
+WHERE AtAMeAtendimento = $iAtendimentoId
+ORDER BY AtAMeId DESC";
+$result = $conn->query($sql);
+$rowAtestadoMedico= $result->fetch(PDO::FETCH_ASSOC);
+
+$iAtendimentoAtestadoMedicoId = $rowAtestadoMedico?$rowAtestadoMedico['AtAMeId']:null;
+
+// essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
+
+$ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
+$ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
 
 //Essa consulta é para verificar  o profissional
 $sql = "SELECT UsuarId, ProfiUsuario, ProfiId, ProfiNome
@@ -77,7 +93,7 @@ if (isset($_POST['txtareaConteudo']) ){
 	
 
 		//Edição
-		if (isset($iAtendimentoAtestadoMedicoId ) <> ''){
+		if ($iAtendimentoAtestadoMedicoId){
 		
 			$sql = "UPDATE AtendimentoAtestadoMedico SET AtAMeAtendimento = :sAtendimento, AtAMeData = :dData, AtAMeHoraInicio = :sHoraInicio,
 						   AtAMeHoraFim  = :sHoraFim, AtAMeProfissional = :sProfissional, AtAMeCid10 = :iCid10, AtAMeAtestadoMedico = :sAtestadoMedico, AtAMeUnidade = :iUnidade
@@ -172,17 +188,16 @@ if (isset($_POST['txtareaConteudo']) ){
 
 			$('#summernote').summernote();
 			
-		}); //document.ready
         
 		$('#enviar').on('click', function(e){
 			
 			e.preventDefault();
 	
 
-			$( "#formAtendimentoAtestadoMedico" ).submit();
-				
+			$( "#formAtendimentoAtestadoMedico" ).submit()	
 			
 		})
+	}); //document.ready	
 			
 		// Calculo da idade do paciente.
 		
@@ -198,14 +213,17 @@ if (isset($_POST['txtareaConteudo']) ){
 
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
 	<!-- Page content -->
 	<div class="page-content">
 		
-		<?php include_once("menu-left.php"); ?>
+		<?php
+			include_once("menu-left.php");
+			include_once("menuLeftSecundarioVenda.php");
+		?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
@@ -219,10 +237,19 @@ if (isset($_POST['txtareaConteudo']) ){
 				<div class="row">
 					
 					<div class="col-lg-12">
+
+
+						<form id='dadosPost'>
+							<?php
+								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+							?>
+						</form>
 							<!-- Basic responsive configuration -->
 
 						<form name="formAtendimentoAtestadoMedico" id="formAtendimentoAtestadoMedico" method="post" class="form-validate-jquery">
-						<input type="hidden" id="inputAtendimentoAtestadoMedicoId" name="inputAtendimentoAtestadoMedicoId" value="<?php if (isset($iAtendimentoAtestadoMedicoId )) echo $iAtendimentoAtestadoMedicoId ; ?>" >
+							<?php
+								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+							?>
 							<div class="card">
 								<div class="card-header header-elements-inline">
 									<h3 class="card-title">ATESTADO MÉDICO</h3>
@@ -368,6 +395,7 @@ if (isset($_POST['txtareaConteudo']) ){
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
 												<button class="btn btn-lg btn-principal" id="enviar">Salvar</button>
+												<a href="atendimento.php" class="btn btn-basic" role="button">Cancelar</a>
 											</div>
 										</div>
 									</div>    

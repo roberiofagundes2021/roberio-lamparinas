@@ -223,6 +223,9 @@ if(isset($_POST['inputTipo'])){
 				var inputNomeVelho = $('#inputProfissionalNome').val();				
 				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputCnpj = $('#inputCnpj').val().replace(/[^\d]+/g,'');
+				var cmbNomeNovo = $('#cmbUsuario').val();
+      			var cmbNomeVelho = $('#cmbUsuarioVelho').val();
+
 
 				if (inputTipo == 'F'){ 
 					inputNomeNovo = inputNomeNovoPF; 
@@ -272,6 +275,24 @@ if(isset($_POST['inputTipo'])){
 						$( "#formProfissional" ).submit();
 					}
 				}); //ajax
+
+
+
+				//Esse ajax está sendo usado para verificar o usuário já é vinculado a um profissional 
+				$.ajax({
+					type: "POST",
+					url: "profissionalUsuarioValida.php",
+					data: ('nomeNovo=' + cmbNomeNovo + '&nomeVelho=' + cmbNomeVelho),
+					success: function(resposta) {
+
+						if (resposta == 1) {
+							alerta('Atenção', 'Esse usuário já é vinculado a um profissional!', 'error');
+							return false;
+						}
+
+
+					}
+				})
 				
 			}); // enviar
             
@@ -410,7 +431,7 @@ if(isset($_POST['inputTipo'])){
 						
 						<input type="hidden" id="inputProfissionalId" name="inputProfissionalId" value="<?php echo $row['ProfiId']; ?>" >
 						<input type="hidden" id="inputProfissionalNome" name="inputProfissionalNome" value="<?php echo $row['ProfiNome']; ?>" >
-						
+						<input type="hidden" id="cmbUsuarioVelho" name="cmbUsuarioVelho" value="<?php echo $row['ProfiUsuario']; ?>">
 						<div class="card-body">								
 							<div class="row">
 								<div class="col-lg-4">
