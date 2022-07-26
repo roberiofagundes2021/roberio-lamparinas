@@ -28,6 +28,7 @@
 					case 'atendimentoEletivo': URL = 'atendimentoEletivo.php'; break;
 					case 'receituario': URL = 'atendimentoReceituario.php'; break;
 					case 'atestadoMedico': URL = 'atendimentoAtestadoMedico.php'; break;
+					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
