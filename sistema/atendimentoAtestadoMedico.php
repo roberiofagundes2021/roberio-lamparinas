@@ -369,10 +369,6 @@ if (isset($_POST['txtareaConteudo']) ){
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-													//foreach ($row as $item){
-													//	print('<option value="'.$item['Cid10Id'].'">'.$item['Cid10Capitulo'] . ' - '.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
-													//}
-
 													foreach ($row as $item){
 														$seleciona = $item['Cid10Id'] == $rowAtestadoMedico['AtAMeCid10'] ? "selected" : "";
 														print('<option value="'.$item['Cid10Id'].'" '. $seleciona .'>'.$item['Cid10Capitulo'] . ' - '.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');

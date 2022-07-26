@@ -229,7 +229,7 @@ if (isset($_POST['txtareaConteudo']) ){
 							?>
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h3 class="card-title">ANAMNESE</h3>
+									<h3 class="card-title"><b>ANAMNESE</b></h3>
 								</div>
 							</div>
 
@@ -262,7 +262,7 @@ if (isset($_POST['txtareaConteudo']) ){
 									</div>
 									<div class="row">
 										<div class="col-lg-6">
-											<p class="font-size-lg"><b><?php echo strtoupper($row['ClienNome']); ?></b></p>
+											<h4><b><?php echo strtoupper($row['ClienNome']); ?></b></h4>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
