@@ -29,6 +29,8 @@
 					case 'receituario': URL = 'atendimentoReceituario.php'; break;
 					case 'atestadoMedico': URL = 'atendimentoAtestadoMedico.php'; break;
 					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; break;
+					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; break;
+					case 'triagem': URL = 'atendimentoTriagem.php'; break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
