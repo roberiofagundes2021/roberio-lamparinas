@@ -223,6 +223,9 @@ if(isset($_POST['inputTipo'])){
 				var inputNomeVelho = $('#inputProfissionalNome').val();				
 				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputCnpj = $('#inputCnpj').val().replace(/[^\d]+/g,'');
+				var cmbNomeNovo = $('#cmbUsuario').val();
+      			var cmbNomeVelho = $('#cmbUsuarioVelho').val();
+
 
 				if (inputTipo == 'F'){ 
 					inputNomeNovo = inputNomeNovoPF; 
@@ -256,22 +259,37 @@ if(isset($_POST['inputTipo'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNomeNovo.trim();
-					
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+
+				//Esse ajax está sendo usado para verificar o usuário já é vinculado a um profissional 
 				$.ajax({
 					type: "POST",
-					url: "profissionalValida.php",
-					data: {tipo: inputTipo, nomeNovo: inputNomeNovo, nomeVelho: inputNomeVelho, cpf: inputCpf, cnpj: inputCnpj},
-					success: function(resposta){
-						
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
+					url: "profissionalUsuarioValida.php",
+					data: ('nomeNovo=' + cmbNomeNovo + '&nomeVelho=' + cmbNomeVelho),
+					success: function(resposta) {
+
+						if (resposta == 1) {
+							alerta('Atenção', 'Esse usuário já está vinculado a outro profissional!', 'error');
 							return false;
+						} else{
+
+							//Esse ajax está sendo usado para verificar no banco se o registro já existe
+							$.ajax({
+								type: "POST",
+								url: "profissionalValida.php",
+								data: {tipo: inputTipo, nomeNovo: inputNomeNovo, nomeVelho: inputNomeVelho, cpf: inputCpf, cnpj: inputCnpj},
+								success: function(resposta){
+									
+									if(resposta == 1){
+										alerta('Atenção','Esse funcionário já possui cadastro no sistema!','error');
+										return false;
+									}
+									
+									$( "#formProfissional" ).submit();
+								}
+							}); //ajax
 						}
-						
-						$( "#formProfissional" ).submit();
 					}
-				}); //ajax
+				})
 				
 			}); // enviar
             
@@ -410,7 +428,7 @@ if(isset($_POST['inputTipo'])){
 						
 						<input type="hidden" id="inputProfissionalId" name="inputProfissionalId" value="<?php echo $row['ProfiId']; ?>" >
 						<input type="hidden" id="inputProfissionalNome" name="inputProfissionalNome" value="<?php echo $row['ProfiNome']; ?>" >
-						
+						<input type="hidden" id="cmbUsuarioVelho" name="cmbUsuarioVelho" value="<?php echo $row['ProfiUsuario']; ?>">
 						<div class="card-body">								
 							<div class="row">
 								<div class="col-lg-4">

@@ -219,6 +219,8 @@ if(isset($_POST['inputTipo'])){
 				var inputNomePJ = $('#inputNomePJ').val();
 				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
 				var inputCnpj = $('#inputCnpj').val().replace(/[^\d]+/g,'');
+				var cmbUsuario = $('#cmbUsuario').val();
+
 
 				if (inputTipo == 'F'){ 
 					inputNome = inputNomePF; 
@@ -250,24 +252,37 @@ if(isset($_POST['inputTipo'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
-				
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+
+				//Esse ajax está sendo usado para verificar o usuário já é vinculado a um profissional 
 				$.ajax({
 					type: "POST",
-					url: "profissionalValida.php",
-					data: {tipo: inputTipo, nome: inputNome, cpf: inputCpf, cnpj: inputCnpj},
-					success: function(resposta){
-						
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
+					url: "profissionalUsuarioValida.php",
+					data: ('nomeNovo=' + cmbUsuario),
+					success: function(resposta) {
+
+						if (resposta == 1) {
+							alerta('Atenção', 'Esse usuário já está vinculado a outro profissional!', 'error');
 							return false;
+						} else{
+							//Esse ajax está sendo usado para verificar no banco se o registro já existe
+							$.ajax({
+								type: "POST",
+								url: "profissionalValida.php",
+								data: {tipo: inputTipo, nome: inputNome, cpf: inputCpf, cnpj: inputCnpj},
+								success: function(resposta){
+									
+									if(resposta == 1){
+										alerta('Atenção','Esse funcionário já possui cadastro no sistema!','error');
+										return false;
+									}
+									
+									$('#formProfissional').submit();
+								}
+							}); //ajax
 						}
 						
-						//return false;
-						
-						$('#formProfissional').submit();
 					}
-				}); //ajax
+				}) 
 				
 			}); // enviar
 			
