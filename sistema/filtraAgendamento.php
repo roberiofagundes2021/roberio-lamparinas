@@ -126,7 +126,7 @@ try{
 		try{		
 			$sql = "SELECT COUNT(isnull(clienCodigo,0)) as Codigo
 					FROM Cliente
-					Where ClienUnidade = ".$_SESSION['UnidadeId']."";
+					Where ClienUnidade = $iUnidade";
 			//echo $sql;die;
 			$result = $conn->query("$sql");
 			$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
