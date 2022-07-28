@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Atestado Médico';
+$_SESSION['PaginaAtual'] = 'Encaminhamento Médico';
 
 include('global_assets/php/conexao.php'); 
 
@@ -12,14 +12,14 @@ if(!$iAtendimentoId){
 	irpara("atendimento.php");
 }
 
-$sql = "SELECT TOP(1) AtAMeId
-FROM AtendimentoAtestadoMedico
-WHERE AtAMeAtendimento = $iAtendimentoId
-ORDER BY AtAMeId DESC";
+$sql = "SELECT TOP(1) AtEMeId
+FROM AtendimentoEncaminhamentoMedico
+WHERE AtEMeAtendimento = $iAtendimentoId
+ORDER BY AtEMeId DESC";
 $result = $conn->query($sql);
-$rowAtestadoMedico= $result->fetch(PDO::FETCH_ASSOC);
+$rowEncaminhamentoMedico= $result->fetch(PDO::FETCH_ASSOC);
 
-$iAtendimentoAtestadoMedicoId = $rowAtestadoMedico?$rowAtestadoMedico['AtAMeId']:null;
+$iAtendimentoEncaminhamentoMedicoId = $rowEncaminhamentoMedico?$rowEncaminhamentoMedico['AtEMeId']:null;
 
 // essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
 
@@ -60,26 +60,26 @@ if ($row['ClienSexo'] == 'F'){
 }
 
 //Se estiver editando
-if(isset($iAtendimentoAtestadoMedicoId ) && $iAtendimentoAtestadoMedicoId ){
+if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMedicoId ){
 
-	//Essa consulta é para preencher o campo Atestado Médico ao editar
-	$sql = "SELECT AtAMeAtestadoMedico, AtAMeHoraFim, AtAMeHoraInicio, AtAMeData, AtAMeCid10
-			FROM AtendimentoAtestadoMedico
-			WHERE AtAMeId = " . $iAtendimentoAtestadoMedicoId ;
+	//Essa consulta é para preencher o campo Encaminhamento Médico ao editar
+	$sql = "SELECT AtEMeEncaminhamentoMedico, AtEMeHoraFim, AtEMeHoraInicio, AtEMeData, AtEMeCid10
+			FROM AtendimentoEncaminhamentoMedico
+			WHERE AtEMeId = " . $iAtendimentoEncaminhamentoMedicoId ;
 	$result = $conn->query($sql);
-	$rowAtestadoMedico = $result->fetch(PDO::FETCH_ASSOC);
+	$rowEncaminhamentoMedico = $result->fetch(PDO::FETCH_ASSOC);
 		
 	$_SESSION['msg'] = array();
 
 	// Formatar Hora/Data
 
-	$Data = strtotime($rowAtestadoMedico['AtAMeData']);
+	$Data = strtotime($rowEncaminhamentoMedico['AtEMeData']);
 	$DataAtendimento = date("d/m/Y", $Data);
 
-	$Inicio = strtotime($rowAtestadoMedico['AtAMeHoraInicio']);
+	$Inicio = strtotime($rowEncaminhamentoMedico['AtEMeHoraInicio']);
 	$HoraInicio = date("H:i", $Inicio);
 
-	$Fim = strtotime($rowAtestadoMedico['AtAMeHoraFim']);
+	$Fim = strtotime($rowEncaminhamentoMedico['AtEMeHoraFim']);
 	$HoraFim = date("H:i", $Fim);
 
 } 
@@ -93,11 +93,11 @@ if (isset($_POST['txtareaConteudo']) ){
 	
 
 		//Edição
-		if ($iAtendimentoAtestadoMedicoId){
+		if ($iAtendimentoEncaminhamentoMedicoId){
 		
-			$sql = "UPDATE AtendimentoAtestadoMedico SET AtAMeAtendimento = :sAtendimento, AtAMeData = :dData, AtAMeHoraInicio = :sHoraInicio,
-						   AtAMeHoraFim  = :sHoraFim, AtAMeProfissional = :sProfissional, AtAMeCid10 = :iCid10, AtAMeAtestadoMedico = :sAtestadoMedico, AtAMeUnidade = :iUnidade
-					WHERE AtAMeId = :iAtendimentoAtestadoMedico";
+			$sql = "UPDATE AtendimentoEncaminhamentoMedico SET AtEMeAtendimento = :sAtendimento, AtEMeData = :dData, AtEMeHoraInicio = :sHoraInicio,
+						   AtEMeHoraFim  = :sHoraFim, AtEMeProfissional = :sProfissional, AtEMeCid10 = :iCid10, AtEMeEncaminhamentoMedico = :sEncaminhamentoMedico, AtEMeUnidade = :iUnidade
+					WHERE AtEMeId = :iAtendimentoEncaminhamentoMedico";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -107,18 +107,18 @@ if (isset($_POST['txtareaConteudo']) ){
 				':sHoraFim' => $_POST['inputFim'],
 				':sProfissional' => $userId,
 				':iCid10' => $_POST['cmbCid10'],
-				':sAtestadoMedico' => $_POST['txtareaConteudo'],
+				':sEncaminhamentoMedico' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],
-				':iAtendimentoAtestadoMedico' => $iAtendimentoAtestadoMedicoId 
+				':iAtendimentoEncaminhamentoMedico' => $iAtendimentoEncaminhamentoMedicoId 
 				));
 
-			$_SESSION['msg']['mensagem'] = "Atestado Médico alterado!!!";
+			$_SESSION['msg']['mensagem'] = "Encaminhamento Médico alterado!!!";
 			
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoAtestadoMedico (AtAMeAtendimento, AtAMeData, AtAMeHoraInicio, AtAMeHoraFim, AtAMeProfissional, AtAMeCid10, AtAMeAtestadoMedico, AtAMeUnidade)
-						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional, :iCid10, :sAtestadoMedico, :iUnidade)";
+			$sql = "INSERT INTO AtendimentoEncaminhamentoMedico (AtEMeAtendimento, AtEMeData, AtEMeHoraInicio, AtEMeHoraFim, AtEMeProfissional, AtEMeCid10, AtEMeEncaminhamentoMedico, AtEMeUnidade)
+						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional, :iCid10, :sEncaminhamentoMedico, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -128,11 +128,11 @@ if (isset($_POST['txtareaConteudo']) ){
 				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,
 				':iCid10' => $_POST['cmbCid10'],
-				':sAtestadoMedico' => $_POST['txtareaConteudo'],
+				':sEncaminhamentoMedico' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],
 			));
 
-			$_SESSION['msg']['mensagem'] = "Atestado Médico incluído!!!";
+			$_SESSION['msg']['mensagem'] = "Encaminhamento Médico incluído!!!";
 
 		}
 	
@@ -142,13 +142,13 @@ if (isset($_POST['txtareaConteudo']) ){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro reportado com o Atestado Médico!!!";
+		$_SESSION['msg']['mensagem'] = "Erro reportado com o Encaminhamento Médico!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
 	}
 
-	irpara("atendimentoAtestadoMedico.php");
+	irpara("atendimentoEncaminhamentoMedico.php");
 }
 
 ?>
@@ -159,7 +159,7 @@ if (isset($_POST['txtareaConteudo']) ){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Atestado Médico</title>
+	<title>Lamparinas | Encaminhamento Médico</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -194,7 +194,7 @@ if (isset($_POST['txtareaConteudo']) ){
 			e.preventDefault();
 	
 
-			$( "#formAtendimentoAtestadoMedico" ).submit()	
+			$( "#formAtendimentoEncaminhamentoMedico" ).submit()	
 			
 		})
 	}); //document.ready	
@@ -246,13 +246,13 @@ if (isset($_POST['txtareaConteudo']) ){
 						</form>
 							<!-- Basic responsive configuration -->
 
-						<form name="formAtendimentoAtestadoMedico" id="formAtendimentoAtestadoMedico" method="post" class="form-validate-jquery">
+						<form name="formAtendimentoEncaminhamentoMedico" id="formAtendimentoEncaminhamentoMedico" method="post" class="form-validate-jquery">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
 							?>
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h3 class="card-title"><b>ATESTADO MÉDICO</b></h3>
+									<h3 class="card-title"><b>ENCAMINHAMENTO MÉDICO</b></h3>
 								</div>
 							</div>
 
@@ -326,19 +326,19 @@ if (isset($_POST['txtareaConteudo']) ){
 										<div class="col-lg-3">
 										<div class="form-group">
 												<label for="inputData">Data</label>
-												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php if (isset($iAtendimentoAtestadoMedicoId )){ echo $DataAtendimento;} else { echo date('d/m/Y'); } ?>" readOnly> 
+												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php if (isset($iAtendimentoEncaminhamentoMedicoId )){ echo $DataAtendimento;} else { echo date('d/m/Y'); } ?>" readOnly> 
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputInicio">Início do Atendimento</label>
-												<input type="text" id="inputInicio" name="inputInicio" class="form-control"  value="<?php if (isset($iAtendimentoAtestadoMedicoId )){ echo $HoraInicio;} else { echo date('H:i'); } ?>" readOnly>
+												<input type="text" id="inputInicio" name="inputInicio" class="form-control"  value="<?php if (isset($iAtendimentoEncaminhamentoMedicoId )){ echo $HoraInicio;} else { echo date('H:i'); } ?>" readOnly>
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputFim">Témino do Atendimento</label>
-												<input type="text" id="inputFim" name="inputFim" class="form-control" value="<?php if (isset($iAtendimentoAtestadoMedicoId )) echo $HoraFim; ?>" readOnly>
+												<input type="text" id="inputFim" name="inputFim" class="form-control" value="<?php if (isset($iAtendimentoEncaminhamentoMedicoId )) echo $HoraFim; ?>" readOnly>
 											</div>
 										</div>
 										<div class="col-lg-3">
@@ -369,8 +369,12 @@ if (isset($_POST['txtareaConteudo']) ){
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
+													//foreach ($row as $item){
+													//	print('<option value="'.$item['Cid10Id'].'">'.$item['Cid10Capitulo'] . ' - '.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
+													//}
+
 													foreach ($row as $item){
-														$seleciona = $item['Cid10Id'] == $rowAtestadoMedico['AtAMeCid10'] ? "selected" : "";
+														$seleciona = $item['Cid10Id'] == $rowEncaminhamentoMedico['AtEMeCid10'] ? "selected" : "";
 														print('<option value="'.$item['Cid10Id'].'" '. $seleciona .'>'.$item['Cid10Capitulo'] . ' - '.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
 													}
 												
@@ -382,8 +386,8 @@ if (isset($_POST['txtareaConteudo']) ){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="inputNome">Atestado Médico </label>
-												<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Corpo do anamnese (informe aqui o texto que você queira que apareça no anamnese)" > <?php if (isset($iAtendimentoAtestadoMedicoId )) echo $rowAtestadoMedico['AtAMeAtestadoMedico']; ?> </textarea>
+												<label for="inputNome">Encaminhamento Médico </label>
+												<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Corpo do anamnese (informe aqui o texto que você queira que apareça no anamnese)" > <?php if (isset($iAtendimentoEncaminhamentoMedicoId )) echo $rowEncaminhamentoMedico['AtEMeEncaminhamentoMedico']; ?> </textarea>
 											</div>
 										</div>
 									</div>

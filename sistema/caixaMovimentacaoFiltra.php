@@ -2,42 +2,106 @@
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
-//$atendimentoId = $_POST['inputAtendimentoId'];
-$atendimentoId = 5;
-$operadorId = $_SESSION['UsuarId'];
+$argsRecebimento = [];
+$argsPagamento = [];
+
+//Aqui é para limpar a sessão caso o usuário filtre todos novamente
+$_SESSION['MovCaixaPeriodoDe'] = '';
+$_SESSION['MovCaixaAte'] = '';
+$_SESSION['MovCaixaCliente'] = '';
+$_SESSION['MovCaixaFormaPagamento'] = '';
+
+//Depois vê o que fazer depois
+if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
+    empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = date('Y-m-d 01:00:00') : $inputPeriodoDe = $_POST['inputPeriodoDe'] . ' 00:00:00';
+    empty($_POST['inputAte']) ? $inputAte = date('Y-m-d 23:59:59') : $inputAte = $_POST['inputAte'] . ' 23:59:59';
+
+    $argsRecebimento[]  = "CxRecDataHora BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+    $argsPagamento[]  = "CxPagDataHora BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
+
+    if (!empty($_POST['inputPeriodoDe'])) {
+        $_SESSION['MovCaixaPeriodoDe'] = $_POST['inputPeriodoDe'];
+    }
+
+    if (!empty($_POST['inputAte'])) {
+        $_SESSION['MovCaixaAte'] = $_POST['inputAte'];
+    }
+}
+
+if (!empty($_POST['cmbClientes'])) {
+    $argsRecebimento[]  = "AtendCliente = " . $_POST['cmbClientes'] . " ";
+    $_SESSION['MovCaixaCliente'] = $_POST['cmbClientes'];
+}
+
+if (!empty($_POST['inputFormaPagamento'])) {
+    $argsRecebimento[]  = "CxRecFormaPagamento = " . $_POST['inputFormaPagamento'] . " ";
+    $argsPagamento[]  = "CxPagFormaPagamento = " . $_POST['inputFormaPagamento'] . " ";
+    $_SESSION['MovCaixaFormaPagamento'] = $_POST['inputFormaPagamento'];
+}
+
+if (!empty($_POST['cmbStatus'])) {
+    $argsRecebimento[]  = "CxRecStatus = " . $_POST['cmbStatus'] . " ";
+    $argsPagamento[]  = "CxPagStatus = " . $_POST['cmbStatus'] . " ";
+    $_SESSION['MovCaixaStatus'] = $_POST['cmbStatus'];
+}
+
+$stringRecebimento = implode(" and ", $argsRecebimento);
+$stringPagamento = implode(" and ", $argsPagamento);
+
+if ($stringRecebimento != '') {
+    $stringRecebimento .= ' and ';
+}
+
+if ($stringPagamento != '') {
+    $stringPagamento .= ' and ';
+}
 
 //Falta colocar o CaixaFechamento
-$sql_movimentacao    = "SELECT AtendNumRegistro, ClienNome, CxRecDataHora, CxRecAtendimento, FrPagNome, 
-                              CxRecValor, CxRecValorTotal, SituaNome, SituaChave, 'Recebimento' as Tipo
-                       FROM CaixaRecebimento
-                       JOIN CaixaAbertura on CxAbeId = CxRecCaixaAbertura
-                       JOIN FormaPagamento on FrPagId = CxRecFormaPagamento
-                       JOIN Atendimento on AtendId = CxRecAtendimento
-                       JOIN Cliente on ClienId = AtendCliente
-                       JOIN Situacao on SituaId = CxRecStatus
-                       WHERE CxAbeOperador = " . $operadorId . " and CxRecUnidade = " . $_SESSION['UnidadeId'] . "";
+$sql_movimentacao    = "SELECT AtendNumRegistro, ClienNome as HISTORICO, CxRecDataHora as DATAHORA, CxRecAtendimento, FrPagNome, 
+                                CxRecValor, CxRecValorTotal as TOTAL, SituaNome, SituaChave, 'Recebimento' as Tipo
+                        FROM CaixaRecebimento
+                        JOIN CaixaAbertura on CxAbeId = CxRecCaixaAbertura
+                        JOIN FormaPagamento on FrPagId = CxRecFormaPagamento
+                        JOIN Atendimento on AtendId = CxRecAtendimento
+                        JOIN Cliente on ClienId = AtendCliente
+                        JOIN Situacao on SituaId = CxRecStatus
+                        WHERE ".$stringRecebimento." CxAbeOperador = $_SESSION[UsuarId] and CxRecUnidade = $_SESSION[UnidadeId]
+                        UNION 
+                        SELECT '' as NUM_REGISTRO, '' as HISTORICO, CxPagDataHora as DATAHORA, 0 as ATENDIMENTO, FrPagNome,
+                                0 as Valor, CxPagValor as TOTAL, SituaNome, SituaChave, 'Pagamento' as Tipo
+                        FROM CaixaPagamento
+                        JOIN CaixaAbertura on CxAbeId = CxPagCaixaAbertura
+                        JOIN FormaPagamento on FrPagId = CxPagFormaPagamento
+                        JOIN Situacao on SituaId = CxPagStatus
+                        WHERE ".$stringPagamento." CxAbeOperador = $_SESSION[UsuarId] and CxPagUnidade = $_SESSION[UnidadeId]";
 $resultMovimentacao  = $conn->query($sql_movimentacao);
 $rowMovimentacao = $resultMovimentacao->fetchAll(PDO::FETCH_ASSOC);
 
 $arrayData = [];
 foreach ($rowMovimentacao as $item) {
     $numeroRegistro = $item["AtendNumRegistro"];
-    $dataHora = mostraDataHora($item["CxRecDataHora"]);
-    $historico = $item["ClienNome"];
+    $dataHora = mostraDataHora($item["DATAHORA"]);
+    $historico = $item["HISTORICO"];
     $tipo = $item["Tipo"];
     $formaPagamento = $item["FrPagNome"];
-    $valorFinal = mostraValor($item["CxRecValorTotal"]);
     $status = $item["SituaNome"];
+    
+    if($tipo == 'Recebimento') {
+        $valorFinal = mostraValor($item["TOTAL"]);
+    }else {
+        //Transformando os valores em números negativos.
+        $valorFinal = mostraValor($item["TOTAL"] * -1); 
+    }
 
-    $iconeVizivel = $item["SituaChave"] == 'ESTORNADO' ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$item['AtendNumRegistro'].','.$item["ClienNome"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar"><i class="icon-info3"></i></a>' :
-                                                         '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$item['AtendNumRegistro'].','.$item["ClienNome"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar"><i class="icon-undo2"></i></a>';
+    $iconeVizivel = $item["SituaChave"] == 'ESTORNADO' ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar();"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar"><i class="icon-info3"></i></a>' :
+                                                         '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar();"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar"><i class="icon-undo2"></i></a>';
 
     $acoes = '
             <div class="list-icons">
                 <div class="list-icons list-icons-extended">
-                    <a href="#" onclick="atualizaContasAPagar('.$item['AtendNumRegistro'].','.$item["ClienNome"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Detalhamento"><i class="icon-file-text2"></i></a>
+                    <a href="#" onclick="atualizaContasAPagar();" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Detalhamento"><i class="icon-file-text2"></i></a>
                     '.$iconeVizivel.'
-                    <a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$item['AtendNumRegistro'].','.$item["ClienNome"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Imprimir"><i class="icon-printer2"></i></a>
+                    <a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar();"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Imprimir"><i class="icon-printer2"></i></a>
                 </div>
             </div>';
 

@@ -9,31 +9,60 @@ include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputDestinoContaFinanceiraId'])) {
     //gravaData($_POST['inputData']);
-    $idCaixaAbertura = intval($_POST['aberturaCaixaId']);
+    $idCaixaAbertura = $_POST['aberturaCaixaId'];
     $dataHoraAtual = date('Y-m-d H:i:s');
-    $totalRecebido = $_POST['inputValorCalculado'];
+    $totalRecebido = str_replace(',', '.', str_replace('.', '', $_POST['inputValorCalculado']));
     $totalPago = 0; //Corrigir depois
-    $destinoContaFinanceiraId = $_POST['inputDestinoContaFinanceiraId'];
-    $valorTransferido = $_POST['inputValorTransferir'];
-    $resultadoSaldoCaixa = $_POST['inputSaldoCaixa'];
+    $destinoContaFinanceiraId = str_replace(',', '.', str_replace('.', '', $_POST['inputDestinoContaFinanceiraId']));
+    $valorTransferido = str_replace(',', '.', str_replace('.', '', $_POST['inputValorTransferir']));
+    $saldoFinal = str_replace(',', '.', str_replace('.', '', $_POST['inputSaldoCaixa']));
 
-    $sql = "UPDATE CaixaAbertura SET CxAbeDataHoraFechamento = :dDataFechamento, CxAbeTotalRecebido = :sTotalRecebido,
-                CxAbeTotalPago  = :sTotalPago, CxAbeContaTransferencia = :sContaTransferida, CxAbeValorTransferido = :sValorTransferido, CxAbeSaldoFinal = :sSaldoFinal,
-                CxAbeStatus = :iStatus, CxAbeUnidade = :iUnidade
-            WHERE CxAbeId = :iCaixaAbertura";
-    $result = $conn->prepare($sql);
-            
-    $result->execute(array(
-        ':dDataFechamento' => $dataHoraAtual,
-        ':sTotalRecebido' => $totalRecebido,
-        ':sTotalPago' => $totalPago,
-        ':sContaTransferida' => $destinoContaFinanceiraId,
-        ':sValorTransferido' => $valorTransferido,
-        ':sSaldoFinal' => $resultadoSaldoCaixa,
-        ':iStatus' => 33,
-        ':iUnidade' => $_SESSION['UnidadeId'],
-        ':iCaixaAbertura' => $idCaixaAbertura
-    ));
+    //Mandar para contas a pagar e contas a receber
+
+    try{
+        $conn->beginTransaction();
+
+        $sql = "SELECT SituaId
+				FROM Situacao
+			    WHERE SituaChave = 'FECHADO'";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+		$iStatus = $row['SituaId'];	
+
+        $sql = "UPDATE CaixaAbertura SET CxAbeDataHoraFechamento = :sDataHoraFechamento, CxAbeTotalRecebido = :fTotalRecebido, CxAbeContaTransferencia = :iDestinoTransfererencia,
+                                         CxAbeValorTransferido = :fValorTransferido, CxAbeSaldoFinal = :fSaldoFinal, CxAbeStatus = :iStatus, CxAbeUnidade = :iUnidade
+                WHERE CxAbeId = " . $idCaixaAbertura . "";
+        $result = $conn->prepare($sql);			
+
+        $result->execute(array(
+            ':sDataHoraFechamento' => $dataHoraAtual,
+            ':fTotalRecebido' => $totalRecebido,
+            ':iDestinoTransfererencia' => $destinoContaFinanceiraId,
+            ':fValorTransferido' => $valorTransferido,
+            ':fSaldoFinal' => $saldoFinal,
+            ':iStatus' => $iStatus,
+            ':iUnidade' => $_SESSION['UnidadeId']
+        ));
+                
+        $conn->commit();
+
+        $_SESSION['msg']['titulo'] = "Sucesso";
+        $_SESSION['msg']['mensagem'] = "Fechamento do Caixa Concluído!!!";
+        $_SESSION['msg']['tipo'] = "success";
+
+        
+    } catch(PDOException $e) {
+        
+        $conn->rollback();
+
+        $_SESSION['msg']['titulo'] = "Erro";
+        $_SESSION['msg']['mensagem'] = "Erro fechar o caixa!!!";
+        $_SESSION['msg']['tipo'] = "error";	
+        
+        echo 'Error: ' . $e->getMessage();
+    }
+
+    irpara('caixaMovimentacao.php');
 }
 
 if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
@@ -141,6 +170,36 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
             _componentSelect2();
             */
 
+            function consultaSaldoCaixaAtual() {
+                let urlConsultaAberturaCaixa = "consultaCaixaSaldoAtual.php";
+                
+                //Verifica se deverá ou não abrir o caixa
+                $.ajax({
+                    type: "POST",
+                    url: urlConsultaAberturaCaixa,
+                    dataType: "json",
+                    success: function(resposta) {
+                        if(resposta != 'consultaVazia') {
+                            let valorRecebido = resposta[0].SaldoRecebido;
+                            let valorPago = resposta[1].SaldoPago;
+        
+                            let saldo = valorRecebido - valorPago;
+                            
+                            $("#inputRecebido").val(float2moeda(valorRecebido));
+                            $("#inputPago").val(float2moeda(valorPago * -1));
+        
+        
+                            $("#inputSaldo").val(float2moeda(saldo));
+                        }else {
+                            $("#inputRecebido").val('');
+                            $("#inputSaldo").val('');
+                        }
+                    }
+                })
+            }
+
+            consultaSaldoCaixaAtual();
+
             $("#btnPdv").on('click', () => {
                 let urlConsultaAberturaCaixa = "consultaAberturaCaixa.php";
                 let idOperador = "<?php echo $_SESSION['UsuarId']; ?>"
@@ -196,6 +255,14 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                 let valorTransferir = $("#valorTransferir").val();
                 let saldoCaixa = $("#saldoCaixa").val();
 
+                if(idDestino == '') {
+                    $("#cmbDestinoContaFinanceira").focus();
+                    
+                    var menssagem = 'Informe uma conta destino por favor!';
+                    alerta('Atenção', menssagem, 'error');
+					return;
+                }  
+
                 $("#inputDestinoContaFinanceiraId").val(idDestino);
                 $("#inputValorCalculado").val(valorCalculado);
                 $("#inputValorTransferir").val(valorTransferir);
@@ -248,7 +315,7 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label for="cmbDestinoContaFinanceira">Destino (Conta Financeira)</label>
+                                            <label for="cmbDestinoContaFinanceira">Destino (Conta Financeira) <span class="text-danger">*</span></label>
                                             <select id="cmbDestinoContaFinanceira" name="cmbDestinoContaFinanceira" class="form-control form-control-select2" required>
                                                 <option value="">Todos</option>
                                                 <?php
@@ -279,7 +346,7 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                                     <div class="col-2">
                                         <div>
                                             <div class="form-group text-right">
-                                                <label for="valorTransferir">Valor a Transferir</label>
+                                                <label for="valorTransferir">Valor a Transferir <span class="text-danger">*</span></label>
                                                 <input type="text" id="valorTransferir" onkeyup="moeda(this)" class="form-control text-right" name="valorTransferir" value="">
                                             </div>
                                         </div>

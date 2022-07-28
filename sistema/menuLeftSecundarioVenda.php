@@ -1,7 +1,7 @@
 <?php
 	// essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
 
-	$sql = "SELECT AtClaNome, AtClaChave, AtendCliente, ClienNome
+	$sql = "SELECT AtClaNome, AtClaChave, AtendCliente, ClienCodigo, ClienNome
 	FROM Atendimento
 	JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 	JOIN Cliente ON ClienId = AtendCliente
@@ -11,6 +11,7 @@
 
 	$ClaChave = $rowClassificacao['AtClaChave'];
 	$ClaNome = $rowClassificacao['AtClaNome'];
+	$prontuario = $rowClassificacao['ClienCodigo'];
 	$Cliente = $rowClassificacao['ClienNome'];
 ?>
 
@@ -26,6 +27,10 @@
 				switch(tipo){
 					case 'atendimentoEletivo': URL = 'atendimentoEletivo.php'; break;
 					case 'receituario': URL = 'atendimentoReceituario.php'; break;
+					case 'atestadoMedico': URL = 'atendimentoAtestadoMedico.php'; break;
+					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; break;
+					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; break;
+					case 'triagem': URL = 'atendimentoTriagem.php'; break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
@@ -79,7 +84,11 @@
 			<div class="card-body p-0">
 				<?php if($ClaChave == 'AMBULATORIAL'){?>
 					<ul class="nav nav-sidebar" data-nav-type="accordion">
-						<li class="nav-item-header"><?php echo "".strtoupper($ClaNome)." - ".strtoupper($Cliente); ?></li>
+						<li class="nav-item-header"><b><?php echo "".strtoupper($ClaNome); ?></b></li>
+
+						<li class="nav-item-divider"></li>
+
+						<li class="nav-item-header"><?php echo strtoupper($Cliente). "<br>Prontuário: " .$prontuario ; ?></li>
 
 						<li class="nav-item-divider"></li>
 

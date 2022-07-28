@@ -7,8 +7,6 @@
 <script type="text/javascript">
     $(document).ready(function () {
     });
-
-    alert(algo)
     
 </script>
 
@@ -26,19 +24,22 @@
             </div>
 
             <div style="padding: 10px 10px 0px 10px;background: #EEEDED;text-align: center;border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;">
-                <input type="date" id="inputDtVencResumoFinanceiro" onchange="selecionaData();" name="inputDtVencResumoFinanceiro" class="form-control" value="<?php echo date('Y-m-d'); ?>" style="font-size: 21px; text-align: center;">
+                <!--
+                <input type="date" id="inputDtVencResumoFinanceiro" onchange="selecionaData();" name="inputDtVencResumoFinanceiro" class="form-control" value="<?php //echo date('Y-m-d'); ?>" style="font-size: 21px; text-align: center;">
+                -->
+                <h2><?php echo date('d/m/Y'); ?></h2>
             </div>
 
             <div style="padding: 10px 10px 0 10px; background: #ccc;">
                 <div id="dados">
                     <div class="form-group">
                         <h3 class="form-text text-right" style="color: #666;">Recebido</h3>
-                        <input id="inputCredito" name="inputCredito" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
+                        <input id="inputRecebido" name="inputRecebido" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
                     </div>
                 
                     <div class="form-group">
                         <h3 class="form-text text-right" style="color: #666;">Pago</h3>
-                        <input id="inputCredito" name="inputCredito" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
+                        <input id="inputPago" name="inputPago" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
                     </div>             
     
                     <div class="form-group">
@@ -68,7 +69,7 @@
 
                 <div id="caixaEmOperacao" class="row">
                     <div class="col-6">
-                        <button id="btnRetirada" type="button" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple" style="width: 100%; margin-top: 10px;">
+                        <button id="btnRetirada" type="button" data-toggle="modal" data-target="#modal_small_Retirada_Caixa" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple" style="width: 100%; margin-top: 10px;">
                             <span style="font-size: 11px;">Retirada</span>
                         </button>
                     </div>

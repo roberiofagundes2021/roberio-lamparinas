@@ -158,6 +158,21 @@ if ((array_key_exists('ContPagPeriodoDe', $_SESSION) || array_key_exists('ContPa
 	unset($_SESSION['ContPagStatus']);
 }
 
+$arquivosMovimentacaoCaixa = array(
+	'caixaMovimentacao.php', 'caixaMovimentacaoFiltra.php', 'caixaPDV.php', 'caixaFechamento.php', 'consultaAberturaCaixa.php', 
+	'consultaAberturaCaixa.php', 'consultaCaixaSaldoAtual.php', 'consultaCaixaSaldo.php'
+);
+
+if ((array_key_exists('MovCaixaPeriodoDe', $_SESSION) || array_key_exists('MovCaixaAte', $_SESSION) || array_key_exists('MovCaixaCliente', $_SESSION) || 
+    array_key_exists('MovCaixaFormaPagamento', $_SESSION) || array_key_exists('MovCaixaStatus', $_SESSION)) && 
+	!in_array(basename($_SERVER['PHP_SELF']), $arquivosMovimentacaoCaixa)) {
+	unset($_SESSION['MovCaixaPeriodoDe']);
+	unset($_SESSION['MovCaixaAte']);
+	unset($_SESSION['MovCaixaCliente']);
+	unset($_SESSION['MovCaixaFormaPagamento']);
+	unset($_SESSION['MovCaixaStatus']);
+}
+
 $arquivosContasAReceber = array(
 	'contasAReceber.php', 'contasAReceberNovoLancamento.php',
 	'contasAReceberFiltra.php', 'contasAReceberExclui.php',

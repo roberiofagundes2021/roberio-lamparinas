@@ -68,28 +68,51 @@ if(isset($_POST['inputAtendimentoId'])) {
             $iStatus = $row['SituaId'];		
 
             try{
+                $conn->beginTransaction();
+
                 $sql = "INSERT INTO CaixaRecebimento (CxRecCaixaAbertura, CxRecDataHora, CxRecAtendimento, CxRecValor, CxRecDesconto, CxRecValorTotal, 
                                                     CxRecFormaPagamento, CxRecStatus, CxRecUnidade)
                         VALUES (:iAberturaCaixa, :sDataHora, :iAtendimento, :fValor, :fDesconto, :fValorTotal, :iFormaPagamento, :bStatus, :iUnidade)";
                 $result = $conn->prepare($sql);
                         
                 $result->execute(array(
-                                ':iAberturaCaixa' => $aberturaCaixaId,
-                                ':sDataHora' => $dataHora,
-                                ':iAtendimento' => $atendimentoId,
-                                ':fValor' => $valor,
-                                ':fDesconto' => $desconto,
-                                ':fValorTotal' => $valorFinal,
-                                ':iFormaPagamento' => $formaPagamentoId,
-                                ':bStatus' => $iStatus,
-                                ':iUnidade' => $_SESSION['UnidadeId'],
-                                ));
+                    ':iAberturaCaixa' => $aberturaCaixaId,
+                    ':sDataHora' => $dataHora,
+                    ':iAtendimento' => $atendimentoId,
+                    ':fValor' => $valor,
+                    ':fDesconto' => $desconto,
+                    ':fValorTotal' => $valorFinal,
+                    ':iFormaPagamento' => $formaPagamentoId,
+                    ':bStatus' => $iStatus,
+                    ':iUnidade' => $_SESSION['UnidadeId'],
+                ));
+
+                //Consulta o saldo de recebimento atual que está na abertura do caixa
+                $sql = "SELECT CxAbeTotalRecebido
+                        FROM CaixaAbertura
+                        WHERE CxAbeId = $aberturaCaixaId";
+                $result = $conn->query($sql);
+                $row = $result->fetch(PDO::FETCH_ASSOC);
+                $valorFinal = $row['CxAbeTotalRecebido'] + $valorFinal;	
+
+                $sql = "UPDATE CaixaAbertura SET CxAbeTotalRecebido = :fValorRecebido
+                        WHERE CxAbeId = :iCaixaAberturaId";
+                $result = $conn->prepare($sql);
+                        
+                $result->execute(array(
+                    ':fValorRecebido' => $valorFinal,
+                    ':iCaixaAberturaId' => $aberturaCaixaId 
+                ));
+
+                $conn->commit();
                         
                 $_SESSION['msg']['titulo'] = "Sucesso";
                 $_SESSION['msg']['mensagem'] = "Atendimento incluído ao caixa!!!";
                 $_SESSION['msg']['tipo'] = "success";
                             
             } catch(PDOException $e) {
+
+                $conn->rollback();
                 
                 $_SESSION['msg']['titulo'] = "Erro";
                 $_SESSION['msg']['mensagem'] = "Erro aos cadastrar atendimento no caixa!!!";
