@@ -36,7 +36,7 @@ function mostraDataHora($data) {
 }
 
 /*----------------------------------------------------------------------
-	|	 Passando hora "00:00:00.000" para "00:00" |
+	|	 Passando hora "00:00:00.000" para "00:00" |("HH:MM:SS.000")|
 	---------------------------------------------------------------------*/
 function mostraHora($hora) {
 
@@ -49,6 +49,20 @@ function mostraHora($hora) {
 	}
 	return($horaRefatorada);
 }
+
+/*----------------------------------------------------------------------
+	|	retornando horas entre uma data e outra | ("Y-m-d","Y-m-d") |
+	---------------------------------------------------------------------*/
+	function diferencaEmHoras($dataInicio, $dataFim) {
+		$differenceInHours = '';
+
+		if ($dataInicio != '' && $dataFim != '') {
+			$differenceInHours = abs(strtotime($dataFim) - strtotime($dataInicio))/3600;
+			$differenceInHours = "$differenceInHours h";
+		}
+
+		return($differenceInHours);
+	}
 
 /*--------------------------------------------------------------------------
 	  |					Exibe mensagem na tela								   |
