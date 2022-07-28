@@ -20,7 +20,7 @@ function mostraData($data)
 /*----------------------------------------------------------------------
 	|	 Passando dataHora "AAAA-MM-DD 00:00:00" para "DD/MM/AAAA 00:00:00" |
 	---------------------------------------------------------------------*/
-	function mostraDataHora($data) {
+function mostraDataHora($data) {
 
 	if ($data <> '0000-00-00 00:00:00' and $data <> ''){
 		$dataHora = explode(" ", $data);
@@ -33,7 +33,22 @@ function mostraData($data)
 		$dataformatada = '';
 	}
 	return($dataformatada);
-}	
+}
+
+/*----------------------------------------------------------------------
+	|	 Passando hora "00:00:00.000" para "00:00" |
+	---------------------------------------------------------------------*/
+function mostraHora($hora) {
+
+	if ($hora <> '00:00:00' and $hora <> ''){
+		$horaRefatorada = explode(":", $hora); //Caso a hora venha do banco de dados no seguinte formato. H:i:s.000 
+		$horaRefatorada = "$horaRefatorada[0]:$horaRefatorada[1]"; // H:i:s.000 => H:i:s
+	} 
+	else{
+		$horaRefatorada = '';
+	}
+	return($horaRefatorada);
+}
 
 /*--------------------------------------------------------------------------
 	  |					Exibe mensagem na tela								   |
