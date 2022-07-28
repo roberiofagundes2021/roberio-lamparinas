@@ -92,9 +92,15 @@ if(isset($_POST['iAgendamento'])){
 	
 	<script type="text/javascript" >
 		$(document).ready(function() {
+			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+			dataAtual = dataAtual.split(' ')[0];
+			dataAtual = dataAtual.split('/')[2]+'-'+dataAtual.split('/')[1]+'-'+dataAtual.split('/')[0];
+			$('#data').val(dataAtual);
+
+			$('#servicoTable').hide();
 			alteraSituacao();
 			getCmbs();
-			// setDataProfissional();
+			// setDataProfissional();	
 			// setHoraProfissional();
 			// se existir agendamento os dados serão preenchidos ao carregar a página
 			if(agendamento){
@@ -148,6 +154,7 @@ if(isset($_POST['iAgendamento'])){
 								$('#paciente').append(`<option ${item.isSelected} value="${item.id}">${item.nome}</option>`)
 							})
 							alerta(response.titulo, response.menssagem, response.status)
+							$('#page-modal-paciente').fadeOut();
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 						}
@@ -262,6 +269,7 @@ if(isset($_POST['iAgendamento'])){
 					$('#servico').focus()
 					return
 				}
+				
 				let dados = agendamento?{
 						'tipoRequest': 'ADDAGENDAMENTO',
 						'data': data,
@@ -337,9 +345,14 @@ if(isset($_POST['iAgendamento'])){
 							<td class="text-center">${acoes}</td>
 						</tr>`
 					})
+					if(statusServicos){
+						$('#servicoTable').show();
+					}else{
+						$('#servicoTable').hide();
+					}
 					$('#dataAtendimento').val('')
 					$('#horaAtendimento').val('')
-					$('#servicoValorTotal').html(`VALOR TOTAL: R$ ${float2moeda(response.valorTotal)}`).show();
+					$('#servicoValorTotal').html(`${float2moeda(response.valorTotal)}`).show();
 					$('#dataServico').html(HTML).show();
 				}
 			});
@@ -805,10 +818,17 @@ if(isset($_POST['iAgendamento'])){
 										<tbody id="dataServico">
 											
 										</tbody>
+										<tfoot>
+											<tr>
+												<th colspan="5" class="text-right font-weight-bold" style="font-size: 16px;">
+													<div>Valor(R$):</div>
+												</th>
+												<th colspan="1" class="mr-1">
+													<div id="servicoValorTotal" class="text-center font-weight-bold" style="font-size: 15px;">R$ 0,00</div>
+												</th>
+											</tr>
+										</tfoot>
 									</table>
-									<div class="col-lg-12 text-right font-weight-bold">
-										<div id="servicoValorTotal" class="">R$ 0,00</div>
-									</div>
 								</div>
 
 								<div class="col-lg-12 mb-4 row mt-5">
