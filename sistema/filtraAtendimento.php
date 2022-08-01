@@ -22,7 +22,9 @@ try{
 		$_SESSION['atendimentoNovo'] = [
 			'paciente' => [],
 			'responsavel' => [],
-			'atendimento' => [],
+			'atendimento' => [
+				'servicos' => [],
+			],
 			'triagem' => []
 		];
 	}
@@ -32,21 +34,39 @@ try{
 		$array = [];
 
 		if($acesso == 'ATENDIMENTO'){
-			$sql = "SELECT AtendId,AtendDataRegistro,ClienNome,AtModNome,AtendClassificacao,
-			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,ProfiNome,SrVenNome
-			FROM Atendimento
-			JOIN AtendimentoXServico ON AtXSeAtendimento = AtendId
+			$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
+			AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
+			AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
+			SituaCor,ProfiNome,AtLocNome, SrVenNome
+			FROM Agendamento
+			JOIN AtendimentoModalidade ON AtModId = AgendModalidade
+			JOIN Situacao ON SituaId = AgendSituacao
+			JOIN Cliente ON ClienId = AgendCliente
+			JOIN Profissional ON ProfiId = AgendProfissional
+			JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
+			JOIN ServicoVenda ON SrVenId = AgendServico
+			WHERE AgendUnidade = $iUnidade";
+			$result = $conn->query($sql);
+			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
+
+			$sql = "SELECT AtendId,AtendNumRegistro,AtendDataRegistro,ClienNome,AtModNome,AtendClassificacao,
+			AtendObservacao,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,
+			ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,ProfiNome,SrVenNome
+			FROM AtendimentoXServico
+			JOIN Atendimento ON AtendId = AtXSeAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			JOIN Situacao ON SituaId = AtendSituacao
 			JOIN Cliente ON ClienId = AtendCliente
 			JOIN Profissional ON ProfiId = AtXSeProfissional
-			JOIN ServicoVenda ON SrVenId = AtXSeServico";
+			JOIN ServicoVenda ON SrVenId = AtXSeServico
+			JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
+			WHERE AtendUnidade = $iUnidade";
 			$result = $conn->query($sql);
-			$row = $result->fetchAll(PDO::FETCH_ASSOC);
+			$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
 			
-			$data = [];
-			foreach($row as $item){
+			$dataAtendimento = [];
+			$dataAgendamento = [];
+			foreach($rowAgendamento as $item){
 				$att = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				$exc = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
 				$acoes = "<div class='list-icons'>
@@ -69,13 +89,65 @@ try{
 						</div>";
 			
 				$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
-				array_push($data, [
+				
+				$dataEspera = date('Y-m-d');
+				$difference = diferencaEmHoras($dataEspera, $item['AgendData']);
+				
+				array_push($dataAgendamento, [
 					'data' => [
-						mostraData($item['AtXSeData']),  // Data
-						$item['AtXSeHorario'],  // Horario
-						'04:20*',  // Espera
-						'286*',  // Nº Registro
-						'2568*',  // Prontuário
+						mostraData($item['AgendData']), // Data
+						mostraHora($item['AgendHorario']), // Horario
+						$difference,  // Espera
+						'****',  // Nº Registro
+						'****',  // Prontuário
+						$item['ClienNome'],  // Paciente
+						$item['ProfiNome'],  // Profissional
+						$item['AtModNome'],  // Modalidade
+						$item['SrVenNome'],  // Procedimento
+						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+						$acoes,  // Ações
+					],
+					'identify' => [
+						'situacao' => $item['SituaChave'],
+						'iAgendamento' => $item['AgendId'],
+						'sObservacao' => $item['AgendObservacao']
+					]
+				]);
+			}
+			foreach($rowAtendimento as $item){
+				$att = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
+				$exc = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
+				$acoes = "<div class='list-icons'>
+							$att
+							$exc
+							<div class='dropdown'>													
+								<a href='#' class='list-icons-item' data-toggle='dropdown'>
+									<i class='icon-menu9'></i>
+								</a>
+
+								<div class='dropdown-menu dropdown-menu-right'>
+									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Prioridade'></i> Prioridade</a>
+									
+									<div class='dropdown-divider'></div>
+
+									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Gerar nota fiscal'></i> Gerar nota fiscal</a>
+									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Anexos'></i> Anexos</a>
+								</div>
+							</div>
+						</div>";
+			
+				$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
+				
+				$dataEspera = date('Y-m-d');
+				$difference = diferencaEmHoras($dataEspera, $item['AtXSeData']);
+				
+				array_push($dataAtendimento, [
+					'data' => [
+						mostraData($item['AtXSeData']), // Data
+						mostraHora($item['AtXSeHorario']), // Horario
+						$difference,  // Espera
+						$item['AtendNumRegistro'],  // Nº Registro
+						'456456*',  // Prontuário
 						$item['ClienNome'],  // Paciente
 						$item['ProfiNome'],  // Profissional
 						$item['AtModNome'],  // Modalidade
@@ -91,38 +163,50 @@ try{
 				]);
 			}
 			$array  = [
-				'data' => $data,
+				'dataAgendamento' => $dataAgendamento,
+				'dataAtendimento' => $dataAtendimento,
 				'acesso' => $acesso,
 				'titulo' => 'Alterar Situação',
 				'tipo' => 'success',
 				'menssagem' => 'Situação alterada com sucesso!!!'
 			];
 		} elseif($acesso == 'PROFISSIONAL'){
-			$sql = "SELECT AtendId,AtendDataRegistro,ClienNome,AtModNome,AtClaChave,AtClaNome,
+			$sql = "SELECT ProfiId, ProfiUsuario
+			FROM Profissional
+			WHERE ProfiUsuario = $usuarioId and ProfiUnidade = $iUnidade";
+			$result = $conn->query($sql);
+			$row = $result->fetch(PDO::FETCH_ASSOC);
+			$iProfissional = $row['ProfiId'];
+
+			$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,AtModNome,AtClaChave,AtClaNome,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
 			FROM AtendimentoXServico
-			JOIN Atendimento ON AtendId = AtXSeAtendimento
-			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			JOIN Situacao ON SituaId = AtendSituacao
-			JOIN Cliente ON ClienId = AtendCliente
-			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
+			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+			LEFT JOIN Situacao ON SituaId = AtendSituacao
+			LEFT JOIN Cliente ON ClienId = AtendCliente
+			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional != $usuarioId";
+			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = !$iUnidade
+			ORDER BY AtXSeId DESC";
 			$resultEspera = $conn->query($sql);
 			$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
 
-			$sql = "SELECT AtendId,AtendDataRegistro,ClienNome,AtModNome,AtClaChave,AtClaNome,
+			$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,AtModNome,AtClaChave,AtClaNome,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
 			FROM AtendimentoXServico
-			JOIN Atendimento ON AtendId = AtXSeAtendimento
-			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			JOIN Situacao ON SituaId = AtendSituacao
-			JOIN Cliente ON ClienId = AtendCliente
-			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
+			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+			LEFT JOIN Situacao ON SituaId = AtendSituacao
+			LEFT JOIN Cliente ON ClienId = AtendCliente
+			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional != $usuarioId";
+			WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = !$iUnidade
+			ORDER BY AtXSeId DESC";
 			$resultAtendido = $conn->query($sql);
 			$rowAtendido = $resultAtendido->fetchAll(PDO::FETCH_ASSOC);
 			
@@ -130,6 +214,8 @@ try{
 			$atendido = [];
 
 			foreach($rowEspera as $item){
+				$difference = diferencaEmHoras($item['AtXSeData'], date('Y-m-d'));
+
 				$att = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				// $exc = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
 				$acoes = "<div class='list-icons'>
@@ -153,11 +239,11 @@ try{
 					'data' => [
 						mostraData($item['AtXSeData']),  // Data
 						$item['AtXSeHorario'],  // Horario
-						'04:20*',  // Espera
-						'286*',  // Nº Registro
+						$difference,  // Espera
+						$item['AtXSeId'],  // Nº Registro
 						'2568*',  // Prontuário
 						$item['ClienNome'],  // Paciente
-						'Procedimento**',  // Procedimento
+						$item['SrVenNome'],  // Procedimento
 						'Risco**',  // Risco
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 						$acoes,  // Ações
@@ -169,6 +255,8 @@ try{
 					]]);
 			}
 			foreach($rowAtendido as $item){
+				$difference = diferencaEmHoras($item['AtXSeData'], date('Y-m-d'));
+
 				$att = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				// $exc = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
 				$acoes = "<div class='list-icons'>
@@ -193,11 +281,11 @@ try{
 					'data' => [
 						mostraData($item['AtXSeData']),  // Data
 						$item['AtXSeHorario'],  // Horario
-						'04:20*',  // Espera
-						'286*',  // Nº Registro
+						$difference,  // Espera
+						$item['AtXSeId'],  // Nº Registro
 						'2568*',  // Prontuário
 						$item['ClienNome'],  // Paciente
-						'Procedimento**',  // Procedimento
+						$item['SrVenNome'],  // Procedimento
 						'Risco**',  // Risco
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 						$acoes,  // Ações
@@ -358,6 +446,58 @@ try{
 			'tipo' => 'success',
 			'menssagem' => 'Responsável selecionado!!'
 		]);
+	} elseif ($tipoRequest == 'SERVICOS'){
+		// $sql = "SELECT SrVenId,SrVenNome,SrVenPlanoConta,SrVenDetalhamento,SrVenValorCusto,
+		// SrVenOutrasDespesas,SrVenCustoFinal,SrVenMargemLucro,SrVenValorVenda,SrVenStatus,
+		// SrVenUsuarioAtualizador,SrVenUnidade
+		// FROM Servico WHERE SrVenUnidade = $iUnidade";
+
+		$sql = "SELECT SrVenId,SrVenNome
+		FROM ServicoVenda WHERE SrVenUnidade = $iUnidade";
+		$result = $conn->query($sql);
+
+		$array = [];
+		foreach($result as $item){
+			array_push($array,[
+				'id' => $item['SrVenId'],
+				'nome' => $item['SrVenNome'],
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'MEDICOS'){
+		$sql = "SELECT ProfiId,ProfiTipo,ProfiCodigo,ProfiNome,ProfiRazaoSocial,ProfiCnpj,
+		ProfiInscricaoMunicipal,ProfiInscricaoEstadual,ProfiCpf,ProfiRg,ProfiOrgaoEmissor,ProfiUf,ProfiSexo,
+		ProfiDtNascimento,ProfiProfissao,ProfiNumConselho,ProfiCNES,ProfiEspecialidade,ProfiCep,ProfiEndereco,
+		ProfiNumero,ProfiComplemento,ProfiBairro,ProfiCidade,ProfiEstado,ProfiContato,ProfiTelefone,
+		ProfiCelular,ProfiEmail,ProfiSite,ProfiObservacao,ProfiBanco,ProfiAgencia,ProfiConta,
+		ProfiInformacaoAdicional,ProfiStatus,ProfiUsuarioAtualizador,ProfiUnidade
+		FROM Profissional WHERE ProfiUnidade != $iUnidade";
+		$result = $conn->query($sql);
+
+		$array = [];
+		foreach($result as $item){
+			array_push($array,[
+				'id' => $item['ProfiId'],
+				'nome' => $item['ProfiNome'],
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'LOCALATENDIMENTO'){
+		$sql = "SELECT AtLocId,AtLocNome,AtLocStatus,AtLocUsuarioAtualizador,AtLocUnidade
+		FROM AtendimentoLocal WHERE AtLocUnidade = $iUnidade";
+		$result = $conn->query($sql);
+
+		$array = [];
+		foreach($result as $item){
+			array_push($array,[
+				'id' => $item['AtLocId'],
+				'nome' => $item['AtLocNome'],
+			]);
+		}
+
+		echo json_encode($array);
 	} elseif($tipoRequest == 'SALVARRESPONSAVEL'){
 		$atendimentoSessao = $_SESSION['atendimentoNovo'];
 
@@ -385,6 +525,30 @@ try{
 			'tipo' => 'success',
 			'menssagem' => 'Responsável adicionado!!',
 			'paciente' => $responsavel
+		]);
+	} elseif($tipoRequest == 'ADICIONARSERVICO'){
+		$servicos = $_SESSION['atendimentoNovo']['atendimento']['servicos'];
+
+		$servico = $_POST['servico'];
+		$medicos = $_POST['medicos'];
+		$dataAtendimento = $_POST['dataAtendimento'];
+		$horaAtendimento = $_POST['horaAtendimento'];
+		$localAtendimento = $_POST['localAtendimento'];
+
+		array_push($servicos, [
+			'servico' => $servico,
+			'medicos' => $medicos,
+			'dataAtendimento' => $dataAtendimento,
+			'horaAtendimento' => $horaAtendimento,
+			'localAtendimento' => $localAtendimento
+		]);
+		$_SESSION['atendimentoNovo']['atendimento']['servicos'] = $servicos;
+
+		echo json_encode([
+			'data' => $servicos,
+			'titulo' => 'Serviço',
+			'status' => 'success',
+			'menssagem' => 'Serviço adicionado!!'
 		]);
 	} 
 }catch(PDOException $e) {

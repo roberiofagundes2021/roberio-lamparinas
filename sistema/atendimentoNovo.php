@@ -23,6 +23,9 @@ include('global_assets/php/conexao.php');
 		table td{
 			padding: 1rem !important;
 		}
+		.nav-tabs-bottom .nav-link.active:before{
+			background-color: #375b82;
+		}
 	</style>
 	
 	<!-- Theme JS files -->
@@ -49,9 +52,56 @@ include('global_assets/php/conexao.php');
 	
 	<script type="text/javascript" >			
 		$(document).ready(function() {
+			$('#servicoTable').html('').hide();
+
 			$('#incluirServico').on('click', function(e){
 				e.preventDefault();
-				console.log('Incluir Serviço');
+				let menssageError = ''
+				let servico  = $('#servico').val()
+				let medicos  = $('#medicos').val()
+				let dataAtendimento  = $('#dataAtendimento').val()
+				let horaAtendimento  = $('#horaAtendimento').val()
+				let localAtendimento  = $('#localAtendimento').val()
+
+				switch(menssageError){
+					case servico: menssageError = 'informe o serviço'; $('#servico').focus();break;
+					case medicos: menssageError = 'informe o médico'; $('#medicos').focus();break;
+					case dataAtendimento: menssageError = 'informe uma data'; $('#dataAtendimento').focus();break;
+					case horaAtendimento: menssageError = 'informe o horário'; $('#horaAtendimento').focus();break;
+					case localAtendimento: menssageError = 'informe o local de atendimento'; $('#localAtendimento').focus();break;
+					default: menssageError = ''; break;
+				}
+
+				if(menssageError){
+					alerta('Campo Obrigatório!', menssageError, 'error')
+					return
+				}
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'ADICIONARSERVICO',
+						'servico': servico,
+						'medicos': medicos,
+						'dataAtendimento': dataAtendimento,
+						'horaAtendimento': horaAtendimento,
+						'localAtendimento': localAtendimento
+					},
+					success: function(response) {
+						if(response.status == 'success'){
+							alerta(response.titulo, response.menssagem, response.tipo);
+							resetServicoCmb()
+							checkServicos()
+						} else {
+							alerta(response.titulo, response.menssagem, response.tipo);
+						}
+					},
+					error: function(response) {
+						alerta(response.titulo, response.menssagem, response.tipo);
+					}
+				});
 			})
 
 			$('.btnSalvar').each(function() {
@@ -175,6 +225,56 @@ include('global_assets/php/conexao.php');
 								alerta(response.titulo, response.menssagem, response.tipo);
 							}
 						});
+					} else if(target == 'ATENDIMENTO'){
+						let msg = ''
+						switch(msg){
+							case $('#nomeResp').val(): msg = 'Informe o nome!!';$('#nomeResp').focus();break;
+							case $('#parentescoResp').val(): msg = 'Informe o tipo de parentesco!!';$('#parentescoResp').focus();break;
+							case $('#nascimentoResp').val(): msg = 'Informe a data de nascimento!!';$('#nascimentoResp').focus();break;
+							case $('#cepResp').val(): msg = 'Informe o cep!!';$('#cepResp').focus();break;
+							case $('#enderecoResp').val(): msg = 'Informe endereco!!';$('#enderecoResp').focus();break;
+							case $('#numeroResp').val(): msg = 'Informe número!!';$('#numeroResp').focus();break;
+							case $('#bairroResp').val(): msg = 'Informe o bairro!!';$('#bairroResp').focus();break;
+							case $('#cidadeResp').val(): msg = 'Informe a cidade!!';$('#cidadeResp').focus();break;
+							case $('#estadoResp').val(): msg = 'Informe o estado!!';$('#estadoResp').focus();break;
+							case $('#telefoneResp').val() || $('#celularResp').val(): msg = 'Informe um telefone ou celular!!';$('#telefoneResp').focus();break;
+							case $('#emailResp').val(): msg = 'Informe um email!!';$('#emailResp').focus();break;
+							default:  msg = '';break;
+						}
+
+						if(msg){
+							alerta('Campo obrigatório!', msg, 'error');
+							return
+						}
+
+						$.ajax({
+							type: 'POST',
+							url: 'filtraAtendimento.php',
+							dataType: 'json',
+							data:{
+								'tipoRequest': 'SALVARRESPONSAVEL',
+								'nomeResp': $('#nomeResp').val(),
+								'parentescoResp': $('#parentescoResp').val(),
+								'nascimentoResp': $('#nascimentoResp').val(),
+								'cepResp': $('#cepResp').val(),
+								'enderecoResp': $('#enderecoResp').val(),
+								'numeroResp': $('#numeroResp').val(),
+								'complementoResp': $('#complementoResp').val(),
+								'bairroResp': $('#bairroResp').val(),
+								'cidadeResp': $('#cidadeResp').val(),
+								'estadoResp': $('#estadoResp').val(),
+								'telefoneResp': $('#telefoneResp').val(),
+								'celularResp': $('#celularResp').val(),
+								'emailResp': $('#emailResp').val(),
+								'observacaoResp': $('#observacaoResp').val()
+							},
+							success: function(response) {
+								alerta(response.titulo, response.menssagem, response.tipo);
+							},
+							error: function(response) {
+								alerta(response.titulo, response.menssagem, response.tipo);
+							}
+						});
 					}
 				})
 			});
@@ -236,6 +336,102 @@ include('global_assets/php/conexao.php');
 				}
 			});
 		});
+
+		function checkServicos(idAgendamento){
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'CHECKSERVICO',
+					'iAgendamento': idAgendamento
+				},
+				success: async function(response) {
+					statusServicos = response.array.length?true:false;
+					$('#servicoTable').html('').show();
+
+					let HTML = ''
+					response.array.forEach(item => {
+						let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
+						let acoes = `<div class='list-icons'>
+									${exc}
+								</div>`;
+						HTML += `
+						<tr class='servicoItem'>
+							<td class="text-center">${item.servico}</td>
+							<td class="text-center">${item.medico}</td>
+							<td class="text-center">${item.sData}</td>
+							<td class="text-center">${item.hora}</td>
+							<td class="text-center">${item.local}</td>
+							<td class="text-right">R$ ${float2moeda(item.valor)}</td>
+							<td class="text-center">${acoes}</td>
+						</tr>`
+					})
+					if(statusServicos){
+						$('#servicoTable').show();
+					}else{
+						$('#servicoTable').hide();
+					}
+					$('#servicoValorTotal').html(`${float2moeda(response.valorTotal)}`).show();
+					$('#dataServico').html(HTML).show();
+				}
+			});
+		}
+		function resetServicoCmb(){
+			// vai preencher cmbServicos
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'SERVICOS'
+				},
+				success: function(response) {
+					$('#servico').empty();
+					$('#servico').append(`<option value=''>Selecione</option>`)
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.nome}</option>`
+						$('#servico').append(opt)
+					})
+				}
+			});
+			// vai preencher cmbMedicos
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'MEDICOS'
+				},
+				success: function(response) {
+					$('#medicos').empty();
+					$('#medicos').append(`<option value=''>Selecione</option>`)
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.nome}</option>`
+						$('#medicos').append(opt)
+					})
+				}
+			});
+			// vai preencher cmbLocalAtendimento
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'LOCALATENDIMENTO'
+				},
+				success: function(response) {
+					$('#localAtendimento').empty();
+					$('#localAtendimento').append(`<option value=''>Selecione</option>`)
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.nome}</option>`
+						$('#localAtendimento').append(opt)
+					})
+				}
+			});
+			$('#dataAtendimento').val('')
+			$('#horaAtendimento').val('')
+		}
 	</script>
 
 </head>
@@ -259,7 +455,7 @@ include('global_assets/php/conexao.php');
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="card">
-							<ul class="nav nav-tabs nav-justified">
+							<ul class="nav nav-tabs nav-tabs-bottom nav-justified">
 								<li class="nav-item"><a href="#paciente" class="nav-link rounded-top legitRipple active show" data-toggle="tab">Paciente</a></li>
 								<li class="nav-item"><a href="#responsavel" class="nav-link rounded-top legitRipple" data-toggle="tab">Responsável</a></li>
 								<li class="nav-item"><a href="#atendimento" class="nav-link rounded-top legitRipple" data-toggle="tab">Atendimento</a></li>
@@ -655,14 +851,11 @@ include('global_assets/php/conexao.php');
 									<form id="submitAtendimento" method="POST" >
 										<div class="col-lg-12 mb-4 row">
 											<!-- titulos -->
-											<div class="col-lg-2">
+											<div class="col-lg-3">
 												<label>Data do Registro</label>
 											</div>
 											<div class="col-lg-3">
 												<label>Paciente</label>
-											</div>
-											<div class="col-lg-1">
-												<!-- icone -->
 											</div>
 											<div class="col-lg-3">
 												<label>Modalidade</label>
@@ -672,16 +865,20 @@ include('global_assets/php/conexao.php');
 											</div>
 
 											<!-- campos -->
-											<div class="col-lg-2">
+											<div class="col-lg-3">
 												<input id="dataRegistro" name="dataRegistro" type="date" class="form-control" placeholder="Nome">
 											</div>
-											<div class="col-lg-3">
-												<select id="paciente" name="paciente" class="form-control form-control-select2">
-													<option value="" selected>selecionar</option>
-												</select>
-											</div>
-											<div class="col-lg-1" style="max-width:50px">
-												<i class="icon-add py-2" style="cursor: pointer; font-size:25px;"></i>
+											<div class="col-lg-3 row">
+												<div class="col-lg-9">
+													<select id="paciente" name="paciente" class="form-control form-control-select2">
+														<option value="" selected>selecionar</option>
+													</select>
+												</div>
+												<div class="col-lg-3">
+													<span class="action btn btn-principal legitRipple" id="addPaciente" style="user-select: none;">
+														<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
+													</span>
+												</div>
 											</div>
 											<div class="col-lg-3">
 												<select id="modalidade" name="modalidade" class="form-control form-control-select2">
@@ -701,7 +898,7 @@ include('global_assets/php/conexao.php');
 
 										<div class="col-lg-12 mb-4 row">
 											<!-- titulos -->
-											<div class="col-lg-3">
+											<div class="col-lg-2">
 												<label>Serviço</label>
 											</div>
 											<div class="col-lg-3">
@@ -718,7 +915,7 @@ include('global_assets/php/conexao.php');
 											</div>
 
 											<!-- campos -->
-											<div class="col-lg-3">
+											<div class="col-lg-2">
 												<select id="servico" name="servico" class="form-control form-control-select2">
 													<option value="" selected>selecionar</option>
 												</select>
@@ -739,42 +936,29 @@ include('global_assets/php/conexao.php');
 													<option value="" selected>selecionar</option>
 												</select>
 											</div>
+											<!-- btnAddServico -->
+											<div class="col-lg-1 text-right">
+												<button id="incluirServico" class="btn btn-lg btn-principal" data-tipo="INCLUIRSERVICO" >
+													<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
+												</button>
+											</div>
 										</div>
 
-										<!-- btnAddServico -->
-										<div class="col-lg-12 my-4 text-right px-4">
-											<button id="incluirServico" class="btn btn-lg btn-principal" id="salvarAtendimento" data-tipo="INCLUIRSERVICO" >incluir</button>
-										</div>
-
-										<div class="col-lg-12 mb-4">
-											<table class="table" id="tblServicos" style="background-color: rgba(0,0,0, 0.05)">
+										<div class="col-lg-12">
+											<table class="table" id="servicoTable">
 												<thead>
-													<tr class="bg-slate">
+													<tr class="bg-slate text-center">
 														<th>Procedimento</th>
-														<th>Médicos</th>
+														<th>Médico</th>
 														<th>Data do Atendimento</th>
 														<th>Horário</th>
-														<th>Local do Atendimento</th>
+														<th>Local</th>			
 														<th>Valor</th>
+														<th class="text-center">Ações</th>
 													</tr>
 												</thead>
-												<tbody>
-													<tr>
-														<td>Cirurgia do coração</td>
-														<td>Dr. Rubens Pereira</td>
-														<td>14/05/2022</td>
-														<td>14:00</td>
-														<td>Setor de Cirurgia</td>
-														<td>R$ 400,00</td>
-													</tr>
-													<tr>
-														<td>Exame de Sangue</td>
-														<td>Dra. Fernanda Pessoa</td>
-														<td>13/05/2022</td>
-														<td>10:00</td>
-														<td>Clínica X</td>
-														<td>R$ 100,00</td>
-													</tr>
+												<tbody id="dataServico">
+													
 												</tbody>
 												<tfoot>
 													<tr>
@@ -782,7 +966,7 @@ include('global_assets/php/conexao.php');
 															<div>Valor(R$):</div>
 														</th>
 														<th colspan="1" class="mr-1">
-															<div id="total" class="text-center font-weight-bold" style="font-size: 15px;">R$ 500,00</div>
+															<div id="servicoValorTotal" class="text-center font-weight-bold" style="font-size: 15px;">R$ 0,00</div>
 														</th>
 													</tr>
 												</tfoot>

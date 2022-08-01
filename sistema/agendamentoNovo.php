@@ -201,7 +201,7 @@ if(isset($_POST['iAgendamento'])){
 				let local = $('#localAtendimento').val()
 
 				switch(menssageError){
-					case servico: menssageError = 'informe o servico'; $('#servico').focus();break;
+					case servico: menssageError = 'informe o serviço'; $('#servico').focus();break;
 					case medico: menssageError = 'informe o médico'; $('#medico').focus();break;
 					case data: menssageError = 'informe uma data'; $('#dataAtendimento').focus();break;
 					case hora: menssageError = 'informe o horário'; $('#horaAtendimento').focus();break;
@@ -737,7 +737,9 @@ if(isset($_POST['iAgendamento'])){
 											</select>
 										</div>
 										<div class="col-lg-2">
-											<span class="action btn btn-principal legitRipple" id="addPaciente" style="user-select: none;">+</span>
+											<span class="action btn btn-principal legitRipple" id="addPaciente" style="user-select: none;">
+												<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
+											</span>
 										</div>
 									</div>
 									<div class="col-lg-3">
@@ -751,9 +753,9 @@ if(isset($_POST['iAgendamento'])){
 									<h5>Serviços</h5>
 								</div>
 
-								<div class="col-lg-12 mb-4 row">
+								<div class="col-lg-12 mb-2 row">
 									<!-- titulos -->
-									<div class="col-lg-3">
+									<div class="col-lg-2">
 										<label>Serviços <span class="text-danger">*</span></label>
 									</div>
 									<div class="col-lg-2">
@@ -770,7 +772,7 @@ if(isset($_POST['iAgendamento'])){
 									</div>
 
 									<!-- campos -->
-									<div class="col-lg-3">
+									<div class="col-lg-2">
 										<select id="servico" name="servico" class="select-search" required>
 											<!--  -->
 										</select>
@@ -797,8 +799,10 @@ if(isset($_POST['iAgendamento'])){
 											<!--  -->
 										</select>
 									</div>
-									<div class="col-lg-12 text-right mt-4">
-										<button class="btn btn-lg btn-principal" id="inserirServico" >inserir</button>
+									<div class="col-lg-1 text-right">
+										<button class="btn btn-lg btn-principal" id="inserirServico" >
+											<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
+										</button>
 									</div>
 								</div>
 
@@ -831,7 +835,7 @@ if(isset($_POST['iAgendamento'])){
 									</table>
 								</div>
 
-								<div class="col-lg-12 mb-4 row mt-5">
+								<div class="col-lg-12 mb-4 row mt-2">
 									<!-- titulos -->
 									<div class="col-lg-12">
 										<label>Observação</label>
