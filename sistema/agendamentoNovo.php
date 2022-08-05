@@ -15,7 +15,6 @@ if(isset($_POST['iAgendamento'])){
 	$sql = "SELECT AgendId,AgendDataRegistro,AgendCliente,AgendModalidade,AgendClienteResponsavel,
 	AgendObservacao,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor
 	FROM Agendamento
-	JOIN AtendimentoModalidade ON AtModId = AgendModalidade
 	JOIN Situacao ON SituaId = AgendSituacao
 	JOIN Cliente ON ClienId = AgendCliente
 	WHERE AgendId = $iAgendamento";
@@ -100,8 +99,7 @@ if(isset($_POST['iAgendamento'])){
 			$('#servicoTable').hide();
 			alteraSituacao();
 			getCmbs();
-			// setDataProfissional();	
-			// setHoraProfissional();
+			
 			// se existir agendamento os dados serão preenchidos ao carregar a página
 			if(agendamento){
 				$('#data').val(agendamento.AgendDataRegistro)
@@ -350,8 +348,6 @@ if(isset($_POST['iAgendamento'])){
 					}else{
 						$('#servicoTable').hide();
 					}
-					$('#dataAtendimento').val('')
-					$('#horaAtendimento').val('')
 					$('#servicoValorTotal').html(`${float2moeda(response.valorTotal)}`).show();
 					$('#dataServico').html(HTML).show();
 				}
