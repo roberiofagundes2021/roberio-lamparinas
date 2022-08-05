@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Triagem';
 
 include('global_assets/php/conexao.php');
 
-$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
+$iAtendimentoId = 3;//isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
 if(!$iAtendimentoId){
 	irpara("atendimento.php");
@@ -509,7 +509,7 @@ if (isset($_POST['inputAlergia']) ){
 												<div class="input-group">
 												<input type="number" id="inputTemperatura" name="inputTemperatura" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriTempAXI']; ?>">
 													<span class="input-group-prepend">
-														<span class="input-group-text"><i class="icon-eyedropper3"></i></span>
+														<span class="input-group-text"><img src="global_assets/images/lamparinas/termometro.png" width="32" style="margin-top: -13px;" /></span>
 													</span>
 													
 												</div>
