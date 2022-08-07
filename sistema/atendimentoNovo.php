@@ -40,6 +40,25 @@ if($iAtendimento){
 			background-color: #375b82;
 		}
 	</style>
+
+	<!-- wizzard (steppers) -->
+
+	<link href="global_assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
+	<link href="global_assets/css/lamparinas/layout.min.css" rel="stylesheet" type="text/css">
+	<link href="global_assets/css/lamparinas/components.min.css" rel="stylesheet" type="text/css">
+
+	<script src="global_assets/js/main/bootstrap.bundle.min.js"></script>
+	<script src="global_assets/js/plugins/loaders/blockui.min.js"></script>
+	<script src="global_assets/js/plugins/ui/ripple.min.js"></script>
+
+	<script src="global_assets/js/plugins/forms/wizards/steps.min.js"></script>
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/extensions/cookie.js"></script>
+	<script src="global_assets/js/demo_pages/form_wizard.js"></script>
+
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
@@ -94,7 +113,6 @@ if($iAtendimento){
 		$(document).ready(function() {
 			$('#servicoTable').hide()
 			$('#novoPaciente').fadeOut()
-			$('#voltarSelectPaciente').fadeOut()
 			$('#novoResponsavel').fadeOut()
 
 			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
@@ -163,252 +181,17 @@ if($iAtendimento){
 				});
 			})
 
-			// FORMS
-
-			$('#formPaciente').submit(function(e){
-				e.preventDefault()
-				if($('#pacienteId').val() == 'NOVO'){
-					let msg = ''
-					switch(msg){
-						case $('#prontuario').val():  msg = 'Informe o prontuario!'; $('#prontuario').focus();break;
-						case $('#nome').val():  msg = 'Informe o nome!'; $('#nome').focus();break;
-						case $('#cpf').val():  msg = 'Informe o cpf!'; $('#cpf').focus();break;
-						case $('#rg').val():  msg = 'Informe o rg!'; $('#rg').focus();break;
-						case $('#emissor').val():  msg = 'Informe o emissor!'; $('#emissor').focus();break;
-						case $('#uf').val():  msg = 'Informe o uf!'; $('#uf').focus();break;
-						case $('#sexo').val():  msg = 'Informe o sexo!'; $('#sexo').focus();break;
-						case $('#nascimento').val():  msg = 'Informe a data de nascimento!'; $('#nascimento').focus();break;
-						case $('#nomePai').val() || $('#nomeMae').val():  msg = 'Informe o nome do pai ou da mãe!'; $('#nomePai').focus();break;
-						case $('#profissao').val():  msg = 'Informe a profissão!'; $('#profissao').focus();break;
-						case $('#cep').val():  msg = 'Informe o cep!'; $('#cep').focus();break;
-						case $('#endereco').val():  msg = 'Informe o endereço!'; $('#endereco').focus();break;
-						case $('#numero').val():  msg = 'Informe o número!'; $('#numero').focus();break;
-						case $('#bairro').val():  msg = 'Informe o bairro!'; $('#bairro').focus();break;
-						case $('#cidade').val():  msg = 'Informe a cidade!'; $('#cidade').focus();break;
-						case $('#estado').val():  msg = 'Informe o estado!'; $('#estado').focus();break;
-						case $('#contato').val():  msg = 'Informe o nome do contato!'; $('#contato').focus();break;
-						case $('#telefone').val() || $('#celular').val():  msg = 'Informe um telefone ou celular!'; $('#telefone').focus();break;
-						case $('#email').val():  msg = 'Informe um email!'; $('#email').focus();break;
-						default:  msg = '';break;
-					}
-					if(msg){
-						alerta('Campo obrigatório!', msg, 'error');
-						return
-					}
-	
-					$.ajax({
-						type: 'POST',
-						url: 'filtraAtendimento.php',
-						dataType: 'json',
-						data:{
-							'tipoRequest': 'SALVARPACIENTE',
-							'pessoaTipo': $('#fisica').is(':checked')? 'F' : 'J',
-							'prontuario': $('#prontuario').val(),
-							'nome': $('#nome').val(),
-							'cpf': $('#cpf').val(),
-							'rg': $('#rg').val(),
-							'emissor': $('#emissor').val(),
-							'uf': $('#uf').val(),
-							'sexo': $('#sexo').val(),
-							'nascimento': $('#nascimento').val(),
-							'nomePai': $('#nomePai').val(),
-							'nomeMae': $('#nomeMae').val(),
-							'profissao': $('#profissao').val(),
-							'cep': $('#cep').val(),
-							'endereco': $('#endereco').val(),
-							'numero': $('#numero').val(),
-							'complemento': $('#complemento').val(),
-							'bairro': $('#bairro').val(),
-							'cidade': $('#cidade').val(),
-							'estado': $('#estado').val(),
-							'contato': $('#contato').val(),
-							'telefone': $('#telefone').val(),
-							'celular': $('#celular').val(),
-							'email': $('#email').val(),
-							'observacao': $('#observacao').val()
-						},
-						success: function(response) {
-							alerta(response.titulo, response.menssagem, response.tipo);
-							$('#novoPaciente').fadeOut()
-							$('#selectPaciente').fadeIn()
-							$('#voltarSelectPaciente').fadeOut()
-							$('#cancelar').fadeIn()
-							$('#pacienteId').val('')
-
-							getCmbs({pacienteID: response.id})
-						},
-						error: function(response) {
-							alerta(response.titulo, response.menssagem, response.tipo);
-						}
-					});
-				} else if(!$('#paciente').val()){
-					alerta('Campo Obrigatório!', 'informe o paciente', 'error')
-					return
-				} else {
-					$('#formPaciente').removeClass('active show')
-					$('#formResponsavel').removeClass('active show')
-					$('#FormAtendimento').removeClass('active show')
-
-					$('#navPaciente').removeClass('active show')
-					$('#navResponsavel').removeClass('active show')
-					$('#navAtendimento').removeClass('active show')
-
-					$('#formResponsavel').addClass('active show')
-					$('#navResponsavel').addClass('active show')
-
-					$('#cancelar').fadeIn()
-					$('#voltarSelectPaciente').fadeOut()
-				}
-			})
-
-			$('#formResponsavel').submit(function(e){
-				e.preventDefault()
-				if($('#responsavelId').val() == 'NOVO'){
-					let msg = ''
-					switch(msg){
-						case $('#nomeResp').val(): msg = 'Informe o nome!!';$('#nomeResp').focus();break;
-						case $('#parentescoResp').val(): msg = 'Informe o tipo de parentesco!!';$('#parentescoResp').focus();break;
-						case $('#nascimentoResp').val(): msg = 'Informe a data de nascimento!!';$('#nascimentoResp').focus();break;
-						case $('#cepResp').val(): msg = 'Informe o cep!!';$('#cepResp').focus();break;
-						case $('#enderecoResp').val(): msg = 'Informe endereco!!';$('#enderecoResp').focus();break;
-						case $('#numeroResp').val(): msg = 'Informe número!!';$('#numeroResp').focus();break;
-						case $('#bairroResp').val(): msg = 'Informe o bairro!!';$('#bairroResp').focus();break;
-						case $('#cidadeResp').val(): msg = 'Informe a cidade!!';$('#cidadeResp').focus();break;
-						case $('#estadoResp').val(): msg = 'Informe o estado!!';$('#estadoResp').focus();break;
-						case $('#telefoneResp').val() || $('#celularResp').val(): msg = 'Informe um telefone ou celular!!';$('#telefoneResp').focus();break;
-						case $('#emailResp').val(): msg = 'Informe um email!!';$('#emailResp').focus();break;
-						default:  msg = '';break;
-					}
-
-					if(msg){
-						alerta('Campo obrigatório!', msg, 'error');
-						return
-					}
-
-					$.ajax({
-						type: 'POST',
-						url: 'filtraAtendimento.php',
-						dataType: 'json',
-						data:{
-							'tipoRequest': 'SALVARRESPONSAVEL',
-							'nomeResp': $('#nomeResp').val(),
-							'parentescoResp': $('#parentescoResp').val(),
-							'nascimentoResp': $('#nascimentoResp').val(),
-							'cepResp': $('#cepResp').val(),
-							'enderecoResp': $('#enderecoResp').val(),
-							'numeroResp': $('#numeroResp').val(),
-							'complementoResp': $('#complementoResp').val(),
-							'bairroResp': $('#bairroResp').val(),
-							'cidadeResp': $('#cidadeResp').val(),
-							'estadoResp': $('#estadoResp').val(),
-							'telefoneResp': $('#telefoneResp').val(),
-							'celularResp': $('#celularResp').val(),
-							'emailResp': $('#emailResp').val(),
-							'observacaoResp': $('#observacaoResp').val()
-						},
-						success: function(response) {
-							alerta(response.titulo, response.menssagem, response.tipo);
-							$('#novoPaciente').fadeOut()
-							$('#selectPaciente').fadeIn()
-							$('#pacienteId').val('')
-
-							getCmbs({responsavelID: response.id})
-						},
-						error: function(response) {
-							alerta(response.titulo, response.menssagem, response.tipo);
-						}
-					});
-				} else if(!$('#parentescoCadatrado').val()){
-					alerta('Campo Obrigatório!', 'informe o responsável', 'error')
-					return
-				} else {
-					$('#formPaciente').removeClass('active show')
-					$('#formResponsavel').removeClass('active show')
-					$('#FormAtendimento').removeClass('active show')
-
-					$('#navPaciente').removeClass('active show')
-					$('#navResponsavel').removeClass('active show')
-					$('#navAtendimento').removeClass('active show')
-
-					$('#FormAtendimento').addClass('active show')
-					$('#navAtendimento').addClass('active show')
-				}
-			})
-
-			$('#formAtendimento').submit(function(e){
-				e.preventDefault()
-				let msg = ''
-				switch(msg){
-					case $('#dataRegistro').val(): msg = 'Informe a data de registro!!';$('#dataRegistro').focus();break;
-					case $('#modalidade').val(): msg = 'Informe a modalidade!!';$('#modalidade').focus();break;
-					case $('#classificacao').val(): msg = 'Informe a classificação!!';$('#classificacao').focus();break;
-					default:  msg = '';break;
-				}
-				// falta fazer a inserção no banco, so esta feito a validação
-				if(msg){
-					alerta('Campo obrigatório!', msg, 'error');
-					return
-				}
-
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimento.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'SALVARATENDIMENTO',
-						'dataRegistro': $('#dataRegistro').val(),
-						'modalidade': $('#modalidade').val(),
-						'classificacao': $('#classificacao').val(),
-						'observacaoAtendimento': $('#observacaoAtendimento').val()
-					},
-					success: function(response) {
-						alerta(response.titulo, response.menssagem, response.tipo);
-					},
-					error: function(response) {
-						alerta(response.titulo, response.menssagem, response.tipo);
-					}
-				});
-			})
-
 			// /////////////////////////////////////
 
-			$('#backSalvarResponsavel').on('click', function(e){
-				e.preventDefault()
-				$('#formPaciente').removeClass('active show')
-				$('#formResponsavel').removeClass('active show')
-				$('#FormAtendimento').removeClass('active show')
-
-				$('#navPaciente').removeClass('active show')
-				$('#navResponsavel').removeClass('active show')
-				$('#navAtendimento').removeClass('active show')
-
-				$('#formPaciente').addClass('active show')
-				$('#navPaciente').addClass('active show')
-			})
-
-			$('#backSalvarAtendimento').on('click', function(e){
-				e.preventDefault()
-				$('#formPaciente').removeClass('active show')
-				$('#formResponsavel').removeClass('active show')
-				$('#FormAtendimento').removeClass('active show')
-
-				$('#navPaciente').removeClass('active show')
-				$('#navResponsavel').removeClass('active show')
-				$('#navAtendimento').removeClass('active show')
-
-				$('#formResponsavel').addClass('active show')
-				$('#navResponsavel').addClass('active show')
-			})
-
+			// btn de adicionar novo paciente
 			$('#addPaciente').on('click', function(e){
 				e.preventDefault()
 				$('#pacienteId').val('NOVO')
 				$('#selectPaciente').fadeOut()
 				$('#novoPaciente').fadeIn()
-				$('#cancelar').fadeOut()
-				$('#voltarSelectPaciente').fadeIn()
 			})
 
+			// btn de adicionar novo responsavel
 			$('#addResponsavel').on('click', function(e){
 				e.preventDefault()
 				$('#responsavelId').val('NOVO')
@@ -416,16 +199,49 @@ if($iAtendimento){
 				$('#novoResponsavel').fadeIn()
 			})
 
+			// btn de cancelar a inserção de novo paciente
 			$('#voltarSelectPaciente').on('click', function(){
 				$('#novoPaciente').fadeOut()
 				$('#selectPaciente').fadeIn()
-				$('#voltarSelectPaciente').fadeOut()
-				$('#cancelar').fadeIn()
-				$('#pacienteId').val('')
+				setPacienteAtribut()
 
 				getCmbs()
 			})
 
+			// btn de cancelar a inserção de novo responsavel
+			$('#voltarSelectResponsavel').on('click', function(){
+				$('#novoResponsavel').fadeOut()
+				$('#selectResponsavel').fadeIn()
+				setResponsavelAtribut()
+
+				getCmbs()
+			})
+
+			$('#paciente').on('change', function(){
+				let iPaciente = $(this).val();
+				if(iPaciente){
+					$.ajax({
+						type: 'POST',
+						url: 'filtraAtendimento.php',
+						dataType: 'json',
+						data:{
+							'tipoRequest': 'PACIENTE',
+							'iPaciente': iPaciente
+						},
+						success: function(response) {
+							if(response.tipo == 'success'){
+								setPacienteAtribut(response)
+								$('#novoPaciente').fadeIn()
+							}else{
+								alerta(response.titulo, response.menssagem, response.tipo)
+								$('#novoPaciente').fadeOut()
+							}
+						},
+						error: function(response) {
+						}
+					});
+				}
+			});
 
 			$('#parentescoCadatrado').on('change', function(){
 				let iResponsavel = $(this).val();
@@ -440,24 +256,11 @@ if($iAtendimento){
 						},
 						success: function(response) {
 							if(response.tipo == 'success'){
-								$('#nomeResp').val(response.data.nomeResp)
-								$('#parentescoResp').val(response.data.parentescoResp)
-								$('#nascimentoResp').val(response.data.nascimentoResp)
-								$('#cepResp').val(response.data.cepResp)
-								$('#enderecoResp').val(response.data.enderecoResp)
-								$('#numeroResp').val(response.data.numeroResp)
-								$('#complementoResp').val(response.data.complementoResp)
-								$('#bairroResp').val(response.data.bairroResp)
-								$('#cidadeResp').val(response.data.cidadeResp)
-								$('#estadoResp').val(response.data.estadoResp)
-								$('#telefoneResp').val(response.data.telefoneResp)
-								$('#celularResp').val(response.data.celularResp)
-								$('#emailResp').val(response.data.emailResp)
-								$('#observacaoResp').val(response.data.observacaoResp)
-
-								alerta(response.titulo, response.menssagem, response.tipo)
+								setResponsavelAtribut(response)
+								$('#novoResponsavel').fadeIn()
 							}else{
 								alerta(response.titulo, response.menssagem, response.tipo)
+								$('#novoResponsavel').fadeOut()
 							}
 						},
 						error: function(response) {
@@ -556,10 +359,6 @@ if($iAtendimento){
 				$('#iAtendimento').val('')
 				$('#page-modal-paciente').fadeOut(200);
 			})
-
-			$('.legitRipple').each(function(){
-				console.log($(this).html())
-			});
 
 			resetServicoCmb()
 		});
@@ -721,6 +520,183 @@ if($iAtendimento){
 					}
 				}
 			});
+		}
+
+		// essa função vai setar os atributos nos campos quando for selecionado o paciente
+		function setPacienteAtribut(obj){
+			if(obj){
+				switch(obj.tipoPessoa){
+					case 'F':$('#fisica').attr('checked', true);$('#juridica').attr('checked', false);break;
+					case 'J':$('#fisica').attr('checked', false);$('#juridica').attr('checked', true);break;
+				}
+
+				$('#prontuario').val(obj.prontuario)
+				$('#nome').val(obj.nome)
+				$('#cpf').val(obj.cpf)
+				$('#cns').val(obj.cns)
+				$('#rg').val(obj.rg)
+				$('#emissor').val(obj.emissor)
+				$('#uf').val(obj.uf)
+				$('#sexo').val(obj.sexo)
+				$('#nascimento').val(obj.nascimento)
+				$('#nomePai').val(obj.nomePai)
+				$('#nomeMae').val(obj.nomeMae)
+				$('#profissao').val(obj.profissao)
+				$('#cep').val(obj.cep)
+				$('#endereco').val(obj.endereco)
+				$('#numero').val(obj.numero)
+				$('#complemento').val(obj.complemento)
+				$('#bairro').val(obj.bairro)
+				$('#cidade').val(obj.cidade)
+				$('#estado').val(obj.estado)
+				$('#contato').val(obj.contato)
+				$('#telefone').val(obj.telefone)
+				$('#celular').val(obj.celular)
+				$('#email').val(obj.email)
+				$('#observacao').val(obj.observacao)
+
+				$('#prontuario').attr('readonly',true)
+				$('#nome').attr('readonly',true)
+				$('#cpf').attr('readonly',true)
+				$('#cns').attr('readonly',true)
+				$('#rg').attr('readonly',true)
+				$('#emissor').attr('readonly',true)
+				$('#uf').attr('readonly',true)
+				$('#sexo').attr('readonly',true)
+				$('#nascimento').attr('readonly',true)
+				$('#nomePai').attr('readonly',true)
+				$('#nomeMae').attr('readonly',true)
+				$('#profissao').attr('readonly',true)
+
+				// $('#cep').attr('readonly',true)
+				// $('#endereco').attr('readonly',true)
+				// $('#numero').attr('readonly',true)
+				// $('#complemento').attr('readonly',true)
+				// $('#bairro').attr('readonly',true)
+				// $('#cidade').attr('readonly',true)
+				// $('#estado').attr('readonly',true)
+				// $('#contato').attr('readonly',true)
+				// $('#telefone').attr('readonly',true)
+				// $('#celular').attr('readonly',true)
+				// $('#email').attr('readonly',true)
+				// $('#observacao').attr('readonly',true)
+			} else {
+				$('#prontuario').val('')
+				$('#nome').val('')
+				$('#cpf').val('')
+				$('#cns').val('')
+				$('#rg').val('')
+				$('#emissor').val('')
+				$('#uf').val('')
+				$('#sexo').val('')
+				$('#nascimento').val('')
+				$('#nomePai').val('')
+				$('#nomeMae').val('')
+				$('#profissao').val('')
+				$('#cep').val('')
+				$('#endereco').val('')
+				$('#numero').val('')
+				$('#complemento').val('')
+				$('#bairro').val('')
+				$('#cidade').val('')
+				$('#estado').val('')
+				$('#contato').val('')
+				$('#telefone').val('')
+				$('#celular').val('')
+				$('#email').val('')
+				$('#observacao').val('')
+
+				$('#prontuario').attr('readonly',false)
+				$('#nome').attr('readonly',false)
+				$('#cpf').attr('readonly',false)
+				$('#cns').attr('readonly',false)
+				$('#rg').attr('readonly',false)
+				$('#emissor').attr('readonly',false)
+				$('#uf').attr('readonly',false)
+				$('#sexo').attr('readonly',false)
+				$('#nascimento').attr('readonly',false)
+				$('#nomePai').attr('readonly',false)
+				$('#nomeMae').attr('readonly',false)
+				$('#profissao').attr('readonly',false)
+
+				// $('#cep').attr('readonly',false)
+				// $('#endereco').attr('readonly',false)
+				// $('#numero').attr('readonly',false)
+				// $('#complemento').attr('readonly',false)
+				// $('#bairro').attr('readonly',false)
+				// $('#cidade').attr('readonly',false)
+				// $('#estado').attr('readonly',false)
+				// $('#contato').attr('readonly',false)
+				// $('#telefone').attr('readonly',false)
+				// $('#celular').attr('readonly',false)
+				// $('#email').attr('readonly',false)
+				// $('#observacao').attr('readonly',false)
+			}
+		}
+
+		// essa função vai setar os atributos nos campos quando for selecionado o responsável
+		function setResponsavelAtribut(obj){
+			if(obj){
+				$('#nomeResp').val(obj.data.nomeResp)
+				$('#parentescoResp').val(obj.data.parentescoResp)
+				$('#nascimentoResp').val(obj.data.nascimentoResp)
+				$('#cepResp').val(obj.data.cepResp)
+				$('#enderecoResp').val(obj.data.enderecoResp)
+				$('#numeroResp').val(obj.data.numeroResp)
+				$('#complementoResp').val(obj.data.complementoResp)
+				$('#bairroResp').val(obj.data.bairroResp)
+				$('#cidadeResp').val(obj.data.cidadeResp)
+				$('#estadoResp').val(obj.data.estadoResp)
+				$('#telefoneResp').val(obj.data.telefoneResp)
+				$('#celularResp').val(obj.data.celularResp)
+				$('#emailResp').val(obj.data.emailResp)
+				$('#observacaoResp').val(obj.data.observacaoResp)
+
+				$('#nomeResp').attr('readonly', true)
+				$('#parentescoResp').attr('readonly', true)
+				$('#nascimentoResp').attr('readonly', true)
+				$('#cepResp').attr('readonly', true)
+				$('#enderecoResp').attr('readonly', true)
+				$('#numeroResp').attr('readonly', true)
+				$('#complementoResp').attr('readonly', true)
+				$('#bairroResp').attr('readonly', true)
+				$('#cidadeResp').attr('readonly', true)
+				$('#estadoResp').attr('readonly', true)
+				$('#telefoneResp').attr('readonly', true)
+				$('#celularResp').attr('readonly', true)
+				$('#emailResp').attr('readonly', true)
+				$('#observacaoResp').attr('readonly', true)
+			} else {
+				$('#nomeResp').val('')
+				$('#parentescoResp').val('')
+				$('#nascimentoResp').val('')
+				$('#cepResp').val('')
+				$('#enderecoResp').val('')
+				$('#numeroResp').val('')
+				$('#complementoResp').val('')
+				$('#bairroResp').val('')
+				$('#cidadeResp').val('')
+				$('#estadoResp').val('')
+				$('#telefoneResp').val('')
+				$('#celularResp').val('')
+				$('#emailResp').val('')
+				$('#observacaoResp').val('')
+
+				$('#nomeResp').attr('readonly', false)
+				$('#parentescoResp').attr('readonly', false)
+				$('#nascimentoResp').attr('readonly', false)
+				$('#cepResp').attr('readonly', false)
+				$('#enderecoResp').attr('readonly', false)
+				$('#numeroResp').attr('readonly', false)
+				$('#complementoResp').attr('readonly', false)
+				$('#bairroResp').attr('readonly', false)
+				$('#cidadeResp').attr('readonly', false)
+				$('#estadoResp').attr('readonly', false)
+				$('#telefoneResp').attr('readonly', false)
+				$('#celularResp').attr('readonly', false)
+				$('#emailResp').attr('readonly', false)
+				$('#observacaoResp').attr('readonly', false)
+			}
 		}
 
 		function excluiServico(id){
@@ -982,23 +958,28 @@ if($iAtendimento){
 			<div class="content">
 				<div class="row">
 					<div class="col-lg-12">
-						<div class="card">							
-							<ul class="nav nav-tabs nav-tabs-bottom nav-justified">
-								<li class="nav-item"><a id="navPaciente" href="#" class="nav-link rounded-top legitRipple active show" >Paciente</a></li>
-								<li class="nav-item"><a id="navResponsavel" href="#" class="nav-link rounded-top legitRipple" >Responsável</a></li>
-								<li class="nav-item"><a id="navAtendimento" href="#" class="nav-link rounded-top legitRipple" >Atendimento</a></li>
-							</ul>
+						<div class="card">
+							<div class="card-header bg-white header-elements-inline">
+								<h6 class="card-title">Cadastro de novo atendimento</h6>
+								<div class="header-elements">
+									<!-- <div class="list-icons">
+										<a class="list-icons-item" data-action="collapse"></a>
+										<a class="list-icons-item" data-action="reload"></a>
+										<a class="list-icons-item" data-action="remove"></a>
+									</div> -->
+								</div>
+							</div>
 
-							<div class="tab-content">
-								<!-- dados do paciente -->
-								<form id="formPaciente" class="form-validate-jquery mt-4 p-2 tab-pane fade active show" action="#">
+							<form class="wizard-form steps-validation" action="#" data-fouc>
+								<h6>Paciente</h6>
+								<fieldset>
 									<input id="pacienteId" type="hidden" name="pacienteId" value="">
-									<div class="col-12 row text-center" id="selectPaciente">
+									<div class="col-12 row text-center mb-5" id="selectPaciente">
 										<div class="col-lg-12 my-3 text-black-50">
 											<h5>Selecione o paciente</h5>
 										</div>
 										<div class="col-11">
-											<select id="paciente" name="paciente" class="select-search">
+											<select id="paciente" name="paciente" class="select-search" required>
 												
 											</select>
 										</div>
@@ -1017,7 +998,7 @@ if($iAtendimento){
 	
 											<div class="col-lg-1 text-center">
 												<input class="mr-1" id="juridica" name="pessoaTipo" type="radio" />
-												<label for="fisica">Jurídica</label>
+												<label for="juridica">Jurídica</label>
 											</div>
 										</div>
 	
@@ -1234,30 +1215,22 @@ if($iAtendimento){
 												<textarea id="observacao" name="observacao" class="form-control" placeholder="Observações"></textarea>
 											</div>
 										</div>
+
+										<div class="row col-12 my-4 ml-0 mr-0">
+											<a class="col-2 btn btn-lg" href="#" id="voltarSelectPaciente">cancelar</a>
+										</div>
 									</div>
+								</fieldset>
 
-									<!-- botões -->
-									<div class="row col-12 my-4 ml-0 mr-0">
-										<a class="col-2 btn btn-lg" href="atendimento.php" id="cancelar">Cancelar</a>
-										<a class="col-2 btn btn-lg" href="#" id="voltarSelectPaciente">voltar</a>
-
-										<div class="col-8" ></div>
-
-										<button class="col-2 btn btn-lg btn-principal btnNext" id="salvarPaciente" data-tipo="PACIENTE">
-											Próximo <i class="icon-arrow-right32"></i>
-										</button>
-									</div>
-								</form>
-
-								<!-- dados do responsável -->
-								<form id="formResponsavel" class="form-validate-jquery mt-4 p-2 tab-pane fade" action="#">
+								<h6>Responsável</h6>
+								<fieldset>
 									<input id="responsavelId" type="hidden" name="responsavelId" value="">
-									<div class="col-12 row text-center" id="selectResponsavel">
+									<div class="col-12 row text-center mb-5" id="selectResponsavel">
 										<div class="col-lg-12 my-3 text-black-50">
 											<h5>Selecione o responsável</h5>
 										</div>
 										<div class="col-11">
-											<select id="parentescoCadatrado" name="parentescoCadatrado" class="select-search">
+											<select id="parentescoCadatrado" name="parentescoCadatrado" class="select-search" required>
 											</select>
 										</div>
 										<div class="col-1">
@@ -1398,24 +1371,15 @@ if($iAtendimento){
 												<textarea id="observacaoResp" name="observacaoResp" class="form-control" placeholder="Observações"></textarea>
 											</div>
 										</div>
+
+										<div class="row col-12 my-4 ml-0 mr-0">
+											<a class="col-2 btn btn-lg" href="#" id="voltarSelectResponsavel">cancelar</a>
+										</div>
 									</div>
+								</fieldset>
 
-									<!-- botões -->
-									<div class="row col-12 my-4 ml-0 mr-0">
-										<button class="col-2 btn btn-lg btn-principal btnBack" id="backSalvarResponsavel" data-tipo="RESPONSAVEL" >
-											<i class="icon-arrow-left32"></i> Anterior
-										</button>
-
-										<div class="col-8" ></div>
-
-										<button class="col-2 btn btn-lg btn-principal btnNext" id="salvarResponsavel" data-tipo="RESPONSAVEL" >
-											Próximo <i class="icon-arrow-right32"></i>
-										</button>
-									</div>
-								</form>
-
-								<!-- dados do atendimento -->
-								<form id="formAtendimento" class="form-validate-jquery mt-4 p-2 tab-pane fade" action="#">
+								<h6>Atendimento</h6>
+								<fieldset>
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
@@ -1555,21 +1519,8 @@ if($iAtendimento){
 											</select>
 										</div>
 									</div>
-
-									<!-- botões -->
-									<div class="row col-12 my-4 ml-0 mr-0">
-										<button class="col-2 btn btn-lg btn-principal btnBack" id="backSalvarAtendimento" data-tipo="ATENDIMENTO" >
-											<i class="icon-arrow-left32"></i> Anterior
-										</button>
-
-										<div class="col-8" ></div>
-
-										<button class="col-2 btn btn-lg btn-principal btnSalvar" id="salvarAtendimento" data-tipo="ATENDIMENTO" >
-											Concluir <i class="icon-check"></i>
-										</button>
-									</div>
-								</form>
-							</div>
+								</fieldset>
+							</form>
 						</div>
 					</div>
 				</div>

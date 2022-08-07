@@ -564,6 +564,51 @@ try{
 		}
 
 		echo json_encode($array);
+	} elseif ($tipoRequest == 'PACIENTE'){
+		$iPaciente = $_POST['iPaciente'];
+
+		$sql = "SELECT ClienTipo,ClienNome,ClienRazaoSocial,
+		ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
+		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
+		ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
+		FROM Cliente WHERE ClienId = $iPaciente and ClienUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		$array = [];
+		if($row){
+			$array = [
+				'tipo' => 'success',
+				'tipoPessoa' => $row['ClienTipo'],
+				// 'prontuario' => $item['ClienId'],
+				'nome' => $row['ClienNome'],
+				'cpf' => $row['ClienCpf'],
+				// 'cns' => $row['ClienId'],
+				'rg' => $row['ClienRg'],
+				'emissor' => $row['ClienOrgaoEmissor'],
+				'uf' => $row['ClienUf'],
+				'sexo' => $row['ClienSexo'],
+				'nascimento' => $row['ClienDtNascimento'],
+				'nomePai' => $row['ClienNomePai'],
+				'nomeMae' => $row['ClienNomeMae'],
+				'profissao' => $row['ClienProfissao'],
+				'cep' => $row['ClienCep'],
+				'endereco' => $row['ClienEndereco'],
+				'numero' => $row['ClienNumero'],
+				'complemento' => $row['ClienComplemento'],
+				'bairro' => $row['ClienBairro'],
+				'cidade' => $row['ClienCidade'],
+				'estado' => $row['ClienEstado'],
+				'contato' => $row['ClienContato'],
+				'telefone' => $row['ClienTelefone'],
+				'celular' => $row['ClienCelular'],
+				'email' => $row['ClienEmail'],
+				'observacao' => $row['ClienObservacao']
+			];
+		}
+
+		echo json_encode($array);
 	} elseif ($tipoRequest == 'ADDPACIENTENOVO'){
 
 		$nomePaciente = $_POST['nomePaciente'];
@@ -646,21 +691,21 @@ try{
 
 		if($row){
 			$array = [
-				'id' => $item['ClResId'],
-				'nomeResp' => $item['ClResNome'],
-				'parentescoResp' => $item['CResParentesco'],
-				'nascimentoResp' => $item['ClResNascimento'],
-				'cepResp' => $item['ClResCep'],
-				'enderecoResp' => $item['ClResEndereco'],
-				'numeroResp' => $item['ClResNumero'],
-				'complementoResp' => $item['ClResComplemento'],
-				'bairroResp' => $item['ClResBairro'],
-				'cidadeResp' => $item['ClResCidade'],
-				'estadoResp' => $item['ClResEstado'],
-				'telefoneResp' => $item['ClResTelefone'],
-				'celularResp' => $item['ClResCelular'],
-				'emailResp' => $item['ClResEmail'],
-				'observacaoResp' => $item['ClResObservacao']
+				'id' => $row['ClResId'],
+				'nomeResp' => $row['ClResNome'],
+				'parentescoResp' => $row['CResParentesco'],
+				'nascimentoResp' => $row['ClResNascimento'],
+				'cepResp' => $row['ClResCep'],
+				'enderecoResp' => $row['ClResEndereco'],
+				'numeroResp' => $row['ClResNumero'],
+				'complementoResp' => $row['ClResComplemento'],
+				'bairroResp' => $row['ClResBairro'],
+				'cidadeResp' => $row['ClResCidade'],
+				'estadoResp' => $row['ClResEstado'],
+				'telefoneResp' => $row['ClResTelefone'],
+				'celularResp' => $row['ClResCelular'],
+				'emailResp' => $row['ClResEmail'],
+				'observacaoResp' => $row['ClResObservacao']
 			];
 		}
 		
