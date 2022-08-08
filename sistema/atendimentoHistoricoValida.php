@@ -5,10 +5,12 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 if(isset($_POST['historicoId'])){
+
 	
-	$sql = "SELECT ClienNome
-            FROM Cliente
-            WHERE ClienUnidade = ".$_SESSION['UnidadeId']." and ClienId = '". $_POST['historicoId']."'";
+	$sql = "SELECT AtendNumRegistro, AtendDataRegistro, AtendId
+			FROM Atendimento
+			JOIN Cliente ON ClienId = AtendCliente
+			WHERE  AtendId = '". $_POST['historicoId']."'"; 
 } 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
