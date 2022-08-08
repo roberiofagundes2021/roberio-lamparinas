@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Triagem';
 
 include('global_assets/php/conexao.php');
 
-$iAtendimentoId = 3;//isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
+$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
 if(!$iAtendimentoId){
 	irpara("atendimento.php");
@@ -555,7 +555,7 @@ if (isset($_POST['inputAlergia']) ){
 											<div class="form-group">
 												<label for="inputAltura">Altura </label>
 												<div class="input-group">
-												<input type="text" onKeyUp="moeda(this)" maxLength="4" id="inputAltura" name="inputAltura" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo mostraValor($rowTriagem['AtTriAltura']); ?>">
+												<input type="text" onKeyUp="moeda(this)" maxLength="6" id="inputAltura" name="inputAltura" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo mostraValor($rowTriagem['AtTriAltura']); ?>">
 													<span class="input-group-prepend">
 														<span class="input-group-text">Cm</span>
 													</span>
