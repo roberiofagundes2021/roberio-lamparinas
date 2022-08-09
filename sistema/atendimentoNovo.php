@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 
 // a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
 
-$iAtendimento = isset($_POST['iAtendimento'])?$_POST['iAtendimento']:false;
+$iAtendimento = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:false;
 $iUnidade = $_SESSION['UnidadeId'];
 
 if($iAtendimento){
@@ -56,8 +56,153 @@ if($iAtendimento){
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/extensions/cookie.js"></script>
-	<script src="global_assets/js/demo_pages/form_wizard.js"></script>
+
+	<!-- essa função deve ser devlarada aqui pois existem funções que são sobrescrevidas
+	nas importações abaixo -->
+	<script>
+		var FormWizard = function() {
+			// Wizard
+			var _componentWizard = function() {
+				// Stop function if validation is missing
+				if (!$().validate) {
+					console.warn('Warning - validate.min.js is not loaded.');
+					return;
+				}
+
+				// Show form
+				var form = $('.steps-validation').show();
+
+
+				// Initialize wizard
+				$('.steps-validation').steps({
+					headerTag: 'h6',
+					bodyTag: 'fieldset',
+					titleTemplate: '<span class="number">#index#</span> #title#',
+					labels: {
+						previous: '<i class="icon-arrow-left13 mr-2" /> Anterior',
+						next: 'Próximo <i class="icon-arrow-right14 ml-2" />',
+						finish: 'Finalizar <i class="icon-arrow-right14 ml-2" />'
+					},
+					transitionEffect: 'fade',
+					autoFocus: true,
+					onStepChanging: function (event, currentIndex, newIndex) {
+
+						// Allways allow previous action even if the current form is not valid!
+						if (currentIndex > newIndex) {
+							return true;
+						}
+
+						// Needed in some cases if the user went back (clean up)
+						if (currentIndex < newIndex) {
+
+							// To remove error styles
+							form.find('.body:eq(' + newIndex + ') label.error').remove();
+							form.find('.body:eq(' + newIndex + ') .error').removeClass('error');
+						}
+
+						form.validate().settings.ignore = ':disabled,:hidden';
+						return form.valid();
+					},
+					onFinishing: function (event, currentIndex) {
+						form.validate().settings.ignore = ':disabled';
+						return form.valid();
+					},
+					onFinished: function (event, currentIndex) {
+						event.preventDefault();
+						let menssageError = ''
+
+						switch(menssageError){
+							case $('#dataRegistro').val(): menssageError = 'informe a data de registro'; $('#servico').focus();break;
+							case $('#modalidade').val(): menssageError = 'informe a modalidade'; $('#medicos').focus();break;
+							case $('#classificacao').val(): menssageError = 'informe a classificação'; $('#dataAtendimento').focus();break;
+							default: menssageError = ''; break;
+						}
+
+						if(menssageError){
+							alerta('Campo Obrigatório!', menssageError, 'error')
+							return
+						}
+
+						$.ajax({
+							type: 'POST',
+							url: 'filtraAtendimento.php',
+							dataType: 'json',
+							data:{
+								'tipoRequest': 'SALVARATENDIMENTO',
+								'cliente':$('paciente').val(),
+								'responsavel':$('parentescoCadatrado').val(),
+								'dataRegistro': $('#dataRegistro').val(),
+								'modalidade': $('#modalidade').val(),
+								'classificacao': $('#classificacao').val(),
+								'observacao': $('#observacaoAtendimento').val(),
+								'situacao': $('#situacao').val()
+							},
+							success: function(response) {
+								if(response.status == 'success'){
+									alerta(response.titulo, response.menssagem, response.status)
+									window.location.href = 'atendimento.php'
+								} else {
+									alerta(response.titulo, response.menssagem, response.status);
+								}
+							},
+							error: function(response) {
+								alerta(response.titulo, response.menssagem, response.status);
+							}
+						});
+					}
+				});
+				$('.steps-validation').validate({
+					ignore: 'input[type=hidden], .select2-search__field', // ignore hidden fields
+					errorClass: 'validation-invalid-label',
+					highlight: function(element, errorClass) {
+						$(element).removeClass(errorClass);
+					},
+					unhighlight: function(element, errorClass) {
+						$(element).removeClass(errorClass);
+					},
+
+					// Different components require proper error label placement
+					errorPlacement: function(error, element) {
+
+						// Unstyled checkboxes, radios
+						if (element.parents().hasClass('form-check')) {
+							error.appendTo( element.parents('.form-check').parent() );
+						}
+
+						// Input with icons and Select2
+						else if (element.parents().hasClass('form-group-feedback') || element.hasClass('select2-hidden-accessible')) {
+							error.appendTo( element.parent() );
+						}
+
+						// Input group, styled file input
+						else if (element.parent().is('.uniform-uploader, .uniform-select') || element.parents().hasClass('input-group')) {
+							error.appendTo( element.parent().parent() );
+						}
+
+						// Other elements
+						else {
+							error.insertAfter(element);
+						}
+					},
+					rules: {
+						email: {
+							email: true
+						}
+					}
+				});
+			};
+			return {
+				init: function() {
+					_componentWizard();
+				}
+			}
+			}();
+		
+		document.addEventListener('DOMContentLoaded', function() {
+			FormWizard.init();
+		});
+	</script>
+	<!-- <script src="global_assets/js/demo_pages/form_wizard.js"></script> -->
 
 	
 	<!-- Theme JS files -->
@@ -109,7 +254,7 @@ if($iAtendimento){
 			</script>';
 	?>
 
-	<script type="text/javascript" >			
+	<script type="text/javascript" >
 		$(document).ready(function() {
 			$('#servicoTable').hide()
 			$('#novoPaciente').fadeOut()
@@ -128,7 +273,6 @@ if($iAtendimento){
 				$('#dataRegistro').val(atendimento.AtendDataRegistro)
 				$('#observacao').val(atendimento.AtendObservacao)
 				$('#tipoRequest').val('EDITAR')
-				checkServicos(atendimento.AtendId)
 			}
 
 			$('#incluirServico').on('click', function(e){
@@ -180,12 +324,12 @@ if($iAtendimento){
 					}
 				});
 			})
-
 			// /////////////////////////////////////
 
 			// btn de adicionar novo paciente
 			$('#addPaciente').on('click', function(e){
 				e.preventDefault()
+				setPacienteAtribut()
 				$('#pacienteId').val('NOVO')
 				$('#selectPaciente').fadeOut()
 				$('#novoPaciente').fadeIn()
@@ -194,6 +338,7 @@ if($iAtendimento){
 			// btn de adicionar novo responsavel
 			$('#addResponsavel').on('click', function(e){
 				e.preventDefault()
+				setResponsavelAtribut()
 				$('#responsavelId').val('NOVO')
 				$('#selectResponsavel').fadeOut()
 				$('#novoResponsavel').fadeIn()
@@ -219,28 +364,7 @@ if($iAtendimento){
 
 			$('#paciente').on('change', function(){
 				let iPaciente = $(this).val();
-				if(iPaciente){
-					$.ajax({
-						type: 'POST',
-						url: 'filtraAtendimento.php',
-						dataType: 'json',
-						data:{
-							'tipoRequest': 'PACIENTE',
-							'iPaciente': iPaciente
-						},
-						success: function(response) {
-							if(response.tipo == 'success'){
-								setPacienteAtribut(response)
-								$('#novoPaciente').fadeIn()
-							}else{
-								alerta(response.titulo, response.menssagem, response.tipo)
-								$('#novoPaciente').fadeOut()
-							}
-						},
-						error: function(response) {
-						}
-					});
-				}
+				setPacienteAtribut(iPaciente)
 			});
 
 			$('#parentescoCadatrado').on('change', function(){
@@ -255,11 +379,11 @@ if($iAtendimento){
 							'iResponsavel': iResponsavel
 						},
 						success: function(response) {
-							if(response.tipo == 'success'){
+							if(response.status == 'success'){
 								setResponsavelAtribut(response)
 								$('#novoResponsavel').fadeIn()
 							}else{
-								alerta(response.titulo, response.menssagem, response.tipo)
+								alerta(response.titulo, response.menssagem, response.status)
 								$('#novoResponsavel').fadeOut()
 							}
 						},
@@ -360,6 +484,11 @@ if($iAtendimento){
 				$('#page-modal-paciente').fadeOut(200);
 			})
 
+			$('#formServicoAtendimento').submit(function(e){
+				e.preventDefault()
+				console.log()
+			})
+
 			resetServicoCmb()
 		});
 
@@ -380,9 +509,9 @@ if($iAtendimento){
 					// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
 					// logo esses valores deveram vir preenchido com os dados desse atendimento
 
-					if(obj && obj.pacienteID){
+					if(obj && obj.pacienteID ){
 						response.forEach(item =>{
-							opt = obj.pacienteID  == item.id?
+							opt = obj.pacienteID == item.id?
 							 `<option selected value="${item.id}">${item.nome}</option>`:
 							 `<option value="${item.id}">${item.nome}</option>`
 							 $('#paciente').append(opt)
@@ -394,6 +523,7 @@ if($iAtendimento){
 							 `<option value="${item.id}">${item.nome}</option>`
 							 $('#paciente').append(opt)
 						})
+						setPacienteAtribut(atendimento.AtendCliente)
 					} else {
 						response.forEach(item =>{
 							opt = opt = `<option value="${item.id}">${item.nome}</option>`
@@ -418,7 +548,7 @@ if($iAtendimento){
 						// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
 						// logo esses valores deveram vir preenchido com os dados desse atendimento
 						if(atendimento){
-							 opt = atendimento.AgendModalidade == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
+							 opt = atendimento.AtendModalidade == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						} else {
 							opt = `<option value="${item.id}">${item.nome}</option>`
 						}
@@ -488,10 +618,18 @@ if($iAtendimento){
 				success: function(response) {
 					if(obj && obj.responsavelID){
 						$('#parentescoCadatrado').html("<option value=''>selecione</option>")
-						response.data.forEach(function(item, index){
+						response.data.forEach(function (item){
 							let opt = obj.responsavelID == item.id?'<option selected value="'+item.id+'">'+item.nome+'</option>':'<option value="'+item.id+'">'+item.nome+'</option>'
 							$('#parentescoCadatrado').append(opt);
 						});
+					} else if(atendimento){
+						response.data.forEach(function (item){
+							opt = atendimento.AtendResponsavel  == item.id?
+							 `<option selected value="${item.id}">${item.nome}</option>`:
+							 `<option value="${item.id}">${item.nome}</option>`
+							 $('#parentescoCadatrado').append(opt)
+						})
+						setResponsavelAtribut(atendimento.AtendResponsavel)
 					} else {
 						$('#parentescoCadatrado').html("<option selected value=''>selecione</option>")
 						response.data.forEach(function(item, index){
@@ -511,191 +649,254 @@ if($iAtendimento){
 					'tipoRequest': 'SITUACOES'
 				},
 				success: function(response) {
-					if(response.status == 'success'){
-						$('#situacao').html('<option value="">Selecione</option>')
+					$('#situacao').html('<option value="">Selecione</option>')
 
-						response.data.forEach(function(item, index){
-							$('#situacao').append('<option value="'+item.SituId+'">'+item.SituaNome+'</option>')
-						})
-					}
+					response.forEach(function(item, index){
+						let opt = ''
+						if(atendimento){
+							 opt = atendimento.AtendSituacao == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
+						} else {
+							opt = `<option value="${item.id}">${item.nome}</option>`
+						}
+						$('#situacao').append(opt)
+					})
+				}
+			});
+			// vai preencher cmbClassificacao
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'CLASSIFICACAO'
+				},
+				success: function(response) {
+					$('#classificacao').empty();
+					$('#classificacao').append(`<option value=''>Selecione</option>`)
+					
+					response.forEach(item =>{
+						let opt = ''
+						if(atendimento){
+							 opt = atendimento.AtendClassificacao == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
+						} else {
+							opt = `<option value="${item.id}">${item.nome}</option>`
+						}
+						$('#classificacao').append(opt)
+					})
 				}
 			});
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o paciente
-		function setPacienteAtribut(obj){
-			if(obj){
-				switch(obj.tipoPessoa){
-					case 'F':$('#fisica').attr('checked', true);$('#juridica').attr('checked', false);break;
-					case 'J':$('#fisica').attr('checked', false);$('#juridica').attr('checked', true);break;
+		function setPacienteAtribut(iPaciente){
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'PACIENTE',
+					'iPaciente': iPaciente
+				},
+				success: function(response) {
+					if(response.status == 'success'){
+						switch(response.tipoPessoa){
+							case 'F':$('#fisica').attr('checked', true);$('#juridica').attr('checked', false);break;
+							case 'J':$('#fisica').attr('checked', false);$('#juridica').attr('checked', true);break;
+						}
+
+						$('#prontuario').val(response.prontuario)
+						$('#nome').val(response.nome)
+						$('#cpf').val(response.cpf)
+						$('#cns').val(response.cns)
+						$('#rg').val(response.rg)
+						$('#emissor').val(response.emissor)
+						$('#uf').val(response.uf)
+						$('#sexo').val(response.sexo)
+						$('#nascimento').val(response.nascimento)
+						$('#nomePai').val(response.nomePai)
+						$('#nomeMae').val(response.nomeMae)
+						$('#profissao').val(response.profissao)
+						$('#cep').val(response.cep)
+						$('#endereco').val(response.endereco)
+						$('#numero').val(response.numero)
+						$('#complemento').val(response.complemento)
+						$('#bairro').val(response.bairro)
+						$('#cidade').val(response.cidade)
+						$('#estado').val(response.estado)
+						$('#contato').val(response.contato)
+						$('#telefone').val(response.telefone)
+						$('#celular').val(response.celular)
+						$('#email').val(response.email)
+						$('#observacao').val(response.observacao)
+
+						$('#prontuario').attr('readonly',true)
+						$('#nome').attr('readonly',true)
+						$('#cpf').attr('readonly',true)
+						$('#cns').attr('readonly',true)
+						$('#rg').attr('readonly',true)
+						$('#emissor').attr('readonly',true)
+						$('#uf').attr('readonly',true)
+						$('#sexo').attr('readonly',true)
+						$('#nascimento').attr('readonly',true)
+						$('#nomePai').attr('readonly',true)
+						$('#nomeMae').attr('readonly',true)
+						$('#profissao').attr('readonly',true)
+
+						// $('#cep').attr('readonly',true)
+						// $('#endereco').attr('readonly',true)
+						// $('#numero').attr('readonly',true)
+						// $('#complemento').attr('readonly',true)
+						// $('#bairro').attr('readonly',true)
+						// $('#cidade').attr('readonly',true)
+						// $('#estado').attr('readonly',true)
+						// $('#contato').attr('readonly',true)
+						// $('#telefone').attr('readonly',true)
+						// $('#celular').attr('readonly',true)
+						// $('#email').attr('readonly',true)
+						// $('#observacao').attr('readonly',true)
+						$('#novoPaciente').fadeIn()
+					}else{
+						$('#prontuario').val('')
+						$('#nome').val('')
+						$('#cpf').val('')
+						$('#cns').val('')
+						$('#rg').val('')
+						$('#emissor').val('')
+						$('#uf').val('')
+						$('#sexo').val('')
+						$('#nascimento').val('')
+						$('#nomePai').val('')
+						$('#nomeMae').val('')
+						$('#profissao').val('')
+						$('#cep').val('')
+						$('#endereco').val('')
+						$('#numero').val('')
+						$('#complemento').val('')
+						$('#bairro').val('')
+						$('#cidade').val('')
+						$('#estado').val('')
+						$('#contato').val('')
+						$('#telefone').val('')
+						$('#celular').val('')
+						$('#email').val('')
+						$('#observacao').val('')
+
+						$('#prontuario').attr('readonly',false)
+						$('#nome').attr('readonly',false)
+						$('#cpf').attr('readonly',false)
+						$('#cns').attr('readonly',false)
+						$('#rg').attr('readonly',false)
+						$('#emissor').attr('readonly',false)
+						$('#uf').attr('readonly',false)
+						$('#sexo').attr('readonly',false)
+						$('#nascimento').attr('readonly',false)
+						$('#nomePai').attr('readonly',false)
+						$('#nomeMae').attr('readonly',false)
+						$('#profissao').attr('readonly',false)
+
+						// $('#cep').attr('readonly',false)
+						// $('#endereco').attr('readonly',false)
+						// $('#numero').attr('readonly',false)
+						// $('#complemento').attr('readonly',false)
+						// $('#bairro').attr('readonly',false)
+						// $('#cidade').attr('readonly',false)
+						// $('#estado').attr('readonly',false)
+						// $('#contato').attr('readonly',false)
+						// $('#telefone').attr('readonly',false)
+						// $('#celular').attr('readonly',false)
+						// $('#email').attr('readonly',false)
+						// $('#observacao').attr('readonly',false)
+						alerta(response.titulo, response.menssagem, response.status)
+						$('#novoPaciente').fadeOut()
+					}
+				},
+				error: function(response) {
 				}
-
-				$('#prontuario').val(obj.prontuario)
-				$('#nome').val(obj.nome)
-				$('#cpf').val(obj.cpf)
-				$('#cns').val(obj.cns)
-				$('#rg').val(obj.rg)
-				$('#emissor').val(obj.emissor)
-				$('#uf').val(obj.uf)
-				$('#sexo').val(obj.sexo)
-				$('#nascimento').val(obj.nascimento)
-				$('#nomePai').val(obj.nomePai)
-				$('#nomeMae').val(obj.nomeMae)
-				$('#profissao').val(obj.profissao)
-				$('#cep').val(obj.cep)
-				$('#endereco').val(obj.endereco)
-				$('#numero').val(obj.numero)
-				$('#complemento').val(obj.complemento)
-				$('#bairro').val(obj.bairro)
-				$('#cidade').val(obj.cidade)
-				$('#estado').val(obj.estado)
-				$('#contato').val(obj.contato)
-				$('#telefone').val(obj.telefone)
-				$('#celular').val(obj.celular)
-				$('#email').val(obj.email)
-				$('#observacao').val(obj.observacao)
-
-				$('#prontuario').attr('readonly',true)
-				$('#nome').attr('readonly',true)
-				$('#cpf').attr('readonly',true)
-				$('#cns').attr('readonly',true)
-				$('#rg').attr('readonly',true)
-				$('#emissor').attr('readonly',true)
-				$('#uf').attr('readonly',true)
-				$('#sexo').attr('readonly',true)
-				$('#nascimento').attr('readonly',true)
-				$('#nomePai').attr('readonly',true)
-				$('#nomeMae').attr('readonly',true)
-				$('#profissao').attr('readonly',true)
-
-				// $('#cep').attr('readonly',true)
-				// $('#endereco').attr('readonly',true)
-				// $('#numero').attr('readonly',true)
-				// $('#complemento').attr('readonly',true)
-				// $('#bairro').attr('readonly',true)
-				// $('#cidade').attr('readonly',true)
-				// $('#estado').attr('readonly',true)
-				// $('#contato').attr('readonly',true)
-				// $('#telefone').attr('readonly',true)
-				// $('#celular').attr('readonly',true)
-				// $('#email').attr('readonly',true)
-				// $('#observacao').attr('readonly',true)
-			} else {
-				$('#prontuario').val('')
-				$('#nome').val('')
-				$('#cpf').val('')
-				$('#cns').val('')
-				$('#rg').val('')
-				$('#emissor').val('')
-				$('#uf').val('')
-				$('#sexo').val('')
-				$('#nascimento').val('')
-				$('#nomePai').val('')
-				$('#nomeMae').val('')
-				$('#profissao').val('')
-				$('#cep').val('')
-				$('#endereco').val('')
-				$('#numero').val('')
-				$('#complemento').val('')
-				$('#bairro').val('')
-				$('#cidade').val('')
-				$('#estado').val('')
-				$('#contato').val('')
-				$('#telefone').val('')
-				$('#celular').val('')
-				$('#email').val('')
-				$('#observacao').val('')
-
-				$('#prontuario').attr('readonly',false)
-				$('#nome').attr('readonly',false)
-				$('#cpf').attr('readonly',false)
-				$('#cns').attr('readonly',false)
-				$('#rg').attr('readonly',false)
-				$('#emissor').attr('readonly',false)
-				$('#uf').attr('readonly',false)
-				$('#sexo').attr('readonly',false)
-				$('#nascimento').attr('readonly',false)
-				$('#nomePai').attr('readonly',false)
-				$('#nomeMae').attr('readonly',false)
-				$('#profissao').attr('readonly',false)
-
-				// $('#cep').attr('readonly',false)
-				// $('#endereco').attr('readonly',false)
-				// $('#numero').attr('readonly',false)
-				// $('#complemento').attr('readonly',false)
-				// $('#bairro').attr('readonly',false)
-				// $('#cidade').attr('readonly',false)
-				// $('#estado').attr('readonly',false)
-				// $('#contato').attr('readonly',false)
-				// $('#telefone').attr('readonly',false)
-				// $('#celular').attr('readonly',false)
-				// $('#email').attr('readonly',false)
-				// $('#observacao').attr('readonly',false)
-			}
+			});
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o responsável
-		function setResponsavelAtribut(obj){
-			if(obj){
-				$('#nomeResp').val(obj.data.nomeResp)
-				$('#parentescoResp').val(obj.data.parentescoResp)
-				$('#nascimentoResp').val(obj.data.nascimentoResp)
-				$('#cepResp').val(obj.data.cepResp)
-				$('#enderecoResp').val(obj.data.enderecoResp)
-				$('#numeroResp').val(obj.data.numeroResp)
-				$('#complementoResp').val(obj.data.complementoResp)
-				$('#bairroResp').val(obj.data.bairroResp)
-				$('#cidadeResp').val(obj.data.cidadeResp)
-				$('#estadoResp').val(obj.data.estadoResp)
-				$('#telefoneResp').val(obj.data.telefoneResp)
-				$('#celularResp').val(obj.data.celularResp)
-				$('#emailResp').val(obj.data.emailResp)
-				$('#observacaoResp').val(obj.data.observacaoResp)
+		function setResponsavelAtribut(iResponsavel){
+			if(iResponsavel){
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'RESPONSAVEL',
+						'iResponsavel': iResponsavel
+					},
+					success: function(response) {
+						if(response.status == 'success'){
+							$('#nomeResp').val(response.data.nomeResp)
+							$('#parentescoResp').val(response.data.parentescoResp)
+							$('#nascimentoResp').val(response.data.nascimentoResp)
+							$('#cepResp').val(response.data.cepResp)
+							$('#enderecoResp').val(response.data.enderecoResp)
+							$('#numeroResp').val(response.data.numeroResp)
+							$('#complementoResp').val(response.data.complementoResp)
+							$('#bairroResp').val(response.data.bairroResp)
+							$('#cidadeResp').val(response.data.cidadeResp)
+							$('#estadoResp').val(response.data.estadoResp)
+							$('#telefoneResp').val(response.data.telefoneResp)
+							$('#celularResp').val(response.data.celularResp)
+							$('#emailResp').val(response.data.emailResp)
+							$('#observacaoResp').val(response.data.observacaoResp)
 
-				$('#nomeResp').attr('readonly', true)
-				$('#parentescoResp').attr('readonly', true)
-				$('#nascimentoResp').attr('readonly', true)
-				$('#cepResp').attr('readonly', true)
-				$('#enderecoResp').attr('readonly', true)
-				$('#numeroResp').attr('readonly', true)
-				$('#complementoResp').attr('readonly', true)
-				$('#bairroResp').attr('readonly', true)
-				$('#cidadeResp').attr('readonly', true)
-				$('#estadoResp').attr('readonly', true)
-				$('#telefoneResp').attr('readonly', true)
-				$('#celularResp').attr('readonly', true)
-				$('#emailResp').attr('readonly', true)
-				$('#observacaoResp').attr('readonly', true)
-			} else {
-				$('#nomeResp').val('')
-				$('#parentescoResp').val('')
-				$('#nascimentoResp').val('')
-				$('#cepResp').val('')
-				$('#enderecoResp').val('')
-				$('#numeroResp').val('')
-				$('#complementoResp').val('')
-				$('#bairroResp').val('')
-				$('#cidadeResp').val('')
-				$('#estadoResp').val('')
-				$('#telefoneResp').val('')
-				$('#celularResp').val('')
-				$('#emailResp').val('')
-				$('#observacaoResp').val('')
+							$('#nomeResp').attr('readonly', true)
+							$('#parentescoResp').attr('readonly', true)
+							$('#nascimentoResp').attr('readonly', true)
+							$('#cepResp').attr('readonly', true)
+							$('#enderecoResp').attr('readonly', true)
+							$('#numeroResp').attr('readonly', true)
+							$('#complementoResp').attr('readonly', true)
+							$('#bairroResp').attr('readonly', true)
+							$('#cidadeResp').attr('readonly', true)
+							$('#estadoResp').attr('readonly', true)
+							$('#telefoneResp').attr('readonly', true)
+							$('#celularResp').attr('readonly', true)
+							$('#emailResp').attr('readonly', true)
+							$('#observacaoResp').attr('readonly', true)
 
-				$('#nomeResp').attr('readonly', false)
-				$('#parentescoResp').attr('readonly', false)
-				$('#nascimentoResp').attr('readonly', false)
-				$('#cepResp').attr('readonly', false)
-				$('#enderecoResp').attr('readonly', false)
-				$('#numeroResp').attr('readonly', false)
-				$('#complementoResp').attr('readonly', false)
-				$('#bairroResp').attr('readonly', false)
-				$('#cidadeResp').attr('readonly', false)
-				$('#estadoResp').attr('readonly', false)
-				$('#telefoneResp').attr('readonly', false)
-				$('#celularResp').attr('readonly', false)
-				$('#emailResp').attr('readonly', false)
-				$('#observacaoResp').attr('readonly', false)
+							$('#novoResponsavel').fadeIn()
+						} else {
+							$('#nomeResp').val('')
+							$('#parentescoResp').val('')
+							$('#nascimentoResp').val('')
+							$('#cepResp').val('')
+							$('#enderecoResp').val('')
+							$('#numeroResp').val('')
+							$('#complementoResp').val('')
+							$('#bairroResp').val('')
+							$('#cidadeResp').val('')
+							$('#estadoResp').val('')
+							$('#telefoneResp').val('')
+							$('#celularResp').val('')
+							$('#emailResp').val('')
+							$('#observacaoResp').val('')
+
+							$('#nomeResp').attr('readonly', false)
+							$('#parentescoResp').attr('readonly', false)
+							$('#nascimentoResp').attr('readonly', false)
+							$('#cepResp').attr('readonly', false)
+							$('#enderecoResp').attr('readonly', false)
+							$('#numeroResp').attr('readonly', false)
+							$('#complementoResp').attr('readonly', false)
+							$('#bairroResp').attr('readonly', false)
+							$('#cidadeResp').attr('readonly', false)
+							$('#estadoResp').attr('readonly', false)
+							$('#telefoneResp').attr('readonly', false)
+							$('#celularResp').attr('readonly', false)
+							$('#emailResp').attr('readonly', false)
+							$('#observacaoResp').attr('readonly', false)
+
+							alerta(response.titulo, response.menssagem, response.status)
+							$('#novoResponsavel').fadeOut()
+						}
+					},
+					error: function(response) {
+					}
+				});
 			}
 		}
 
@@ -715,14 +916,14 @@ if($iAtendimento){
 			});
 		}
 
-		function checkServicos(iAtendimento){
+		function checkServicos(){
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'CHECKSERVICO',
-					'iAtendimento': iAtendimento
+					'iAtendimento': atendimento?atendimento['AtendId']:false
 				},
 				success: async function(response) {
 					statusServicos = response.array.length?true:false;
@@ -1023,7 +1224,7 @@ if($iAtendimento){
 	
 											<!-- campos -->
 											<div class="col-lg-3">
-												<input id="prontuario" name="prontuario" type="text" class="form-control" placeholder="Prontuário Eletrônico" required>
+												<input id="prontuario" name="prontuario" type="text" class="form-control" placeholder="Prontuário Eletrônico">
 											</div>
 											<div class="col-lg-3">
 												<input id="nome" name="nome" type="text" class="form-control" placeholder="Nome completo" required>
@@ -1217,7 +1418,7 @@ if($iAtendimento){
 										</div>
 
 										<div class="row col-12 my-4 ml-0 mr-0">
-											<a class="col-2 btn btn-lg" href="#" id="voltarSelectPaciente">cancelar</a>
+											<a class="col-2 btn btn-lg" href="#" id="voltarSelectPaciente">voltar</a>
 										</div>
 									</div>
 								</fieldset>
@@ -1373,7 +1574,7 @@ if($iAtendimento){
 										</div>
 
 										<div class="row col-12 my-4 ml-0 mr-0">
-											<a class="col-2 btn btn-lg" href="#" id="voltarSelectResponsavel">cancelar</a>
+											<a class="col-2 btn btn-lg" href="#" id="voltarSelectResponsavel">voltar</a>
 										</div>
 									</div>
 								</fieldset>
@@ -1382,30 +1583,67 @@ if($iAtendimento){
 								<fieldset>
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
-										<div class="col-lg-4">
-											<label>Data do Registro</label>
-										</div>
-										<div class="col-lg-4">
-											<label>Modalidade</label>
-										</div>
-										<div class="col-lg-4">
-											<label>Classificação do Atendimento</label>
-										</div>
+										<?php
+											if($iAtendimento){
+												echo "
+													<div class='col-lg-2'>
+														<label>Nº Registro <span class='text-danger'>*</span></label>
+													</div>
+													<div class='col-lg-4'>
+														<label>Data do Registro <span class='text-danger'>*</span></label>
+													</div>
+													<div class='col-lg-2'>
+														<label>Modalidade <span class='text-danger'>*</span></label>
+													</div>
+													<div class='col-lg-4'>
+														<label>Classificação do Atendimento <span class='text-danger'>*</span></label>
+													</div>
 
-										<!-- campos -->
-										<div class="col-lg-4">
-											<input id="dataRegistro" name="dataRegistro" type="date" class="form-control" placeholder="Nome">
-										</div>
-										<div class="col-lg-4">
-											<select id="modalidade" name="modalidade" class="form-control form-control-select2">
-												<option value="" selected>selecionar</option>
-											</select>
-										</div>
-										<div class="col-lg-4">
-											<select id="classificacao" name="classificacao" class="form-control form-control-select2">
-												<option value="" selected>selecionar</option>
-											</select>
-										</div>
+													<!-- campos -->
+													<div class='col-lg-2'>
+														<input id='numeroRegistro' name='numeroRegistro' type='text' class='form-control' placeholder='Nº Registro' readOnly value='$row[AtendNumRegistro]'>
+													</div>
+													<div class='col-lg-4'>
+														<input id='dataRegistro' name='dataRegistro' type='date' class='form-control' placeholder='Nome' required>
+													</div>
+													<div class='col-lg-2'>
+														<select id='modalidade' name='modalidade' class='select-search' required>
+															<option value='' selected>selecionar</option>
+														</select>
+													</div>
+													<div class='col-lg-4'>
+														<select id='classificacao' name='classificacao' class='select-search' required>
+															<option value='' selected>selecionar</option>
+														</select>
+													</div>";
+											} else {
+												echo "
+													<div class='col-lg-4'>
+														<label>Data do Registro <span class='text-danger'>*</span></label>
+													</div>
+													<div class='col-lg-4'>
+														<label>Modalidade <span class='text-danger'>*</span></label>
+													</div>
+													<div class='col-lg-4'>
+														<label>Classificação do Atendimento <span class='text-danger'>*</span></label>
+													</div>
+
+													<!-- campos -->
+													<div class='col-lg-4'>
+														<input id='dataRegistro' name='dataRegistro' type='date' class='form-control' placeholder='Nome' required>
+													</div>
+													<div class='col-lg-4'>
+														<select id='modalidade' name='modalidade' class='select-search' required>
+															<option value='' selected>selecionar</option>
+														</select>
+													</div>
+													<div class='col-lg-4'>
+														<select id='classificacao' name='classificacao' class='select-search' required>
+															<option value='' selected>selecionar</option>
+														</select>
+													</div>";
+											}
+										?>
 									</div>
 
 									<div class="col-lg-12 my-3 text-black-50">
@@ -1432,12 +1670,12 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-2">
-											<select id="servico" name="servico" class="form-control form-control-select2">
+											<select id="servico" name="servico" class="select-search">
 												<option value="" selected>selecionar</option>
 											</select>
 										</div>
 										<div class="col-lg-2">
-											<select id="medicos" name="medicos" class="form-control form-control-select2">
+											<select id="medicos" name="medicos" class="select-search">
 												<option value="" selected>selecionar</option>
 											</select>
 										</div>
@@ -1445,7 +1683,6 @@ if($iAtendimento){
 											<input id="dataAtendimento" name="dataAtendimento" type="text"
 											class="form-control dataAtendimento" readonly aria-haspopup="true" aria-expanded="false"
 											aria-readonly="false" aria-owns="P1503001435_root">
-											<!-- <input id="dataAtendimento" name="dataAtendimento" type="date" class="form-control" required> -->
 										</div>
 										<div id="modalHora" class="col-lg-2">
 											<input id="horaAtendimento" name="horaAtendimento" type="text"
@@ -1510,17 +1747,20 @@ if($iAtendimento){
 									<div class="col-lg-12 mb-4">
 										<!-- titulos -->
 										<div class="col-lg-2">
-											<label>Situacao</label>
+											<label>Situacao <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-2">
-											<select id="situacao" name="situacao" class="form-control form-control-select2">
+											<select id="situacao" name="situacao" class="form-control form-control-select2" required>
 											</select>
 										</div>
 									</div>
 								</fieldset>
 							</form>
+							<div class="row col-12 my-4 ml-0 mr-0">
+								<a class="col-2 btn btn-lg" href="atendimento.php" id="cancelar">cancelar</a>
+							</div>
 						</div>
 					</div>
 				</div>

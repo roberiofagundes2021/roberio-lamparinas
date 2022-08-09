@@ -394,6 +394,42 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					$('#dadosPost').submit()
 				})
 			});
+
+			// btn para editar ou excluir atendimento
+			$('.atualizaAtendimento').each(function() {
+				$(this).on('click',function(e){
+					e.preventDefault()
+					let atendimento = $(this).data('atendimento')
+
+					$('#iAtendimentoId').val(atendimento)
+					$('#dadosPost').attr('action', 'atendimentoNovo.php')
+					$('#dadosPost').submit()
+				})
+			})
+
+			$('.excluiAtendimento').each(function() {
+				$(this).on('click',function(e){
+					e.preventDefault()
+					let atendimento = $(this).data('atendimento')
+					$.ajax({
+						type: 'POST',
+						url: 'filtraAtendimento.php',
+						dataType: 'json',
+						data: {
+							'tipoRequest': 'EXCLUI',
+							'iAtendimento': atendimento
+						},
+						success: function(response) {
+							if(response.status  == 'success'){
+								alerta(response.titulo, response.menssagem, response.status)
+								getAtendimentos()
+							} else {
+								alerta(response.titulo, response.menssagem, response.status)
+							}
+						}
+					});
+				})
+			})
 		}
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -487,7 +523,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 			<!-- Content area -->
 			<div class="content">
-				<form id='dadosPost'>
+				<form id='dadosPost' method="POST">
 					<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='' />
 					<input type='hidden' id='iAtendimentoEletivoId' name='iAtendimentoEletivoId' value='' />
 					<input type='hidden' id='ClaChave' name='ClaChave' value='' />
@@ -503,30 +539,45 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Atendimentos</h5>
 									<div class="header-elements">
-										<div class="list-icons">
+										<!-- <div class="list-icons">
 											<a class="list-icons-item" data-action="collapse"></a>
 											<a href="perfil.php" class="list-icons-item" data-action="reload"></a>
-											<!--<a class="list-icons-item" data-action="remove"></a>-->
-										</div>
+											<a class="list-icons-item" data-action="remove"></a>
+										</div> -->
 									</div>
-								</div>					
+								</div>
 
 								<div class="card-body">
 									<div class="row">
 										<div class="col-lg-9">
-											A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
+											<p class="font-size-lg">A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 										</div>
-										<div class="col-lg-12 row text-right p-0">
-											<div class="text-right col-sm-8 p-0"><!-- EESPASSO --></div>
-											<div class="text-right col-sm-2 p-0"><a href="atendimentoNovo.php" class="btn btn-principal" role="button">Novo Atendimento</a></div>
-											<div class="text-right col-sm-2 p-0"><a href="#" class="btn bg-secondary" role="button">Imprimir Relação</a></div>
-										</div>
+										<div class="col-lg-3">
+											<div class="text-right">
+												<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
+													<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
+														<i class="icon-printer2"></i>																						
+													</a>
+												</div>
+												<div>
+													<a href="atendimentoNovo.php" class="btn btn-principal" role="button">Novo Atendimento</a>
+												</div>
+											</div>
+										</div>	
 									</div>
 								</div>
+							</div>
 
-								<div>
+								<div class="card">
 									<div class="card-header header-elements-inline">
 										<h5 class="card-title">Agendamentos</h5>
+										<div class="header-elements">
+											<div class="list-icons">
+												<a class="list-icons-item" data-action="collapse"></a>
+												<!-- <a href="perfil.php" class="list-icons-item" data-action="reload"></a>
+												<a class="list-icons-item" data-action="remove"></a> -->
+											</div>
+										</div>
 									</div>
 	
 									<table class="table" id="AgendamentoTable">
@@ -551,9 +602,16 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 									</table>
 								</div>
 
-								<div>
+								<div class="card">
 									<div class="card-header header-elements-inline">
 										<h5 class="card-title">Atendimentos</h5>
+										<div class="header-elements">
+											<div class="list-icons">
+												<a class="list-icons-item" data-action="collapse"></a>
+												<!-- <a href="perfil.php" class="list-icons-item" data-action="reload"></a>
+												<a class="list-icons-item" data-action="remove"></a> -->
+											</div>
+										</div>
 									</div>
 	
 									<table class="table" id="AtendimentoTable">
@@ -578,7 +636,6 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 									</table>
 								</div>
 							</div>
-						</div>
 					</div>
 				<?php } elseif ($acesso == 'PROFISSIONAL'){ ?>
 					<!-- Visão Atendente -->		
