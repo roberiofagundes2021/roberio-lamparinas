@@ -359,3 +359,13 @@ function pegaDiferencaArray( $ary_1, $ary_2 ) {
 	
 	return $diff;
 }
+
+//Calcula a idade a partir de uma data
+function calculaIdade($datanascimento){
+	
+	$date1 = new DateTime($datanascimento);
+	$date2 = new DateTime();
+	$interval = $date1->diff($date2); 
+
+	return $interval->y . " anos, " . $interval->m." meses, ".$interval->d." dias";
+}
