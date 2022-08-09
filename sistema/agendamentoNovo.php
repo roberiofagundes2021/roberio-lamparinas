@@ -739,7 +739,7 @@ if(isset($_POST['iAgendamento'])){
 										</div>
 									</div>
 									<div class="col-lg-3">
-										<select id="modalidade" name="modalidade" class="form-control-select2">
+										<select id="modalidade" name="modalidade" class="select-search">
 											<!--  -->
 										</select>
 									</div>

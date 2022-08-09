@@ -289,8 +289,8 @@ include('global_assets/php/conexao.php');
 								<h5 class="card-title">Relação de Agendamentos</h5>
 								<div class="header-elements">
 									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="perfil.php" class="list-icons-item" data-action="reload"></a>
+										<!-- <a class="list-icons-item" data-action="collapse"></a>
+										<a href="perfil.php" class="list-icons-item" data-action="reload"></a> -->
 										<!--<a class="list-icons-item" data-action="remove"></a>-->
 									</div>
 								</div>
@@ -298,14 +298,33 @@ include('global_assets/php/conexao.php');
 
 							<div class="card-body">
 								<div class="row">
-									<div class="col-lg-8">
-										 A relação abaixo faz referência aos agendamentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
+									<div class="col-lg-9">
+										<p class="font-size-lg">A relação abaixo faz referência aos agendamentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>
+									<div class="col-lg-3">
+										<div class="text-right">
+											<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
+												<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
+													<i class="icon-printer2"></i>																						
+												</a>
+											</div>
+											<div>
+												<a href="agendamentoNovo.php" class="btn btn-principal" role="button">Novo Agendamento</a>
+											</div>
+										</div>
+									</div>	
 								</div>
-								<div class="col-lg-12 row text-right p-0">
-									<div class="text-right col-sm-8 p-0"><!-- EESPASSO --></div>
-									<div class="text-right col-sm-2 p-0"><a href="agendamentoNovo.php" class="btn btn-principal" role="button">Novo Agendamento</a></div>
-									<div class="text-right col-sm-2 p-0"><a href="#" class="btn bg-secondary" role="button">Imprimir Relação</a></div>
+							</div>
+						</div>
+						<div class="card">
+							<div class="card-header header-elements-inline">
+								<h5 class="card-title">Agendamentos</h5>
+								<div class="header-elements">
+									<div class="list-icons">
+										<a class="list-icons-item" data-action="collapse"></a>
+										<!-- <a href="perfil.php" class="list-icons-item" data-action="reload"></a> -->
+										<!--<a class="list-icons-item" data-action="remove"></a>-->
+									</div>
 								</div>
 							</div>
 
