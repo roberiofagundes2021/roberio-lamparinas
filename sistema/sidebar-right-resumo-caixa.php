@@ -33,18 +33,23 @@
             <div style="padding: 10px 10px 0 10px; background: #ccc;">
                 <div id="dados">
                     <div class="form-group">
+                        <h3 class="form-text text-right" style="color: #666;">Saldo Inicial</h3>
+                        <input id="inputResumoCaixaSaldoInicial" name="inputResumoCaixaSaldoInicial" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
+                    </div>
+                
+                    <div class="form-group">
                         <h3 class="form-text text-right" style="color: #666;">Recebido</h3>
-                        <input id="inputRecebido" name="inputRecebido" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
+                        <input id="inputResumoCaixaRecebido" name="inputResumoCaixaRecebido" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
                     </div>
                 
                     <div class="form-group">
                         <h3 class="form-text text-right" style="color: #666;">Pago</h3>
-                        <input id="inputPago" name="inputPago" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
+                        <input id="inputResumoCaixaPago" name="inputResumoCaixaPago" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
                     </div>             
     
                     <div class="form-group">
                         <h3 class="form-text text-right" style="color: #666;"><b>Saldo</b></h3>
-                        <input id="inputSaldo" name="inputSaldo" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
+                        <input id="inputResumoCaixaSaldo" name="inputResumoCaixaSaldo" class="form-control" value="" style="font-size: 30px; text-align: right;" readonly>
                     </div>
                 </div>
             </div>
