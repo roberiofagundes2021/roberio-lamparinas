@@ -29,6 +29,9 @@
 					case 'receituario': URL = 'atendimentoReceituario.php'; break;
 					case 'atestadoMedico': URL = 'atendimentoAtestadoMedico.php'; break;
 					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; break;
+					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; break;
+					case 'triagem': URL = 'atendimentoTriagem.php'; break;
+					case 'atendimentoAmbulatorial': URL = 'atendimentoAmbulatorial.php'; break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
@@ -91,10 +94,10 @@
 						<li class="nav-item-divider"></li>
 
 						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='atendimentoEletivo'><i class="icon-certificate"></i> Atendimento Eletivo</a>
+							<a href="#" class="nav-link itemLink" data-tipo='atendimentoAmbulatorial'><i class="icon-certificate"></i> Atendimento Ambulatorial</a>
 						</li>
 						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='triagem'><i class="icon-home7"></i> Triágem</a>
+							<a href="#" class="nav-link itemLink" data-tipo='triagem'><i class="icon-home7"></i> Triagem</a>
 						</li>
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='receituario'><i class="icon-cabinet"></i> Receituário</a>

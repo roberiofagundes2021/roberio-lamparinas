@@ -20,7 +20,7 @@ function mostraData($data)
 /*----------------------------------------------------------------------
 	|	 Passando dataHora "AAAA-MM-DD 00:00:00" para "DD/MM/AAAA 00:00:00" |
 	---------------------------------------------------------------------*/
-	function mostraDataHora($data) {
+function mostraDataHora($data) {
 
 	if ($data <> '0000-00-00 00:00:00' and $data <> ''){
 		$dataHora = explode(" ", $data);
@@ -33,7 +33,36 @@ function mostraData($data)
 		$dataformatada = '';
 	}
 	return($dataformatada);
-}	
+}
+
+/*----------------------------------------------------------------------
+	|	 Passando hora "00:00:00.000" para "00:00" |("HH:MM:SS.000")|
+	---------------------------------------------------------------------*/
+function mostraHora($hora) {
+
+	if ($hora <> '00:00:00' and $hora <> ''){
+		$horaRefatorada = explode(":", $hora); //Caso a hora venha do banco de dados no seguinte formato. H:i:s.000 
+		$horaRefatorada = "$horaRefatorada[0]:$horaRefatorada[1]"; // H:i:s.000 => H:i:s
+	} 
+	else{
+		$horaRefatorada = '';
+	}
+	return($horaRefatorada);
+}
+
+/*----------------------------------------------------------------------
+	|	retornando horas entre uma data e outra | ("Y-m-d","Y-m-d") |
+	---------------------------------------------------------------------*/
+	function diferencaEmHoras($dataInicio, $dataFim) {
+		$differenceInHours = '';
+
+		if ($dataInicio != '' && $dataFim != '') {
+			$differenceInHours = abs(strtotime($dataFim) - strtotime($dataInicio))/3600;
+			$differenceInHours = "$differenceInHours h";
+		}
+
+		return($differenceInHours);
+	}
 
 /*--------------------------------------------------------------------------
 	  |					Exibe mensagem na tela								   |
@@ -329,4 +358,14 @@ function pegaDiferencaArray( $ary_1, $ary_2 ) {
 	}
 	
 	return $diff;
+}
+
+//Calcula a idade a partir de uma data
+function calculaIdade($datanascimento){
+	
+	$date1 = new DateTime($datanascimento);
+	$date2 = new DateTime();
+	$interval = $date1->diff($date2); 
+
+	return $interval->y . " anos, " . $interval->m." meses, ".$interval->d." dias";
 }

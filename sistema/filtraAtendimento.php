@@ -18,12 +18,11 @@ que irá indicar qual ação será executada
 try{
 	$iUnidade = $_SESSION['UnidadeId'];
 	$usuarioId = $_SESSION['UsuarId'];
-	if(!isset($_SESSION['atendimentoNovo'])){
-		$_SESSION['atendimentoNovo'] = [
-			'paciente' => [],
-			'responsavel' => [],
-			'atendimento' => [],
-			'triagem' => []
+	if(!isset($_SESSION['atendimento'])){
+		$_SESSION['atendimento'] = [
+			'paciente' => '',
+			'responsavel' => '',
+			'atendimentoServicos' => []
 		];
 	}
 
@@ -32,21 +31,39 @@ try{
 		$array = [];
 
 		if($acesso == 'ATENDIMENTO'){
-			$sql = "SELECT AtendId,AtendDataRegistro,ClienNome,AtModNome,AtendClassificacao,
-			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,ProfiNome,SrVenNome
-			FROM Atendimento
-			JOIN AtendimentoXServico ON AtXSeAtendimento = AtendId
-			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			JOIN Situacao ON SituaId = AtendSituacao
-			JOIN Cliente ON ClienId = AtendCliente
-			JOIN Profissional ON ProfiId = AtXSeProfissional
-			JOIN ServicoVenda ON SrVenId = AtXSeServico";
+			$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
+				AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
+				AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
+				SituaCor,ProfiNome,AtLocNome, SrVenNome
+				FROM Agendamento
+				JOIN AtendimentoModalidade ON AtModId = AgendModalidade
+				JOIN Situacao ON SituaId = AgendSituacao
+				JOIN Cliente ON ClienId = AgendCliente
+				JOIN Profissional ON ProfiId = AgendProfissional
+				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
+				JOIN ServicoVenda ON SrVenId = AgendServico
+				WHERE AgendUnidade = $iUnidade";
 			$result = $conn->query($sql);
-			$row = $result->fetchAll(PDO::FETCH_ASSOC);
+			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
+
+			$sql = "SELECT AtendId,AtendNumRegistro,AtendDataRegistro,ClienNome,AtModNome,AtendClassificacao,
+				AtendObservacao,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,
+				ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,ProfiNome,SrVenNome
+				FROM AtendimentoXServico
+				JOIN Atendimento ON AtendId = AtXSeAtendimento
+				JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+				JOIN Situacao ON SituaId = AtendSituacao
+				JOIN Cliente ON ClienId = AtendCliente
+				JOIN Profissional ON ProfiId = AtXSeProfissional
+				JOIN ServicoVenda ON SrVenId = AtXSeServico
+				JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
+				WHERE AtendUnidade = $iUnidade";
+			$result = $conn->query($sql);
+			$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
 			
-			$data = [];
-			foreach($row as $item){
+			$dataAtendimento = [];
+			$dataAgendamento = [];
+			foreach($rowAgendamento as $item){
 				$att = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				$exc = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
 				$acoes = "<div class='list-icons'>
@@ -69,13 +86,65 @@ try{
 						</div>";
 			
 				$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
-				array_push($data, [
+				
+				$dataEspera = date('Y-m-d');
+				$difference = diferencaEmHoras($dataEspera, $item['AgendData']);
+				
+				array_push($dataAgendamento, [
 					'data' => [
-						mostraData($item['AtXSeData']),  // Data
-						$item['AtXSeHorario'],  // Horario
-						'04:20*',  // Espera
-						'286*',  // Nº Registro
-						'2568*',  // Prontuário
+						mostraData($item['AgendData']), // Data
+						mostraHora($item['AgendHorario']), // Horario
+						$difference,  // Espera
+						'****',  // Nº Registro
+						'****',  // Prontuário
+						$item['ClienNome'],  // Paciente
+						$item['ProfiNome'],  // Profissional
+						$item['AtModNome'],  // Modalidade
+						$item['SrVenNome'],  // Procedimento
+						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+						$acoes,  // Ações
+					],
+					'identify' => [
+						'situacao' => $item['SituaChave'],
+						'iAgendamento' => $item['AgendId'],
+						'sObservacao' => $item['AgendObservacao']
+					]
+				]);
+			}
+			foreach($rowAtendimento as $item){
+				$att = "<a class='list-icons-item atualizaAtendimento' style='color: black' href='#' data-atendimento='$item[AtendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
+				$exc = "<a class='list-icons-item excluiAtendimento' style='color: black' href='#' data-atendimento='$item[AtendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
+				$acoes = "<div class='list-icons'>
+							$att
+							$exc
+							<div class='dropdown'>													
+								<a href='#' class='list-icons-item' data-toggle='dropdown'>
+									<i class='icon-menu9'></i>
+								</a>
+
+								<div class='dropdown-menu dropdown-menu-right'>
+									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Prioridade'></i> Prioridade</a>
+									
+									<div class='dropdown-divider'></div>
+
+									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Gerar nota fiscal'></i> Gerar nota fiscal</a>
+									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Anexos'></i> Anexos</a>
+								</div>
+							</div>
+						</div>";
+			
+				$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
+				
+				$dataEspera = date('Y-m-d');
+				$difference = diferencaEmHoras($dataEspera, $item['AtXSeData']);
+				
+				array_push($dataAtendimento, [
+					'data' => [
+						mostraData($item['AtXSeData']), // Data
+						mostraHora($item['AtXSeHorario']), // Horario
+						$difference,  // Espera
+						$item['AtendNumRegistro'],  // Nº Registro
+						'456456*',  // Prontuário
 						$item['ClienNome'],  // Paciente
 						$item['ProfiNome'],  // Profissional
 						$item['AtModNome'],  // Modalidade
@@ -91,38 +160,50 @@ try{
 				]);
 			}
 			$array  = [
-				'data' => $data,
+				'dataAgendamento' => $dataAgendamento,
+				'dataAtendimento' => $dataAtendimento,
 				'acesso' => $acesso,
 				'titulo' => 'Alterar Situação',
-				'tipo' => 'success',
+				'status' => 'success',
 				'menssagem' => 'Situação alterada com sucesso!!!'
 			];
 		} elseif($acesso == 'PROFISSIONAL'){
-			$sql = "SELECT AtendId,AtendDataRegistro,ClienNome,AtModNome,AtClaChave,AtClaNome,
-			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId
-			FROM AtendimentoXServico
-			JOIN Atendimento ON AtendId = AtXSeAtendimento
-			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			JOIN Situacao ON SituaId = AtendSituacao
-			JOIN Cliente ON ClienId = AtendCliente
-			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional != $usuarioId";
+			$sql = "SELECT ProfiId, ProfiUsuario
+				FROM Profissional
+				WHERE ProfiUsuario = $usuarioId and ProfiUnidade = $iUnidade";
+			$result = $conn->query($sql);
+			$row = $result->fetch(PDO::FETCH_ASSOC);
+			$iProfissional = $row['ProfiId'];
+
+			$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,AtModNome,AtClaChave,AtClaNome,
+				AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
+				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+				FROM AtendimentoXServico
+				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
+				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+				LEFT JOIN Situacao ON SituaId = AtendSituacao
+				LEFT JOIN Cliente ON ClienId = AtendCliente
+				LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+				LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+				WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+				ORDER BY AtXSeId DESC";
 			$resultEspera = $conn->query($sql);
 			$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
 
-			$sql = "SELECT AtendId,AtendDataRegistro,ClienNome,AtModNome,AtClaChave,AtClaNome,
-			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId
-			FROM AtendimentoXServico
-			JOIN Atendimento ON AtendId = AtXSeAtendimento
-			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			JOIN Situacao ON SituaId = AtendSituacao
-			JOIN Cliente ON ClienId = AtendCliente
-			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional != $usuarioId";
+			$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,AtModNome,AtClaChave,AtClaNome,
+				AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
+				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+				FROM AtendimentoXServico
+				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
+				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+				LEFT JOIN Situacao ON SituaId = AtendSituacao
+				LEFT JOIN Cliente ON ClienId = AtendCliente
+				LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+				LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+				WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+				ORDER BY AtXSeId DESC";
 			$resultAtendido = $conn->query($sql);
 			$rowAtendido = $resultAtendido->fetchAll(PDO::FETCH_ASSOC);
 			
@@ -130,6 +211,8 @@ try{
 			$atendido = [];
 
 			foreach($rowEspera as $item){
+				$difference = diferencaEmHoras($item['AtXSeData'], date('Y-m-d'));
+
 				$att = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				// $exc = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
 				$acoes = "<div class='list-icons'>
@@ -153,11 +236,11 @@ try{
 					'data' => [
 						mostraData($item['AtXSeData']),  // Data
 						$item['AtXSeHorario'],  // Horario
-						'04:20*',  // Espera
-						'286*',  // Nº Registro
+						$difference,  // Espera
+						$item['AtXSeId'],  // Nº Registro
 						'2568*',  // Prontuário
 						$item['ClienNome'],  // Paciente
-						'Procedimento**',  // Procedimento
+						$item['SrVenNome'],  // Procedimento
 						'Risco**',  // Risco
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 						$acoes,  // Ações
@@ -169,6 +252,8 @@ try{
 					]]);
 			}
 			foreach($rowAtendido as $item){
+				$difference = diferencaEmHoras($item['AtXSeData'], date('Y-m-d'));
+
 				$att = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				// $exc = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
 				$acoes = "<div class='list-icons'>
@@ -193,11 +278,11 @@ try{
 					'data' => [
 						mostraData($item['AtXSeData']),  // Data
 						$item['AtXSeHorario'],  // Horario
-						'04:20*',  // Espera
-						'286*',  // Nº Registro
+						$difference,  // Espera
+						$item['AtXSeId'],  // Nº Registro
 						'2568*',  // Prontuário
 						$item['ClienNome'],  // Paciente
-						'Procedimento**',  // Procedimento
+						$item['SrVenNome'],  // Procedimento
 						'Risco**',  // Risco
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 						$acoes,  // Ações
@@ -216,7 +301,7 @@ try{
 				'dataAtendido' =>$atendido,
 				'acesso' => $acesso,
 				'titulo' => '',
-				'tipo' => 'success',
+				'status' => 'success',
 				'menssagem' => ''
 			];
 		}
@@ -228,8 +313,31 @@ try{
 		WHERE SituaChave in ('AGENDADOVENDA','ATENDIDOVENDA','EMESPERAVENDA','LIBERADOVENDA')";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['SituaId'],
+				'nome' => $item['SituaNome']
+			]);
+		}
 	
-		echo json_encode($row);
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'CLASSIFICACAO'){
+		$sql = "SELECT AtClaId,AtClaNome,AtClaNomePersonalizado,AtClaChave,AtClaModelo,AtClaStatus,
+		AtClaUsuarioAtualizador,AtClaUnidade
+		FROM AtendimentoClassificacao WHERE AtClaUnidade != $iUnidade";
+		$result = $conn->query($sql);
+
+		$array = [];
+		foreach($result as $item){
+			array_push($array,[
+				'id' => $item['AtClaId'],
+				'nome' => $item['AtClaNome'],
+			]);
+		}
+
+		echo json_encode($array);
 	} elseif ($tipoRequest === 'MUDARSITUACAO'){
 		$iAtendimento = $_POST['iAtendimento'];
 		$situacao = isset($_POST['sSituacao'])?$_POST['sSituacao']:'';
@@ -246,24 +354,31 @@ try{
 
 		echo json_encode([
 			'titulo' => 'Alterar Situação',
-			'tipo' => 'success',
+			'status' => 'success',
 			'menssagem' => 'Situação alterada com sucesso!!!',
 		]);
 	} elseif ($tipoRequest == 'EXCLUI'){
 		$iAtendimento = $_POST['iAtendimento'];
 	
+		$sql = "DELETE FROM AtendimentoXServico WHERE AtXSeAtendimento = $iAtendimento
+		and AtXSeUnidade = $iUnidade";
+		$conn->query($sql);
+
 		$sql = "DELETE FROM Atendimento WHERE AtendId = $iAtendimento";
-		$result = $conn->query($sql);
+		$conn->query($sql);
 
 		echo json_encode([
 			'titulo' => 'Excluir atendimento',
-			'tipo' => 'success',
+			'status' => 'success',
 			'menssagem' => 'Atendimento excluido com sucesso!!!',
 		]);
 	} elseif($tipoRequest == 'SALVARPACIENTE'){
-		$atendimentoSessao = $_SESSION['atendimentoNovo'];
+		$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'ATIVO'";
+		$result = $conn->query($sql);
+		$rowStatus = $result->fetch(PDO::FETCH_ASSOC);
 
 		$paciente = [
+			'id' => 'NOVO',
 			'pessoaTipo' => isset($_POST['pessoaTipo'])?$_POST['pessoaTipo']:'F',
 			'prontuario' => isset($_POST['prontuario'])?$_POST['prontuario']:'null',
 			'nome' => isset($_POST['nome'])?$_POST['nome']:'null',
@@ -289,13 +404,132 @@ try{
 			'email' => isset($_POST['email'])?$_POST['email']:'null',
 			'observacao' => isset($_POST['observacao'])?$_POST['observacao']:'null'
 		];
-		$atendimentoSessao['paciente'] = $paciente;
-		$_SESSION['atendimentoNovo'] = $atendimentoSessao;
+		$sql = "INSERT INTO Cliente(ClienTipo,ClienNome,ClienRazaoSocial,
+			ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+			ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
+			ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
+			ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade)
+			VALUES('$paciente[pessoaTipo]','$paciente[nome]','$paciente[nome]','$paciente[cpf]','$paciente[rg]',
+			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[nascimento]','$paciente[nomePai]','$paciente[nomeMae]',
+			'$paciente[profissao]','$paciente[cep]','$paciente[endereco]','$paciente[numero]','$paciente[complemento]',
+			'$paciente[bairro]','$paciente[cidade]','$paciente[estado]','$paciente[contato]','$paciente[telefone]',
+			'$paciente[celular]','$paciente[email]','$paciente[observacao]','$rowStatus[SituaId]','$usuarioId','$iUnidade')";
+		$conn->query($sql);
+		$pacienteId = $conn->lastInsertId();
 		echo json_encode([
 			'titulo' => 'Paciente',
-			'tipo' => 'success',
+			'status' => 'success',
 			'menssagem' => 'Paciente adicionado!!',
-			'paciente' => $paciente
+			'id' => $pacienteId
+		]);
+	} elseif($tipoRequest == 'SALVARRESPONSAVEL'){
+		$responsavel = [
+			'nomeResp' => isset($_POST['nomeResp'])?$_POST['nomeResp']: 'null',
+			'parentescoResp' => isset($_POST['parentescoResp'])?$_POST['parentescoResp']: 'null',
+			'nascimentoResp' => isset($_POST['nascimentoResp'])?$_POST['nascimentoResp']: 'null',
+			'cepResp' => isset($_POST['cepResp'])?$_POST['cepResp']: 'null',
+			'enderecoResp' => isset($_POST['enderecoResp'])?$_POST['enderecoResp']: 'null',
+			'numeroResp' => isset($_POST['numeroResp'])?$_POST['numeroResp']: 'null',
+			'complementoResp' => isset($_POST['complementoResp'])?$_POST['complementoResp']: 'null',
+			'bairroResp' => isset($_POST['bairroResp'])?$_POST['bairroResp']: 'null',
+			'cidadeResp' => isset($_POST['cidadeResp'])?$_POST['cidadeResp']: 'null',
+			'estadoResp' => isset($_POST['estadoResp'])?$_POST['estadoResp']: 'null',
+			'telefoneResp' => isset($_POST['telefoneResp'])?$_POST['telefoneResp']: 'null',
+			'celularResp' => isset($_POST['celularResp'])?$_POST['celularResp']: 'null',
+			'emailResp' => isset($_POST['emailResp'])?$_POST['emailResp']: 'null',
+			'observacaoResp' => isset($_POST['observacaoResp'])?$_POST['observacaoResp']: 'null'
+		];
+
+		$sql = "INSERT INTO ClienteResponsavel(ClResCliente,ClResNome,CResParentesco,ClResNascimento,
+			ClResCep,ClResEndereco,ClResNumero,ClResComplemento,ClResBairro,ClResCidade,ClResEstado,
+			ClResTelefone,ClResCelular,ClResEmail,ClResObservacao)
+			VALUES('$pacienteId', '$responsavel[nomeResp]','$responsavel[parentescoResp]','$responsavel[nascimentoResp]',
+			'$responsavel[cepResp]','$responsavel[enderecoResp]','$responsavel[numeroResp]','$responsavel[complementoResp]',
+			'$responsavel[bairroResp]','$responsavel[cidadeResp]','$responsavel[estadoResp]','$responsavel[telefoneResp]',
+			'$responsavel[celularResp]','$responsavel[emailResp]','$responsavel[observacaoResp]')";
+		$conn->query($sql);
+		$responsavelId = $conn->lastInsertId();
+
+		echo json_encode([
+			'titulo' => 'Responsável',
+			'status' => 'success',
+			'menssagem' => 'Responsável adicionado!!',
+			'paciente' => $responsavelId
+		]);
+	} elseif($tipoRequest == 'SALVARATENDIMENTO'){
+		$atendimentoServicos = $_SESSION['atendimento']['atendimentoServicos'];
+
+		// $sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'ATIVO'";
+		// $result = $conn->query($sql);
+		// $rowStatus = $result->fetch(PDO::FETCH_ASSOC);
+
+		if(!COUNT($atendimentoServicos)){
+			echo json_encode([
+				'titulo' => 'Atendimento',
+				'status' => 'error',
+				'menssagem' => 'Atendimento deve ter ao menos 1(um) serviço!!'
+			]);
+			exit;
+		}
+
+		$atendimento = [
+			'cliente' => $_SESSION['atendimento']['paciente'],
+			'responsavel' => $_SESSION['atendimento']['responsavel'],
+			'dataRegistro' => isset($_POST['dataRegistro'])?$_POST['dataRegistro']:'',
+			'modalidade' => isset($_POST['modalidade'])?$_POST['modalidade']:'',
+			'classificacao' => isset($_POST['classificacao'])?$_POST['classificacao']:'',
+			'situacao' => isset($_POST['situacao'])?$_POST['situacao']:'',
+			'observacao' => isset($_POST['observacaoAtendimento'])?$_POST['observacaoAtendimento']:''
+		];
+
+		$mes = explode('-',$atendimento['dataRegistro']);
+		$mes = $mes[1];
+
+		$sql = "SELECT AtendNumRegistro FROM Atendimento WHERE AtendNumRegistro LIKE '%A$mes-%'
+		ORDER BY AtendId DESC";
+		$result = $conn->query($sql);
+		$rowCodigo = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$intaValCodigo = COUNT($rowCodigo)?intval(explode('-',$rowCodigo[0]['AtendNumRegistro'])[1])+1:1;
+
+		$numRegistro = "A$mes-$intaValCodigo";
+
+		$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,AtendCliente,
+		AtendModalidade,AtendResponsavel,AtendClassificacao,AtendObservacao,AtendSituacao,
+		AtendUsuarioAtualizador,AtendUnidade)
+		VALUES('$numRegistro','$atendimento[dataRegistro]',$atendimento[cliente],$atendimento[modalidade],
+		$atendimento[responsavel],$atendimento[classificacao],'$atendimento[observacao]',
+		$atendimento[situacao],$usuarioId,$iUnidade)";
+		$result = $conn->query($sql);
+
+		$atendimentoID = $conn->lastInsertId();
+
+		// $sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
+		// AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,AtXSeUsuarioAtualizador,AtXSeUnidade)
+		// VALUES ";
+		if(COUNT($atendimentoServicos)){
+			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
+			AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
+			VALUES ";
+	
+			foreach($atendimentoServicos as $atendimentoServico){
+				$sql .= "('$atendimentoID','$atendimentoServico[iServico]','$atendimentoServico[iMedico]',
+				'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
+				'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
+			}
+			$sql = substr($sql, 0, -1);
+			$conn->query($sql);
+		}
+		$_SESSION['atendimento'] = [
+			'paciente' => '',
+			'responsavel' => '',
+			'atendimentoServicos' => []
+		];
+
+		echo json_encode([
+			'titulo' => 'Atendimento',
+			'status' => 'success',
+			'menssagem' => 'Atendimento cadastrado!!'
 		]);
 	} elseif($tipoRequest == 'RESPONSAVEIS'){
 
@@ -318,7 +552,7 @@ try{
 		echo json_encode([
 			'data' => $array,
 			'titulo' => '',
-			'tipo' => 'success',
+			'status' => 'success',
 			'menssagem' => ''
 		]);
 	} elseif($tipoRequest == 'RESPONSAVEL'){
@@ -334,59 +568,401 @@ try{
 
 		if($row){
 			$array = [
-				'id' => $item['ClResId'],
-				'nomeResp' => $item['ClResNome'],
-				'parentescoResp' => $item['CResParentesco'],
-				'nascimentoResp' => $item['ClResNascimento'],
-				'cepResp' => $item['ClResCep'],
-				'enderecoResp' => $item['ClResEndereco'],
-				'numeroResp' => $item['ClResNumero'],
-				'complementoResp' => $item['ClResComplemento'],
-				'bairroResp' => $item['ClResBairro'],
-				'cidadeResp' => $item['ClResCidade'],
-				'estadoResp' => $item['ClResEstado'],
-				'telefoneResp' => $item['ClResTelefone'],
-				'celularResp' => $item['ClResCelular'],
-				'emailResp' => $item['ClResEmail'],
-				'observacaoResp' => $item['ClResObservacao']
+				'id' => $row['ClResId'],
+				'nomeResp' => $row['ClResNome'],
+				'parentescoResp' => $row['CResParentesco'],
+				'nascimentoResp' => $row['ClResNascimento'],
+				'cepResp' => $row['ClResCep'],
+				'enderecoResp' => $row['ClResEndereco'],
+				'numeroResp' => $row['ClResNumero'],
+				'complementoResp' => $row['ClResComplemento'],
+				'bairroResp' => $row['ClResBairro'],
+				'cidadeResp' => $row['ClResCidade'],
+				'estadoResp' => $row['ClResEstado'],
+				'telefoneResp' => $row['ClResTelefone'],
+				'celularResp' => $row['ClResCelular'],
+				'emailResp' => $row['ClResEmail'],
+				'observacaoResp' => $row['ClResObservacao']
 			];
+			$_SESSION['atendimento']['responsavel'] = $row['ClResId'];
 		}
 		
 		echo json_encode([
 			'data' => $array,
 			'titulo' => 'Responsável',
-			'tipo' => 'success',
+			'status' => 'success',
 			'menssagem' => 'Responsável selecionado!!'
 		]);
-	} elseif($tipoRequest == 'SALVARRESPONSAVEL'){
-		$atendimentoSessao = $_SESSION['atendimentoNovo'];
+	} elseif ($tipoRequest == 'PACIENTES'){
 
-		$responsavel = [
-			'id' => isset($_POST['id'])?$_POST['id']: 'null',
-			'nomeResp' => isset($_POST['nomeResp'])?$_POST['nomeResp']: 'null',
-			'parentescoResp' => isset($_POST['parentescoResp'])?$_POST['parentescoResp']: 'null',
-			'nascimentoResp' => isset($_POST['nascimentoResp'])?$_POST['nascimentoResp']: 'null',
-			'cepResp' => isset($_POST['cepResp'])?$_POST['cepResp']: 'null',
-			'enderecoResp' => isset($_POST['enderecoResp'])?$_POST['enderecoResp']: 'null',
-			'numeroResp' => isset($_POST['numeroResp'])?$_POST['numeroResp']: 'null',
-			'complementoResp' => isset($_POST['complementoResp'])?$_POST['complementoResp']: 'null',
-			'bairroResp' => isset($_POST['bairroResp'])?$_POST['bairroResp']: 'null',
-			'cidadeResp' => isset($_POST['cidadeResp'])?$_POST['cidadeResp']: 'null',
-			'estadoResp' => isset($_POST['estadoResp'])?$_POST['estadoResp']: 'null',
-			'telefoneResp' => isset($_POST['telefoneResp'])?$_POST['telefoneResp']: 'null',
-			'celularResp' => isset($_POST['celularResp'])?$_POST['celularResp']: 'null',
-			'emailResp' => isset($_POST['emailResp'])?$_POST['emailResp']: 'null',
-			'observacaoResp' => isset($_POST['observacaoResp'])?$_POST['observacaoResp']: 'null'
-		];
-		$atendimentoSessao['responsavel'] = $responsavel;
-		$_SESSION['atendimentoNovo'] = $atendimentoSessao;
+		$sql = "SELECT ClienId,ClienNome
+		FROM Cliente WHERE ClienUnidade = $iUnidade";
+		$result = $conn->query($sql);
+
+		$array = [];
+		foreach($result as $item){
+			array_push($array,[
+				'id' => $item['ClienId'],
+				'nome' => $item['ClienNome'],
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'PACIENTE'){
+		$iPaciente = $_POST['iPaciente'];
+
+		$sql = "SELECT ClienId,ClienTipo,ClienNome,ClienRazaoSocial,
+		ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
+		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
+		ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
+		FROM Cliente WHERE ClienId = $iPaciente and ClienUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		$array = [];
+		if($row){
+			$array = [
+				'status' => 'success',
+				'tipoPessoa' => $row['ClienTipo'],
+				// 'prontuario' => $item['ClienId'],
+				'nome' => $row['ClienNome'],
+				'cpf' => $row['ClienCpf'],
+				// 'cns' => $row['ClienId'],
+				'rg' => $row['ClienRg'],
+				'emissor' => $row['ClienOrgaoEmissor'],
+				'uf' => $row['ClienUf'],
+				'sexo' => $row['ClienSexo'],
+				'nascimento' => $row['ClienDtNascimento'],
+				'nomePai' => $row['ClienNomePai'],
+				'nomeMae' => $row['ClienNomeMae'],
+				'profissao' => $row['ClienProfissao'],
+				'cep' => $row['ClienCep'],
+				'endereco' => $row['ClienEndereco'],
+				'numero' => $row['ClienNumero'],
+				'complemento' => $row['ClienComplemento'],
+				'bairro' => $row['ClienBairro'],
+				'cidade' => $row['ClienCidade'],
+				'estado' => $row['ClienEstado'],
+				'contato' => $row['ClienContato'],
+				'telefone' => $row['ClienTelefone'],
+				'celular' => $row['ClienCelular'],
+				'email' => $row['ClienEmail'],
+				'observacao' => $row['ClienObservacao']
+			];
+			$_SESSION['atendimento']['paciente'] = $row['ClienId'];
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'ADDPACIENTENOVO'){
+
+		$nomePaciente = $_POST['nomePaciente'];
+		$telefone = $_POST['telefone'];
+		$celular = $_POST['celular'];
+		$email = $_POST['email'];
+		$observacao = $_POST['observacao'];
+		$sCodigo = null;
+
+		try{
+			$sql = "SELECT COUNT(isnull(clienCodigo,0)) as Codigo
+					FROM Cliente
+					Where ClienUnidade = $iUnidade";
+			//echo $sql;die;
+			$result = $conn->query("$sql");
+			$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
+			
+			$sCodigo = (int)$rowCodigo['Codigo'] + 1;
+			$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
+		} catch(PDOException $e) {	
+			echo 'Error1: ' . $e->getMessage();die;
+		}
+	
+		// insere o novo usuário no banco
+		$sql = "INSERT INTO  Cliente(clienCodigo,ClienNome,ClienTelefone,ClienCelular,ClienEmail,ClienObservacao,
+		ClienTipo,ClienStatus,ClienUnidade,ClienUsuarioAtualizador)
+		VALUES ('$sCodigo','$nomePaciente','$telefone','$celular','$email','$observacao','F',1,$iUnidade,$usuarioId)";
+		$conn->query($sql);
+
+		$lestIdCliente = $conn->lastInsertId();
+
+		// busca todos os usuários com o novo inserido para adicionalo ja selecionado no select
+		$sql = "SELECT ClienId,ClienTipo,ClienCodigo,ClienNome,ClienRazaoSocial,ClienCnpj,
+		ClienInscricaoMunicipal,ClienInscricaoEstadual,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienCartaoSus,ClienProfissao,ClienCep,ClienEndereco,
+		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
+		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
+		FROM Cliente";
+		$result = $conn->query($sql);
+
+		$array = [];
+		foreach($result as $item){
+			array_push($array,[
+				'id' => $item['ClienId'],
+				'nome' => $item['ClienNome'],
+				'isSelected' => $item['ClienId'] == $lestIdCliente? 'selected':''
+			]);
+		}
 		echo json_encode([
-			'titulo' => 'Responsável',
-			'tipo' => 'success',
-			'menssagem' => 'Responsável adicionado!!',
-			'paciente' => $responsavel
+			'titulo' => 'Incluir paciente',
+			'status' => 'success',
+			'menssagem' => 'Paciente inserido com sucesso!!!',
+			'array' => $array,
 		]);
-	} 
+	} elseif ($tipoRequest == 'MODALIDADES'){
+	
+		$sql = "SELECT AtModId,AtModNome,AtModChave,AtModSituacao,AtModUsuarioAtualizador
+		FROM AtendimentoModalidade";
+		$result = $conn->query($sql);
+
+		$array = [];
+		foreach($result as $item){
+			array_push($array,[
+				'id' => $item['AtModId'],
+				'nome' => $item['AtModNome'],
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'SERVICOS'){
+		$sql = "SELECT SrVenId,SrVenNome
+		FROM ServicoVenda WHERE SrVenUnidade = $iUnidade";
+		$result = $conn->query($sql);
+
+		$array = [];
+		foreach($result as $item){
+			array_push($array,[
+				'id' => $item['SrVenId'],
+				'nome' => $item['SrVenNome'],
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'MEDICOS'){
+		$sql = "SELECT ProfiId,ProfiNome
+		FROM Profissional WHERE ProfiUnidade = $iUnidade";
+		$result = $conn->query($sql);
+
+		$array = [];
+		foreach($result as $item){
+			array_push($array,[
+				'id' => $item['ProfiId'],
+				'nome' => $item['ProfiNome'],
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'LOCALATENDIMENTO'){
+		$sql = "SELECT AtLocId,AtLocNome,AtLocStatus,AtLocUsuarioAtualizador,AtLocUnidade
+		FROM AtendimentoLocal WHERE AtLocUnidade = $iUnidade";
+		$result = $conn->query($sql);
+
+		$array = [];
+		foreach($result as $item){
+			array_push($array,[
+				'id' => $item['AtLocId'],
+				'nome' => $item['AtLocNome'],
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif($tipoRequest == 'ADICIONARSERVICO'){
+		$atendimentoSessao = $_SESSION['atendimento']['atendimentoServicos'];
+
+		$iServico = $_POST['servico'];
+		$iMedico = $_POST['medicos'];
+		$sData = explode('/',$_POST['dataAtendimento']);
+		$sData = $sData[2].'-'.$sData[1].'-'.$sData[0];
+		$sHora = $_POST['horaAtendimento'];
+		$iLocal = $_POST['localAtendimento'];
+		
+		// $sqlServico = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorCusto,SrVenUnidade
+		// FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
+		$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorVenda,SrVenUnidade
+		FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
+		$resultServico = $conn->query($sql);
+		$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
+
+		// $sqlMedico = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
+		// FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
+		$sql = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
+		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade != $iUnidade";
+		$resultMedico = $conn->query($sql);
+		$resultMedico = $resultMedico->fetch(PDO::FETCH_ASSOC);
+
+		// $sqlLocal = "SELECT AtLocId,AtLocNome
+		// FROM AtendimentoLocal WHERE AtLocId = $iLocal and AtLocUnidade = $iUnidade";
+		$sql = "SELECT AtLocId,AtLocNome
+		FROM AtendimentoLocal WHERE AtLocId = $iLocal and AtLocUnidade = $iUnidade";
+		$resultLocal = $conn->query($sql);
+		$resultLocal = $resultLocal->fetch(PDO::FETCH_ASSOC);
+
+		$valorTotal = 0;
+		foreach($atendimentoSessao as $item){
+			if($item['iMedico'] == $iMedico && $item['data'] == $sData && $item['hora'] == $sHora){
+				echo json_encode([
+					'status' => 'error',
+					'titulo' => 'Duplicação de registro',
+					'menssagem' => 'Já foi adicionado registro com o mesmo Médico, Data e Hora',
+					'array' => $atendimentoSessao,
+				]);
+				exit;
+			}
+		}
+
+		array_push($atendimentoSessao, [
+			'id' => "$resultServico[SrVenId]#$resultMedico[ProfiId]#$resultLocal[AtLocId]",
+			'iServico' => $resultServico['SrVenId'],
+			'iMedico' => $resultMedico['ProfiId'],
+			'iLocal' => $resultLocal['AtLocId'],
+
+			'servico' => $resultServico['SrVenNome'],
+			'medico' => $resultMedico['ProfiNome'],
+			'local' => $resultLocal['AtLocNome'],
+			'sData' => mostraData($sData),
+			'data' => $sData,
+			'hora' => mostraHora($sHora),
+			'valor' => $resultServico['SrVenValorVenda'],
+		]);
+		$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
+
+		echo json_encode([
+			'array' => $atendimentoSessao,
+			'valorTotal' => $valorTotal,
+			'status' => 'success',
+			'titulo' => 'Serviço',
+			'menssagem' => 'Serviço adicionado!!!',
+		]);
+	} elseif ($tipoRequest == 'CHECKSERVICO'){
+		$atendimentoSessao = $_SESSION['atendimento']['atendimentoServicos'];
+
+		if(isset($_POST['iAtendimento']) && $_POST['iAtendimento']){
+			$iAtendimento = $_POST['iAtendimento'];
+			$atendimentoSessao  = [];
+			
+			
+			$sql = "SELECT AtXSeId,AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,AtXSeHorario,
+			AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,AtXSeUsuarioAtualizador,AtXSeUnidade,
+			ProfiId,AtLocId,AtLocNome,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
+			SituaCor,ProfiNome,SrVenNome,SrVenValorVenda,SrVenId
+			FROM AtendimentoXServico
+			JOIN Atendimento ON AtendId = AtXSeAtendimento
+			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+			JOIN Situacao ON SituaId = AtendSituacao
+			JOIN Cliente ON ClienId = AtendCliente
+			JOIN Profissional ON ProfiId = AtXSeProfissional
+			JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
+			JOIN ServicoVenda ON SrVenId = AtXSeServico
+			WHERE AtXSeUnidade = $iUnidade and AtXSeAtendimento = $iAtendimento";
+			$result = $conn->query($sql);
+			$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
+			
+			foreach($rowAtendimento as $item){
+				array_push($atendimentoSessao, [
+					'id' => "$item[SrVenId]#$item[ProfiId]#$item[AtLocId]",
+					'iServico' => $item['SrVenId'],
+					'iMedico' => $item['ProfiId'],
+					'iLocal' => $item['AtLocId'],
+			
+					'servico' => $item['SrVenNome'],
+					'medico' => $item['ProfiNome'],
+					'local' => $item['AtLocNome'],
+					'sData' => mostraData($item['AtXSeData']),
+					'data' => $item['AtXSeData'],
+					'hora' => mostraHora($item['AtXSeHorario']),
+					'valor' => $item['SrVenValorVenda'],
+				]);
+			}
+		}
+		$valorTotal = 0;
+
+		foreach($atendimentoSessao as $item){
+			$valorTotal += $item['valor'];
+		}
+		$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
+		
+		echo json_encode([
+			'array' => $atendimentoSessao,
+			'valorTotal' => $valorTotal
+		]);
+	} elseif ($tipoRequest == 'EXCLUISERVICO'){
+		$oldId = $_POST['id']; // "SrVenId#ProfiId#AtLocId"
+		$atendimentoSessao = $_SESSION['atendimento']['atendimentoServicos'];
+
+		foreach($atendimentoSessao as $key => $item){
+			$iServico = $item['iServico'];
+			$iMedico = $item['iMedico'];
+			$iLocal = $item['iLocal'];
+
+			$newId = "$iServico#$iMedico#$iLocal";
+
+			if($newId == $oldId){
+				array_splice($atendimentoSessao, $key, 1);
+				$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
+				echo json_encode([
+					'status' => 'success',
+					'titulo' => 'Excluir serviço',
+					'menssagem' => 'Serviço Excluído!!!',
+				]);
+				break;
+			}
+		}
+	} elseif ($tipoRequest == 'SETDATAPROFISSIONAL'){
+		$iMedico = $_POST['iMedico'];
+
+		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
+		FROM ProfissionalAgenda WHERE PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$arrayData = [true];
+		foreach($row as $item){
+			$data = explode('-', $item['PrAgeData']);
+			
+			array_push($arrayData,
+			[
+				intval($data[0]),
+				intval($data[1])-1,
+				intval($data[2])
+			]);
+		}
+
+		echo json_encode([
+			'arrayData' => $arrayData,
+			'status' => 'success',
+			'titulo' => 'Data',
+			'menssagem' => 'Data do profissional selecionado!!!',
+		]);
+	} elseif ($tipoRequest == 'SETHORAPROFISSIONAL'){
+		$iMedico = $_POST['iMedico'];
+		$data = $_POST['data'];
+		$data = explode('/', $data); // dd/mm/yyyy
+		$data = $data[2].'-'.$data[1].'-'.$data[0]; // yyyy-mm-dd
+
+		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
+		FROM ProfissionalAgenda
+		WHERE PrAgeData = '$data' and PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$arrayHora = [true,];
+		foreach($row as $item){
+			$horaI = explode(':', $item['PrAgeHoraInicio']);
+			$horaF = explode(':', $item['PrAgeHoraFim']);
+			
+			array_push($arrayHora,
+			[
+				'from' => [intval($horaI[0]), intval($horaI[1])],
+				'to' => [intval($horaF[0]), intval($horaF[1])],
+			]);
+		}
+
+		echo json_encode([
+			'arrayHora' => $arrayHora,
+			'status' => 'success',
+			'titulo' => 'Data',
+			'menssagem' => 'Hora do profissional selecionado!!!',
+		]);
+	}
 }catch(PDOException $e) {
 	$msg = '';
 	switch($tipoRequest){
@@ -399,8 +975,9 @@ try{
 	}
 	echo json_encode([
 		'titulo' => 'Atendimento',
-		'tipo' => 'error',
+		'status' => 'error',
 		'menssagem' => $msg,
-		'error' => $e->getMessage()
+		'error' => $e->getMessage(),
+		'sql' => $sql
 	]);
 }

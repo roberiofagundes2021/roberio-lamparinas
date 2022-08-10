@@ -9,33 +9,21 @@ include('global_assets/php/conexao.php');
 // as duas lista "$visaoAtendente" e "$visaoProfissional" representam os perfis
 // que podem ver a tela de atendimento na visão do atendente ou profissional respectivamente
 
-$visaoAtendente = [
-	'SUPERR',
-	'RECEPCAO'
-];
-
-$visaoProfissional = [
-	'SUPER',
-	'PROFISSIONAL'
-];
-
 $iUnidade = $_SESSION['UnidadeId'];
 $usuarioId = $_SESSION['UsuarId'];
 $acesso = 'ATENDIMENTO';
 
-$sql = "SELECT PerfiNome, PerfiChave
-FROM UsuarioXUnidade
-JOIN Perfil ON PerfiId = UsXUnPermissaoPerfil
-WHERE UsXUnEmpresaUsuarioPerfil = $usuarioId and UsXUnUnidade = $iUnidade";
+$sql = "SELECT ProfiId, ProfiUsuario
+FROM Profissional
+WHERE ProfiUsuario = $usuarioId and ProfiUnidade = $iUnidade";
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 
-switch($row['PerfiChave']){
-	case in_array($row['PerfiChave'], $visaoAtendente):$acesso = 'ATENDIMENTO';break;
-	case in_array($row['PerfiChave'], $visaoProfissional):$acesso = 'PROFISSIONAL';break;
-	default: $acesso = 'ATENDIMENTO';break;
-}
-// a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
+$acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
+
+// $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'PROFISSIONAL';
+
+// as requisições são feitas ao carregar a página via AJAX no arquivo filtraAtendimento.php
 ?>
 
 <!DOCTYPE html>
@@ -83,6 +71,79 @@ switch($row['PerfiChave']){
 			
 			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
 			/* Início: Tabela Personalizada do Setor Publico */
+			$('#AgendamentoTable').DataTable({
+				"order": [[ 0, "desc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [{
+					orderable: true,   //Data
+					width: "10%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Horario
+					width: "10%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //Espera
+					width: "5%",
+					targets: [2]
+				},				
+				{ 
+					orderable: true,   //Nº Registro
+					width: "5%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //Prontuário
+					width: "5%",
+					targets: [4]
+				},
+				{ 
+					orderable: true,   //Paciente
+					width: "20%",
+					targets: [5]
+				},
+				{ 
+					orderable: true,   //Profissional
+					width: "10%",
+					targets: [6]
+				},
+				{ 
+					orderable: true,   //Modalidade
+					width: "20%",
+					targets: [7]
+				},
+				{ 
+					orderable: true,   //Procedimento
+					width: "5%",
+					targets: [8]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "5%",
+					targets: [9]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "5%",
+					targets: [10]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+                language: {
+                    search: '<span>Filtro:</span> _INPUT_',
+                    searchPlaceholder: 'filtra qualquer coluna...',
+                    lengthMenu: '<span>Mostrar:</span> _MENU_',
+                    paginate: {
+                        'first': 'Primeira',
+                        'last': 'Última',
+                        'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+                        'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+                    }
+                }
+			});
+
 			$('#AtendimentoTable').DataTable({
 				"order": [[ 0, "desc" ]],
 			    autoWidth: false,
@@ -333,6 +394,42 @@ switch($row['PerfiChave']){
 					$('#dadosPost').submit()
 				})
 			});
+
+			// btn para editar ou excluir atendimento
+			$('.atualizaAtendimento').each(function() {
+				$(this).on('click',function(e){
+					e.preventDefault()
+					let atendimento = $(this).data('atendimento')
+
+					$('#iAtendimentoId').val(atendimento)
+					$('#dadosPost').attr('action', 'atendimentoNovo.php')
+					$('#dadosPost').submit()
+				})
+			})
+
+			$('.excluiAtendimento').each(function() {
+				$(this).on('click',function(e){
+					e.preventDefault()
+					let atendimento = $(this).data('atendimento')
+					$.ajax({
+						type: 'POST',
+						url: 'filtraAtendimento.php',
+						dataType: 'json',
+						data: {
+							'tipoRequest': 'EXCLUI',
+							'iAtendimento': atendimento
+						},
+						success: function(response) {
+							if(response.status  == 'success'){
+								alerta(response.titulo, response.menssagem, response.status)
+								getAtendimentos()
+							} else {
+								alerta(response.titulo, response.menssagem, response.status)
+							}
+						}
+					});
+				})
+			})
 		}
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -350,18 +447,32 @@ switch($row['PerfiChave']){
 					//|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
 
 					if(response.acesso == 'ATENDIMENTO'){
-						let table = $('#AtendimentoTable').DataTable().clear().draw()
+						$('#AgendamentoTable').DataTable().clear().draw()
 	
-						table = $('#AtendimentoTable').DataTable()
-						let rowNode
+						tableAgendamento = $('#AgendamentoTable').DataTable()
+						let rowNodeAgendamento
 	
-						response.data.forEach(item => {
-							rowNode = table.row.add(item.data).draw().node()
-							$(rowNode).attr('class', 'text-center')
-							$(rowNode).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNode).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							$(rowNode).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNode).find('td:eq(10)').attr('data-observacao', `${item.identify.sObservacao}`)
+						response.dataAgendamento.forEach(item => {
+							rowNodeAgendamento = tableAgendamento.row.add(item.data).draw().node()
+							$(rowNodeAgendamento).attr('class', 'text-center')
+							$(rowNodeAgendamento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+							$(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+							$(rowNodeAgendamento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+							$(rowNodeAgendamento).find('td:eq(10)').attr('data-observacao', `${item.identify.sObservacao}`)
+						})
+
+						$('#AtendimentoTable').DataTable().clear().draw()
+
+						tableAtendimento = $('#AtendimentoTable').DataTable()
+						let rowNodeAtendimento
+
+						response.dataAtendimento.forEach(item => {
+							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
+							$(rowNodeAtendimento).attr('class', 'text-center')
+							$(rowNodeAtendimento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+							$(rowNodeAtendimento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+							$(rowNodeAtendimento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sObservacao}`)
 						})
 					} else if (response.acesso == 'PROFISSIONAL'){
 						let tableE = $('#AtendimentoTableEspera').DataTable().clear().draw()
@@ -412,7 +523,7 @@ switch($row['PerfiChave']){
 
 			<!-- Content area -->
 			<div class="content">
-				<form id='dadosPost'>
+				<form id='dadosPost' method="POST">
 					<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='' />
 					<input type='hidden' id='iAtendimentoEletivoId' name='iAtendimentoEletivoId' value='' />
 					<input type='hidden' id='ClaChave' name='ClaChave' value='' />
@@ -428,49 +539,103 @@ switch($row['PerfiChave']){
 								<div class="card-header header-elements-inline">
 									<h5 class="card-title">Relação de Atendimentos</h5>
 									<div class="header-elements">
-										<div class="list-icons">
+										<!-- <div class="list-icons">
 											<a class="list-icons-item" data-action="collapse"></a>
 											<a href="perfil.php" class="list-icons-item" data-action="reload"></a>
-											<!--<a class="list-icons-item" data-action="remove"></a>-->
-										</div>
+											<a class="list-icons-item" data-action="remove"></a>
+										</div> -->
 									</div>
-								</div>					
+								</div>
 
 								<div class="card-body">
 									<div class="row">
 										<div class="col-lg-9">
-											A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
+											<p class="font-size-lg">A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 										</div>
-										<div class="col-lg-12 row text-right p-0">
-											<div class="text-right col-sm-8 p-0"><!-- EESPASSO --></div>
-											<div class="text-right col-sm-2 p-0"><a href="atendimentoNovo.php" class="btn btn-principal" role="button">Novo Atendimento</a></div>
-											<div class="text-right col-sm-2 p-0"><a href="#" class="btn bg-secondary" role="button">Imprimir Relação</a></div>
-										</div>
+										<div class="col-lg-3">
+											<div class="text-right">
+												<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
+													<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
+														<i class="icon-printer2"></i>																						
+													</a>
+												</div>
+												<div>
+													<a href="atendimentoNovo.php" class="btn btn-principal" role="button">Novo Atendimento</a>
+												</div>
+											</div>
+										</div>	
 									</div>
 								</div>
-
-								<table class="table" id="AtendimentoTable">
-									<thead>
-										<tr class="bg-slate text-center">
-											<th>Data</th>
-											<th>Horario</th>
-											<th>Espera</th>
-											<th>Nº Registro</th>
-											<th>Prontuário</th>			
-											<th>Paciente</th>
-											<th>Profissional</th>
-											<th>Modalidade</th>
-											<th>Procedimento</th>
-											<th>Situação</th>
-											<th class="text-center">Ações</th>
-										</tr>
-									</thead>
-									<tbody>
-
-									</tbody>
-								</table>
 							</div>
-						</div>
+
+								<div class="card">
+									<div class="card-header header-elements-inline">
+										<h5 class="card-title">Agendamentos</h5>
+										<div class="header-elements">
+											<div class="list-icons">
+												<a class="list-icons-item" data-action="collapse"></a>
+												<!-- <a href="perfil.php" class="list-icons-item" data-action="reload"></a>
+												<a class="list-icons-item" data-action="remove"></a> -->
+											</div>
+										</div>
+									</div>
+	
+									<table class="table" id="AgendamentoTable">
+										<thead>
+											<tr class="bg-slate text-center">
+												<th>Data</th>
+												<th>Horario</th>
+												<th>Espera</th>
+												<th>Nº Registro</th>
+												<th>Prontuário</th>			
+												<th>Paciente</th>
+												<th>Profissional</th>
+												<th>Modalidade</th>
+												<th>Procedimento</th>
+												<th>Situação</th>
+												<th class="text-center">Ações</th>
+											</tr>
+										</thead>
+										<tbody>
+	
+										</tbody>
+									</table>
+								</div>
+
+								<div class="card">
+									<div class="card-header header-elements-inline">
+										<h5 class="card-title">Atendimentos</h5>
+										<div class="header-elements">
+											<div class="list-icons">
+												<a class="list-icons-item" data-action="collapse"></a>
+												<!-- <a href="perfil.php" class="list-icons-item" data-action="reload"></a>
+												<a class="list-icons-item" data-action="remove"></a> -->
+											</div>
+										</div>
+									</div>
+	
+									<table class="table" id="AtendimentoTable">
+										<thead>
+											<tr class="bg-slate text-center">
+												<th>Data</th>
+												<th>Horario</th>
+												<th>Espera</th>
+												<th>Nº Registro</th>
+												<th>Prontuário</th>			
+												<th>Paciente</th>
+												<th>Profissional</th>
+												<th>Modalidade</th>
+												<th>Procedimento</th>
+												<th>Situação</th>
+												<th class="text-center">Ações</th>
+											</tr>
+										</thead>
+										<tbody>
+	
+										</tbody>
+									</table>
+								</div>
+							</div>
 					</div>
 				<?php } elseif ($acesso == 'PROFISSIONAL'){ ?>
 					<!-- Visão Atendente -->		

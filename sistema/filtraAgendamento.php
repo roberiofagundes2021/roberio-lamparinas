@@ -17,26 +17,18 @@ try{
 	$iUnidade = $_SESSION['UnidadeId'];
 	$usuarioId = $_SESSION['UsuarId'];
 
-	if($tipoRequest == 'AGENDAMENTOS'){
-		// $sql = "SELECT AgendId,AgendDataRegistro,AgendCliente,AgendModalidade,AgendClienteResponsavel,
-		// AgendObservacao,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor
-		// FROM Agendamento
-		// JOIN AtendimentoModalidade ON AtModId = AgendModalidade
-		// JOIN Situacao ON SituaId = AgendSituacao
-		// JOIN Cliente ON ClienId = AgendCliente
-		// WHERE AgendUnidade = $iUnidade";
-		
-		$sql = "SELECT AgendId,AgendDataRegistro,AgendCliente,AgendModalidade,AgendClienteResponsavel,
-		AgendObservacao,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-		AgXSeServico,ProfiNome,AgXSeData,AgXSeHorario,AtLocNome, SrVenNome
-		FROM AgendamentoXServico
-		JOIN Agendamento ON AgendId = AgXSeAgendamento
+	if($tipoRequest == 'AGENDAMENTOS'){		
+		$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
+		AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
+		AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
+		SituaCor,ProfiNome,AtLocNome, SrVenNome
+		FROM Agendamento
 		JOIN AtendimentoModalidade ON AtModId = AgendModalidade
 		JOIN Situacao ON SituaId = AgendSituacao
 		JOIN Cliente ON ClienId = AgendCliente
-		JOIN Profissional ON ProfiId = AgXSeProfissional
-		JOIN AtendimentoLocal ON AtLocId = AgXSeAtendimentoLocal
-		JOIN ServicoVenda ON SrVenId = AgXSeServico
+		JOIN Profissional ON ProfiId = AgendProfissional
+		JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
+		JOIN ServicoVenda ON SrVenId = AgendServico
 		WHERE AgendUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -53,8 +45,8 @@ try{
 			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
 			array_push($array, [
 				'data' => [
-					mostraData($item['AgXSeData']),
-					$item['AgXSeHorario'],
+					mostraData($item['AgendData']),
+					mostraHora($item['AgendHorario']),
 					$item['ClienNome'],
 					$item['ProfiNome'],
 					$item['SrVenNome'],
@@ -129,11 +121,26 @@ try{
 		$celular = $_POST['celular'];
 		$email = $_POST['email'];
 		$observacao = $_POST['observacao'];
+		$sCodigo = null;
+
+		try{		
+			$sql = "SELECT COUNT(isnull(clienCodigo,0)) as Codigo
+					FROM Cliente
+					Where ClienUnidade = $iUnidade";
+			//echo $sql;die;
+			$result = $conn->query("$sql");
+			$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
+			
+			$sCodigo = (int)$rowCodigo['Codigo'] + 1;
+			$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
+		} catch(PDOException $e) {	
+			echo 'Error1: ' . $e->getMessage();die;
+		}
 	
 		// insere o novo usuário no banco
-		$sql = "INSERT INTO  Cliente(ClienNome,ClienTelefone,ClienCelular,ClienEmail,ClienObservacao,
+		$sql = "INSERT INTO  Cliente(clienCodigo,ClienNome,ClienTelefone,ClienCelular,ClienEmail,ClienObservacao,
 		ClienTipo,ClienStatus,ClienUnidade,ClienUsuarioAtualizador)
-		VALUES ('$nomePaciente','$telefone','$celular','$email','$observacao','F',1,$iUnidade,$usuarioId)";
+		VALUES ('$sCodigo','$nomePaciente','$telefone','$celular','$email','$observacao','F',1,$iUnidade,$usuarioId)";
 		$conn->query($sql);
 
 		$lestIdCliente = $conn->lastInsertId();
@@ -211,13 +218,8 @@ try{
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'MEDICOS'){
-		$sql = "SELECT ProfiId,ProfiTipo,ProfiCodigo,ProfiNome,ProfiRazaoSocial,ProfiCnpj,
-		ProfiInscricaoMunicipal,ProfiInscricaoEstadual,ProfiCpf,ProfiRg,ProfiOrgaoEmissor,ProfiUf,ProfiSexo,
-		ProfiDtNascimento,ProfiProfissao,ProfiNumConselho,ProfiCNES,ProfiEspecialidade,ProfiCep,ProfiEndereco,
-		ProfiNumero,ProfiComplemento,ProfiBairro,ProfiCidade,ProfiEstado,ProfiContato,ProfiTelefone,
-		ProfiCelular,ProfiEmail,ProfiSite,ProfiObservacao,ProfiBanco,ProfiAgencia,ProfiConta,
-		ProfiInformacaoAdicional,ProfiStatus,ProfiUsuarioAtualizador,ProfiUnidade
-		FROM Profissional WHERE ProfiUnidade = $iUnidade";
+		$sql = "SELECT ProfiId,ProfiNome
+		FROM Profissional WHERE ProfiUnidade != $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];
@@ -251,13 +253,19 @@ try{
 		$cmbSituacao = $_POST['cmbSituacao'];
 		$servicos = $_SESSION['SERVICOS'];
 
+		// caso não vá atualizar,deve procurar no banco se existe um agendamento para o dia,
+		// horário e profissional selecionado caso contrário, irá procurar no banco se existe um
+		// agendamento para o dia,horário e profissional diferente do atendimento atual
+
 		foreach($servicos as $item){
 			$iMedico = $item['iMedico'];
 			$data = $item['data'];
 			$hora = $item['hora'];
+			$isUpdate = isset($_POST['isUpdate'])?$_POST['isUpdate']:false;
 
-			$sql = "SELECT AgXSeId FROM AgendamentoXServico 
-			WHERE AgXSeData = '$data' and AgXSeHorario = '$hora' and AgXSeProfissional = '$iMedico'";
+			$sql = "SELECT AgendId FROM Agendamento
+			WHERE AgendData = '$data' and AgendHorario = '$hora' and AgendProfissional = '$iMedico'";
+			$sql .= $isUpdate?" and AgendId != $isUpdate":"";
 			$result = $conn->query($sql);
 			$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -271,83 +279,51 @@ try{
 			}
 		}
 
-		if(!isset($_POST['isUpdate'])){
-			$tipoRequest = 'ATTAGENDAMENTO';
-			$sql = "INSERT INTO Agendamento(AgendDataRegistro,AgendCliente,AgendModalidade,
-			AgendObservacao,AgendSituacao,AgendUnidade,AgendUsuarioAtualizador)
-			VALUES('$data','$paciente','$modalidade','$observacao','$cmbSituacao','$iUnidade','$usuarioId')";
-			$conn->query($sql);
-			$lastIdInsert = $conn->lastInsertId();
-	
-			$array = [];
-			foreach($servicos as $servico){
-				$iServico = $servico['iServico'];
-				$iMedico = $servico['iMedico'];
-				$data = $servico['data'];
-				$hora = $servico['hora'];
-				$iLocal = $servico['iLocal'];
-	
-				$sql = "INSERT INTO AgendamentoXServico(AgXSeAgendamento,AgXSeServico,AgXSeProfissional,
-				AgXSeData,AgXSeHorario,AgXSeAtendimentoLocal,AgXSeUsuarioAtualizador,AgXSeUnidade)
-				VALUES($lastIdInsert,$iServico,$iMedico,'$data','$hora',$iLocal,$usuarioId,$iUnidade)";
-				array_push($array, $sql);
-			}
-	
-			foreach($array as $sql){
-				$conn->query($sql);
-			}
-	
-			// vai limpar todos os dados da sessão utilizadas em agendamento após o cadastro
-			$_SESSION['SERVICOS'] = [];
-	
+		$sql = "SELECT AgXSeId FROM AgendamentoXServico 
+		WHERE AgXSeData = '$data' and AgXSeHorario = '$hora' and AgXSeProfissional = '$iMedico'";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+		if(COUNT($row)){
 			echo json_encode([
-				'titulo' => 'Incluir agendamento',
-				'status' => 'success',
-				'menssagem' => 'Agendamento inserido com sucesso!!!',
+				'titulo' => 'Conflito de serviço',
+				'status' => 'error',
+				'menssagem' => 'Um dos serviços já possui cadastro com o mesmo Profissional, data e horário',
 			]);
-		} else {
-			$isUpdate = $_POST['isUpdate'];
-
-			$sql = "UPDATE Agendamento SET
-			AgendDataRegistro = '$data',
-			AgendCliente = $paciente,
-			AgendModalidade = $modalidade,
-			AgendObservacao = '$observacao',
-			AgendSituacao = $cmbSituacao,
-			AgendUsuarioAtualizador = $usuarioId
-			WHERE AgendId = $isUpdate";
-			$conn->query($sql);
-
-			$sql = "DELETE FROM AgendamentoXServico WHERE AgXSeAgendamento = $isUpdate and AgXSeUnidade = $iUnidade";
-			$conn->query($sql);
-
-			$array = [];
-			foreach($servicos as $servico){
-				$iServico = $servico['iServico'];
-				$iMedico = $servico['iMedico'];
-				$data = $servico['data'];
-				$hora = $servico['hora'];
-				$iLocal = $servico['iLocal'];
-	
-				$sql = "INSERT INTO AgendamentoXServico(AgXSeAgendamento,AgXSeServico,AgXSeProfissional,
-				AgXSeData,AgXSeHorario,AgXSeAtendimentoLocal,AgXSeUsuarioAtualizador,AgXSeUnidade)
-				VALUES($isUpdate,$iServico,$iMedico,'$data','$hora',$iLocal,$usuarioId,$iUnidade)";
-				array_push($array, $sql);
-			}
-	
-			foreach($array as $sql){
-				$conn->query($sql);
-			}
-
-			// vai limpar todos os dados da sessão utilizadas em agendamento após o cadastro
-			$_SESSION['SERVICOS'] = [];
-	
-			echo json_encode([
-				'titulo' => 'Atualizar agendamento',
-				'status' => 'success',
-				'menssagem' => 'Agendamento atualizado com sucesso!!!',
-			]);
+			exit;
 		}
+
+		if($isUpdate){
+			$sql = "DELETE FROM Agendamento WHERE AgendId = $isUpdate and AgendUnidade = $iUnidade";
+			$conn->query($sql);
+		}
+
+		$tipoRequest = 'ATTAGENDAMENTO';
+		$sql = "INSERT INTO Agendamento(AgendDataRegistro,AgendCliente,AgendModalidade,
+		AgendServico,AgendProfissional,AgendData,AgendHorario,AgendAtendimentoLocal,
+		AgendObservacao,AgendSituacao,AgendUnidade,AgendUsuarioAtualizador)
+		VALUES ";
+
+		foreach($servicos as $servico){
+			$iServico = $servico['iServico'];
+			$iMedico = $servico['iMedico'];
+			$dataR = $servico['data'];
+			$horaR = $servico['hora'];
+			$iLocal = $servico['iLocal'];
+
+			$sql .= "('$data','$paciente','$modalidade','$iServico','$iMedico','$dataR','$horaR',
+			'$iLocal','$observacao','$cmbSituacao','$iUnidade','$usuarioId'),";
+		}
+		$sql  = substr($sql, 0, -1);
+		$conn->query($sql);
+
+		// vai limpar todos os dados da sessão utilizadas em agendamento após o cadastro
+		$_SESSION['SERVICOS'] = [];
+
+		echo json_encode([
+			'titulo' => 'Incluir agendamento',
+			'status' => 'success',
+			'menssagem' => 'Agendamento inserido com sucesso!!!',
+		]);
 	} elseif ($tipoRequest == 'EDITAR'){
 		$iAgendamento = isset($_POST['iAgendamento'])?$_POST['iAgendamento']:'';
 
@@ -413,7 +389,7 @@ try{
 		// $sqlMedico = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
 		// FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 		$sql = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
-		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
+		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade != $iUnidade";
 		$resultMedico = $conn->query($sql);
 		$resultMedico = $resultMedico->fetch(PDO::FETCH_ASSOC);
 
@@ -427,16 +403,11 @@ try{
 		$valorTotal = 0;
 
 		foreach($arrayServico as $item){
-			$iServico = $item['iServico'];
-			$iMedico = $item['iMedico'];
-			$iLocal = $item['iLocal'];
-			
-
-			if($iServico == $resultServico['SrVenId'] && $iMedico == $resultMedico['ProfiId'] && $iLocal == $resultLocal['AtLocId']){
+			if($item['iMedico'] == $iMedico && $item['data'] == $sData && $item['hora'] == $sHora){
 				echo json_encode([
 					'status' => 'error',
 					'titulo' => 'Duplicação de registro',
-					'menssagem' => 'Já foi adicionado registro com o mesmo Médico, Procedimento e Local',
+					'menssagem' => 'Já foi adicionado registro com o mesmo Médico, Data e Hora',
 				]);
 				exit;
 			}
@@ -475,21 +446,26 @@ try{
 
 		if(isset($_POST['iAgendamento'])){
 			$iAgendamento = $_POST['iAgendamento'];
-
-			$sqlAgendamento = "SELECT AgXSeId,AgXSeAgendamento,AgXSeServico,AgXSeProfissional,AgXSeData,AgXSeHorario,
-			AgXSeAtendimentoLocal,AgXSeUsuarioAtualizador,AgXSeUnidade, SrVenId, SrVenNome, SrVenValorVenda,
-			ProfiId, ProfiNome, AtLocId, AtLocNome
-			FROM AgendamentoXServico
-			JOIN ServicoVenda ON SrVenId = AgXSeServico
-			JOIN Profissional ON ProfiId = AgXSeProfissional
-			JOIN AtendimentoLocal ON AtLocId = AgXSeAtendimentoLocal
-			WHERE AgXSeAgendamento = $iAgendamento and AgXSeUnidade = $iUnidade";
-			$resultAgendamento = $conn->query($sqlAgendamento);
-			$rowAgendamento = $resultAgendamento->fetchAll(PDO::FETCH_ASSOC);
+			
+			$sql = "SELECT AgendId,ProfiId,AtLocId,AgendProfissional,AgendAtendimentoLocal,AgendDataRegistro,
+			AgendData,AgendHorario,AtModNome,
+			AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
+			AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
+			SituaCor,ProfiNome,AtLocNome,SrVenNome,SrVenValorVenda,SrVenId
+			FROM Agendamento
+			JOIN AtendimentoModalidade ON AtModId = AgendModalidade
+			JOIN Situacao ON SituaId = AgendSituacao
+			JOIN Cliente ON ClienId = AgendCliente
+			JOIN Profissional ON ProfiId = AgendProfissional
+			JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
+			JOIN ServicoVenda ON SrVenId = AgendServico
+			WHERE AgendId = $iAgendamento and AgendUnidade = $iUnidade";
+			$result = $conn->query($sql);
+			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
 			
 			foreach($rowAgendamento as $item){
 				array_push($arrayServico, [
-					'id' => "$item[SrVenId]#$item[ProfiId]#$item[AtLocId]",
+					'id' => "$item[AgendServico]#$item[ProfiId]#$item[AtLocId]",
 					'iServico' => $item['SrVenId'],
 					'iMedico' => $item['ProfiId'],
 					'iLocal' => $item['AtLocId'],
@@ -497,9 +473,9 @@ try{
 					'servico' => $item['SrVenNome'],
 					'medico' => $item['ProfiNome'],
 					'local' => $item['AtLocNome'],
-					'sData' => mostraData($item['AgXSeData']),
-					'data' => $item['AgXSeData'],
-					'hora' => $item['AgXSeHorario'],
+					'sData' => mostraData($item['AgendData']),
+					'data' => $item['AgendData'],
+					'hora' => mostraHora($item['AgendHorario']),
 					'valor' => $item['SrVenValorVenda'],
 				]);
 			}

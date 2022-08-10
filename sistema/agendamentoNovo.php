@@ -15,7 +15,6 @@ if(isset($_POST['iAgendamento'])){
 	$sql = "SELECT AgendId,AgendDataRegistro,AgendCliente,AgendModalidade,AgendClienteResponsavel,
 	AgendObservacao,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor
 	FROM Agendamento
-	JOIN AtendimentoModalidade ON AtModId = AgendModalidade
 	JOIN Situacao ON SituaId = AgendSituacao
 	JOIN Cliente ON ClienId = AgendCliente
 	WHERE AgendId = $iAgendamento";
@@ -92,10 +91,15 @@ if(isset($_POST['iAgendamento'])){
 	
 	<script type="text/javascript" >
 		$(document).ready(function() {
+			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+			dataAtual = dataAtual.split(' ')[0];
+			dataAtual = dataAtual.split('/')[2]+'-'+dataAtual.split('/')[1]+'-'+dataAtual.split('/')[0];
+			$('#data').val(dataAtual);
+
+			$('#servicoTable').hide();
 			alteraSituacao();
 			getCmbs();
-			// setDataProfissional();
-			// setHoraProfissional();
+			
 			// se existir agendamento os dados serão preenchidos ao carregar a página
 			if(agendamento){
 				$('#data').val(agendamento.AgendDataRegistro)
@@ -148,6 +152,7 @@ if(isset($_POST['iAgendamento'])){
 								$('#paciente').append(`<option ${item.isSelected} value="${item.id}">${item.nome}</option>`)
 							})
 							alerta(response.titulo, response.menssagem, response.status)
+							$('#page-modal-paciente').fadeOut();
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 						}
@@ -194,7 +199,7 @@ if(isset($_POST['iAgendamento'])){
 				let local = $('#localAtendimento').val()
 
 				switch(menssageError){
-					case servico: menssageError = 'informe o servico'; $('#servico').focus();break;
+					case servico: menssageError = 'informe o serviço'; $('#servico').focus();break;
 					case medico: menssageError = 'informe o médico'; $('#medico').focus();break;
 					case data: menssageError = 'informe uma data'; $('#dataAtendimento').focus();break;
 					case hora: menssageError = 'informe o horário'; $('#horaAtendimento').focus();break;
@@ -262,6 +267,7 @@ if(isset($_POST['iAgendamento'])){
 					$('#servico').focus()
 					return
 				}
+				
 				let dados = agendamento?{
 						'tipoRequest': 'ADDAGENDAMENTO',
 						'data': data,
@@ -337,9 +343,12 @@ if(isset($_POST['iAgendamento'])){
 							<td class="text-center">${acoes}</td>
 						</tr>`
 					})
-					$('#dataAtendimento').val('')
-					$('#horaAtendimento').val('')
-					$('#servicoValorTotal').html(`VALOR TOTAL: R$ ${float2moeda(response.valorTotal)}`).show();
+					if(statusServicos){
+						$('#servicoTable').show();
+					}else{
+						$('#servicoTable').hide();
+					}
+					$('#servicoValorTotal').html(`${float2moeda(response.valorTotal)}`).show();
 					$('#dataServico').html(HTML).show();
 				}
 			});
@@ -724,11 +733,13 @@ if(isset($_POST['iAgendamento'])){
 											</select>
 										</div>
 										<div class="col-lg-2">
-											<span class="action btn btn-principal legitRipple" id="addPaciente" style="user-select: none;">+</span>
+											<span class="action btn btn-principal legitRipple" id="addPaciente" style="user-select: none;">
+												<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
+											</span>
 										</div>
 									</div>
 									<div class="col-lg-3">
-										<select id="modalidade" name="modalidade" class="form-control-select2">
+										<select id="modalidade" name="modalidade" class="select-search">
 											<!--  -->
 										</select>
 									</div>
@@ -738,9 +749,9 @@ if(isset($_POST['iAgendamento'])){
 									<h5>Serviços</h5>
 								</div>
 
-								<div class="col-lg-12 mb-4 row">
+								<div class="col-lg-12 mb-2 row">
 									<!-- titulos -->
-									<div class="col-lg-3">
+									<div class="col-lg-2">
 										<label>Serviços <span class="text-danger">*</span></label>
 									</div>
 									<div class="col-lg-2">
@@ -757,7 +768,7 @@ if(isset($_POST['iAgendamento'])){
 									</div>
 
 									<!-- campos -->
-									<div class="col-lg-3">
+									<div class="col-lg-2">
 										<select id="servico" name="servico" class="select-search" required>
 											<!--  -->
 										</select>
@@ -784,8 +795,10 @@ if(isset($_POST['iAgendamento'])){
 											<!--  -->
 										</select>
 									</div>
-									<div class="col-lg-12 text-right mt-4">
-										<button class="btn btn-lg btn-principal" id="inserirServico" >inserir</button>
+									<div class="col-lg-1 text-right">
+										<button class="btn btn-lg btn-principal" id="inserirServico" >
+											<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
+										</button>
 									</div>
 								</div>
 
@@ -805,13 +818,20 @@ if(isset($_POST['iAgendamento'])){
 										<tbody id="dataServico">
 											
 										</tbody>
+										<tfoot>
+											<tr>
+												<th colspan="5" class="text-right font-weight-bold" style="font-size: 16px;">
+													<div>Valor(R$):</div>
+												</th>
+												<th colspan="1" class="mr-1">
+													<div id="servicoValorTotal" class="text-center font-weight-bold" style="font-size: 15px;">R$ 0,00</div>
+												</th>
+											</tr>
+										</tfoot>
 									</table>
-									<div class="col-lg-12 text-right font-weight-bold">
-										<div id="servicoValorTotal" class="">R$ 0,00</div>
-									</div>
 								</div>
 
-								<div class="col-lg-12 mb-4 row mt-5">
+								<div class="col-lg-12 mb-4 row mt-2">
 									<!-- titulos -->
 									<div class="col-lg-12">
 										<label>Observação</label>

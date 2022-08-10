@@ -2,6 +2,7 @@
 
 session_start();
 include('global_assets/php/conexao.php');
+require_once("global_assets/php/funcoesgerais.php");
 
 if (!array_key_exists('UsuarId', $_SESSION) or !array_key_exists('UnidadeId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
 	header('Expires: 0');
@@ -224,5 +225,3 @@ if (array_key_exists('OrdemCompraIdEmpenho', $_SESSION) && !in_array(basename($_
 	unset($_SESSION['OrdemCompraNumero']);
 	unset($_SESSION['OrdemCompraSituacao']);
 }
-
-require_once("global_assets/php/funcoesgerais.php");

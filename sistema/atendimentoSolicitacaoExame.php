@@ -12,14 +12,14 @@ if(!$iAtendimentoId){
 	irpara("atendimento.php");
 }
 
-$sql = "SELECT TOP(1) AtRecId
-FROM AtendimentoReceituario
-WHERE AtRecAtendimento = $iAtendimentoId
-ORDER BY AtRecId DESC";
+$sql = "SELECT TOP(1) AtSExId
+FROM AtendimentoSolicitacaoExame
+WHERE AtSExAtendimento = $iAtendimentoId
+ORDER BY AtSExId DESC";
 $result = $conn->query($sql);
-$rowReceituario= $result->fetch(PDO::FETCH_ASSOC);
+$rowSolicitacaoExame= $result->fetch(PDO::FETCH_ASSOC);
 
-$iAtendimentoReceituarioId = $rowReceituario?$rowReceituario['AtRecId']:null;
+$iAtendimentoSolicitacaoExameId = $rowSolicitacaoExame?$rowSolicitacaoExame['AtSExId']:null;
 
 // essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
 
@@ -61,26 +61,26 @@ if ($row['ClienSexo'] == 'F'){
 }
 
 //Se estiver editando
-if(isset($iAtendimentoReceituarioId ) && $iAtendimentoReceituarioId ){
+if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 	//Essa consulta é para preencher o campo Receituário ao editar
-	$sql = "SELECT AtRecReceituario, AtRecHoraFim, AtRecHoraInicio, AtRecData
-			FROM AtendimentoReceituario
-			WHERE AtRecId = " . $iAtendimentoReceituarioId ;
+	$sql = "SELECT AtSExSolicitacaoExame, AtSExHoraFim, AtSExHoraInicio, AtSExData
+			FROM AtendimentoSolicitacaoExame
+			WHERE AtSExId = " . $iAtendimentoSolicitacaoExameId ;
 	$result = $conn->query($sql);
-	$rowReceituario = $result->fetch(PDO::FETCH_ASSOC);
+	$rowSolicitacaoExame = $result->fetch(PDO::FETCH_ASSOC);
 		
 	$_SESSION['msg'] = array();
 
 	// Formatar Hora/Data
 
-	$Data = strtotime($rowReceituario['AtRecData']);
+	$Data = strtotime($rowSolicitacaoExame['AtSExData']);
 	$DataAtendimento = date("d/m/Y", $Data);
 
-	$Inicio = strtotime($rowReceituario['AtRecHoraInicio']);
+	$Inicio = strtotime($rowSolicitacaoExame['AtSExHoraInicio']);
 	$HoraInicio = date("H:i", $Inicio);
 
-	$Fim = strtotime($rowReceituario['AtRecHoraFim']);
+	$Fim = strtotime($rowSolicitacaoExame['AtSExHoraFim']);
 	$HoraFim = date("H:i", $Fim);
 
 } 
@@ -91,11 +91,11 @@ if(isset($iAtendimentoReceituarioId ) && $iAtendimentoReceituarioId ){
 if (isset($_POST['txtareaConteudo']) ){
 	try{
 		//Edição
-		if ($iAtendimentoReceituarioId){
+		if ($iAtendimentoSolicitacaoExameId){
 		
-			$sql = "UPDATE AtendimentoReceituario SET AtRecAtendimento = :sAtendimento, AtRecData = :dData, AtRecHoraInicio = :sHoraInicio,
-						   AtRecHoraFim  = :sHoraFim, AtRecProfissional = :sProfissional, AtRecReceituario = :sReceituario, AtRecUnidade = :iUnidade
-					WHERE AtRecId = :iAtendimentoReceituario";
+			$sql = "UPDATE AtendimentoSolicitacaoExame SET AtSExAtendimento = :sAtendimento, AtSExData = :dData, AtSExHoraInicio = :sHoraInicio,
+						   AtSExHoraFim  = :sHoraFim, AtSExProfissional = :sProfissional, AtSExSolicitacaoExame = :sSolicitacaoExame, AtSExUnidade = :iUnidade
+					WHERE AtSExId = :iAtendimentoSolicitacaoExame";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -104,9 +104,9 @@ if (isset($_POST['txtareaConteudo']) ){
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => $_POST['inputFim'],
 				':sProfissional' => $userId,
-				':sReceituario' => $_POST['txtareaConteudo'],
+				':sSolicitacaoExame' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],
-				':iAtendimentoReceituario' => $iAtendimentoReceituarioId 
+				':iAtendimentoSolicitacaoExame' => $iAtendimentoSolicitacaoExameId 
 				));
 
 			$_SESSION['msg']['mensagem'] = "Receituário alterada!!!";
@@ -114,8 +114,8 @@ if (isset($_POST['txtareaConteudo']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoReceituario (AtRecAtendimento, AtRecData, AtRecHoraInicio, AtRecHoraFim, AtRecProfissional, AtRecReceituario, AtRecUnidade)
-						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional,:sReceituario, :iUnidade)";
+			$sql = "INSERT INTO AtendimentoSolicitacaoExame (AtSExAtendimento, AtSExData, AtSExHoraInicio, AtSExHoraFim, AtSExProfissional, AtSExSolicitacaoExame, AtSExUnidade)
+						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional,:sSolicitacaoExame, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -124,7 +124,7 @@ if (isset($_POST['txtareaConteudo']) ){
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,
-				':sReceituario' => $_POST['txtareaConteudo'],
+				':sSolicitacaoExame' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],
 			));
 
@@ -144,7 +144,7 @@ if (isset($_POST['txtareaConteudo']) ){
 		echo 'Error: ' . $e->getMessage();
 	}
 
-	irpara("atendimentoReceituario.php");
+	irpara("atendimentoSolicitacaoExame.php");
 }
 
 ?>
@@ -190,7 +190,7 @@ if (isset($_POST['txtareaConteudo']) ){
 			e.preventDefault();
 	
 
-			$( "#formAtendimentoReceituario" ).submit();
+			$( "#formAtendimentoSolicitacaoExame" ).submit();
 					
 		})
 
@@ -240,13 +240,13 @@ if (isset($_POST['txtareaConteudo']) ){
 							?>
 						</form>
 						<!-- Basic responsive configuration -->
-						<form name="formAtendimentoReceituario" id="formAtendimentoReceituario" method="post" class="form-validate-jquery">
+						<form name="formAtendimentoSolicitacaoExame" id="formAtendimentoSolicitacaoExame" method="post" class="form-validate-jquery">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
 							?>
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h3 class="card-title"><b>RECEITUÁRIO</b></h3>
+									<h3 class="card-title"><b>SOLICITAÇÃO DE EXAME</b></h3>
 								</div>
 							</div>
 
@@ -325,19 +325,19 @@ if (isset($_POST['txtareaConteudo']) ){
 										<div class="col-lg-3">
 										<div class="form-group">
 												<label for="inputData">Data</label>
-												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php if (isset($iAtendimentoReceituarioId )){ echo $DataAtendimento;} else { echo date('d/m/Y'); } ?>" readOnly> 
+												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php if (isset($iAtendimentoSolicitacaoExameId )){ echo $DataAtendimento;} else { echo date('d/m/Y'); } ?>" readOnly> 
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputInicio">Início do Atendimento</label>
-												<input type="text" id="inputInicio" name="inputInicio" class="form-control"  value="<?php if (isset($iAtendimentoReceituarioId )){ echo $HoraInicio;} else { echo date('H:i'); } ?>" readOnly>
+												<input type="text" id="inputInicio" name="inputInicio" class="form-control"  value="<?php if (isset($iAtendimentoSolicitacaoExameId )){ echo $HoraInicio;} else { echo date('H:i'); } ?>" readOnly>
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputFim">Témino do Atendimento</label>
-												<input type="text" id="inputFim" name="inputFim" class="form-control" value="<?php if (isset($iAtendimentoReceituarioId )) echo $HoraFim; ?>" readOnly>
+												<input type="text" id="inputFim" name="inputFim" class="form-control" value="<?php if (isset($iAtendimentoSolicitacaoExameId )) echo $HoraFim; ?>" readOnly>
 											</div>
 										</div>
 										<div class="col-lg-3">
@@ -358,7 +358,7 @@ if (isset($_POST['txtareaConteudo']) ){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="inputNome">Receituário do Paciente </label>
-												<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Corpo do receituário (informe aqui o texto que você queira que apareça no receituário)" > <?php if (isset($iAtendimentoReceituarioId )) echo $rowReceituario['AtRecReceituario']; ?> </textarea>
+												<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Corpo da solicitacao de exame (informe aqui o texto que você queira que apareça na solicitacao de exame)" > <?php if (isset($iAtendimentoSolicitacaoExameId )) echo $rowSolicitacaoExame['AtSExSolicitacaoExame']; ?> </textarea>
 											</div>
 										</div>
 									</div>
