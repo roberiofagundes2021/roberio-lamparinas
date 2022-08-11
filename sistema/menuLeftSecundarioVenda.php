@@ -28,6 +28,7 @@
 					case 'atendimentoEletivo': URL = 'atendimentoEletivo.php'; break;
 					case 'receituario': URL = 'atendimentoReceituario.php'; break;
 					case 'atestadoMedico': URL = 'atendimentoAtestadoMedico.php'; break;
+					case 'historicoPaciente': URL = 'atendimentoHistoricoPaciente.php'; break;
 					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; break;
 					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; break;
 					case 'triagem': URL = 'atendimentoTriagem.php'; break;
