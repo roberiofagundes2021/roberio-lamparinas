@@ -369,6 +369,7 @@ if($iAtendimento){
 
 			$('#parentescoCadatrado').on('change', function(){
 				let iResponsavel = $(this).val();
+				console.log(iResponsavel)
 				if(iResponsavel){
 					$.ajax({
 						type: 'POST',
@@ -380,7 +381,7 @@ if($iAtendimento){
 						},
 						success: function(response) {
 							if(response.status == 'success'){
-								setResponsavelAtribut(response)
+								setResponsavelAtribut(response.data.id)
 								$('#novoResponsavel').fadeIn()
 							}else{
 								alerta(response.titulo, response.menssagem, response.status)
@@ -689,134 +690,138 @@ if($iAtendimento){
 
 		// essa função vai setar os atributos nos campos quando for selecionado o paciente
 		function setPacienteAtribut(iPaciente){
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'PACIENTE',
-					'iPaciente': iPaciente
-				},
-				success: function(response) {
-					if(response.status == 'success'){
-						switch(response.tipoPessoa){
-							case 'F':$('#fisica').attr('checked', true);$('#juridica').attr('checked', false);break;
-							case 'J':$('#fisica').attr('checked', false);$('#juridica').attr('checked', true);break;
+			if(iPaciente){
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'PACIENTE',
+						'iPaciente': iPaciente
+					},
+					success: function(response) {
+						if(response.status == 'success'){
+							switch(response.tipoPessoa){
+								case 'F':$('#fisica').attr('checked', true);$('#juridica').attr('checked', false);break;
+								case 'J':$('#fisica').attr('checked', false);$('#juridica').attr('checked', true);break;
+							}
+	
+							$('#prontuario').val(response.prontuario)
+							$('#nome').val(response.nome)
+							$('#cpf').val(response.cpf)
+							$('#cns').val(response.cns)
+							$('#rg').val(response.rg)
+							$('#emissor').val(response.emissor)
+							$('#uf').val(response.uf)
+							$('#sexo').val(response.sexo)
+							$('#nascimento').val(response.nascimento)
+							$('#nomePai').val(response.nomePai)
+							$('#nomeMae').val(response.nomeMae)
+							$('#profissao').val(response.profissao)
+							$('#cep').val(response.cep)
+							$('#endereco').val(response.endereco)
+							$('#numero').val(response.numero)
+							$('#complemento').val(response.complemento)
+							$('#bairro').val(response.bairro)
+							$('#cidade').val(response.cidade)
+							$('#estado').val(response.estado)
+							$('#contato').val(response.contato)
+							$('#telefone').val(response.telefone)
+							$('#celular').val(response.celular)
+							$('#email').val(response.email)
+							$('#observacao').val(response.observacao)
+	
+							$('#prontuario').attr('readonly',true)
+							$('#nome').attr('readonly',true)
+							$('#cpf').attr('readonly',true)
+							$('#cns').attr('readonly',true)
+							$('#rg').attr('readonly',true)
+							$('#emissor').attr('readonly',true)
+							$('#uf').attr('readonly',true)
+							$('#sexo').attr('readonly',true)
+							$('#nascimento').attr('readonly',true)
+							$('#nomePai').attr('readonly',true)
+							$('#nomeMae').attr('readonly',true)
+							$('#profissao').attr('readonly',true)
+	
+							// $('#cep').attr('readonly',true)
+							// $('#endereco').attr('readonly',true)
+							// $('#numero').attr('readonly',true)
+							// $('#complemento').attr('readonly',true)
+							// $('#bairro').attr('readonly',true)
+							// $('#cidade').attr('readonly',true)
+							// $('#estado').attr('readonly',true)
+							// $('#contato').attr('readonly',true)
+							// $('#telefone').attr('readonly',true)
+							// $('#celular').attr('readonly',true)
+							// $('#email').attr('readonly',true)
+							// $('#observacao').attr('readonly',true)
+							$('#novoPaciente').fadeIn()
+						}else{
+							alerta(response.titulo, response.menssagem, response.status)
+							$('#novoPaciente').fadeOut()
 						}
-
-						$('#prontuario').val(response.prontuario)
-						$('#nome').val(response.nome)
-						$('#cpf').val(response.cpf)
-						$('#cns').val(response.cns)
-						$('#rg').val(response.rg)
-						$('#emissor').val(response.emissor)
-						$('#uf').val(response.uf)
-						$('#sexo').val(response.sexo)
-						$('#nascimento').val(response.nascimento)
-						$('#nomePai').val(response.nomePai)
-						$('#nomeMae').val(response.nomeMae)
-						$('#profissao').val(response.profissao)
-						$('#cep').val(response.cep)
-						$('#endereco').val(response.endereco)
-						$('#numero').val(response.numero)
-						$('#complemento').val(response.complemento)
-						$('#bairro').val(response.bairro)
-						$('#cidade').val(response.cidade)
-						$('#estado').val(response.estado)
-						$('#contato').val(response.contato)
-						$('#telefone').val(response.telefone)
-						$('#celular').val(response.celular)
-						$('#email').val(response.email)
-						$('#observacao').val(response.observacao)
-
-						$('#prontuario').attr('readonly',true)
-						$('#nome').attr('readonly',true)
-						$('#cpf').attr('readonly',true)
-						$('#cns').attr('readonly',true)
-						$('#rg').attr('readonly',true)
-						$('#emissor').attr('readonly',true)
-						$('#uf').attr('readonly',true)
-						$('#sexo').attr('readonly',true)
-						$('#nascimento').attr('readonly',true)
-						$('#nomePai').attr('readonly',true)
-						$('#nomeMae').attr('readonly',true)
-						$('#profissao').attr('readonly',true)
-
-						// $('#cep').attr('readonly',true)
-						// $('#endereco').attr('readonly',true)
-						// $('#numero').attr('readonly',true)
-						// $('#complemento').attr('readonly',true)
-						// $('#bairro').attr('readonly',true)
-						// $('#cidade').attr('readonly',true)
-						// $('#estado').attr('readonly',true)
-						// $('#contato').attr('readonly',true)
-						// $('#telefone').attr('readonly',true)
-						// $('#celular').attr('readonly',true)
-						// $('#email').attr('readonly',true)
-						// $('#observacao').attr('readonly',true)
-						$('#novoPaciente').fadeIn()
-					}else{
-						$('#prontuario').val('')
-						$('#nome').val('')
-						$('#cpf').val('')
-						$('#cns').val('')
-						$('#rg').val('')
-						$('#emissor').val('')
-						$('#uf').val('')
-						$('#sexo').val('')
-						$('#nascimento').val('')
-						$('#nomePai').val('')
-						$('#nomeMae').val('')
-						$('#profissao').val('')
-						$('#cep').val('')
-						$('#endereco').val('')
-						$('#numero').val('')
-						$('#complemento').val('')
-						$('#bairro').val('')
-						$('#cidade').val('')
-						$('#estado').val('')
-						$('#contato').val('')
-						$('#telefone').val('')
-						$('#celular').val('')
-						$('#email').val('')
-						$('#observacao').val('')
-
-						$('#prontuario').attr('readonly',false)
-						$('#nome').attr('readonly',false)
-						$('#cpf').attr('readonly',false)
-						$('#cns').attr('readonly',false)
-						$('#rg').attr('readonly',false)
-						$('#emissor').attr('readonly',false)
-						$('#uf').attr('readonly',false)
-						$('#sexo').attr('readonly',false)
-						$('#nascimento').attr('readonly',false)
-						$('#nomePai').attr('readonly',false)
-						$('#nomeMae').attr('readonly',false)
-						$('#profissao').attr('readonly',false)
-
-						// $('#cep').attr('readonly',false)
-						// $('#endereco').attr('readonly',false)
-						// $('#numero').attr('readonly',false)
-						// $('#complemento').attr('readonly',false)
-						// $('#bairro').attr('readonly',false)
-						// $('#cidade').attr('readonly',false)
-						// $('#estado').attr('readonly',false)
-						// $('#contato').attr('readonly',false)
-						// $('#telefone').attr('readonly',false)
-						// $('#celular').attr('readonly',false)
-						// $('#email').attr('readonly',false)
-						// $('#observacao').attr('readonly',false)
-						alerta(response.titulo, response.menssagem, response.status)
-						$('#novoPaciente').fadeOut()
+					},
+					error: function(response) {
 					}
-				},
-				error: function(response) {
-				}
-			});
+				});
+			} else {
+				$('#prontuario').val('')
+				$('#nome').val('')
+				$('#cpf').val('')
+				$('#cns').val('')
+				$('#rg').val('')
+				$('#emissor').val('')
+				$('#uf').val('')
+				$('#sexo').val('')
+				$('#nascimento').val('')
+				$('#nomePai').val('')
+				$('#nomeMae').val('')
+				$('#profissao').val('')
+				$('#cep').val('')
+				$('#endereco').val('')
+				$('#numero').val('')
+				$('#complemento').val('')
+				$('#bairro').val('')
+				$('#cidade').val('')
+				$('#estado').val('')
+				$('#contato').val('')
+				$('#telefone').val('')
+				$('#celular').val('')
+				$('#email').val('')
+				$('#observacao').val('')
+
+				$('#prontuario').attr('readonly',false)
+				$('#nome').attr('readonly',false)
+				$('#cpf').attr('readonly',false)
+				$('#cns').attr('readonly',false)
+				$('#rg').attr('readonly',false)
+				$('#emissor').attr('readonly',false)
+				$('#uf').attr('readonly',false)
+				$('#sexo').attr('readonly',false)
+				$('#nascimento').attr('readonly',false)
+				$('#nomePai').attr('readonly',false)
+				$('#nomeMae').attr('readonly',false)
+				$('#profissao').attr('readonly',false)
+
+				// $('#cep').attr('readonly',false)
+				// $('#endereco').attr('readonly',false)
+				// $('#numero').attr('readonly',false)
+				// $('#complemento').attr('readonly',false)
+				// $('#bairro').attr('readonly',false)
+				// $('#cidade').attr('readonly',false)
+				// $('#estado').attr('readonly',false)
+				// $('#contato').attr('readonly',false)
+				// $('#telefone').attr('readonly',false)
+				// $('#celular').attr('readonly',false)
+				// $('#email').attr('readonly',false)
+				// $('#observacao').attr('readonly',false)
+			}
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o responsável
 		function setResponsavelAtribut(iResponsavel){
+			console.log(iResponsavel)
 			if(iResponsavel){
 				$.ajax({
 					type: 'POST',
@@ -842,7 +847,7 @@ if($iAtendimento){
 							$('#celularResp').val(response.data.celularResp)
 							$('#emailResp').val(response.data.emailResp)
 							$('#observacaoResp').val(response.data.observacaoResp)
-
+	
 							$('#nomeResp').attr('readonly', true)
 							$('#parentescoResp').attr('readonly', true)
 							$('#nascimentoResp').attr('readonly', true)
@@ -857,39 +862,9 @@ if($iAtendimento){
 							$('#celularResp').attr('readonly', true)
 							$('#emailResp').attr('readonly', true)
 							$('#observacaoResp').attr('readonly', true)
-
+	
 							$('#novoResponsavel').fadeIn()
 						} else {
-							$('#nomeResp').val('')
-							$('#parentescoResp').val('')
-							$('#nascimentoResp').val('')
-							$('#cepResp').val('')
-							$('#enderecoResp').val('')
-							$('#numeroResp').val('')
-							$('#complementoResp').val('')
-							$('#bairroResp').val('')
-							$('#cidadeResp').val('')
-							$('#estadoResp').val('')
-							$('#telefoneResp').val('')
-							$('#celularResp').val('')
-							$('#emailResp').val('')
-							$('#observacaoResp').val('')
-
-							$('#nomeResp').attr('readonly', false)
-							$('#parentescoResp').attr('readonly', false)
-							$('#nascimentoResp').attr('readonly', false)
-							$('#cepResp').attr('readonly', false)
-							$('#enderecoResp').attr('readonly', false)
-							$('#numeroResp').attr('readonly', false)
-							$('#complementoResp').attr('readonly', false)
-							$('#bairroResp').attr('readonly', false)
-							$('#cidadeResp').attr('readonly', false)
-							$('#estadoResp').attr('readonly', false)
-							$('#telefoneResp').attr('readonly', false)
-							$('#celularResp').attr('readonly', false)
-							$('#emailResp').attr('readonly', false)
-							$('#observacaoResp').attr('readonly', false)
-
 							alerta(response.titulo, response.menssagem, response.status)
 							$('#novoResponsavel').fadeOut()
 						}
@@ -897,6 +872,36 @@ if($iAtendimento){
 					error: function(response) {
 					}
 				});
+			} else {
+				$('#nomeResp').val('')
+				$('#parentescoResp').val('')
+				$('#nascimentoResp').val('')
+				$('#cepResp').val('')
+				$('#enderecoResp').val('')
+				$('#numeroResp').val('')
+				$('#complementoResp').val('')
+				$('#bairroResp').val('')
+				$('#cidadeResp').val('')
+				$('#estadoResp').val('')
+				$('#telefoneResp').val('')
+				$('#celularResp').val('')
+				$('#emailResp').val('')
+				$('#observacaoResp').val('')
+
+				$('#nomeResp').attr('readonly', false)
+				$('#parentescoResp').attr('readonly', false)
+				$('#nascimentoResp').attr('readonly', false)
+				$('#cepResp').attr('readonly', false)
+				$('#enderecoResp').attr('readonly', false)
+				$('#numeroResp').attr('readonly', false)
+				$('#complementoResp').attr('readonly', false)
+				$('#bairroResp').attr('readonly', false)
+				$('#cidadeResp').attr('readonly', false)
+				$('#estadoResp').attr('readonly', false)
+				$('#telefoneResp').attr('readonly', false)
+				$('#celularResp').attr('readonly', false)
+				$('#emailResp').attr('readonly', false)
+				$('#observacaoResp').attr('readonly', false)
 			}
 		}
 
