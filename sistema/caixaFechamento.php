@@ -10,40 +10,235 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputDestinoContaFinanceiraId'])) {
     //gravaData($_POST['inputData']);
     $idCaixaAbertura = $_POST['aberturaCaixaId'];
+    $dataAtual = date('Y-m-d');
     $dataHoraAtual = date('Y-m-d H:i:s');
-    $totalRecebido = str_replace(',', '.', str_replace('.', '', $_POST['inputValorCalculado']));
-    $totalPago = 0; //Corrigir depois
-    $destinoContaFinanceiraId = str_replace(',', '.', str_replace('.', '', $_POST['inputDestinoContaFinanceiraId']));
-    $valorTransferido = str_replace(',', '.', str_replace('.', '', $_POST['inputValorTransferir']));
-    $saldoFinal = str_replace(',', '.', str_replace('.', '', $_POST['inputSaldoCaixa']));
-
-    //Mandar para contas a pagar e contas a receber
-
+    $destinoContaFinanceiraId = $_POST['inputDestinoContaFinanceiraId'];
+    $totalRecebido = $_POST['inputTotalRecebido'];
+    $totalPago = $_POST['inputTotalPago'];
+    $valorTransferido = $_POST['inputValorTransferir'] != '' ? gravaValor($_POST['inputValorTransferir']) : 0;
+    //$saldoFinal = gravaValor($_POST['inputSaldoCaixa']);
+    $saldoFinal = 0; //No momento está deixando saldo final do caixa zerado porque está transferindo todo o valor
+    $justificativa = $_POST['inputJustificativa'] != '' ? $_POST['inputJustificativa'] : null;
+    $nomeCaixa = $_POST['caixaNome'];
+    
     try{
         $conn->beginTransaction();
-
+        
         $sql = "SELECT SituaId
 				FROM Situacao
 			    WHERE SituaChave = 'FECHADO'";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iStatus = $row['SituaId'];	
-
-        $sql = "UPDATE CaixaAbertura SET CxAbeDataHoraFechamento = :sDataHoraFechamento, CxAbeTotalRecebido = :fTotalRecebido, CxAbeContaTransferencia = :iDestinoTransfererencia,
-                                         CxAbeValorTransferido = :fValorTransferido, CxAbeSaldoFinal = :fSaldoFinal, CxAbeStatus = :iStatus, CxAbeUnidade = :iUnidade
+        
+        $sql = "UPDATE CaixaAbertura SET CxAbeDataHoraFechamento = :sDataHoraFechamento, CxAbeContaTransferencia = :iDestinoTransfererencia, 
+                                         CxAbeValorTransferido = :fValorTransferido, CxAbeSaldoFinal = :fSaldoFinal, CxAbeJustificativa = :sJustificativa, 
+                                         CxAbeStatus = :iStatus, CxAbeUnidade = :iUnidade
                 WHERE CxAbeId = " . $idCaixaAbertura . "";
         $result = $conn->prepare($sql);			
-
+        
         $result->execute(array(
             ':sDataHoraFechamento' => $dataHoraAtual,
-            ':fTotalRecebido' => $totalRecebido,
             ':iDestinoTransfererencia' => $destinoContaFinanceiraId,
             ':fValorTransferido' => $valorTransferido,
             ':fSaldoFinal' => $saldoFinal,
+            ':sJustificativa' => $justificativa,
             ':iStatus' => $iStatus,
             ':iUnidade' => $_SESSION['UnidadeId']
         ));
+        
+        $sql_movimentacaoRecebimento = "SELECT AtendNumRegistro, AtendCliente, ClienNome, CxRecFormaPagamento, CxRecValor, CxRecValorTotal, CxRecDataHora, CxRecDesconto
+                                        FROM CaixaRecebimento
+                                        JOIN CaixaAbertura on CxAbeId = CxRecCaixaAbertura
+                                        JOIN FormaPagamento on FrPagId = CxRecFormaPagamento
+                                        JOIN Atendimento on AtendId = CxRecAtendimento
+                                        JOIN Cliente on ClienId = AtendCliente
+                                        WHERE CxAbeOperador = $_SESSION[UsuarId] and CxRecUnidade = $_SESSION[UnidadeId] and CxRecCaixaAbertura = $idCaixaAbertura";
+        $resultMovimentacaoRecebimento  = $conn->query($sql_movimentacaoRecebimento);
+
+        if($rowMovimentacaoRecebimento = $resultMovimentacaoRecebimento->fetchAll(PDO::FETCH_ASSOC)) {
+            $descricaoAgrupamentoRecebimento = 'Recebimento do '.$nomeCaixa.' - '.date('d/m/Y H:i');
+
+            //Corrigir valor do agrupamento do caixa
+            $sql = "INSERT INTO ContasAgrupadas ( CnAgrDtPagamento, CnAgrValorTotal, CnAgrFormaPagamento, CnAgrContaBanco, CnAgrDescricaoAgrupamento)
+                    VALUES ( :dateDtPagamento, :fValorTotal, :iFormaPagamento, :iContaBanco, :sDescricaoAgrupamento)";
+            $result = $conn->prepare($sql);
+            
+            $result->execute(array(
+                ':dateDtPagamento' => $dataAtual,
+                ':fValorTotal' => $totalRecebido,
+                ':iFormaPagamento' => null,
+                ':iContaBanco' => null,
+                ':sDescricaoAgrupamento' => $descricaoAgrupamentoRecebimento
+            ));
+
+            $agrupamentoRecebimento = $conn->lastInsertId();
+            
+            $sql = "SELECT SituaId
+                    FROM Situacao
+                    WHERE SituaChave = 'RECEBIDO'";
+            $result = $conn->query($sql);
+            $rowAReceber = $result->fetch(PDO::FETCH_ASSOC);
+            $iStatusRecebido = $rowAReceber['SituaId'];		
+
+            foreach($rowMovimentacaoRecebimento as $item) {
+                $arrayDataHora = explode(' ', $item['CxRecDataHora']);
+                $dataRecebimento = $arrayDataHora[0];
+
+                $descricaoContaRecebimento = $item['AtendNumRegistro'].' - '.$item['ClienNome'];
+                $cliente = $item['AtendCliente'];
+                $formaPagamento = $item['CxRecFormaPagamento'];
+                $valorAReceber = $item['CxRecValor'];
+                $valorRecebido = $item['CxRecValorTotal'];
+                $desconto = $item['CxRecDesconto'];
+
+                //Falta o plano de contas e centro de custos
                 
+                $sql = "INSERT INTO ContasAReceber ( CnAReDtEmissao, CnARePlanoContas, CnAReCliente, CnAReDescricao, CnAReNumDocumento,  CnAReContaBanco, 
+                                                    CnAReFormaPagamento, CnAReVenda, CnAReDtVencimento, CnAReValorAReceber, CnAReDtRecebimento, CnAReValorRecebido, 
+                                                    CnAReTipoJuros, CnAReJuros, CnAReTipoDesconto, CnAReDesconto, CnAReObservacao, CnAReNumCheque, CnAReValorCheque,                  
+                                                    CnAReDtEmissaoCheque, CnAReDtVencimentoCheque, CnAReBancoCheque, CnAReAgenciaCheque, CnAReContaCheque,                  
+                                                    CnAReNomeCheque, CnAReCpfCheque, CnAReAgrupamento, CnAReStatus, CnAReUsuarioAtualizador, CnAReUnidade)
+                           VALUES ( :dDtEmissao, :iPlanoContas, :iCliente, :sDescricao, :sNumDocumento, :iContaBanco, 
+                                    :iFormaPagamento, :iVenda, :dDtVencimento, :fValorAReceber, :dDtRecebimento, :fValorRecebido,
+                                    :sTipoJuros, :fJuros, :sTipoDesconto, :fDesconto, :sObservacao, :sNumCheque, :fValorCheque, 
+                                    :dDtEmissaoCheque, :dDtVencimentoCheque, :iBancoCheque, :iAgenciaCheque, :iContaCheque,
+                                    :iNomeCheque, :iCpfCheque, :iAgrupamento, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+
+                $result = $conn->prepare($sql);
+
+                $result->execute(array(
+
+                    ':dDtEmissao'           => $dataRecebimento,
+                    ':iPlanoContas'         => null,
+                    ':iCliente'             => $cliente,
+                    ':sDescricao'           => $descricaoContaRecebimento,
+                    ':sNumDocumento'        => null,
+                    ':iContaBanco'          => $destinoContaFinanceiraId,
+                    ':iFormaPagamento'      => $formaPagamento,
+                    ':iVenda'               => null,
+                    ':dDtVencimento'        => $dataRecebimento,
+                    ':fValorAReceber'       => $valorAReceber,
+                    ':dDtRecebimento'       => $dataRecebimento,
+                    ':fValorRecebido'       => $valorRecebido,
+                    ':sTipoJuros'           => null,
+                    ':fJuros'               => null,
+                    ':sTipoDesconto'        => null,
+                    ':fDesconto'            => $desconto,
+                    ':sObservacao'          => null,
+                    ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
+                    ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
+                    ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
+                    ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
+                    ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
+                    ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
+                    ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
+                    ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
+                    ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
+                    ':iAgrupamento'         => $agrupamentoRecebimento, 
+                    ':iStatus'              => $iStatusRecebido,
+                    ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
+                    ':iUnidade'             => intval($_SESSION['UnidadeId'])
+                ));
+                
+                //$idContaAReceber = $conn->lastInsertId();
+            }   
+        }
+
+        $sql_movimentacaoPagamento = "SELECT CxPagFormaPagamento, CxPagValor, CxPagDataHora, CxPagPlanoConta, CxPagJustificativaRetirada, CxPagFornecedor, CxPagCentroCusto
+                                        FROM CaixaPagamento
+                                        JOIN CaixaAbertura on CxAbeId = CxPagCaixaAbertura
+                                        JOIN FormaPagamento on FrPagId = CxPagFormaPagamento
+                                        WHERE CxAbeOperador = $_SESSION[UsuarId] and CxPagUnidade = $_SESSION[UnidadeId] and CxPagCaixaAbertura = $idCaixaAbertura";
+        $resultMovimentacaoPagamento  = $conn->query($sql_movimentacaoPagamento);
+        
+        if($rowMovimentacaoPagamento = $resultMovimentacaoPagamento->fetchAll(PDO::FETCH_ASSOC)) {
+            $descricaoPagamento = 'Pagamento do '.$nomeCaixa.' - '.date('d/m/Y H:i');
+            
+            $sql = "INSERT INTO ContasAgrupadas ( CnAgrDtPagamento, CnAgrValorTotal, CnAgrFormaPagamento, CnAgrContaBanco, CnAgrDescricaoAgrupamento)
+                    VALUES ( :dateDtPagamento, :fValorTotal, :iFormaPagamento, :iContaBanco, :sDescricaoAgrupamento)";
+            $result = $conn->prepare($sql);
+                    
+            $result->execute(array(
+                ':dateDtPagamento' => $dataAtual,
+                ':fValorTotal' => $totalPago,
+                ':iFormaPagamento' => null,
+                ':iContaBanco' => null,
+                ':sDescricaoAgrupamento' => $descricaoPagamento
+            ));
+
+            $agrupamentoPagamento = $conn->lastInsertId();
+
+            $sql = "SELECT SituaId
+            FROM Situacao
+            WHERE SituaChave = 'PAGO'";
+            $result = $conn->query($sql);
+            $rowAPagar = $result->fetch(PDO::FETCH_ASSOC);
+            $iStatusPago = $rowAPagar['SituaId'];
+
+            foreach($rowMovimentacaoPagamento as $item) {
+                $arrayDataHora = explode(' ', $item['CxPagDataHora']);
+                $dataPagamento = $arrayDataHora[0];
+
+                $planoConta = $item['CxPagPlanoConta'];
+                $centroCusto = $item['CxPagCentroCusto'];
+                $planoConta = $item['CxPagPlanoConta'];
+                $fornecedor = $item['CxPagFornecedor'] != '' ? $item['CxPagFornecedor'] : 0; 
+                $formaPagamento =  $item['CxPagFormaPagamento'];
+                $descricaoContaPagamento = $item['CxPagJustificativaRetirada'];
+                $valorPago = $item['CxPagValor'];
+
+                $sql = "INSERT INTO ContasAPagar ( CnAPaPlanoContas, CnAPaFornecedor, CnAPaContaBanco, CnAPaFormaPagamento,
+                                                CnAPaNotaFiscal, CnAPaDtEmissao, CnAPaOrdemCompra, CnAPaDescricao, CnAPaDtVencimento, CnAPaValorAPagar,
+                                                CnAPaDtPagamento, CnAPaValorPago, CnAPaObservacao, CnAPaTipoJuros, CnAPaJuros, 
+                                                CnAPaTipoDesconto, CnAPaDesconto, CnAPaAgrupamento, CnAPaStatus, CnAPaUsuarioAtualizador, CnAPaUnidade)
+                        VALUES ( :iPlanoContas, :iFornecedor, :iContaBanco, :iFormaPagamento, :sNotaFiscal, :dateDtEmissao, :iOrdemCompra,
+                                :sDescricao, :dateDtVencimento, :fValorAPagar, :dateDtPagamento, :fValorPago, :sObservacao, :sTipoJuros, :fJuros, 
+                                :sTipoDesconto, :fDesconto, :iAgrupamento, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+                $result = $conn->prepare($sql);
+
+                $result->execute(array(
+                    ':iPlanoContas'         => $planoConta,
+                    ':iFornecedor'          => $fornecedor,
+                    ':iContaBanco'          => $destinoContaFinanceiraId,
+                    ':iFormaPagamento'      => $formaPagamento,
+                    ':sNotaFiscal'          => null,
+                    ':dateDtEmissao'        => $dataPagamento,
+                    ':iOrdemCompra'         => null,
+                    ':sDescricao'           => $descricaoContaPagamento,
+                    ':dateDtVencimento'     => $dataPagamento,
+                    ':fValorAPagar'         => $valorPago,
+                    ':dateDtPagamento'      => $dataPagamento,
+                    ':fValorPago'           => $valorPago,
+                    ':sObservacao'          => null,
+                    ':sTipoJuros'           => null,
+                    ':fJuros'               => null,
+                    ':sTipoDesconto'        => null,
+                    ':fDesconto'            => null,   
+                    ':iAgrupamento'         => $agrupamentoPagamento, 
+                    ':iStatus'              => $iStatusPago,
+                    ':iUsuarioAtualizador'  => $_SESSION['UsuarId'],
+                    ':iUnidade'             => $_SESSION['UnidadeId']
+                ));
+
+                if($centroCusto != '') {
+                    $idContaAPagar = $conn->lastInsertId();
+
+                    $sql = "INSERT INTO ContasAPagarXCentroCusto ( CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CAPXCUsuarioAtualizador, CAPXCUnidade)
+                            VALUES ( :iContasAPagar, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                    $result = $conn->prepare($sql);
+
+                    $result->execute(array(
+                        ':iContasAPagar' => $idContaAPagar,
+                        ':iCentroCusto' => $centroCusto,
+                        ':iValor' => $valorPago,
+                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                        ':iUnidade' => $_SESSION['UnidadeId']
+                    ));
+                }
+            }
+        }
+        
         $conn->commit();
 
         $_SESSION['msg']['titulo'] = "Sucesso";
@@ -56,37 +251,75 @@ if(isset($_POST['inputDestinoContaFinanceiraId'])) {
         $conn->rollback();
 
         $_SESSION['msg']['titulo'] = "Erro";
-        $_SESSION['msg']['mensagem'] = "Erro fechar o caixa!!!";
+        $_SESSION['msg']['mensagem'] = "Erro ao fechar o caixa!!!";
         $_SESSION['msg']['tipo'] = "error";	
         
         echo 'Error: ' . $e->getMessage();
     }
-
+    
     irpara('caixaMovimentacao.php');
 }
 
+$situaCaixa = '';
+
 if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
+    if(isset($_POST['inputSituacaoCaixa']) && $_POST['inputSituacaoCaixa'] != '') {
+        $situaCaixa = $_POST['inputSituacaoCaixa'];
+    }
+
     $caixaAberturaId = isset($_POST['inputAberturaCaixaId']) ? $_POST['inputAberturaCaixaId'] : $_POST['aberturaCaixaId'];
     $idCaixa = isset($_POST['inputCaixaId']) ? $_POST['inputCaixaId'] : $_POST['caixaId'];
-    //$nomeCaixa = $_POST['inputAberturaCaixaNome'];
+    $nomeCaixa = $_POST['inputAberturaCaixaNome'];
 
-    $sql_saldoCaixa    = "SELECT CxAbeSaldoFinal
+    $sql_saldoCaixa    = "SELECT CxAbeSaldoInicial
                           FROM CaixaAbertura 
                           WHERE CxAbeUnidade = " . $_SESSION['UnidadeId'] . " and CxAbeCaixa = ".$idCaixa."
                           ORDER BY CxAbeId DESC";
     $resultSaldoCaixa  = $conn->query($sql_saldoCaixa);
     $rowSaldoCaixa = $resultSaldoCaixa->fetch(PDO::FETCH_ASSOC);
 
-    $saldoCaixa = $rowSaldoCaixa['CxAbeSaldoFinal'];
+    $saldoInicialCaixa = $rowSaldoCaixa['CxAbeSaldoInicial'];
     
-    //Falta colocar o CaixaFechamento
-    $sql_totalMovimentacao    = "SELECT SUM(CxRecValorTotal) as TotalFinal
+    $sql_totalMovimentacao    = "SELECT SUM(CxRecValorTotal) as TotalRecebido
                                 FROM CaixaRecebimento 
                                 WHERE CxRecUnidade = " . $_SESSION['UnidadeId'] . " and CxRecCaixaAbertura = ".$caixaAberturaId."";
     $resultTotalMovimentacao  = $conn->query($sql_totalMovimentacao);
-    $rowTotalMovimentacao = $resultTotalMovimentacao->fetch(PDO::FETCH_ASSOC);
+    $rowTotalRecebido = $resultTotalMovimentacao->fetch(PDO::FETCH_ASSOC);
 
-    $valorCalculado = $rowTotalMovimentacao['TotalFinal'];
+    $sql_totalMovimentacao    = "SELECT SUM(CxPagValor) as TotalPago
+                                FROM CaixaPagamento
+                                WHERE CxPagUnidade = " . $_SESSION['UnidadeId'] . " and CxPagCaixaAbertura = ".$caixaAberturaId."";
+    $resultTotalMovimentacao  = $conn->query($sql_totalMovimentacao);
+    $rowTotalPago = $resultTotalMovimentacao->fetch(PDO::FETCH_ASSOC);
+
+    $valorRecebido = $rowTotalRecebido['TotalRecebido'];
+    $valorPago = $rowTotalPago['TotalPago'];
+
+    $valorCalculado = $valorRecebido - $valorPago;
+
+    $valorATransferir = $valorCalculado + $saldoInicialCaixa;
+    $saldoFinalCaixa = $valorCalculado + $saldoInicialCaixa; 
+
+    $sql_movimentacao    = "SELECT AtendNumRegistro, ClienNome as HISTORICO, CxRecDataHora as DATAHORA, CxRecAtendimento, FrPagId, FrPagNome, 
+                                CxRecValor, CxRecValorTotal as TOTAL, SituaNome, SituaChave, 'Recebimento' as Tipo
+                        FROM CaixaRecebimento
+                        JOIN CaixaAbertura on CxAbeId = CxRecCaixaAbertura
+                        JOIN FormaPagamento on FrPagId = CxRecFormaPagamento
+                        JOIN Atendimento on AtendId = CxRecAtendimento
+                        JOIN Cliente on ClienId = AtendCliente
+                        JOIN Situacao on SituaId = CxRecStatus
+                        WHERE CxAbeOperador = $_SESSION[UsuarId] and CxRecCaixaAbertura = $_POST[inputAberturaCaixaId] and CxRecUnidade = $_SESSION[UnidadeId]
+                        UNION 
+                        SELECT '' as NUM_REGISTRO, CxPagJustificativaRetirada as HISTORICO, CxPagDataHora as DATAHORA, 0 as ATENDIMENTO, FrPagId, FrPagNome,
+                                0 as Valor, CxPagValor as TOTAL, SituaNome, SituaChave, 'Pagamento' as Tipo
+                        FROM CaixaPagamento
+                        JOIN CaixaAbertura on CxAbeId = CxPagCaixaAbertura
+                        JOIN FormaPagamento on FrPagId = CxPagFormaPagamento
+                        JOIN Situacao on SituaId = CxPagStatus
+                        WHERE CxAbeOperador = $_SESSION[UsuarId] and CxPagCaixaAbertura = $_POST[inputAberturaCaixaId] and CxPagUnidade = $_SESSION[UnidadeId]
+                        ORDER BY FrPagNome,  HISTORICO ASC";
+    $resultMovimentacao  = $conn->query($sql_movimentacao);
+    $rowMovimentacao = $resultMovimentacao->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
 
@@ -122,34 +355,45 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
 
     <script type="text/javascript">
         $(document).ready(function () {
-            /*
-            $('#tblAtendimento').DataTable( {
-                "order": [[ 0, "asc" ]],
+            $('#tblFechamentoCaixa').DataTable( {
+                "order": [
+                    [ 5, "asc" ], //Coluna de controle, para deixar a lista na ordem correta, já que o dataTable organiza a tabela automaticamente
+                ],
                 autoWidth: false,
                 responsive: true,
                 columnDefs: [
                 {
-                    orderable: true,   //Marca
-                    width: "40%",
+                    orderable: false,   //Forma Recebimento
+                    width: "38%",
                     targets: [0]
                 },
                 { 
-                    orderable: true,   //Situação
-                    width: "40%",
+                    orderable: false,   //Valor Recebido
+                    width: "15%",
                     targets: [1]
                 },
                 { 
-                    orderable: true,   //Ações
-                    width: "20%",
+                    orderable: false,   //Valor Retirado
+                    width: "15%",
                     targets: [2]
+                },
+                { 
+                    orderable: false,   //Valor na gaveta
+                    width: "15%",
+                    targets: [3]
+                },
+                { 
+                    orderable: false,   //Falta ou Sobra
+                    width: "15%",
+                    targets: [4]
+                },
+                { 
+                    visible: false, //Deixa a coluna controle invisível
+                    orderable: false,   //Controle / contador
+                    width: "2%",
+                    targets: [5]
                 }],
-                dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-                language: {
-                    search: '<span>Filtro:</span> _INPUT_',
-                    searchPlaceholder: 'filtra qualquer coluna...',
-                    lengthMenu: '<span>Mostrar:</span> _MENU_',
-                    paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
-                }
+                dom: ''
             });
             
             // Select2 for length menu styling
@@ -168,7 +412,54 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
             };	
 
             _componentSelect2();
-            */
+
+            function inputsValorGaveta() {
+                var contadorLinha = $("#tblFechamentoCaixa tr").length;
+                
+                for (let i = 1; i <= contadorLinha; i++) {
+
+                    $(`#valorGaveta${i}`).on("change", function() {
+                        let valorRecebido = parseFloat($(`#valorRecebido${i}`).text().replaceAll(".", "").replace(",", "."));
+                        let valorRetirado = parseFloat($(`#valorRetirado${i}`).text().replaceAll(".", "").replace(",", "."));
+                        let valor = valorRecebido + valorRetirado; //Está sendo somado pq o valor retirado ele já é negativo
+
+                        let valorGaveta = $(this).val().replaceAll(".", "").replace(",", ".");
+                        let faltaSobra = valor - valorGaveta;
+
+                        $(`#valorFaltaSobra${i}`).html(float2moeda(faltaSobra * -1)); //É para o valor do falta ou sobra vir correto
+
+                        consultaTotalDadosFechamento(contadorLinha);
+                    })
+                }
+            }
+
+            inputsValorGaveta();
+
+            function consultaTotalDadosFechamento(quantidadeLinha) {
+                let valorGaveta = 0;
+                let faltaSobra = 0;
+                let totalGaveta = 0;
+                let totalFaltaSobra = 0;
+
+                for (let i = 1; i <= quantidadeLinha; i++) {
+                    valorGaveta = $(`#valorGaveta${i}`).val() != undefined && $(`#valorGaveta${i}`).val() != '' ? parseFloat($(`#valorGaveta${i}`).val()) : 0;
+
+                    if($(`#valorFaltaSobra${i}`).text() != undefined && $(`#valorFaltaSobra${i}`).text() != '') {
+                        if($(`#valorFaltaSobra${i}`).text().indexOf('-') > -1) { //retorna a posição da primeira ocorrência do valor especificado, caso contrário retorna -1
+                            faltaSobra = $(`#valorFaltaSobra${i}`).text() != undefined && $(`#valorFaltaSobra${i}`).text() != '' ? parseFloat($(`#valorFaltaSobra${i}`).text().replaceAll(".", "").replace(",", ".").replace("-", "")) * -1 : 0;
+                        }else {
+                            faltaSobra = $(`#valorFaltaSobra${i}`).text() != undefined && $(`#valorFaltaSobra${i}`).text() != '' ? parseFloat($(`#valorFaltaSobra${i}`).text().replaceAll(".", "").replace(",", ".")): 0;
+                        }
+                        
+                        totalFaltaSobra += faltaSobra; 
+                    }
+
+                    totalGaveta += valorGaveta;  
+                } 
+
+                $("#totalGaveta").text(float2moeda(totalGaveta));
+                $("#totalFaltaSobra").text(float2moeda(totalFaltaSobra)); 
+            }
 
             function consultaSaldoCaixaAtual() {
                 let urlConsultaAberturaCaixa = "consultaCaixaSaldoAtual.php";
@@ -180,19 +471,23 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                     dataType: "json",
                     success: function(resposta) {
                         if(resposta != 'consultaVazia') {
-                            let valorRecebido = resposta[0].SaldoRecebido;
-                            let valorPago = resposta[1].SaldoPago;
+                            let saldoInicial = parseFloat(resposta[0].CxAbeSaldoInicial);
+
+                            let valorRecebido = parseFloat(resposta[1].SaldoRecebido);
+                            let valorPago = parseFloat(resposta[2].SaldoPago);
         
-                            let saldo = valorRecebido - valorPago;
+                            let saldo = saldoInicial + valorRecebido - valorPago;
                             
-                            $("#inputRecebido").val(float2moeda(valorRecebido));
-                            $("#inputPago").val(float2moeda(valorPago * -1));
+                            $("#inputResumoCaixaSaldoInicial").val(float2moeda(saldoInicial));
+                            $("#inputResumoCaixaRecebido").val(float2moeda(valorRecebido));
+                            $("#inputResumoCaixaPago").val(float2moeda(valorPago * -1));
         
-        
-                            $("#inputSaldo").val(float2moeda(saldo));
+                            $("#inputResumoCaixaSaldo").val(float2moeda(saldo));
                         }else {
-                            $("#inputRecebido").val('');
-                            $("#inputSaldo").val('');
+                            $("#inputResumoCaixaSaldoInicial").val('');
+                            $("#inputResumoCaixaRecebido").val('');
+                            $("#inputResumoCaixaPago").val('');
+                            $("#inputResumoCaixaSaldo").val('');
                         }
                     }
                 })
@@ -224,36 +519,46 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                 })
             }) 
 
-            $('#valorTransferir').on("change", function() {
-                let valorCalculado = "<?php echo $valorCalculado; ?>";
-                let valorTransferir = $(this).val() != '' ? parseFloat($(this).val().replace(".", "").replace(",", ".")) : 0;
-                let saldoCaixa = "<?php echo $saldoCaixa != '' ? $saldoCaixa : 0; ?>";
-
-                valorCalculado = parseFloat(valorCalculado);
-                saldoCaixa = parseFloat(saldoCaixa);
-
-                if(valorTransferir != 0) {
-                    if(valorTransferir < valorCalculado) {
-                        valorCalculado -= valorTransferir;
-                        saldoCaixa += valorCalculado;
-                        saldoCaixa = saldoCaixa;
-                        
-                        valorCalculado = valorCalculado;
-                    }else {
-                        $(this).val(float2moeda(valorCalculado));
-                        saldoCaixa = saldoCaixa;
-                        valorCalculado = 0,00;
+            function pendenciaValorGavetaFaltaSobra() {
+                var contadorLinha = $("#tblFechamentoCaixa tr").length;
+                
+                //Não permitir fechar o caixa caso todos os inputs não tenham sido preenchidos
+                for (let i = 1; i <= contadorLinha; i++) {    
+                    let gaveta = $(`#valorGaveta${i}`).val();
+                    if(gaveta == '') {
+                        $(`#valorGaveta${i}`).focus();
+                        var menssagem = 'Informe o valor desta gaveta por favor!';
+                        alerta('Atenção', menssagem, 'error');
+                        return true;
                     }
-                }
+                } 
 
-                $('#saldoCaixa').val(float2moeda(saldoCaixa));
+                //Deverá ser dada uma justificativa caso tenha alguma falta ou sobra nas gavetas
+                for (let i = 1; i <= contadorLinha; i++) {
+                    let faltaSobra = $(`#valorFaltaSobra${i}`).text() != undefined && $(`#valorFaltaSobra${i}`).text() != '' ? parseFloat($(`#valorFaltaSobra${i}`).text().replaceAll(".", "").replace(",", ".").replace("-", "")): 0;
+                    if(faltaSobra != 0) {
+                        $('#abrirJustificativa').trigger("click");
+                        return true;
+                    }
+                } 
+
+                return false;
+            }
+
+            $("#btnJustificar").on('click', () => {
+                let justificativa = $('#justificativa').val();
+                
+                $('#inputJustificativa').val(justificativa);
+                document.formFechamentoCaixa.submit();
             })
 
             $("#btnFecharCaixa").on('click', () => {
                 let idDestino = $("#cmbDestinoContaFinanceira").val();
+                let totalRecebido = '<?php echo $valorRecebido; ?>';
+                let totalPago = '<?php echo $valorPago; ?>';
                 let valorCalculado = $("#valorCalculado").val();
                 let valorTransferir = $("#valorTransferir").val();
-                let saldoCaixa = $("#saldoCaixa").val();
+                let saldoFinalCaixa = $("#saldoFinalCaixa").val();
 
                 if(idDestino == '') {
                     $("#cmbDestinoContaFinanceira").focus();
@@ -264,12 +569,29 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                 }  
 
                 $("#inputDestinoContaFinanceiraId").val(idDestino);
+                $("#inputTotalRecebido").val(totalRecebido);
+                $("#inputTotalPago").val(totalPago);
                 $("#inputValorCalculado").val(valorCalculado);
                 $("#inputValorTransferir").val(valorTransferir);
-                $("#inputSaldoCaixa").val(saldoCaixa);
+                $("#inputSaldoCaixa").val(saldoFinalCaixa);
 
+                if(pendenciaValorGavetaFaltaSobra()) {
+                    return;
+                }
+                
                 document.formFechamentoCaixa.submit();
             })
+
+            //Desabilita o botão do PDV caso o caixa tenha uma data diferente da de hoje e que ainda não foi fechada
+            function situacaoCaixa() {
+                let situacaoCaixa = "<?php echo $situaCaixa; ?>";
+
+                if(situacaoCaixa == 'DEVE_FECHAR') {
+                    $('#btnPdv').prop('disabled', true);
+                }
+            }
+
+            situacaoCaixa();
         });
     </script>
 
@@ -300,20 +622,123 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                             <div class="card-header text-center">
                                 <h3 class="card-title">Fechamento de Caixa</h3>
                                 <br>
-                                <h5>Data: <?php echo date('d/m/Y'); ?>
 
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-                                Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?></h5>
+                                <div class="row d-flex justify-content-center">
+                                    <div class="col-lg-3">
+                                        <h5>Data: <?php echo date('d/m/Y'); ?>
+                                    </div>
+    
+                                    <div class="col-lg-3">
+                                        <h5>Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?></h5>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="card-body">
                                 <div class="text-center">
+                                    <h3>Dados do Fechamento</h3>
+                                </div>
+
+                                <!--Link para abertura de caixa-->
+                                <a id="abrirJustificativa" data-toggle="modal" data-target="#modal_small_justifica"></a>
+                                
+                                <table id="tblFechamentoCaixa" class="table table-bordered">
+                                    <thead>
+                                        <tr style="background-color: #CCCCCC;">
+                                            <th>Forma de Recebimento/Pagamento</th>
+                                            <th>Valor Recebido</th>
+                                            <th>Valor Retirado</th>
+                                            <th>Valor na gaveta</th>
+                                            <th>Falta ou Sobra</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $contador = 1;
+                                        $formaPagamentoNome = '';
+                                        $formaPagamentoNomeControle = '';
+
+                                        $totalValorRecebimento = 0;
+                                        $totalValorPagamento = 0;
+
+                                        foreach($rowMovimentacao as $item) {
+                                            $formaPagamentoNome = $item['FrPagNome'];
+
+                                            if($formaPagamentoNome != $formaPagamentoNomeControle) {
+                                                $sql = "SELECT dbo.fnValorTotalRecebimentoCaixa(" . $_POST['inputAberturaCaixaId'] . ", " . $item['FrPagId'] . ") as ValorRecebimento";
+                                                $result = $conn->query($sql);
+                                                $rowValorRecebimento = $result->fetch(PDO::FETCH_ASSOC);
+
+                                                $sql = "SELECT dbo.fnValorTotalPagamentoCaixa(" . $_POST['inputAberturaCaixaId'] . ", " . $item['FrPagId'] . ") as ValorPagamento";
+                                                $result = $conn->query($sql);
+                                                $rowValorPagamento = $result->fetch(PDO::FETCH_ASSOC);
+
+                                                $valorRecebimento = $rowValorRecebimento['ValorRecebimento']; 
+                                                $totalValorRecebimento += $valorRecebimento;
+                                                $valorPagamento = $rowValorPagamento['ValorPagamento']; 
+                                                $totalValorPagamento += $valorPagamento;
+
+                                                print('
+                                                <tr style="background-color: #e5e6e5;"> 
+                                                    <td>'.$item['FrPagNome'].'</td>
+                                                    <td id="valorRecebido'.$contador.'" style="text-align: right;">'.mostraValor($valorRecebimento).'</td>
+                                                    <td id="valorRetirado'.$contador.'" style="text-align: right; color: red;">'.mostraValor($valorPagamento * -1).'</td>
+                                                    <td><input id="valorGaveta'.$contador.'" tabindex="'.$contador.'" type="text" onkeyup="moeda(this)" class="text-right"></td>
+                                                    <td id="valorFaltaSobra'.$contador.'" style="text-align: right;"></td>
+                                                    <td style="display: none;">'.$contador.'</td>
+                                                </tr>');
+                                            }
+
+                                            if($item['Tipo'] == 'Recebimento') {
+                                                $saldo = $item['TOTAL'];
+
+                                                print('
+                                                <tr style="background-color: #f0f0f0;">
+                                                    <td class="pl-5">'.$item['HISTORICO'].'</td>
+                                                    <td id="teste'.$contador.'" style="text-align: right;">'.mostraValor($saldo).'</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>'.$contador.'</td>
+                                                </tr>');
+                                            }else {
+                                                $saldo = $item['TOTAL'] * -1;
+
+                                                print('
+                                                <tr style="background-color: #f0f0f0;">
+                                                    <td class="pl-5">'.$item['HISTORICO'].'</td>
+                                                    <td></td>
+                                                    <td style="text-align: right; color: red;">'.mostraValor($saldo).'</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td style="display: none;">'.$contador.'</td>
+                                                </tr>');
+                                            }
+
+                                            $formaPagamentoNomeControle = $formaPagamentoNome;
+
+                                            $contador++;
+                                        }
+                                        ?>
+
+                                            <tr style="background-color: #f0f0f0;">
+                                                <td>VALOR TOTAL</td>
+                                                <td style="text-align: right;"><?php echo mostraValor($totalValorRecebimento); ?></td>
+                                                <td style="text-align: right; color: red;"><?php echo mostraValor($totalValorPagamento * -1); ?></td>
+                                                <td id="totalGaveta" style="text-align: right;"></td>
+                                                <td id="totalFaltaSobra" style="text-align: right;"></td>
+                                                <td style="display: none;"><?php echo $contador + 1; ?></td>
+                                            </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="text-center mt-4">
                                     <h3>Dados de Transferência</h3>
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-lg-6">
+                                    <div class="col-lg-4">
                                         <div class="form-group">
                                             <label for="cmbDestinoContaFinanceira">Destino (Conta Financeira) <span class="text-danger">*</span></label>
                                             <select id="cmbDestinoContaFinanceira" name="cmbDestinoContaFinanceira" class="form-control form-control-select2" required>
@@ -335,28 +760,29 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                                     </div>
 
                                     <div class="col-2">
-                                        <div>
-                                            <div class="form-group text-right">
-                                                <label for="valorCalculado">Valor Calculado</label>
-                                                <input type="text" id="valorCalculado" class="form-control text-right" name="valorCalculado" value="<?php echo mostraValor($valorCalculado); ?>" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-2">
-                                        <div>
-                                            <div class="form-group text-right">
-                                                <label for="valorTransferir">Valor a Transferir <span class="text-danger">*</span></label>
-                                                <input type="text" id="valorTransferir" onkeyup="moeda(this)" class="form-control text-right" name="valorTransferir" value="">
-                                            </div>
+                                        <div class="form-group text-right">
+                                            <label for="saldoInicial">Saldo Inicial</label>
+                                            <input type="text" id="saldoInicial" class="form-control text-right" name="saldoInicial"  value="<?php echo mostraValor($saldoInicialCaixa); ?>" readonly>
                                         </div>
                                     </div>
 
                                     <div class="col-2">
                                         <div class="form-group text-right">
-                                            <label for="saldoCaixa">Saldo Caixa</label>
-                                            <input type="text" id="saldoCaixa" class="form-control text-right" name="saldoCaixa" value="<?php echo mostraValor($saldoCaixa); ?>" readonly>
+                                            <label for="valorCalculado">Valor Calculado</label>
+                                            <input type="text" id="valorCalculado" class="form-control text-right" name="valorCalculado" value="<?php echo mostraValor($valorCalculado); ?>" readonly>
                                         </div>
+                                    </div>
+
+                                    <div class="col-2">
+                                        <div class="form-group text-right">
+                                            <label for="valorTransferir">Valor a Transferir</label>
+                                            <input type="text" id="valorTransferir" class="form-control text-right" name="valorTransferir" value="<?php echo mostraValor($valorATransferir); ?>" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group text-right">
+                                        <label for="saldoFinalCaixa">Saldo Caixa</label>
+                                        <input type="text" id="saldoFinalCaixa" class="form-control text-right" name="saldoFinalCaixa" value="<?php echo mostraValor($saldoFinalCaixa); ?>" readonly>
                                     </div>
                                 </div>
 
@@ -380,11 +806,15 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                 
                 <form name="formFechamentoCaixa" method="post">   
                     <input type="hidden" id="inputDestinoContaFinanceiraId" name="inputDestinoContaFinanceiraId">
+                    <input type="hidden" id="inputTotalRecebido" name="inputTotalRecebido">
+                    <input type="hidden" id="inputTotalPago" name="inputTotalPago">
                     <input type="hidden" id="inputValorCalculado" name="inputValorCalculado">
                     <input type="hidden" id="inputValorTransferir" name="inputValorTransferir">
                     <input type="hidden" id="inputSaldoCaixa" name="inputSaldoCaixa">
+                    <input type="hidden" id="inputJustificativa" name="inputJustificativa">
                     <input type="hidden" id="aberturaCaixaId" name="aberturaCaixaId" value="<?php echo $caixaAberturaId;?>">
                     <input type="hidden" id="caixaId" name="caixaId" value="<?php echo $idCaixa;?>">
+                    <input type="hidden" id="caixaNome" name="caixaNome" value="<?php echo $nomeCaixa;?>">
                 </form>
 
                 <form name="formCaixaAberturaId" method="post">
@@ -393,6 +823,34 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
 				</form>
             </div>
             <!-- /content area -->
+
+            <!-- small modal -->
+            <div id="modal_small_justifica" class="modal fade" tabindex="-1">
+                <div class="modal-dialog modal-xs">
+                    <div class="modal-content">
+                        <div class="custon-modal-title">
+                            <i class=""></i>
+                            <p class="h3">Falta ou Sobra</p>
+                            <i class=""></i>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="justificativa" class="font-size-lg">Justificativa<span class="text-danger"> *</span></label>
+                                <div class="input-group">
+                                    <textarea id="justificativa" class="form-control font-size-lg" name="justificativa" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-basic" data-dismiss="modal">Cancelar</button>
+                            <button id="btnJustificar" type="button" class="btn bg-slate">Justificar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /small modal -->
 
             <?php include_once("footer.php"); ?>
 

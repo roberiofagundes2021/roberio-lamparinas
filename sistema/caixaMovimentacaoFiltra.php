@@ -10,8 +10,8 @@ $_SESSION['MovCaixaPeriodoDe'] = '';
 $_SESSION['MovCaixaAte'] = '';
 $_SESSION['MovCaixaCliente'] = '';
 $_SESSION['MovCaixaFormaPagamento'] = '';
+$_SESSION['MovCaixaStatus'] = '';
 
-//Depois vê o que fazer depois
 if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
     empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = date('Y-m-d 01:00:00') : $inputPeriodoDe = $_POST['inputPeriodoDe'] . ' 00:00:00';
     empty($_POST['inputAte']) ? $inputAte = date('Y-m-d 23:59:59') : $inputAte = $_POST['inputAte'] . ' 23:59:59';
@@ -30,6 +30,7 @@ if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
 
 if (!empty($_POST['cmbClientes'])) {
     $argsRecebimento[]  = "AtendCliente = " . $_POST['cmbClientes'] . " ";
+    $argsPagamento[]  = "CxPagId = 0 "; //Para não mostrar nenhum pagamento quando um cliente for filtrado 
     $_SESSION['MovCaixaCliente'] = $_POST['cmbClientes'];
 }
 
@@ -56,7 +57,7 @@ if ($stringPagamento != '') {
     $stringPagamento .= ' and ';
 }
 
-//Falta colocar o CaixaFechamento
+//Falta o id da abertura do caixa
 $sql_movimentacao    = "SELECT AtendNumRegistro, ClienNome as HISTORICO, CxRecDataHora as DATAHORA, CxRecAtendimento, FrPagNome, 
                                 CxRecValor, CxRecValorTotal as TOTAL, SituaNome, SituaChave, 'Recebimento' as Tipo
                         FROM CaixaRecebimento
@@ -67,7 +68,7 @@ $sql_movimentacao    = "SELECT AtendNumRegistro, ClienNome as HISTORICO, CxRecDa
                         JOIN Situacao on SituaId = CxRecStatus
                         WHERE ".$stringRecebimento." CxAbeOperador = $_SESSION[UsuarId] and CxRecUnidade = $_SESSION[UnidadeId]
                         UNION 
-                        SELECT '' as NUM_REGISTRO, '' as HISTORICO, CxPagDataHora as DATAHORA, 0 as ATENDIMENTO, FrPagNome,
+                        SELECT '' as NUM_REGISTRO, CxPagJustificativaRetirada as HISTORICO, CxPagDataHora as DATAHORA, 0 as ATENDIMENTO, FrPagNome,
                                 0 as Valor, CxPagValor as TOTAL, SituaNome, SituaChave, 'Pagamento' as Tipo
                         FROM CaixaPagamento
                         JOIN CaixaAbertura on CxAbeId = CxPagCaixaAbertura

@@ -18,7 +18,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 $data = date("Y-m-d");
 
-$visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['ResumoFinanceiro'] ? 'sidebar-right-visible' : ''; 
+//A sessão de resumo financeiro é a opção de visibilidade do resumo financeiro, aqui ele também foi aplicado ao resumo de Caixa
+$visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['ResumoFinanceiro'] ? 'sidebar-right-visible' : ''; 
 ?>
 
 <!DOCTYPE html>
@@ -59,12 +60,13 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
                 "order": [
-                    [0, "desc"]
+                    [0, "desc"],
+                    [1, "desc"]
                 ],
                 responsive: true,
                 columnDefs: [{
                         orderable: true, //Nº registro
-                        width: "15%",
+                        width: "13%",
                         targets: [0]
                     },
                     {
@@ -74,7 +76,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     },
                     {
                         orderable: true, //Histórico
-                        width: "18%",
+                        width: "20%",
                         targets: [2]
                     },
                     {
@@ -119,6 +121,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
 
                 $('tbody').html(msg)
 
+                let aberturaCaixa = $('#inputAberturaCaixaId').val();
                 let periodoDe = $('#inputPeriodoDe').val()
                 let ate = $('#inputAte').val()
                 let clientes = $('#cmbClientes').val()
@@ -127,6 +130,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                 let urlConsultaAberturaCaixa = "caixaMovimentacaoFiltra.php";
 
                 let inputsValuesConsulta = {
+                    inputAberturaCaixaId: aberturaCaixa,
                     inputPeriodoDe: periodoDe,
                     inputAte: ate,
                     cmbClientes: clientes,
@@ -143,21 +147,25 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     success: function(resposta) {
                         //|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
                         let table 
-                        table = $('#tblMovimentacao').DataTable()
-                        table = $('#tblMovimentacao').DataTable().clear().draw()
+                        table = $('#tblMovimentacao').DataTable();
+                        table = $('#tblMovimentacao').DataTable().clear().draw();
                         //--|
 
-                        table = $('#tblMovimentacao').DataTable()
+                        table = $('#tblMovimentacao').DataTable();
 
-                        let rowNode
+                        let rowNode;
 
                         let valorTotal = null;
                         let descontoTotal = null;
 
                         resposta.forEach(item => {
-                            rowNode = table.row.add(item.data).draw().node()
+                            rowNode = table.row.add(item.data).draw().node();
 
-                            $(rowNode).find('td').eq(5).attr('style', 'text-align: right;')
+                            if(item.data[3] == 'Recebimento') {
+                                $(rowNode).find('td').eq(5).attr('style', 'text-align: right;');
+                            }else {
+                                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;');
+                            }
                         })
 
                         valorFinal = valorTotal - descontoTotal;
@@ -238,8 +246,6 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     (mes <10 ? '0' : '') + mes + '-' +
                                     (dia <10 ? '0' : '') + dia;
 
-                                //alert('Data abertura: ' + dataAbertura + ' Data atual: ' + dataAtual)
-
                                 //Verifica se o caixa foi aberto hoje, se não foi o operador terá que fechar
                                 if(dataAbertura == dataAtual) {
                                     $("#inputAberturaCaixaId").val(resposta.CxAbeId);
@@ -251,6 +257,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     $("#inputAberturaCaixaId").val(resposta.CxAbeId);                    
                                     $("#inputCaixaId").val(resposta.CxAbeCaixa);
                                     $("#inputAberturaCaixaNome").val(resposta.CaixaNome);
+                                    $("#inputSituacaoCaixa").val('DEVE_FECHAR'); //Esse input serve para não permitir o acesso ao PDV caso o caixa tenha uma data diferente da de hoje e não tenha sido fechado
 
                                     document.formCaixaAbertura.action = "caixaFechamento.php";
                                     document.formCaixaAbertura.submit();
@@ -259,7 +266,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                         }
                     }
                 })
-            }) 
+            })
 
             function consultaSaldoCaixaAtual() {
                 let urlConsultaAberturaCaixa = "consultaCaixaSaldoAtual.php";
@@ -271,65 +278,287 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     dataType: "json",
                     success: function(resposta) {
                         if(resposta != 'consultaVazia') {
-                            let valorRecebido = resposta[0].SaldoRecebido;
-                            let valorPago = resposta[1].SaldoPago;
-        
-                            let saldo = valorRecebido - valorPago;
+                            let saldoInicial = parseFloat(resposta[0].CxAbeSaldoInicial);
+                            let valorRecebido = parseFloat(resposta[1].SaldoRecebido);
+                            let valorPago = parseFloat(resposta[2].SaldoPago);
+                            let saldo = saldoInicial + valorRecebido - valorPago;
                             
-                            $("#inputRecebido").val(float2moeda(valorRecebido));
-                            $("#inputPago").val(float2moeda(valorPago * -1));
-        
-        
-                            $("#inputSaldo").val(float2moeda(saldo));
+                            $("#inputResumoCaixaSaldoInicial").val(float2moeda(saldoInicial));
+                            $("#inputResumoCaixaRecebido").val(float2moeda(valorRecebido));
+                            $("#inputResumoCaixaPago").val(float2moeda(valorPago * -1));        
+                            $("#inputResumoCaixaSaldo").val(float2moeda(saldo));
                         }else {
-                            $("#inputRecebido").val('');
-                            $("#inputSaldo").val('');
+                            $("#inputResumoCaixaSaldoInicial").val('');
+                            $("#inputResumoCaixaRecebido").val('');
+                            $("#inputResumoCaixaPago").val('');
+                            $("#inputResumoCaixaSaldo").val('');
                         }
                     }
                 })
             }
 
             consultaSaldoCaixaAtual();
+
+            //A função 
+            $("#radioButtonSangria").on('click', () => {
+                //Para evitar que seja executado comando em um botão já selecionado
+                $("#radioButtonSangria").prop('disabled', true);
+                $("#radioButtonRetirada").prop('disabled', false);
+
+                let HTML = ''
+
+                HTML = `
+                    <div class="row mt-4">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label for="valorRetirada" class="font-size-lg">Valor <span class="text-danger">*</span></label>
+                                <input type="text" id="valorRetirada" name="valorRetirada" onkeyup="moeda(this)" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-8">
+                            <div class="form-group">
+                                <label for="pagamentoRetirada" class="font-size-lg">Forma de Pagamento <span class="text-danger">*</span></label>
+                                <select id="pagamentoRetirada" name="pagamentoRetirada" class="form-control form-control-select2" aria-hidden="true">
+                                    <option value="">Selecionar</option>
+                                    <?php
+                                    $sql = "SELECT FrPagId, FrPagNome, FrPagChave
+                                            FROM FormaPagamento
+                                            JOIN Situacao on SituaId = FrPagStatus
+                                            WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                            ORDER BY FrPagNome ASC";
+                    
+                                    $result = $conn->query($sql);
+                                    $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
+                                    foreach ($rowFormaPagamento as $item) {
+                                        print('<option value="' . $item['FrPagId'] . '-' . $item['FrPagChave'] . '">' . $item['FrPagNome'] . '</option>');
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>   
+                    
+                    <div class="form-group">
+                        <label for="justificativa" class="font-size-lg">Justificativa<span class="text-danger"> *</span></label>
+                        <div class="input-group">
+                            <textarea id="justificativa" class="form-control" name="justificativa" rows="3" required></textarea>
+                        </div>
+                    </div>`;
+                
+                $("#conteudoModalCorpoPagamento").html(HTML).show();
+            }) 
+
+            $("#radioButtonRetirada").on('click', () => {
+                $("#radioButtonSangria").prop('disabled', false);
+                $("#radioButtonRetirada").prop('disabled', true);
+
+                let HTML = ''
+
+                HTML = `
+                    <div class="row mt-4">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label for="valorRetirada" class="font-size-lg">Valor <span class="text-danger">*</span></label>
+                                <input type="text" id="valorRetirada" name="valorRetirada" onkeyup="moeda(this)" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-8">
+                            <div class="form-group">
+                                <label for="pagamentoRetirada" class="font-size-lg">Forma de Pagamento <span class="text-danger">*</span></label>
+                                <select id="pagamentoRetirada" name="pagamentoRetirada" class="form-control form-control-select2" required aria-hidden="true">
+                                    <option value="">Selecionar</option>
+                                    <?php
+                                    $sql = "SELECT FrPagId, FrPagNome, FrPagChave
+                                            FROM FormaPagamento
+                                            JOIN Situacao on SituaId = FrPagStatus
+                                            WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                            ORDER BY FrPagNome ASC";
+                    
+                                    $result = $conn->query($sql);
+                                    $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
+                                    foreach ($rowFormaPagamento as $item) {
+                                        print('<option value="' . $item['FrPagId'] . '-' . $item['FrPagChave'] . '">' . $item['FrPagNome'] . '</option>');
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>   
+
+                    <div class="form-group">
+                        <label for="planoContas" class="font-size-lg">Plano de Contas <span class="text-danger">*</span></label>
+                        <select id="planoContas" name="planoContas" class="form-control form-control-select2" required aria-hidden="true">
+                            <option value="">Selecionar</option>
+                            <?php
+                            $sql = "SELECT PlConId, PlConCodigo, PlConNome
+                                    FROM PlanoConta
+                                    JOIN Situacao on SituaId = PlConStatus
+                                    WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and 
+                                    PlConNatureza = 'D' and PlConTipo = 'A' and SituaChave = 'ATIVO'
+                                    ORDER BY PlConCodigo ASC";
+                            $result = $conn->query($sql);
+                            $rowPlanoContas = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($rowPlanoContas as $item) {
+                                print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="centroCusto" class="font-size-lg">Centro de Custos <span class="text-danger">*</span></label>
+                        <select id="centroCusto" name="centroCusto" class="form-control form-control-select2" required aria-hidden="true">
+                            <option value="">Selecionar</option>
+                            <?php
+                            $sql = "SELECT CnCusId, CnCusNome, SituaChave
+                                    FROM CentroCusto
+                                    JOIN Situacao on SituaId = CnCusStatus
+                                    WHERE CnCusUnidade = $_SESSION[UnidadeId] and SituaChave = 'ATIVO'
+                                    ORDER BY CnCusNome ASC";
+                            $result = $conn->query($sql);
+                            $rowCentroCusto = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($rowCentroCusto as $item) {
+                                print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusNome'] . '</option>');
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fornecedor" class="font-size-lg">Fornecedor <span class="text-danger">*</span></label>
+                        <select id="fornecedor" name="fornecedor" class="form-control form-control-select2" required aria-hidden="true">
+                            <option value="">Selecionar</option>
+                            <?php
+                            $sql = "SELECT ForneId, ForneNome
+                                    FROM Fornecedor
+                                    JOIN Situacao on SituaId = ForneStatus
+                                    WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                    ORDER BY ForneNome ASC";
+                            $result = $conn->query($sql);
+                            $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+                            
+                            foreach ($rowFornecedor as $item) {
+                                print('<option value="' . $item['ForneId'] . '">' . $item['ForneNome'] . '</option>');
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="justificativa" class="font-size-lg">Justificativa<span class="text-danger"> *</span></label>
+                        <div class="input-group">
+                            <textarea id="justificativa" class="form-control" name="justificativa" rows="3" required></textarea>
+                        </div>
+                    </div>`;
+                
+                $("#conteudoModalCorpoPagamento").html(HTML).show();
+            }) 
+
+            //É para a aparência do select permanecer a msm do select que a função jquery adiciona no pop-up, já que ela não deixa o select idêntico ao do template
+            $("#pagamentoRetirada").addClass('form-control form-control-select2');
             
             $("#btnFinalizarRetirada").on('click', () => {
-                if($("#valorRetirada").val() == '') {
-                    $("#valorRetirada").focus();
-                        
-                    var menssagem = 'Informe um valor retirado!'
-                    alerta('Atenção', menssagem, 'error')
-                    return
+                //Caso o planoContas seja indefinido quer dizer que está aberto o pop-up para sangria, caso contrário seria o de retirada
+                if(typeof $("#planoContas").val() == 'undefined') {
+                    if($("#valorRetirada").val() == '') {
+                        $("#valorRetirada").focus();
+                            
+                        var menssagem = 'Informe um valor retirado!'
+                        alerta('Atenção', menssagem, 'error')
+                        return
+                    }
+                    
+                    if($("#pagamentoRetirada").val() == '') {
+                        $("#pagamentoRetirada").focus();
+                            
+                        var menssagem = 'Informe uma forma de pagamento!'
+                        alerta('Atenção', menssagem, 'error')
+                        return
+                    }
+    
+                    if($("#justificativa").val() == '') {
+                        $("#justificativa").focus();
+                            
+                        var menssagem = 'Informe uma justificativa!'
+                        alerta('Atenção', menssagem, 'error')
+                        return
+                    }
+
+                    
+                }else {
+                    if($("#valorRetirada").val() == '') {
+                        $("#valorRetirada").focus();
+                            
+                        var menssagem = 'Informe um Valor Retirado!'
+                        alerta('Atenção', menssagem, 'error')
+                        return
+                    }
+                    
+                    if($("#pagamentoRetirada").val() == '') {
+                        $("#pagamentoRetirada").focus();
+                            
+                        var menssagem = 'Informe uma Forma de Pagamento!'
+                        alerta('Atenção', menssagem, 'error')
+                        return
+                    }
+
+                    if($("#planoContas").val() == '') {
+                        $("#planoContas").focus();
+                            
+                        var menssagem = 'Informe um Plano de Conta!'
+                        alerta('Atenção', menssagem, 'error')
+                        return
+                    }
+
+                    if($("#centroCusto").val() == '') {
+                        $("#centroCusto").focus();
+                            
+                        var menssagem = 'Informe um Centro de Custo!'
+                        alerta('Atenção', menssagem, 'error')
+                        return
+                    }
+
+                    if($("#fornecedor").val() == '') {
+                        $("#fornecedor").focus();
+                            
+                        var menssagem = 'Informe um fornecedor!'
+                        alerta('Atenção', menssagem, 'error')
+                        return
+                    }
+    
+                    if($("#justificativa").val() == '') {
+                        $("#justificativa").focus();
+                            
+                        var menssagem = 'Informe uma justificativa!'
+                        alerta('Atenção', menssagem, 'error')
+                        return
+                    }
+    
                 }
                 
-                if($("#pagamentoRetirada").val() == '') {
-                    $("#pagamentoRetirada").focus();
-                        
-                    var menssagem = 'Informe uma forma de pagamento!'
-                    alerta('Atenção', menssagem, 'error')
-                    return
-                }
-
-                if($("#justificativa").val() == '') {
-                    $("#justificativa").focus();
-                        
-                    var menssagem = 'Informe uma justificativa!'
-                    alerta('Atenção', menssagem, 'error')
-                    return
-                }
-
-                //Para fechar o pop up dps que é feito uma retirada
-                $("#btnCancelar").trigger("click");
-
+                let tipo = typeof $("#planoContas").val() == 'undefined' ? 'SANGRIA' : 'RETIRADA';
                 let idCaixaAbertura = $("#inputAberturaCaixaId").val();
                 let valorRetirado = $("#valorRetirada").val().replace(".", "").replace(",", ".");
                 let arrayFormaPagamento = $("#pagamentoRetirada").val().split('-');
                 let formaPagamento = arrayFormaPagamento[0];
+                let planoContas = $("#planoContas").val();
+                let centroCustos = $("#centroCusto").val();
+                let fornecedor = $("#fornecedor").val();
                 let justificativa = $("#justificativa").val(); 
 
                 let inputsValuesConsulta = {
+                    inputTipo: tipo,
                     inputAberturaCaixaId: idCaixaAbertura,
                     inputValorRetirado: valorRetirado,
                     inputFormaPagamento: formaPagamento,
-                    inputJustificativa: justificativa
+                    inputPlanoContas: planoContas,
+                    inputCentroCustos: centroCustos,
+                    inputFornecedor: fornecedor,
+                    inputJustificativaRetirada: justificativa
                 }; 
 
                 let urlConsultaAberturaCaixa = "caixaPagamentoNovo.php";
@@ -342,8 +571,14 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     data: inputsValuesConsulta,
                     success: function(resposta) {
                         if(resposta != 'Impossivel retirar') {
+                            //Para fechar o pop up dps que é feito uma radioButtonRetirada
+                            $("#btnCancelar").trigger("click");
+
                             $("#valorRetirada").val('');
-                            $("#pagamentoRetirada").val('').change()
+                            $("#pagamentoRetirada").val('').change();               
+                            $("#planoContas").val('').change()
+                            $("#centroCusto").val('').change()
+                            $("#fornecedor").val('').change()
                             $("#justificativa").val('');
     
                             filtrar();
@@ -351,13 +586,13 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
     
                             $("#inputValorRetirada").val(valorRetirado);
                             $("#cmbPagamentoRetirada").val(formaPagamento);
-                            $("#inputJustificativa").val(justificativa);
+                            $("#inputJustificativaRetirada").val(justificativa);
     
                             $('#formRetiradaCaixa').attr('action', 'caixaImprimiReciboRetirada.php');
                             $('#formRetiradaCaixa').attr('target', '_blank');
                             $('#formRetiradaCaixa').submit();
                         }else {
-                            var menssagem = 'Não é possível retirar um valor superior ao saldo do atual!'
+                            var menssagem = 'Não é possível retirar um valor superior ao saldo atual!'
                             alerta('Atenção', menssagem, 'error')
                             return
                         }
@@ -382,6 +617,23 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                         $("#inputAberturaCaixaId").val(resposta.CxAbeId);                    
                         $("#inputCaixaId").val(resposta.CxAbeCaixa);
                         $("#inputAberturaCaixaNome").val(resposta.CaixaNome);
+
+                        let arrayDataAbertura = resposta.CxAbeDataHoraAbertura.split(" ")
+                        let dataAbertura = arrayDataAbertura[0]
+
+                        let arrayDataAtual = new Date();
+
+                        let mes = arrayDataAtual.getMonth()+1;
+                        let dia = arrayDataAtual.getDate();
+
+                        let dataAtual = arrayDataAtual.getFullYear() + '-' +
+                            (mes <10 ? '0' : '') + mes + '-' +
+                            (dia <10 ? '0' : '') + dia;
+
+                        //Esse input serve para não permitir o acesso ao PDV caso o caixa tenha uma data diferente da de hoje e não tenha sido fechado
+                        if(dataAbertura != dataAtual) {
+                            $("#inputSituacaoCaixa").val('DEVE_FECHAR');
+                        }
 
                         document.formCaixaAbertura.action = "caixaFechamento.php";
                         document.formCaixaAbertura.submit();
@@ -408,6 +660,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                             }
                             
                             $("#inputAberturaCaixaId").val(resposta.CxAbeId);
+                            $("#inputCaixaId").val(resposta.CxAbeCaixa);
                             $("#inputSaldoInicial").val(float2moeda(resposta.CxAbeSaldoFinal));
                         }
                     }
@@ -420,7 +673,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
 
 </head>
 
-<body class="navbar-top <?php echo $visibilidadeResumoFinanceiro; ?> sidebar-xs">
+<body class="navbar-top <?php echo $visibilidadeResumoCaixa; ?> sidebar-xs">
 
     <?php include_once("topo.php"); ?>
 
@@ -561,21 +814,6 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                         print('<option value="' . $item['FrPagId'] . '">' . $item['FrPagNome'] . '</option>');
                                                     }
                                                 }
-
-                                                //Para consulta
-                                                /*
-                                                foreach ($rowPlanoContas as $item) {
-                                                    if(isset($_SESSION['MovCaixaPlanoContas'])){
-                                                        if($item['PlConId'] == $_SESSION['MovCaixaPlanoContas']){
-                                                            print('<option value="' . $item['PlConId'] . '" selected>' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
-                                                        } else {
-                                                            print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');
-                                                        }
-                                                    } else {
-                                                        print('<option value="' . $item['PlConId'] . '">' . $item['PlConCodigo'] . ' - ' . $item['PlConNome'] . '</option>');                                                            
-                                                    }
-                                                }
-                                                */
                                                 ?>
                                             </select>
                                         </div>
@@ -648,13 +886,14 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
 					<input type="hidden" id="inputAberturaCaixaId" name="inputAberturaCaixaId" value="">
                     <input type="hidden" id="inputCaixaId" name="inputCaixaId" value="">
                     <input type="hidden" id="inputAberturaCaixaNome" name="inputAberturaCaixaNome" value="">
+                    <input type="hidden" id="inputSituacaoCaixa" name="inputSituacaoCaixa" value="">
 				</form>
 
                 
                 <form id="formRetiradaCaixa" name="formRetiradaCaixa" method="POST">
                     <input type="hidden" id="inputValorRetirada" name="inputValorRetirada" value="">
                     <input type="hidden" id="cmbPagamentoRetirada" name="cmbPagamentoRetirada" value="">
-                    <input type="hidden" id="inputJustificativa" name="inputJustificativa" value="">
+                    <input type="hidden" id="inputJustificativaRetirada" name="inputJustificativaRetirada" value="">
                 </form>
 
             </div>
@@ -662,7 +901,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
 
             <!-- Small modal -->
             <!--Procurar uma correção com relação ao filtro do select-->
-            <div id="modal_small_abertura_caixa" class="modal fade" tabindex="-1">
+            <div id="modal_small_abertura_caixa" class="modal fade">
                 <div class="modal-dialog modal-sm">
                     <div class="modal-content">
                         <div class="custon-modal-title">
@@ -690,7 +929,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     <input type="hidden" id="inputAbrirCaixa" name="inputAbrirCaixa" value="" class="form-control">
 
                                     <label for="cmbCaixa" class="font-size-lg">Caixa <span class="text-danger">*</span></label>
-                                    <select id="cmbCaixa" name="cmbCaixa" class="form-control form-control-select2 select2-hidden-accessible" required="" tabindex="-1" aria-hidden="true">
+                                    <select id="cmbCaixa" name="cmbCaixa" class="form-control form-control-select2 select2-hidden-accessible" required="" aria-hidden="true">
                                         <option value="">Selecionar</option>
                                         <?php
                                         
@@ -728,7 +967,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                 </div>
             </div>
             
-            <div id="modal_small_Retirada_Caixa" class="modal fade" tabindex="-1">
+            <div id="modal_small_Retirada_Caixa" class="modal fade">
                 <div class="modal-dialog modal-sm">
                     <div class="modal-content">
                         <div class="custon-modal-title">
@@ -737,42 +976,57 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                             <i class=""></i>
                         </div>
 
-                        <div class="modal-body">
-                            <div class="row mt-2">
-                                <div class="col-lg-5">
-                                    <div class="form-group">
-                                        <label for="valorRetirada" class="font-size-lg">Valor <span class="text-danger">*</span></label>
-                                        <input type="text" id="valorRetirada" name="valorRetirada" onkeyup="moeda(this)" class="form-control" required>
-                                    </div>
+                        <div class="modal-body mt-2">
+                            <div class="d-flex justify-content-center">
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input type="radio" name="radioFrequencia" id="radioButtonSangria" class="form-input-styled" value="" checked>Sangria
+                                    </label>
                                 </div>
-
-                                <div class="col-lg-7">
-                                    <div class="form-group">
-                                        <label for="pagamentoRetirada" class="font-size-lg">Forma de Pagamento <span class="text-danger">*</span></label>
-                                        <select id="pagamentoRetirada" name="pagamentoRetirada" class="form-control form-control-select2 select2-hidden-accessible" required tabindex="-1" aria-hidden="true">
-                                            <option value="">Selecionar</option>
-                                            <?php
-                                            $sql = "SELECT FrPagId, FrPagNome, FrPagChave
-                                                    FROM FormaPagamento
-                                                    JOIN Situacao on SituaId = FrPagStatus
-                                                    WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                    ORDER BY FrPagNome ASC";
-                               
-                                            $result = $conn->query($sql);
-                                            $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
-                                            foreach ($rowFormaPagamento as $item) {
-                                                print('<option value="' . $item['FrPagId'] . '-' . $item['FrPagChave'] . '">' . $item['FrPagNome'] . '</option>');
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
+                                <div class="form-check form-check-inline">
+                                    <label class="form-check-label">
+                                        <input type="radio" name="radioFrequencia" id="radioButtonRetirada" class="form-input-styled" value="">Retirada
+                                    </label>
                                 </div>
                             </div>
                             
-                            <div class="form-group">
-                                <label for="justificativa">Justificativa<span class="text-danger"> *</span></label>
-                                <div class="input-group">
-                                    <textarea id="justificativa" class="form-control" name="justificativa" rows="3" required></textarea>
+                            <div id="conteudoModalCorpoPagamento">
+                                <div class="row mt-4">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label for="valorRetirada" class="font-size-lg">Valor <span class="text-danger">*</span></label>
+                                            <input type="text" id="valorRetirada" name="valorRetirada" onkeyup="moeda(this)" class="form-control" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-8">
+                                        <div class="form-group">
+                                            <label for="pagamentoRetirada" class="font-size-lg">Forma de Pagamento <span class="text-danger">*</span></label>
+                                            <select id="pagamentoRetirada" name="pagamentoRetirada" required aria-hidden="true">
+                                                <option value="">Selecionar</option>
+                                                <?php
+                                                $sql = "SELECT FrPagId, FrPagNome, FrPagChave
+                                                        FROM FormaPagamento
+                                                        JOIN Situacao on SituaId = FrPagStatus
+                                                        WHERE FrPagUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                        ORDER BY FrPagNome ASC";
+                                
+                                                $result = $conn->query($sql);
+                                                $rowFormaPagamento = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                foreach ($rowFormaPagamento as $item) {
+                                                    print('<option value="' . $item['FrPagId'] . '-' . $item['FrPagChave'] . '">' . $item['FrPagNome'] . '</option>');
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                       
+                                <div class="form-group">
+                                    <label for="justificativa" class="font-size-lg">Justificativa<span class="text-danger"> *</span></label>
+                                    <div class="input-group">
+                                        <textarea id="justificativa" class="form-control" name="justificativa" rows="3" required></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -780,7 +1034,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                         <div class="modal-footer">
                             <button id="btnCancelar" type="button" class="btn btn-basic legitRipple" data-dismiss="modal">Cancelar</button>
                             <button id="btnFinalizarRetirada" type="button" class="btn bg-slate legitRipple">Finalizar e Imprimir</button>
-                        </div>
+                        </div>       
                     </div>
                 </div>
             </div>
