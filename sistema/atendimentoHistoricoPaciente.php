@@ -287,7 +287,7 @@ if ($row['ClienSexo'] == 'F'){
 								<div class="col-lg-6">
 									<div class="card-header header-elements-inline" style="padding-left: 0px;">
 										<h3 class="card-title"><b>DATA DO ATENDIMENTO AMBULATORIAL</b></h3>
-										<button id="imprimir" class="btn btn-secondary btn-icon" disabled>
+										<button style="margin-top:-5px" id="imprimir" class="btn btn-secondary btn-icon" disabled>
                                             <i class="icon-printer2"></i>
                                         </button>
 									</div>
