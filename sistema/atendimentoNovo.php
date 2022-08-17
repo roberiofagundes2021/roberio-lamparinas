@@ -1166,7 +1166,7 @@ if($iAtendimento){
 					<div class="col-lg-12">
 						<div class="card">
 							<div class="card-header bg-white header-elements-inline">
-								<h6 class="card-title">Cadastro de novo atendimento</h6>
+								<h3 class="card-title">Cadastro do novo atendimento</h3>
 								<div class="header-elements">
 									<!-- <div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
