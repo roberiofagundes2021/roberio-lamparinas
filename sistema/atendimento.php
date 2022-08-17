@@ -32,7 +32,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Atendimentos</title>
+	<title>Lamparinas | Atendimento</title>
 
 	<?php include_once("head.php"); ?>
 	<style>
@@ -537,14 +537,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							<!-- Basic responsive configuration -->
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h5 class="card-title">Relação de Atendimentos</h5>
-									<div class="header-elements">
-										<!-- <div class="list-icons">
-											<a class="list-icons-item" data-action="collapse"></a>
-											<a href="perfil.php" class="list-icons-item" data-action="reload"></a>
-											<a class="list-icons-item" data-action="remove"></a>
-										</div> -->
-									</div>
+									<h3 class="card-title">Relação de Atendimentos</h3>
 								</div>
 
 								<div class="card-body">
@@ -567,75 +560,71 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 									</div>
 								</div>
 							</div>
-
-								<div class="card">
-									<div class="card-header header-elements-inline">
-										<h5 class="card-title">Agendamentos</h5>
-										<div class="header-elements">
-											<div class="list-icons">
-												<a class="list-icons-item" data-action="collapse"></a>
-												<!-- <a href="perfil.php" class="list-icons-item" data-action="reload"></a>
-												<a class="list-icons-item" data-action="remove"></a> -->
-											</div>
+							<!-- Agendamentos -->
+							<div class="card">
+								<div class="card-header header-elements-inline">
+									<h3 class="card-title">Agendamentos</h3>
+									<div class="header-elements">
+										<div class="list-icons">
+											<a class="list-icons-item" data-action="collapse"></a>
 										</div>
 									</div>
-	
-									<table class="table" id="AgendamentoTable">
-										<thead>
-											<tr class="bg-slate text-center">
-												<th>Data</th>
-												<th>Horario</th>
-												<th>Espera</th>
-												<th>Nº Registro</th>
-												<th>Prontuário</th>			
-												<th>Paciente</th>
-												<th>Profissional</th>
-												<th>Modalidade</th>
-												<th>Procedimento</th>
-												<th>Situação</th>
-												<th class="text-center">Ações</th>
-											</tr>
-										</thead>
-										<tbody>
-	
-										</tbody>
-									</table>
 								</div>
 
-								<div class="card">
-									<div class="card-header header-elements-inline">
-										<h5 class="card-title">Atendimentos</h5>
-										<div class="header-elements">
-											<div class="list-icons">
-												<a class="list-icons-item" data-action="collapse"></a>
-												<!-- <a href="perfil.php" class="list-icons-item" data-action="reload"></a>
-												<a class="list-icons-item" data-action="remove"></a> -->
-											</div>
-										</div>
-									</div>
-	
-									<table class="table" id="AtendimentoTable">
-										<thead>
-											<tr class="bg-slate text-center">
-												<th>Data</th>
-												<th>Horario</th>
-												<th>Espera</th>
-												<th>Nº Registro</th>
-												<th>Prontuário</th>			
-												<th>Paciente</th>
-												<th>Profissional</th>
-												<th>Modalidade</th>
-												<th>Procedimento</th>
-												<th>Situação</th>
-												<th class="text-center">Ações</th>
-											</tr>
-										</thead>
-										<tbody>
-	
-										</tbody>
-									</table>
-								</div>
+								<table class="table" id="AgendamentoTable">
+									<thead>
+										<tr class="bg-slate text-center">
+											<th>Data</th>
+											<th>Horario</th>
+											<th>Espera</th>
+											<th>Nº Registro</th>
+											<th>Prontuário</th>			
+											<th>Paciente</th>
+											<th>Profissional</th>
+											<th>Modalidade</th>
+											<th>Procedimento</th>
+											<th>Situação</th>
+											<th class="text-center">Ações</th>
+										</tr>
+									</thead>
+									<tbody>
+
+									</tbody>
+								</table>
 							</div>
+ 							<!-- Atendimentos -->
+							<div class="card">
+								<div class="card-header header-elements-inline">
+									<h3 class="card-title">Atendimentos</h3>
+									<div class="header-elements">
+										<div class="list-icons">
+											<a class="list-icons-item" data-action="collapse"></a>
+										</div>
+									</div>
+								</div>
+
+								<table class="table" id="AtendimentoTable">
+									<thead>
+										<tr class="bg-slate text-center">
+											<th>Data</th>
+											<th>Horario</th>
+											<th>Espera</th>
+											<th>Nº Registro</th>
+											<th>Prontuário</th>			
+											<th>Paciente</th>
+											<th>Profissional</th>
+											<th>Modalidade</th>
+											<th>Procedimento</th>
+											<th>Situação</th>
+											<th class="text-center">Ações</th>
+										</tr>
+									</thead>
+									<tbody>
+
+									</tbody>
+								</table>
+							</div>
+						</div>
 					</div>
 				<?php } elseif ($acesso == 'PROFISSIONAL'){ ?>
 					<!-- Visão Atendente -->		
@@ -644,82 +633,84 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							<!-- Basic responsive configuration -->
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h5 class="card-title">Relação de Pacientes</h5>
-									<div class="header-elements">
-										<div class="list-icons">
-											<a class="list-icons-item" data-action="collapse"></a>
-											<a href="perfil.php" class="list-icons-item" data-action="reload"></a>
-											<!--<a class="list-icons-item" data-action="remove"></a>-->
-										</div>
-									</div>
+									<h3 class="card-title">Relação de Atendimento</h3>
 								</div>
-
 								<div class="card-body">
 									<div class="row">
 										<div class="col-lg-9">
-											A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
+											<p class="font-size-lg">A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 										</div>
-										<div class="col-lg-12 row text-right p-0">
-											<div class="text-right col-sm-10 p-0"><!-- EESPASSO --></div>
-											<div class="text-right col-sm-2 p-0"><a href="#" class="btn bg-secondary" role="button">Imprimir Relação</a></div>
+										<div class="col-lg-3">
+											<div class="dropdown p-0" style="float:right; margin-left: 5px;">
+												<div class="text-right col-sm-2 p-0"><a href="#" class="btn bg-secondary" role="button">Imprimir Relação</a></div>
+											</div>
 										</div>
 									</div>
 								</div>
-
+							</div>
 								
-								<!-- Em espera -->
-								<div>
-									<div class="card-header header-elements-inline">
-										<h5 class="card-title">Pacientes em espera</h5>
+							<!-- Em espera -->
+							<div class="card">
+								<div class="card-header header-elements-inline">
+									<h3 class="card-title">Pacientes em espera</h3>
+									<div class="header-elements">
+										<div class="list-icons">
+											<a class="list-icons-item" data-action="collapse"></a>
+										</div>
 									</div>
-	
-									<table class="table" id="AtendimentoTableEspera">
-										<thead>
-											<tr class="bg-slate text-center">
-												<th>Data</th>
-												<th>Horario</th>
-												<th>Espera</th>
-												<th>Nº Registro</th>
-												<th>Prontuário</th>			
-												<th>Paciente</th>
-												<th>Procedimento</th>
-												<th>Risco</th>
-												<th>Situação</th>
-												<th class="text-center">Ações</th>
-											</tr>
-										</thead>
-										<tbody id="dataAtendimentos">
-	
-										</tbody>
-									</table>
 								</div>
 
-								<!-- Atendidos -->
-								<div>
-									<div class="card-header header-elements-inline">
-										<h5 class="card-title">Pacientes Atendidos</h5>
+								<table class="table" id="AtendimentoTableEspera">
+									<thead>
+										<tr class="bg-slate text-center">
+											<th>Data</th>
+											<th>Horario</th>
+											<th>Espera</th>
+											<th>Nº Registro</th>
+											<th>Prontuário</th>			
+											<th>Paciente</th>
+											<th>Procedimento</th>
+											<th>Risco</th>
+											<th>Situação</th>
+											<th class="text-center">Ações</th>
+										</tr>
+									</thead>
+									<tbody id="dataAtendimentos">
+
+									</tbody>
+								</table>
+							</div>
+
+							<!-- Atendidos -->
+							<div  class="card">
+								<div class="card-header header-elements-inline">
+									<h3 class="card-title">Pacientes Atendidos</h3>
+									<div class="header-elements">
+										<div class="list-icons">
+											<a class="list-icons-item" data-action="collapse"></a>
+										</div>
 									</div>
-	
-									<table class="table" id="AtendimentoTableAtendido">
-										<thead>
-											<tr class="bg-slate text-center">
-												<th>Data</th>
-												<th>Horario</th>
-												<th>Espera</th>
-												<th>Nº Registro</th>
-												<th>Prontuário</th>			
-												<th>Paciente</th>
-												<th>Procedimento</th>
-												<th>Risco</th>
-												<th>Situação</th>
-												<th class="text-center">Ações</th>
-											</tr>
-										</thead>
-										<tbody id="dataAtendimentos">
-	
-										</tbody>
-									</table>
 								</div>
+
+								<table class="table" id="AtendimentoTableAtendido">
+									<thead>
+										<tr class="bg-slate text-center">
+											<th>Data</th>
+											<th>Horario</th>
+											<th>Espera</th>
+											<th>Nº Registro</th>
+											<th>Prontuário</th>			
+											<th>Paciente</th>
+											<th>Procedimento</th>
+											<th>Risco</th>
+											<th>Situação</th>
+											<th class="text-center">Ações</th>
+										</tr>
+									</thead>
+									<tbody id="dataAtendimentos">
+
+									</tbody>
+								</table>
 							</div>
 						</div>
 					</div>
