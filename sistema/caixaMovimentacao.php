@@ -43,6 +43,8 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
     <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
    
     <!-- /theme JS files -->
 
@@ -184,6 +186,125 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
             $("#submitFiltro").on('click', () => {
                 filtrar();
+            })
+
+            function validaCPF(strCPF) {
+                var Soma;
+                var Resto;
+                Soma = 0;
+
+                strCPF = strCPF.replace(/[^\d]+/g,'');
+
+                for(let i = 0; i <= 9; i++) {
+                    let digito = i + "";
+                    let cpf = digito + digito + digito + digito + digito + digito + digito + digito + digito + digito + digito;
+
+                    if(strCPF == cpf) return false;
+                }
+                    
+                for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+                    Resto = (Soma * 10) % 11;
+                    
+                if ((Resto == 10) || (Resto == 11))  Resto = 0;
+                if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
+        
+                Soma = 0;
+                for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+                    Resto = (Soma * 10) % 11;
+                
+                if ((Resto == 10) || (Resto == 11))  Resto = 0;
+                if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
+                return true;
+            }
+
+            //A função $(document).on... trabalha dinâmicamente, neste caso funciona com html colocado posteriormente via javascript
+		    $(document).on("change", "#pagamentoRetirada", function(){
+                let arrayFormaPagamentoId = $(this).val().split("-");;
+                
+                if(arrayFormaPagamentoId[1] == 'CHEQUE') {
+                    $("#detalhamentoCheque").trigger("click");
+                }
+            });
+
+            $("#btnCancelaDadosCheque").on('click', () => {
+                var menssagem = 'Forma de pagamento por cheque cancelada!'
+                alerta('Atenção', menssagem, 'error')
+
+                $("#pagamentoRetirada").val('').change()
+            })
+
+            $("#btnDadosCheque").on('click', () => {
+                if($("#numCheque").val() == '') {
+                    $("#numCheque").focus();
+                    var menssagem = 'Por favor informe o Nº do cheque!'
+                    alerta('Atenção', menssagem, 'error')
+					return;
+                }
+
+                if($("#valorCheque").val() == '') {
+                    $("#valorCheque").focus();
+                    var menssagem = 'Por favor informe o valor do cheque!'
+                    alerta('Atenção', menssagem, 'error')
+					return;
+                }
+
+                if($("#dataEmissaoCheque").val() == '') {
+                    $("#dataEmissaoCheque").focus();
+                    var menssagem = 'Por favor informe a data de emissão do cheque!'
+                    alerta('Atenção', menssagem, 'error')
+					return;
+                }
+
+                if($("#dataVencimentoCheque").val() == '') {
+                    $("#dataVencimentoCheque").focus();
+                    var menssagem = 'Por favor informe a data de vencimento do cheque!'
+                    alerta('Atenção', menssagem, 'error')
+					return;
+                }
+
+                if($("#cmbBancoCheque").val() == '') {
+                    $("#cmbBancoCheque").focus();
+                    var menssagem = 'Por favor informe o banco!'
+                    alerta('Atenção', menssagem, 'error')
+					return;
+                }
+
+                if($("#agenciaCheque").val() == '') {
+                    $("#agenciaCheque").focus();
+                    var menssagem = 'Por favor informe a agência!'
+                    alerta('Atenção', menssagem, 'error')
+					return;
+                }
+
+                if($("#contaCheque").val() == '') {
+                    $("#contaCheque").focus();
+                    var menssagem = 'Por favor informe a conta!'
+                    alerta('Atenção', menssagem, 'error')
+					return;
+                }
+
+                if($("#nomeCheque").val() == '') {
+                    $("#nomeCheque").focus();
+                    var menssagem = 'Por favor informe o nome!'
+                    alerta('Atenção', menssagem, 'error')
+					return;
+                }
+
+                if($("#cpfCheque").val() == '') {
+                    $("#cpfCheque").focus();
+                    var menssagem = 'Por favor informe o CPF!'
+                    alerta('Atenção', menssagem, 'error')
+					return;
+                }
+
+                if(!validaCPF($("#cpfCheque").val())) {
+                    $("#cpfCheque").focus();
+                    var menssagem = 'CPF inválido!'
+                    alerta('Atenção', menssagem, 'error')
+					return;
+                }
+
+                $('#modal_large_detalhamento_cheque').modal('hide');
             })
 
             $("#cmbCaixa").on("change", function() {
@@ -486,9 +607,7 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                         var menssagem = 'Informe uma justificativa!'
                         alerta('Atenção', menssagem, 'error')
                         return
-                    }
-
-                    
+                    }                    
                 }else {
                     if($("#valorRetirada").val() == '') {
                         $("#valorRetirada").focus();
@@ -545,10 +664,20 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                 let valorRetirado = $("#valorRetirada").val().replace(".", "").replace(",", ".");
                 let arrayFormaPagamento = $("#pagamentoRetirada").val().split('-');
                 let formaPagamento = arrayFormaPagamento[0];
+                let nomeFormaPagamento = arrayFormaPagamento[1];
                 let planoContas = $("#planoContas").val();
                 let centroCustos = $("#centroCusto").val();
                 let fornecedor = $("#fornecedor").val();
                 let justificativa = $("#justificativa").val(); 
+                let numeroCheque = nomeFormaPagamento == 'CHEQUE' ? $("#numCheque").val() : '';
+                let valorCheque = nomeFormaPagamento == 'CHEQUE' ? $("#valorCheque").val() : '';
+                let dataEmissao = nomeFormaPagamento == 'CHEQUE' ? $("#dataEmissaoCheque").val() : '';
+                let dataVencimento = nomeFormaPagamento == 'CHEQUE' ? $("#dataVencimentoCheque").val() : '';
+                let bancoCheque = nomeFormaPagamento == 'CHEQUE' ? $("#cmbBancoCheque").val() : '';
+                let agenciaCheque = nomeFormaPagamento == 'CHEQUE' ? $("#agenciaCheque").val() : '';
+                let contaCheque = nomeFormaPagamento == 'CHEQUE' ? $("#contaCheque").val() : '';
+                let nomeCheque = nomeFormaPagamento == 'CHEQUE' ? $("#nomeCheque").val() : '';
+                let cpfCheque = nomeFormaPagamento == 'CHEQUE' ? $("#cpfCheque").val().replaceAll(".", "").replace("-", "") : '';
 
                 let inputsValuesConsulta = {
                     inputTipo: tipo,
@@ -558,7 +687,16 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                     inputPlanoContas: planoContas,
                     inputCentroCustos: centroCustos,
                     inputFornecedor: fornecedor,
-                    inputJustificativaRetirada: justificativa
+                    inputJustificativaRetirada: justificativa,
+                    inputNumeroCheque: numeroCheque,
+                    inputValorCheque: valorCheque,
+                    inputDataEmissaoCheque: dataEmissao,
+                    inputDataVencimentoCheque: dataVencimento,
+                    inputBancoCheque: bancoCheque,
+                    inputAgenciaCheque: agenciaCheque,
+                    inputContaCheque: contaCheque,
+                    inputNomeCheque: nomeCheque,
+                    inputCpfCheque: cpfCheque
                 }; 
 
                 let urlConsultaAberturaCaixa = "caixaPagamentoNovo.php";
@@ -705,6 +843,7 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
                                 <!--Link para abertura de caixa-->
                                 <a id="aberturaCaixa" data-toggle="modal" data-target="#modal_small_abertura_caixa"></a>
+                                <a id="detalhamentoCheque" data-toggle="modal" data-target="#modal_large_detalhamento_cheque"></a>
 
                                 <form id="formImprime" method="POST" target="_blank">
                                     <input id="TipoProdutoServico" type="hidden" name="TipoProdutoServico"></input>
@@ -966,8 +1105,8 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                     </div>
                 </div>
             </div>
-            
-            <div id="modal_small_Retirada_Caixa" class="modal fade">
+
+            <div id="modal_small_Retirada_Caixa" class="modal fade" tabindex="-1">
                 <div class="modal-dialog modal-sm">
                     <div class="modal-content">
                         <div class="custon-modal-title">
@@ -1035,6 +1174,111 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                             <button id="btnCancelar" type="button" class="btn btn-basic legitRipple" data-dismiss="modal">Cancelar</button>
                             <button id="btnFinalizarRetirada" type="button" class="btn bg-slate legitRipple">Finalizar e Imprimir</button>
                         </div>       
+                    </div>
+                </div>
+            </div>
+
+            <div id="modal_large_detalhamento_cheque" data-backdrop="static" class="modal fade" tabindex="-1" style="z-index: 1060;">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="custon-modal-title">
+                            <i class=""></i>
+                            <h2 class="modal-title p-2">Detalhamento de Cheque</h2>
+                            <i class=""></i>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="numCheque" class="font-size-lg">Nº do Cheque <span class="text-danger">*</span></label>
+                                        <input type="text" id="numCheque" name="numCheque" value="" class="form-control removeValidacao font-size-lg">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="valorCheque" class="font-size-lg">Valor <span class="text-danger">*</span></label>
+                                        <input type="text" id="valorCheque" onkeyup="moeda(this)" name="valorCheque" value="" class="form-control removeValidacao font-size-lg">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="dataEmissaoCheque" class="font-size-lg">Data da Emissão <span class="text-danger">*</span></label>
+                                        <input type="date" id="dataEmissaoCheque" name="dataEmissaoCheque" min="1800-01-01" max="2100-12-12" class="form-control font-size-lg" value="<?php echo date('Y-m-d'); ?>">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="dataVencimentoCheque" class="font-size-lg">Data do Vencimento <span class="text-danger">*</span></label>
+                                        <input type="date" id="dataVencimentoCheque" name="dataVencimentoCheque" min="1800-01-01" max="2100-12-12" class="form-control font-size-lg" value="<?php echo date('Y-m-d'); ?>">
+                                    </div>
+                                </div>
+                            </div>
+                                
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <!--Input para controle, para que caso acesse o PDV pela abertura de caixa ele fará o cadastro da nova abertura de caixa-->
+                                        <input type="hidden" id="inputAbrirCaixa" name="inputAbrirCaixa" value="" class="form-control removeValidacao">
+    
+                                        <label for="cmbBancoCheque">Banco <span class="text-danger">*</span></label>
+                                        <select id="cmbBancoCheque" name="cmbBancoCheque" class="form-control form-control-select2 select2-hidden-accessible" aria-hidden="true">
+                                            <option value="">Selecionar</option>
+                                            <?php
+                                            $sql = "SELECT CnBanId, CnBanNome
+                                                    FROM ContaBanco
+                                                    JOIN Situacao on SituaId = CnBanStatus
+                                                    WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                    ORDER BY CnBanNome ASC";
+                                            $result = $conn->query($sql);
+                                            $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+                                            foreach ($rowContaBanco as $item) {
+                                                print('<option value="' . $item['CnBanId'] . '">' . $item['CnBanNome'] . '</option>');
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="agenciaCheque" class="font-size-lg">Agência <span class="text-danger">*</span></label>
+                                        <input type="text" id="agenciaCheque" name="agenciaCheque" value="" class="form-control removeValidacao font-size-lg">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="contaCheque" class="font-size-lg">Conta <span class="text-danger">*</span></label>
+                                        <input type="text" id="contaCheque" name="contaCheque" value="" class="form-control removeValidacao font-size-lg">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-9">
+                                    <div class="form-group">
+                                        <label for="nomeCheque" class="font-size-lg">Nome <span class="text-danger">*</span></label>
+                                        <input type="text" id="nomeCheque" name="nomeCheque" value="" class="form-control removeValidacao font-size-lg">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label for="cpfCheque" class="font-size-lg">CPF <span class="text-danger">*</span></label>
+                                        <input type="text" id="cpfCheque" name="cpfCheque" value="" data-mask="999.999.999-99" class="form-control removeValidacao font-size-lg">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button id="btnCancelaDadosCheque" type="button" class="btn btn-basic legitRipple" data-dismiss="modal">Cancelar</button>
+                            <button id="btnDadosCheque" class="btn bg-slate legitRipple">Salvar</button>
+                        </div>
                     </div>
                 </div>
             </div>

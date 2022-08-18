@@ -39,7 +39,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 			$('.form-check-label > input[type="checkbox"][value="multiselect-all"]').prop( "checked", true );
 		});
 
-		//A função .on("click"): trabalha dinâmicamente, ou seja, funciona antes q o objeto seja carregado na página
+		//A função $(document).on... trabalha dinâmicamente, ou seja, funciona antes q o objeto seja carregado na página
 		//Carrega os planos de contas sintéticos
 		$(document).on("click", ".planoConta", function(){
 			let planoConta = $(this).attr('id');
