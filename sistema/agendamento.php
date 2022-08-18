@@ -5,7 +5,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Agendamentos';
+$_SESSION['PaginaAtual'] = 'Agendamento';
 
 include('global_assets/php/conexao.php');
 
@@ -19,7 +19,7 @@ include('global_assets/php/conexao.php');
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Agendamentos</title>
+	<title>Lamparinas | Agendamento</title>
 
 	<?php include_once("head.php"); ?>
 	<style>
@@ -286,7 +286,7 @@ include('global_assets/php/conexao.php');
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h5 class="card-title">Relação de Agendamentos</h5>
+								<h3 class="card-title">Relação de Agendamentos</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<!-- <a class="list-icons-item" data-action="collapse"></a>
@@ -318,7 +318,7 @@ include('global_assets/php/conexao.php');
 						</div>
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h5 class="card-title">Agendamentos</h5>
+								<h3 class="card-title">Agendamentos</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>

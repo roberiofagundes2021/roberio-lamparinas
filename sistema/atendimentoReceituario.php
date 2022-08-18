@@ -195,17 +195,7 @@ if (isset($_POST['txtareaConteudo']) ){
 		})
 
 	}); //document.ready
-			
-		// Calculo da idade do paciente.
-		
-		<?php
-			$date1 = new DateTime($row['ClienDtNascimento']);
-			$date2 = new DateTime();
-			$interval = $date1->diff($date2); 
-		?>
-
-
-
+	
 	</script>
 
 </head>
@@ -305,7 +295,7 @@ if (isset($_POST['txtareaConteudo']) ){
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label>Idade  : <?php echo " " . $interval->y . " anos, " . $interval->m." meses, ".$interval->d." dias"; ?></label> 
+												<label>Idade: <?php echo calculaIdade($row['ClienDtNascimento']); ?></label>
 											</div>
 										</div>
 										<div class="col-lg-3">

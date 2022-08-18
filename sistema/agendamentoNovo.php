@@ -795,10 +795,8 @@ if(isset($_POST['iAgendamento'])){
 											<!--  -->
 										</select>
 									</div>
-									<div class="col-lg-1 text-right">
-										<button class="btn btn-lg btn-principal" id="inserirServico" >
-											<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
-										</button>
+									<div class="col-lg-1" style="margin-top: -5px;">
+										<a class="btn btn-lg btn-principal" id="inserirServico">Incluir</a>
 									</div>
 								</div>
 

@@ -136,11 +136,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						alerta('Permissão Negada!','');
 						return false;
 					}
+				} else if(Tipo == 'agenda'){
+					document.formProfissional.action = "profissionalAgenda.php";
 				}
 			}
-			
 			document.formProfissional.submit();
-			
 		}		
 			
 	</script>
@@ -247,6 +247,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															    <a href="#" onclick="atualizaProfissional(1,'.$item['ProfiId'].', \''.$item['ProfiNome'].'\','.$item['ProfiStatus'].', \'anexo\');" class="dropdown-item"><i class="icon-attachment" title="Anexos"></i> Anexos</a>
 															<div class="dropdown-divider"></div>
 																<a href="#" onclick="atualizaProfissional(1,'.$item['ProfiId'].', \''.$item['ProfiNome'].'\','.$item['ProfiStatus'].', \'historico\');" class="dropdown-item" title="Histórico"><i class="icon-stack"></i> Histórico</a>
+																<a href="#" onclick="atualizaProfissional(1,'.$item['ProfiId'].', \''.$item['ProfiNome'].'\','.$item['ProfiStatus'].', \'agenda\');" class="dropdown-item" title="Agenda"><i class="icon-calendar2"></i> Agenda</a>
 														</div>
 													</div>
 												</div>

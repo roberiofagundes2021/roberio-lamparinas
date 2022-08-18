@@ -20,7 +20,7 @@ $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
 
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtClaNome, AtendDataRegistro, AtModNome, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
-               ClienNomeMae, ClienCartaoSus, ClienCelular, ClienStatus, ClienUsuarioAtualizador, ClienUnidade, ClResNome
+               ClienNomeMae, ClienCartaoSus, ClienCelular, ClResNome
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
@@ -36,7 +36,7 @@ $iAtendimentoId = $row['AtendId'];
 $iClienteId = $row['ClienId'];
 
 
-$sql = "SELECT  AtendNumRegistro, AtendDataRegistro, AtClaNome, AtendId
+$sql = "SELECT AtendId, AtendNumRegistro, AtendDataRegistro, AtClaNome
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
@@ -127,7 +127,7 @@ if ($row['ClienSexo'] == 'F'){
 			//Esse ajax está sendo usado para verificar no banco se o registro já existe
 			$.ajax({
 				type: "POST",
-				url: "atendimentoHistoricoValida.php",
+				url: "atendimentoHistoricoPacienteValida.php",
 				data: ('historicoId=' + inputHistoricoId ),
 				success: function(resposta) {
 
@@ -287,6 +287,9 @@ if ($row['ClienSexo'] == 'F'){
 								<div class="col-lg-6">
 									<div class="card-header header-elements-inline" style="padding-left: 0px;">
 										<h3 class="card-title"><b>DATA DO ATENDIMENTO AMBULATORIAL</b></h3>
+										<button style="margin-top:-5px" id="imprimir" class="btn btn-secondary btn-icon" disabled>
+                                            <i class="icon-printer2"></i>
+                                        </button>
 									</div>
 									<div class="form-group" style="border: 1px solid #ccc;">
 										<div id="txtareaHistorico" style="padding: 10px; min-height: 200px;"></div>
