@@ -120,6 +120,13 @@ if ($row['ClienSexo'] == 'F'){
                 
 			});
 
+			// Imprimir Histórico
+			$('#imprimir').on('click', function(e){
+				
+				$('#formAtendimentoHistorico').attr('target', '_blank');
+				$('#formAtendimentoHistorico').submit();
+			});
+
 		}); //document.ready
 
 		function buscarHistorico(inputHistoricoId){
@@ -131,7 +138,11 @@ if ($row['ClienSexo'] == 'F'){
 				data: ('historicoId=' + inputHistoricoId ),
 				success: function(resposta) {
 
-					$('#txtareaHistorico').html(resposta);
+					if(resposta){
+						
+						$('#imprimir').show();
+						$('#txtareaHistorico').html(resposta);
+					}					
 				}
 			})
 		}
@@ -287,7 +298,7 @@ if ($row['ClienSexo'] == 'F'){
 								<div class="col-lg-6">
 									<div class="card-header header-elements-inline" style="padding-left: 0px;">
 										<h3 class="card-title"><b>DATA DO ATENDIMENTO AMBULATORIAL</b></h3>
-										<button style="margin-top:-5px" id="imprimir" class="btn btn-secondary btn-icon" disabled>
+										<button style="margin-top:-5px; display:none;" id="imprimir" class="btn btn-secondary btn-icon">
                                             <i class="icon-printer2"></i>
                                         </button>
 									</div>
