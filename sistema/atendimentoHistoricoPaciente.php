@@ -20,7 +20,7 @@ $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
 
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtClaNome, AtendDataRegistro, AtModNome, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
-               ClienNomeMae, ClienCartaoSus, ClienCelular, ClResNome
+               ClienNomeMae, ClienCartaoSus, ClienCelular, ClResNome, AtClaChave
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
@@ -297,7 +297,16 @@ if ($row['ClienSexo'] == 'F'){
 								</div>
 								<div class="col-lg-6">
 									<div class="card-header header-elements-inline" style="padding-left: 0px;">
-										<h3 class="card-title"><b>DATA DO ATENDIMENTO AMBULATORIAL</b></h3>
+										<?php
+											//if ($row['AtClaChave'] == "AMBULATORIAL") {	
+												//echo '<h3 class="card-title"><b>DATA DO ATENDIMENTO AMBULATORIAL</b></h3>';
+											//} else if  ($row['AtClaChave'] == "ELETIVO"){
+												//echo '<h3 class="card-title"><b>DATA DO ATENDIMENTO ELETIVO</b></h3>';
+											//} else {
+												echo '<h3 class="card-title"><b>DATA DO ATENDIMENTO</b></h3>';
+											//}
+										?>	
+										
 										<button style="margin-top:-5px; display:none;" id="imprimir" class="btn btn-secondary btn-icon">
                                             <i class="icon-printer2"></i>
                                         </button>
