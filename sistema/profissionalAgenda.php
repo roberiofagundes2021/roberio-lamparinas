@@ -87,7 +87,60 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 			$('#modal-close-x').on('click', ()=>{
 				$('#page-modal-agenda').fadeOut(200);
 			})
+			$('#salvarAgenda').on('click', ()=>{
+				$.ajax({
+					type: 'POST',
+					url: 'filtraProfissionalAgenda.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'SALVAAGENDA',
+						'iProfissional': $('#iProfissional').val()
+					},
+					success: function(response) {
+						alerta(response.titulo, response.menssagem, response.status)
+						FullCalendarAdvanced.init();
+					}
+				});
+			})
 		})
+
+		function formatDate(start,end){
+			let dataI = ''
+			let dataF = ''
+			// as vezes ao vir do banco o campo "start" e "end" está como string,
+			// e quando ele é criado aqui vem como array. Assim precisa desse switch.
+			if(start){
+				switch (typeof start){
+					case 'object': // "[YYYY,MM,DD,HH,mm,ss]"
+						let dia = start[2] > 9?start[2]:'0'+start[2]
+						let mes = start[1] > 9?(start[1]+1):'0'+(start[1]+1)
+
+						let hora = start[3] > 9?start[3]:'0'+start[3]
+						let minuto = start[4] > 9?start[4]:'0'+start[4]
+
+						dataI = start[0]+'-'+mes+'-'+dia+'T'+hora+':'+minuto+':00';
+						dataI = new Date(dataI).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+						break;
+					default:dataI = new Date(start).toLocaleString("pt-BR", {timeZone: "America/Bahia"});break;
+				}
+			}
+			if(end){
+				switch (typeof end){
+					case 'object': // "[YYYY,MM,DD,HH,mm,ss]"
+						let dia = end[2] > 9?end[2]:'0'+end[2]
+						let mes = end[1] > 9?(end[1]+1):'0'+(end[1]+1)
+
+						let hora = end[3] > 9?end[3]:'0'+end[3]
+						let minuto = end[4] > 9?end[4]:'0'+end[4]
+
+						dataF = end[0]+'-'+mes+'-'+dia+'T'+hora+':'+minuto+':00';
+						dataF = new Date(dataF).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+						break;
+					default:dataF = new Date(end).toLocaleString("pt-BR", {timeZone: "America/Bahia"});break;
+				}
+			}
+			return {dataI:dataI,dataF:dataF}
+		}
 
 		var dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"});
 		dataAtual = dataAtual.split(' ')[0];
@@ -103,7 +156,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 			success: function(response) {
 				$('#locaisAtendimento').html('').show()
 				response.forEach(function(item){
-					$('#locaisAtendimento').append(`<div class="fc-event" data-color="${item.cor}">${item.nome}</div>`)
+					$('#locaisAtendimento').append(`<div data-agenda="${item.id}" class="fc-event" data-local="${item.idLocal}" data-color="${item.cor}">${item.nome}</div>`)
 				});
 			}
 		});
@@ -119,7 +172,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 					return;
 				}
 				var eventColors = agenda;
-				// [
+				// agenda = [
 				// 	{
 				// 		id: 999,
 				// 		url: 'http://google.com/',
@@ -140,13 +193,102 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 					editable: true,
 					defaultDate: dataAtual,
 					events: eventColors,
+					timeZone: 'America/Bahia',
 					locale: 'pt-br',
-					droppable: true, // this allows things to be dropped onto the calendar
-						drop: function() {
-							$(this).remove();
-							console.log($(this).data());
-							$('#page-modal-agenda').fadeIn();
-					},
+					droppable: true,
+						drop: function() { //ao soltar
+							// $(this).remove();
+							let id = event.id?event.id:(event._id?event._id:'N/A')
+							let localId = event.localId
+							let title = event.title
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+
+							let data = formatDate(dtI, dtF)
+
+							$.ajax({
+								type: 'POST',
+								url: 'filtraProfissionalAgenda.php',
+								dataType: 'json',
+								data:{
+									'tipoRequest': 'SETAGENDA',
+									'id':id,
+									'localId':localId,
+									'title':title,
+									'dataI':data.dataI,
+									'dataF':data.dataF,
+									'dataF':data.dataF
+								},
+								success: function(response) {
+									console.log(response)
+								}
+							});
+						},
+						eventClick: function(event, jsEvent, view) { //ao clicar em cima
+							console.log(event)
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+
+							let data = formatDate(dtI, dtF)
+
+							console.log('Início: '+data.dataI)
+							console.log('Fim: '+data.dataF)
+						},
+						eventDrop: function(event, jsEvent, ui, view) { // ao arrastar e soltar
+							let id = event.id?event.id:event._id
+							let localId = event.localId
+							let title = event.title
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+
+							let data = formatDate(dtI, dtF)
+
+							$.ajax({
+								type: 'POST',
+								url: 'filtraProfissionalAgenda.php',
+								dataType: 'json',
+								data:{
+									'tipoRequest': 'SETAGENDA',
+									'id':id,
+									'localId':localId,
+									'title':title,
+									'dataI':data.dataI,
+									'dataF':data.dataF,
+									'dataF':data.dataF
+								},
+								success: function(response) {
+									console.log(response)
+								}
+							});
+						},
+						eventResize: function(event, delta, revertFunc) { // ao redimencionar o horário
+							let id = event.id?event.id:event._id
+							let localId = event.localId
+							let title = event.title
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+
+							let data = formatDate(dtI, dtF)
+
+							$.ajax({
+								type: 'POST',
+								url: 'filtraProfissionalAgenda.php',
+								dataType: 'json',
+								data:{
+									'tipoRequest': 'SETAGENDA',
+									'id':id,
+									'localId':localId,
+									'title':title,
+									'dataI':data.dataI,
+									'dataF':data.dataF,
+									'dataF':data.dataF
+								},
+								success: function(response) {
+									console.log(response)
+								}
+							});
+
+						},
 					isRTL: $('html').attr('dir') == 'rtl' ? true : false
 				});
 
@@ -159,7 +301,11 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 					$(this).data('event', {
 						title: $.trim($(this).html()), // use the element's text as the event title
 						color: $(this).data('color'),
-						stick: true // maintain when user navigates (see docs on the renderEvent method)
+						agenda: $(this).data('agenda'),
+						localId: $(this).data('local'),
+						stick: true, // maintain when user navigates (see docs on the renderEvent method)
+						start: null,
+						end: null,
 					});
 
 					// Make the event draggable using jQuery UI
@@ -182,7 +328,6 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 						},
 						success: function(response) {
 							_componentFullCalendarEvents(response);
-							_componentPickatime();
 						}
 					});
 				}
@@ -233,11 +378,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 								<div class="mb-3" id="external-events">
 									<h6>Draggable Events</h6>
 									<div id="locaisAtendimento" class="fc-events-container mb-3">
-										<div class="fc-event" data-color="#546E7A">Sauna and stuff</div>
-										<div class="fc-event" data-color="#26A69A">Lunch time</div>
-										<div class="fc-event" data-color="#546E7A">Meeting with Fred</div>
-										<div class="fc-event" data-color="#FF7043">Shopping</div>
-										<div class="fc-event" data-color="#5C6BC0">Restaurant</div>
+										<!-- <div class="fc-event" data-color="#546E7A">Sauna and stuff</div> -->
 									</div>
 
 									<div class="">
@@ -250,44 +391,9 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 								<div class="fullcalendar-external"></div>
 							</div>
 						</div>
-					</div>
-				</div>
-
-				<!-- modal para setar a hora de inicio e fim -->
-				<div id="page-modal-agenda" class="custon-modal">
-                    <div class="custon-modal-container" style="max-width: 300px;">
-                        <div class="card custon-modal-content">
-                            <div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
-                                <p class="h5">Hora de início e Fim</p>
-                                <i id="modal-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
-                            </div>
-							<div class="px-0">
-								<div class="d-flex flex-row">
-									<div class="col-lg-12">
-										<form id="editaSituacao" name="alterarSituacao" method="POST" class="form-validate-jquery">
-											<div class="form-group">
-												<div class="col-lg-12 mt-2">
-													<div class="col-lg-12">
-														<label>Início <span class="text-danger">*</span></label>
-													</div>
-													<div class="col-lg-12">
-														<input id="horaAgendaInicio" type="time" class="form-control" value="" required>
-													</div>
-												</div>
-												<div class="col-lg-12 mt-2">
-													<div class="col-lg-12">
-														<label>Fim <span class="text-danger">*</span></label>
-													</div>
-													<div class="col-lg-12">
-														<input id="horaAgendaFim" type="time" class="form-control" value="" required>
-													</div>
-												</div>
-											</div>
-										</form>
-									</div>
-								</div>
-								<div class="text-right m-2"><button id="mudarSituacao" class="btn btn-principal" role="button">Confirmar</button></div>
-							</div>
+						<div class="text-left m-2">
+							<button id="salvarAgenda" class="btn btn-principal" role="button">Salvar</button>
+							<a href="profissional.php" class="btn btn-lg" id="cancelar">Cancelar</a>
 						</div>
 					</div>
 				</div>
