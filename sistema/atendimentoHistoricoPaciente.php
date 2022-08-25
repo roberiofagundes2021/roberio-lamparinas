@@ -256,7 +256,7 @@ if ($row['ClienSexo'] == 'F'){
 									</div>
 									<div class="col-lg-3">
 										<div class="form-group">
-											<label>Responsavel: <?php echo $row['ClResNome']; ?></label>
+											<label>Responsável: <?php echo $row['ClResNome']; ?></label>
 										</div>
 									</div>
 								</div>

@@ -83,7 +83,7 @@ try {
 		</style>
 		
 		<div style='position: relative; width:100%; border-bottom: 1px solid #000;'>
-			<div style='width:300px; float:left; display: inline;'>
+			<div style='width:450px; float:left; display: inline;'>
 				<img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:60px; height:60px; float:left; margin-right: 10px; margin-top:-10px;' />		
 				<span style='font-weight:bold;line-height:200px;'>" . $_SESSION['EmpreNomeFantasia'] . "</span><br>
 				<div style='position: absolute; font-size:12px; margin-top: 8px; margin-left:4px;'>Unidade: ".$_SESSION['UnidadeNome']."</div>
@@ -94,7 +94,7 @@ try {
 			</div> 
 		</div>	 
 
-		<div style='text-align:center; margin-top: 20px;'><h1>Dados do Paciente</h1></div>
+		<div style='text-align:center; margin-top: 10px;'><h1>Dados do Paciente</h1></div>
 	";
 
     
@@ -111,7 +111,7 @@ try {
             <tr>
                 <td colspan="1" style="width:50%; font-size:14px; background-color:#F1F1F1;"><br>'.$row['ClienNome'].'</td>	
                 <td colspan="1" style="width:25%; font-size:12px;">Sexo:<br>'.$sexo.'</td>
-                <td colspan="1" style="width:25%; font-size:12px;">Data Nascimento:<br>'.$row['ClienDtNascimento'].'</td>
+                <td colspan="1" style="width:25%; font-size:12px;">Telefone:<br>'.$row['ClienCelular'].'</td>
             </tr>
         </table>
         <table style="width:100%; border-collapse: collapse;">
@@ -119,23 +119,20 @@ try {
                 <td colspan="1" style="width:25%; font-size:12px;">Data Nascimento:<br>'.mostraData($row['ClienDtNascimento']).'</td>
                 <td colspan="1" style="width:25%; font-size:12px;">Idade:<br>'.calculaIdade($row['ClienDtNascimento']).'</td>	
                 <td colspan="1" style="width:25%; font-size:12px;">Mãe:<br>'.$row['ClienNomeMae'].'</td>
-                <td colspan="1" style="width:25%; font-size:12px;">Responsavel:<br>'.$row['ClResNome'].'</td>
+                <td colspan="1" style="width:25%; font-size:12px;">Responsável:<br>'.$row['ClResNome'].'</td>
             </tr>
         </table>
     ';
     if($row['AtClaChave'] == "AMBULATORIAL"){
         $html .= '
-            <div style="text-align:center; margin-top: 20px;"><h1>Histórico do Paciente</h1></div>
-        
-            <div style=" text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
-            DATA DO ATENDIMENTO AMBULATORIAL
-            <br><br>
-            <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($row['AtAmbData']).' - '.mostraHora($row['AtAmbHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($row['AtAmbData']).' - '.mostraHora($row['AtAmbHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <div style="text-align:center; margin-top: 10px;"><h1>Histórico do Paciente</h1></div>
+            <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
+                DATA DO ATENDIMENTO AMBULATORIAL
+                <br><br>
+                <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($row['AtAmbData']).' - '.mostraHora($row['AtAmbHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($row['AtAmbData']).' - '.mostraHora($row['AtAmbHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
             </div>
-            <div style="text-align:center;font-weight: bold; position:relative; background-color:#ccc; padding: 1px;">
-            </div>
-            <div style="font-weight: bold; position:relative;  background-color:#eee; padding: 5px;">
-            Unidade de Atendimento: <span style="font-weight:normal;">'. $row['UnidaNome'] .'</span> <span style="color:#aaa;"></span><br>Médico Solicitante: <span style="font-weight:normal;">'.$row['ProfissionalNome'].' ('.$row['ProfissaoNome'].')</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Modalidade: <span style="font-weight:normal;">'. $row['AtModNome'] .'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Guia: <span style="font-weight:normal;">'.$row['AtendNumRegistro'].'</span>
+            <div style=" border: #aaa solid 1px; font-weight: bold; position:relative;  background-color:#eee; padding: 5px;">
+                Unidade de Atendimento: <span style="font-weight:normal;">'. $row['UnidaNome'] .'</span> <span style="color:#aaa;"></span><br>Médico Solicitante: <span style="font-weight:normal;">'.$row['ProfissionalNome'].' ('.$row['ProfissaoNome'].')</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Modalidade: <span style="font-weight:normal;">'. $row['AtModNome'] .'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Guia: <span style="font-weight:normal;">'.$row['AtendNumRegistro'].'</span>
             </div>
             <br>
         ';
