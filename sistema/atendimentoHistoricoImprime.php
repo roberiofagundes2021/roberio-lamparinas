@@ -202,14 +202,12 @@ try {
         $html .= '
             <div style="text-align:center; margin-top: 20px;"><h1>Histórico do Paciente</h1></div>
         
-            <div style=" text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
+            <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
             DATA DO ATENDIMENTO ELETIVO
             <br><br>
             <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($row['AtEleData']).' - '.mostraHora($row['AtEleHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($row['AtEleData']).' - '.mostraHora($row['AtEleHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
             </div>
-            <div style="text-align:center;font-weight: bold; position:relative; background-color:#ccc; padding: 1px;">
-            </div>
-            <div style="font-weight: bold; position:relative; background-color:#eee; padding: 5px;">
+            <div style="  border: #aaa solid 1px; font-weight: bold; position:relative; background-color:#eee; padding: 5px;">
             Unidade de Atendimento: <span style="font-weight:normal;">'. $row['UnidaNome'] .'</span> <span style="color:#aaa;"></span><br>Médico Solicitante: <span style="font-weight:normal;">'.$row['ProfissionalNome'].' ('.$row['ProfissaoNome'].')</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Modalidade: <span style="font-weight:normal;">'. $row['AtModNome'] .'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Guia: <span style="font-weight:normal;">'.$row['AtendNumRegistro'].'</span>
             </div>
             <br>
