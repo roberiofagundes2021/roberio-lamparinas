@@ -12,7 +12,7 @@ if(isset($_POST['inputNome'])){
 		
 		$sql = "INSERT INTO AtendimentoLocal (AtLocNome, AtLocCNES, AtLocCep, AtLocCor, AtLocEndereco, AtLocNumero, AtLocComplemento, AtLocBairro, 
 		                    AtLocCidade, AtLocEstado, AtLocStatus, AtLocUsuarioAtualizador, AtLocUnidade)
-				VALUES (:sNome, :sCNES, :sCep, :sCor, :sEndereco, :sNumero, :sComplemento, :sBairro, 
+				VALUES (:sNome, :sCNES, :sCep, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
 						:sCidade, :sEstado, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 					
