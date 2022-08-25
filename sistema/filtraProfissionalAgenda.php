@@ -73,14 +73,20 @@ try{
 		$id = $_POST['id'];
 		$localId = $_POST['localId'];
 		$title = $_POST['title'];
-		$dataI = $_POST['dataI'];
-		$dataF = $_POST['dataF'];
+
+		$horaI = $_POST['dataI']; // "dd/mm/yyyy hh:MM:ss"
+		$horaI = explode(' ',$horaI);
+		$data = explode('/',$horaI[0]);
+		$data = $data[2].'-'.$data[1].'-'.$data[0]; // "yyyy/mm/dd hh:MM:ss"
+
+		$horaF = $_POST['dataF'];
+		$horaF = explode(' ',$horaF)[1];
 
 		foreach($arrayAgenda as $key=>$item){
 			if($item['id'] == $id){
 				$arrayAgenda[$key]['title'] = $title;
-				$arrayAgenda[$key]['start'] = $dataI;
-				$arrayAgenda[$key]['end'] = $dataF;
+				$arrayAgenda[$key]['start'] = ($data.' '.$horaI[1]);
+				$arrayAgenda[$key]['end'] = ($data.' '.$horaF);
 				$_SESSION['agendaProfissional'] = $arrayAgenda;
 				echo json_encode($arrayAgenda);
 				exit;
@@ -90,8 +96,8 @@ try{
 		array_push($arrayAgenda, [
 			'id' => $id,
 			'localId' => $localId,
-			'start' => $dataI,
-			'end' => $dataF,
+			'start' => ($data.' '.$horaI[1]),
+			'end' => ($data.' '.$horaF),
 			'tipInsert'=> 'NEW',
 			'title'=> $title,
 			'color'=> '#546E7A',
@@ -104,7 +110,7 @@ try{
 		$iProfissional = $_POST['iProfissional'];
 		$msg = '';
 
-		foreach($arrayAgenda as $key=>$item){
+		foreach($arrayAgenda as $item){
 			switch($item){
 				case !isset($item['tipInsert']):$msg = 'Informe o início e fim do agendamento!!';break;
 				case !$item['start']:$msg = 'Data de início não informada!!';break;
@@ -125,12 +131,11 @@ try{
 
 		$arraySql = [];
 
-		foreach($arrayAgenda as $key=>$item){
+		foreach($arrayAgenda as $item){
 			$start = explode(' ',$item['start']); //"22-08-2022 09:00:00"
 			$end = explode(' ',$item['end']); //"22-08-2022 09:00:00"
 
-			$data = explode('/',$start[0]); // "dd/mm/yyyy"
-			$data = $data[2].'-'.$data[1].'-'.$data[0];// "yyyy-mm-dd"
+			$data = $start[0]; // "dd/mm/yyyy"
 
 			if($item['tipInsert'] == 'NEW'){
 				$sql = "INSERT INTO ProfissionalAgenda(PrAgeProfissional,PrAgeData,PrAgeHoraInicio,
@@ -160,6 +165,7 @@ try{
 			'titulo'=> 'Agenda salva!!',
 			'menssagem' => 'Agenda do profissional salva com sucesso!!',
 			'sql' =>$arraySql
+			// 'sql' =>$arrayAgenda
 		]);
 	}
 }catch(PDOException $e) {

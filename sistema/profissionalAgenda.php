@@ -188,7 +188,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 					header: {
 						left: 'prev,next today',
 						center: 'title',
-						right: 'month,agendaWeek,agendaDay'
+						right: 'month,agendaWeek'
 					},
 					editable: true,
 					defaultDate: dataAtual,
