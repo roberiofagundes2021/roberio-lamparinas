@@ -10,9 +10,9 @@ if(isset($_POST['inputNome'])){
 
 	try{
 		
-		$sql = "INSERT INTO AtendimentoLocal (AtLocNome, AtLocCNES, AtLocCep, AtLocEndereco, AtLocNumero, AtLocComplemento, AtLocBairro, 
+		$sql = "INSERT INTO AtendimentoLocal (AtLocNome, AtLocCNES, AtLocCep, AtLocCor, AtLocEndereco, AtLocNumero, AtLocComplemento, AtLocBairro, 
 		                    AtLocCidade, AtLocEstado, AtLocStatus, AtLocUsuarioAtualizador, AtLocUnidade)
-				VALUES (:sNome, :sCNES, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
+				VALUES (:sNome, :sCNES, :sCep, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
 						:sCidade, :sEstado, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 					
@@ -20,6 +20,7 @@ if(isset($_POST['inputNome'])){
 						':sNome' => $_POST['inputNome'],
 						':sCNES' => $_POST['inputCNES'],
 						':sCep' => $_POST['inputCep'],
+						':sCor' => $_POST['inputCor'],
 						':sEndereco' => $_POST['inputEndereco'],
 						':sNumero' => $_POST['inputNumero'],
 						':sComplemento' => $_POST['inputComplemento'],
@@ -211,18 +212,24 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-6">
+								<div class="col-lg-5">
 									<div class="form-group">
 										<label for="inputNome">Nome do Local de Atendimento<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local de Atendimento" required autofocus>
 									</div>
 								</div>
-								<div class="col-lg-6">
+								<div class="col-lg-5">
 									<div class="form-group">
 										<label for="inputCNES">CNES</label>
 										<input type="text" id="inputCNES" name="inputCNES" class="form-control" placeholder="CNES">
 									</div>
-								</div>					
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputCor">Cor <span class="text-danger">*</span></label>
+										<input type="color" id="inputCor" name="inputCor" class="container" placeholder="Cor" required>
+									</div>
+								</div>
 							</div>
 							<br>
 							

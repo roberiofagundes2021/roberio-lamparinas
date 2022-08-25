@@ -20,7 +20,7 @@ try{
 		$iProfissional = $_POST['iProfissional'];
 
 		$sql = "SELECT PrAgeId,PrAgeProfissional,PrAgeData,PrAgeHoraInicio,PrAgeHoraFim,PrAgeAtendimentoLocal,
-			PrAgeUsuarioAtualizador,PrAgeUnidade,AtLocNome
+			PrAgeUsuarioAtualizador,PrAgeUnidade,AtLocNome,AtLocCor
 			FROM ProfissionalAgenda
 			JOIN AtendimentoLocal ON AtLocId = PrAgeAtendimentoLocal
 			WHERE PrAgeProfissional = $iProfissional";
@@ -46,14 +46,14 @@ try{
 				'title'=> $item['AtLocNome'],
 				'start'=> $inicio,
 				'end'=> $fim,
-				'color'=> '#546E7A'
+				'color'=> $item['AtLocCor']?$item['AtLocCor']:'#546E7A'
 			]);
 		}
 		$_SESSION['agendaProfissional'] = $array;
 	
 		echo json_encode($array);
 	} else if($tipoRequest == 'LOCAIS'){
-		$sql = "SELECT AtLocId,AtLocNome
+		$sql = "SELECT AtLocId,AtLocNome,AtLocCor
 			FROM AtendimentoLocal
 			WHERE AtLocUnidade = $iUnidade";
 		$result = $conn->query($sql);
@@ -64,7 +64,7 @@ try{
 			array_push($array,[
 				'idLocal'=> $item['AtLocId'],
 				'nome'=> $item['AtLocNome'],
-				'cor'=> '#546E7A'
+				'cor'=> $item['AtLocCor']?$item['AtLocCor']:'#546E7A'
 			]);
 		}
 		echo json_encode($array);
