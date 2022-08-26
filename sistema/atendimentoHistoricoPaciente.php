@@ -24,8 +24,8 @@ $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtClaNome, AtendDataRegi
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
-		LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-		LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+		JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+		JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 		JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE AtendId = $iAtendimentoId and AtendUnidade = ".$_SESSION['UnidadeId']."
 		ORDER BY AtendNumRegistro ASC";
@@ -39,7 +39,7 @@ $iClienteId = $row['ClienId'];
 $sql = "SELECT AtendId, AtendNumRegistro, AtendDataRegistro, AtClaNome
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
-		LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+		JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 		JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE AtendCliente = $iClienteId and AtendUnidade = ".$_SESSION['UnidadeId']."
 		ORDER BY AtendDataRegistro ASC";
@@ -120,28 +120,28 @@ if ($row['ClienSexo'] == 'F'){
                 
 			});
 
-			// Imprimir Histórico
-			$('#imprimir').on('click', function(e){
-				
-				$('#formAtendimentoHistorico').attr('target', '_blank');
-				$('#formAtendimentoHistorico').submit();
-			});
-
 		}); //document.ready
 
-		function buscarHistorico(inputHistoricoId){
+		function buscarHistorico(historicoId, classificacaoNome){
 
 			//Esse ajax está sendo usado para verificar no banco se o registro já existe
 			$.ajax({
 				type: "POST",
 				url: "atendimentoHistoricoPacienteValida.php",
-				data: ('historicoId=' + inputHistoricoId ),
+				data: ('historicoId=' + historicoId ),
 				success: function(resposta) {
 
 					if(resposta){
 						
-						$('#imprimir').show();
+						$('#classificacao').html('<h3 class="card-title font-weight-bold">ATENDIMENTO ' + classificacaoNome.toUpperCase() + '</h3>');
+						$('#impressao').html('<button style="margin-top:-5px;" id="imprimir" class="btn btn-secondary btn-icon"><i class="icon-printer2"></i></button>');
 						$('#txtareaHistorico').html(resposta);
+
+						// Imprimir Histórico
+						$('#imprimir').on('click', function(e){
+							$('#formAtendimentoHistorico').attr('target', '_blank');
+							$('#formAtendimentoHistorico').submit();
+						});
 					}					
 				}
 			})
@@ -284,7 +284,7 @@ if ($row['ClienSexo'] == 'F'){
 													print( '
 													<tr>													
 														<td class="text-left">
-															<a href="#" onClick="buscarHistorico('.$item['AtendId'].')">'.$item['AtClaNome'].'</a>
+															<a href="#" onClick="buscarHistorico('.$item['AtendId'].', \''.$item['AtClaNome'].'\')">'.$item['AtClaNome'].'</a>
 														</td>
 														<td>'.$item['AtendNumRegistro'].'</td>
 														<td>'.mostraData($item['AtendDataRegistro']).'</td>
@@ -297,19 +297,10 @@ if ($row['ClienSexo'] == 'F'){
 								</div>
 								<div class="col-lg-6">
 									<div class="card-header header-elements-inline" style="padding-left: 0px;">
-										<?php
-											//if ($row['AtClaChave'] == "AMBULATORIAL") {	
-												//echo '<h3 class="card-title"><b>DATA DO ATENDIMENTO AMBULATORIAL</b></h3>';
-											//} else if  ($row['AtClaChave'] == "ELETIVO"){
-												//echo '<h3 class="card-title"><b>DATA DO ATENDIMENTO ELETIVO</b></h3>';
-											//} else {
-												echo '<h3 class="card-title"><b>DATA DO ATENDIMENTO</b></h3>';
-											//}
-										?>	
+
+										<div id="classificacao"><h3 class="card-title font-weight-bold">ATENDIMENTO</h3></div>
 										
-										<button style="margin-top:-5px; display:none;" id="imprimir" class="btn btn-secondary btn-icon">
-                                            <i class="icon-printer2"></i>
-                                        </button>
+										<div id="impressao"></div>
 									</div>
 									<div class="form-group" style="border: 1px solid #ccc;">
 										<div id="txtareaHistorico" style="padding: 10px; min-height: 200px;"></div>
