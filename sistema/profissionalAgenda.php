@@ -11,7 +11,11 @@ include('global_assets/php/conexao.php');
 
 $iUnidade = $_SESSION['UnidadeId'];
 $usuarioId = $_SESSION['UsuarId'];
-$iProfissional = $_POST['inputProfissionalId'];
+if(isset($_POST['inputProfissionalId'])){
+	$iProfissional = $_POST['inputProfissionalId'];
+} else {
+	irpara("profissional.php");
+}
 
 $sql = "SELECT ProfiNome
 	FROM Profissional
@@ -188,7 +192,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 					header: {
 						left: 'prev,next today',
 						center: 'title',
-						right: 'month,agendaWeek,agendaDay'
+						right: 'month,agendaWeek'
 					},
 					editable: true,
 					defaultDate: dataAtual,
