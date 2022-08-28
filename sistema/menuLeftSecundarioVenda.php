@@ -33,10 +33,12 @@
 					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; break;
 					case 'triagem': URL = 'atendimentoTriagem.php'; break;
 					case 'atendimentoAmbulatorial': URL = 'atendimentoAmbulatorial.php'; break;
+					case 'exportacaoProntuario': URL = 'atendimentoProntuarioExportacao.php'; break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
 				$('#dadosPost').attr('method', 'POST')
+				//$('#dadosPost').attr('target', '_blank');
 				$('#dadosPost').submit()
 			})
 		})
@@ -110,19 +112,19 @@
 							<a href="#" class="nav-link itemLink" data-tipo='historicoPaciente'><i class="icon-equalizer"></i> Histórico do Paciente</a>
 						</li>
 						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='solicitacaoExame'><i class="icon-office"></i> Solicitação de Exame</a>
+							<a href="#" class="nav-link itemLink" data-tipo='solicitacaoExame'><i class="icon-copy"></i> Solicitação de Exame</a>
 						</li>
 						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='encaminhamentoMedico'><i class="icon-office"></i> Encaminhamento Médico</a>
+							<a href="#" class="nav-link itemLink" data-tipo='encaminhamentoMedico'><i class="icon-folder-plus4"></i> Encaminhamento Médico</a>
 						</li>	
 						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='exportacaoProntuario'><i class="icon-office"></i> Exportação do Prontuário</a>
+							<a href="#" class="nav-link itemLink" data-tipo='exportacaoProntuario'><i class="icon-drawer-out"></i> Exportação do Prontuário</a>
 						</li>	
 						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='prescricaoMedica'><i class="icon-office"></i> Prescrição Médica</a>
+							<a href="#" class="nav-link itemLink" data-tipo='prescricaoMedica'><i class="icon-file-text2"></i> Prescrição Médica</a>
 						</li>	
 						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='tabelaGastos'><i class="icon-office"></i> Tabela de Gastos</a>
+							<a href="#" class="nav-link itemLink" data-tipo='tabelaGastos'><i class="icon-table2"></i> Tabela de Gastos</a>
 						</li>
 
 						<li class="nav-item-divider"></li>

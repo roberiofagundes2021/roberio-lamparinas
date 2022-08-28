@@ -807,6 +807,58 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
             consultaSituacaoCaixa();
         });
+
+        function atualizaMovimentacaoCaixa(id, tipo, acao) {
+            //document.getElementById('inputContasAPagarId').value = ContasAPagarId;
+            document.getElementById('inputReciboId').value = id;
+
+            if(tipo == 'Recebimento') {
+                if(acao == 'detalhamento') {
+                    //alert('ID: '+id+' || Tipo mov: '+tipo+' || Ação: '+acao);
+                    var menssagem = 'Esta função está indisponível no momento =/, mas estará em breve =D!'
+                    alerta('Atenção', menssagem, 'error')
+                    return
+                }else if(acao == 'imprimir') {
+                    //document.formMovimentacao.setAttribute("target", "_blank");
+                    //document.formMovimentacao.action = "caixaImprimiReciboRecebimento.php";
+                    var menssagem = 'Esta função está indisponível para recebimento, mas já funciona para o pagamento =D!'
+                    alerta('Atenção', menssagem, 'error')
+                    return
+                }else if(acao == 'estornar') {
+                    //alert('ID: '+id+' || Tipo mov: '+tipo+' || Ação: '+acao);
+                    var menssagem = 'Esta função está indisponível no momento =/, mas estará em breve =D!'
+                    alerta('Atenção', menssagem, 'error')
+                    return
+                }else {
+                    //alert('ID: '+id+' || Tipo mov: '+tipo+' || Ação: '+acao);
+                    var menssagem = 'Esta função está indisponível no momento =/, mas estará em breve =D!'
+                    alerta('Atenção', menssagem, 'error')
+                    return
+                }     
+            }else {
+                if(acao == 'detalhamento') {
+                    //('ID: '+id+' || Tipo mov: '+tipo+' || Ação: '+acao);
+                    var menssagem = 'Esta função está indisponível no momento =/, mas estará em breve =D!'
+                    alerta('Atenção', menssagem, 'error')
+                    return
+                }else if(acao == 'imprimir') {
+                    document.formMovimentacao.setAttribute("target", "_blank");
+                    document.formMovimentacao.action = "caixaImprimiReciboRetirada.php";	
+                }else if(acao == 'estornar') {
+                    //document.formMovimentacao.action = "caixaMovimentacao.php";
+                    var menssagem = 'Esta função está indisponível no momento =/, mas está disponível em breve =D!'
+                    alerta('Atenção', menssagem, 'error')
+                    return
+                }else {
+                    //alert('ID: '+id+' || Tipo mov: '+tipo+' || Ação: '+acao);
+                    var menssagem = 'Esta função está indisponível no momento =/, mas está disponível em breve =D!'
+                    alerta('Atenção', menssagem, 'error')
+                    return
+                }   
+            }
+
+            document.formMovimentacao.submit();
+        } 
     </script>
 
 </head>
@@ -1035,6 +1087,9 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                     <input type="hidden" id="inputJustificativaRetirada" name="inputJustificativaRetirada" value="">
                 </form>
 
+                <form id="formMovimentacao" name="formMovimentacao" method="POST">
+                    <input type="hidden" id="inputReciboId" name="inputReciboId" value="">
+                </form>
             </div>
             <!-- /content area -->
 

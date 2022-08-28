@@ -9,108 +9,44 @@ use Mpdf\Mpdf;
 require_once 'global_assets/php/vendor/autoload.php';
 require_once 'global_assets/php/funcoesgerais.php';
 
-$arrayPagamento = explode('-', $_POST['cmbFormaPagamentoRetirada']);
-$pagamentoId = $arrayPagamento[0];
+//$_SESSION['EmpreId']
 
-/*
-if (isset($_POST['inputMovimentacaoId'])) {
-
-    $iMovimentacao = $_POST['inputMovimentacaoId'];
-
-    $sql = "SELECT MovimTipo, MovimData, MovimNumRecibo, MovimObservacao, ParamValorObsImpreRetirada, MotivNome
-            FROM Movimentacao
-            JOIN Unidade on UnidaId = MovimUnidade
-            JOIN Parametro on ParamEmpresa = UnidaEmpresa
-            LEFT JOIN Motivo on MotivId = MovimMotivo
-            WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = ". $iMovimentacao;
-    $result = $conn->query($sql);
-    $row = $result->fetch(PDO::FETCH_ASSOC);
-
-    // Após concluido a tela de Movimentação tem que avaliar se precisa desse Distinct,
-    // porque não deve ser criado vários registros na tabela MovimentacaoXProduto pra esse caso
-    // de produtos não patrimoniados.
-    $sql = "SELECT Distinct MvXPrProduto as ProduServi, MvXPrQuantidade as Quantidade, MvXPrLote, isnull(cast(cast(MvXPrValidade as date)as varchar),'') as Validade, ClassNome, ClassChave, ProduNome as Nome, 
-            ProduCodigo as Codigo, ProduUnidadeMedida, CategNome as Categoria, UnMedSigla, ModelNome as NomeModelo, MarcaNome as Marca, Tipo = 'P'
-	        FROM Movimentacao
-	        JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-	        JOIN Produto on ProduId = MvXPrProduto
-	        JOIN Categoria on CategId = ProduCategoria
-	        LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
-	        LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-            LEFT JOIN OrdemCompra on OrComId = MovimOrdemCompra
-            LEFT JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
-            LEFT JOIN ProdutoXFabricante on PrXFaFluxoOperacional = FlOpeId
-            LEFT JOIN Marca on MarcaId = PrXFaMarca
-	        LEFT JOIN Modelo on ModelId = PrXFaModelo
-	        WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao. " and ClassChave <> 'PERMANENTE' 
-            UNION
-            SELECT Distinct MvXSrServico as ProduServi, MvXSrQuantidade as Quantidade, '' , '' , '', '' , ServiNome as Nome, ServiCodigo as Codigo,
-            '' , CategNome as Categoria, '', ModelNome as NomeModelo, MarcaNome as Marca, Tipo = 'S'
-            FROM Movimentacao
-            JOIN MovimentacaoXServico on MvXSrMovimentacao = MovimId
-            JOIN Servico on ServiId = MvXSrServico
-            JOIN Categoria on CategId = ServiCategoria
-            LEFT JOIN OrdemCompra on OrComId = MovimOrdemCompra
-            LEFT JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
-            LEFT JOIN ServicoXFabricante on SrXFaFluxoOperacional = FlOpeId
-            LEFT JOIN Marca on MarcaId = SrXFaMarca
-	        LEFT JOIN Modelo on ModelId = SrXFaModelo
-            WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao. "
-            ";
-            $result = $conn->query($sql);
-            $rowMvPrNaoPatrimoniado = $result->fetchAll(PDO::FETCH_ASSOC);
-
-    $sql = "SELECT MvXPrProduto, MvXPrQuantidade, MvXPrLote, isnull(cast(cast(MvXPrValidade as date)as varchar),'') as Validade, ClassNome, ClassChave, ProduNome, ProduMarca, 
-            ProduModelo, ProduCodigo, ProduUnidadeMedida, ProduModelo, CategNome, UnMedSigla, ModelNome, MarcaNome, PatriNumero
-	        FROM Movimentacao
-	        JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
-	        JOIN Produto on ProduId = MvXPrProduto
-	        JOIN Categoria on CategId = ProduCategoria
-	        LEFT JOIN Classificacao on ClassId = MvXPrClassificacao
-	        JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-	        LEFT JOIN Modelo on ModelId = ProduModelo
-            LEFT JOIN Marca on MarcaId = ProduMarca
-            --JOIN MovimentacaoXProdutoXPatrimonio on MXPXPMovimentacaoXProduto = MvXPrId
-            JOIN Patrimonio on PatriId = MvXPrPatrimonio
-	        WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao. " and ClassChave = 'PERMANENTE' ";
-    $result = $conn->query($sql);
-    $rowMvPrPatrimoniado = $result->fetchAll(PDO::FETCH_ASSOC);    
-
-    if ($row['MovimTipo'] == 'S'){
-        
-        $sql = "SELECT LcEstNome as Origem, SetorNome as Destino
-                FROM Movimentacao
-                JOIN LocalEstoque on LcEstId = MovimOrigemLocal
-                JOIN Setor on SetorId = MovimDestinoSetor
-                WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao;
-
-    } else if ($row['MovimTipo'] == 'T'){
-        
-        $sql = "SELECT CASE
-                         WHEN MovimOrigemLocal IS NULL THEN StO.SetorNome
-                         ELSE LcO.LcEstNome
-                       END AS Origem, 
-                       CASE
-                         WHEN MovimDestinoLocal IS NULL THEN isnull(StD.SetorNome, MovimDestinoManual)
-                         ELSE LcD.LcEstNome
-                       END AS Destino, 
-                       MotivChave
-                FROM Movimentacao
-                LEFT JOIN LocalEstoque LcO on LcO.LcEstId = MovimOrigemLocal
-                LEFT JOIN LocalEstoque LcD on LcD.LcEstId = MovimDestinoLocal                
-                LEFT JOIN Setor StO on StO.SetorId = MovimOrigemSetor
-                LEFT JOIN Setor StD on StD.SetorId = MovimDestinoSetor
-                JOIN Motivo on MotivId = MovimMotivo
-                WHERE MovimUnidade = " . $_SESSION['UnidadeId'] . " and MovimId = " . $iMovimentacao;
-    }
-    $result = $conn->query($sql);
-    $rowMv = $result->fetch(PDO::FETCH_ASSOC);
-
-    $Origem = $rowMv['Origem'];
-    $Destino = $rowMv['Destino'];
-    //$Motivo = $rowMv['MotivChave']; 
+if(!isset($_POST['inputReciboId'])) { 
+    irpara("caixaMovimentacao.php");
 }
-*/
+
+$retiradaId = $_POST['inputReciboId'];
+
+$sql_movimentacao    = "SELECT CxPagDataHora, CxPagValor, CxPagJustificativaRetirada, CaixaNome
+                        FROM CaixaPagamento
+                        JOIN CaixaAbertura on CxAbeId = CxPagCaixaAbertura
+                        JOIN Caixa on CxAbeCaixa = CaixaId
+                        WHERE CxPagId = $retiradaId";
+$resultMovimentacao  = $conn->query($sql_movimentacao);
+$rowMovimentacao = $resultMovimentacao->fetch(PDO::FETCH_ASSOC);
+
+$valorRetirado = mostraValor($rowMovimentacao['CxPagValor']);
+$valorPorExtenso = valor_por_extenso($rowMovimentacao['CxPagValor']);
+$justificativa = $rowMovimentacao['CxPagJustificativaRetirada'];
+$nomeCaixa = $rowMovimentacao['CaixaNome'];
+$dataHoraRetirada = mostraDataHora($rowMovimentacao['CxPagDataHora']);
+$operador = nomeSobrenome($_SESSION['UsuarNome'], 2);
+
+$sqlEmpresa = "SELECT EmpreCnpj, EmpreEndereco, EmpreNumero, EmpreBairro, EmpreCidade, EmpreEstado, EmpreCep
+                FROM Empresa
+				WHERE EmpreId = ".$_SESSION['EmpreId'];
+			
+$resultEmpresa = $conn->query($sqlEmpresa);
+$empresa = $resultEmpresa->fetch(PDO::FETCH_ASSOC);
+
+$empresaCnpj = formatarCPF_Cnpj($empresa['EmpreCnpj']);
+$empresaEnderecoRua = $empresa['EmpreEndereco'];
+$empresaEnderecoNumero = $empresa['EmpreNumero'];
+$empresaBairro = $empresa['EmpreBairro'];
+$empresaCidade = $empresa['EmpreCidade'];
+$empresaEstado = $empresa['EmpreEstado'];
+$empresaCep = $empresa['EmpreCep'];
+$endereco = $empresaEnderecoRua.' '.$empresaEnderecoNumero.', '.$empresaBairro.', '.$empresaCidade.' - '.$empresaEstado.' CEP: '.mostraCEP($empresaCep);
 
 try {
 	$mpdf = new mPDF([
@@ -125,11 +61,6 @@ try {
 	             'margin-header' => 6,     // margin header
 	             'margin-bottom' => 0,     // margin footer
 	             'orientation' => 'P']);  // L - landscape, P - portrait	
-
-    // Evita erro ao recarregar pagina do relatório
-    //if (!isset($rowMv)) {
-    //    return;
-    //}
 
     $html = "
     <style>
@@ -147,40 +78,67 @@ try {
     </style>
 
 
-    <div style='position: relative; width:100%; border-bottom: 1px solid #666;'>
-        <div style='float:left; width: 400px; display: inline-block;'>
+    <div style='position: relative; width:100%; border-bottom: 1px solid #666; padding-bottom: 10px;'>
+        <div style='float:left; width: 200px; display: inline-block; padding: 10px;'>
             <img src='global_assets/images/lamparinas/logo-lamparinas.png' style='width:190px; height:45px; float:left; margin-right: 10px; margin-top:-10px;' />  
         </div>
         
-        <div style='width:250px; float:right; display: inline; text-align:right;'>
-            <div>".date('d/m/Y')."</div>
-            <div style='margin-top:8px; font-weight:bold;'>Recibo de Retirada</div>
+        <div style='width:400px; float:right; display: inline; text-align:right;'>
+            <div style='font-weight:bold; padding: 2px; font-size: 15px;'>$_SESSION[EmpreNomeFantasia]</div>
+            <div style='padding: 2px; font-size: 10px;'>Unidade: $_SESSION[UnidadeNome]</div>
+            <div style='padding: 2px; font-size: 10px;'>CNPJ: $empresaCnpj</div>
+            <div style='padding: 2px; font-size: 10px;'>$endereco</div>
         </div> 
     </div>
 
-    <div style='text-align:center; margin-top: 20px;'><h1>$_POST[inputValorRetirada]</h1></div>
-    <div style='text-align:center; margin-top: 20px;'><h1>$pagamentoId</h1></div>
-    <div style='text-align:center; margin-top: 20px;'><h1>$_POST[inputJustificativa]</h1></div>
-    ";
+    <div style='position: relative; width:100%; border-bottom: 1px solid #666; margin-bottom: 10px;'>
+        <h3 style='text-align:center;'>Recibo de retirada de Caixa</h3>
+    </div>
+
+    <div style='position: relative; width:100%; padding: 10px; margin-bottom: 10px; font-weight:bold;'>
+        <div style='float:left; width: 400px; display: inline-block;'>
+            <div style='padding: 5px; font-size: 15px;'>Operador: $operador</div>
+            <div style='padding: 5px; font-size: 15px;'>Caixa: $nomeCaixa</div>
+            <div style='padding: 5px; font-size: 15px;'>Data/hora: $dataHoraRetirada</div>
+        </div>
+        
+        <div style='width:250px; float:right; display: inline; text-align:right; color: red; margin-top: 30px;'>
+            <div style='margin-bottom: 10px; font-size: 15px;'>Valor: R$ $valorRetirado</div>
+            <div style='font-size: 15px;'>$valorPorExtenso</div>
+        </div> 
+    </div>
+
+    <div style='position: relative; width:100%; border: 3px solid #CCCCCC; margin-bottom: 10px; background-color: #eeeeee;'>
+        <h3 style='text-align: center;'>Justificativa</h3>
+    </div>
+
+    <div style='position: relative; width:100%; border-bottom: 1px solid #666; padding: 20px; margin-bottom: 60px;'>
+        <div style='font-size: 12px;'>$justificativa</div>
+    </div>
+
+
+    <div style='width: 50%; position: relative; margin-left: auto; margin-right: auto; text-align: center; padding-top: 10px;'>
+        <div style='font-size: 12px; border-top: 1px solid #666; padding: 15px'>Assinatura Operador de Caixa</div>
+    </div>";
 
     //Listando os Bens Não Patrimoniados
     //include("movimentacaoImprimeRetiradaNaoPatrimoniado.php");
 
-        $rodape = "<hr/>
-        <div style='width:100%'>
-        <div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
-        <div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
-        </div>";			
+    $rodape = "<hr/>
+    <div style='width:100%'>
+    <div style='width:300px; float:left; display: inline;'>Sistema Lamparinas</div>
+    <div style='width:105px; float:right; display: inline;'>Página {PAGENO} / {nbpg}</div> 
+    </div>";			
 
-        //$mpdf->SetHTMLHeader($topo);
-        //$stylesheet = file_get_contents('global_assets/css/lamparinas/bootstrap-3.3.7/dist/css/bootstrap.min.css');
-        //$stylesheet = file_get_contents('global_assets/css/lamparinas/impressao.css');         
-        //$mpdf->WriteHTML($stylesheet, 1); // CSS Script goes here.
-        $mpdf->SetHTMLFooter($rodape);
-        $mpdf->WriteHTML($html);            
-        // $mpdf->SetHTMLHeader($topo,'O',true);	    
+    //$mpdf->SetHTMLHeader($topo);
+    //$stylesheet = file_get_contents('global_assets/css/lamparinas/bootstrap-3.3.7/dist/css/bootstrap.min.css');
+    //$stylesheet = file_get_contents('global_assets/css/lamparinas/impressao.css');         
+    //$mpdf->WriteHTML($stylesheet, 1); // CSS Script goes here.
+    $mpdf->SetHTMLFooter($rodape);
+    $mpdf->WriteHTML($html);            
+    // $mpdf->SetHTMLHeader($topo,'O',true);	    
 
-        $mpdf->Output();
+    $mpdf->Output();
 
 } catch (\Mpdf\MpdfException $e) { // Note: safer fully qualified exception name used for catch
 

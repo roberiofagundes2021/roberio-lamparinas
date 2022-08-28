@@ -276,9 +276,11 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                           WHERE CxAbeUnidade = " . $_SESSION['UnidadeId'] . " and CxAbeCaixa = ".$idCaixa."
                           ORDER BY CxAbeId DESC";
     $resultSaldoCaixa  = $conn->query($sql_saldoCaixa);
-    $rowSaldoCaixa = $resultSaldoCaixa->fetch(PDO::FETCH_ASSOC);
 
-    $saldoInicialCaixa = $rowSaldoCaixa['CxAbeSaldoInicial'];
+    $saldoInicialCaixa = 0;
+    if($rowSaldoCaixa = $resultSaldoCaixa->fetch(PDO::FETCH_ASSOC)) {
+        $saldoInicialCaixa = $rowSaldoCaixa['CxAbeSaldoInicial'];
+    }
     
     $sql_totalMovimentacao    = "SELECT SUM(CxRecValorTotal) as TotalRecebido
                                 FROM CaixaRecebimento 
@@ -320,6 +322,8 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                         ORDER BY FrPagNome,  HISTORICO ASC";
     $resultMovimentacao  = $conn->query($sql_movimentacao);
     $rowMovimentacao = $resultMovimentacao->fetchAll(PDO::FETCH_ASSOC);
+}else {
+    irpara("caixaMovimentacao.php");
 }
 ?>
 
