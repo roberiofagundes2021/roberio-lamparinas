@@ -20,7 +20,7 @@ try{
 		$iProfissional = $_POST['iProfissional'];
 
 		$sql = "SELECT PrAgeId,PrAgeProfissional,PrAgeData,PrAgeHoraInicio,PrAgeHoraFim,PrAgeAtendimentoLocal,
-			PrAgeUsuarioAtualizador,PrAgeUnidade,AtLocNome,AtLocCor
+			PrAgeUsuarioAtualizador,PrAgeUnidade,AtLocNome,AtLocCor,PrAgeIntervalo
 			FROM ProfissionalAgenda
 			JOIN AtendimentoLocal ON AtLocId = PrAgeAtendimentoLocal
 			WHERE PrAgeProfissional = $iProfissional";
@@ -41,6 +41,7 @@ try{
 			array_push($array,[
 				'id'=> $item['PrAgeId'],
 				'url'=> '',
+				'intervalo'=> $item['PrAgeIntervalo'],
 				'tipInsert'=> 'ATT',
 				'localId' => $item['PrAgeAtendimentoLocal'],
 				'title'=> $item['AtLocNome'],
@@ -49,23 +50,17 @@ try{
 				'color'=> $item['AtLocCor']?$item['AtLocCor']:'#546E7A'
 			]);
 		}
+		$_SESSION['agendaProfissional'] = $array;
+	
+		echo json_encode($array);
+	} else if($tipoRequest == 'CHECKAGENDA'){
+		$arrayAgenda = [];
 
-		// loop para checar se existem itens duplicados
-
-		$arrayAgenda = $_SESSION['agendaProfissional'];
-		foreach($array as $item_1){
-			$intoArray = false;
-			foreach($_SESSION['agendaProfissional'] as $item_2){
-				if($item_2['id'] == $item_1['id']){
-					$intoArray = true;
-				}
-			}
-			if(!$intoArray){
-				array_push($arrayAgenda,$item_1);
+		foreach($_SESSION['agendaProfissional'] as $item){
+			if($item['tipInsert'] != 'REMOVE'){
+				array_push($arrayAgenda, $item);
 			}
 		}
-		$_SESSION['agendaProfissional'] = $arrayAgenda;
-	
 		echo json_encode($arrayAgenda);
 	} else if($tipoRequest == 'LOCAIS'){
 		$sql = "SELECT AtLocId,AtLocNome,AtLocCor
@@ -86,6 +81,7 @@ try{
 	} else if($tipoRequest == 'SETAGENDA'){
 		$arrayAgenda = $_SESSION['agendaProfissional'];
 		$id = $_POST['id'];
+		$intervalo = $_POST['horaIntervalo'];
 		$localId = isset($_POST['localId'])?$_POST['localId']:'N/A';
 		$title = isset($_POST['title'])?$_POST['title']:'N/A';
 		$cor = isset($_POST['cor'])?$_POST['cor']:'#546E7A';
@@ -112,6 +108,7 @@ try{
 				$arrayAgenda[$key]['title'] = $title;
 				$arrayAgenda[$key]['start'] = ($data.' '.$horaI);
 				$arrayAgenda[$key]['end'] = ($data.' '.$horaF);
+				$arrayAgenda[$key]['intervalo'] = $intervalo;
 				$_SESSION['agendaProfissional'] = $arrayAgenda;
 				echo json_encode($arrayAgenda);
 				exit;
@@ -123,6 +120,7 @@ try{
 			'localId' => $localId,
 			'start' => ($data.' '.$horaI),
 			'end' => ($data.' '.$horaF),
+			'intervalo' => $intervalo,
 			'tipInsert'=> 'NEW',
 			'title'=> $title,
 			'color'=> $cor,
@@ -136,7 +134,7 @@ try{
 		$id = $_POST['id'];
 		$horaAgendaInicio = $_POST['horaAgendaInicio'];
 		$horaAgendaFim = $_POST['horaAgendaFim'];
-		$horaIntervalo = $_POST['horaIntervalo'];
+		$intervalo = $_POST['horaIntervalo'];
 
 		foreach($arrayAgenda as $key=>$item){
 			if($item['id'] == $id){
@@ -144,6 +142,7 @@ try{
 				$dataF = explode(' ',$item['start'])[0];
 				$arrayAgenda[$key]['start'] = $dataI.' '.$horaAgendaInicio;
 				$arrayAgenda[$key]['end'] = $dataF.' '.$horaAgendaFim;
+				$arrayAgenda[$key]['intervalo'] = $intervalo;
 			}
 		}
 		
@@ -185,23 +184,29 @@ try{
 		foreach($arrayAgenda as $item){
 			$start = explode(' ',$item['start']); //"22-08-2022 09:00:00"
 			$end = explode(' ',$item['end']); //"22-08-2022 09:00:00"
+			$intervalo = $item['intervalo']>0?$item['intervalo']:30;
 
 			$data = $start[0]; // "dd/mm/yyyy"
 
 			if($item['tipInsert'] == 'NEW'){
-				$sql = "INSERT INTO ProfissionalAgenda(PrAgeProfissional,PrAgeData,PrAgeHoraInicio,
+				$sql = "INSERT INTO ProfissionalAgenda(PrAgeProfissional,PrAgeIntervalo,PrAgeData,PrAgeHoraInicio,
 				PrAgeHoraFim,PrAgeAtendimentoLocal,PrAgeUsuarioAtualizador,PrAgeUnidade) VALUES
-				('$iProfissional','$data', '$start[1]','$end[1]','$item[localId]','$usuarioId','$iUnidade')";
+				('$iProfissional','$intervalo','$data', '$start[1]','$end[1]','$item[localId]','$usuarioId','$iUnidade')";
 
 				array_push($arraySql, $sql);
 			} elseif($item['tipInsert'] == 'ATT'){
 				$sql = "UPDATE ProfissionalAgenda SET
 				PrAgeData='$data',
+				PrAgeIntervalo='$intervalo',
 				PrAgeHoraInicio='$start[1]',
 				PrAgeHoraFim='$end[1]',
 				PrAgeAtendimentoLocal='$item[localId]',
 				PrAgeUsuarioAtualizador='$usuarioId'
 				WHERE PrAgeId = $item[id]";
+
+				array_push($arraySql, $sql);
+			} elseif($item['tipInsert'] == 'REMOVE'){
+				$sql = "DELETE FROM ProfissionalAgenda WHERE PrAgeId = $item[id]";
 
 				array_push($arraySql, $sql);
 			}
@@ -224,11 +229,7 @@ try{
 
 		foreach($arrayAgenda as $key=>$item){
 			if($item['id'] == $id){
-				array_splice($arrayAgenda, $key, 1);
-				if($item['tipInsert'] == 'ATT'){
-					$sql = "DELETE FROM ProfissionalAgenda WHERE PrAgeId = $id";
-					$conn->query($sql);
-				}
+				$arrayAgenda[$key]['tipInsert'] = 'REMOVE';
 			}
 		}
 

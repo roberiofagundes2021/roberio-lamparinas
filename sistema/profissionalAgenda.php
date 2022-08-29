@@ -102,7 +102,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 					},
 					success: function(response) {
 						alerta(response.titulo, response.menssagem, response.status)
-						$('#fullcalendar-external').fullCalendar('refetchEvents')
+						getAgenda()
 					}
 				});
 			})
@@ -130,9 +130,8 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 						'horaIntervalo':horaIntervalo,
 					},
 					success: function(response){
-						getAgenda()
+						refreshAgenda()
 						alerta(response.titulo, response.menssagem, response.status)
-						console.log(response)
 					}
 				});
 			})
@@ -176,8 +175,16 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 							let title = event.title
 							let dtI=event.start?event.start._i:''
 							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
 
 							let data = formatDate(dtI, dtF)
+
+							let horaStart = data.dataI.split(' ')[1]
+							let horaEnd = data.dataF.split(' ')[1]
+
+							$('#horaAgendaInicio').val(horaStart)
+							$('#horaAgendaFim').val(horaEnd)
+							$('#horaIntervalo').val(intervalo)
 
 							$.ajax({
 								type: 'POST',
@@ -190,6 +197,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									'title':title,
 									'dataI':data.dataI,
 									'dataF':data.dataF,
+									'horaIntervalo':intervalo,
 									'cor':event.color
 								},
 								success: function(response) {
@@ -205,17 +213,16 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 							let id = event.id?event.id:event._id
 							let dtI=event.start?event.start._i:''
 							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
 
 							let data = formatDate(dtI, dtF)
-
-							console.log(data)
 
 							let horaStart = data.dataI.split(' ')[1]
 							let horaEnd = data.dataF.split(' ')[1]
 
 							$('#horaAgendaInicio').val(horaStart)
 							$('#horaAgendaFim').val(horaEnd)
-							$('#horaIntervalo').val('')
+							$('#horaIntervalo').val(intervalo)
 
 							let dataTitulo = data.dataI.split(' ');
 
@@ -230,8 +237,16 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 							let title = event.title
 							let dtI=event.start?event.start._i:''
 							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
 
 							let data = formatDate(dtI, dtF)
+
+							let horaStart = data.dataI.split(' ')[1]
+							let horaEnd = data.dataF.split(' ')[1]
+
+							$('#horaAgendaInicio').val(horaStart)
+							$('#horaAgendaFim').val(horaEnd)
+							$('#horaIntervalo').val(intervalo)
 
 							$.ajax({
 								type: 'POST',
@@ -244,10 +259,12 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									'title':title,
 									'dataI':data.dataI,
 									'dataF':data.dataF,
+									'horaIntervalo':intervalo,
 									'cor':event.color
 								},
 								success: function(response) {
 									let dataTitulo = data.dataI.split(' ');
+
 									$('#tituloModal').html(`Definir horário para dia ${dataTitulo[0]}`);
 									$('#idEvent').val(id);
 									$('#page-modal-horario').fadeIn(200);
@@ -281,7 +298,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 														success: function(response) {
 															notice.remove();
 															alerta(response.titulo, response.menssagem, response.status)
-															getAgenda()
+															refreshAgenda()
 														}
 													});
 												},
@@ -319,6 +336,217 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 							title: $.trim($(this).html()), // use the element's text as the event title
 							color: $(this).data('color'),
 							localId: $(this).data('local'),
+							intervalo: $(this).data('intervalo'),
+							allDay: false,
+							stick: true, // maintain when user navigates (see docs on the renderEvent method)
+							start: '07:00:00',
+							end: null,
+						});
+
+						// Make the event draggable using jQuery UI
+						$(this).draggable({
+							zIndex: 999,
+							revert: true, // will cause the event to go back to its
+							revertDuration: 0 // original position after the drag
+						});
+					});
+				}
+			});
+		}
+
+		function refreshAgenda(){
+			// recarrega o calendário
+			$.ajax({
+				type: 'POST',
+				url: 'filtraProfissionalAgenda.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'CHECKAGENDA',
+					'iProfissional': $('#iProfissional').val()
+				},
+				success: function(response) {
+					clearModal()
+					// reseta o calendário
+					$('#fullcalendar-external').fullCalendar('destroy')
+					
+					// Initialize the calendar
+					$('#fullcalendar-external').fullCalendar({
+						header: {
+							left: 'prev,next today',
+							center: 'title',
+							right: 'month,agendaWeek'
+						},
+						editable: true,
+						defaultDate: dataAtual,
+						events: response,
+						timeZone: 'America/Bahia',
+						locale: 'pt-br',
+						droppable: true,
+						drop: function(arg) { //ao soltar
+							// $(this).remove();
+						},
+						eventReceive: function(event, jsEvent, view){
+							clearModal()
+							let id = event.id?event.id:event._id
+							let localId = event.localId
+							let title = event.title
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
+
+							let data = formatDate(dtI, dtF)
+
+							$.ajax({
+								type: 'POST',
+								url: 'filtraProfissionalAgenda.php',
+								dataType: 'json',
+								data:{
+									'tipoRequest': 'SETAGENDA',
+									'id':id,
+									'localId':localId,
+									'title':title,
+									'dataI':data.dataI,
+									'dataF':data.dataF,
+									'horaIntervalo':intervalo,
+									'cor':event.color
+								},
+								success: function(response) {
+									let dataTitulo = data.dataI.split(' ');
+
+									$('#tituloModal').html(`Definir horário para dia ${dataTitulo[0]}`);
+									$('#idEvent').val(id);
+									$('#page-modal-horario').fadeIn(200);
+								}
+							});
+						},
+						eventClick: function(event, jsEvent, view) { //ao clicar em cima (pode ser removido)
+							let id = event.id?event.id:event._id
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
+
+							let data = formatDate(dtI, dtF)
+
+							let horaStart = data.dataI.split(' ')[1]
+							let horaEnd = data.dataF.split(' ')[1]
+
+							$('#horaAgendaInicio').val(horaStart)
+							$('#horaAgendaFim').val(horaEnd)
+							$('#horaIntervalo').val(intervalo)
+
+							let dataTitulo = data.dataI.split(' ');
+
+							$('#tituloModal').html(`Definir horário para dia ${dataTitulo[0]}`);
+							$('#idEvent').val(id);
+							$('#page-modal-horario').fadeIn(200);
+						},
+						eventDrop: function(event, jsEvent, ui, view) { // ao arrastar e soltar
+							clearModal()
+							let id = event.id?event.id:event._id
+							let localId = event.localId
+							let title = event.title
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
+
+							let data = formatDate(dtI, dtF)
+
+							let horaStart = data.dataI.split(' ')[1]
+							let horaEnd = data.dataF.split(' ')[1]
+
+							$('#horaAgendaInicio').val(horaStart)
+							$('#horaAgendaFim').val(horaEnd)
+							$('#horaIntervalo').val(intervalo)
+
+							$.ajax({
+								type: 'POST',
+								url: 'filtraProfissionalAgenda.php',
+								dataType: 'json',
+								data:{
+									'tipoRequest': 'SETAGENDA',
+									'id':id,
+									'localId':localId,
+									'title':title,
+									'dataI':data.dataI,
+									'dataF':data.dataF,
+									'horaIntervalo':intervalo,
+									'cor':event.color
+								},
+								success: function(response) {
+									let dataTitulo = data.dataI.split(' ');
+
+									$('#tituloModal').html(`Definir horário para dia ${dataTitulo[0]}`);
+									$('#idEvent').val(id);
+									$('#page-modal-horario').fadeIn(200);
+								}
+							});
+						},
+						eventDragStop: function(event,jsEvent) {
+							// alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+
+							if((jsEvent.pageX < 330 && jsEvent.pageX > 100) && (jsEvent.pageY < 900 && jsEvent.pageY > 350)){
+								new PNotify({
+									title: 'Confirmação',
+									text: 'Deseja excluir esse item da agenda?',
+									icon: 'icon-question4',
+									hide: false,
+									confirm: {
+										confirm: true,
+										buttons: [
+											{
+												text: 'Sim',
+												primary: true,
+												click: function (notice) {
+													$.ajax({
+														type: 'POST',
+														url: 'filtraProfissionalAgenda.php',
+														dataType: 'json',
+														data:{
+															'tipoRequest': 'REMOVEAGENDA',
+															'id': event.id?event.id:event._id
+														},
+														success: function(response) {
+															notice.remove();
+															alerta(response.titulo, response.menssagem, response.status)
+															refreshAgenda()
+														}
+													});
+												},
+											},
+											{
+												text: 'Não',
+												click: function (notice) {
+													notice.remove();
+												},
+											},
+										],
+									},
+									buttons: {
+										closer: false,
+										sticker: false,
+									},
+									history: {
+										history: false,
+									},
+									addclass: 'stack-modal',
+									stack: { dir1: 'down', dir2: 'right', modal: false },
+								})
+							}
+						},
+						isRTL: false
+					});
+
+					// Initialize the external events
+					$('#external-events .fc-event').each(function() {
+						// Different colors for events
+						$(this).css({'backgroundColor': $(this).data('color'), 'borderColor': $(this).data('color')});
+
+						// Store data so the calendar knows to render an event upon drop
+						$(this).data('event', {
+							title: $.trim($(this).html()), // use the element's text as the event title
+							color: $(this).data('color'),
+							localId: $(this).data('local'),
+							intervalo: $(this).data('intervalo'),
 							allDay: false,
 							stick: true, // maintain when user navigates (see docs on the renderEvent method)
 							start: '07:00:00',
@@ -394,7 +622,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 			success: function(response) {
 				$('#locaisAtendimento').html('').show()
 				response.forEach(function(item){
-					$('#locaisAtendimento').append(`<div class="fc-event" data-local="${item.idLocal}" data-color="${item.cor}">${item.nome}</div>`)
+					$('#locaisAtendimento').append(`<div class="fc-event" data-intervalo="${item.AtLocIntervalo}" data-local="${item.idLocal}" data-color="${item.cor}">${item.nome}</div>`)
 				});
 			}
 		});
