@@ -58,7 +58,7 @@ if ($stringPagamento != '') {
 }
 
 //Falta o id da abertura do caixa
-$sql_movimentacao    = "SELECT CxRecId as ID, AtendNumRegistro, ClienNome as HISTORICO, CxRecDataHora as DATAHORA, CxRecAtendimento, FrPagNome, 
+$sql_movimentacao    = "SELECT CxRecId as ID, AtendNumRegistro, ClienNome as HISTORICO, CxRecDataHora as DATAHORA, CxRecAtendimento as ATENDIMENTO, FrPagNome, 
                                 CxRecValor, CxRecValorTotal as TOTAL, SituaNome, SituaChave, 'Recebimento' as TIPO
                         FROM CaixaRecebimento
                         JOIN CaixaAbertura on CxAbeId = CxRecCaixaAbertura
@@ -82,7 +82,7 @@ $arrayData = [];
 foreach ($rowMovimentacao as $item) {
     $numeroRegistro = $item["AtendNumRegistro"];
     $dataHora = mostraDataHora($item["DATAHORA"]);
-    $historico = '<a href="#" onclick="atualizaMovimentacaoCaixa('.$item["ID"].', \''.$item["TIPO"].'\', \'detalhamento\');">'.$item["HISTORICO"].'</a>';
+    $historico = '<a href="#" onclick="atualizaMovimentacaoCaixa('.$item["ID"].','.$item["ATENDIMENTO"].', \''.$item["TIPO"].'\', \'detalhamento\');">'.$item["HISTORICO"].'</a>';
     $tipo = $item["TIPO"];
     $formaPagamento = $item["FrPagNome"];
     $status = $item["SituaNome"];
@@ -94,15 +94,15 @@ foreach ($rowMovimentacao as $item) {
         $valorFinal = mostraValor($item["TOTAL"] * -1); 
     }
 
-    $iconeVizivel = $item["SituaChave"] == 'ESTORNADO' ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoCaixa('.$item["ID"].', \''.$item["TIPO"].'\', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar"><i class="icon-info3"></i></a>' :
-                                                         '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoCaixa('.$item["ID"].', \''.$item["TIPO"].'\', \'detalhesEstornamento\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar"><i class="icon-undo2"></i></a>';
+    $iconeVizivel = $item["SituaChave"] == 'ESTORNADO' ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoCaixa('.$item["ID"].','.$item["ATENDIMENTO"].', \''.$item["TIPO"].'\', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar"><i class="icon-info3"></i></a>' :
+                                                         '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoCaixa('.$item["ID"].','.$item["ATENDIMENTO"].', \''.$item["TIPO"].'\', \'detalhesEstornamento\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar"><i class="icon-undo2"></i></a>';
 
     $acoes = '
             <div class="list-icons">
                 <div class="list-icons list-icons-extended">
-                    <a href="#" onclick="atualizaMovimentacaoCaixa('.$item["ID"].', \''.$item["TIPO"].'\', \'detalhamento\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Detalhamento"><i class="icon-file-text2"></i></a>
+                    <a href="#" onclick="atualizaMovimentacaoCaixa('.$item["ID"].','.$item["ATENDIMENTO"].', \''.$item["TIPO"].'\', \'detalhamento\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Detalhamento"><i class="icon-file-text2"></i></a>
                     '.$iconeVizivel.'
-                    <a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoCaixa('.$item["ID"].', \''.$item["TIPO"].'\', \'imprimir\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Imprimir"><i class="icon-printer2"></i></a>
+                    <a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoCaixa('.$item["ID"].','.$item["ATENDIMENTO"].', \''.$item["TIPO"].'\', \'imprimir\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Imprimir"><i class="icon-printer2"></i></a>
                 </div>
             </div>';
 

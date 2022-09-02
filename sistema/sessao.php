@@ -160,8 +160,8 @@ if ((array_key_exists('ContPagPeriodoDe', $_SESSION) || array_key_exists('ContPa
 }
 
 $arquivosMovimentacaoCaixa = array(
-	'caixaMovimentacao.php', 'caixaMovimentacaoFiltra.php', 'caixaPDV.php', 'caixaFechamento.php', 'consultaAberturaCaixa.php', 
-	'consultaAberturaCaixa.php', 'consultaCaixaSaldoAtual.php', 'consultaCaixaSaldo.php'
+	'caixaMovimentacao.php', 'caixaMovimentacaoFiltra.php', 'caixaPDV.php', 'caixaFechamento.php', 'caixaRecebimentoDetalhamento.php', 'caixaImprimiReciboRetirada.php', 
+	'consultaAberturaCaixa.php', 'consultaAberturaCaixa.php', 'consultaCaixaSaldoAtual.php', 'consultaCaixaSaldo.php'
 );
 
 if ((array_key_exists('MovCaixaPeriodoDe', $_SESSION) || array_key_exists('MovCaixaAte', $_SESSION) || array_key_exists('MovCaixaCliente', $_SESSION) || 

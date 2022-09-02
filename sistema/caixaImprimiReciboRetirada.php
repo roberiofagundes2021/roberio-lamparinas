@@ -108,7 +108,7 @@ try {
         </div> 
     </div>
 
-    <div style='position: relative; width:100%; border: 3px solid #CCCCCC; margin-bottom: 10px; background-color: #eeeeee;'>
+    <div style='position: relative; width:100%; border: 3px solid #CCCCCC; background-color: #eeeeee;'>
         <h3 style='text-align: center;'>Justificativa</h3>
     </div>
 
