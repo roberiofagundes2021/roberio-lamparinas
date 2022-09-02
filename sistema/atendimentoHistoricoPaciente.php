@@ -28,7 +28,7 @@ $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtClaNome, AtendDataRegi
 		JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 		JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE AtendId = $iAtendimentoId and AtendUnidade = ".$_SESSION['UnidadeId']."
-		ORDER BY AtendNumRegistro ASC";
+		ORDER BY AtendDataRegistro ASC";
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 

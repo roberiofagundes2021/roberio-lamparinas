@@ -26,15 +26,16 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE AtendimentoLocal SET AtLocNome = :sNome, AtLocCNES= :sCNES,AtLocCep = :sCep, AtLocEndereco = :sEndereco, 
-											AtLocNumero = :sNumero, AtLocComplemento = :sComplemento, AtLocBairro = :sBairro, 
-											AtLocCidade = :sCidade, AtLocEstado = :sEstado, AtLocUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE AtLocId = :iAtendimentoLocal";
+		$sql = "UPDATE AtendimentoLocal SET AtLocNome = :sNome, AtLocCNES= :sCNES, AtLocCor = :sCOR, AtLocCep = :sCep,
+		AtLocEndereco = :sEndereco, AtLocNumero = :sNumero, AtLocComplemento = :sComplemento, AtLocBairro = :sBairro, 
+		AtLocCidade = :sCidade, AtLocEstado = :sEstado, AtLocUsuarioAtualizador = :iUsuarioAtualizador
+		WHERE AtLocId = :iAtendimentoLocal";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
 						':sCNES' => $_POST['inputCNES'],
+						':sCOR' => $_POST['inputCor'],
 						':sCep' => trim($_POST['inputCep']) == "" ? null : $_POST['inputCep'],
 						':sEndereco' => $_POST['inputEndereco'],
 						':sNumero' => $_POST['inputNumero'],
@@ -219,18 +220,24 @@ if(isset($_POST['inputNome'])){
 						
 						<div class="card-body">								
 							<div class="row">
-								<div class="col-lg-6">
+								<div class="col-lg-5">
 									<div class="form-group">
 										<label for="inputNome">Nome do Local de Atendimento<span class="text-danger"> *</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Local de Atendimento" value="<?php echo $row['AtLocNome']; ?>" required autofocus>
 									</div>
 								</div>
-								<div class="col-lg-6">
+								<div class="col-lg-5">
 									<div class="form-group">
-										<label for="inputCNES">Nome do Local de Atendimento</label>
+										<label for="inputCNES">CNES</label>
 										<input type="text" id="inputCNES" name="inputCNES" class="form-control" placeholder="CNES" value="<?php echo $row['AtLocCNES']; ?>" >
 									</div>
-								</div>							
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputCor">Cor <span class="text-danger">*</span></label>
+										<input type="color" id="inputCor" name="inputCor" class="container" placeholder="Cor" value="<?php echo $row['AtLocCor']; ?>" required>
+									</div>
+								</div>
 							</div>
 							<br>
 							

@@ -202,7 +202,7 @@ if($row['AtClaChave'] == "AMBULATORIAL"){
 }  else if  ($row['AtClaChave'] == "ELETIVO"){
 
     $html .= '
-        <div style="text-align:center; margin-top: 20px;"><h1>Histórico do Paciente</h1></div>
+        <div style="text-align:center; margin-top: 10px;"><h1>Histórico do Paciente</h1></div>
     
         <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 10px;">
         DATA DO ATENDIMENTO ELETIVO

@@ -3,6 +3,7 @@
 include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Agenda';
+$_SESSION['agendaProfissional'] = [];
 
 include('global_assets/php/conexao.php');
 
@@ -88,9 +89,8 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 
 	<script type="text/javascript" >
 		$(document).ready(function(){
-			$('#modal-close-x').on('click', ()=>{
-				$('#page-modal-agenda').fadeOut(200);
-			})
+			getAgenda()
+
 			$('#salvarAgenda').on('click', ()=>{
 				$.ajax({
 					type: 'POST',
@@ -102,11 +102,467 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 					},
 					success: function(response) {
 						alerta(response.titulo, response.menssagem, response.status)
-						FullCalendarAdvanced.init();
+						getAgenda()
+					}
+				});
+			})
+			$('#modal-close-x').on('click', function(){
+				$('#page-modal-horario').fadeOut(200);
+			})
+			$('#definirHorario').on('click', function(e){
+				e.preventDefault()
+				$('#page-modal-horario').fadeOut(200)
+
+				let id = $('#idEvent').val()
+				let horaAgendaInicio = $('#horaAgendaInicio').val()
+				let horaAgendaFim = $('#horaAgendaFim').val()
+				let horaIntervalo = $('#horaIntervalo').val()
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraProfissionalAgenda.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'SETHORAAGENDA',
+						'id':id,
+						'horaAgendaInicio':horaAgendaInicio,
+						'horaAgendaFim':horaAgendaFim,
+						'horaIntervalo':horaIntervalo,
+					},
+					success: function(response){
+						refreshAgenda()
+						alerta(response.titulo, response.menssagem, response.status)
 					}
 				});
 			})
 		})
+
+		function getAgenda(){
+			// iniciar o calendário
+			$.ajax({
+				type: 'POST',
+				url: 'filtraProfissionalAgenda.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'AGENDA',
+					'iProfissional': $('#iProfissional').val()
+				},
+				success: function(response) {
+					clearModal()
+					// reseta o calendário
+					$('#fullcalendar-external').fullCalendar('destroy')
+					
+					// Initialize the calendar
+					$('#fullcalendar-external').fullCalendar({
+						header: {
+							left: 'prev,next today',
+							center: 'title',
+							right: 'month,agendaWeek'
+						},
+						editable: true,
+						defaultDate: dataAtual,
+						events: response,
+						timeZone: 'America/Bahia',
+						locale: 'pt-br',
+						droppable: true,
+						drop: function(arg) { //ao soltar
+							// $(this).remove();
+						},
+						eventReceive: function(event, jsEvent, view){
+							clearModal()
+							let id = event.id?event.id:event._id
+							let localId = event.localId
+							let title = event.title
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
+
+							let data = formatDate(dtI, dtF)
+
+							let horaStart = data.dataI.split(' ')[1]
+							let horaEnd = data.dataF.split(' ')[1]
+
+							$('#horaAgendaInicio').val(horaStart)
+							$('#horaAgendaFim').val(horaEnd)
+							$('#horaIntervalo').val(intervalo)
+
+							$.ajax({
+								type: 'POST',
+								url: 'filtraProfissionalAgenda.php',
+								dataType: 'json',
+								data:{
+									'tipoRequest': 'SETAGENDA',
+									'id':id,
+									'localId':localId,
+									'title':title,
+									'dataI':data.dataI,
+									'dataF':data.dataF,
+									'horaIntervalo':intervalo,
+									'cor':event.color
+								},
+								success: function(response) {
+									let dataTitulo = data.dataI.split(' ');
+
+									$('#tituloModal').html(`Definir horário para dia ${dataTitulo[0]}`);
+									$('#idEvent').val(id);
+									$('#page-modal-horario').fadeIn(200);
+								}
+							});
+						},
+						eventClick: function(event, jsEvent, view) { //ao clicar em cima (pode ser removido)
+							let id = event.id?event.id:event._id
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
+
+							let data = formatDate(dtI, dtF)
+
+							let horaStart = data.dataI.split(' ')[1]
+							let horaEnd = data.dataF.split(' ')[1]
+
+							$('#horaAgendaInicio').val(horaStart)
+							$('#horaAgendaFim').val(horaEnd)
+							$('#horaIntervalo').val(intervalo)
+
+							let dataTitulo = data.dataI.split(' ');
+
+							$('#tituloModal').html(`Definir horário para dia ${dataTitulo[0]}`);
+							$('#idEvent').val(id);
+							$('#page-modal-horario').fadeIn(200);
+						},
+						eventDrop: function(event, jsEvent, ui, view) { // ao arrastar e soltar
+							clearModal()
+							let id = event.id?event.id:event._id
+							let localId = event.localId
+							let title = event.title
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
+
+							let data = formatDate(dtI, dtF)
+
+							let horaStart = data.dataI.split(' ')[1]
+							let horaEnd = data.dataF.split(' ')[1]
+
+							$('#horaAgendaInicio').val(horaStart)
+							$('#horaAgendaFim').val(horaEnd)
+							$('#horaIntervalo').val(intervalo)
+
+							$.ajax({
+								type: 'POST',
+								url: 'filtraProfissionalAgenda.php',
+								dataType: 'json',
+								data:{
+									'tipoRequest': 'SETAGENDA',
+									'id':id,
+									'localId':localId,
+									'title':title,
+									'dataI':data.dataI,
+									'dataF':data.dataF,
+									'horaIntervalo':intervalo,
+									'cor':event.color
+								},
+								success: function(response) {
+									let dataTitulo = data.dataI.split(' ');
+
+									$('#tituloModal').html(`Definir horário para dia ${dataTitulo[0]}`);
+									$('#idEvent').val(id);
+									$('#page-modal-horario').fadeIn(200);
+								}
+							});
+						},
+						eventDragStop: function(event,jsEvent) {
+							// alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+
+							if((jsEvent.pageX < 330 && jsEvent.pageX > 100) && (jsEvent.pageY < 900 && jsEvent.pageY > 350)){
+								new PNotify({
+									title: 'Confirmação',
+									text: 'Deseja excluir esse item da agenda?',
+									icon: 'icon-question4',
+									hide: false,
+									confirm: {
+										confirm: true,
+										buttons: [
+											{
+												text: 'Sim',
+												primary: true,
+												click: function (notice) {
+													$.ajax({
+														type: 'POST',
+														url: 'filtraProfissionalAgenda.php',
+														dataType: 'json',
+														data:{
+															'tipoRequest': 'REMOVEAGENDA',
+															'id': event.id?event.id:event._id
+														},
+														success: function(response) {
+															notice.remove();
+															alerta(response.titulo, response.menssagem, response.status)
+															refreshAgenda()
+														}
+													});
+												},
+											},
+											{
+												text: 'Não',
+												click: function (notice) {
+													notice.remove();
+												},
+											},
+										],
+									},
+									buttons: {
+										closer: false,
+										sticker: false,
+									},
+									history: {
+										history: false,
+									},
+									addclass: 'stack-modal',
+									stack: { dir1: 'down', dir2: 'right', modal: false },
+								})
+							}
+						},
+						isRTL: false
+					});
+
+					// Initialize the external events
+					$('#external-events .fc-event').each(function() {
+						// Different colors for events
+						$(this).css({'backgroundColor': $(this).data('color'), 'borderColor': $(this).data('color')});
+
+						// Store data so the calendar knows to render an event upon drop
+						$(this).data('event', {
+							title: $.trim($(this).html()), // use the element's text as the event title
+							color: $(this).data('color'),
+							localId: $(this).data('local'),
+							intervalo: $(this).data('intervalo'),
+							allDay: false,
+							stick: true, // maintain when user navigates (see docs on the renderEvent method)
+							start: '07:00:00',
+							end: null,
+						});
+
+						// Make the event draggable using jQuery UI
+						$(this).draggable({
+							zIndex: 999,
+							revert: true, // will cause the event to go back to its
+							revertDuration: 0 // original position after the drag
+						});
+					});
+				}
+			});
+		}
+
+		function refreshAgenda(){
+			// recarrega o calendário
+			$.ajax({
+				type: 'POST',
+				url: 'filtraProfissionalAgenda.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'CHECKAGENDA',
+					'iProfissional': $('#iProfissional').val()
+				},
+				success: function(response) {
+					clearModal()
+					// reseta o calendário
+					$('#fullcalendar-external').fullCalendar('destroy')
+					
+					// Initialize the calendar
+					$('#fullcalendar-external').fullCalendar({
+						header: {
+							left: 'prev,next today',
+							center: 'title',
+							right: 'month,agendaWeek'
+						},
+						editable: true,
+						defaultDate: dataAtual,
+						events: response,
+						timeZone: 'America/Bahia',
+						locale: 'pt-br',
+						droppable: true,
+						drop: function(arg) { //ao soltar
+							// $(this).remove();
+						},
+						eventReceive: function(event, jsEvent, view){
+							clearModal()
+							let id = event.id?event.id:event._id
+							let localId = event.localId
+							let title = event.title
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
+
+							let data = formatDate(dtI, dtF)
+
+							$.ajax({
+								type: 'POST',
+								url: 'filtraProfissionalAgenda.php',
+								dataType: 'json',
+								data:{
+									'tipoRequest': 'SETAGENDA',
+									'id':id,
+									'localId':localId,
+									'title':title,
+									'dataI':data.dataI,
+									'dataF':data.dataF,
+									'horaIntervalo':intervalo,
+									'cor':event.color
+								},
+								success: function(response) {
+									let dataTitulo = data.dataI.split(' ');
+
+									$('#tituloModal').html(`Definir horário para dia ${dataTitulo[0]}`);
+									$('#idEvent').val(id);
+									$('#page-modal-horario').fadeIn(200);
+								}
+							});
+						},
+						eventClick: function(event, jsEvent, view) { //ao clicar em cima (pode ser removido)
+							let id = event.id?event.id:event._id
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
+
+							let data = formatDate(dtI, dtF)
+
+							let horaStart = data.dataI.split(' ')[1]
+							let horaEnd = data.dataF.split(' ')[1]
+
+							$('#horaAgendaInicio').val(horaStart)
+							$('#horaAgendaFim').val(horaEnd)
+							$('#horaIntervalo').val(intervalo)
+
+							let dataTitulo = data.dataI.split(' ');
+
+							$('#tituloModal').html(`Definir horário para dia ${dataTitulo[0]}`);
+							$('#idEvent').val(id);
+							$('#page-modal-horario').fadeIn(200);
+						},
+						eventDrop: function(event, jsEvent, ui, view) { // ao arrastar e soltar
+							clearModal()
+							let id = event.id?event.id:event._id
+							let localId = event.localId
+							let title = event.title
+							let dtI=event.start?event.start._i:''
+							let dtF=event.end?event.end._i:''
+							let intervalo=event.intervalo?event.intervalo:30
+
+							let data = formatDate(dtI, dtF)
+
+							let horaStart = data.dataI.split(' ')[1]
+							let horaEnd = data.dataF.split(' ')[1]
+
+							$('#horaAgendaInicio').val(horaStart)
+							$('#horaAgendaFim').val(horaEnd)
+							$('#horaIntervalo').val(intervalo)
+
+							$.ajax({
+								type: 'POST',
+								url: 'filtraProfissionalAgenda.php',
+								dataType: 'json',
+								data:{
+									'tipoRequest': 'SETAGENDA',
+									'id':id,
+									'localId':localId,
+									'title':title,
+									'dataI':data.dataI,
+									'dataF':data.dataF,
+									'horaIntervalo':intervalo,
+									'cor':event.color
+								},
+								success: function(response) {
+									let dataTitulo = data.dataI.split(' ');
+
+									$('#tituloModal').html(`Definir horário para dia ${dataTitulo[0]}`);
+									$('#idEvent').val(id);
+									$('#page-modal-horario').fadeIn(200);
+								}
+							});
+						},
+						eventDragStop: function(event,jsEvent) {
+							// alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+
+							if((jsEvent.pageX < 330 && jsEvent.pageX > 100) && (jsEvent.pageY < 900 && jsEvent.pageY > 350)){
+								new PNotify({
+									title: 'Confirmação',
+									text: 'Deseja excluir esse item da agenda?',
+									icon: 'icon-question4',
+									hide: false,
+									confirm: {
+										confirm: true,
+										buttons: [
+											{
+												text: 'Sim',
+												primary: true,
+												click: function (notice) {
+													$.ajax({
+														type: 'POST',
+														url: 'filtraProfissionalAgenda.php',
+														dataType: 'json',
+														data:{
+															'tipoRequest': 'REMOVEAGENDA',
+															'id': event.id?event.id:event._id
+														},
+														success: function(response) {
+															notice.remove();
+															alerta(response.titulo, response.menssagem, response.status)
+															refreshAgenda()
+														}
+													});
+												},
+											},
+											{
+												text: 'Não',
+												click: function (notice) {
+													notice.remove();
+												},
+											},
+										],
+									},
+									buttons: {
+										closer: false,
+										sticker: false,
+									},
+									history: {
+										history: false,
+									},
+									addclass: 'stack-modal',
+									stack: { dir1: 'down', dir2: 'right', modal: false },
+								})
+							}
+						},
+						isRTL: false
+					});
+
+					// Initialize the external events
+					$('#external-events .fc-event').each(function() {
+						// Different colors for events
+						$(this).css({'backgroundColor': $(this).data('color'), 'borderColor': $(this).data('color')});
+
+						// Store data so the calendar knows to render an event upon drop
+						$(this).data('event', {
+							title: $.trim($(this).html()), // use the element's text as the event title
+							color: $(this).data('color'),
+							localId: $(this).data('local'),
+							intervalo: $(this).data('intervalo'),
+							allDay: false,
+							stick: true, // maintain when user navigates (see docs on the renderEvent method)
+							start: '07:00:00',
+							end: null,
+						});
+
+						// Make the event draggable using jQuery UI
+						$(this).draggable({
+							zIndex: 999,
+							revert: true, // will cause the event to go back to its
+							revertDuration: 0 // original position after the drag
+						});
+					});
+				}
+			});
+		}
 
 		function formatDate(start,end){
 			let dataI = ''
@@ -146,6 +602,12 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 			return {dataI:dataI,dataF:dataF}
 		}
 
+		function clearModal(){
+			$('#horaAgendaInicio').val('')
+			$('#horaAgendaFim').val('')
+			$('#horaIntervalo').val('')	
+		}
+
 		var dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"});
 		dataAtual = dataAtual.split(' ')[0];
 		dataAtual = dataAtual.split('/')[2]+'-'+dataAtual.split('/')[1]+'-'+dataAtual.split('/')[0];
@@ -160,183 +622,11 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 			success: function(response) {
 				$('#locaisAtendimento').html('').show()
 				response.forEach(function(item){
-					$('#locaisAtendimento').append(`<div data-agenda="${item.id}" class="fc-event" data-local="${item.idLocal}" data-color="${item.cor}">${item.nome}</div>`)
+					$('#locaisAtendimento').append(`<div class="fc-event" data-intervalo="${item.AtLocIntervalo}" data-local="${item.idLocal}" data-color="${item.cor}">${item.nome}</div>`)
 				});
 			}
 		});
 
-		document.addEventListener('DOMContentLoaded', function() {
-			FullCalendarAdvanced.init();
-		});
-
-		var FullCalendarAdvanced = function() {
-			var _componentFullCalendarEvents = function(agenda) {
-				if (!$().fullCalendar || typeof Switchery == 'undefined' || !$().draggable) {
-					console.warn('Warning - fullcalendar.min.js, switchery.min.js or jQuery UI is not loaded.');
-					return;
-				}
-				var eventColors = agenda;
-				// agenda = [
-				// 	{
-				// 		id: 999,
-				// 		url: 'http://google.com/',
-				// 		title: 'Meeting',
-				// 		start: '2014-11-12T10:30:00',
-				// 		end: '2014-11-12T12:30:00',
-				// 		color: '#546E7A'
-				// 	}
-				// ];
-
-				// Initialize the calendar
-				$('.fullcalendar-external').fullCalendar({
-					header: {
-						left: 'prev,next today',
-						center: 'title',
-						right: 'month,agendaWeek'
-					},
-					editable: true,
-					defaultDate: dataAtual,
-					events: eventColors,
-					timeZone: 'America/Bahia',
-					locale: 'pt-br',
-					droppable: true,
-						drop: function() { //ao soltar
-							// $(this).remove();
-							let id = event.id?event.id:(event._id?event._id:'N/A')
-							let localId = event.localId
-							let title = event.title
-							let dtI=event.start?event.start._i:''
-							let dtF=event.end?event.end._i:''
-
-							let data = formatDate(dtI, dtF)
-
-							$.ajax({
-								type: 'POST',
-								url: 'filtraProfissionalAgenda.php',
-								dataType: 'json',
-								data:{
-									'tipoRequest': 'SETAGENDA',
-									'id':id,
-									'localId':localId,
-									'title':title,
-									'dataI':data.dataI,
-									'dataF':data.dataF,
-									'dataF':data.dataF
-								},
-								success: function(response) {
-									console.log(response)
-								}
-							});
-						},
-						eventClick: function(event, jsEvent, view) { //ao clicar em cima
-							console.log(event)
-							let dtI=event.start?event.start._i:''
-							let dtF=event.end?event.end._i:''
-
-							let data = formatDate(dtI, dtF)
-
-							console.log('Início: '+data.dataI)
-							console.log('Fim: '+data.dataF)
-						},
-						eventDrop: function(event, jsEvent, ui, view) { // ao arrastar e soltar
-							let id = event.id?event.id:event._id
-							let localId = event.localId
-							let title = event.title
-							let dtI=event.start?event.start._i:''
-							let dtF=event.end?event.end._i:''
-
-							let data = formatDate(dtI, dtF)
-
-							$.ajax({
-								type: 'POST',
-								url: 'filtraProfissionalAgenda.php',
-								dataType: 'json',
-								data:{
-									'tipoRequest': 'SETAGENDA',
-									'id':id,
-									'localId':localId,
-									'title':title,
-									'dataI':data.dataI,
-									'dataF':data.dataF,
-									'dataF':data.dataF
-								},
-								success: function(response) {
-									console.log(response)
-								}
-							});
-						},
-						eventResize: function(event, delta, revertFunc) { // ao redimencionar o horário
-							let id = event.id?event.id:event._id
-							let localId = event.localId
-							let title = event.title
-							let dtI=event.start?event.start._i:''
-							let dtF=event.end?event.end._i:''
-
-							let data = formatDate(dtI, dtF)
-
-							$.ajax({
-								type: 'POST',
-								url: 'filtraProfissionalAgenda.php',
-								dataType: 'json',
-								data:{
-									'tipoRequest': 'SETAGENDA',
-									'id':id,
-									'localId':localId,
-									'title':title,
-									'dataI':data.dataI,
-									'dataF':data.dataF,
-									'dataF':data.dataF
-								},
-								success: function(response) {
-									console.log(response)
-								}
-							});
-
-						},
-					isRTL: $('html').attr('dir') == 'rtl' ? true : false
-				});
-
-				// Initialize the external events
-				$('#external-events .fc-event').each(function() {
-					// Different colors for events
-					$(this).css({'backgroundColor': $(this).data('color'), 'borderColor': $(this).data('color')});
-
-					// Store data so the calendar knows to render an event upon drop
-					$(this).data('event', {
-						title: $.trim($(this).html()), // use the element's text as the event title
-						color: $(this).data('color'),
-						agenda: $(this).data('agenda'),
-						localId: $(this).data('local'),
-						stick: true, // maintain when user navigates (see docs on the renderEvent method)
-						start: null,
-						end: null,
-					});
-
-					// Make the event draggable using jQuery UI
-					$(this).draggable({
-						zIndex: 999,
-						revert: true, // will cause the event to go back to its
-						revertDuration: 0 // original position after the drag
-					});
-				});
-			};
-			return {
-				init: function() {
-					$.ajax({
-						type: 'POST',
-						url: 'filtraProfissionalAgenda.php',
-						dataType: 'json',
-						data:{
-							'tipoRequest': 'AGENDA',
-							'iProfissional': $('#iProfissional').val()
-						},
-						success: function(response) {
-							_componentFullCalendarEvents(response);
-						}
-					});
-				}
-			}
-		}();
 	</script>
 
 </head>
@@ -380,9 +670,8 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 						<div class="row">
 							<div class="col-md-3">
 								<div class="mb-3" id="external-events">
-									<h6>Draggable Events</h6>
+									<h6>Locais de atendimento</h6>
 									<div id="locaisAtendimento" class="fc-events-container mb-3">
-										<!-- <div class="fc-event" data-color="#546E7A">Sauna and stuff</div> -->
 									</div>
 
 									<div class="">
@@ -392,12 +681,66 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 							</div>
 
 							<div class="col-md-9">
-								<div class="fullcalendar-external"></div>
+								<div id="fullcalendar-external"></div>
 							</div>
 						</div>
 						<div class="text-left m-2">
 							<button id="salvarAgenda" class="btn btn-principal" role="button">Salvar</button>
 							<a href="profissional.php" class="btn btn-lg" id="cancelar">Cancelar</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!--Modal Editar Situação-->
+			<div id="page-modal-horario" class="custon-modal">
+				<div class="custon-modal-container" style="max-width: 600px;">
+					<div class="card custon-modal-content">
+						<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+							<p id="tituloModal" class="h5"><!-- definido ao abrir modal--></p>
+							<i id="modal-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+						</div>
+						<div class="px-0">
+							<div class="d-flex flex-row">
+								<div class="col-lg-12">
+									<div id="setHorario">
+										<div class="form-group row">
+											<div class="col-lg-5 mt-2">
+												<div class="col-lg-12">
+													<label>Início <span class="text-danger">*</span></label>
+												</div>
+												<div class="col-lg-12">
+													<input id="horaAgendaInicio" type="time" class="form-control" value="" required>
+												</div>
+											</div>
+
+											<div class="col-lg-5 mt-2">
+												<div class="col-lg-12">
+													<label>Fim <span class="text-danger">*</span></label>
+												</div>
+												<div class="col-lg-12">
+													<input id="horaAgendaFim" type="time" class="form-control" value="" required>
+												</div>
+											</div>
+
+											<div class="col-lg-2 mt-2">
+												<div class="col-lg-12">
+													<label>Intervalo <span class="text-danger">*</span></label>
+												</div>
+												<div class="col-lg-12">
+													<input id="horaIntervalo" class="form-control" type="number" name="number">
+												</div>
+											</div>
+										</div>
+										<div>
+											<input type="hidden" id="idEvent" name="idEvent" value=""/>
+										</div>
+										<div class="text-right m-2 mt-3">
+											<button id="definirHorario" class="btn btn-principal" role="button">Confirmar</button>
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
