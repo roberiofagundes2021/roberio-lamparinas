@@ -211,7 +211,6 @@ $resultProdutos  = $conn->query($sql_rrecebimentoProdutos);
                                         $desconto += $item['AtXSeDesconto'];
 
                                         $valorFinal += $valorTotalServicos - $desconto;
-
                                     }
                                     
                                     echo '
@@ -260,7 +259,6 @@ $resultProdutos  = $conn->query($sql_rrecebimentoProdutos);
                                         $desconto += $item['AtXPrDesconto'];
 
                                         $valorFinal += $valorTotalProdutos - $desconto;
-
                                     }
                                     
                                     echo '
