@@ -298,19 +298,16 @@ include('global_assets/php/conexao.php');
 
 							<div class="card-body">
 								<div class="row">
-									<div class="col-lg-9">
+									<div class="col-lg-8">
 										<p class="font-size-lg">A relação abaixo faz referência aos agendamentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>
-									<div class="col-lg-3">
+									<div class="col-lg-4 text-right">
 										<div class="text-right">
-											<div class="dropdown p-0" style="float:right; margin-left: 5px;">										
-												<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
-													<i class="icon-printer2"></i>																						
-												</a>
-											</div>
-											<div>
-												<a href="agendamentoNovo.php" class="btn btn-principal" role="button">Novo Agendamento</a>
-											</div>
+											<a href="agendaMedica.php" class="btn" role="button">Agenda médica</a>
+											<a href="agendamentoNovo.php" class="btn btn-principal" role="button">Novo Agendamento</a>
+											<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
+												<i class="icon-printer2"></i>																						
+											</a>
 										</div>
 									</div>	
 								</div>
