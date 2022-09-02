@@ -423,6 +423,7 @@ try{
 			'id' => $pacienteId
 		]);
 	} elseif($tipoRequest == 'SALVARRESPONSAVEL'){
+		$pacienteId = $_POST['pacienteId'];
 		$responsavel = [
 			'nomeResp' => isset($_POST['nomeResp'])?$_POST['nomeResp']: 'null',
 			'parentescoResp' => isset($_POST['parentescoResp'])?$_POST['parentescoResp']: 'null',
@@ -458,10 +459,6 @@ try{
 		]);
 	} elseif($tipoRequest == 'SALVARATENDIMENTO'){
 		$atendimentoServicos = $_SESSION['atendimento']['atendimentoServicos'];
-
-		// $sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'ATIVO'";
-		// $result = $conn->query($sql);
-		// $rowStatus = $result->fetch(PDO::FETCH_ASSOC);
 
 		if(!COUNT($atendimentoServicos)){
 			echo json_encode([
@@ -785,7 +782,7 @@ try{
 		// $sqlMedico = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
 		// FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 		$sql = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
-		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade != $iUnidade";
+		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 		$resultMedico = $conn->query($sql);
 		$resultMedico = $resultMedico->fetch(PDO::FETCH_ASSOC);
 
@@ -837,40 +834,61 @@ try{
 
 		if(isset($_POST['iAtendimento']) && $_POST['iAtendimento']){
 			$iAtendimento = $_POST['iAtendimento'];
-			$atendimentoSessao  = [];
-			
-			
+
 			$sql = "SELECT AtXSeId,AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,AtXSeHorario,
-			AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,AtXSeUsuarioAtualizador,AtXSeUnidade,
-			ProfiId,AtLocId,AtLocNome,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-			SituaCor,ProfiNome,SrVenNome,SrVenValorVenda,SrVenId
-			FROM AtendimentoXServico
-			JOIN Atendimento ON AtendId = AtXSeAtendimento
-			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			JOIN Situacao ON SituaId = AtendSituacao
-			JOIN Cliente ON ClienId = AtendCliente
-			JOIN Profissional ON ProfiId = AtXSeProfissional
-			JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
-			JOIN ServicoVenda ON SrVenId = AtXSeServico
-			WHERE AtXSeUnidade = $iUnidade and AtXSeAtendimento = $iAtendimento";
+				AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,AtXSeUsuarioAtualizador,AtXSeUnidade,
+				ProfiId,AtLocId,AtLocNome,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
+				SituaCor,ProfiNome,SrVenNome,SrVenValorVenda,SrVenId
+				FROM AtendimentoXServico
+				JOIN Atendimento ON AtendId = AtXSeAtendimento
+				JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+				JOIN Situacao ON SituaId = AtendSituacao
+				JOIN Cliente ON ClienId = AtendCliente
+				JOIN Profissional ON ProfiId = AtXSeProfissional
+				JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
+				JOIN ServicoVenda ON SrVenId = AtXSeServico
+				WHERE AtXSeUnidade = $iUnidade and AtXSeAtendimento = $iAtendimento";
 			$result = $conn->query($sql);
 			$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
-			
+
+			// esse loop duplo serve para evitar duplicações e evitar que os itens incluídos localmente não
+			// desapareçam
 			foreach($rowAtendimento as $item){
-				array_push($atendimentoSessao, [
-					'id' => "$item[SrVenId]#$item[ProfiId]#$item[AtLocId]",
-					'iServico' => $item['SrVenId'],
-					'iMedico' => $item['ProfiId'],
-					'iLocal' => $item['AtLocId'],
-			
-					'servico' => $item['SrVenNome'],
-					'medico' => $item['ProfiNome'],
-					'local' => $item['AtLocNome'],
-					'sData' => mostraData($item['AtXSeData']),
-					'data' => $item['AtXSeData'],
-					'hora' => mostraHora($item['AtXSeHorario']),
-					'valor' => $item['SrVenValorVenda'],
-				]);
+				if(COUNT($atendimentoSessao)){
+					foreach($atendimentoSessao as $item2){
+						if(($item2['id'] != "$item[SrVenId]#$item[ProfiId]#$item[AtLocId]")){
+							array_push($atendimentoSessao, [
+								'id' => "$item[SrVenId]#$item[ProfiId]#$item[AtLocId]",
+								'iServico' => $item['SrVenId'],
+								'iMedico' => $item['ProfiId'],
+								'iLocal' => $item['AtLocId'],
+						
+								'servico' => $item['SrVenNome'],
+								'medico' => $item['ProfiNome'],
+								'local' => $item['AtLocNome'],
+								'sData' => mostraData($item['AtXSeData']),
+								'data' => $item['AtXSeData'],
+								'hora' => mostraHora($item['AtXSeHorario']),
+								'valor' => $item['SrVenValorVenda'],
+							]);
+						}
+					}
+				}else{
+					array_push($atendimentoSessao, [
+						'id' => "$item[SrVenId]#$item[ProfiId]#$item[AtLocId]",
+						'iServico' => $item['SrVenId'],
+						'iMedico' => $item['ProfiId'],
+						'iLocal' => $item['AtLocId'],
+				
+						'servico' => $item['SrVenNome'],
+						'medico' => $item['ProfiNome'],
+						'local' => $item['AtLocNome'],
+						'sData' => mostraData($item['AtXSeData']),
+						'data' => $item['AtXSeData'],
+						'hora' => mostraHora($item['AtXSeHorario']),
+						'valor' => $item['SrVenValorVenda'],
+					]);
+				}
 			}
 		}
 		$valorTotal = 0;

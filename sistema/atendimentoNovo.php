@@ -6,6 +6,12 @@ $_SESSION['PaginaAtual'] = 'Novo Atendimento';
 
 include('global_assets/php/conexao.php');
 
+$_SESSION['atendimento'] = [
+	'paciente' => '',
+	'responsavel' => '',
+	'atendimentoServicos' => []
+];
+
 // a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
 
 $iAtendimento = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:false;
@@ -89,12 +95,21 @@ if($iAtendimento){
 
 						// Allways allow previous action even if the current form is not valid!
 						if (currentIndex > newIndex) {
+							switch(currentIndex){
+								case 1:$('#novoResponsavel').hide();($('#paciente').val()?$('#novoPaciente').show():$('#novoPaciente').hide());break;
+								case 2:($('#parentescoCadatrado').val()?$('#novoResponsavel').show():$('#novoResponsavel').hide());break;
+								default:$('#novoPaciente').hide();$('#novoResponsavel').hide();break;
+							}
 							return true;
 						}
 
 						// Needed in some cases if the user went back (clean up)
 						if (currentIndex < newIndex) {
-
+							switch(currentIndex){
+								case 0:$('#novoPaciente').hide();($('#parentescoCadatrado').val()?$('#novoResponsavel').show():$('#novoResponsavel').hide());break;
+								case 1:$('#novoResponsavel').hide();break;
+								default:$('#novoPaciente').hide();$('#novoResponsavel').hide();break;
+							}
 							// To remove error styles
 							form.find('.body:eq(' + newIndex + ') label.error').remove();
 							form.find('.body:eq(' + newIndex + ') .error').removeClass('error');
@@ -112,9 +127,9 @@ if($iAtendimento){
 						let menssageError = ''
 
 						switch(menssageError){
-							case $('#dataRegistro').val(): menssageError = 'informe a data de registro'; $('#servico').focus();break;
-							case $('#modalidade').val(): menssageError = 'informe a modalidade'; $('#medicos').focus();break;
-							case $('#classificacao').val(): menssageError = 'informe a classificação'; $('#dataAtendimento').focus();break;
+							case $('#dataRegistro').val(): menssageError = 'informe a data de registro'; $('#dataRegistro').focus();break;
+							case $('#modalidade').val(): menssageError = 'informe a modalidade'; $('#modalidade').focus();break;
+							case $('#classificacao').val(): menssageError = 'informe a classificação'; $('#classificacao').focus();break;
 							default: menssageError = ''; break;
 						}
 
@@ -196,7 +211,7 @@ if($iAtendimento){
 					_componentWizard();
 				}
 			}
-			}();
+		}();
 		
 		document.addEventListener('DOMContentLoaded', function() {
 			FormWizard.init();
@@ -324,46 +339,15 @@ if($iAtendimento){
 					}
 				});
 			})
-			// /////////////////////////////////////
-
-			// btn de adicionar novo paciente
-			$('#addPaciente').on('click', function(e){
-				e.preventDefault()
-				setPacienteAtribut()
-				$('#pacienteId').val('NOVO')
-				$('#selectPaciente').fadeOut()
-				$('#novoPaciente').fadeIn()
-			})
 
 			// btn de adicionar novo responsavel
 			$('#addResponsavel').on('click', function(e){
 				e.preventDefault()
-				setResponsavelAtribut()
-				$('#responsavelId').val('NOVO')
-				$('#selectResponsavel').fadeOut()
-				$('#novoResponsavel').fadeIn()
-			})
-
-			// btn de cancelar a inserção de novo paciente
-			$('#voltarSelectPaciente').on('click', function(){
-				$('#novoPaciente').fadeOut()
-				$('#selectPaciente').fadeIn()
-				setPacienteAtribut()
-
-				getCmbs()
-			})
-
-			// btn de cancelar a inserção de novo responsavel
-			$('#voltarSelectResponsavel').on('click', function(){
-				$('#novoResponsavel').fadeOut()
-				$('#selectResponsavel').fadeIn()
-				setResponsavelAtribut()
-
-				getCmbs()
+				$('#page-modal-responsavel').fadeIn(200)
 			})
 
 			$('#paciente').on('change', function(){
-				let iPaciente = $(this).val();
+				let iPaciente = $(this).val()
 				setPacienteAtribut(iPaciente)
 			});
 
@@ -425,18 +409,29 @@ if($iAtendimento){
 			$('#salvarPacienteModal').on('click', function(e){
 				e.preventDefault()
 
-				let nomePaciente = $('#nomePacienteModal').val()
-				let telefone = $('#telefoneModal').val()
-				let celular = $('#celularModal').val()
-				let email = $('#emailModal').val()
-				let observacao = $('#observacaoModal').val()
-
 				let menssageError = ''
 
 				switch(menssageError){
-					case nomePaciente: menssageError = 'Informe o nome';break;
-					case telefone || celular: menssageError = 'Informe o telefone ou celular';break;
-					case email: menssageError = 'Informe o E-mail';break;
+					case $('#prontuarioNew').val(): menssageError = 'Informe o prontuário!!';$('#prontuarioNew').focus();break;
+					case $('#nomeNew').val(): menssageError = 'Informe o nome!!';$('#nomeNew').focus();break;
+					case $('#cpfNew').val(): menssageError = 'Informe o CPF!!';$('#cpfNew').focus();break;
+					case $('#rgNew').val(): menssageError = 'Informe o RG!!';$('#rgNew').focus();break;
+					case $('#emissorNew').val(): menssageError = 'Informe o emissor!!';$('#emissorNew').focus();break;
+					case $('#ufNew').val(): menssageError = 'Informe o UF!!';$('#ufNew').focus();break;
+					case $('#sexoNew').val(): menssageError = 'Informe o sexo!!';$('#sexoNew').focus();break;
+					case $('#nascimentoNew').val(): menssageError = 'Informe a data de nascimento!!';$('#nascimentoNew').focus();break;
+					case $('#nomePaiNew').val(): menssageError = 'Informe o nome do pai!!';$('#nomePaiNew').focus();break;
+					case $('#nomeMaeNew').val(): menssageError = 'Informe o nome da mãe!!';$('#nomeMaeNew').focus();break;
+					case $('#profissaoNew').val(): menssageError = 'Informe a profissão!!';$('#profissaoNew').focus();break;
+					case $('#cepNew').val(): menssageError = 'Informe o CEP!!';$('#cepNew').focus();break;
+					case $('#enderecoNew').val(): menssageError = 'Informe o endereço!!';$('#enderecoNew').focus();break;
+					case $('#numeroNew').val(): menssageError = 'Informe o número!!';$('#numeroNew').focus();break;
+					case $('#bairroNew').val(): menssageError = 'Informe o bairro!!';$('#bairroNew').focus();break;
+					case $('#cidadeNew').val(): menssageError = 'Informe a cidade!!';$('#cidadeNew').focus();break;
+					case $('#estadoNew').val(): menssageError = 'Informe o estado!!';$('#estadoNew').focus();break;
+					case $('#contatoNew').val(): menssageError = 'Informe o nome do contato!!';$('#contatoNew').focus();break;
+					case $('#telefoneNew').val()||$('#celularNew').val(): menssageError = 'Informe o telefone ou celular!!';$('#telefoneNew').val()||$('#celularNew').focus();break;
+					case $('#emailNew').val(): menssageError = 'Informe um e-mail!!';$('#emailNew').focus();break;
 					default: menssageError = '';break;
 				}
 
@@ -444,32 +439,108 @@ if($iAtendimento){
 					alerta('Campo Obrigatório!', menssageError, 'error')
 					return
 				}
-				console.log(menssageError)
-				return
 
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
 					data:{
-						'tipoRequest': 'ADDPACIENTENOVO',
-						'nomePaciente': nomePaciente,
-						'telefone': telefone,
-						'celular': celular,
-						'email': email,
-						'observacao': observacao
+						'tipoRequest': 'SALVARPACIENTE',
+						'pessoaTipo': $('#pessoaTipoNew').val(),
+						'prontuario': $('#prontuarioNew').val(),
+						'nome': $('#nomeNew').val(),
+						'cpf': $('#cpfNew').val(),
+						'rg': $('#rgNew').val(),
+						'emissor': $('#emissorNew').val(),
+						'uf': $('#ufNew').val(),
+						'sexo': $('#sexoNew').val(),
+						'nascimento': $('#nascimentoNew').val(),
+						'nomePai': $('#nomePaiNew').val(),
+						'nomeMae': $('#nomeMaeNew').val(),
+						'profissao': $('#profissaoNew').val(),
+						'cep': $('#cepNew').val(),
+						'endereco': $('#enderecoNew').val(),
+						'numero': $('#numeroNew').val(),
+						'complemento': $('#complementoNew').val(),
+						'bairro': $('#bairroNew').val(),
+						'cidade': $('#cidadeNew').val(),
+						'estado': $('#estadoNew').val(),
+						'contato': $('#contatoNew').val(),
+						'telefone': $('#telefoneNew').val(),
+						'celular': $('#celularNew').val(),
+						'email': $('#emailNew').val(),
+						'observacao': $('#observacaoNew').val()
 					},
 					success: function(response) {
-						if(response.status  == 'success'){
-							$('#pacienteAtendimento').empty();
-							$('#pacienteAtendimento').append(`<option value=''>Selecione</option>`)
-							response.array.forEach(item => {
-								$('#pacienteAtendimento').append(`<option ${item.isSelected} value="${item.id}">${item.nome}</option>`)
+						if(response.status == 'success'){
+							alerta(response.titulo,response.menssagem,response.status)
+							getCmbs({
+								'pacienteID':response.id
 							})
-							alerta(response.titulo, response.menssagem, response.status)
-							$('#page-modal-paciente').fadeOut();
-						} else {
-							alerta(response.titulo, response.menssagem, response.status)
+							$('#page-modal-paciente').fadeOut(200)
+						}else{
+							alerta(response.titulo,response.menssagem,response.status)
+						}
+					}
+				});
+			})
+
+			$('#salvarResponsavelModal').on('click', function(e){
+				e.preventDefault()
+
+				let menssageError = ''
+
+				switch(menssageError){
+					case $('#nomeRespNew').val():menssageError = 'Informe o nome!!';$('#nomeResp').focus();break;
+					case $('#parentescoRespNew').val():menssageError ='Informe o grau de parentesco!!';$('#parentescoResp').focus();break;
+					case $('#nascimentoRespNew').val():menssageError='Informe a data de nascimento';$('#nascimentoResp').focus();break;
+					case $('#cepRespNew').val():menssageError='Informe o CEP';$('#cepResp').focus();break;
+					case $('#enderecoRespNew').val():menssageError='Informe o endereço';$('#enderecoResp').focus();break;
+					case $('#numeroRespNew').val():menssageError='Informe o número';$('#numeroResp').focus();break;
+					case $('#bairroRespNew').val():menssageError='Informe o bairro';$('#bairroResp').focus();break;
+					case $('#cidadeRespNew').val():menssageError='Informe a cidade';$('#cidadeResp').focus();break;
+					case $('#estadoRespNew').val():menssageError='Informe o estado';$('#estadoResp').focus();break;
+					case $('#celularRespNew').val()||$('#telefoneResp').val():menssageError='Informe um contato';$('#telefoneResp').focus();break;
+					case $('#emailRespNew').val():menssageError='Informe um e-mail';$('#emailResp').focus();break;
+					default: menssageError = '';break;
+				}
+
+				if(menssageError){
+					alerta('Campo Obrigatório!', menssageError, 'error')
+					return
+				}
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'SALVARRESPONSAVEL',
+						'pacienteId':$('#paciente').val(),
+						'nomeResp':$('#nomeRespNew').val(),
+						'parentescoResp':$('#parentescoRespNew').val(),
+						'nascimentoResp':$('#nascimentoRespNew').val(),
+						'cepResp':$('#cepRespNew').val(),
+						'enderecoResp':$('#enderecoRespNew').val(),
+						'numeroResp':$('#numeroRespNew').val(),
+						'complementoResp':$('#observacaoRespNew').val(),
+						'bairroResp':$('#bairroRespNew').val(),
+						'cidadeResp':$('#cidadeRespNew').val(),
+						'estadoResp':$('#estadoRespNew').val(),
+						'telefoneResp':$('#telefoneRespNew').val(),
+						'celularResp':$('#celularRespNew').val(),
+						'emailResp':$('#emailRespNew').val(),
+						'observacaoResp':$('#complementoRespNew').val()
+					},
+					success: function(response) {
+						if(response.status == 'success'){
+							alerta(response.titulo,response.menssagem,response.status)
+							getCmbs({
+								'responsavelID':response.paciente
+							})
+							$('#page-modal-responsavel').fadeOut(200)
+						}else{
+							alerta(response.titulo,response.menssagem,response.status)
 						}
 					}
 				});
@@ -477,12 +548,16 @@ if($iAtendimento){
 
 			$('#addPaciente').on('click', function(e){
 				e.preventDefault();
-				$('#page-modal-paciente').fadeIn();
+				$('#page-modal-paciente').fadeIn(200)
 			})
 
-			$('#modal-close-x').on('click', ()=>{
+			$('#modalPaciente-close-x').on('click', ()=>{
 				$('#iAtendimento').val('')
-				$('#page-modal-paciente').fadeOut(200);
+				$('#page-modal-paciente').fadeOut(200)
+			})
+			$('#modalResponsavel-close-x').on('click', ()=>{
+				$('#iAtendimento').val('')
+				$('#page-modal-responsavel').fadeOut(200)
 			})
 
 			$('#formServicoAtendimento').submit(function(e){
@@ -512,10 +587,13 @@ if($iAtendimento){
 
 					if(obj && obj.pacienteID ){
 						response.forEach(item =>{
-							opt = obj.pacienteID == item.id?
-							 `<option selected value="${item.id}">${item.nome}</option>`:
-							 `<option value="${item.id}">${item.nome}</option>`
-							 $('#paciente').append(opt)
+							if(obj.pacienteID == item.id){
+								opt = `<option selected value="${item.id}">${item.nome}</option>`
+								setPacienteAtribut(item.id)
+							}else{
+								opt = `<option value="${item.id}">${item.nome}</option>`
+							}
+							$('#paciente').append(opt)
 						})
 					} else if(atendimento){
 						response.forEach(item =>{
@@ -617,10 +695,16 @@ if($iAtendimento){
 					'tipoRequest': 'RESPONSAVEIS'
 				},
 				success: function(response) {
+					let opt = ''
 					if(obj && obj.responsavelID){
 						$('#parentescoCadatrado').html("<option value=''>selecione</option>")
 						response.data.forEach(function (item){
-							let opt = obj.responsavelID == item.id?'<option selected value="'+item.id+'">'+item.nome+'</option>':'<option value="'+item.id+'">'+item.nome+'</option>'
+							if(obj.responsavelID == item.id){
+								opt = '<option selected value="'+item.id+'">'+item.nome+'</option>'
+								setResponsavelAtribut(item.id)
+							}else{
+								opt = '<option value="'+item.id+'">'+item.nome+'</option>'
+							}
 							$('#parentescoCadatrado').append(opt);
 						});
 					} else if(atendimento){
@@ -730,32 +814,6 @@ if($iAtendimento){
 							$('#celular').val(response.celular)
 							$('#email').val(response.email)
 							$('#observacao').val(response.observacao)
-	
-							$('#prontuario').attr('readonly',true)
-							$('#nome').attr('readonly',true)
-							$('#cpf').attr('readonly',true)
-							$('#cns').attr('readonly',true)
-							$('#rg').attr('readonly',true)
-							$('#emissor').attr('readonly',true)
-							$('#uf').attr('readonly',true)
-							$('#sexo').attr('readonly',true)
-							$('#nascimento').attr('readonly',true)
-							$('#nomePai').attr('readonly',true)
-							$('#nomeMae').attr('readonly',true)
-							$('#profissao').attr('readonly',true)
-	
-							// $('#cep').attr('readonly',true)
-							// $('#endereco').attr('readonly',true)
-							// $('#numero').attr('readonly',true)
-							// $('#complemento').attr('readonly',true)
-							// $('#bairro').attr('readonly',true)
-							// $('#cidade').attr('readonly',true)
-							// $('#estado').attr('readonly',true)
-							// $('#contato').attr('readonly',true)
-							// $('#telefone').attr('readonly',true)
-							// $('#celular').attr('readonly',true)
-							// $('#email').attr('readonly',true)
-							// $('#observacao').attr('readonly',true)
 							$('#novoPaciente').fadeIn()
 						}else{
 							alerta(response.titulo, response.menssagem, response.status)
@@ -790,38 +848,11 @@ if($iAtendimento){
 				$('#celular').val('')
 				$('#email').val('')
 				$('#observacao').val('')
-
-				$('#prontuario').attr('readonly',false)
-				$('#nome').attr('readonly',false)
-				$('#cpf').attr('readonly',false)
-				$('#cns').attr('readonly',false)
-				$('#rg').attr('readonly',false)
-				$('#emissor').attr('readonly',false)
-				$('#uf').attr('readonly',false)
-				$('#sexo').attr('readonly',false)
-				$('#nascimento').attr('readonly',false)
-				$('#nomePai').attr('readonly',false)
-				$('#nomeMae').attr('readonly',false)
-				$('#profissao').attr('readonly',false)
-
-				// $('#cep').attr('readonly',false)
-				// $('#endereco').attr('readonly',false)
-				// $('#numero').attr('readonly',false)
-				// $('#complemento').attr('readonly',false)
-				// $('#bairro').attr('readonly',false)
-				// $('#cidade').attr('readonly',false)
-				// $('#estado').attr('readonly',false)
-				// $('#contato').attr('readonly',false)
-				// $('#telefone').attr('readonly',false)
-				// $('#celular').attr('readonly',false)
-				// $('#email').attr('readonly',false)
-				// $('#observacao').attr('readonly',false)
 			}
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o responsável
 		function setResponsavelAtribut(iResponsavel){
-			console.log(iResponsavel)
 			if(iResponsavel){
 				$.ajax({
 					type: 'POST',
@@ -848,21 +879,6 @@ if($iAtendimento){
 							$('#emailResp').val(response.data.emailResp)
 							$('#observacaoResp').val(response.data.observacaoResp)
 	
-							$('#nomeResp').attr('readonly', true)
-							$('#parentescoResp').attr('readonly', true)
-							$('#nascimentoResp').attr('readonly', true)
-							$('#cepResp').attr('readonly', true)
-							$('#enderecoResp').attr('readonly', true)
-							$('#numeroResp').attr('readonly', true)
-							$('#complementoResp').attr('readonly', true)
-							$('#bairroResp').attr('readonly', true)
-							$('#cidadeResp').attr('readonly', true)
-							$('#estadoResp').attr('readonly', true)
-							$('#telefoneResp').attr('readonly', true)
-							$('#celularResp').attr('readonly', true)
-							$('#emailResp').attr('readonly', true)
-							$('#observacaoResp').attr('readonly', true)
-	
 							$('#novoResponsavel').fadeIn()
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
@@ -887,21 +903,6 @@ if($iAtendimento){
 				$('#celularResp').val('')
 				$('#emailResp').val('')
 				$('#observacaoResp').val('')
-
-				$('#nomeResp').attr('readonly', false)
-				$('#parentescoResp').attr('readonly', false)
-				$('#nascimentoResp').attr('readonly', false)
-				$('#cepResp').attr('readonly', false)
-				$('#enderecoResp').attr('readonly', false)
-				$('#numeroResp').attr('readonly', false)
-				$('#complementoResp').attr('readonly', false)
-				$('#bairroResp').attr('readonly', false)
-				$('#cidadeResp').attr('readonly', false)
-				$('#estadoResp').attr('readonly', false)
-				$('#telefoneResp').attr('readonly', false)
-				$('#celularResp').attr('readonly', false)
-				$('#emailResp').attr('readonly', false)
-				$('#observacaoResp').attr('readonly', false)
 			}
 		}
 
@@ -928,7 +929,7 @@ if($iAtendimento){
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'CHECKSERVICO',
-					'iAtendimento': atendimento?atendimento['AtendId']:false
+					'iAtendimento': atendimento?atendimento['AtendId']:''
 				},
 				success: async function(response) {
 					statusServicos = response.array.length?true:false;
@@ -1177,253 +1178,23 @@ if($iAtendimento){
 							</div>
 
 							<form class="wizard-form steps-validation" action="#" data-fouc>
+								<div class='dropdown-divider'></div>
 								<h6>Paciente</h6>
 								<fieldset>
 									<input id="pacienteId" type="hidden" name="pacienteId" value="">
-									<div class="col-12 row text-center mb-5" id="selectPaciente">
+									<div class="col-12 row text-center justify-content-center mb-5" id="selectPaciente">
 										<div class="col-lg-12 my-3 text-black-50">
 											<h5>Selecione o paciente</h5>
 										</div>
-										<div class="col-11">
+										<div class="col-5">
 											<select id="paciente" name="paciente" class="select-search" required>
 												
 											</select>
 										</div>
 										<div class="col-1">
 											<span class="action btn btn-principal legitRipple" id="addPaciente" style="user-select: none;">
-												<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
+												NOVO PACIENTE
 											</span>
-										</div>
-									</div>
-									<div id="novoPaciente" class="fadeOut">
-										<div class="row col-lg-12">
-											<div class="col-lg-1 text-center">
-												<input class="mr-1" id="fisica" name="pessoaTipo" type="radio" checked />
-												<label for="fisica">Física</label>
-											</div>
-	
-											<div class="col-lg-1 text-center">
-												<input class="mr-1" id="juridica" name="pessoaTipo" type="radio" />
-												<label for="juridica">Jurídica</label>
-											</div>
-										</div>
-	
-										<div class="col-lg-12 my-3 text-black-50">
-											<h5>Dados Pessoais</h5>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-3">
-												<label>Prontuário <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>Nome <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>CPF <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>CNS</label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-3">
-												<input id="prontuario" name="prontuario" type="text" class="form-control" placeholder="Prontuário Eletrônico">
-											</div>
-											<div class="col-lg-3">
-												<input id="nome" name="nome" type="text" class="form-control" placeholder="Nome completo" required>
-											</div>
-											<div class="col-lg-3">
-												<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required>
-											</div>
-											<div class="col-lg-3">
-												<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS">
-											</div>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-2">
-												<label>RG <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>Emissor <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-2">
-												<label>UF <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-2">
-												<label>Sexo <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>Data de Nascimento <span class="text-danger">*</span></label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-2">
-												<input id="rg" name="rg" type="text" class="form-control" placeholder="RG" required>
-											</div>
-											<div class="col-lg-3">
-												<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor" required>
-											</div>
-											<div class="col-lg-2">
-												<select id="uf" name="uf" class="select-search" required>
-													<option value="" selected>selecionar</option>
-													<option value='BA'>BA</option>
-												</select>
-											</div>
-											<div class="col-lg-2">
-												<select id="sexo" name="sexo" class="form-control form-control-select2" required>
-													<option value="" selected>selecionar</option>
-													<option value="M">Masculino</option>
-													<option value="F">Feminino</option>
-												</select>
-											</div>
-											<div class="col-lg-3">
-												<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa" required>
-											</div>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-6">
-												<label>Nome do Pai <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-6">
-												<label>Nome da Mãe <span class="text-danger">*</span></label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-6">
-												<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai" required>
-											</div>
-											<div class="col-lg-6">
-												<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe" required>
-											</div>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-12">
-												<label>Profissão <span class="text-danger">*</span></label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-12">
-												<select id="profissao" name="profissao" class="form-control form-control-select2" required>
-													<option selected value="">selecionar</option>
-													<option value="1">Teste</option>
-												</select>
-											</div>
-										</div>
-	
-										<div class="col-lg-12 my-3 text-black-50">
-											<h5>Endereco do Pacinte</h5>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-3">
-												<label>CEP <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-4">
-												<label>Endereco <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-2">
-												<label>Nº <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>Complemento</label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-3">
-												<input id="cep" name="cep" type="text" class="form-control" placeholder="CEP" required>
-											</div>
-											<div class="col-lg-4">
-												<input id="endereco" name="endereco" type="text" class="form-control" placeholder="EX.: Rua, Av" required>
-											</div>
-											<div class="col-lg-2">
-												<input id="numero" name="numero" type="text" class="form-control" placeholder="Número" required>
-											</div>
-											<div class="col-lg-3">
-												<input id="complemento" name="complemento" type="text" class="form-control" placeholder="Complemento">
-											</div>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-4">
-												<label>Bairro <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-4">
-												<label>Cidade <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-4">
-												<label>Estado <span class="text-danger">*</span></label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-4">
-												<input id="bairro" name="bairro" type="text" class="form-control" placeholder="Bairro" required>
-											</div>
-											<div class="col-lg-4">
-												<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade" required>
-											</div>
-											<div class="col-lg-4">
-												<input id="estado" name="estado" type="text" class="form-control" placeholder="Estado" required>
-											</div>
-										</div>
-	
-										<div class="col-lg-12 my-3 text-black-50">
-											<h5>Contato</h5>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-3">
-												<label>Nome <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>Telefone <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>Celular <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>E-mail <span class="text-danger">*</span></label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-3">
-												<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato" required>
-											</div>
-											<div class="col-lg-3">
-												<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com." required>
-											</div>
-											<div class="col-lg-3">
-												<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular" required>
-											</div>
-											<div class="col-lg-3">
-												<input id="email" name="email" type="text" class="form-control" placeholder="E-mail" required>
-											</div>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-12">
-												<label>Observação</label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-12">
-												<textarea id="observacao" name="observacao" class="form-control" placeholder="Observações"></textarea>
-											</div>
-										</div>
-
-										<div class="row col-12 my-4 ml-0 mr-0">
-											<a class="col-2 btn btn-lg" href="#" id="voltarSelectPaciente">voltar</a>
 										</div>
 									</div>
 								</fieldset>
@@ -1431,155 +1202,18 @@ if($iAtendimento){
 								<h6>Responsável</h6>
 								<fieldset>
 									<input id="responsavelId" type="hidden" name="responsavelId" value="">
-									<div class="col-12 row text-center mb-5" id="selectResponsavel">
+									<div class="col-12 row text-center justify-content-center mb-5" id="selectResponsavel">
 										<div class="col-lg-12 my-3 text-black-50">
 											<h5>Selecione o responsável</h5>
 										</div>
-										<div class="col-11">
-											<select id="parentescoCadatrado" name="parentescoCadatrado" class="select-search" required>
+										<div class="col-5">
+											<select id="parentescoCadatrado" name="parentescoCadatrado" class="select-search">
 											</select>
 										</div>
 										<div class="col-1">
 											<span class="action btn btn-principal legitRipple" id="addResponsavel" style="user-select: none;">
-												<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
+											NOVO RESPONSÁVEL
 											</span>
-										</div>
-									</div>	
-									<div id="novoResponsavel" class="fadeOut">
-										<div class="col-lg-12 row mb-lg-5 text-black-50">
-											<div class="col-lg-8">
-												<h5>Dados Pessoais do responsável</h5>
-											</div>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-4">
-												<label>Nome</label>
-											</div>
-											<div class="col-lg-4">
-												<label>Parentesco</label>
-											</div>
-											<div class="col-lg-4">
-												<label>Nascimento</label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-4">
-												<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome">
-											</div>
-											<div class="col-lg-4">
-												<select id="parentescoResp" name="parentesco" class="form-control form-control-select2">
-													<option value="" selected>selecionar</option>
-													<option value="tio">Tia/Tio</option>
-													<option value="pai">Mãe/Pai</option>
-												</select>
-											</div>
-											<div class="col-lg-4">
-												<input id="nascimentoResp" name="nascimentoResp" type="date" class="form-control">
-											</div>
-										</div>
-	
-										<div class="col-lg-12 my-3 text-black-50">
-											<h5>Endereco do Responsável</h5>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-3">
-												<label>CEP</label>
-											</div>
-											<div class="col-lg-4">
-												<label>Endereco</label>
-											</div>
-											<div class="col-lg-2">
-												<label>Nº</label>
-											</div>
-											<div class="col-lg-3">
-												<label>Complemento</label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-3">
-												<input id="cepResp" name="cepResp" type="text" class="form-control" placeholder="CEP">
-											</div>
-											<div class="col-lg-4">
-												<input id="enderecoResp" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av">
-											</div>
-											<div class="col-lg-2">
-												<input id="numeroResp" name="numeroResp" type="text" class="form-control" placeholder="Número">
-											</div>
-											<div class="col-lg-3">
-												<input id="complementoResp" name="complementoResp" type="text" class="form-control" placeholder="Complemento">
-											</div>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-4">
-												<label>Bairro</label>
-											</div>
-											<div class="col-lg-4">
-												<label>Cidade</label>
-											</div>
-											<div class="col-lg-4">
-												<label>Estado</label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-4">
-												<input id="bairroResp" name="bairroResp" type="text" class="form-control" placeholder="Bairro">
-											</div>
-											<div class="col-lg-4">
-												<input id="cidadeResp" name="cidadeResp" type="text" class="form-control" placeholder="Cidade">
-											</div>
-											<div class="col-lg-4">
-												<input id="estadoResp" name="estadoResp" type="text" class="form-control" placeholder="Estado">
-											</div>
-										</div>
-	
-										<div class="col-lg-12 my-3 text-black-50">
-											<h5>Contato</h5>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-4">
-												<label>Telefone</label>
-											</div>
-											<div class="col-lg-4">
-												<label>Celular</label>
-											</div>
-											<div class="col-lg-4">
-												<label>E-mail</label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-4">
-												<input id="telefoneResp" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com.">
-											</div>
-											<div class="col-lg-4">
-												<input id="celularResp" name="celularResp" type="text" class="form-control" placeholder="Celular">
-											</div>
-											<div class="col-lg-4">
-												<input id="emailResp" name="emailResp" type="text" class="form-control" placeholder="E-mail">
-											</div>
-										</div>
-	
-										<div class="col-lg-12 mb-4 row">
-											<!-- titulos -->
-											<div class="col-lg-12">
-												<label>Observação</label>
-											</div>
-	
-											<!-- campos -->
-											<div class="col-lg-12">
-												<textarea id="observacaoResp" name="observacaoResp" class="form-control" placeholder="Observações"></textarea>
-											</div>
-										</div>
-
-										<div class="row col-12 my-4 ml-0 mr-0">
-											<a class="col-2 btn btn-lg" href="#" id="voltarSelectResponsavel">voltar</a>
 										</div>
 									</div>
 								</fieldset>
@@ -1763,6 +1397,370 @@ if($iAtendimento){
 									</div>
 								</fieldset>
 							</form>
+
+							<div id="informacoes">
+								<div id="novoPaciente" class="fadeOut">
+									<div class="row col-lg-12">
+										<div class="col-lg-1 text-center">
+											<input class="mr-1" id="fisica" name="pessoaTipo" type="radio" checked />
+											<label for="fisica">Física</label>
+										</div>
+	
+										<div class="col-lg-1 text-center">
+											<input class="mr-1" id="juridica" name="pessoaTipo" type="radio" />
+											<label for="juridica">Jurídica</label>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5>Dados Pessoais</h5>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>Prontuário <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Nome <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>CPF <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>CNS</label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="prontuario" name="prontuario" type="text" class="form-control" placeholder="Prontuário Eletrônico" readonly>
+										</div>
+										<div class="col-lg-3">
+											<input id="nome" name="nome" type="text" class="form-control" placeholder="Nome completo" required readonly>
+										</div>
+										<div class="col-lg-3">
+											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required readonly>
+										</div>
+										<div class="col-lg-3">
+											<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS" readonly>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-2">
+											<label>RG <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Emissor <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-2">
+											<label>UF <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-2">
+											<label>Sexo <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Data de Nascimento <span class="text-danger">*</span></label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-2">
+											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG" required readonly>
+										</div>
+										<div class="col-lg-3">
+											<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor" required readonly>
+										</div>
+										<div class="col-lg-2">
+											<select id="uf" name="uf" class="select-search" required readonly>
+												<option value="" selected>selecionar</option>
+												<option value='BA'>BA</option>
+											</select>
+										</div>
+										<div class="col-lg-2">
+											<select id="sexo" name="sexo" class="form-control form-control-select2" required readonly>
+												<option value="" selected>selecionar</option>
+												<option value="M">Masculino</option>
+												<option value="F">Feminino</option>
+											</select>
+										</div>
+										<div class="col-lg-3">
+											<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa" required readonly>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-6">
+											<label>Nome do Pai <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-6">
+											<label>Nome da Mãe <span class="text-danger">*</span></label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-6">
+											<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai" required readonly>
+										</div>
+										<div class="col-lg-6">
+											<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe" required readonly>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-12">
+											<label>Profissão <span class="text-danger">*</span></label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-12">
+											<select id="profissao" name="profissao" class="form-control form-control-select2" required readonly>
+												<option selected value="">selecionar</option>
+												<option value="1">Teste</option>
+											</select>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5>Endereco do Pacinte</h5>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>CEP <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-4">
+											<label>Endereco <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-2">
+											<label>Nº <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Complemento</label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="cep" name="cep" type="text" class="form-control" placeholder="CEP" required readonly>
+										</div>
+										<div class="col-lg-4">
+											<input id="endereco" name="endereco" type="text" class="form-control" placeholder="EX.: Rua, Av" required readonly>
+										</div>
+										<div class="col-lg-2">
+											<input id="numero" name="numero" type="text" class="form-control" placeholder="Número" required readonly>
+										</div>
+										<div class="col-lg-3">
+											<input id="complemento" name="complemento" type="text" class="form-control" placeholder="Complemento" readonly>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Bairro <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-4">
+											<label>Cidade <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-4">
+											<label>Estado <span class="text-danger">*</span></label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="bairro" name="bairro" type="text" class="form-control" placeholder="Bairro" required readonly>
+										</div>
+										<div class="col-lg-4">
+											<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade" required readonly>
+										</div>
+										<div class="col-lg-4">
+											<input id="estado" name="estado" type="text" class="form-control" placeholder="Estado" required readonly>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5>Contato</h5>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>Nome <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Telefone <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Celular <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>E-mail <span class="text-danger">*</span></label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato" required readonly>
+										</div>
+										<div class="col-lg-3">
+											<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com." required readonly>
+										</div>
+										<div class="col-lg-3">
+											<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular" required readonly>
+										</div>
+										<div class="col-lg-3">
+											<input id="email" name="email" type="text" class="form-control" placeholder="E-mail" required readonly>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-12">
+											<label>Observação</label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-12">
+											<textarea id="observacao" name="observacao" class="form-control" placeholder="Observações" readonly></textarea>
+										</div>
+									</div>
+								</div>
+								<div id="novoResponsavel" class="fadeOut">
+									<div class="col-lg-12 row mb-lg-5 text-black-50">
+										<div class="col-lg-8">
+											<h5>Dados Pessoais do responsável</h5>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Nome</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Parentesco</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Nascimento</label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome" readonly>
+										</div>
+										<div class="col-lg-4">
+											<select id="parentescoResp" name="parentesco" class="form-control form-control-select2" readonly>
+												<option value="" selected>selecionar</option>
+												<option value="tio">Tia/Tio</option>
+												<option value="pai">Mãe/Pai</option>
+											</select>
+										</div>
+										<div class="col-lg-4">
+											<input id="nascimentoResp" name="nascimentoResp" type="date" class="form-control" readonly>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5>Endereco do Responsável</h5>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>CEP</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Endereco</label>
+										</div>
+										<div class="col-lg-2">
+											<label>Nº</label>
+										</div>
+										<div class="col-lg-3">
+											<label>Complemento</label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="cepResp" name="cepResp" type="text" class="form-control" placeholder="CEP" readonly>
+										</div>
+										<div class="col-lg-4">
+											<input id="enderecoResp" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av" readonly>
+										</div>
+										<div class="col-lg-2">
+											<input id="numeroResp" name="numeroResp" type="text" class="form-control" placeholder="Número" readonly>
+										</div>
+										<div class="col-lg-3">
+											<input id="complementoResp" name="complementoResp" type="text" class="form-control" placeholder="Complemento" readonly>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Bairro</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Cidade</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Estado</label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="bairroResp" name="bairroResp" type="text" class="form-control" placeholder="Bairro" readonly>
+										</div>
+										<div class="col-lg-4">
+											<input id="cidadeResp" name="cidadeResp" type="text" class="form-control" placeholder="Cidade" readonly>
+										</div>
+										<div class="col-lg-4">
+											<input id="estadoResp" name="estadoResp" type="text" class="form-control" placeholder="Estado" readonly>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5>Contato</h5>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Telefone</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Celular</label>
+										</div>
+										<div class="col-lg-4">
+											<label>E-mail</label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="telefoneResp" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com." readonly>
+										</div>
+										<div class="col-lg-4">
+											<input id="celularResp" name="celularResp" type="text" class="form-control" placeholder="Celular" readonly>
+										</div>
+										<div class="col-lg-4">
+											<input id="emailResp" name="emailResp" type="text" class="form-control" placeholder="E-mail" readonly>
+										</div>
+									</div>
+	
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-12">
+											<label>Observação</label>
+										</div>
+	
+										<!-- campos -->
+										<div class="col-lg-12">
+											<textarea id="observacaoResp" name="observacaoResp" class="form-control" placeholder="Observações" readonly></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+
 							<div class="row col-12 my-4 ml-0 mr-0">
 								<a class="col-2 btn btn-lg" href="atendimento.php" id="cancelar">cancelar</a>
 							</div>
@@ -1773,6 +1771,409 @@ if($iAtendimento){
 			<?php include_once("footer.php"); ?>
 		</div>
 	</div>
+
+	<!--Modal-->
+	<div id="page-modal-paciente" class="custon-modal">
+		<div class="custon-modal-container" style="max-width: 800px;">
+			<div class="card custon-modal-content">
+				<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+					<p class="h5">Novo paciente</p>
+					<i id="modalPaciente-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+				</div>
+				<div class="px-0">
+					<div class="d-flex flex-row">
+						<div class="col-lg-12">
+							<form id="novoPaciente" name="alterarSituacao" method="POST" class="form-validate-jquery">
+								<div class="form-group">
+									<div class="row col-lg-12">
+										<div class="col-lg-1 text-center">
+											<input class="mr-1" id="fisicaNew" name="pessoaTipo" type="radio" checked />
+											<label for="fisica">Física</label>
+										</div>
+
+										<div class="col-lg-1 text-center">
+											<input class="mr-1" id="juridicaNew" name="pessoaTipo" type="radio" />
+											<label for="juridica">Jurídica</label>
+										</div>
+									</div>
+
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5>Dados Pessoais</h5>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>Prontuário <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Nome <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>CPF <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>CNS</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="prontuarioNew" name="prontuarioNew" type="text" class="form-control" placeholder="Prontuário Eletrônico">
+										</div>
+										<div class="col-lg-3">
+											<input id="nomeNew" name="nomeNew" type="text" class="form-control" placeholder="Nome completo" required>
+										</div>
+										<div class="col-lg-3">
+											<input id="cpfNew" name="cpfNew" type="text" class="form-control" placeholder="CPF" required>
+										</div>
+										<div class="col-lg-3">
+											<input id="cnsNew" name="cnsNew" type="text" class="form-control" placeholder="Cartão do SUS">
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-2">
+											<label>RG <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Emissor <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-2">
+											<label>UF <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-2">
+											<label>Sexo <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Data de Nascimento <span class="text-danger">*</span></label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-2">
+											<input id="rgNew" name="rgNew" type="text" class="form-control" placeholder="RG" required>
+										</div>
+										<div class="col-lg-3">
+											<input id="emissorNew" name="emissorNew" type="text" class="form-control" placeholder="Orgão Emissor" required>
+										</div>
+										<div class="col-lg-2">
+											<select id="ufNew" name="ufNew" class="select-search" required>
+												<option value="" selected>selecionar</option>
+												<option value='BA'>BA</option>
+											</select>
+										</div>
+										<div class="col-lg-2">
+											<select id="sexoNew" name="sexoNew" class="form-control form-control-select2" required>
+												<option value="" selected>selecionar</option>
+												<option value="M">Masculino</option>
+												<option value="F">Feminino</option>
+											</select>
+										</div>
+										<div class="col-lg-3">
+											<input id="nascimentoNew" name="nascimentoNew" type="date" class="form-control" placeholder="dd/mm/aaaa" required>
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-6">
+											<label>Nome do Pai <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-6">
+											<label>Nome da Mãe <span class="text-danger">*</span></label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-6">
+											<input id="nomePaiNew" name="nomePaiNew" type="text" class="form-control" placeholder="Nome do Pai" required>
+										</div>
+										<div class="col-lg-6">
+											<input id="nomeMaeNew" name="nomeMaeNew" type="text" class="form-control" placeholder="Nome da Mãe" required>
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-12">
+											<label>Profissão <span class="text-danger">*</span></label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-12">
+											<select id="profissaoNew" name="profissaoNew" class="form-control form-control-select2" required>
+												<option selected value="">selecionar</option>
+												<option value="1">Teste</option>
+											</select>
+										</div>
+									</div>
+
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5>Endereco do Pacinte</h5>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>CEP <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-4">
+											<label>Endereco <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-2">
+											<label>Nº <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Complemento</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="cepNew" name="cepNew" type="text" class="form-control" placeholder="CEP" required>
+										</div>
+										<div class="col-lg-4">
+											<input id="enderecoNew" name="enderecoNew" type="text" class="form-control" placeholder="EX.: Rua, Av" required>
+										</div>
+										<div class="col-lg-2">
+											<input id="numeroNew" name="numeroNew" type="text" class="form-control" placeholder="Número" required>
+										</div>
+										<div class="col-lg-3">
+											<input id="complementoNew" name="complementoNew" type="text" class="form-control" placeholder="Complemento">
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Bairro <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-4">
+											<label>Cidade <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-4">
+											<label>Estado <span class="text-danger">*</span></label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="bairroNew" name="bairroNew" type="text" class="form-control" placeholder="Bairro" required>
+										</div>
+										<div class="col-lg-4">
+											<input id="cidadeNew" name="cidadeNew" type="text" class="form-control" placeholder="Cidade" required>
+										</div>
+										<div class="col-lg-4">
+											<input id="estadoNew" name="estadoNew" type="text" class="form-control" placeholder="Estado" required>
+										</div>
+									</div>
+
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5>Contato</h5>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>Nome <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Telefone <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Celular <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>E-mail <span class="text-danger">*</span></label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="contatoNew" name="contatoNew" type="text" class="form-control" placeholder="Contato" required>
+										</div>
+										<div class="col-lg-3">
+											<input id="telefoneNew" name="telefoneNew" type="text" class="form-control" placeholder="Res. / Com." required>
+										</div>
+										<div class="col-lg-3">
+											<input id="celularNew" name="celularNew" type="text" class="form-control" placeholder="Celular" required>
+										</div>
+										<div class="col-lg-3">
+											<input id="emailNew" name="emailNew" type="text" class="form-control" placeholder="E-mail" required>
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-12">
+											<label>Observação</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-12">
+											<textarea id="observacaoNew" name="observacaoNew" class="form-control" placeholder="Observações"></textarea>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="text-right m-2"><button id="salvarPacienteModal" class="btn btn-principal" role="button">Confirmar</button></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="page-modal-responsavel" class="custon-modal">
+		<div class="custon-modal-container" style="max-width: 800px;">
+			<div class="card custon-modal-content">
+				<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+					<p class="h5">Novo responsável</p>
+					<i id="modalResponsavel-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+				</div>
+				<div class="px-0">
+					<div class="d-flex flex-row">
+						<div class="col-lg-12">
+							<form id="novoResponsavel" name="novoResponsavel" method="POST" class="form-validate-jquery">
+								<div class="form-group">
+									<div class="col-lg-12 row mb-lg-5 text-black-50">
+										<div class="col-lg-8">
+											<h5>Dados Pessoais do responsável</h5>
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Nome</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Parentesco</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Nascimento</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="nomeRespNew" name="nomeResp" type="text" class="form-control" placeholder="Nome">
+										</div>
+										<div class="col-lg-4">
+											<select id="parentescoRespNew" name="parentesco" class="form-control form-control-select2">
+												<option value="" selected>selecionar</option>
+												<option value="tio">Tia/Tio</option>
+												<option value="pai">Mãe/Pai</option>
+											</select>
+										</div>
+										<div class="col-lg-4">
+											<input id="nascimentoRespNew" name="nascimentoResp" type="date" class="form-control">
+										</div>
+									</div>
+
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5>Endereco do Responsável</h5>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>CEP</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Endereco</label>
+										</div>
+										<div class="col-lg-2">
+											<label>Nº</label>
+										</div>
+										<div class="col-lg-3">
+											<label>Complemento</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="cepRespNew" name="cepResp" type="text" class="form-control" placeholder="CEP">
+										</div>
+										<div class="col-lg-4">
+											<input id="enderecoRespNew" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av">
+										</div>
+										<div class="col-lg-2">
+											<input id="numeroRespNew" name="numeroResp" type="text" class="form-control" placeholder="Número">
+										</div>
+										<div class="col-lg-3">
+											<input id="complementoRespNew" name="complementoResp" type="text" class="form-control" placeholder="Complemento">
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Bairro</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Cidade</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Estado</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="bairroRespNew" name="bairroResp" type="text" class="form-control" placeholder="Bairro">
+										</div>
+										<div class="col-lg-4">
+											<input id="cidadeRespNew" name="cidadeResp" type="text" class="form-control" placeholder="Cidade">
+										</div>
+										<div class="col-lg-4">
+											<input id="estadoRespNew" name="estadoResp" type="text" class="form-control" placeholder="Estado">
+										</div>
+									</div>
+
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5>Contato</h5>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Telefone</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Celular</label>
+										</div>
+										<div class="col-lg-4">
+											<label>E-mail</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="telefoneRespNew" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com.">
+										</div>
+										<div class="col-lg-4">
+											<input id="celularRespNew" name="celularResp" type="text" class="form-control" placeholder="Celular">
+										</div>
+										<div class="col-lg-4">
+											<input id="emailRespNew" name="emailResp" type="text" class="form-control" placeholder="E-mail">
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-12">
+											<label>Observação</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-12">
+											<textarea id="observacaoRespNew" name="observacaoResp" class="form-control" placeholder="Observações"></textarea>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="text-right m-2"><button id="salvarResponsavelModal" class="btn btn-principal" role="button">Confirmar</button></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--end Modal-->
+
 	<?php include_once("alerta.php"); ?>
 </body>
 
