@@ -808,16 +808,15 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
             consultaSituacaoCaixa();
         });
 
-        function atualizaMovimentacaoCaixa(id, tipo, acao) {
+        function atualizaMovimentacaoCaixa(id, atendimento, tipo, acao) {
             //document.getElementById('inputContasAPagarId').value = ContasAPagarId;
             document.getElementById('inputReciboId').value = id;
+            document.getElementById('inputAtendimento').value = atendimento;
 
             if(tipo == 'Recebimento') {
                 if(acao == 'detalhamento') {
                     //alert('ID: '+id+' || Tipo mov: '+tipo+' || Ação: '+acao);
-                    var menssagem = 'Esta função está indisponível no momento =/, mas estará em breve =D!'
-                    alerta('Atenção', menssagem, 'error')
-                    return
+                    document.formMovimentacao.action = "caixaRecebimentoDetalhamento.php";
                 }else if(acao == 'imprimir') {
                     //document.formMovimentacao.setAttribute("target", "_blank");
                     //document.formMovimentacao.action = "caixaImprimiReciboRecebimento.php";
@@ -838,7 +837,7 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
             }else {
                 if(acao == 'detalhamento') {
                     //('ID: '+id+' || Tipo mov: '+tipo+' || Ação: '+acao);
-                    var menssagem = 'Esta função está indisponível no momento =/, mas estará em breve =D!'
+                    var menssagem = 'Esta função está indisponível para o pagamento, mas já está funcionando no recebimento =D!'
                     alerta('Atenção', menssagem, 'error')
                     return
                 }else if(acao == 'imprimir') {
@@ -1089,6 +1088,7 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
                 <form id="formMovimentacao" name="formMovimentacao" method="POST">
                     <input type="hidden" id="inputReciboId" name="inputReciboId" value="">
+                    <input type="hidden" id="inputAtendimento" name="inputAtendimento" value="">
                 </form>
             </div>
             <!-- /content area -->
