@@ -42,7 +42,7 @@ $sql = "SELECT AtendId, AtendNumRegistro, AtendDataRegistro, AtClaNome
 		JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 		JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE AtendCliente = $iClienteId and AtendUnidade = ".$_SESSION['UnidadeId']."
-		ORDER BY AtendDataRegistro ASC";
+		ORDER BY AtendDataRegistro, AtendId DESC";
 $result = $conn->query($sql);
 $rowHistorico = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -82,7 +82,7 @@ if ($row['ClienSexo'] == 'F'){
 
             /* Início: Tabela Personalizada */
 			$('#tblHistorico').DataTable( {
-				"order": [[ 0, "asc" ]],
+				"order": [[ 2, "desc" ]],
 			    autoWidth: false,
 				responsive: true,
 				searching: false,
