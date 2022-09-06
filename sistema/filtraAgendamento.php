@@ -219,7 +219,7 @@ try{
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'MEDICOS'){
 		$sql = "SELECT ProfiId,ProfiNome
-		FROM Profissional WHERE ProfiUnidade != $iUnidade";
+		FROM Profissional WHERE ProfiUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];
@@ -550,16 +550,18 @@ try{
 		$data = explode('/', $data); // dd/mm/yyyy
 		$data = $data[2].'-'.$data[1].'-'.$data[0]; // yyyy-mm-dd
 
-		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
+		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim, PrAgeIntervalo
 		FROM ProfissionalAgenda
 		WHERE PrAgeData = '$data' and PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$arrayHora = [true,];
+		$intervalo = 30;
 		foreach($row as $item){
 			$horaI = explode(':', $item['PrAgeHoraInicio']);
 			$horaF = explode(':', $item['PrAgeHoraFim']);
+			$intervalo = $item['PrAgeIntervalo'];
 			
 			array_push($arrayHora,
 			[
@@ -570,6 +572,7 @@ try{
 
 		echo json_encode([
 			'arrayHora' => $arrayHora,
+			'intervalo'=> $intervalo?$intervalo:30,
 			'status' => 'success',
 			'titulo' => 'Data',
 			'menssagem' => 'Hora do profissional selecionado!!!',

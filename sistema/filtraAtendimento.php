@@ -1,6 +1,6 @@
 <?php 
 
-include_once("sessao.php"); 
+include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Ordem de Compra';
 
@@ -326,7 +326,7 @@ try{
 	} elseif ($tipoRequest == 'CLASSIFICACAO'){
 		$sql = "SELECT AtClaId,AtClaNome,AtClaNomePersonalizado,AtClaChave,AtClaModelo,AtClaStatus,
 		AtClaUsuarioAtualizador,AtClaUnidade
-		FROM AtendimentoClassificacao WHERE AtClaUnidade != $iUnidade";
+		FROM AtendimentoClassificacao WHERE AtClaUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];
@@ -495,7 +495,7 @@ try{
 		AtendModalidade,AtendResponsavel,AtendClassificacao,AtendObservacao,AtendSituacao,
 		AtendUsuarioAtualizador,AtendUnidade)
 		VALUES('$numRegistro','$atendimento[dataRegistro]',$atendimento[cliente],$atendimento[modalidade],
-		$atendimento[responsavel],$atendimento[classificacao],'$atendimento[observacao]',
+		'$atendimento[responsavel]',$atendimento[classificacao],'$atendimento[observacao]',
 		$atendimento[situacao],$usuarioId,$iUnidade)";
 		$result = $conn->query($sql);
 
@@ -956,16 +956,21 @@ try{
 		$data = explode('/', $data); // dd/mm/yyyy
 		$data = $data[2].'-'.$data[1].'-'.$data[0]; // yyyy-mm-dd
 
-		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
+		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim, PrAgeIntervalo
 		FROM ProfissionalAgenda
 		WHERE PrAgeData = '$data' and PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$arrayHora = [true,];
+		$intervalo = 30;
 		foreach($row as $item){
 			$horaI = explode(':', $item['PrAgeHoraInicio']);
 			$horaF = explode(':', $item['PrAgeHoraFim']);
+
+			if($item['PrAgeIntervalo']){
+				$intervalo = intval($item['PrAgeIntervalo']);
+			}
 			
 			array_push($arrayHora,
 			[
@@ -976,6 +981,7 @@ try{
 
 		echo json_encode([
 			'arrayHora' => $arrayHora,
+			'intervalo'=> $intervalo,
 			'status' => 'success',
 			'titulo' => 'Data',
 			'menssagem' => 'Hora do profissional selecionado!!!',
