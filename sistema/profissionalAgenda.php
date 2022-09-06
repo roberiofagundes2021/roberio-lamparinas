@@ -622,7 +622,11 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 			success: function(response) {
 				$('#locaisAtendimento').html('').show()
 				response.forEach(function(item){
-					$('#locaisAtendimento').append(`<div class="fc-event" data-intervalo="${item.AtLocIntervalo}" data-local="${item.idLocal}" data-color="${item.cor}">${item.nome}</div>`)
+					$('#locaisAtendimento').append(
+						`<div class="fc-event" style="text-shadow: 0px 0px 2px #000" data-intervalo="${item.AtLocIntervalo}" data-local="${item.idLocal}" data-color="${item.cor}">
+							${item.nome}
+						</div>`
+					)
 				});
 			}
 		});
