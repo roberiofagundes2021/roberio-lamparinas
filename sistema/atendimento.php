@@ -89,46 +89,41 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					orderable: true,   //Espera
 					width: "5%",
 					targets: [2]
-				},				
-				{ 
-					orderable: true,   //Nº Registro
-					width: "5%",
-					targets: [3]
 				},
 				{ 
 					orderable: true,   //Prontuário
-					width: "5%",
-					targets: [4]
+					width: "10%",
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Profissional
 					width: "10%",
-					targets: [6]
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Modalidade
 					width: "20%",
-					targets: [7]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Procedimento
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [9]
+					targets: [8]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [10]
+					targets: [9]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -574,7 +569,6 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 											<th>Data</th>
 											<th>Horario</th>
 											<th>Espera</th>
-											<th>Nº Registro</th>
 											<th>Prontuário</th>			
 											<th>Paciente</th>
 											<th>Profissional</th>
