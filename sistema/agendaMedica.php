@@ -65,7 +65,7 @@ include('global_assets/php/conexao.php');
 			
 			/* Início: Tabela Personalizada do Setor Publico */
 			$('#AgendaTable').DataTable({
-				"order": [[ 0, "desc" ]],
+				"order": [[ 0, "desc" ],[ 1, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{
@@ -218,7 +218,7 @@ include('global_assets/php/conexao.php');
 						if(hasClass){
 							$(this).addClass((hasSelected?
 							'':
-							'font-weight-bold text-black border'))
+							'font-weight-bold border bg-gray-agenda'))
 						}
 					})
 				},
@@ -230,7 +230,7 @@ include('global_assets/php/conexao.php');
 						if(hasClass){
 							$(this).addClass((hasSelected?
 							'':
-							'font-weight-bold text-black border'))
+							'font-weight-bold border bg-gray-agenda'))
 						}
 					})
 				},
@@ -301,7 +301,7 @@ include('global_assets/php/conexao.php');
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de agenda médica</h3>
+								<h3 class="card-title">Relação da agenda médica</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<!-- <a class="list-icons-item" data-action="collapse"></a>
@@ -328,7 +328,7 @@ include('global_assets/php/conexao.php');
 								</div>
 							</div>
 						</div>
-						<div class="card">
+						<div class="card pl-2">
 							<div class="col-lg-12 my-4 row">
 								<!-- titulos -->
 								<div class="col-lg-6">
@@ -351,7 +351,7 @@ include('global_assets/php/conexao.php');
 						</div>
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Agenda</h3>
+								<h3 class="card-title">Relação da Agenda</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>

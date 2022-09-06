@@ -126,9 +126,11 @@ try{
 					]);
 				}
 			} else {
+				$horario = str_pad($horario,2,0,STR_PAD_LEFT);
+				$horario = str_pad($horario,5,":00",STR_PAD_RIGHT);
 				array_push($arrayAgenda, [
 					$data,
-					$horario.':00',
+					$horario,
 					'',
 					'',
 					'',
