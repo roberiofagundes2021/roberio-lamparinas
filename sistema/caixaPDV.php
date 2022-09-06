@@ -170,23 +170,19 @@ if(isset($_POST['inputAtendimentoId'])) {
 
     <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
    
     <!-- /theme JS files -->
 
-    <!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
-    <script type="text/javascript" language="javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-    <script type="text/javascript" language="javascript"
-        src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
-
     <script type="text/javascript">
+        
         $(document).ready(function () {
+            
             $('#tblAtendimento').DataTable( {
                 "order": [[ 0, "asc" ]],
                 autoWidth: false,
                 responsive: true,
+                pageLength : 5,
+                lengthMenu: [5, 10, 20],
                 columnDefs: [
                 {
                     orderable: true,   //Marca
@@ -225,40 +221,8 @@ if(isset($_POST['inputAtendimentoId'])) {
                     dropdownAutoWidth: true,
                     width: 'auto'
                 });
-            };	
-
+            };
             _componentSelect2();
-            
-            /* Fim: Tabela Personalizada */
-
-            function validaCPF(strCPF) {
-                var Soma;
-                var Resto;
-                Soma = 0;
-
-                strCPF = strCPF.replace(/[^\d]+/g,'');
-
-                for(let i = 0; i <= 9; i++) {
-                    let digito = i + "";
-                    let cpf = digito + digito + digito + digito + digito + digito + digito + digito + digito + digito + digito;
-
-                    if(strCPF == cpf) return false;
-                }
-                    
-                for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
-                    Resto = (Soma * 10) % 11;
-                    
-                if ((Resto == 10) || (Resto == 11))  Resto = 0;
-                if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
-        
-                Soma = 0;
-                for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
-                    Resto = (Soma * 10) % 11;
-                
-                if ((Resto == 10) || (Resto == 11))  Resto = 0;
-                if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
-                return true;
-            }
 
             //É para a aparência do select permanecer a msm do select que a função jquery adiciona no pop-up, já que ela não deixa o select idêntico ao do template
             $("#pagamentoRetirada").addClass('form-control form-control-select2');
@@ -467,9 +431,9 @@ if(isset($_POST['inputAtendimentoId'])) {
                         valorTotal = (valorTotal != null) ?  float2moeda(valorTotal) : float2moeda(0);
                         descontoTotal = (descontoTotal != null) ?  float2moeda(descontoTotal) : float2moeda(0);
                         
-                        $("#valorTotal").text(valorTotal);
-                        $("#desconto").text(descontoTotal);
-                        $("#valorFinal").text(valorFinal);
+                        $("#valorTotal").text("R$ " + valorTotal);
+                        $("#desconto").text("R$ " + descontoTotal);
+                        $("#valorFinal").text("R$ " + valorFinal);
                     }
                 })
             })
@@ -832,11 +796,15 @@ if(isset($_POST['inputAtendimentoId'])) {
         .valorFinal {
             font-size: 3.5625rem; 
         }
+
+        body{
+            background: #355370;
+        }
     </style>
 
 </head>
 
-<body class="navbar-top sidebar-right-visible sidebar-xs">
+<body class="sidebar-xs">
 
     <!-- Page content -->
     <div class="page-content">
@@ -845,78 +813,77 @@ if(isset($_POST['inputAtendimentoId'])) {
         <div class="content-wrapper">
 
             <!-- Content area -->
-            <div class="content">
+            <!--<div class="content">-->
 
-                <!-- Info blocks -->
-                <div class="row">
-                    <div class="col-lg-12">
-                        <!-- Basic responsive configuration -->
-                        <div class="card p-3" style="background-color: #466d96;">
-                            <div class="card-header header-elements">
-                                <div class="row text-white">
-                                    <div class="col-4">
-                                        <h4 class="m-auto">PDV: <?php echo $nomeCaixa; ?></h4>
-                                    </div>
+                <div class="col-lg-12">
+                    <!-- Basic responsive configuration -->
+                    <div class="card" style="background-color: #466d96">
 
-                                    <div class="col-4">
-                                        <h4 class="m-auto">Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?></h4>
-                                    </div>
-
-                                    <div class="col-4 text-right">
-                                        <h4 class="m-auto">Data: <?php echo date('d/m/Y'); ?></h4>
-                                    </div>
+                        <div class="card-header header-elements" style="background-color: #355370">
+                            <div class="row text-white">
+                                <div class="col-6">
+                                    <h2 class="card-title" style="color: #ccc"><b>PDV - <?php echo  $_SESSION['UnidadeNome']; ?></b></h2>
                                 </div>
 
-                                <hr>
+                                <div class="col-3" style="padding-top: 5px;">
+                                    <h4 class="m-auto">PDV: <?php echo $nomeCaixa; ?> | Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?></h4>
+                                </div>
 
-                                <div class="row">
-                                    <div class="col-lg-10">
-                                        <h1 class="card-title text-white"><b>PDV - <?php echo  $_SESSION['UnidadeNome']; ?></b></h1>
-                                    </div>
-
-                                    <div class="col-lg-2 d-flex justify-content-end">
-                                        <button id="btnCancelar" class="btn btn-lg" style="background-color: #CCCCCC;">Cancelar</button>
-                                    </div>
+                                <div class="col-3 text-right" style="padding-top: 5px;">
+                                    <h4 class="m-auto">Data: <?php echo date('d/m/Y'); ?></h4>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="card-body">
-                                <div class="form-group" style="font-size: 1.200rem;">
-                                    <label for="cmbAtendimento" class="text-white font-size-lg" style="font-size: 1.200rem;">Atendimento <span class="text-danger">*</span></label>
-                                    <select id="cmbAtendimento" name="cmbAtendimento" class="form-control form-control-select2" required>
-                                        <option value="">Selecionar</option>
-                                        <?php
-                                        $sql = "SELECT AtendId, ClienNome
-                                                FROM Atendimento
-                                                JOIN Cliente on ClienId = AtendCliente
-                                                JOIN Situacao on SituaId = AtendSituacao
-                                                LEFT JOIN CaixaRecebimento on CxRecAtendimento = AtendId
-                                                WHERE AtendUnidade = ".$_SESSION['UnidadeId']." and AtendId not in (SELECT CxRecAtendimento FROM CaixaRecebimento)
-                                                ORDER BY ClienNome";
-                                        $result = $conn->query($sql);
-                                        $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+                        <div class="card-body">
 
-                                        foreach ($rowFornecedor as $item) {
-                                            print('<option value="' . $item['AtendId'] . '">' . $item['ClienNome'] . '</option>');
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
+                            <div class="row" style="padding: 20px 5px 15px 2px">
+                                
+                                <div class="col-4">
 
-                                <div class="row mt-5">
-                                    <div class="col-4">
-                                        <h1 class="text-right text-white pr-3">Valor Total</h1>
+                                    <div style="background-color:#fff; padding: 20px;">
+
+                                        <div class="form-group" style="font-size: 1.200rem;">
+                                            <label for="cmbAtendimento" class="font-size-lg" style="font-size: 1.200rem; color: #333">Atendimento <span class="text-danger">*</span></label>
+                                            <select id="cmbAtendimento" name="cmbAtendimento" class="form-control form-control-select2" required>
+                                                <option value="">Selecionar</option>
+                                                <?php
+                                                $sql = "SELECT AtendId, ClienNome
+                                                        FROM Atendimento
+                                                        JOIN Cliente on ClienId = AtendCliente
+                                                        JOIN Situacao on SituaId = AtendSituacao
+                                                        LEFT JOIN CaixaRecebimento on CxRecAtendimento = AtendId
+                                                        WHERE AtendUnidade = ".$_SESSION['UnidadeId']." and AtendId not in (SELECT CxRecAtendimento FROM CaixaRecebimento)
+                                                        ORDER BY ClienNome";
+                                                $result = $conn->query($sql);
+                                                $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                foreach ($rowFornecedor as $item) {
+                                                    print('<option value="' . $item['AtendId'] . '">' . $item['ClienNome'] . '</option>');
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>     
+                                    </div>
+                                    <div style="background-color:#ccc; padding: 20px;">
+                                        <h1 class="text-right pr-3">Valor Total</h1>
                                         <div class="d-flex justify-content-end text-right pr-3">
-                                            <h1 id="valorTotal" class="bg-white w-50 p-1 valorTotalEDesconto">0,00</h1>
+                                            <h1 id="valorTotal" class="bg-white w-50 p-1 valorTotalEDesconto">R$ 0,00</h1>
                                         </div>
 
-                                        <h1 class="text-right text-white pr-3">Desconto</h1>
+                                        <h1 class="text-right pr-3">Desconto</h1>
                                         <div class="d-flex justify-content-end text-right pr-3">
-                                            <h1 id="desconto" class="text-right bg-white w-50 p-1 valorTotalEDesconto">0,00</h1>
+                                            <h1 id="desconto" class="text-right bg-white w-50 p-1 valorTotalEDesconto">R$ 0,00</h1>
                                         </div>
                                     </div>
-                                    
-                                    <div class="col-8 p-4 bg-white">
+
+                                    <div class="col-8 d-flex justify-content-end text-right mt-3" style="padding-right: 10px;">
+                                        <h1 id="valorFinal" class="text-right bg-white text-orange p-3 valorFinal">R$ 0,00</h1>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-8">
+                                    <div class="p-4 bg-white" style="min-height:448px;">
                                         <table id="tblAtendimento" class="table">
                                             <thead>
                                                 <tr class="bg-slate">
@@ -930,30 +897,29 @@ if(isset($_POST['inputAtendimentoId'])) {
                                             </tbody>
                                         </table>
                                     </div>
-                                </div>
+                                    <div class="row" style="background-color: #466d96;">
+                                        <div class="col-4 mt-3">
+                                            <img src="https://lamparinas.com.br/wp-content/uploads/2021/10/Logo_Novo_Site-1536x491.png" style="max-width: 300px;" />
+                                        </div>
 
-                                <div class="row d-flex justify-content-end text-right mt-3 mb-3">
-                                    <h1 id="valorFinal" class="text-right w-25 bg-white text-orange p-1 valorFinal">0,00</h1>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-lg-6 text-left">
-                                        <a href="caixaMovimentacao.php" class="btn legitRipple text-white">Movimentação</a>
-                                        <br>
-                                        <a id="btnRetirada" href="#" data-toggle="modal" data-target="#modal_small_Retirada_Caixa" class="btn legitRipple text-white">Retirada</a>
-                                    </div>	
-                                
-                                    <div class="col-lg-6 text-right">
-                                        <button id="btnFinalizar" class="btn btn-principal legitRipple btn-lg" style="font-size: 2rem;">Finalizar</button>
-                                    </div>	
+                                        <div class="col-lg-8 text-right">
+                                            <button id="btnFinalizar" class="btn btn-principal legitRipple btn-lg" style="font-size: 2rem;">Finalizar</button>
+                                        </div>	
+                                    </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-lg-6 text-left">
+                                    <a href="caixaMovimentacao.php" class="btn btn-principal legitRipple">Movimentação</a>
+                                    <a href="#" class="btn btn-principal legitRipple" id="btnRetirada" data-toggle="modal" data-target="#modal_small_Retirada_Caixa">Retirada</a>
+                                </div>	
+                            </div>
                         </div>
-                        <!-- /basic responsive configuration -->
-
                     </div>
-                </div>
+                    <!-- /basic responsive configuration -->
 
+                </div>
                 
                 <form name="formAtendimento" method="post" action="caixaPDV.php">   
                     <input type="hidden" id="inputCaixaNome" name="inputCaixaNome" value="<?php echo $nomeCaixa; ?>">
@@ -986,7 +952,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                     <input type="hidden" id="cmbPagamentoRetirada" name="cmbPagamentoRetirada" value="">
                     <input type="hidden" id="inputJustificativaRetirada" name="inputJustificativaRetirada" value="">
                 </form>
-            </div>
+            <!--</div>-->
             <!-- /content area -->
 
             <!--Link para finalizar recebimento-->
@@ -1242,8 +1208,6 @@ if(isset($_POST['inputAtendimentoId'])) {
                 </div>
             </div>
             <!-- / modal -->
-
-            <?php include_once("footer.php"); ?>
 
         </div>
         <!-- /main content -->
