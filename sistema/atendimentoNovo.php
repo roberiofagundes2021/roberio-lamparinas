@@ -138,6 +138,52 @@ if($iAtendimento){
 						alerta('Campo Obrigatório!', menssageError, 'error')
 						return
 					}
+					let paciente = {
+						'id': $('#paciente').val(),
+						'pessoaTipo': ($('#fisica').is(':checked')?'F':'J'),
+						'prontuario': $('#prontuario').val(),
+						'nome': $('#nome').val(),
+						'cpf': $('#cpf').val(),
+						'cns': $('#cns').val(),
+						'rg': $('#rg').val(),
+						'emissor': $('#emissor').val(),
+						'uf': $('#uf').val(),
+						'sexo': $('#sexo').val(),
+						'nascimento': $('#nascimento').val(),
+						'nomePai': $('#nomePai').val(),
+						'nomeMae': $('#nomeMae').val(),
+						'profissao': $('#profissao').val(),
+						'cep': $('#cep').val(),
+						'endereco': $('#endereco').val(),
+						'numero': $('#numero').val(),
+						'complemento': $('#complemento').val(),
+						'bairro': $('#bairro').val(),
+						'cidade': $('#cidade').val(),
+						'estado': $('#estado').val(),
+						'contato': $('#contato').val(),
+						'telefone': $('#telefone').val(),
+						'celular': $('#celular').val(),
+						'email': $('#email').val(),
+						'observacao': $('#observacao').val()
+					}
+
+					let responsavel = $('#parentescoCadatrado').val()?{
+						'id':$('#parentescoCadatrado').val(),
+						'nomeResp':$('#nomeResp').val(),
+						'parentescoResp':$('#parentescoResp').val(),
+						'nascimentoResp':$('#nascimentoResp').val(),
+						'cepResp':$('#cepResp').val(),
+						'enderecoResp':$('#enderecoResp').val(),
+						'numeroResp':$('#numeroResp').val(),
+						'complementoResp':$('#complementoResp').val(),
+						'bairroResp':$('#bairroResp').val(),
+						'cidadeResp':$('#cidadeResp').val(),
+						'estadoResp':$('#estadoResp').val(),
+						'telefoneResp':$('#telefoneResp').val(),
+						'celularResp':$('#celularResp').val(),
+						'emailResp':$('#emailResp').val(),
+						'observacaoResp':$('#observacaoResp').val()
+					}:null
 	
 					$.ajax({
 						type: 'POST',
@@ -145,8 +191,8 @@ if($iAtendimento){
 						dataType: 'json',
 						data:{
 							'tipoRequest': 'SALVARATENDIMENTO',
-							'cliente':$('paciente').val(),
-							'responsavel':$('parentescoCadatrado').val(),
+							'cliente':paciente,
+							'responsavel':responsavel,
 							'dataRegistro': $('#dataRegistro').val(),
 							'modalidade': $('#modalidade').val(),
 							'classificacao': $('#classificacao').val(),
@@ -277,6 +323,10 @@ if($iAtendimento){
 			$('#novoPaciente').hide()
 			$('#novoResponsavel').hide()
 
+			$('.actions').addClass('col-lg-12 row')
+			$('.actions ul').addClass('col-lg-10 actionContent')
+			$('.actions').append(`<a class='col-lg-2 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>`)
+			$('#cancelar').insertBefore('.actionContent')
 
 			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
 			dataAtual = dataAtual.split(' ')[0]
@@ -357,35 +407,41 @@ if($iAtendimento){
 						$(element).attr('href',href)
 					}
 				})
+				$('.steps ul li').each(function(index,element){
+					if(!$('#paciente').val() && index > 0){
+						$(element).attr('class','disabled')
+					}
+				})
 				setPacienteAtribut(iPaciente)
 			});
 
 			$('#parentescoCadatrado').on('change', function(){
 				let iResponsavel = $(this).val();
-				if(iResponsavel){
-					$.ajax({
-						type: 'POST',
-						url: 'filtraAtendimento.php',
-						dataType: 'json',
-						data:{
-							'tipoRequest': 'RESPONSAVEL',
-							'iResponsavel': iResponsavel
-						},
-						success: function(response) {
-							if(response.status == 'success'){
-								setResponsavelAtribut(response.data.id)
-								$('#novoResponsavel').show()
-								$('#informacoes').show()
-							}else{
-								alerta(response.titulo, response.menssagem, response.status)
-								$('#novoResponsavel').hide()
-								$('#informacoes').hide()
-							}
-						},
-						error: function(response) {
-						}
-					});
-				}
+				setResponsavelAtribut(iResponsavel)
+				// if(iResponsavel){
+				// 	$.ajax({
+				// 		type: 'POST',
+				// 		url: 'filtraAtendimento.php',
+				// 		dataType: 'json',
+				// 		data:{
+				// 			'tipoRequest': 'RESPONSAVEL',
+				// 			'iResponsavel': iResponsavel
+				// 		},
+				// 		success: function(response) {
+				// 			if(response.status == 'success'){
+				// 				setResponsavelAtribut(response.data.id)
+				// 				$('#novoResponsavel').show()
+				// 				$('#informacoes').show()
+				// 			}else{
+				// 				alerta(response.titulo, response.menssagem, response.status)
+				// 				$('#novoResponsavel').hide()
+				// 				$('#informacoes').hide()
+				// 			}
+				// 		},
+				// 		error: function(response) {
+				// 		}
+				// 	});
+				// }
 			});
 
 			$('#medicos').on('change', function(){
@@ -863,6 +919,8 @@ if($iAtendimento){
 				$('#celular').val('')
 				$('#email').val('')
 				$('#observacao').val('')
+				$('#novoPaciente').hide()
+				$('#informacoes').hide()
 			}
 		}
 
@@ -894,10 +952,12 @@ if($iAtendimento){
 							$('#emailResp').val(response.data.emailResp)
 							$('#observacaoResp').val(response.data.observacaoResp)
 	
-							$('#novoResponsavel').fadeIn()
+							$('#informacoes').show()
+							$('#novoResponsavel').show()
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
-							$('#novoResponsavel').fadeOut()
+							$('#novoResponsavel').hide()
+							$('#informacoes').hide()
 						}
 					},
 					error: function(response) {
@@ -918,6 +978,8 @@ if($iAtendimento){
 				$('#celularResp').val('')
 				$('#emailResp').val('')
 				$('#observacaoResp').val('')
+				$('#informacoes').hide()
+				$('#novoResponsavel').hide()
 			}
 		}
 
@@ -1228,7 +1290,7 @@ if($iAtendimento){
 							<div id="dados">
 								<form id="dadosPaciente" class="form-validate-jquery" action="#" data-fouc>
 									<div class="card-header header-elements-inline">
-										<h3 class="card-title">Paciente</h3>
+										<h3 class="card-title">Cadastro de Paciente</h3>
 										<div class="header-elements">
 											<div class="list-icons">
 												<!-- <a class="list-icons-item" data-action="collapse"></a> -->
@@ -1256,7 +1318,7 @@ if($iAtendimento){
 								</form>
 								<form id="dadosResponsavel" class="form-validate-jquery" action="#" data-fouc>
 									<div class="card-header header-elements-inline">
-										<h3 class="card-title">Responsável</h3>
+										<h3 class="card-title">Cadastro de Responsável</h3>
 										<div class="header-elements">
 											<div class="list-icons">
 												<!-- <a class="list-icons-item" data-action="collapse"></a> -->
@@ -1282,7 +1344,18 @@ if($iAtendimento){
 									</div>
 								</form>
 								<form id="dadosAtendimento" class="form-validate-jquery" action="#" data-fouc>
-									<div class="col-lg-12 mb-4 row">
+									<div class="card-header header-elements-inline">
+										<h3 class="card-title">Cadastro de Atendimento</h3>
+										<div class="header-elements">
+											<div class="list-icons">
+												<!-- <a class="list-icons-item" data-action="collapse"></a> -->
+												<!-- <a href="fornecedor.php" class="list-icons-item" data-action="reload"></a> -->
+												<!--<a class="list-icons-item" data-action="remove"></a>-->
+											</div>
+										</div>
+									</div>
+									
+									<div class="col-lg-12 mb-4 row mt-4">
 										<!-- titulos -->
 										<?php
 											if($iAtendimento){
@@ -1454,10 +1527,6 @@ if($iAtendimento){
 									</div>
 								</form>
 							</div>
-
-							<div class="row col-12 my-4 ml-0 mr-0">
-								<a class="col-2 btn btn-lg" href="atendimento.php" id="cancelar">cancelar</a>
-							</div>
 						</div>
 
 						<div id="informacoes" class="card p-4">
@@ -1508,13 +1577,13 @@ if($iAtendimento){
 										<input id="prontuario" name="prontuario" type="text" class="form-control" placeholder="Prontuário Eletrônico" readonly>
 									</div>
 									<div class="col-lg-3">
-										<input id="nome" name="nome" type="text" class="form-control" placeholder="Nome completo" required readonly>
+										<input id="nome" name="nome" type="text" class="form-control" placeholder="Nome completo" required>
 									</div>
 									<div class="col-lg-3">
-										<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required readonly>
+										<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required>
 									</div>
 									<div class="col-lg-3">
-										<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS" readonly>
+										<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS">
 									</div>
 								</div>
 
@@ -1538,26 +1607,26 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-2">
-										<input id="rg" name="rg" type="text" class="form-control" placeholder="RG" required readonly>
+										<input id="rg" name="rg" type="text" class="form-control" placeholder="RG" required >
 									</div>
 									<div class="col-lg-3">
-										<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor" required readonly>
+										<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor" required >
 									</div>
 									<div class="col-lg-2">
-										<select id="uf" name="uf" class="select-search" required readonly>
+										<select id="uf" name="uf" class="select-search" required >
 											<option value="" selected>selecionar</option>
 											<option value='BA'>BA</option>
 										</select>
 									</div>
 									<div class="col-lg-2">
-										<select id="sexo" name="sexo" class="form-control form-control-select2" required readonly>
+										<select id="sexo" name="sexo" class="form-control form-control-select2" required >
 											<option value="" selected>selecionar</option>
 											<option value="M">Masculino</option>
 											<option value="F">Feminino</option>
 										</select>
 									</div>
 									<div class="col-lg-3">
-										<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa" required readonly>
+										<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa" required >
 									</div>
 								</div>
 
@@ -1572,10 +1641,10 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-6">
-										<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai" required readonly>
+										<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai" required >
 									</div>
 									<div class="col-lg-6">
-										<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe" required readonly>
+										<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe" required >
 									</div>
 								</div>
 
@@ -1587,7 +1656,7 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-12">
-										<select id="profissao" name="profissao" class="form-control form-control-select2" required readonly>
+										<select id="profissao" name="profissao" class="form-control form-control-select2" required >
 											<option selected value="">selecionar</option>
 											<option value="1">Teste</option>
 										</select>
@@ -1603,7 +1672,7 @@ if($iAtendimento){
 									<div class="col-lg-3">
 										<label>CEP <span class="text-danger">*</span></label>
 									</div>
-									<div class="col-lg-4">
+									<div class="col-lg-4">,
 										<label>Endereço <span class="text-danger">*</span></label>
 									</div>
 									<div class="col-lg-2">
@@ -1615,16 +1684,16 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-3">
-										<input id="cep" name="cep" type="text" class="form-control" placeholder="CEP" required readonly>
+										<input id="cep" name="cep" type="text" class="form-control" placeholder="CEP" required >
 									</div>
 									<div class="col-lg-4">
-										<input id="endereco" name="endereco" type="text" class="form-control" placeholder="EX.: Rua, Av" required readonly>
+										<input id="endereco" name="endereco" type="text" class="form-control" placeholder="EX.: Rua, Av" required >
 									</div>
 									<div class="col-lg-2">
-										<input id="numero" name="numero" type="text" class="form-control" placeholder="Número" required readonly>
+										<input id="numero" name="numero" type="text" class="form-control" placeholder="Número" required >
 									</div>
 									<div class="col-lg-3">
-										<input id="complemento" name="complemento" type="text" class="form-control" placeholder="Complemento" readonly>
+										<input id="complemento" name="complemento" type="text" class="form-control" placeholder="Complemento" >
 									</div>
 								</div>
 
@@ -1642,13 +1711,13 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-4">
-										<input id="bairro" name="bairro" type="text" class="form-control" placeholder="Bairro" required readonly>
+										<input id="bairro" name="bairro" type="text" class="form-control" placeholder="Bairro" required >
 									</div>
 									<div class="col-lg-4">
-										<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade" required readonly>
+										<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade" required >
 									</div>
 									<div class="col-lg-4">
-										<input id="estado" name="estado" type="text" class="form-control" placeholder="Estado" required readonly>
+										<input id="estado" name="estado" type="text" class="form-control" placeholder="Estado" required >
 									</div>
 								</div>
 
@@ -1673,16 +1742,16 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-3">
-										<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato" required readonly>
+										<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato" required >
 									</div>
 									<div class="col-lg-3">
-										<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com." required readonly>
+										<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com." required >
 									</div>
 									<div class="col-lg-3">
-										<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular" required readonly>
+										<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular" required >
 									</div>
 									<div class="col-lg-3">
-										<input id="email" name="email" type="text" class="form-control" placeholder="E-mail" required readonly>
+										<input id="email" name="email" type="text" class="form-control" placeholder="E-mail" required >
 									</div>
 								</div>
 
@@ -1694,7 +1763,7 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-12">
-										<textarea id="observacao" name="observacao" class="form-control" placeholder="Observações" readonly></textarea>
+										<textarea id="observacao" name="observacao" class="form-control" placeholder="Observações" ></textarea>
 									</div>
 								</div>
 							</div>
@@ -1724,17 +1793,17 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-4">
-										<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome" readonly>
+										<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome" >
 									</div>
 									<div class="col-lg-4">
-										<select id="parentescoResp" name="parentesco" class="form-control form-control-select2" readonly>
+										<select id="parentescoResp" name="parentesco" class="form-control form-control-select2" >
 											<option value="" selected>selecionar</option>
 											<option value="tio">Tia/Tio</option>
 											<option value="pai">Mãe/Pai</option>
 										</select>
 									</div>
 									<div class="col-lg-4">
-										<input id="nascimentoResp" name="nascimentoResp" type="date" class="form-control" readonly>
+										<input id="nascimentoResp" name="nascimentoResp" type="date" class="form-control" >
 									</div>
 								</div>
 
@@ -1759,16 +1828,16 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-3">
-										<input id="cepResp" name="cepResp" type="text" class="form-control" placeholder="CEP" readonly>
+										<input id="cepResp" name="cepResp" type="text" class="form-control" placeholder="CEP" >
 									</div>
 									<div class="col-lg-4">
-										<input id="enderecoResp" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av" readonly>
+										<input id="enderecoResp" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av" >
 									</div>
 									<div class="col-lg-2">
-										<input id="numeroResp" name="numeroResp" type="text" class="form-control" placeholder="Número" readonly>
+										<input id="numeroResp" name="numeroResp" type="text" class="form-control" placeholder="Número" >
 									</div>
 									<div class="col-lg-3">
-										<input id="complementoResp" name="complementoResp" type="text" class="form-control" placeholder="Complemento" readonly>
+										<input id="complementoResp" name="complementoResp" type="text" class="form-control" placeholder="Complemento" >
 									</div>
 								</div>
 
@@ -1786,13 +1855,13 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-4">
-										<input id="bairroResp" name="bairroResp" type="text" class="form-control" placeholder="Bairro" readonly>
+										<input id="bairroResp" name="bairroResp" type="text" class="form-control" placeholder="Bairro" >
 									</div>
 									<div class="col-lg-4">
-										<input id="cidadeResp" name="cidadeResp" type="text" class="form-control" placeholder="Cidade" readonly>
+										<input id="cidadeResp" name="cidadeResp" type="text" class="form-control" placeholder="Cidade" >
 									</div>
 									<div class="col-lg-4">
-										<input id="estadoResp" name="estadoResp" type="text" class="form-control" placeholder="Estado" readonly>
+										<input id="estadoResp" name="estadoResp" type="text" class="form-control" placeholder="Estado" >
 									</div>
 								</div>
 
@@ -1814,13 +1883,13 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-4">
-										<input id="telefoneResp" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com." readonly>
+										<input id="telefoneResp" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com." >
 									</div>
 									<div class="col-lg-4">
-										<input id="celularResp" name="celularResp" type="text" class="form-control" placeholder="Celular" readonly>
+										<input id="celularResp" name="celularResp" type="text" class="form-control" placeholder="Celular" >
 									</div>
 									<div class="col-lg-4">
-										<input id="emailResp" name="emailResp" type="text" class="form-control" placeholder="E-mail" readonly>
+										<input id="emailResp" name="emailResp" type="text" class="form-control" placeholder="E-mail" >
 									</div>
 								</div>
 
@@ -1832,7 +1901,7 @@ if($iAtendimento){
 
 									<!-- campos -->
 									<div class="col-lg-12">
-										<textarea id="observacaoResp" name="observacaoResp" class="form-control" placeholder="Observações" readonly></textarea>
+										<textarea id="observacaoResp" name="observacaoResp" class="form-control" placeholder="Observações" ></textarea>
 									</div>
 								</div>
 							</div>

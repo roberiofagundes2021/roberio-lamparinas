@@ -469,20 +469,20 @@ try{
 		}
 
 		$atendimento = [
-			'cliente' => $_SESSION['atendimento']['paciente'],
-			'responsavel' => $_SESSION['atendimento']['responsavel'],
 			'dataRegistro' => isset($_POST['dataRegistro'])?$_POST['dataRegistro']:'',
 			'modalidade' => isset($_POST['modalidade'])?$_POST['modalidade']:'',
 			'classificacao' => isset($_POST['classificacao'])?$_POST['classificacao']:'',
 			'situacao' => isset($_POST['situacao'])?$_POST['situacao']:'',
 			'observacao' => isset($_POST['observacaoAtendimento'])?$_POST['observacaoAtendimento']:''
 		];
+		$cliente = $_POST['cliente'];
+		$responsavel = $_POST['responsavel'];
 
 		$mes = explode('-',$atendimento['dataRegistro']);
 		$mes = $mes[1];
 
 		$sql = "SELECT AtendNumRegistro FROM Atendimento WHERE AtendNumRegistro LIKE '%A$mes-%'
-		ORDER BY AtendId DESC";
+			ORDER BY AtendId DESC";
 		$result = $conn->query($sql);
 		$rowCodigo = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -490,19 +490,20 @@ try{
 
 		$numRegistro = "A$mes-$intaValCodigo";
 
+		$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'EMESPERAVENDA'";
+		$result = $conn->query($sql);
+		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
 		$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,AtendCliente,
-		AtendModalidade,AtendResponsavel,AtendClassificacao,AtendObservacao,AtendSituacao,
-		AtendUsuarioAtualizador,AtendUnidade)
-		VALUES('$numRegistro','$atendimento[dataRegistro]',$atendimento[cliente],$atendimento[modalidade],
-		'$atendimento[responsavel]',$atendimento[classificacao],'$atendimento[observacao]',
-		$atendimento[situacao],$usuarioId,$iUnidade)";
+			AtendModalidade,AtendResponsavel,AtendClassificacao,AtendObservacao,AtendSituacao,
+			AtendUsuarioAtualizador,AtendUnidade)
+			VALUES('$numRegistro','$atendimento[dataRegistro]','$cliente[id]','$atendimento[modalidade]',
+			'".($responsavel?$responsavel['id']:'')."',$atendimento[classificacao],'$atendimento[observacao]',
+		$rowSituacao[SituaId],$usuarioId,$iUnidade)";
 		$result = $conn->query($sql);
 
 		$atendimentoID = $conn->lastInsertId();
 
-		// $sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
-		// AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,AtXSeUsuarioAtualizador,AtXSeUnidade)
-		// VALUES ";
 		if(COUNT($atendimentoServicos)){
 			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
 			AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
@@ -516,6 +517,57 @@ try{
 			$sql = substr($sql, 0, -1);
 			$conn->query($sql);
 		}
+
+		$sql = "UPDATE Cliente SET 
+			ClienTipo= '$cliente[pessoaTipo]',
+			ClienNome= '$cliente[nome]',
+			ClienRazaoSocial= '$cliente[nome]',
+			ClienCpf= '$cliente[cpf]',
+			ClienRg= '$cliente[rg]',
+			ClienOrgaoEmissor= '$cliente[emissor]',
+			ClienUf= '$cliente[uf]',
+			ClienSexo= '$cliente[sexo]',
+			ClienDtNascimento= '$cliente[nascimento]',
+			ClienNomePai= '$cliente[nomePai]',
+			ClienNomeMae= '$cliente[nomeMae]',
+			ClienProfissao= '$cliente[profissao]',
+			ClienCep= '$cliente[cep]',
+			ClienEndereco= '$cliente[endereco]',
+			ClienNumero= '$cliente[numero]',
+			ClienComplemento= '$cliente[complemento]',
+			ClienBairro= '$cliente[bairro]',
+			ClienCidade= '$cliente[cidade]',
+			ClienEstado= '$cliente[estado]',
+			ClienContato= '$cliente[contato]',
+			ClienTelefone= '$cliente[telefone]',
+			ClienCelular= '$cliente[celular]',
+			ClienEmail= '$cliente[email]',
+			ClienObservacao= '$cliente[observacao]',
+			ClienUsuarioAtualizador= $usuarioId
+			WHERE ClienId = $cliente[id]";
+		$conn->query($sql);
+
+		if($responsavel){
+			$sql = "UPDATE ClienteResponsavel SET 
+				ClResCliente='$cliente[id]',
+				ClResNome='$responsavel[nomeResp]',
+				CResParentesco='$responsavel[parentescoResp]',
+				ClResNascimento='$responsavel[nascimentoResp]',
+				ClResCep='$responsavel[cepResp]',
+				ClResEndereco='$responsavel[enderecoResp]',
+				ClResNumero='$responsavel[numeroResp]',
+				ClResComplemento='$responsavel[complementoResp]',
+				ClResBairro='$responsavel[bairroResp]',
+				ClResCidade='$responsavel[cidadeResp]',
+				ClResEstado='$responsavel[estadoResp]',
+				ClResTelefone='$responsavel[telefoneResp]',
+				ClResCelular='$responsavel[celularResp]',
+				ClResEmail='$responsavel[emailResp]',
+				ClResObservacao='$responsavel[observacaoResp]'
+				WHERE ClResId = $responsavel[id]";
+			$conn->query($sql);
+		}
+
 		$_SESSION['atendimento'] = [
 			'paciente' => '',
 			'responsavel' => '',
