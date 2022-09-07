@@ -57,7 +57,7 @@ include('global_assets/php/conexao.php');
 	
 	<script type="text/javascript" >			
 		$(document).ready(function() {
-			getPrifissionais()
+			getProfissionais()
 			getPikerDate()
 
 			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
@@ -93,9 +93,14 @@ include('global_assets/php/conexao.php');
 					targets: [4]
 				},
 				{ 
-					orderable: false,   //Ações
+					orderable: true,   //Situação
 					width: "10%",
 					targets: [5]
+				},
+				{ 
+					orderable: false,   //Ações
+					width: "10%",
+					targets: [6]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -152,28 +157,26 @@ include('global_assets/php/conexao.php');
 						}
 					}
 				});
+
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "filtraAgendaMedica.php",
+					data:{
+						'tipoRequest': 'DADOSPROFISSIONAL',
+						'iProfissional': $(this).val()
+					},
+					success: function(resposta) {
+
+						if(resposta){
+							$('#dadosProfissional').html(resposta);
+						}					
+					}
+				})
 			})
 		});
 
-		function buscarProfissional(profissionalId){
-
-			//Esse ajax está sendo usado para verificar no banco se o registro já existe
-			$.ajax({
-				type: "POST",
-				url: "agendaFiltraProfissional.php",
-				data: ('profissionalId=' + profissionalId ),
-				success: function(resposta) {
-
-					if(resposta){
-
-						$('#dadosProfissional').html(resposta);
-
-					}					
-				}
-			})
-		}
-
-		function getPrifissionais(){
+		function getProfissionais(){
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAgendaMedica.php',
@@ -362,9 +365,7 @@ include('global_assets/php/conexao.php');
 								</div>
 							</div>
 
-							<div class="form-group" style="border: 1px solid #ccc;">
-								<div id="dadosProfissional" style="padding: 10px; "></div>
-							</div>
+							<div id="dadosProfissional" style="padding: 10px; "></div>							
 
 						</div>
 						<div class="card">
@@ -387,6 +388,7 @@ include('global_assets/php/conexao.php');
 										<th>Local</th>
 										<th>Paciente</th>
 										<th>Serviço</th>
+										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
 								</thead>

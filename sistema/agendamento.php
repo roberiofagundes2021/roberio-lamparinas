@@ -398,6 +398,11 @@ include('global_assets/php/conexao.php');
 				<form id="formEdita" method="POST" action="agendamentoNovo.php">
 					<input id="iAgendamento" name="iAgendamento" type="hidden" value="" />
 				</form>
+
+				<!-- Agenda Médica -->
+				<form id="formAgendaMedica" method="POST" action="agendaMedica.php">
+					<input id="iOrigem" name="iOrigem" type="hidden" value="agendamento.php" />
+				</form>
 			</div>			
 			<?php include_once("footer.php"); ?>
 
