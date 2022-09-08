@@ -478,107 +478,115 @@ try{
 		$cliente = $_POST['cliente'];
 		$responsavel = $_POST['responsavel'];
 
-		$mes = explode('-',$atendimento['dataRegistro']);
-		$mes = $mes[1];
-
-		$sql = "SELECT AtendNumRegistro FROM Atendimento WHERE AtendNumRegistro LIKE '%A$mes-%'
-			ORDER BY AtendId DESC";
-		$result = $conn->query($sql);
-		$rowCodigo = $result->fetchAll(PDO::FETCH_ASSOC);
-
-		$intaValCodigo = COUNT($rowCodigo)?intval(explode('-',$rowCodigo[0]['AtendNumRegistro'])[1])+1:1;
-
-		$numRegistro = "A$mes-$intaValCodigo";
-
-		$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'EMESPERAVENDA'";
-		$result = $conn->query($sql);
-		$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
-
-		$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,AtendCliente,
-			AtendModalidade,AtendResponsavel,AtendClassificacao,AtendObservacao,AtendSituacao,
-			AtendUsuarioAtualizador,AtendUnidade)
-			VALUES('$numRegistro','$atendimento[dataRegistro]','$cliente[id]','$atendimento[modalidade]',
-			'".($responsavel?$responsavel['id']:'')."',$atendimento[classificacao],'$atendimento[observacao]',
-		$rowSituacao[SituaId],$usuarioId,$iUnidade)";
-		$result = $conn->query($sql);
-
-		$atendimentoID = $conn->lastInsertId();
-
-		if(COUNT($atendimentoServicos)){
-			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
-			AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
-			VALUES ";
+		if($cliente['id']){
+			$mes = explode('-',$atendimento['dataRegistro']);
+			$mes = $mes[1];
 	
-			foreach($atendimentoServicos as $atendimentoServico){
-				$sql .= "('$atendimentoID','$atendimentoServico[iServico]','$atendimentoServico[iMedico]',
-				'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
-				'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
+			$sql = "SELECT AtendNumRegistro FROM Atendimento WHERE AtendNumRegistro LIKE '%A$mes-%'
+				ORDER BY AtendId DESC";
+			$result = $conn->query($sql);
+			$rowCodigo = $result->fetchAll(PDO::FETCH_ASSOC);
+	
+			$intaValCodigo = COUNT($rowCodigo)?intval(explode('-',$rowCodigo[0]['AtendNumRegistro'])[1])+1:1;
+	
+			$numRegistro = "A$mes-$intaValCodigo";
+	
+			$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'EMESPERAVENDA'";
+			$result = $conn->query($sql);
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+	
+			$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,AtendCliente,
+				AtendModalidade,AtendResponsavel,AtendClassificacao,AtendObservacao,AtendSituacao,
+				AtendUsuarioAtualizador,AtendUnidade)
+				VALUES('$numRegistro','$atendimento[dataRegistro]','$cliente[id]','$atendimento[modalidade]',
+				'".($responsavel?$responsavel['id']:'')."',$atendimento[classificacao],'$atendimento[observacao]',
+			$rowSituacao[SituaId],$usuarioId,$iUnidade)";
+			$result = $conn->query($sql);
+	
+			$atendimentoID = $conn->lastInsertId();
+	
+			if(COUNT($atendimentoServicos)){
+				$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
+				AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
+				VALUES ";
+		
+				foreach($atendimentoServicos as $atendimentoServico){
+					$sql .= "('$atendimentoID','$atendimentoServico[iServico]','$atendimentoServico[iMedico]',
+					'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
+					'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
+				}
+				$sql = substr($sql, 0, -1);
+				$conn->query($sql);
 			}
-			$sql = substr($sql, 0, -1);
+	
+			$sql = "UPDATE Cliente SET 
+				ClienTipo= '$cliente[pessoaTipo]',
+				ClienNome= '$cliente[nome]',
+				ClienRazaoSocial= '$cliente[nome]',
+				ClienCpf= '$cliente[cpf]',
+				ClienRg= '$cliente[rg]',
+				ClienOrgaoEmissor= '$cliente[emissor]',
+				ClienUf= '$cliente[uf]',
+				ClienSexo= '$cliente[sexo]',
+				ClienDtNascimento= '$cliente[nascimento]',
+				ClienNomePai= '$cliente[nomePai]',
+				ClienNomeMae= '$cliente[nomeMae]',
+				ClienProfissao= '$cliente[profissao]',
+				ClienCep= '$cliente[cep]',
+				ClienEndereco= '$cliente[endereco]',
+				ClienNumero= '$cliente[numero]',
+				ClienComplemento= '$cliente[complemento]',
+				ClienBairro= '$cliente[bairro]',
+				ClienCidade= '$cliente[cidade]',
+				ClienEstado= '$cliente[estado]',
+				ClienContato= '$cliente[contato]',
+				ClienTelefone= '$cliente[telefone]',
+				ClienCelular= '$cliente[celular]',
+				ClienEmail= '$cliente[email]',
+				ClienObservacao= '$cliente[observacao]',
+				ClienUsuarioAtualizador= $usuarioId
+				WHERE ClienId = $cliente[id]";
 			$conn->query($sql);
+	
+			if($responsavel){
+				$sql = "UPDATE ClienteResponsavel SET 
+					ClResCliente='$cliente[id]',
+					ClResNome='$responsavel[nomeResp]',
+					CResParentesco='$responsavel[parentescoResp]',
+					ClResNascimento='$responsavel[nascimentoResp]',
+					ClResCep='$responsavel[cepResp]',
+					ClResEndereco='$responsavel[enderecoResp]',
+					ClResNumero='$responsavel[numeroResp]',
+					ClResComplemento='$responsavel[complementoResp]',
+					ClResBairro='$responsavel[bairroResp]',
+					ClResCidade='$responsavel[cidadeResp]',
+					ClResEstado='$responsavel[estadoResp]',
+					ClResTelefone='$responsavel[telefoneResp]',
+					ClResCelular='$responsavel[celularResp]',
+					ClResEmail='$responsavel[emailResp]',
+					ClResObservacao='$responsavel[observacaoResp]'
+					WHERE ClResId = $responsavel[id]";
+				$conn->query($sql);
+			}
+	
+			$_SESSION['atendimento'] = [
+				'paciente' => '',
+				'responsavel' => '',
+				'atendimentoServicos' => []
+			];
+	
+			echo json_encode([
+				'titulo' => 'Atendimento',
+				'status' => 'success',
+				'menssagem' => 'Atendimento cadastrado!!'
+			]);
+		}else{
+			echo json_encode([
+				'titulo' => 'Atendimento',
+				'status' => 'error',
+				'menssagem' => 'Erro ao cadastrar atendimento!!'
+			]);
 		}
-
-		$sql = "UPDATE Cliente SET 
-			ClienTipo= '$cliente[pessoaTipo]',
-			ClienNome= '$cliente[nome]',
-			ClienRazaoSocial= '$cliente[nome]',
-			ClienCpf= '$cliente[cpf]',
-			ClienRg= '$cliente[rg]',
-			ClienOrgaoEmissor= '$cliente[emissor]',
-			ClienUf= '$cliente[uf]',
-			ClienSexo= '$cliente[sexo]',
-			ClienDtNascimento= '$cliente[nascimento]',
-			ClienNomePai= '$cliente[nomePai]',
-			ClienNomeMae= '$cliente[nomeMae]',
-			ClienProfissao= '$cliente[profissao]',
-			ClienCep= '$cliente[cep]',
-			ClienEndereco= '$cliente[endereco]',
-			ClienNumero= '$cliente[numero]',
-			ClienComplemento= '$cliente[complemento]',
-			ClienBairro= '$cliente[bairro]',
-			ClienCidade= '$cliente[cidade]',
-			ClienEstado= '$cliente[estado]',
-			ClienContato= '$cliente[contato]',
-			ClienTelefone= '$cliente[telefone]',
-			ClienCelular= '$cliente[celular]',
-			ClienEmail= '$cliente[email]',
-			ClienObservacao= '$cliente[observacao]',
-			ClienUsuarioAtualizador= $usuarioId
-			WHERE ClienId = $cliente[id]";
-		$conn->query($sql);
-
-		if($responsavel){
-			$sql = "UPDATE ClienteResponsavel SET 
-				ClResCliente='$cliente[id]',
-				ClResNome='$responsavel[nomeResp]',
-				CResParentesco='$responsavel[parentescoResp]',
-				ClResNascimento='$responsavel[nascimentoResp]',
-				ClResCep='$responsavel[cepResp]',
-				ClResEndereco='$responsavel[enderecoResp]',
-				ClResNumero='$responsavel[numeroResp]',
-				ClResComplemento='$responsavel[complementoResp]',
-				ClResBairro='$responsavel[bairroResp]',
-				ClResCidade='$responsavel[cidadeResp]',
-				ClResEstado='$responsavel[estadoResp]',
-				ClResTelefone='$responsavel[telefoneResp]',
-				ClResCelular='$responsavel[celularResp]',
-				ClResEmail='$responsavel[emailResp]',
-				ClResObservacao='$responsavel[observacaoResp]'
-				WHERE ClResId = $responsavel[id]";
-			$conn->query($sql);
-		}
-
-		$_SESSION['atendimento'] = [
-			'paciente' => '',
-			'responsavel' => '',
-			'atendimentoServicos' => []
-		];
-
-		echo json_encode([
-			'titulo' => 'Atendimento',
-			'status' => 'success',
-			'menssagem' => 'Atendimento cadastrado!!'
-		]);
 	} elseif($tipoRequest == 'RESPONSAVEIS'){
 
 		$sql = "SELECT ClResId,ClResCliente,ClResNome,CResParentesco,ClResNascimento,ClResCep,ClResEndereco,
