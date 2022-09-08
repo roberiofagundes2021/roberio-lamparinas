@@ -342,6 +342,27 @@ try{
 		]);
 	} elseif ($tipoRequest == 'EXCLUI'){
 		$iAtendimento = $_POST['iAtendimento'];
+
+		$sql = "DELETE FROM AtendimentoAtestadoMedico WHERE AtAMeAtendimento = $iAtendimento
+		and AtAMeUnidade = $iUnidade";
+		$conn->query($sql);
+
+		$sql = "DELETE FROM AtendimentoEletivo WHERE AtEleAtendimento = $iAtendimento
+		and AtEleUnidade = $iUnidade";
+		$conn->query($sql);
+		
+		$sql = "DELETE FROM AtendimentoReceituario WHERE AtRecAtendimento = $iAtendimento
+		and AtRecUnidade = $iUnidade";
+		$conn->query($sql);
+
+		$sql = "DELETE FROM AtendimentoSolicitacaoExame WHERE AtSExAtendimento = $iAtendimento
+		and AtSExUnidade = $iUnidade";
+		$conn->query($sql);
+		
+		$sql = "DELETE FROM AtendimentoEncaminhamentoMedico WHERE AtEMeAtendimento = $iAtendimento
+		and AtEMeUnidade = $iUnidade";
+		$conn->query($sql);
+
 	
 		$sql = "DELETE FROM AtendimentoXServico WHERE AtXSeAtendimento = $iAtendimento
 		and AtXSeUnidade = $iUnidade";
