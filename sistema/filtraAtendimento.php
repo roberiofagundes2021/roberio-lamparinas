@@ -306,6 +306,23 @@ try{
 		}
 	
 		echo json_encode($array);
+	} elseif ($tipoRequest == 'SITUACOES'){
+		$sql = "SELECT SituaId,SituaNome,SituaChave
+		FROM Situacao
+		WHERE SituaChave in ('AGENDADOVENDA','ATENDIDOVENDA','EMESPERAVENDA','LIBERADOVENDA')";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['SituaId'],
+				'nome' => $item['SituaNome'],
+				'SituaChave' => $item['SituaChave'],
+			]);
+		}
+	
+		echo json_encode($array);
 	} elseif ($tipoRequest == 'CLASSIFICACAO'){
 		$sql = "SELECT AtClaId,AtClaNome,AtClaNomePersonalizado,AtClaChave,AtClaModelo,AtClaStatus,
 		AtClaUsuarioAtualizador,AtClaUnidade
@@ -323,15 +340,10 @@ try{
 		echo json_encode($array);
 	} elseif ($tipoRequest === 'MUDARSITUACAO'){
 		$iAtendimento = $_POST['iAtendimento'];
-		$situacao = isset($_POST['sSituacao'])?$_POST['sSituacao']:'';
-
-		$sql = "SELECT SituaId
-		FROM Situacao WHERE SituaChave = '$situacao'";
-		$result = $conn->query($sql);
-		$row = $result->fetch(PDO::FETCH_ASSOC);
-		$situacao = $row['SituaId'];
+		$situacao = $_POST['iSituacao'];
+		$sObservacao = $_POST['sObservacao'];
 	
-		$sql = "UPDATE Atendimento set AtendSituacao = $situacao
+		$sql = "UPDATE Atendimento set AtendSituacao = '$situacao', AtendObservacao = '$sObservacao'
 		WHERE AtendId = $iAtendimento";
 		$result = $conn->query($sql);
 

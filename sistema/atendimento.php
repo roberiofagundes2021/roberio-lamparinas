@@ -137,7 +137,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
                         'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
                     }
                 }
-			});
+			})
 
 			$('#AtendimentoTable').DataTable({
 				"order": [[ 0, "desc" ]],
@@ -210,7 +210,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
                         'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
                     }
                 }
-			});
+			})
 			
 			/* Início: Tabela Personalizada do Setor Publico */
 			$('#AtendimentoTableEspera').DataTable({
@@ -279,7 +279,13 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
                         'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
                     }
                 }
-			});
+			})
+
+			$('#modal-close-x').on('click', ()=>{
+				$('#iAtendimento').val('')
+				$('#observacaoModal').html('').show()
+				$('#page-modal-situacao').fadeOut(200);
+			})
 
 			/* Início: Tabela Personalizada do Setor Publico */
 			$('#AtendimentoTableAtendido').DataTable({
@@ -348,7 +354,40 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
                         'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
                     }
                 }
-			});
+			})
+
+			$('#cmbSituacao').on('change', ()=>{
+				let cmbSituacao = $('#cmbSituacao').val()
+				$('iSituacao').val(cmbSituacao)
+			})
+
+			$('#mudarSituacao').on('click', ()=>{
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'MUDARSITUACAO',
+						'iAtendimento': $('#iAtendimento').val(),
+						'iSituacao': $('#cmbSituacao').val(),
+						'sObservacao': $('#observacaoModal').val()
+					},
+					success: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
+						$('#iAtendimento').val('')
+						$('#observacaoModal').val('')
+						$('#page-modal-situacao').fadeOut(200);
+						getAtendimentos();
+					},
+					error: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
+						$('#iAtendimento').val('')
+						$('#observacaoModal').val('')
+						$('#page-modal-situacao').fadeOut(200);
+						getAtendimentos();
+					}
+				});
+			})
 			
 			// Select2 for length menu styling
 			var _componentSelect2 = function() {
@@ -426,6 +465,32 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				})
 			})
 		}
+
+		function alteraSituacao(situacao, element){
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'SITUACOES'
+				},
+				success: function(response) {
+					// primeiro limpa os valores para adicionar novos evitando duplicação
+					$('#cmbSituacao').empty()
+					$('#iAtendimento').val('')
+					$('#observacaoModal').val('')
+
+					response.forEach(item => {
+						let opt = item.SituaChave === situacao? `<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
+						$('#cmbSituacao').append(opt)
+					})
+					$('#iAtendimento').val($(element).data('atendimento'))
+					$('#observacaoModal').val($(element).data('observacao'))
+
+					$('#page-modal-situacao').fadeIn(200);
+				}
+			});
+		}
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function getAtendimentos(){
@@ -452,8 +517,8 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							$(rowNodeAgendamento).attr('class', 'text-center')
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							$(rowNodeAgendamento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeAgendamento).find('td:eq(10)').attr('data-observacao', `${item.identify.sObservacao}`)
+							$(rowNodeAgendamento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						})
 
 						$('#AtendimentoTable').DataTable().clear().draw()
@@ -466,8 +531,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							$(rowNodeAtendimento).attr('class', 'text-center')
 							$(rowNodeAtendimento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeAtendimento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							$(rowNodeAtendimento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sObservacao}`)
+							$(rowNodeAtendimento).find('td:eq(9)').attr('data-observacao', `${item.identify.sObservacao}`)
 						})
 					} else if (response.acesso == 'PROFISSIONAL'){
 						let tableE = $('#AtendimentoTableEspera').DataTable().clear().draw()
