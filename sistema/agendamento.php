@@ -181,6 +181,18 @@ include('global_assets/php/conexao.php');
 					}
 				});
 			})
+
+			function atualizaOrigem(iOrigem, Tipo){
+ 
+				document.getElementById('iOrigem').value = iOrigem;
+						
+				if (Tipo == 'origem'){
+					document.formAgendaMedica.action = "agendaMedica.php";					
+				} 
+
+				document.formAgendaMedica.submit();
+			}	
+			
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -303,7 +315,7 @@ include('global_assets/php/conexao.php');
 									</div>
 									<div class="col-lg-4 text-right">
 										<div class="text-right">
-											<a href="agendaMedica.php" class="btn" role="button">Agenda médica</a>
+											<a href="agendaMedica.php" onclick="atualizaOrigem(0, 'origem')" class="btn" role="button">Agenda médica</a>
 											<a href="agendamentoNovo.php" class="btn btn-principal" role="button">Novo Agendamento</a>
 											<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
 												<i class="icon-printer2"></i>																						

@@ -365,6 +365,8 @@ include('global_assets/php/conexao.php');
 								</div>
 							</div>
 
+							<div class="text-right" style=" margin-top: -40px; margin-right: 15px; "><a href="agendamento.php" role="button"><< VOLTAR</a>&nbsp;&nbsp;&nbsp;</div>
+
 							<div id="dadosProfissional" style="padding: 10px; "></div>							
 
 						</div>

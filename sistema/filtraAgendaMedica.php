@@ -151,8 +151,10 @@ try{
 			'menssagem' => 'Agenda encontrada!!!',
 		]);
 	}else if($tipoRequest == 'DADOSPROFISSIONAL'){
-		$sql = "SELECT ProfiId, ProfiNome
+		$sql = "SELECT ProfiId, ProfiNome, ProfiNumConselho, ProfiCelular, PrConNome, EspecNome
 				FROM Profissional
+				LEFT JOIN ProfissionalConselho ON PrConId = ProfiConselho
+				LEFT JOIN Especialidade ON EspecId = ProfiEspecialidade
 				WHERE ProfiId = ".$_POST['iProfissional'];
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);
@@ -161,8 +163,23 @@ try{
 		if($count){
 
 			print('
-				<div class="form-group" style="border: 1px solid #ccc;">	
-					<p style="margin-right:10px; margin-left: 10px"><b> Profissional:</b> '.$row['ProfiNome'].'</p>
+				<div class="form-group" style="border: 1px solid #ccc; background-color:#F1F1F1; margin-right: 10px ">
+					<div class="row" style="margin-top: 10px;">
+						<div class="col-lg-2">	
+							<p style="margin-right:10px; margin-left: 10px"><b> Dr. '.$row['ProfiNome'].'</b> </p>
+						</div>
+						<div class="col-lg-2">	
+							<p style="margin-right:10px; margin-left: 10px"><b>'.$row['PrConNome'].': '.$row['ProfiNumConselho'].'</b> </p>
+						</div>
+						<div class="col-lg-2">		
+							<p style="margin-right:10px; margin-left: 10px"><b>Celular: '.$row['ProfiCelular'].'</b> </p>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-12">	
+							<p style="margin-right:10px; margin-left: 10px">Especialidades: '.$row['EspecNome'].' </p>
+						</div>
+					</div>
 				</div>
 			');
 				
