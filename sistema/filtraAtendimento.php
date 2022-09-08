@@ -306,22 +306,6 @@ try{
 		}
 	
 		echo json_encode($array);
-	} elseif ($tipoRequest == 'SITUACOES'){
-		$sql = "SELECT SituaId,SituaNome,SituaChave,SituaStatus,SituaUsuarioAtualizador,SituaCor
-		FROM Situacao
-		WHERE SituaChave in ('AGENDADOVENDA','ATENDIDOVENDA','EMESPERAVENDA','LIBERADOVENDA')";
-		$result = $conn->query($sql);
-		$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-		$array = [];
-		foreach($row as $item){
-			array_push($array,[
-				'id' => $item['SituaId'],
-				'nome' => $item['SituaNome']
-			]);
-		}
-	
-		echo json_encode($array);
 	} elseif ($tipoRequest == 'CLASSIFICACAO'){
 		$sql = "SELECT AtClaId,AtClaNome,AtClaNomePersonalizado,AtClaChave,AtClaModelo,AtClaStatus,
 		AtClaUsuarioAtualizador,AtClaUnidade

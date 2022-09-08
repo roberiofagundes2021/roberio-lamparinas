@@ -138,7 +138,7 @@ if($iAtendimento){
 						alerta('Campo Obrigatório!', menssageError, 'error')
 						return
 					}
-					let paciente = {
+					let paciente = $('#parentescoCadatrado').val()?{
 						'id': $('#paciente').val(),
 						'pessoaTipo': ($('#fisica').is(':checked')?'F':'J'),
 						'prontuario': $('#prontuario').val(),
@@ -165,7 +165,7 @@ if($iAtendimento){
 						'celular': $('#celular').val(),
 						'email': $('#email').val(),
 						'observacao': $('#observacao').val()
-					}
+					}:null
 
 					let responsavel = $('#parentescoCadatrado').val()?{
 						'id':$('#parentescoCadatrado').val(),
@@ -258,7 +258,6 @@ if($iAtendimento){
 				if($(element).attr('href') == '#next'){
 					$(element).attr('href','#')
 					$(element).on('click', function(e){
-						console.log('re')
 						$('#dadosPaciente').submit()
 					})
 				}
@@ -792,28 +791,6 @@ if($iAtendimento){
 					}
 				},
 				error: function(response) {
-				}
-			});
-			//  incluir situação
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'SITUACOES'
-				},
-				success: function(response) {
-					$('#situacao').html('<option value="">Selecione</option>')
-
-					response.forEach(function(item, index){
-						let opt = ''
-						if(atendimento){
-							 opt = atendimento.AtendSituacao == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
-						} else {
-							opt = `<option value="${item.id}">${item.nome}</option>`
-						}
-						$('#situacao').append(opt)
-					})
 				}
 			});
 			// vai preencher cmbClassificacao
@@ -1510,19 +1487,6 @@ if($iAtendimento){
 										<!-- campos -->
 										<div class="col-lg-12">
 											<textarea id="observacaoAtendimento" name="observacaoAtendimento" class="form-control" placeholder="Observações"></textarea>
-										</div>
-									</div>
-
-									<div class="col-lg-12 mb-4">
-										<!-- titulos -->
-										<div class="col-lg-2">
-											<label>Situacao <span class="text-danger">*</span></label>
-										</div>
-
-										<!-- campos -->
-										<div class="col-lg-2">
-											<select id="situacao" name="situacao" class="form-control form-control-select2" required>
-											</select>
 										</div>
 									</div>
 								</form>
