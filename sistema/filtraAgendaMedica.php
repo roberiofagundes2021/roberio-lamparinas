@@ -20,7 +20,9 @@ try{
 
 	if($tipoRequest == 'PROFISSIONAIS'){
 		$sql = "SELECT ProfiId,ProfiNome
-		FROM Profissional WHERE ProfiUnidade = $iUnidade";
+				FROM Profissional
+				JOIN Situacao on SituaId = ProfiStatus
+				WHERE ProfiUnidade = $iUnidade and SituaChave = 'ATIVO' ";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 		
@@ -102,15 +104,16 @@ try{
 		$arrayAgenda = [];
 
 		foreach($arrayHora as $horario){
-			$sql = "SELECT AtXSeId,AtXSeData,AtXSeHorario,AtLocNome,ClienNome,SrVenNome
-				FROM AtendimentoXServico
-				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
-				LEFT JOIN Cliente ON ClienId = AtendCliente
-				LEFT JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
-				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
-				WHERE AtXSeProfissional = $iProfissional and AtXSeData = '$data' and AtXSeUnidade = $iUnidade
-				and AtXSeHorario like '%$horario%'
-				ORDER BY AtXSeHorario";
+			$sql = "SELECT AtXSeId,AtXSeData,AtXSeHorario,AtLocNome,ClienNome,SrVenNome,SituaNome
+					FROM AtendimentoXServico
+					LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
+					LEFT JOIN Cliente ON ClienId = AtendCliente
+					LEFT JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
+					LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+					JOIN Situacao on SituaId = AtendStatus
+					WHERE AtXSeProfissional = $iProfissional and AtXSeData = '$data' and AtXSeUnidade = $iUnidade
+					and AtXSeHorario like '%$horario%'
+					ORDER BY AtXSeHorario";
 			$result = $conn->query($sql);
 			$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -122,6 +125,7 @@ try{
 						$item['AtLocNome']?$item['AtLocNome']:'',
 						$item['ClienNome']?$item['ClienNome']:'',
 						$item['SrVenNome']?$item['SrVenNome']:'',
+						$item['SituaNome']?$item['SituaNome']:'',
 						'',
 					]);
 				}
@@ -131,6 +135,7 @@ try{
 				array_push($arrayAgenda, [
 					$data,
 					$horario,
+					'',
 					'',
 					'',
 					'',
@@ -145,6 +150,25 @@ try{
 			'titulo' => 'Agenda',
 			'menssagem' => 'Agenda encontrada!!!',
 		]);
+	}else if($tipoRequest == 'DADOSPROFISSIONAL'){
+		$sql = "SELECT ProfiId, ProfiNome
+				FROM Profissional
+				WHERE ProfiId = ".$_POST['iProfissional'];
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+		$count = count($row);
+		
+		if($count){
+
+			print('
+				<div class="form-group" style="border: 1px solid #ccc;">	
+					<p style="margin-right:10px; margin-left: 10px"><b> Profissional:</b> '.$row['ProfiNome'].'</p>
+				</div>
+			');
+				
+		} else{
+			echo 0;
+		}
 	}
 }catch(PDOException $e) {
 	$msg = '';

@@ -756,6 +756,11 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				<?php
 					echo "<input id='sAcesso' name='sAcesso' type='hidden' value='$acesso'/>"
 				?>
+
+				<!-- Agenda Médica -->
+				<form id="formAgendaMedica" method="POST" action="agendaMedica.php">
+					<input id="iOrigem" name="iOrigem" type="hidden" value="atendimento.php" />
+				</form>
 			</div>
 			<?php include_once("footer.php"); ?>
 		</div>
