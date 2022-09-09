@@ -181,6 +181,7 @@ include('global_assets/php/conexao.php');
 					}
 				});
 			})
+			
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -259,6 +260,10 @@ include('global_assets/php/conexao.php');
 				});
 			}
 		}
+
+		function submeterAgendaMedica(){ 
+			document.formAgendaMedica.submit();
+		}
 	</script>
 
 </head>
@@ -303,7 +308,7 @@ include('global_assets/php/conexao.php');
 									</div>
 									<div class="col-lg-4 text-right">
 										<div class="text-right">
-											<a href="agendaMedica.php" class="btn" role="button">Agenda médica</a>
+											<a href="#" onclick="submeterAgendaMedica()" class="btn" role="button">Agenda médica</a>
 											<a href="agendamentoNovo.php" class="btn btn-principal" role="button">Novo Agendamento</a>
 											<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
 												<i class="icon-printer2"></i>																						
@@ -399,9 +404,9 @@ include('global_assets/php/conexao.php');
 					<input id="iAgendamento" name="iAgendamento" type="hidden" value="" />
 				</form>
 
-				<!-- Agenda Médica -->
-				<form id="formAgendaMedica" method="POST" action="agendaMedica.php">
-					<input id="iOrigem" name="iOrigem" type="hidden" value="agendamento.php" />
+				<!-- Agenda Médica --> 
+				<form name="formAgendaMedica" id="formAgendaMedica" method="POST" action="agendaMedica.php">
+					<input id="inputOrigem" name="inputOrigem" type="hidden" value="agendamento.php" />
 				</form>
 			</div>			
 			<?php include_once("footer.php"); ?>

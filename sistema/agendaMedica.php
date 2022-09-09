@@ -9,6 +9,12 @@ $_SESSION['PaginaAtual'] = 'Agenda medica';
 
 include('global_assets/php/conexao.php');
 
+if (isset($_POST['inputOrigem'])){
+	$urlOrigem = $_POST['inputOrigem'];
+} else {
+	irpara("agendamento.php");
+}
+
 // a requisição é feita ao carregar a página via AJAX no arquivo filtraAgendamentos.php
 ?>
 
@@ -364,6 +370,8 @@ include('global_assets/php/conexao.php');
 									</div>
 								</div>
 							</div>
+
+							<div class="text-right" style=" margin-top: -40px; margin-right: 15px; "><a href="<?php echo $urlOrigem; ?>" role="button"><< VOLTAR</a>&nbsp;&nbsp;&nbsp;</div>
 
 							<div id="dadosProfissional" style="padding: 10px; "></div>							
 
