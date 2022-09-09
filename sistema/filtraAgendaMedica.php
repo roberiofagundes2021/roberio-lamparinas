@@ -110,7 +110,7 @@ try{
 					LEFT JOIN Cliente ON ClienId = AtendCliente
 					LEFT JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
 					LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
-					JOIN Situacao on SituaId = AtendStatus
+					JOIN Situacao on SituaId = AtendSituacao
 					WHERE AtXSeProfissional = $iProfissional and AtXSeData = '$data' and AtXSeUnidade = $iUnidade
 					and AtXSeHorario like '%$horario%'
 					ORDER BY AtXSeHorario";
