@@ -404,7 +404,7 @@ include('global_assets/php/conexao.php');
 					<input id="iAgendamento" name="iAgendamento" type="hidden" value="" />
 				</form>
 
-				<!-- Agenda Médica -->
+				<!-- Agenda Médica --> 
 				<form name="formAgendaMedica" id="formAgendaMedica" method="POST" action="agendaMedica.php">
 					<input id="inputOrigem" name="inputOrigem" type="hidden" value="agendamento.php" />
 				</form>
