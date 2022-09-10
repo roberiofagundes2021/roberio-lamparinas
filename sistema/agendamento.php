@@ -304,7 +304,9 @@ include('global_assets/php/conexao.php');
 									<div class="col-lg-4 text-right">
 										<div class="text-right">
 											<a href="agendaMedica.php" class="btn" role="button">Agenda médica</a>
-											<a href="agendamentoNovo.php" class="btn btn-principal" role="button">Novo Agendamento</a>
+											<?php 
+												echo $inserir?"<a href='agendamentoNovo.php' class='btn btn-principal' role='button'>Novo Agendamento</a>":"";
+											?>
 											<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
 												<i class="icon-printer2"></i>																						
 											</a>

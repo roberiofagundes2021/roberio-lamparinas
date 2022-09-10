@@ -548,7 +548,9 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 										<div class="col-lg-4 text-right">
 											<div class="text-right">
 												<a href="agendaMedica.php" class="btn" role="button">Agenda médica</a>
-												<a href="atendimentoNovo.php" class="btn btn-principal" role="button">Novo Atendimento</a>
+												<?php 
+                                                    echo $inserir?"<a href='atendimentoNovo.php' class='btn btn-principal' role='button'>Novo Atendimento</a>":"";
+												?>
 												<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
 													<i class="icon-printer2"></i>																						
 												</a>

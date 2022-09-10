@@ -136,9 +136,15 @@ try {
     //$mpdf->WriteHTML($stylesheet, 1); // CSS Script goes here.
     $mpdf->SetHTMLFooter($rodape);
     $mpdf->WriteHTML($html);            
-    // $mpdf->SetHTMLHeader($topo,'O',true);	    
+    // $mpdf->SetHTMLHeader($topo,'O',true);
+    
+    $arrayDataHora = explode(' ', $rowMovimentacao['CxPagDataHora']);
+    $data = $arrayDataHora[0];
+    $arrayHora = explode('.', $arrayDataHora[1]);
+    $hora = $arrayHora[0];
+    $nomeArquivo = $data.' '.$hora.' '.$justificativa.'.pdf';
 
-    $mpdf->Output();
+    $mpdf->Output($nomeArquivo, 'I');
 
 } catch (\Mpdf\MpdfException $e) { // Note: safer fully qualified exception name used for catch
 
