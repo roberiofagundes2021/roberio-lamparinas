@@ -9,8 +9,13 @@ $_SESSION['PaginaAtual'] = 'Agenda medica';
 
 include('global_assets/php/conexao.php');
 
-// a requisição é feita ao carregar a página via AJAX no arquivo filtraAgendamentos.php
+if (isset($_POST['inputOrigem'])){
+	$urlOrigem = $_POST['inputOrigem'];
+} else {
+	irpara("agendamento.php");
+}
 
+// a requisição é feita ao carregar a página via AJAX no arquivo filtraAgendamentos.php
 ?>
 
 <!DOCTYPE html>
@@ -58,14 +63,14 @@ include('global_assets/php/conexao.php');
 	
 	<script type="text/javascript" >			
 		$(document).ready(function() {
-			getPrifissionais()
+			getProfissionais()
 			getPikerDate()
 
 			$.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
 			
 			/* Início: Tabela Personalizada do Setor Publico */
 			$('#AgendaTable').DataTable({
-				"order": [[ 0, "desc" ]],
+				"order": [[ 0, "desc" ],[ 1, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{
@@ -94,9 +99,14 @@ include('global_assets/php/conexao.php');
 					targets: [4]
 				},
 				{ 
-					orderable: false,   //Ações
+					orderable: true,   //Situação
 					width: "10%",
 					targets: [5]
+				},
+				{ 
+					orderable: false,   //Ações
+					width: "10%",
+					targets: [6]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -153,10 +163,26 @@ include('global_assets/php/conexao.php');
 						}
 					}
 				});
+
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "filtraAgendaMedica.php",
+					data:{
+						'tipoRequest': 'DADOSPROFISSIONAL',
+						'iProfissional': $(this).val()
+					},
+					success: function(resposta) {
+
+						if(resposta){
+							$('#dadosProfissional').html(resposta);
+						}					
+					}
+				})
 			})
 		});
 
-		function getPrifissionais(){
+		function getProfissionais(){
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAgendaMedica.php',
@@ -218,7 +244,7 @@ include('global_assets/php/conexao.php');
 						if(hasClass){
 							$(this).addClass((hasSelected?
 							'':
-							'font-weight-bold text-black border'))
+							'font-weight-bold border bg-gray-agenda'))
 						}
 					})
 				},
@@ -230,7 +256,7 @@ include('global_assets/php/conexao.php');
 						if(hasClass){
 							$(this).addClass((hasSelected?
 							'':
-							'font-weight-bold text-black border'))
+							'font-weight-bold border bg-gray-agenda'))
 						}
 					})
 				},
@@ -281,6 +307,7 @@ include('global_assets/php/conexao.php');
 <body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
+	
 
 	<!-- Page content -->
 	<div class="page-content">
@@ -301,7 +328,7 @@ include('global_assets/php/conexao.php');
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de agenda médica</h3>
+								<h3 class="card-title">Relação da agenda médica</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<!-- <a class="list-icons-item" data-action="collapse"></a>
@@ -314,7 +341,7 @@ include('global_assets/php/conexao.php');
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-12">
-										<p class="font-size-lg">A relação abaixo faz referência à agenda do profissional <b id="profissionalNome">profissionalNome</b> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
+										<p class="font-size-lg">A relação abaixo faz referência à agenda dos profissionais da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>
 									<!-- <div class="col-lg-4 text-right">
 										<div class="text-right">
@@ -328,30 +355,30 @@ include('global_assets/php/conexao.php');
 								</div>
 							</div>
 						</div>
-						<div class="card">
+						<div class="card pl-2">
 							<div class="col-lg-12 my-4 row">
-								<!-- titulos -->
-								<div class="col-lg-6">
-									<label>Profissional</label>
-								</div>
-								<div class="col-lg-6">
-									<label>Data</label>
-								</div>
-
-								<!-- campos -->
-								<div class="col-lg-6">
+								<div class="col-lg-3">
+									<label for="medicoSelect">Profissional</label>
 									<select id="medicoSelect" name="medicoSelect" class="select-search">
 										<option value="">selecione</option>
 									</select>
 								</div>
-								<div id="dataAgenda" class="col-lg-6 input-group">
-									<input type="text" class="form-control pickadate" placeholder="">
+								<div class="col-lg-3">
+									<label>Data</label>
+									<div id="dataAgenda" class=" input-group">
+										<input type="text" class="form-control pickadate" placeholder="">
+									</div>
 								</div>
 							</div>
+
+							<div class="text-right" style=" margin-top: -40px; margin-right: 15px; "><a href="<?php echo $urlOrigem; ?>" role="button"><< VOLTAR</a>&nbsp;&nbsp;&nbsp;</div>
+
+							<div id="dadosProfissional" style="padding: 10px; "></div>							
+
 						</div>
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Agenda</h3>
+								<h3 class="card-title">Relação da Agenda</h3>
 								<div class="header-elements">
 									<div class="list-icons">
 										<a class="list-icons-item" data-action="collapse"></a>
@@ -369,6 +396,7 @@ include('global_assets/php/conexao.php');
 										<th>Local</th>
 										<th>Paciente</th>
 										<th>Serviço</th>
+										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
 								</thead>

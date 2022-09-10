@@ -30,10 +30,11 @@ $sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, ClienId, ClienCo
         $sexo = 'Masculino';
     }
 
-    $sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExSolicitacaoExame, AtAmbData, AtAmbHoraInicio, AtAmbHoraFim, AtAmbQueixaPrincipal, 
-                   AtAmbHistoriaMolestiaAtual,AtAmbExameFisico, AtAmbSuspeitaDiagnostico, AtAmbExameSolicitado, AtAmbPrescricao, AtAmbOutrasObservacoes, 
-				   A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleData, AtEleHoraInicio, AtEleHoraFim, AtEleAnamnese, AtClaChave,
-                   ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento, ClienNomeMae, ClienCartaoSus, ClienCelular, ClResNome
+    $sql = "SELECT AtendId, AtendNumRegistro, AtendDataRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExSolicitacaoExame, AtAmbData, AtAmbHoraInicio, AtAmbHoraFim, 
+                   AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual,AtAmbExameFisico, AtAmbSuspeitaDiagnostico, AtAmbExameSolicitado, AtAmbPrescricao, 
+                   AtAmbOutrasObservacoes, A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleData, AtEleHoraInicio, 
+                   AtEleHoraFim, AtEleAnamnese, AtClaChave, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento, ClienNomeMae, ClienCartaoSus, 
+                   ClienCelular, ClResNome
 			FROM Atendimento
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoAmbulatorial ON AtAmbAtendimento = AtendId
@@ -46,7 +47,8 @@ $sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, ClienId, ClienCo
             LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
 			JOIN Unidade ON UnidaId = AtendUnidade
 			JOIN Cliente ON ClienId = AtendCliente
-			WHERE AtendCliente = '". $iPaciente."' and AtendUnidade = ".$_SESSION['UnidadeId']; 
+			WHERE AtendCliente = '". $iPaciente."' and AtendUnidade = ".$_SESSION['UnidadeId']."
+            ORDER BY AtendDataRegistro, AtendId DESC"; 
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 	$count = count($row);
@@ -121,7 +123,7 @@ try {
         </table>
         <table style="width:100%; border-collapse: collapse;"> 
             <tr>
-                <td style="width:50%; font-size:14px; background-color:#F1F1F1;"><br>'.$rowPaciente['ClienNome'].'</td>	
+                <td style="width:50%; font-size:14px; background-color:#F1F1F1;">Paciente:<br>'.$rowPaciente['ClienNome'].'</td>	
                 <td style="width:25%; font-size:12px;">Sexo:<br>'.$sexo.'</td>
                 <td style="width:25%; font-size:12px;">Telefone:<br>'.$rowPaciente['ClienCelular'].'</td>
             </tr>
@@ -139,19 +141,20 @@ try {
         <div style="text-align:center; margin-top: 10px;"><h1>Histórico do Paciente</h1></div>
 
     ';
+    
     foreach ($row as $item){
         if($item['AtClaChave'] == "AMBULATORIAL"){
             $html .= '
                 
-                <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
+                <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 10px;">
                     DATA DO ATENDIMENTO AMBULATORIAL
                     <br><br>
                     <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($item['AtAmbData']).' - '.mostraHora($item['AtAmbHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($item['AtAmbData']).' - '.mostraHora($item['AtAmbHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
                 </div>
-                <div style=" border: #aaa solid 1px; font-weight: bold; position:relative;  background-color:#eee; padding: 5px;">
+                <div style=" border: #aaa solid 1px; font-weight: bold; position:relative;  background-color:#eee; padding: 10px;">
                     Unidade de Atendimento: <span style="font-weight:normal;">'. $item['UnidaNome'] .'</span> <span style="color:#aaa;"></span><br>Médico Solicitante: <span style="font-weight:normal;">'.$item['ProfissionalNome'].' ('.$item['ProfissaoNome'].')</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Modalidade: <span style="font-weight:normal;">'. $item['AtModNome'] .'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Guia: <span style="font-weight:normal;">'.$item['AtendNumRegistro'].'</span>
                 </div>
-                <br>
+                <br>                
             ';
 
             $html .= '
@@ -218,19 +221,17 @@ try {
             ';
             
         }  
-
-       
     
         if  ($item['AtClaChave'] == "ELETIVO"){
 
             $html .= '
             
-                <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 5px;">
+                <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 10px;">
                 DATA DO ATENDIMENTO ELETIVO
                 <br><br>
                 <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($item['AtEleData']).' - '.mostraHora($item['AtEleHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($item['AtEleData']).' - '.mostraHora($item['AtEleHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
                 </div>
-                <div style="  border: #aaa solid 1px; font-weight: bold; position:relative; background-color:#eee; padding: 5px;">
+                <div style="  border: #aaa solid 1px; font-weight: bold; position:relative; background-color:#eee; padding: 10px;">
                 Unidade de Atendimento: <span style="font-weight:normal;">'. $item['UnidaNome'] .'</span> <span style="color:#aaa;"></span><br>Médico Solicitante: <span style="font-weight:normal;">'.$item['ProfissionalNome'].' ('.$item['ProfissaoNome'].')</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Modalidade: <span style="font-weight:normal;">'. $item['AtModNome'] .'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Guia: <span style="font-weight:normal;">'.$item['AtendNumRegistro'].'</span>
                 </div>
                 <br>
@@ -260,6 +261,8 @@ try {
                     
                     </tr>
                 </table>
+
+                <br><br>
             ';
         
         } 

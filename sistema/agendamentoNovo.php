@@ -35,35 +35,25 @@ if(isset($_POST['iAgendamento'])){
 	<title>Lamparinas | Agendamentos</title>
 
 	<?php include_once("head.php"); ?>
-	<style>
-		table td{
-			padding: 1rem !important;
-		}
-	</style>
 
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	<script src="global_assets/js/demo_pages/form_select2.js"></script>
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-    <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-    <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-    <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-    <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
-	
+	<script src="global_assets/js/plugins/loaders/blockui.min.js"></script>
+	<script src="global_assets/js/plugins/ui/ripple.min.js"></script>
 	<script src="global_assets/js/plugins/ui/moment/moment.min.js"></script>
 	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>
 	<script src="global_assets/js/plugins/pickers/anytime.min.js"></script>
 	<script src="global_assets/js/plugins/pickers/pickadate/picker.js"></script>
 	<script src="global_assets/js/plugins/pickers/pickadate/picker.date.js"></script>
-	<script src="global_assets/js/demo_pages/picker_date.js"></script>
 	<script src="global_assets/js/plugins/pickers/pickadate/picker.time.js"></script>
 	<script src="global_assets/js/plugins/pickers/pickadate/legacy.js"></script>
 	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
+
+	<!-- Theme JS files -->
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+    <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+    <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+    <script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 
 	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
 	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
@@ -91,14 +81,14 @@ if(isset($_POST['iAgendamento'])){
 	
 	<script type="text/javascript" >
 		$(document).ready(function() {
-			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"});
-			dataAtual = dataAtual.split(' ')[0];
-			dataAtual = dataAtual.split('/')[2]+'-'+dataAtual.split('/')[1]+'-'+dataAtual.split('/')[0];
-			$('#data').val(dataAtual);
+			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
+			dataAtual = dataAtual.split(' ')[0]
+			dataAtual = dataAtual.split('/')[2]+'-'+dataAtual.split('/')[1]+'-'+dataAtual.split('/')[0]
+			$('#data').val(dataAtual)
 
-			$('#servicoTable').hide();
-			alteraSituacao();
-			getCmbs();
+			$('#servicoTable').hide()
+			alteraSituacao()
+			getCmbs()
 			
 			// se existir agendamento os dados serão preenchidos ao carregar a página
 			if(agendamento){
@@ -180,7 +170,6 @@ if(isset($_POST['iAgendamento'])){
 						if(response.status == 'success'){
 							setDataProfissional(response.arrayData)
 							$('#dataAtendimento').focus()
-
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 						}
@@ -194,16 +183,16 @@ if(isset($_POST['iAgendamento'])){
 				let menssageError = ''
 				let servico = $('#servico').val()
 				let medico = $('#medico').val()
-				let data = $('#dataAtendimento').val()
-				let hora = $('#horaAtendimento').val()
-				let local = $('#localAtendimento').val()
+				let dataAtendimento = $('#dataAtendimento').val()
+				let horaAtendimento = $('#horaAtendimento').val()
+				let localAtendimento = $('#localAtendimento').val()
 
 				switch(menssageError){
 					case servico: menssageError = 'informe o serviço'; $('#servico').focus();break;
 					case medico: menssageError = 'informe o médico'; $('#medico').focus();break;
-					case data: menssageError = 'informe uma data'; $('#dataAtendimento').focus();break;
-					case hora: menssageError = 'informe o horário'; $('#horaAtendimento').focus();break;
-					case local: menssageError = 'informe o local de atendimento'; $('#localAtendimento').focus();break;
+					case dataAtendimento: menssageError = 'informe uma data'; $('#dataAtendimento').focus();break;
+					case horaAtendimento: menssageError = 'informe o horário'; $('#horaAtendimento').focus();break;
+					case localAtendimento: menssageError = 'informe o local de atendimento'; $('#localAtendimento').focus();break;
 					default: menssageError = ''; break;
 				}
 
@@ -220,9 +209,9 @@ if(isset($_POST['iAgendamento'])){
 						'tipoRequest': 'ADDSERVICO',
 						'servico': servico,
 						'medico': medico,
-						'data': data,
-						'hora': hora,
-						'local': local
+						'data': dataAtendimento,
+						'hora': horaAtendimento,
+						'local': localAtendimento
 					},
 					success: function(response) {
 						if(response.status  == 'success'){
@@ -354,14 +343,101 @@ if(isset($_POST['iAgendamento'])){
 			});
 		}
 
-		function setHoraProfissional(array){
-			$('#modalHora').html('').show();
-			$('#modalHora').html("<input id='horaAtendimento' name='horaAtendimento' type='text' class='form-control horaAtendimento' readonly aria-haspopup='true' aria-expanded='false' aria-readonly='false' aria-owns='P1503001435_root'>").show();
+		function setDataProfissional(arrayData){
+			$('#dataAgenda').html('')
+			$('#dataAgenda').html('<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">')
 
+			let array = arrayData?arrayData:undefined
+			// Events
+			$('#dataAtendimento').pickadate({
+				weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+				monthsFull: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+				monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+				today: '',
+				close: '',
+				clear: 'Limpar',
+				labelMonthNext: 'Próximo',
+				labelMonthPrev: 'Anterior',
+				labelMonthSelect: 'Escolha um mês na lista suspensa',
+				labelYearSelect: 'Escolha um ano na lista suspensa',
+				selectMonths: false,
+				selectYears: false,
+				showMonthsShort: true,
+				closeOnSelect: true,
+				closeOnClear: true,
+				formatSubmit: 'yyyy/mm/dd',
+				format: 'yyyy/mm/dd',
+				disable: array,
+				onStart: function() {
+					// console.log('onStart event')
+				},
+				onRender: function() {
+					$('.picker__day').each(function(){
+						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
+						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
+
+						if(hasClass){
+							$(this).addClass((hasSelected?
+							'':
+							'font-weight-bold text-black border'))
+						}
+					})
+				},
+				onOpen: function() {
+					$('.picker__day').each(function(){
+						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
+						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
+
+						if(hasClass){
+							$(this).addClass((hasSelected?
+							'':
+							'font-weight-bold text-black border'))
+						}
+					})
+				},
+				onClose: function() {
+					// console.log('onClose event')
+				},
+				onStop: function() {
+					// console.log('onStop event')
+				},
+				onSet: function(context) {
+					let data = new Date(context.select).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+					data = data.split(' ')[0]; // Formatando a string padrão: "dd/mm/yyyy HH:MM:SS" => "dd/mm/yyyy"
+					let iMedico = $('#medico').val();
+
+					$.ajax({
+						type: 'POST',
+						url: 'filtraAgendamento.php',
+						dataType: 'json',
+						data:{
+							'tipoRequest': 'SETHORAPROFISSIONAL',
+							'data': data,
+							'iMedico': iMedico
+						},
+						success: function(response) {
+							if(response.status == 'success'){
+								setHoraProfissional(response.arrayHora, response.intervalo)
+								$('#horaAtendimento').focus()
+							} else {
+								alerta(response.titulo, response.menssagem, response.status)
+							}
+						}
+					});
+					// $('#horaAtendimento').focus()
+				}
+			});
+		}
+
+		function setHoraProfissional(array,interv){
+			$('#modalHora').html('').show();
+			$('#modalHora').html('<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">');
+
+			let intervalo = interv?interv:30
 			// doc: https://amsul.ca/pickadate.js/time/
-			$('.horaAtendimento').pickatime({
+			$('#horaAtendimento').pickatime({
 				// Regras
-				interval: 30,
+				interval: intervalo,
 				disable: array?array:undefined,
 				// disable: [
 				// 	[1,30],
@@ -396,86 +472,11 @@ if(isset($_POST['iAgendamento'])){
 
 					// somente para atribuir à variável "dataHora" um valor do tipo DataTime
 					dataHora = new Date(dataHora).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
-					console.log(dataHora)
 				},
 				onStart: undefined,
 				onRender: undefined,
 				onOpen: undefined,
 				onClose: undefined,
-				onStop: undefined,
-			});
-		}
-
-		function setDataProfissional(array){
-			$('#modalData').html('').show();
-			$('#modalData').html("<input id='dataAtendimento' name='dataAtendimento' type='text' class='form-control dataAtendimento' readonly aria-haspopup='true' aria-expanded='false' aria-readonly='false' aria-owns='P1503001435_root'>").show();
-			
-			let arrayData = array?array:undefined;
-			// doc: https://amsul.ca/pickadate.js/date/#disable-dates
-			$('.dataAtendimento').pickadate({
-				// regras. OBS: a data mínima é a data atual.
-				// o mes começa em "0" ou seja: Janeiro => 0, Fevereiro => 1, etc.
-				min: undefined,
-				max: undefined,
-				disable: arrayData,
-				// disable: [true,[2022,6,20],[2022,6,22]],
-				
-				// strings
-				monthsFull: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-				monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 't', 'Out', 'Nov', 'Dez'],
-				weekdaysFull: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-				weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-
-				// botões
-				today: 'Hoje',
-				clear: '',
-				close: '',
-
-				// Labels
-				labelMonthNext: 'Seguinte',
-				labelMonthPrev: 'Anterior',
-				labelMonthSelect: 'Selecionar Mes',
-				labelYearSelect: 'Selecionar ano',
-
-				// Formats
-				format: 'dd/mm/yyyy',
-				formatSubmit: undefined,
-				hiddenPrefix: undefined,
-				hiddenSuffix: '_submit',
-				hiddenName: undefined,
-
-				// ações
-				onClose: function() {
-					$('#horaAtendimento').focus()
-				},
-				onSet: function(context) {
-					let data = new Date(context.select).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
-					data = data.split(' ')[0]; // Formatando a string padrão: "dd/mm/yyyy HH:MM:SS" => "dd/mm/yyyy"
-					let iMedico = $('#medico').val();
-					console.log(data)
-					$.ajax({
-						type: 'POST',
-						url: 'filtraAgendamento.php',
-						dataType: 'json',
-						data:{
-							'tipoRequest': 'SETHORAPROFISSIONAL',
-							'data': data,
-							'iMedico': iMedico
-						},
-						success: function(response) {
-							if(response.status == 'success'){
-								setHoraProfissional(response.arrayHora)
-								$('#horaAtendimento').focus()
-							} else {
-								alerta(response.titulo, response.menssagem, response.status)
-							}
-						}
-					});
-					$('#horaAtendimento').focus()
-				},
-				onStart: undefined,
-				onRender: undefined,
-				onOpen: undefined,
 				onStop: undefined,
 			});
 		}
@@ -694,7 +695,7 @@ if(isset($_POST['iAgendamento'])){
 			<?php include_once("cabecalho.php"); ?>	
 
 			<!-- Content area -->
-			<div class="content">	
+			<div class="content">
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="card">
@@ -778,17 +779,11 @@ if(isset($_POST['iAgendamento'])){
 											<!--  -->
 										</select>
 									</div>
-									<div id="modalData" class="col-lg-3">
-										<input id="dataAtendimento" name="dataAtendimento" type="text"
-										class="form-control dataAtendimento" readonly aria-haspopup="true" aria-expanded="false"
-										aria-readonly="false" aria-owns="P1503001435_root">
-										<!-- <input id="dataAtendimento" name="dataAtendimento" type="date" class="form-control" required> -->
+									<div id="dataAgenda" class="col-lg-3 input-group">
+										<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">
 									</div>
-									<div id="modalHora" class="col-lg-2">
-										<input id="horaAtendimento" name="horaAtendimento" type="text"
-										class="form-control horaAtendimento" readonly 
-										aria-haspopup="true" aria-expanded="false" aria-readonly="false" aria-owns="P1503001435_root">
-										<!-- <input id="horaAtendimento" type="time" class="form-control" value="" required> -->
+									<div id="modalHora" class="col-lg-2">										
+										<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
 									</div>
 									<div class="col-lg-2">
 										<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2" required>

@@ -20,7 +20,9 @@ try{
 
 	if($tipoRequest == 'PROFISSIONAIS'){
 		$sql = "SELECT ProfiId,ProfiNome
-		FROM Profissional WHERE ProfiUnidade = $iUnidade";
+				FROM Profissional
+				JOIN Situacao on SituaId = ProfiStatus
+				WHERE ProfiUnidade = $iUnidade and SituaChave = 'ATIVO' ";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 		
@@ -102,15 +104,16 @@ try{
 		$arrayAgenda = [];
 
 		foreach($arrayHora as $horario){
-			$sql = "SELECT AtXSeId,AtXSeData,AtXSeHorario,AtLocNome,ClienNome,SrVenNome
-				FROM AtendimentoXServico
-				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
-				LEFT JOIN Cliente ON ClienId = AtendCliente
-				LEFT JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
-				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
-				WHERE AtXSeProfissional = $iProfissional and AtXSeData = '$data' and AtXSeUnidade = $iUnidade
-				and AtXSeHorario like '%$horario%'
-				ORDER BY AtXSeHorario";
+			$sql = "SELECT AtXSeId,AtXSeData,AtXSeHorario,AtLocNome,ClienNome,SrVenNome,SituaNome
+					FROM AtendimentoXServico
+					LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
+					LEFT JOIN Cliente ON ClienId = AtendCliente
+					LEFT JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
+					LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+					JOIN Situacao on SituaId = AtendSituacao
+					WHERE AtXSeProfissional = $iProfissional and AtXSeData = '$data' and AtXSeUnidade = $iUnidade
+					and AtXSeHorario like '%$horario%'
+					ORDER BY AtXSeHorario";
 			$result = $conn->query($sql);
 			$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -122,13 +125,17 @@ try{
 						$item['AtLocNome']?$item['AtLocNome']:'',
 						$item['ClienNome']?$item['ClienNome']:'',
 						$item['SrVenNome']?$item['SrVenNome']:'',
+						$item['SituaNome']?$item['SituaNome']:'',
 						'',
 					]);
 				}
 			} else {
+				$horario = str_pad($horario,2,0,STR_PAD_LEFT);
+				$horario = str_pad($horario,5,":00",STR_PAD_RIGHT);
 				array_push($arrayAgenda, [
 					$data,
-					$horario.':00',
+					$horario,
+					'',
 					'',
 					'',
 					'',
@@ -143,6 +150,49 @@ try{
 			'titulo' => 'Agenda',
 			'menssagem' => 'Agenda encontrada!!!',
 		]);
+	}else if($tipoRequest == 'DADOSPROFISSIONAL'){
+
+		$iProfissional = $_POST['iProfissional'];
+
+		if($iProfissional){
+			$sql = "SELECT ProfiId, ProfiNome, ProfiNumConselho, ProfiCelular, PrConNome, EspecNome
+					FROM Profissional
+					LEFT JOIN ProfissionalConselho ON PrConId = ProfiConselho
+					LEFT JOIN Especialidade ON EspecId = ProfiEspecialidade
+					WHERE ProfiId = ".$iProfissional ;
+			$result = $conn->query($sql);
+			$row = $result->fetch(PDO::FETCH_ASSOC);
+			$count = count($row);
+			
+		
+
+			if($count){
+
+				print('
+					<div class="form-group" style="border: 1px solid #ccc; background-color:#F1F1F1; margin-right: 10px ">
+						<div class="row" style="margin-top: 10px;">
+							<div class="col-lg-2">	
+								<p style="margin-right:10px; margin-left: 10px"><b> Dr. '.$row['ProfiNome'].'</b> </p>
+							</div>
+							<div class="col-lg-2">	
+								<p style="margin-right:10px; margin-left: 10px"><b>'.$row['PrConNome'].': '.$row['ProfiNumConselho'].'</b> </p>
+							</div>
+							<div class="col-lg-2">		
+								<p style="margin-right:10px; margin-left: 10px"><b>Celular: '.$row['ProfiCelular'].'</b> </p>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-12">	
+								<p style="margin-right:10px; margin-left: 10px">Especialidades: '.$row['EspecNome'].' </p>
+							</div>
+						</div>
+					</div>
+				');
+					
+			} else{
+				echo 0;
+			}
+		}	
 	}
 }catch(PDOException $e) {
 	$msg = '';

@@ -25,20 +25,20 @@
 				let URL = ''
 
 				switch(tipo){
-					case 'atendimentoEletivo': URL = 'atendimentoEletivo.php'; break;
-					case 'receituario': URL = 'atendimentoReceituario.php'; break;
-					case 'atestadoMedico': URL = 'atendimentoAtestadoMedico.php'; break;
-					case 'historicoPaciente': URL = 'atendimentoHistoricoPaciente.php'; break;
-					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; break;
-					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; break;
-					case 'triagem': URL = 'atendimentoTriagem.php'; break;
-					case 'atendimentoAmbulatorial': URL = 'atendimentoAmbulatorial.php'; break;
-					case 'exportacaoProntuario': URL = 'atendimentoProntuarioExportacao.php'; break;
+					case 'atendimentoEletivo': URL = 'atendimentoEletivo.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'receituario': URL = 'atendimentoReceituario.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'atestadoMedico': URL = 'atendimentoAtestadoMedico.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'historicoPaciente': URL = 'atendimentoHistoricoPaciente.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'triagem': URL = 'atendimentoTriagem.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'atendimentoAmbulatorial': URL = 'atendimentoAmbulatorial.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'exportacaoProntuario': URL = 'atendimentoProntuarioExportacao.php'; $('#dadosPost').attr('target', '_blank'); break;
+					case 'tabelaGastos': URL = 'atendimentoTabelaGastos.php'; $('#dadosPost').attr('target', '_self'); break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
 				$('#dadosPost').attr('method', 'POST')
-				//$('#dadosPost').attr('target', '_blank');
 				$('#dadosPost').submit()
 			})
 		})

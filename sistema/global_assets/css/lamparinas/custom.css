@@ -21,6 +21,11 @@ Copyright (c) 2018 Carlos Victor
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
+.bg-gray-agenda{
+    background-color: #f2f2f2;
+    color: black !important;
+}
+
 .form-control-border-off {
 	display: block;
     width: 100%;
