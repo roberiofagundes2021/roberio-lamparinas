@@ -308,9 +308,9 @@ if(isset($_POST['inputAtendimentoId'])) {
                         valorTotal = (valorTotal != null) ?  float2moeda(valorTotal) : float2moeda(0);
                         descontoTotal = (descontoTotal != null) ?  float2moeda(descontoTotal) : float2moeda(0);
                         
-                        $("#valorTotal").text("R$ " + valorTotal);
-                        $("#desconto").text("R$ " + descontoTotal);
-                        $("#valorFinal").text("R$ " + valorFinal);
+                        $("#valorTotal").text(valorTotal);
+                        $("#desconto").text(descontoTotal);
+                        $("#valorFinal").text(valorFinal);
                     }
                 })
             })
@@ -692,6 +692,9 @@ if(isset($_POST['inputAtendimentoId'])) {
         }
         .valorTotalEDesconto {
             font-size: 2.5625rem;
+            border: 1px solid #ccc;
+            float: right;
+            min-width: 300px;
         }
 
         .valorFinal {
@@ -723,7 +726,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                         <div class="card-header header-elements" style="background-color: #355370">
                             <div class="row text-white">
                                 <div class="col-6">
-                                    <h2 class="card-title" style="color: #ccc"><b>PDV - <?php echo  $_SESSION['UnidadeNome']; ?></b></h2>
+                                    <h3 class="card-title" style="color: #FFFFFF">PDV - <?php echo  $_SESSION['UnidadeNome']; ?></h3>
                                 </div>
 
                                 <div class="col-3" style="padding-top: 5px;">
@@ -740,7 +743,7 @@ if(isset($_POST['inputAtendimentoId'])) {
 
                             <div class="row" style="padding: 20px 5px 15px 2px">
                                 
-                                <div class="col-4">
+                                <div class="col-3">
 
                                     <div style="background-color:#fff; padding: 20px;">
 
@@ -766,25 +769,43 @@ if(isset($_POST['inputAtendimentoId'])) {
                                             </select>
                                         </div>     
                                     </div>
-                                    <div style="background-color:#ccc; padding: 20px;">
-                                        <h1 class="text-right pr-3">Valor Total</h1>
-                                        <div class="d-flex justify-content-end text-right pr-3">
-                                            <h1 id="valorTotal" class="bg-white w-50 p-1 valorTotalEDesconto">R$ 0,00</h1>
+                                    <div style="background-color:#eee; padding: 20px; min-height: 303px; text-align: right">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h1 class="text-right pr-3">Valor Total (R$)</h1>
+                                                <div class="justify-content-end text-right pr-3">
+                                                    <h1 id="valorTotal" class="p-1 bg-white valorTotalEDesconto">0,00</h1>
+                                                </div>                                                
+                                            </div>
+                                        </div>     
+                                        <div class="row">                           
+                                            <div class="col-12">
+                                                <h1 class="text-right pr-3">Desconto (R$)</h1>
+                                                <div class="justify-content-end text-right pr-3">
+                                                    <h1 id="desconto" class="text-right p-1 bg-white valorTotalEDesconto">0,00</h1>
+                                                </div>
+                                            </div>
                                         </div>
-
-                                        <h1 class="text-right pr-3">Desconto</h1>
-                                        <div class="d-flex justify-content-end text-right pr-3">
-                                            <h1 id="desconto" class="text-right bg-white w-50 p-1 valorTotalEDesconto">R$ 0,00</h1>
+                                        <hr/>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h1 class="text-right pr-3">Total à Receber (R$)</h1>
+                                                <div class="justify-content-end text-right pr-3">
+                                                    <h1 id="valorFinal" class="text-right p-1 bg-white text-orange valorTotalEDesconto">0,00</h1>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <div class="col-8 d-flex justify-content-end text-right mt-3" style="padding-right: 10px;">
-                                        <h1 id="valorFinal" class="text-right bg-white text-orange p-3 valorFinal">R$ 0,00</h1>
+                                    <div class="row">
+                                        <div class="col-lg-12 mt-3 text-left">
+                                            <a href="caixaMovimentacao.php" class="btn bg-slate-700 legitRipple">Movimentação</a>
+                                            <a href="#" class="btn bg-slate-700 legitRipple" id="btnRetirada" data-toggle="modal" data-target="#modal_small_Retirada_Caixa">Retirada</a>
+                                        </div>	
                                     </div>
                                 </div>
                                 
-                                <div class="col-8">
-                                    <div class="p-4 bg-white" style="min-height:448px;">
+                                <div class="col-9">
+                                    <div class="p-4 bg-white" style="min-height:628px;">
                                         <table id="tblAtendimento" class="table">
                                             <thead>
                                                 <tr class="bg-slate">
@@ -803,18 +824,11 @@ if(isset($_POST['inputAtendimentoId'])) {
                                             <img src="https://lamparinas.com.br/wp-content/uploads/2021/10/Logo_Novo_Site-1536x491.png" style="max-width: 300px;" />
                                         </div>
 
-                                        <div class="col-lg-8 text-right">
+                                        <div class="col-lg-8 mt-3 text-right">
                                             <button id="btnFinalizar" class="btn btn-principal legitRipple btn-lg" style="font-size: 2rem;">Finalizar</button>
                                         </div>	
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-lg-6 text-left">
-                                    <a href="caixaMovimentacao.php" class="btn btn-principal legitRipple">Movimentação</a>
-                                    <a href="#" class="btn btn-principal legitRipple" id="btnRetirada" data-toggle="modal" data-target="#modal_small_Retirada_Caixa">Retirada</a>
-                                </div>	
                             </div>
                         </div>
                     </div>
