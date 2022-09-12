@@ -694,7 +694,7 @@ if(isset($_POST['inputAtendimentoId'])) {
             font-size: 2.5625rem;
             border: 1px solid #ccc;
             float: right;
-            min-width: 300px;
+            min-width: 250px;
         }
 
         .valorFinal {
@@ -743,7 +743,7 @@ if(isset($_POST['inputAtendimentoId'])) {
 
                             <div class="row" style="padding: 20px 5px 15px 2px">
                                 
-                                <div class="col-3">
+                                <div class="col-lg-4 col-md-6 col-sm-12">
 
                                     <div style="background-color:#fff; padding: 20px;">
 
@@ -773,7 +773,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                                         <div class="row">
                                             <div class="col-12">
                                                 <h1 class="text-right pr-3">Valor Total (R$)</h1>
-                                                <div class="justify-content-end text-right pr-3">
+                                                <div class="text-right pr-3">
                                                     <h1 id="valorTotal" class="p-1 bg-white valorTotalEDesconto">0,00</h1>
                                                 </div>                                                
                                             </div>
@@ -781,7 +781,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                                         <div class="row">                           
                                             <div class="col-12">
                                                 <h1 class="text-right pr-3">Desconto (R$)</h1>
-                                                <div class="justify-content-end text-right pr-3">
+                                                <div class="text-right pr-3">
                                                     <h1 id="desconto" class="text-right p-1 bg-white valorTotalEDesconto">0,00</h1>
                                                 </div>
                                             </div>
@@ -790,7 +790,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                                         <div class="row">
                                             <div class="col-12">
                                                 <h1 class="text-right pr-3">Total à Receber (R$)</h1>
-                                                <div class="justify-content-end text-right pr-3">
+                                                <div class="text-right pr-3">
                                                     <h1 id="valorFinal" class="text-right p-1 bg-white text-orange valorTotalEDesconto">0,00</h1>
                                                 </div>
                                             </div>
@@ -804,7 +804,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                                     </div>
                                 </div>
                                 
-                                <div class="col-9">
+                                <div class="col-lg-8 col-md-6 col-sm-12">
                                     <div class="p-4 bg-white" style="min-height:628px;">
                                         <table id="tblAtendimento" class="table">
                                             <thead>
