@@ -623,16 +623,17 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                     <div class="col-lg-12">
                         <!-- Basic responsive configuration -->
                         <div class="card">
-                            <div class="card-header text-center">
-                                <h3 class="card-title">Fechamento de Caixa</h3>
-                                <br>
+                            <div class="card-header bg-white" >
+                                <div class="row d-flex ">
+                                    <div class="col-lg-8">
+                                        <h3 class="card-title">Fechamento de Caixa</h3>
+                                    </div>
 
-                                <div class="row d-flex justify-content-center">
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2" style="margin-top: 5px;">
                                         <h5>Data: <?php echo date('d/m/Y'); ?>
                                     </div>
-    
-                                    <div class="col-lg-3">
+
+                                    <div class="col-lg-2" style="margin-top: 5px;">
                                         <h5>Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?></h5>
                                     </div>
                                 </div>
