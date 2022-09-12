@@ -562,6 +562,10 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				}
 			});
 		}
+
+		function submeterAgendaMedica(){ 
+			document.formAgendaMedica.submit();
+		}
 	</script>
 
 </head>
@@ -606,8 +610,11 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 										</div>
 										<div class="col-lg-4 text-right">
 											<div class="text-right">
-												<a href="agendaMedica.php" class="btn" role="button">Agenda médica</a>
-												<a href="atendimentoNovo.php" class="btn btn-principal" role="button">Novo Atendimento</a>
+												<a href="#" onclick="submeterAgendaMedica()" class="btn" role="button">Agenda médica</a>
+												<?php 
+                                                    echo $inserir?"<a href='atendimentoNovo.php' class='btn btn-principal' role='button'>Novo Atendimento</a>":"";
+												?>
+												
 												<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
 													<i class="icon-printer2"></i>																						
 												</a>
@@ -822,8 +829,8 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				?>
 
 				<!-- Agenda Médica -->
-				<form id="formAgendaMedica" method="POST" action="agendaMedica.php">
-					<input id="iOrigem" name="iOrigem" type="hidden" value="atendimento.php" />
+				<form name="formAgendaMedica" id="formAgendaMedica" method="POST" action="agendaMedica.php">
+					<input id="inputOrigem" name="inputOrigem" type="hidden" value="atendimento.php" />
 				</form>
 			</div>
 			<?php include_once("footer.php"); ?>

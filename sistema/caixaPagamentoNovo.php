@@ -109,8 +109,10 @@ if($saldoAtual > $valorRetirado) {
                         ':fValorRecebido' => $valorRetirado,
                         ':iCaixaAberturaId' => $aberturaCaixaId 
                 ));
+
+                $idCaixaPagamento = $conn->lastInsertId();
                 
-                $resposta = 'Foi';
+                $resposta = $idCaixaPagamento;
 
                 $conn->commit();
                             

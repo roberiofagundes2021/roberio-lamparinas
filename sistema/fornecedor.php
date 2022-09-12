@@ -173,13 +173,6 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação de Fornecedores</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="fornecedor.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
@@ -195,7 +188,9 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 												</a>
 											</div>
 											<div>
-												<a href="fornecedorNovo.php" class="btn btn-principal" role="button">Novo Fornecedor</a>
+												<?php 
+													echo $inserir?"<a href='fornecedorNovo.php' class='btn btn-principal' role='button'>Novo Fornecedor</a>":"";
+												?>
 											</div>
 										</div>
 

@@ -707,7 +707,9 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     <div class="text-right col-lg-4 pt-3">
                       <button id="submitPesquisar" class="btn btn-principal">Pesquisar</button>
 
-                      <button id="novoLacamento" class="btn btn-outline bg-slate-600 text-slate-600 border-slate">Novo Lançamento</button>
+											<?php 
+												echo $inserir?"<button id='novoLacamento' class='btn btn-outline bg-slate-600 text-slate-600 border-slate'>Novo Lançamento</button>":"";
+											?>
 
                       <button id="imprimir" class="btn bg-secondary"><i class="icon-printer2"></i></button>
                     </div>

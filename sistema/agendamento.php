@@ -309,7 +309,9 @@ include('global_assets/php/conexao.php');
 									<div class="col-lg-4 text-right">
 										<div class="text-right">
 											<a href="#" onclick="submeterAgendaMedica()" class="btn" role="button">Agenda médica</a>
-											<a href="agendamentoNovo.php" class="btn btn-principal" role="button">Novo Agendamento</a>
+											<?php 
+												echo $inserir?"<a href='agendamentoNovo.php' class='btn btn-principal' role='button'>Novo Agendamento</a>":"";
+											?>
 											<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
 												<i class="icon-printer2"></i>																						
 											</a>
@@ -404,7 +406,7 @@ include('global_assets/php/conexao.php');
 					<input id="iAgendamento" name="iAgendamento" type="hidden" value="" />
 				</form>
 
-				<!-- Agenda Médica -->
+				<!-- Agenda Médica --> 
 				<form name="formAgendaMedica" id="formAgendaMedica" method="POST" action="agendaMedica.php">
 					<input id="inputOrigem" name="inputOrigem" type="hidden" value="agendamento.php" />
 				</form>
