@@ -180,7 +180,7 @@ $count = count($row);
 					<div class="col-lg-12">
 						<!-- Basic responsive configuration -->
 						<div class="card">
-							<div class="card-header header-elements-inline">
+							<div class="card-header bg-white header-elements-inline">
 								<h3 class="card-title">Relação de Empresas</h3>
 								<div class="header-elements">
 									<div class="list-icons">
