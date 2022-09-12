@@ -1227,15 +1227,8 @@ if($iAtendimento){
 				<div class="row">
 					<div class="col-lg-12">
 						<div class="card">
-							<div class="card-header bg-white header-elements-inline">
-								<h3 class="card-title">Cadastro do novo atendimento</h3>
-								<div class="header-elements">
-									<!-- <div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a class="list-icons-item" data-action="reload"></a>
-										<a class="list-icons-item" data-action="remove"></a>
-									</div> -->
-								</div>
+							<div class="card-header header-elements-inline" style="margin-left:10px;">
+								<h5 class="text-uppercase font-weight-bold">Cadastro de Atendimento</h5>
 							</div>
 
 							<form class="wizard-form steps-validation" action="#" data-fouc>
@@ -1263,20 +1256,12 @@ if($iAtendimento){
 							todo o efeito de fadeIn e fadeOut dos componentes e páginas são feitos em JavaScript de 
 							acordo com a seleção do usuário
 						-->
-						<div class="card p-4">
+						<div class="card">
 							<div id="dados">
 								<form id="dadosPaciente" class="form-validate-jquery" action="#" data-fouc>
-									<div class="card-header header-elements-inline">
-										<h3 class="card-title">Cadastro de Paciente</h3>
-										<div class="header-elements">
-											<div class="list-icons">
-												<!-- <a class="list-icons-item" data-action="collapse"></a> -->
-												<!-- <a href="fornecedor.php" class="list-icons-item" data-action="reload"></a> -->
-												<!--<a class="list-icons-item" data-action="remove"></a>-->
-											</div>
-										</div>
+									<div class="card-header header-elements-inline" style="margin-left:10px;">
+										<h5 class="text-uppercase font-weight-bold">Cadastro de Paciente</h5>
 									</div>
-								
 									<div class="col-12 row text-center justify-content-center mb-5" id="selectPaciente">
 										<div class="col-lg-12 my-3 text-black-50">
 											<h5>Selecione o paciente</h5>
@@ -1294,17 +1279,9 @@ if($iAtendimento){
 									</div>
 								</form>
 								<form id="dadosResponsavel" class="form-validate-jquery" action="#" data-fouc>
-									<div class="card-header header-elements-inline">
-										<h3 class="card-title">Cadastro de Responsável</h3>
-										<div class="header-elements">
-											<div class="list-icons">
-												<!-- <a class="list-icons-item" data-action="collapse"></a> -->
-												<!-- <a href="fornecedor.php" class="list-icons-item" data-action="reload"></a> -->
-												<!--<a class="list-icons-item" data-action="remove"></a>-->
-											</div>
-										</div>
+									<div class="card-header header-elements-inline" style="margin-left:10px;">
+										<h5 class="text-uppercase font-weight-bold">Cadastro de Responsável</h5>
 									</div>
-									
 									<div class="col-12 row text-center justify-content-center mb-5" id="selectResponsavel">
 										<div class="col-lg-12 my-3 text-black-50">
 											<h5>Selecione o responsável</h5>
@@ -1321,161 +1298,394 @@ if($iAtendimento){
 									</div>
 								</form>
 								<form id="dadosAtendimento" class="form-validate-jquery" action="#" data-fouc>
-									<div class="card-header header-elements-inline">
-										<h3 class="card-title">Cadastro de Atendimento</h3>
-										<div class="header-elements">
-											<div class="list-icons">
-												<!-- <a class="list-icons-item" data-action="collapse"></a> -->
-												<!-- <a href="fornecedor.php" class="list-icons-item" data-action="reload"></a> -->
-												<!--<a class="list-icons-item" data-action="remove"></a>-->
+									<div class="card-header header-elements-inline" style="margin-left:10px;">
+										<h5 class="text-uppercase font-weight-bold">Cadastro de Atendimento</h5>
+									</div>
+									<div class="card-body">
+										<div class="col-lg-12 mb-4 row mt-4">
+											<!-- titulos -->
+											<?php
+												if($iAtendimento){
+													echo "
+														<div class='col-lg-2'>
+															<label>Nº Registro</label>
+														</div>
+														<div class='col-lg-4'>
+															<label>Data do Registro</label>
+														</div>
+														<div class='col-lg-2'>
+															<label>Modalidade <span class='text-danger'>*</span></label>
+														</div>
+														<div class='col-lg-4'>
+															<label>Classificação do Atendimento <span class='text-danger'>*</span></label>
+														</div>
+
+														<!-- campos -->
+														<div class='col-lg-2'>
+															<input id='numeroRegistro' name='numeroRegistro' type='text' class='form-control' placeholder='Nº Registro' readOnly value='$row[AtendNumRegistro]'>
+														</div>
+														<div class='col-lg-4'>
+															<input id='dataRegistro' name='dataRegistro' type='date' class='form-control' placeholder='Nome' readOnly>
+														</div>
+														<div class='col-lg-2'>
+															<select id='modalidade' name='modalidade' class='select-search' required>
+																<option value='' selected>selecionar</option>
+															</select>
+														</div>
+														<div class='col-lg-4'>
+															<select id='classificacao' name='classificacao' class='select-search' required>
+																<option value='' selected>selecionar</option>
+															</select>
+														</div>";
+												} else {
+													echo "
+														<div class='col-lg-4'>
+															<label>Data do Registro</label>
+														</div>
+														<div class='col-lg-4'>
+															<label>Modalidade <span class='text-danger'>*</span></label>
+														</div>
+														<div class='col-lg-4'>
+															<label>Classificação do Atendimento <span class='text-danger'>*</span></label>
+														</div>
+
+														<!-- campos -->
+														<div class='col-lg-4'>
+															<input id='dataRegistro' name='dataRegistro' type='date' class='form-control' placeholder='Nome' readOnly>
+														</div>
+														<div class='col-lg-4'>
+															<select id='modalidade' name='modalidade' class='select-search' required>
+																<option value='' selected>selecionar</option>
+															</select>
+														</div>
+														<div class='col-lg-4'>
+															<select id='classificacao' name='classificacao' class='select-search' required>
+																<option value='' selected>selecionar</option>
+															</select>
+														</div>";
+												}
+											?>
+										</div>
+
+										<div class="col-lg-12 my-3 text-black-50">
+											<h5 class="mb-0 font-weight-semibold">Serviços</h5>
+										</div>
+
+										<div class="col-lg-12 mb-4 row">
+											<!-- titulos -->
+											<div class="col-lg-2">
+												<label>Serviço</label>
+											</div>
+											<div class="col-lg-2">
+												<label>Médicos</label>
+											</div>
+											<div class="col-lg-3">
+												<label>Data do Atendimento</label>
+											</div>
+											<div class="col-lg-2">
+												<label>Horário</label>
+											</div>
+											<div class="col-lg-2">
+												<label>Local do Atendimento</label>
+											</div>
+
+											<!-- campos -->
+											<div class="col-lg-2">
+												<select id="servico" name="servico" class="select-search">
+													<option value="" selected>selecionar</option>
+												</select>
+											</div>
+											<div class="col-lg-2">
+												<select id="medicos" name="medicos" class="select-search">
+													<option value="" selected>selecionar</option>
+												</select>
+											</div>
+											<div id="dataAgenda" class="col-lg-3 input-group">
+												<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">
+											</div>
+											<div id="modalHora" class="col-lg-2">										
+												<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
+											</div>
+											<div class="col-lg-2">
+												<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2">
+													<option value="" selected>selecionar</option>
+												</select>
+											</div>
+											<!-- btnAddServico -->
+											<div class="col-lg-1 text-right">
+												<button id="incluirServico" class="btn btn-lg btn-principal" data-tipo="INCLUIRSERVICO" >
+													<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
+												</button>
+											</div>
+										</div>
+
+										<div class="col-lg-12">
+											<table class="table" id="servicoTable">
+												<thead>
+													<tr class="bg-slate text-center">
+														<th>Procedimento</th>
+														<th>Médico</th>
+														<th>Data do Atendimento</th>
+														<th>Horário</th>
+														<th>Local</th>			
+														<th>Valor</th>
+														<th class="text-center">Ações</th>
+													</tr>
+												</thead>
+												<tbody id="dataServico">
+													
+												</tbody>
+												<tfoot>
+													<tr>
+														<th colspan="5" class="text-right font-weight-bold" style="font-size: 16px;">
+															<div>Valor(R$):</div>
+														</th>
+														<th colspan="1" class="mr-1">
+															<div id="servicoValorTotal" class="text-center font-weight-bold" style="font-size: 15px;">R$ 0,00</div>
+														</th>
+													</tr>
+												</tfoot>
+											</table>
+										</div>
+
+										<div class="col-lg-12 mb-4 row">
+											<!-- titulos -->
+											<div class="col-lg-12">
+												<label>Observação</label>
+											</div>
+
+											<!-- campos -->
+											<div class="col-lg-12">
+												<textarea id="observacaoAtendimento" name="observacaoAtendimento" class="form-control" placeholder="Observações"></textarea>
 											</div>
 										</div>
 									</div>
-									
-									<div class="col-lg-12 mb-4 row mt-4">
-										<!-- titulos -->
-										<?php
-											if($iAtendimento){
-												echo "
-													<div class='col-lg-2'>
-														<label>Nº Registro</label>
-													</div>
-													<div class='col-lg-4'>
-														<label>Data do Registro</label>
-													</div>
-													<div class='col-lg-2'>
-														<label>Modalidade <span class='text-danger'>*</span></label>
-													</div>
-													<div class='col-lg-4'>
-														<label>Classificação do Atendimento <span class='text-danger'>*</span></label>
-													</div>
+								</form>
+							</div>
+						</div>
 
-													<!-- campos -->
-													<div class='col-lg-2'>
-														<input id='numeroRegistro' name='numeroRegistro' type='text' class='form-control' placeholder='Nº Registro' readOnly value='$row[AtendNumRegistro]'>
-													</div>
-													<div class='col-lg-4'>
-														<input id='dataRegistro' name='dataRegistro' type='date' class='form-control' placeholder='Nome' readOnly>
-													</div>
-													<div class='col-lg-2'>
-														<select id='modalidade' name='modalidade' class='select-search' required>
-															<option value='' selected>selecionar</option>
-														</select>
-													</div>
-													<div class='col-lg-4'>
-														<select id='classificacao' name='classificacao' class='select-search' required>
-															<option value='' selected>selecionar</option>
-														</select>
-													</div>";
-											} else {
-												echo "
-													<div class='col-lg-4'>
-														<label>Data do Registro</label>
-													</div>
-													<div class='col-lg-4'>
-														<label>Modalidade <span class='text-danger'>*</span></label>
-													</div>
-													<div class='col-lg-4'>
-														<label>Classificação do Atendimento <span class='text-danger'>*</span></label>
-													</div>
+						<div id="informacoes" class="card ">
+							<div id="novoPaciente" class="">
+								<div class="card-header header-elements-inline" style="margin-left:10px;">
+									<h5 class="text-uppercase font-weight-bold">Dados Pessoais do paciente</h5>
+								</div>
+								<div class="card-body">
+									<div class="row" style="margin-left:2px;">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<div class="form-check form-check-inline">
+													<input class="form-input-styled" id="fisica" name="pessoaTipo" type="radio" checked />
+													<label class="form-check-label" for="fisica">Física</label>
+												</div>
 
-													<!-- campos -->
-													<div class='col-lg-4'>
-														<input id='dataRegistro' name='dataRegistro' type='date' class='form-control' placeholder='Nome' readOnly>
-													</div>
-													<div class='col-lg-4'>
-														<select id='modalidade' name='modalidade' class='select-search' required>
-															<option value='' selected>selecionar</option>
-														</select>
-													</div>
-													<div class='col-lg-4'>
-														<select id='classificacao' name='classificacao' class='select-search' required>
-															<option value='' selected>selecionar</option>
-														</select>
-													</div>";
-											}
-										?>
-									</div>
+												<div class="form-check form-check-inline">
+													<input class="form-input-styled" id="juridica" name="pessoaTipo" type="radio" />
+													<label class="form-check-label" for="juridica">Jurídica</label>
+												</div>
+											</div>
+										</div>	
+									</div>										
 
 									<div class="col-lg-12 my-3 text-black-50">
-										<h5>Serviços</h5>
+										<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>Prontuário <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Nome <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>CPF <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>CNS</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="prontuario" name="prontuario" type="text" class="form-control" placeholder="Prontuário Eletrônico" readonly>
+										</div>
+										<div class="col-lg-3">
+											<input id="nome" name="nome" type="text" class="form-control" placeholder="Nome completo" required>
+										</div>
+										<div class="col-lg-3">
+											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required>
+										</div>
+										<div class="col-lg-3">
+											<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS">
+										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-2">
-											<label>Serviço</label>
-										</div>
-										<div class="col-lg-2">
-											<label>Médicos</label>
+											<label>RG <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-3">
-											<label>Data do Atendimento</label>
+											<label>Emissor <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-2">
-											<label>Horário</label>
+											<label>UF <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-2">
-											<label>Local do Atendimento</label>
+											<label>Sexo <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Data de Nascimento <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-2">
-											<select id="servico" name="servico" class="select-search">
+											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG" required >
+										</div>
+										<div class="col-lg-3">
+											<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor" required >
+										</div>
+										<div class="col-lg-2">
+											<select id="uf" name="uf" class="select-search" required >
 												<option value="" selected>selecionar</option>
+												<option value='BA'>BA</option>
 											</select>
 										</div>
 										<div class="col-lg-2">
-											<select id="medicos" name="medicos" class="select-search">
+											<select id="sexo" name="sexo" class="form-control form-control-select2" required >
 												<option value="" selected>selecionar</option>
+												<option value="M">Masculino</option>
+												<option value="F">Feminino</option>
 											</select>
 										</div>
-										<div id="dataAgenda" class="col-lg-3 input-group">
-											<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">
-										</div>
-										<div id="modalHora" class="col-lg-2">										
-											<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
-										</div>
-										<div class="col-lg-2">
-											<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2">
-												<option value="" selected>selecionar</option>
-											</select>
-										</div>
-										<!-- btnAddServico -->
-										<div class="col-lg-1 text-right">
-											<button id="incluirServico" class="btn btn-lg btn-principal" data-tipo="INCLUIRSERVICO" >
-												<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
-											</button>
+										<div class="col-lg-3">
+											<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa" required >
 										</div>
 									</div>
 
-									<div class="col-lg-12">
-										<table class="table" id="servicoTable">
-											<thead>
-												<tr class="bg-slate text-center">
-													<th>Procedimento</th>
-													<th>Médico</th>
-													<th>Data do Atendimento</th>
-													<th>Horário</th>
-													<th>Local</th>			
-													<th>Valor</th>
-													<th class="text-center">Ações</th>
-												</tr>
-											</thead>
-											<tbody id="dataServico">
-												
-											</tbody>
-											<tfoot>
-												<tr>
-													<th colspan="5" class="text-right font-weight-bold" style="font-size: 16px;">
-														<div>Valor(R$):</div>
-													</th>
-													<th colspan="1" class="mr-1">
-														<div id="servicoValorTotal" class="text-center font-weight-bold" style="font-size: 15px;">R$ 0,00</div>
-													</th>
-												</tr>
-											</tfoot>
-										</table>
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-6">
+											<label>Nome do Pai <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-6">
+											<label>Nome da Mãe <span class="text-danger">*</span></label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-6">
+											<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai" required >
+										</div>
+										<div class="col-lg-6">
+											<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe" required >
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-12">
+											<label>Profissão <span class="text-danger">*</span></label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-12">
+											<select id="profissao" name="profissao" class="form-control form-control-select2" required >
+												<option selected value="">selecionar</option>
+												<option value="1">Teste</option>
+											</select>
+										</div>
+									</div>
+
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5 class="mb-0 font-weight-semibold">Endereço do Paciente</h5>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>CEP <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-4">,
+											<label>Endereço <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-2">
+											<label>Nº <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Complemento</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="cep" name="cep" type="text" class="form-control" placeholder="CEP" required >
+										</div>
+										<div class="col-lg-4">
+											<input id="endereco" name="endereco" type="text" class="form-control" placeholder="EX.: Rua, Av" required >
+										</div>
+										<div class="col-lg-2">
+											<input id="numero" name="numero" type="text" class="form-control" placeholder="Número" required >
+										</div>
+										<div class="col-lg-3">
+											<input id="complemento" name="complemento" type="text" class="form-control" placeholder="Complemento" >
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Bairro <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-4">
+											<label>Cidade <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-4">
+											<label>Estado <span class="text-danger">*</span></label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="bairro" name="bairro" type="text" class="form-control" placeholder="Bairro" required >
+										</div>
+										<div class="col-lg-4">
+											<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade" required >
+										</div>
+										<div class="col-lg-4">
+											<input id="estado" name="estado" type="text" class="form-control" placeholder="Estado" required >
+										</div>
+									</div>
+
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5 class="mb-0 font-weight-semibold">Contato</h5>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>Nome <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Telefone <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Celular <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>E-mail <span class="text-danger">*</span></label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato" required >
+										</div>
+										<div class="col-lg-3">
+											<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com." required >
+										</div>
+										<div class="col-lg-3">
+											<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular" required >
+										</div>
+										<div class="col-lg-3">
+											<input id="email" name="email" type="text" class="form-control" placeholder="E-mail" required >
+										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
@@ -1486,388 +1696,142 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-12">
-											<textarea id="observacaoAtendimento" name="observacaoAtendimento" class="form-control" placeholder="Observações"></textarea>
+											<textarea id="observacao" name="observacao" class="form-control" placeholder="Observações" ></textarea>
 										</div>
-									</div>
-								</form>
-							</div>
-						</div>
-
-						<div id="informacoes" class="card p-4">
-							<div id="novoPaciente" class="">
-								<div class="card-header header-elements-inline">
-									<h3 class="card-title">Dados Pessoais do paciente</h3>
-									<div class="header-elements">
-										<div class="list-icons">
-											<!-- <a class="list-icons-item" data-action="collapse"></a> -->
-											<!-- <a href="fornecedor.php" class="list-icons-item" data-action="reload"></a> -->
-											<!--<a class="list-icons-item" data-action="remove"></a>-->
-										</div>
-									</div>
-								</div>
-								<div class="row col-lg-12">
-									<div class="col-lg-1 text-center">
-										<input class="mr-1" id="fisica" name="pessoaTipo" type="radio" checked />
-										<label for="fisica">Física</label>
-									</div>
-
-									<div class="col-lg-1 text-center">
-										<input class="mr-1" id="juridica" name="pessoaTipo" type="radio" />
-										<label for="juridica">Jurídica</label>
-									</div>
-								</div>
-
-								<div class="col-lg-12 my-3 text-black-50">
-									<h5>Dados Pessoais</h5>
-								</div>
-
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-3">
-										<label>Prontuário <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-3">
-										<label>Nome <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-3">
-										<label>CPF <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-3">
-										<label>CNS</label>
-									</div>
-
-									<!-- campos -->
-									<div class="col-lg-3">
-										<input id="prontuario" name="prontuario" type="text" class="form-control" placeholder="Prontuário Eletrônico" readonly>
-									</div>
-									<div class="col-lg-3">
-										<input id="nome" name="nome" type="text" class="form-control" placeholder="Nome completo" required>
-									</div>
-									<div class="col-lg-3">
-										<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required>
-									</div>
-									<div class="col-lg-3">
-										<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS">
-									</div>
-								</div>
-
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-2">
-										<label>RG <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-3">
-										<label>Emissor <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-2">
-										<label>UF <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-2">
-										<label>Sexo <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-3">
-										<label>Data de Nascimento <span class="text-danger">*</span></label>
-									</div>
-
-									<!-- campos -->
-									<div class="col-lg-2">
-										<input id="rg" name="rg" type="text" class="form-control" placeholder="RG" required >
-									</div>
-									<div class="col-lg-3">
-										<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor" required >
-									</div>
-									<div class="col-lg-2">
-										<select id="uf" name="uf" class="select-search" required >
-											<option value="" selected>selecionar</option>
-											<option value='BA'>BA</option>
-										</select>
-									</div>
-									<div class="col-lg-2">
-										<select id="sexo" name="sexo" class="form-control form-control-select2" required >
-											<option value="" selected>selecionar</option>
-											<option value="M">Masculino</option>
-											<option value="F">Feminino</option>
-										</select>
-									</div>
-									<div class="col-lg-3">
-										<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa" required >
-									</div>
-								</div>
-
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-6">
-										<label>Nome do Pai <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-6">
-										<label>Nome da Mãe <span class="text-danger">*</span></label>
-									</div>
-
-									<!-- campos -->
-									<div class="col-lg-6">
-										<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai" required >
-									</div>
-									<div class="col-lg-6">
-										<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe" required >
-									</div>
-								</div>
-
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-12">
-										<label>Profissão <span class="text-danger">*</span></label>
-									</div>
-
-									<!-- campos -->
-									<div class="col-lg-12">
-										<select id="profissao" name="profissao" class="form-control form-control-select2" required >
-											<option selected value="">selecionar</option>
-											<option value="1">Teste</option>
-										</select>
-									</div>
-								</div>
-
-								<div class="col-lg-12 my-3 text-black-50">
-									<h5>Endereço do Paciente</h5>
-								</div>
-
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-3">
-										<label>CEP <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-4">,
-										<label>Endereço <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-2">
-										<label>Nº <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-3">
-										<label>Complemento</label>
-									</div>
-
-									<!-- campos -->
-									<div class="col-lg-3">
-										<input id="cep" name="cep" type="text" class="form-control" placeholder="CEP" required >
-									</div>
-									<div class="col-lg-4">
-										<input id="endereco" name="endereco" type="text" class="form-control" placeholder="EX.: Rua, Av" required >
-									</div>
-									<div class="col-lg-2">
-										<input id="numero" name="numero" type="text" class="form-control" placeholder="Número" required >
-									</div>
-									<div class="col-lg-3">
-										<input id="complemento" name="complemento" type="text" class="form-control" placeholder="Complemento" >
-									</div>
-								</div>
-
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-4">
-										<label>Bairro <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-4">
-										<label>Cidade <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-4">
-										<label>Estado <span class="text-danger">*</span></label>
-									</div>
-
-									<!-- campos -->
-									<div class="col-lg-4">
-										<input id="bairro" name="bairro" type="text" class="form-control" placeholder="Bairro" required >
-									</div>
-									<div class="col-lg-4">
-										<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade" required >
-									</div>
-									<div class="col-lg-4">
-										<input id="estado" name="estado" type="text" class="form-control" placeholder="Estado" required >
-									</div>
-								</div>
-
-								<div class="col-lg-12 my-3 text-black-50">
-									<h5>Contato</h5>
-								</div>
-
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-3">
-										<label>Nome <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-3">
-										<label>Telefone <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-3">
-										<label>Celular <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-3">
-										<label>E-mail <span class="text-danger">*</span></label>
-									</div>
-
-									<!-- campos -->
-									<div class="col-lg-3">
-										<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato" required >
-									</div>
-									<div class="col-lg-3">
-										<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com." required >
-									</div>
-									<div class="col-lg-3">
-										<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular" required >
-									</div>
-									<div class="col-lg-3">
-										<input id="email" name="email" type="text" class="form-control" placeholder="E-mail" required >
-									</div>
-								</div>
-
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-12">
-										<label>Observação</label>
-									</div>
-
-									<!-- campos -->
-									<div class="col-lg-12">
-										<textarea id="observacao" name="observacao" class="form-control" placeholder="Observações" ></textarea>
 									</div>
 								</div>
 							</div>
 							<div id="novoResponsavel" class="">
-								<div class="card-header header-elements-inline">
-									<h3 class="card-title">Dados Pessoais do responsável</h3>
-									<div class="header-elements">
-										<div class="list-icons">
-											<!-- <a class="list-icons-item" data-action="collapse"></a> -->
-											<!-- <a href="fornecedor.php" class="list-icons-item" data-action="reload"></a> -->
-											<!--<a class="list-icons-item" data-action="remove"></a>-->
+								<div class="card-header header-elements-inline" style="margin-left:10px;">
+									<h5 class="text-uppercase font-weight-bold">Dados Pessoais do responsável</h5>
+								</div>
+								<div class="card-body">
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Nome</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Parentesco</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Nascimento</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome" >
+										</div>
+										<div class="col-lg-4">
+											<select id="parentescoResp" name="parentesco" class="form-control form-control-select2" >
+												<option value="" selected>selecionar</option>
+												<option value="tio">Tia/Tio</option>
+												<option value="pai">Mãe/Pai</option>
+											</select>
+										</div>
+										<div class="col-lg-4">
+											<input id="nascimentoResp" name="nascimentoResp" type="date" class="form-control" >
 										</div>
 									</div>
-								</div>
 
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-4">
-										<label>Nome</label>
-									</div>
-									<div class="col-lg-4">
-										<label>Parentesco</label>
-									</div>
-									<div class="col-lg-4">
-										<label>Nascimento</label>
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5 class="mb-0 font-weight-semibold">Endereço do Responsável</h5>
 									</div>
 
-									<!-- campos -->
-									<div class="col-lg-4">
-										<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome" >
-									</div>
-									<div class="col-lg-4">
-										<select id="parentescoResp" name="parentesco" class="form-control form-control-select2" >
-											<option value="" selected>selecionar</option>
-											<option value="tio">Tia/Tio</option>
-											<option value="pai">Mãe/Pai</option>
-										</select>
-									</div>
-									<div class="col-lg-4">
-										<input id="nascimentoResp" name="nascimentoResp" type="date" class="form-control" >
-									</div>
-								</div>
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>CEP</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Endereço</label>
+										</div>
+										<div class="col-lg-2">
+											<label>Nº</label>
+										</div>
+										<div class="col-lg-3">
+											<label>Complemento</label>
+										</div>
 
-								<div class="col-lg-12 my-3 text-black-50">
-									<h5>Endereço do Responsável</h5>
-								</div>
-
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-3">
-										<label>CEP</label>
-									</div>
-									<div class="col-lg-4">
-										<label>Endereço</label>
-									</div>
-									<div class="col-lg-2">
-										<label>Nº</label>
-									</div>
-									<div class="col-lg-3">
-										<label>Complemento</label>
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="cepResp" name="cepResp" type="text" class="form-control" placeholder="CEP" >
+										</div>
+										<div class="col-lg-4">
+											<input id="enderecoResp" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av" >
+										</div>
+										<div class="col-lg-2">
+											<input id="numeroResp" name="numeroResp" type="text" class="form-control" placeholder="Número" >
+										</div>
+										<div class="col-lg-3">
+											<input id="complementoResp" name="complementoResp" type="text" class="form-control" placeholder="Complemento" >
+										</div>
 									</div>
 
-									<!-- campos -->
-									<div class="col-lg-3">
-										<input id="cepResp" name="cepResp" type="text" class="form-control" placeholder="CEP" >
-									</div>
-									<div class="col-lg-4">
-										<input id="enderecoResp" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av" >
-									</div>
-									<div class="col-lg-2">
-										<input id="numeroResp" name="numeroResp" type="text" class="form-control" placeholder="Número" >
-									</div>
-									<div class="col-lg-3">
-										<input id="complementoResp" name="complementoResp" type="text" class="form-control" placeholder="Complemento" >
-									</div>
-								</div>
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Bairro</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Cidade</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Estado</label>
+										</div>
 
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-4">
-										<label>Bairro</label>
-									</div>
-									<div class="col-lg-4">
-										<label>Cidade</label>
-									</div>
-									<div class="col-lg-4">
-										<label>Estado</label>
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="bairroResp" name="bairroResp" type="text" class="form-control" placeholder="Bairro" >
+										</div>
+										<div class="col-lg-4">
+											<input id="cidadeResp" name="cidadeResp" type="text" class="form-control" placeholder="Cidade" >
+										</div>
+										<div class="col-lg-4">
+											<input id="estadoResp" name="estadoResp" type="text" class="form-control" placeholder="Estado" >
+										</div>
 									</div>
 
-									<!-- campos -->
-									<div class="col-lg-4">
-										<input id="bairroResp" name="bairroResp" type="text" class="form-control" placeholder="Bairro" >
-									</div>
-									<div class="col-lg-4">
-										<input id="cidadeResp" name="cidadeResp" type="text" class="form-control" placeholder="Cidade" >
-									</div>
-									<div class="col-lg-4">
-										<input id="estadoResp" name="estadoResp" type="text" class="form-control" placeholder="Estado" >
-									</div>
-								</div>
-
-								<div class="col-lg-12 my-3 text-black-50">
-									<h5>Contato</h5>
-								</div>
-
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-4">
-										<label>Telefone</label>
-									</div>
-									<div class="col-lg-4">
-										<label>Celular</label>
-									</div>
-									<div class="col-lg-4">
-										<label>E-mail</label>
+									<div class="col-lg-12 my-3 text-black-50">
+										<h5 class="mb-0 font-weight-semibold">Contato</h5>
 									</div>
 
-									<!-- campos -->
-									<div class="col-lg-4">
-										<input id="telefoneResp" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com." >
-									</div>
-									<div class="col-lg-4">
-										<input id="celularResp" name="celularResp" type="text" class="form-control" placeholder="Celular" >
-									</div>
-									<div class="col-lg-4">
-										<input id="emailResp" name="emailResp" type="text" class="form-control" placeholder="E-mail" >
-									</div>
-								</div>
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-4">
+											<label>Telefone</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Celular</label>
+										</div>
+										<div class="col-lg-4">
+											<label>E-mail</label>
+										</div>
 
-								<div class="col-lg-12 mb-4 row">
-									<!-- titulos -->
-									<div class="col-lg-12">
-										<label>Observação</label>
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="telefoneResp" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com." >
+										</div>
+										<div class="col-lg-4">
+											<input id="celularResp" name="celularResp" type="text" class="form-control" placeholder="Celular" >
+										</div>
+										<div class="col-lg-4">
+											<input id="emailResp" name="emailResp" type="text" class="form-control" placeholder="E-mail" >
+										</div>
 									</div>
 
-									<!-- campos -->
-									<div class="col-lg-12">
-										<textarea id="observacaoResp" name="observacaoResp" class="form-control" placeholder="Observações" ></textarea>
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-12">
+											<label>Observação</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-12">
+											<textarea id="observacaoResp" name="observacaoResp" class="form-control" placeholder="Observações" ></textarea>
+										</div>
 									</div>
-								</div>
+								</div>	
 							</div>
 						</div>
 					</div>
@@ -1890,6 +1854,11 @@ if($iAtendimento){
 						<div class="col-lg-12">
 							<form id="novoPaciente" name="alterarSituacao" method="POST" class="form-validate-jquery">
 								<div class="form-group">
+
+									<div class="card-header header-elements-inline" style="margin-left: -10px;">
+										<h5 class="text-uppercase font-weight-bold">Dados Pessoais do paciente</h5>
+									</div>
+
 									<div class="row col-lg-12">
 										<div class="col-lg-1 text-center">
 											<input class="mr-1" id="fisicaNew" name="pessoaTipo" type="radio" checked />
@@ -1903,7 +1872,7 @@ if($iAtendimento){
 									</div>
 
 									<div class="col-lg-12 my-3 text-black-50">
-										<h5>Dados Pessoais</h5>
+										<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
@@ -2013,7 +1982,7 @@ if($iAtendimento){
 									</div>
 
 									<div class="col-lg-12 my-3 text-black-50">
-										<h5>Endereco do Pacinte</h5>
+										<h5 class="mb-0 font-weight-semibold">Endereço do Paciente</h5>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
@@ -2022,7 +1991,7 @@ if($iAtendimento){
 											<label>CEP <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Endereco <span class="text-danger">*</span></label>
+											<label>Endereço <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-2">
 											<label>Nº <span class="text-danger">*</span></label>
@@ -2071,7 +2040,7 @@ if($iAtendimento){
 									</div>
 
 									<div class="col-lg-12 my-3 text-black-50">
-										<h5>Contato</h5>
+										<h5 class="mb-0 font-weight-semibold">Contato</h5>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
@@ -2137,12 +2106,9 @@ if($iAtendimento){
 						<div class="col-lg-12">
 							<form id="novoResponsavel" name="novoResponsavel" method="POST" class="form-validate-jquery">
 								<div class="form-group">
-									<div class="col-lg-12 row mb-lg-5 text-black-50">
-										<div class="col-lg-8">
-											<h5>Dados Pessoais do responsável</h5>
-										</div>
+									<div class="card-header header-elements-inline" style="margin-left: -10px;">
+										<h5 class="text-uppercase font-weight-bold">Dados Pessoais do responsável</h5>
 									</div>
-
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
@@ -2172,7 +2138,7 @@ if($iAtendimento){
 									</div>
 
 									<div class="col-lg-12 my-3 text-black-50">
-										<h5>Endereco do Responsável</h5>
+										<h5 class="mb-0 font-weight-semibold">Endereço do Responsável</h5>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
@@ -2181,7 +2147,7 @@ if($iAtendimento){
 											<label>CEP</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Endereco</label>
+											<label>Endereço</label>
 										</div>
 										<div class="col-lg-2">
 											<label>Nº</label>
@@ -2230,7 +2196,7 @@ if($iAtendimento){
 									</div>
 
 									<div class="col-lg-12 my-3 text-black-50">
-										<h5>Contato</h5>
+										<h5 class="mb-0 font-weight-semibold">Contato</h5>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
