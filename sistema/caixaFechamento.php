@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Caixa Fechamento';
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputDestinoContaFinanceiraId'])) {
+if(isset($_POST['inputDestinoContaFinanceiraId'])) { 
     //gravaData($_POST['inputData']);
     $idCaixaAbertura = $_POST['aberturaCaixaId'];
     $dataAtual = date('Y-m-d');
