@@ -700,10 +700,10 @@ if(isset($_POST['iAgendamento'])){
 					<div class="col-lg-12">
 						<div class="card">
 							<!-- dados do agendamento -->
-							<div id="agendamento" class="formDados mt-4 pl-2" style="display: block">
-								<div class="col-lg-12 my-3 text-black-50">
+							<div id="agendamento" class="formDados card-body" style="display: block; margin-top:-20px;" >
+								<div class="card-header header-elements-inline" style="margin-left:-10px;">
 									<?php
-										echo isset($_POST['iAgendamento'])?"<h5>Editar Agendamento</h5>":"<h5>Novo Agendamento</h5>"
+										echo isset($_POST['iAgendamento'])?"<h5 class='text-uppercase font-weight-bold'>EDITAR AGENDAMENTO</h5>":"<h5 class='text-uppercase font-weight-bold'>CADASTRO DO AGENDAMENTO</h5>"
 									?>
 								</div>
 
@@ -747,7 +747,7 @@ if(isset($_POST['iAgendamento'])){
 								</div>
 
 								<div class="col-lg-12 my-3 text-black-50">
-									<h5>Serviços</h5>
+									<h5 class="mb-0 font-weight-semibold">Serviços</h5>
 								</div>
 
 								<div class="col-lg-12 mb-2 row">
@@ -859,6 +859,9 @@ if(isset($_POST['iAgendamento'])){
 												<p class="h3">Cadastrar Paciente</p>
 											</div>
 											<form id="editaSituacao" name="incluirProduto" method="POST" class="form-validate-jquery">
+												<div class="card-header header-elements-inline" style="margin-left:15px;">
+													<h5 class="text-uppercase font-weight-bold">Dados Pessoais do paciente</h5>
+												</div>
 												<div class="px-3 ">
 													<div class="d-flex flex-row ">
 														<div class="col-lg-12">
