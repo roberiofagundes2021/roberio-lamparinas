@@ -242,7 +242,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 					'data' => $item['AtTGaDataAtendimento'],
 					'hora' => mostraHora($item['AtTGaHorario']),
 					'valor' => $item['AtTGaValor'],
-					'desconto' => 0
+					'desconto' => $item['AtTGaDesconto']?$item['AtTGaDesconto']:0
 				]);
 			}
 		}

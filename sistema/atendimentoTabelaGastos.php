@@ -331,7 +331,6 @@ if ($row['ClienSexo'] == 'F'){
 				let novoValor = parseFloat($('#itemModalValue').val()) - ($('#inputDesconto').val()?parseFloat($('#inputDesconto').val()):0)
 				$('#inputModalValorF').val(`R$ ${float2moeda(novoValor)}`)
 			})
-
 		}); //document.ready
 
 		function getCmbs(){
@@ -446,6 +445,8 @@ if ($row['ClienSexo'] == 'F'){
 								$('#itemId').val($(this).data('id'))
 								$('#inputModalValorB').val(`R$ ${$(this).data('value')}`)
 								$('#itemModalValue').val($(this).data('value'))
+								let Val1 = parseFloat($(this).data('value'))
+
 								$('#tituloModal').html(`Descontos do serviço <strong>${$(this).data('titulo')}</strong>`)
 								$.ajax({
 									type: 'POST',
@@ -457,8 +458,11 @@ if ($row['ClienSexo'] == 'F'){
 									},
 									success: async function(response) {
 										if(response.status == 'success'){
-											let desconto = response.desconto?response.desconto:0;
-											$('#inputDesconto').val(desconto)
+											$('#inputDesconto').val(response.desconto)
+											let Val2 = parseFloat(response.desconto)
+											console.log(Val1)
+											console.log(Val2)
+											$('#inputModalValorF').val(`R$ ${float2moeda(Val1 - Val2)}`)
 											$('#pageModalDescontos').fadeIn(200)
 										}else{
 											alerta(response.titulo, response.menssagem, response.status)
