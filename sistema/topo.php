@@ -104,7 +104,7 @@
 				if($_SESSION['PaginaAtual'] == 'Relação de Contas à Pagar' || $_SESSION['PaginaAtual'] == 'Novo Lançamento - Contas a Pagar' ||
 				$_SESSION['PaginaAtual'] == 'Relação de Contas à Receber' || $_SESSION['PaginaAtual'] == 'Novo Lançamento - Contas a Receber' ||
 				$_SESSION['PaginaAtual'] == 'Relação de Movimentações Financeiras' || $_SESSION['PaginaAtual'] == 'Financeiro / Movimentação do Financeiro / Novo Lançamento' ||
-				$_SESSION['PaginaAtual'] == 'Movimentação do Caixa') {
+				$_SESSION['PaginaAtual'] == 'Movimentação do Caixa' || $_SESSION['PaginaAtual'] == 'Caixa - Recebimento Detalhamento') {
 					
 					$visibilidade = 'display:block;'; 
 				

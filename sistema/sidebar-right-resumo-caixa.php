@@ -6,6 +6,36 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+        function consultaSaldoCaixaAtual() {
+            let urlConsultaAberturaCaixa = "consultaCaixaSaldoAtual.php";
+            
+            //Verifica se deverá ou não abrir o caixa
+            $.ajax({
+                type: "POST",
+                url: urlConsultaAberturaCaixa,
+                dataType: "json",
+                success: function(resposta) {
+                    if(resposta != 'consultaVazia') {
+                        let saldoInicial = parseFloat(resposta[0].CxAbeSaldoInicial);
+                        let valorRecebido = parseFloat(resposta[1].SaldoRecebido);
+                        let valorPago = parseFloat(resposta[2].SaldoPago);
+                        let saldo = saldoInicial + valorRecebido - valorPago;
+                        
+                        $("#inputResumoCaixaSaldoInicial").val(float2moeda(saldoInicial));
+                        $("#inputResumoCaixaRecebido").val(float2moeda(valorRecebido));
+                        $("#inputResumoCaixaPago").val(float2moeda(valorPago * -1));        
+                        $("#inputResumoCaixaSaldo").val(float2moeda(saldo));
+                    }else {
+                        $("#inputResumoCaixaSaldoInicial").val('');
+                        $("#inputResumoCaixaRecebido").val('');
+                        $("#inputResumoCaixaPago").val('');
+                        $("#inputResumoCaixaSaldo").val('');
+                    }
+                }
+            })
+        }
+
+        consultaSaldoCaixaAtual();
     });
     
 </script>
