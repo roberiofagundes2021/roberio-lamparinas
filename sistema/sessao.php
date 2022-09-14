@@ -172,6 +172,9 @@ if ((array_key_exists('MovCaixaPeriodoDe', $_SESSION) || array_key_exists('MovCa
 	unset($_SESSION['MovCaixaCliente']);
 	unset($_SESSION['MovCaixaFormaPagamento']);
 	unset($_SESSION['MovCaixaStatus']);
+	unset($_SESSION['aberturaCaixaId']);
+	unset($_SESSION['aberturaCaixaNome']);
+	unset($_SESSION['aberturaCaixaData']);
 }
 
 $arquivosContasAReceber = array(

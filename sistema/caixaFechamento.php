@@ -310,7 +310,7 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                         JOIN Atendimento on AtendId = CxRecAtendimento
                         JOIN Cliente on ClienId = AtendCliente
                         JOIN Situacao on SituaId = CxRecStatus
-                        WHERE CxAbeOperador = $_SESSION[UsuarId] and CxRecCaixaAbertura = $_POST[inputAberturaCaixaId] and CxRecUnidade = $_SESSION[UnidadeId]
+                        WHERE CxAbeOperador = $_SESSION[UsuarId] and CxRecCaixaAbertura = $caixaAberturaId and CxRecUnidade = $_SESSION[UnidadeId]
                         UNION 
                         SELECT '' as NUM_REGISTRO, CxPagJustificativaRetirada as HISTORICO, CxPagDataHora as DATAHORA, 0 as ATENDIMENTO, FrPagId, FrPagNome,
                                 0 as Valor, CxPagValor as TOTAL, SituaNome, SituaChave, 'Pagamento' as Tipo
@@ -318,12 +318,81 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                         JOIN CaixaAbertura on CxAbeId = CxPagCaixaAbertura
                         JOIN FormaPagamento on FrPagId = CxPagFormaPagamento
                         JOIN Situacao on SituaId = CxPagStatus
-                        WHERE CxAbeOperador = $_SESSION[UsuarId] and CxPagCaixaAbertura = $_POST[inputAberturaCaixaId] and CxPagUnidade = $_SESSION[UnidadeId]
+                        WHERE CxAbeOperador = $_SESSION[UsuarId] and CxPagCaixaAbertura = $caixaAberturaId and CxPagUnidade = $_SESSION[UnidadeId]
                         ORDER BY FrPagNome,  HISTORICO ASC";
     $resultMovimentacao  = $conn->query($sql_movimentacao);
     $rowMovimentacao = $resultMovimentacao->fetchAll(PDO::FETCH_ASSOC);
 }else {
-    irpara("caixaMovimentacao.php");
+    //Para pegar a última consulta
+    $sql_saldoInicial    = "SELECT CxAbeId, CaixaId, CaixaNome, CxAbeDataHoraAbertura
+                            FROM CaixaAbertura
+                            JOIN Caixa on CaixaId = CxAbeCaixa
+                            WHERE CxAbeOperador = ".$_SESSION['UsuarId']." AND CxAbeUnidade = $_SESSION[UnidadeId]
+                            ORDER BY CxAbeId DESC";
+    $resultSaldoInicial  = $conn->query($sql_saldoInicial);
+    $rowSaldoInicial = $resultSaldoInicial->fetch(PDO::FETCH_ASSOC);
+
+    $arrayDataAbertura = explode(' ', $rowSaldoInicial['CxAbeDataHoraAbertura']);
+    $dataAbertura = $arrayDataAbertura[0];
+
+    $dateActual = date('Y-m-d');
+    $situaCaixa = $dataAbertura != $dateActual ? 'DEVE_FECHAR' : '';
+
+    $caixaAberturaId = $rowSaldoInicial['CxAbeId'];
+    $idCaixa = $rowSaldoInicial['CaixaId'];
+    $nomeCaixa = $rowSaldoInicial['CaixaNome'];;
+
+    $sql_saldoCaixa    = "SELECT CxAbeSaldoInicial
+                          FROM CaixaAbertura 
+                          WHERE CxAbeUnidade = " . $_SESSION['UnidadeId'] . " and CxAbeCaixa = ".$idCaixa."
+                          ORDER BY CxAbeId DESC";
+    $resultSaldoCaixa  = $conn->query($sql_saldoCaixa);
+
+    $saldoInicialCaixa = 0;
+    if($rowSaldoCaixa = $resultSaldoCaixa->fetch(PDO::FETCH_ASSOC)) {
+        $saldoInicialCaixa = $rowSaldoCaixa['CxAbeSaldoInicial'];
+    }
+    
+    $sql_totalMovimentacao    = "SELECT SUM(CxRecValorTotal) as TotalRecebido
+                                FROM CaixaRecebimento 
+                                WHERE CxRecUnidade = " . $_SESSION['UnidadeId'] . " and CxRecCaixaAbertura = ".$caixaAberturaId."";
+    $resultTotalMovimentacao  = $conn->query($sql_totalMovimentacao);
+    $rowTotalRecebido = $resultTotalMovimentacao->fetch(PDO::FETCH_ASSOC);
+
+    $sql_totalMovimentacao    = "SELECT SUM(CxPagValor) as TotalPago
+                                FROM CaixaPagamento
+                                WHERE CxPagUnidade = " . $_SESSION['UnidadeId'] . " and CxPagCaixaAbertura = ".$caixaAberturaId."";
+    $resultTotalMovimentacao  = $conn->query($sql_totalMovimentacao);
+    $rowTotalPago = $resultTotalMovimentacao->fetch(PDO::FETCH_ASSOC);
+
+    $valorRecebido = $rowTotalRecebido['TotalRecebido'];
+    $valorPago = $rowTotalPago['TotalPago'];
+
+    $valorCalculado = $valorRecebido - $valorPago;
+
+    $valorATransferir = $valorCalculado + $saldoInicialCaixa;
+    $saldoFinalCaixa = $valorCalculado + $saldoInicialCaixa; 
+
+    $sql_movimentacao    = "SELECT AtendNumRegistro, ClienNome as HISTORICO, CxRecDataHora as DATAHORA, CxRecAtendimento, FrPagId, FrPagNome, 
+                                CxRecValor, CxRecValorTotal as TOTAL, SituaNome, SituaChave, 'Recebimento' as Tipo
+                        FROM CaixaRecebimento
+                        JOIN CaixaAbertura on CxAbeId = CxRecCaixaAbertura
+                        JOIN FormaPagamento on FrPagId = CxRecFormaPagamento
+                        JOIN Atendimento on AtendId = CxRecAtendimento
+                        JOIN Cliente on ClienId = AtendCliente
+                        JOIN Situacao on SituaId = CxRecStatus
+                        WHERE CxAbeOperador = $_SESSION[UsuarId] and CxRecCaixaAbertura = $caixaAberturaId and CxRecUnidade = $_SESSION[UnidadeId]
+                        UNION 
+                        SELECT '' as NUM_REGISTRO, CxPagJustificativaRetirada as HISTORICO, CxPagDataHora as DATAHORA, 0 as ATENDIMENTO, FrPagId, FrPagNome,
+                                0 as Valor, CxPagValor as TOTAL, SituaNome, SituaChave, 'Pagamento' as Tipo
+                        FROM CaixaPagamento
+                        JOIN CaixaAbertura on CxAbeId = CxPagCaixaAbertura
+                        JOIN FormaPagamento on FrPagId = CxPagFormaPagamento
+                        JOIN Situacao on SituaId = CxPagStatus
+                        WHERE CxAbeOperador = $_SESSION[UsuarId] and CxPagCaixaAbertura = $caixaAberturaId and CxPagUnidade = $_SESSION[UnidadeId]
+                        ORDER BY FrPagNome,  HISTORICO ASC";
+    $resultMovimentacao  = $conn->query($sql_movimentacao);
+    $rowMovimentacao = $resultMovimentacao->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
 
@@ -671,11 +740,11 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                                             $formaPagamentoNome = $item['FrPagNome'];
 
                                             if($formaPagamentoNome != $formaPagamentoNomeControle) {
-                                                $sql = "SELECT dbo.fnValorTotalRecebimentoCaixa(" . $_POST['inputAberturaCaixaId'] . ", " . $item['FrPagId'] . ") as ValorRecebimento";
+                                                $sql = "SELECT dbo.fnValorTotalRecebimentoCaixa(" . $caixaAberturaId . ", " . $item['FrPagId'] . ") as ValorRecebimento";
                                                 $result = $conn->query($sql);
                                                 $rowValorRecebimento = $result->fetch(PDO::FETCH_ASSOC);
 
-                                                $sql = "SELECT dbo.fnValorTotalPagamentoCaixa(" . $_POST['inputAberturaCaixaId'] . ", " . $item['FrPagId'] . ") as ValorPagamento";
+                                                $sql = "SELECT dbo.fnValorTotalPagamentoCaixa(" . $caixaAberturaId . ", " . $item['FrPagId'] . ") as ValorPagamento";
                                                 $result = $conn->query($sql);
                                                 $rowValorPagamento = $result->fetch(PDO::FETCH_ASSOC);
 
