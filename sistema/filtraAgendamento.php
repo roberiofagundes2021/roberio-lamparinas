@@ -389,7 +389,7 @@ try{
 		// $sqlMedico = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
 		// FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 		$sql = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
-		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade != $iUnidade";
+		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 		$resultMedico = $conn->query($sql);
 		$resultMedico = $resultMedico->fetch(PDO::FETCH_ASSOC);
 
