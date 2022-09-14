@@ -365,8 +365,8 @@ if(isset($_POST['iAgendamento'])){
 				showMonthsShort: true,
 				closeOnSelect: true,
 				closeOnClear: true,
-				formatSubmit: 'yyyy/mm/dd',
-				format: 'yyyy/mm/dd',
+				formatSubmit: 'dd/mm/yyyy',
+				format: 'dd/mm/yyyy',
 				disable: array,
 				onStart: function() {
 					// console.log('onStart event')
