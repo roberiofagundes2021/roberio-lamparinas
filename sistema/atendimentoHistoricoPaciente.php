@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Histórico do Paciente';
 
 include('global_assets/php/conexao.php');
 
-$iAtendimentoId = 9; //isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
+$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
 if(!$iAtendimentoId){
 	irpara("atendimento.php");
