@@ -561,7 +561,7 @@ try{
 		foreach($row as $item){
 			$horaI = explode(':', $item['PrAgeHoraInicio']);
 			$horaF = explode(':', $item['PrAgeHoraFim']);
-			$intervalo = $item['PrAgeIntervalo'];
+			$intervalo = intval($item['PrAgeIntervalo']);
 			
 			array_push($arrayHora,
 			[
@@ -572,7 +572,7 @@ try{
 
 		echo json_encode([
 			'arrayHora' => $arrayHora,
-			'intervalo'=> $intervalo?$intervalo:30,
+			'intervalo'=> $intervalo,
 			'status' => 'success',
 			'titulo' => 'Data',
 			'menssagem' => 'Hora do profissional selecionado!!!',
