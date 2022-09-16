@@ -80,7 +80,7 @@ try {
 
     <div style='position: relative; width:100%; border-bottom: 1px solid #666; padding-bottom: 10px;'>
         <div style='float:left; width: 200px; display: inline-block; padding: 10px;'>
-            <img src='global_assets/images/lamparinas/logo-lamparinas.png' style='width:190px; height:45px; float:left; margin-right: 10px; margin-top:-10px;' />  
+            <img src='global_assets/images/empresas/".$_SESSION['EmpreFoto']."' style='width:190px; height:45px; float:left; margin-right: 10px; margin-top:-10px;' />  
         </div>
         
         <div style='width:400px; float:right; display: inline; text-align:right;'>
