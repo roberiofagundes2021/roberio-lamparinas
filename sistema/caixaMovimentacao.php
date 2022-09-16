@@ -16,6 +16,8 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
+$abrirPopUpCaixaAbertura = isset($_GET['paginaredirecionada']) ? 1 : 0;
+
 $data = date("Y-m-d");
 
 //A sessão de resumo financeiro é a opção de visibilidade do resumo financeiro, aqui ele também foi aplicado ao resumo de Caixa
@@ -361,7 +363,7 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                             $("#aberturaCaixa").trigger("click");
                         }else {
                             //Verifica se o último caixa do operador já foi fechado, se sim irá aparecer uma tela para abrir novamente
-                            if(resposta.CxAbeDataHoraFechamento != null) {
+                            if(resposta.SituaChave == 'FECHADO') {
                                 $("#aberturaCaixa").trigger("click");
                             }else {
                                 let arrayDataAbertura = resposta.CxAbeDataHoraAbertura.split(" ")
@@ -426,8 +428,6 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                     }
                 })
             }
-
-            consultaSaldoCaixaAtual();
 
             $("#radioButtonSangria").on('click', () => {
                 //Para evitar que seja executado comando em um botão já selecionado
@@ -655,8 +655,8 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                         if(resposta == 'abrirCaixa') {
                             $("#caixaEmOperacao").hide();
                         }else {
-                            //Se há uma data de fechamento do caixa, significa que n há um caixa aberto
-                            if(resposta.CxAbeDataHoraFechamento != null) {
+                            //Essa situação é quando há registros, porém o caixa está fechado
+                            if(resposta.SituaChave == 'FECHADO') {
                                 $("#caixaEmOperacao").hide();
                             }
                             
@@ -721,11 +721,21 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
             document.formMovimentacao.submit();
         } 
+
+        
+        function caixaAbertura() {
+            //Consulta se houve um redirecionamento de página
+            let abrirPopUpCaixaAbertura = "<?php echo $abrirPopUpCaixaAbertura; ?>"
+
+            if(abrirPopUpCaixaAbertura == 1) {
+                $("#btnPdv").click();
+            }
+        }
     </script>
 
 </head>
 
-<body class="navbar-top <?php echo $visibilidadeResumoCaixa; ?> sidebar-xs">
+<body class="navbar-top <?php echo $visibilidadeResumoCaixa; ?> sidebar-xs" onload="caixaAbertura()">
 
     <?php include_once("topo.php"); ?>
 

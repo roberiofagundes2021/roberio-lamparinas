@@ -3,10 +3,12 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 //Para pegar a última consulta
-$sql_saldoInicial    = "SELECT CxAbeId, CaixaNome, CxAbeCaixa, CxAbeDataHoraAbertura, CxAbeDataHoraFechamento 
+$sql_saldoInicial    = "SELECT CxAbeId, CaixaNome, CxAbeCaixa, CxAbeDataHoraAbertura, CxAbeDataHoraFechamento, SituaChave
                         FROM CaixaAbertura
                         JOIN Caixa on CaixaId = CxAbeCaixa
-                        WHERE CxAbeOperador = ".$_SESSION['UsuarId']." ORDER BY CxAbeId DESC";
+                        JOIN Situacao on SituaId = CxAbeStatus
+                        WHERE CxAbeOperador = ".$_SESSION['UsuarId']." AND CxAbeUnidade = $_SESSION[UnidadeId]
+                        ORDER BY CxAbeId DESC";
 $resultSaldoInicial  = $conn->query($sql_saldoInicial);
 
 

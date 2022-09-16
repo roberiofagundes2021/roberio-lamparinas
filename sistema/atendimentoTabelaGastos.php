@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Tabela de Gastos';
 
 include('global_assets/php/conexao.php');
 
-$iAtendimentoId = 9; //isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
+$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
 if(!$iAtendimentoId){
 	irpara("atendimento.php");
@@ -17,16 +17,18 @@ if(!$iAtendimentoId){
 $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
 
+$_SESSION['atendimentoTabelaServicos'] = [];
 
 //Essa consulta é para verificar qual é o atendimento e cliente 
-$sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtClaNome, AtendDataRegistro, AtModNome, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
-               ClienNomeMae, ClienCartaoSus, ClienCelular, ClResNome, AtClaChave
+$sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtClaNome, AtendDataRegistro, AtModNome, ClienId,
+		ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,ClienNomeMae, ClienCartaoSus, ClienCelular,
+		ClResNome, AtClaChave
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
 		JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-		JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-		JOIN Situacao ON SituaId = AtendSituacao
+		LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+		LEFT JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE AtendId = $iAtendimentoId and AtendUnidade = ".$_SESSION['UnidadeId']."
 		ORDER BY AtendDataRegistro ASC";
 $result = $conn->query($sql);
@@ -71,22 +73,65 @@ if ($row['ClienSexo'] == 'F'){
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<link href="global_assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
+	<link href="global_assets/css/lamparinas/layout.min.css" rel="stylesheet" type="text/css">
+	<link href="global_assets/css/lamparinas/components.min.css" rel="stylesheet" type="text/css">
 
+	<script src="global_assets/js/main/bootstrap.bundle.min.js"></script>
+	<script src="global_assets/js/plugins/loaders/blockui.min.js"></script>
+	<script src="global_assets/js/plugins/ui/ripple.min.js"></script>
+
+	<script src="global_assets/js/plugins/forms/wizards/steps.min.js"></script>
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+    <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+    <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+    <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
+    <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	
+	<script src="global_assets/js/plugins/ui/moment/moment.min.js"></script>
+	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>
+	<script src="global_assets/js/plugins/pickers/anytime.min.js"></script>
+	<script src="global_assets/js/plugins/pickers/pickadate/picker.js"></script>
+	<script src="global_assets/js/plugins/pickers/pickadate/picker.date.js"></script>
+	<script src="global_assets/js/plugins/pickers/pickadate/picker.time.js"></script>
+	<script src="global_assets/js/plugins/pickers/pickadate/legacy.js"></script>
+	<script src="global_assets/js/plugins/notifications/jgrowl.min.js"></script>
 
-	<!-- Não permite que o usuário retorne para o EDITAR -->
-	<script src="global_assets/js/lamparinas/stop-back.js"></script>
+	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
+	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>	
+
+	<!-- Modal -->
+	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>
+    
+    <!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
+	<?php
+		// essa parte do código transforma uma variáve php em Js para ser utilizado 
+		echo '<script>
+				var atendimento = '.json_encode($row).';
+			</script>';
+	?>
 	
 	<script type="text/javascript">
-
-		$(document).ready(function() {	
+		$(document).ready(function() {
+			getCmbs()
+			checkServicos()
+			setDataProfissional()
+			setHoraProfissional()
 
             /* Início: Tabela Personalizada */
 			$('#tblTabelaGastos').DataTable( {
@@ -98,17 +143,17 @@ if ($row['ClienSexo'] == 'F'){
 				paging: false,
 			    columnDefs: [
 				{ 
-					orderable: true,   //Data do Registro
+					orderable: true,   //Serviço
 					width: "15%",
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Serviço
-					width: "15%",
+					orderable: true,   //Profissional
+					width: "20%",
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Profissional
+					orderable: true,   //Horado Atendimento
 					width: "15%",
 					targets: [2]
 				},				
@@ -124,7 +169,7 @@ if ($row['ClienSexo'] == 'F'){
 				},
 				{ 
 					orderable: true,   //Valor
-					width: "15%",
+					width: "10%",
 					targets: [5]
 				},
 				{ 
@@ -141,43 +186,453 @@ if ($row['ClienSexo'] == 'F'){
 				}
                 
 			});
-		
-
-			function modalDescontos() {
-
-				$('#descontos').on('click', (e) => {
-					e.preventDefault()
-					$('#pageModalDescontos').fadeIn(200);
-					$('.cardDes').css('width', '500px').css('margin', '0px auto')
-				})
-
-				$('#modalCloseDescontos').on('click', function() {
-					$('#pageModalDescontos').fadeOut(200);
-					$('body').css('overflow', 'scroll');
-
-					limparDescontos()
-				})
-
-				$("#salvarDescontos").on('click', function() {
-					$('#pageModalDescontos').fadeOut(200);
-					$('body').css('overflow', 'scroll');
-				})
-			}
-			modalDescontos()
 
 			divTotal = `<div class="row">
                             <div class="col-lg-8">
 								<button class="btn btn-lg btn-principal" id="fecharConta">Fechar Conta</button>
 								<a href="atendimento.php" class="btn btn-basic" role="button">Voltar</a>
 							</div>
-							<div class="col-lg-4">	
+							<div id="tabelaValores" class="col-lg-4">	
 								<div style='font-weight: bold;'>Desconto: </div> <br> 
 								<div style='font-weight: bold;'>TOTAL A PAGAR: </div>
 							</div>
 						</div> <br>`
         	$('.datatable-footer').append(divTotal);
 
+			$('#inserirServico').on('click',function(e){
+				$('#formTabelaGastos').submit()
+			})
+
+			$('#modal-close-x').on('click', function(e){
+				e.preventDefault()
+				$('#pageModalDescontos').fadeOut(200)
+			})
+
+			$('#formTabelaGastos').submit(function(e){
+				e.preventDefault()
+				let menssageError = ''
+				let procedimentos  = $('#procedimentos').val()
+				let profissional  = $('#profissional').val()
+				let dataAtendimento  = $('#dataAtendimento').val()
+				let horaAtendimento  = $('#horaAtendimento').val()
+				let localAtendimento  = $('#localAtendimento').val()
+
+				switch(menssageError){
+					case procedimentos: menssageError = 'informe o procedimento'; $('#procedimentos').focus();break;
+					case profissional: menssageError = 'informe o profissional'; $('#profissional').focus();break;
+					case dataAtendimento: menssageError = 'informe uma data'; $('#dataAtendimento').focus();break;
+					case horaAtendimento: menssageError = 'informe o horário'; $('#horaAtendimento').focus();break;
+					case localAtendimento: menssageError = 'informe o local de atendimento'; $('#localAtendimento').focus();break;
+					default: menssageError = ''; break;
+				}
+
+				if(menssageError){
+					alerta('Campo Obrigatório!', menssageError, 'error')
+					return
+				}
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimentoTabelaGastos.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'ADICIONARSERVICO',
+						'servico': procedimentos,
+						'medicos': profissional,
+						'dataAtendimento': dataAtendimento,
+						'horaAtendimento': horaAtendimento,
+						'localAtendimento': localAtendimento
+					},
+					success: function(response) {
+						if(response.status == 'success'){
+							getCmbs()
+							checkServicos()
+							alerta(response.titulo, response.menssagem, response.status)
+						} else {
+							alerta(response.titulo, response.menssagem, response.status);
+						}
+					},
+					error: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
+					}
+				});
+			})
+
+			$('#profissional').on('change', function(){
+				let iMedico = $(this).val()
+
+				if(!iMedico){
+					setHoraProfissional()
+					setDataProfissional()
+					return
+				}
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimentoTabelaGastos.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'SETDATAPROFISSIONAL',
+						'iMedico': iMedico,
+					},
+					success: function(response) {
+						if(response.status == 'success'){
+							setDataProfissional(response.arrayData)
+							$('#dataAtendimento').focus()
+						} else {
+							alerta(response.titulo, response.menssagem, response.status)
+						}
+					}
+				});
+			});
+
+			$('#fecharConta').on('click', function(e){
+				e.preventDefault();
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimentoTabelaGastos.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'FECHARCONTA',
+						'atendimento': atendimento.AtendId,
+						'cliente': atendimento.ClienId,
+					},
+					success: function(response) {
+						if(response.status == 'success'){
+							getCmbs()
+							checkServicos()
+							window.location.href='atendimento.php'
+							alerta(response.titulo, response.menssagem, response.status)
+						} else {
+							alerta(response.titulo, response.menssagem, response.status)
+						}
+					}
+				});
+			})
+
+			$('#setDesconto').on('click', function(e){
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimentoTabelaGastos.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'SETDESCONTO',
+						'id':$('#itemId').val(),
+						'desconto':$('#inputDesconto').val(),
+					},
+					success: async function(response) {
+						checkServicos()
+						$('#pageModalDescontos').fadeOut(200)
+						alerta(response.titulo, response.menssagem, response.status)
+					}
+				});
+			})
+
+			$('#inputDesconto').on('input', function(e){
+				let novoValor = parseFloat($('#itemModalValue').val()) - ($('#inputDesconto').val()?parseFloat($('#inputDesconto').val()):0)
+				$('#inputModalValorF').val(`R$ ${float2moeda(novoValor)}`)
+			})
 		}); //document.ready
+
+		function getCmbs(){
+			// vai preencher PROCEDIMENTOS
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimentoTabelaGastos.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'PROCEDIMENTOS'
+				},
+				success: function(response) {
+					$('#procedimentos').empty();
+					$('#procedimentos').append(`<option value=''>Selecione</option>`)
+					response.forEach(item => {
+						let opt = ''
+						// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
+						// logo esses valores deveram vir preenchido com os dados desse atendimento
+						if(atendimento){
+							 opt = atendimento.AtendModalidade == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
+						} else {
+							opt = `<option value="${item.id}">${item.nome}</option>`
+						}
+						$('#procedimentos').append(opt)
+					})
+				}
+			});
+			// vai preencher PROFISSIONAL
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimentoTabelaGastos.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'PROFISSIONAL'
+				},
+				success: function(response) {
+					$('#profissional').empty();
+					$('#profissional').append(`<option value=''>Selecione</option>`)
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.nome}</option>`
+						$('#profissional').append(opt)
+					})
+				}
+			});
+			// vai preencher LOCAIS
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimentoTabelaGastos.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'LOCAIS'
+				},
+				success: function(response) {
+					$('#localAtendimento').empty();
+					$('#localAtendimento').append(`<option value=''>Selecione</option>`)
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.nome}</option>`
+						$('#localAtendimento').append(opt)
+					})
+				}
+			});
+			$('#dataAtendimento').val('')
+			$('#horaAtendimento').val('')
+		}
+
+		function checkServicos(){
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimentoTabelaGastos.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'CHECKSERVICO',
+					'iAtendimento': atendimento?atendimento['AtendId']:''
+				},
+				success: async function(response) {
+					statusServicos = response.array.length?true:false;
+					if(statusServicos){
+						$('#dataServico').html('');
+
+						let HTML = ''
+						response.array.forEach(item => {
+							if(item.status != 'rem'){
+								let exc = `<a class='list-icons-item removeItem' style='color: black; cursor:pointer' data-id="${item.id}"><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
+								let popup = `<a class='list-icons-item openPopUp' style="color:${(item.desconto?'#50b900':'#000')}; cursor:pointer" data-value="${float2moeda(item.valor)}" data-titulo="${item.servico}" data-id="${item.id}"><i class='icon-cash' title='Desconto'></i></a>`;
+								
+								let acoes = `<div class='list-icons'>
+											${popup}
+											${exc}
+										</div>`;
+								HTML += `
+								<tr class='servicoItem'>
+									<td class="text-center">${item.servico}</td>
+									<td class="text-center">${item.medico}</td>
+									<td class="text-center">${item.hora}</td>
+									<td class="text-center">${item.sData}</td>
+									<td class="text-center">${item.local}</td>
+									<td class="text-right">R$ ${float2moeda(item.valor)}</td>
+									<td class="text-center">${acoes}</td>
+								</tr>`
+							}
+						})
+						$('#tabelaValores').html(`
+							<div style='font-weight: bold;'>Desconto: R$${float2moeda(response.desconto)}</div> <br> 
+							<div style='font-weight: bold;'>TOTAL A PAGAR: R$${float2moeda(response.valorTotal)}</div>
+						`)
+						$('#dataServico').html(HTML).show();
+						$('#servicoTable').show();
+
+						$('.openPopUp').each(function(index,element){
+							$(element).on('click', function(e){
+								e.preventDefault()
+								$('#itemId').val($(this).data('id'))
+								$('#inputModalValorB').val(`R$ ${$(this).data('value')}`)
+								$('#itemModalValue').val($(this).data('value'))
+								let Val1 = parseFloat($(this).data('value'))
+
+								$('#tituloModal').html(`Descontos do serviço <strong>${$(this).data('titulo')}</strong>`)
+								$.ajax({
+									type: 'POST',
+									url: 'filtraAtendimentoTabelaGastos.php',
+									dataType: 'json',
+									data:{
+										'tipoRequest': 'GETDESCONTO',
+										'id': $(this).data('id')
+									},
+									success: async function(response) {
+										if(response.status == 'success'){
+											$('#inputDesconto').val(response.desconto)
+											let Val2 = parseFloat(response.desconto)
+											console.log(Val1)
+											console.log(Val2)
+											$('#inputModalValorF').val(`R$ ${float2moeda(Val1 - Val2)}`)
+											$('#pageModalDescontos').fadeIn(200)
+										}else{
+											alerta(response.titulo, response.menssagem, response.status)
+										}
+									}
+								});
+							})
+						})
+
+						$('.removeItem').each(function(index,element){
+							$(element).on('click', function(e){
+								$.ajax({
+									type: 'POST',
+									url: 'filtraAtendimentoTabelaGastos.php',
+									dataType: 'json',
+									data:{
+										'tipoRequest': 'EXCLUISERVICO',
+										'id': $(this).data('id')
+									},
+									success: function(response) {
+										alerta(response.titulo, response.menssagem, response.status)
+										checkServicos()
+									}
+								});
+							})
+						})
+					}else{
+						$('#servicoTable').hide();
+					}
+				}
+			});
+		}
+
+		function setDataProfissional(arrayData){
+			$('#dataAgenda').html('')
+			$('#dataAgenda').html('<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">')
+
+			let array = arrayData?arrayData:undefined
+			// Events
+			$('#dataAtendimento').pickadate({
+				weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+				monthsFull: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+				monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+				today: '',
+				close: '',
+				clear: 'Limpar',
+				labelMonthNext: 'Próximo',
+				labelMonthPrev: 'Anterior',
+				labelMonthSelect: 'Escolha um mês na lista suspensa',
+				labelYearSelect: 'Escolha um ano na lista suspensa',
+				selectMonths: false,
+				selectYears: false,
+				showMonthsShort: true,
+				closeOnSelect: true,
+				closeOnClear: true,
+				formatSubmit: 'yyyy/mm/dd',
+				format: 'dd/mm/yyyy',
+				disable: array,
+				onStart: function() {
+					// console.log('onStart event')
+				},
+				onRender: function() {
+					$('.picker__day').each(function(){
+						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
+						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
+
+						if(hasClass){
+							$(this).addClass((hasSelected?
+							'':
+							'font-weight-bold text-black border'))
+						}
+					})
+				},
+				onOpen: function() {
+					$('.picker__day').each(function(){
+						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
+						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
+
+						if(hasClass){
+							$(this).addClass((hasSelected?
+							'':
+							'font-weight-bold text-black border'))
+						}
+					})
+				},
+				onClose: function() {
+					// console.log('onClose event')
+				},
+				onStop: function() {
+					// console.log('onStop event')
+				},
+				onSet: function(context) {
+					let data = new Date(context.select).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+					data = data.split(' ')[0]; // Formatando a string padrão: "dd/mm/yyyy HH:MM:SS" => "dd/mm/yyyy"
+					let iMedico = $('#profissional').val();
+
+					$.ajax({
+						type: 'POST',
+						url: 'filtraAtendimentoTabelaGastos.php',
+						dataType: 'json',
+						data:{
+							'tipoRequest': 'SETHORAPROFISSIONAL',
+							'data': data,
+							'iMedico': iMedico
+						},
+						success: function(response) {
+							if(response.status == 'success'){
+								setHoraProfissional(response.arrayHora, response.intervalo)
+								$('#horaAtendimento').focus()
+							} else {
+								alerta(response.titulo, response.menssagem, response.status)
+							}
+						}
+					});
+				}
+			});
+		}
+
+		function setHoraProfissional(array,interv){
+			$('#modalHora').html('').show();
+			$('#modalHora').html('<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">');
+
+			let arrayTime = array?array:undefined
+			let intervalo = interv?interv:30
+			// doc: https://amsul.ca/pickadate.js/time/
+			$('#horaAtendimento').pickatime({
+				// Regras
+				interval: intervalo,
+				disable: arrayTime,
+				// disable: [
+				// 	[1,30],
+				// ],
+
+				// Formats
+				format: 'HH:i',
+				formatLabel: undefined,
+				formatSubmit: undefined,
+				hiddenPrefix: undefined,
+				hiddenSuffix: '_submit',
+				
+				// Time limits
+				min: undefined,
+				max: undefined,
+				
+				// Close on a user action
+				closeOnSelect: true,
+				closeOnClear: true,
+
+				// eventos
+				onSet: function(context) {
+					// let hora = context.select
+					let data = $('#dataAtendimento').val()
+					let hora = $('#horaAtendimento').val()
+
+					// data: DD/MM/YYYY => MM/DD/YYYY
+					data = `${data.split('/')[1]}/${data.split('/')[0]}/${data.split('/')[2]}`
+
+					// dataHora: MM/DD/YYYY HH:MM:SS
+					let dataHora = `${data} ${hora}`
+
+					// somente para atribuir à variável "dataHora" um valor do tipo DataTime
+					dataHora = new Date(dataHora).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+				},
+				onStart: undefined,
+				onRender: undefined,
+				onOpen: undefined,
+				onClose: undefined,
+				onStop: undefined,
+			});
+		}
 		
 	</script>
 
@@ -299,146 +754,49 @@ if ($row['ClienSexo'] == 'F'){
 									<h3 class="card-title">Procedimentos</h3>
 								</div>
 							<div class="card-body">
-								<form name="formTabelaGastos" id="formTabelaGastos" method="post" class="form-validate-jquery">
-
-									<div class="row">
-										<div class="col-lg-3">
-											<label for="cmbProcedimentos">Procedimentos<span class="text-danger"> *</span></label>
-											<select id="cmbProcedimentos" name="cmbProcedimentos" class="form-control select-search" required>
-												<option value="">Selecione</option>
-												<?php 
-													$sql = "SELECT SrVenId, SrVenNome
-															FROM ServicoVenda
-															JOIN Situacao on SituaId = SrVenStatus
-															WHERE SituaChave = 'ATIVO' and SrVenUnidade = ".$_SESSION['UnidadeId']."
-															ORDER BY SrVenNome ASC";
-													$result = $conn->query($sql);
-													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($rowCategoria as $item){
-														print('<option value="'.$item['SrVenId'].'">'.$item['SrVenNome'].'</option>');
-													}
-
-													foreach ($rowUnidade as $item) {
-														print('<option value="' . $item['UnidaId'] . '">' . $item['UnidaNome'] . '</option>');
-													}
-												
-
-												?>
-											</select>
+								<form id="formTabelaGastos" name="formTabelaGastos" method="post" class="form-validate-jquery">
+									<div class="col-lg-12 mb-2 row">
+										<!-- titulos -->
+										<div class="col-lg-2">
+											<label>Procedimentos <span class="text-danger">*</span></label>
 										</div>
-										<div class="col-lg-2">
-											<label for="cmbProfissional">Profissional<span class="text-danger"> *</span></label>
-											<select id="cmbProfissional" name="cmbProfissional" class="form-control select-search" required>
-												<option value="">Selecione</option>
-												<?php 
-													$sql = "SELECT ProfiId, ProfiNome
-															FROM Profissional
-															JOIN Situacao on SituaId = ProfiStatus
-															WHERE SituaChave = 'ATIVO' and ProfiUnidade = ".$_SESSION['UnidadeId']."
-															ORDER BY ProfiNome ASC";
-													$result = $conn->query($sql);
-													$rowProfissional = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($rowProfissional as $item){
-														
-														print('<option value="'.$item['ProfiId'].'">'.$item['ProfiNome'].'</option>');
-													}
-												
-
-												?>
-											</select>
-										</div>	
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputDataAtendimento">Data do Atendimento <span class="text-danger">*</span></label>
-												<div class="input-group">
-													<span class="input-group-prepend">
-														<span class="input-group-text"><i class="icon-calendar22"></i></span>
-													</span>
-													<input type="date" id="inputData" name="inputData" class="form-control" value="<?php echo $row['AtendDataRegistro']; ?>" >
-												</div>
-											</div>
+										<div class="col-lg-3">
+											<label>Profissional <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-3">
+											<label>Data <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-1">
-											<div class="form-group">
-												<label for="inputHorario">Horário <span class="text-danger">*</span></label>
-												<div class="input-group">
-													<input type="time" id="inputHorario" name="inputHorario" class="form-control" >
-												</div>
-											</div>
-										</div>	
-										<div class="col-lg-2">
-											<label for="cmbLocalAtendimento">Local do Atendimento<span class="text-danger"> *</span></label>
-											<select id="cmbLocalAtendimento" name="cmbLocalAtendimento" class="form-control select-search" required>
-												<option value="">Selecione</option>
-												<?php 
-													$sql = "SELECT AtLocId, AtLocNome
-															FROM AtendimentoLocal
-															JOIN Situacao on SituaId = AtLocStatus
-															WHERE SituaChave = 'ATIVO' and AtLocUnidade = ".$_SESSION['UnidadeId']."
-															ORDER BY AtLocNome ASC";
-													$result = $conn->query($sql);
-													$rowAtendimentoLocal = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($rowAtendimentoLocal as $item){
-														print('<option value="'.$item['AtLocId'].'">'.$item['AtLocNome'].'</option>');
-													}
-												
-
-												?>
-											</select>
-										</div>				
-										<div class="col-lg-2">
-											<div class="form-group" style="padding-top:25px;">
-												<?php
-
-													//editando
-													if (isset($_POST['inputSubCategoriaId'])){
-														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-														print('<a href="subCategoria.php" class="btn btn-basic" role="button">Cancelar</a>');
-													} else{ //inserindo
-														print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
-													}
-
-												?>
-											</div>
+											<label>Horário <span class="text-danger">*</span></label>
 										</div>
-									</div>
+										<div class="col-lg-2">
+											<label>Local do Atendimento <span class="text-danger">*</span></label>
+										</div>
 
-									<!--Modal Desconto-->
-									<div id="pageModalDescontos" class="custon-modal">
-										<div class="custon-modal-container">
-											<div class="card cardDes custon-modal-content">
-												<div class="custon-modal-title">
-													<i class=""></i>
-													<p class="h3">Descontos</p>
-													<i class=""></i>
-												</div>
-												
-												<div class="p-5">
-													<div class="d-flex flex-row justify-content-between">
-														<div class="col-lg-12" style="text-align:center;">
-															<div class="form-group">
-																<label for="inputDesconto">Valor</label>
-																<input id="inputDesconto" maxLength="12" class="form-control" type="text" name="inputDesconto">
-															</div>
-														</div>
-													</div>
-												</div>
-
-												<div class="card-footer mt-2 d-flex flex-column">
-													<div class="row" style="margin-top: 10px;">
-														<div class="col-lg-12">
-															<div class="form-group">
-																<a class="btn btn-lg btn-principal" id="salvarDescontos">Ok</a>
-																<a id="modalCloseDescontos" class="btn btn-basic" role="button">Cancelar</a>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
+										<!-- campos -->
+										<div class="col-lg-2">
+											<select id="procedimentos" name="procedimentos" class="select-search" required>
+												<!--  -->
+											</select>
+										</div>
+										<div class="col-lg-3">
+											<select id="profissional" name="profissional" class="select-search" required>
+												<!--  -->
+											</select>
+										</div>
+										<div id="dataAgenda" class="col-lg-3">
+											<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate" required>
+										</div>
+										<div id="modalHora" class="col-lg-1">										
+											<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled" required>
+										</div>
+										<div class="col-lg-2">
+											<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2" required>
+												<!--  -->
+											</select>
+										</div>
+										<div class="col-lg-1" style="margin-top: -5px;">
+											<a id="inserirServico" class="btn btn-lg btn-principal">Incluir</a>
 										</div>
 									</div>
 								</form>
@@ -448,65 +806,93 @@ if ($row['ClienSexo'] == 'F'){
 									<table class="table" id="tblTabelaGastos">
 										<thead>
 											<tr class="bg-slate">
-												<th>Data do Registro</th>
 												<th>Serviço</th>
 												<th>Profissional</th>
-												<th>Data do Atendimento</th>
-												<th>Local do Atendimento</th>
+												<th>Hora</th>
+												<th>Data</th>
+												<th>Local</th>
 												<th>Valor</th>
 												<th class="text-center">Ações</th>
 											</tr>
 										</thead>
-										<tbody>
-											<?php	
-												foreach ($rowTGasto as $item){	
-													
-													print( '
-													<tr>													
-														<td>'.mostraData($item['AtTGaDataRegistro']).'</td>
-														<td>'.$item['SrVenNome'].'</td>
-														<td>'.$item['ProfiNome'].'</td>
-														<td>'.mostraData($item['AtendDataRegistro']).'</td>
-														<td>'.$item['AtTGaAtendimentoLocal'].'</td>
-														<td>'.mostraValor($item['AtTGaValor']).'</td>');														
-														
-														print('<td class="text-center">
-															<div class="list-icons">
-																<div class="list-icons list-icons-extended">
-																	<a id="descontos" href="" class="list-icons-item"><i class="icon-coins" data-popup="tooltip" data-placement="bottom" title="Desconto"></i></a>
-																	<a href="#" onclick="atualizaTabelaGastos( 1 ,'.$item['AtendId'].', \''.$item['AtClaNome'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
-																</div>
-
-															</div>
-														</td>
-													</tr>');
-
-												}	
-											?>
+										<tbody id="dataServico">
 										</tbody>
 									</table>
 								</div>		
 							</div>
 						</div>
-
 							<!-- /basic responsive configuration -->
-					</div>
-					
-				</div>				
-				
-				<!-- /info blocks -->
 
+							<!--Modal Desconto-->
+							<div id="pageModalDescontos" class="custon-modal">
+								<div class="custon-modal-container" style="max-width: 500px;">
+									<div class="card custon-modal-content">
+										<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+											<p id='tituloModal' class="h5">Desconto</p>
+											<i id="modal-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+										</div>
+										<div class="px-0">
+											<div class="d-flex flex-row">
+												<div class="col-lg-12">
+													<form id="editaSituacao" name="alterarSituacao" method="POST" class="form-validate-jquery">
+														<div class="form-group">
+															<div class="custon-modal-title">
+																<i class=""></i>
+																<p class="h3">Descontos</p>
+																<i class=""></i>
+															</div>
+															
+															<div class="p-5">
+																<div class="d-flex flex-row justify-content-between">
+																	<div class="col-lg-12" style="text-align:center;">
+																		<div class="form-group row">
+																			<div class="col-lg-4">
+																				<label>Desconto</label>
+																			</div>
+																			<div class="col-lg-4">
+																				<label>Valor</label>
+																			</div>
+																			<div class="col-lg-4">
+																				<label>Valor Final</label>
+																			</div>
+
+																			<div class="col-lg-4">
+																				<input id="inputDesconto" maxLength="12" class="form-control" type="number" name="inputDesconto">
+																			</div>
+																			<div class="col-lg-4">
+																				<input id="inputModalValorB" maxLength="12" class="form-control" type="text" readonly>
+																			</div>
+																			<div class="col-lg-4">
+																				<input id="inputModalValorF" maxLength="12" class="form-control" type="text" readonly>
+																			</div>
+
+																			<input id="itemId" name="itemId" type="hidden" value=''>
+																			<input id="itemModalValue" name="itemId" type="hidden" value=''>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</form>
+												</div>
+											</div>
+											<div class="text-right m-2">
+												<button id="setDesconto" class="btn btn-principal" role="button">Confirmar</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+					</div>
+				</div>
+				<!-- /info blocks -->
 			</div>
 			<!-- /content area -->
-			
 			<?php include_once("footer.php"); ?>
-
 		</div>
 		<!-- /main content -->
-
 	</div>
 	<!-- /page content -->
-
 	<?php include_once("alerta.php"); ?>
 
 </body>

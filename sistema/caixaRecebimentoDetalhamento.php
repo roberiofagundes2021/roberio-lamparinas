@@ -49,6 +49,9 @@ $sql_rrecebimentoProdutos= "SELECT ProduNome, ProduDetalhamento, ProduValorVenda
                             JOIN Produto ON ProduId = AtXPrProduto
                             WHERE AtXPrAtendimento = $atendimentoId AND AtXPrUnidade = $_SESSION[UnidadeId]";
 $resultProdutos  = $conn->query($sql_rrecebimentoProdutos);
+
+//A sessão de resumo financeiro é a opção de visibilidade do resumo financeiro, aqui ele também foi aplicado ao resumo de Caixa
+$visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['ResumoFinanceiro'] ? 'sidebar-right-visible' : ''; 
 ?>
 
 <!DOCTYPE html>

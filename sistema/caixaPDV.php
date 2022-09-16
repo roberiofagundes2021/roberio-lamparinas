@@ -34,15 +34,55 @@ if(isset($_POST['inputAberturaCaixaId'])) {
     $_SESSION['aberturaCaixaNome'] = $_POST['inputAberturaCaixaNome'];
 }
 
+$dataAtual = date('Y-m-d');
+
 if(isset($_SESSION['aberturaCaixaId'])) {
     $aberturaCaixaId = $_SESSION['aberturaCaixaId'];
     $nomeCaixa = $_SESSION['aberturaCaixaNome'];
 }else {
-    $_SESSION['msg']['titulo'] = "Erro";
-    $_SESSION['msg']['mensagem'] = "Para acessar o PDV pela primeira vez depois de logado deve ser pela Movimentação do Caixa!!!";
-    $_SESSION['msg']['tipo'] = "error";
+    $sql = "SELECT SituaId
+            FROM Situacao
+            WHERE SituaChave = 'ABERTO'";
+    $result = $conn->query($sql);
+    $row = $result->fetch(PDO::FETCH_ASSOC);
+    $iStatus = $row['SituaId'];
 
-    irpara('caixaMovimentacao.php');
+    //Para pegar a última consulta
+    $sql_saldoInicial    = "SELECT CxAbeId, CaixaNome, CxAbeDataHoraAbertura
+                            FROM CaixaAbertura
+                            JOIN Caixa on CaixaId = CxAbeCaixa
+                            WHERE CxAbeOperador = ".$_SESSION['UsuarId']." AND CxAbeUnidade = $_SESSION[UnidadeId] AND CxAbeStatus = $iStatus
+                            ORDER BY CxAbeId DESC";
+    $resultSaldoInicial  = $conn->query($sql_saldoInicial);
+    
+    if($rowSaldoInicial = $resultSaldoInicial->fetch(PDO::FETCH_ASSOC)) {
+        $arrayDataAbertura = explode(' ', $rowSaldoInicial['CxAbeDataHoraAbertura']);
+        $dataAbertura = $arrayDataAbertura[0];
+
+        //Verifica se o caixa foi aberto hoje, se não foi o operador terá que fechar
+        if($dataAbertura == $dataAtual) {
+            $_SESSION['aberturaCaixaId'] = $rowSaldoInicial['CxAbeId'];
+            $_SESSION['aberturaCaixaNome'] = $rowSaldoInicial['CaixaNome']; 
+            $_SESSION['aberturaCaixaData'] = $rowSaldoInicial['CxAbeDataHoraAbertura']; 
+            
+            $aberturaCaixaId = $_SESSION['aberturaCaixaId'];
+            $nomeCaixa = $_SESSION['aberturaCaixaNome'];
+        }else {
+            $_SESSION['msg']['titulo'] = "Erro";
+            $_SESSION['msg']['mensagem'] = "Você deve fechar o caixa anterior!!!";
+            $_SESSION['msg']['tipo'] = "error";	
+            
+            irpara('caixaFechamento.php'); 
+        }
+    }else {
+        $_SESSION['msg']['titulo'] = "Sucesso";
+        $_SESSION['msg']['mensagem'] = "Você deve abrir um caixa para acessar o PDV!!!";
+        $_SESSION['msg']['tipo'] = "success";
+
+        //Aqui é para a página de movimentação saber q houve um redirecionamento e daí abrir o pop up
+        $GET = '?paginaredirecionada=1';
+        irpara('caixaMovimentacao.php'.$GET); 
+    }
 }
 
 if(isset($_POST['inputAtendimentoId'])) {
