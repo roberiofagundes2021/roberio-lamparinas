@@ -658,23 +658,18 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 				</form>
 				<div class="card">
 					<div class="card-header header-elements-inline">
-						<h5 class="card-title">Agenda do Profissional</h5>
-						<div class="header-elements">
-							<div class="list-icons">
-		                		<a class="list-icons-item" data-action="collapse"></a>
-		                		<!-- <a class="list-icons-item" data-action="reload"></a>
-		                		<a class="list-icons-item" data-action="remove"></a> -->
-		                	</div>
-	                	</div>
+						<h3 class="card-title">Agenda do Profissional</h3>
 					</div>
 					
 					<div class="card-body">
-						<p class="font-size-lg">A relação abaixo faz referência à agenda do profissional <b><?php echo $rowProfissional['ProfiNome']; ?></b></p>
-
+						<div class="card-header bg-white" style="margin-top: -15px;">
+							<p class="font-size-lg" style="margin-left: -20px;">A relação abaixo faz referência à agenda do profissional <b><?php echo $rowProfissional['ProfiNome']; ?></b></p>
+						</div>
+						<br>
 						<div class="row">
-							<div class="col-md-3">
+							<div class="col-md-3" style="margin-top: 25px;">
 								<div class="mb-3" id="external-events">
-									<h6>Locais de atendimento</h6>
+									<h5 class="text-uppercase font-weight-bold">Locais de atendimento</h5>
 									<div id="locaisAtendimento" class="fc-events-container mb-3">
 									</div>
 
