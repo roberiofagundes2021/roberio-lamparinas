@@ -260,6 +260,25 @@ if(isset($_POST['inputDestinoContaFinanceiraId'])) {
     irpara('caixaMovimentacao.php');
 }
 
+$alertaFechanentoCaixa = '';
+$alerta = '';
+if(isset($_POST['inputAlerta']) && $_POST['inputAlerta'] == 'Fechar_Caixa_Anterior') {
+    $alertaFechanentoCaixa = 1;
+    $alerta = '
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                O último Caixa que você abriu em dias anteriores a hoje não foi fechado, portanto, antes de abrir um novo caixa feche o anterior
+            </div>';
+}else if(isset($_SESSION['PDVFechamentoCaixa']) && $_SESSION['PDVFechamentoCaixa'] == 'Fechar_Caixa_Anterior') {
+    $alertaFechanentoCaixa = 1;
+    $alerta = '
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                O último Caixa que você abriu em dias anteriores a hoje não foi fechado, portanto, antes de abrir o PDV você deve fechar o caixa anterior e abrir um novo caixa
+            </div>';
+    unset($_SESSION['PDVFechamentoCaixa']);
+} 
+
 $situaCaixa = '';
 
 if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
@@ -709,6 +728,11 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                             </div>
 
                             <div class="card-body">
+                                <?php 
+                                if($alertaFechanentoCaixa != '')
+                                    echo $alerta;
+                                ?>
+
                                 <div class="text-center">
                                     <h3>Dados do Fechamento</h3>
                                 </div>
