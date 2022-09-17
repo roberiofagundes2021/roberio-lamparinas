@@ -140,15 +140,11 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 	$sHora = $_POST['horaAtendimento'];
 	$iLocal = $_POST['localAtendimento'];
 	
-	// $sqlServico = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorCusto,SrVenUnidade
-	// FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
 	$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorVenda,SrVenUnidade
 	FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
 	$resultServico = $conn->query($sql);
 	$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
 
-	// $sqlMedico = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
-	// FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 	$sql = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
 	FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 	$resultMedico = $conn->query($sql);

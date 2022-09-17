@@ -389,7 +389,7 @@ try{
 		// $sqlMedico = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
 		// FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 		$sql = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
-		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade != $iUnidade";
+		FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 		$resultMedico = $conn->query($sql);
 		$resultMedico = $resultMedico->fetch(PDO::FETCH_ASSOC);
 
@@ -561,7 +561,7 @@ try{
 		foreach($row as $item){
 			$horaI = explode(':', $item['PrAgeHoraInicio']);
 			$horaF = explode(':', $item['PrAgeHoraFim']);
-			$intervalo = $item['PrAgeIntervalo'];
+			$intervalo = intval($item['PrAgeIntervalo']);
 			
 			array_push($arrayHora,
 			[
@@ -572,7 +572,7 @@ try{
 
 		echo json_encode([
 			'arrayHora' => $arrayHora,
-			'intervalo'=> $intervalo?$intervalo:30,
+			'intervalo'=> $intervalo,
 			'status' => 'success',
 			'titulo' => 'Data',
 			'menssagem' => 'Hora do profissional selecionado!!!',
