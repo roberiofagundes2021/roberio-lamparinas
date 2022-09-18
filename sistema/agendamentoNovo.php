@@ -725,7 +725,7 @@ if(isset($_POST['iAgendamento'])){
 
 									<!-- campos -->
 									<div class="col-lg-3">
-										<input id="data" name="data" type="date" class="form-control">
+										<input id="data" name="data" type="date" class="form-control"  readonly>
 									</div>
 									<div class="col-lg-6 row m-0"> 
 										<div class="col-lg-10">
