@@ -86,10 +86,21 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+	<style>
+		.excluirContainer{
+			width:100%;
+			height:220px;
+			padding:10px;
+			background-color:#f99d9d;
+			color:red;
+			opacity:0.2;
+		}
+	</style>
 
 	<script type="text/javascript" >
 		$(document).ready(function(){
 			getAgenda()
+			$('#excluirContainer').hide();
 
 			$('#salvarAgenda').on('click', ()=>{
 				$.ajax({
@@ -271,10 +282,15 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 								}
 							});
 						},
+						eventDragStart: function(event,jsEvent){
+							$('#excluirContainer').show();
+						},
 						eventDragStop: function(event,jsEvent) {
 							// alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
 
-							if((jsEvent.pageX < 330 && jsEvent.pageX > 100) && (jsEvent.pageY < 900 && jsEvent.pageY > 350)){
+							console.log('X: '+jsEvent.pageX)
+							console.log('Y: '+jsEvent.pageY)
+							if((jsEvent.pageX < 370 && jsEvent.pageX > 97) && (jsEvent.pageY < 580 && jsEvent.pageY > 289)){
 								new PNotify({
 									title: 'Confirmação',
 									text: 'Deseja excluir esse item da agenda?',
@@ -322,6 +338,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									stack: { dir1: 'down', dir2: 'right', modal: false },
 								})
 							}
+							$('#excluirContainer').hide();
 						},
 						isRTL: false
 					});
@@ -481,10 +498,15 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 								}
 							});
 						},
+						eventDragStart: function(event,jsEvent){
+							$('#excluirContainer').show();
+						},
 						eventDragStop: function(event,jsEvent) {
 							// alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
 
-							if((jsEvent.pageX < 330 && jsEvent.pageX > 100) && (jsEvent.pageY < 900 && jsEvent.pageY > 350)){
+							console.log('X: '+jsEvent.pageX)
+							console.log('Y: '+jsEvent.pageY)
+							if((jsEvent.pageX < 330 && jsEvent.pageX > 100) && (jsEvent.pageY < 550 && jsEvent.pageY > 350)){
 								new PNotify({
 									title: 'Confirmação',
 									text: 'Deseja excluir esse item da agenda?',
@@ -531,6 +553,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									addclass: 'stack-modal',
 									stack: { dir1: 'down', dir2: 'right', modal: false },
 								})
+								$('#excluirContainer').hide();
 							}
 						},
 						isRTL: false
@@ -674,7 +697,9 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									</div>
 
 									<div class="">
-										
+										<div id="excluirContainer" class="excluirContainer text-center">
+											<i style="font-size:200px;" class="fab-icon-open icon-trash"></i>
+										</div>
 									</div>
 								</div>
 							</div>
