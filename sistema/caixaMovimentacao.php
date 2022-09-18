@@ -7,6 +7,17 @@ $_SESSION['PaginaAtual'] = 'Movimentação do Caixa';
 
 include('global_assets/php/conexao.php');
 
+$abrirPopUpAberturaCaixa = 0;
+if(isset($_SESSION['aberturaCaixa']) && $_SESSION['aberturaCaixa'] == 'Abrir_Novo_Caixaz') {
+    $_SESSION['msg']['titulo'] = "Sucesso";
+    $_SESSION['msg']['mensagem'] = "Você deve abrir um caixa para acessar o PDV!!!";
+    $_SESSION['msg']['tipo'] = "success";
+
+    $abrirPopUpAberturaCaixa = 1;
+
+    unset($_SESSION['aberturaCaixa']);
+}
+
 $sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
 		FROM Fornecedor
 		JOIN Categoria on CategId = ForneCategoria
@@ -390,6 +401,7 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                                     $("#inputCaixaId").val(resposta.CxAbeCaixa);
                                     $("#inputAberturaCaixaNome").val(resposta.CaixaNome);
                                     $("#inputSituacaoCaixa").val('DEVE_FECHAR'); //Esse input serve para não permitir o acesso ao PDV caso o caixa tenha uma data diferente da de hoje e não tenha sido fechado
+                                    $('#inputAlerta').val('Fechar_Caixa_Anterior');
 
                                     document.formCaixaAbertura.action = "caixaFechamento.php";
                                     document.formCaixaAbertura.submit();
@@ -671,6 +683,14 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
             consultaSituacaoCaixa();
         });
 
+        function verificaPopUpAberturaCaixa() {
+            let abriPopUpAberturaCaixa = '<?php echo $abrirPopUpAberturaCaixa; ?>'
+
+            if(abriPopUpAberturaCaixa == '1') {
+                $("#btnPdv").click();
+            }
+        }
+
         function atualizaMovimentacaoCaixa(id, atendimento, tipo, acao) {
             //document.getElementById('inputContasAPagarId').value = ContasAPagarId;
             document.getElementById('inputReciboId').value = id;
@@ -721,21 +741,11 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
             document.formMovimentacao.submit();
         } 
-
-        
-        function caixaAbertura() {
-            //Consulta se houve um redirecionamento de página
-            let abrirPopUpCaixaAbertura = "<?php echo $abrirPopUpCaixaAbertura; ?>"
-
-            if(abrirPopUpCaixaAbertura == 1) {
-                $("#btnPdv").click();
-            }
-        }
     </script>
 
 </head>
 
-<body class="navbar-top <?php echo $visibilidadeResumoCaixa; ?> sidebar-xs" onload="caixaAbertura()">
+<body class="navbar-top <?php echo $visibilidadeResumoCaixa; ?> sidebar-xs" onload="verificaPopUpAberturaCaixa()">
 
     <?php include_once("topo.php"); ?>
 
@@ -950,6 +960,7 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                     <input type="hidden" id="inputCaixaId" name="inputCaixaId" value="">
                     <input type="hidden" id="inputAberturaCaixaNome" name="inputAberturaCaixaNome" value="">
                     <input type="hidden" id="inputSituacaoCaixa" name="inputSituacaoCaixa" value="">
+                    <input type="hidden" id="inputAlerta" name="inputAlerta" value="">
 				</form>
 
                 <form id="formMovimentacao" name="formMovimentacao" method="POST">

@@ -681,23 +681,18 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 				</form>
 				<div class="card">
 					<div class="card-header header-elements-inline">
-						<h5 class="card-title">Agenda do Profissional</h5>
-						<div class="header-elements">
-							<div class="list-icons">
-		                		<a class="list-icons-item" data-action="collapse"></a>
-		                		<!-- <a class="list-icons-item" data-action="reload"></a>
-		                		<a class="list-icons-item" data-action="remove"></a> -->
-		                	</div>
-	                	</div>
+						<h3 class="card-title">Agenda do Profissional</h3>
 					</div>
 					
 					<div class="card-body">
-						<p class="font-size-lg">A relação abaixo faz referência à agenda do profissional <b><?php echo $rowProfissional['ProfiNome']; ?></b></p>
-
+						<div class="card-header bg-white" style="margin-top: -15px;">
+							<p class="font-size-lg" style="margin-left: -20px;">A relação abaixo faz referência à agenda do profissional <b><?php echo $rowProfissional['ProfiNome']; ?></b></p>
+						</div>
+						<br>
 						<div class="row">
-							<div class="col-md-3">
+							<div class="col-md-3" style="margin-top: 25px;">
 								<div class="mb-3" id="external-events">
-									<h6>Locais de atendimento</h6>
+									<h5 class="text-uppercase font-weight-bold">Locais de atendimento</h5>
 									<div id="locaisAtendimento" class="fc-events-container mb-3">
 									</div>
 
@@ -723,7 +718,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 
 			<!--Modal Editar Situação-->
 			<div id="page-modal-horario" class="custon-modal">
-				<div class="custon-modal-container" style="max-width: 600px;">
+				<div class="custon-modal-container" style="max-width: 750px;">
 					<div class="card custon-modal-content">
 						<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
 							<p id="tituloModal" class="h5"><!-- definido ao abrir modal--></p>
@@ -754,7 +749,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 
 											<div class="col-lg-2 mt-2">
 												<div class="col-lg-12">
-													<label>Intervalo <span class="text-danger">*</span></label>
+													<label>Intervalo(min)<span class="text-danger">*</span></label>
 												</div>
 												<div class="col-lg-12">
 													<input id="horaIntervalo" class="form-control" type="number" name="number">

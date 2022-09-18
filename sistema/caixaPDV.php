@@ -7,6 +7,8 @@ $_SESSION['PaginaAtual'] = 'Caixa PDV';
 
 include('global_assets/php/conexao.php');
 
+$nomeCaixa = '';
+
 if(isset($_POST['inputAbrirCaixa'])) {
     $dataHorAtual = date('Y-m-d H:i:s');
     $saldoInicial = str_replace(',', '.', $_POST['inputSaldoInicial']);
@@ -68,20 +70,12 @@ if(isset($_SESSION['aberturaCaixaId'])) {
             $aberturaCaixaId = $_SESSION['aberturaCaixaId'];
             $nomeCaixa = $_SESSION['aberturaCaixaNome'];
         }else {
-            $_SESSION['msg']['titulo'] = "Erro";
-            $_SESSION['msg']['mensagem'] = "Você deve fechar o caixa anterior!!!";
-            $_SESSION['msg']['tipo'] = "error";	
-            
+            $_SESSION['PDVFechamentoCaixa'] = 'Fechar_Caixa_Anterior';
             irpara('caixaFechamento.php'); 
         }
     }else {
-        $_SESSION['msg']['titulo'] = "Sucesso";
-        $_SESSION['msg']['mensagem'] = "Você deve abrir um caixa para acessar o PDV!!!";
-        $_SESSION['msg']['tipo'] = "success";
-
-        //Aqui é para a página de movimentação saber q houve um redirecionamento e daí abrir o pop up
-        $GET = '?paginaredirecionada=1';
-        irpara('caixaMovimentacao.php'.$GET); 
+        $_SESSION['aberturaCaixa'] = 'Abrir_Novo_Caixaz';
+        irpara('caixaMovimentacao.php'); 
     }
 }
 
