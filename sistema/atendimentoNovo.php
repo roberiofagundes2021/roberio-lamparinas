@@ -1437,11 +1437,11 @@ if($iAtendimento){
 												</tbody>
 												<tfoot>
 													<tr>
-														<th colspan="5" class="text-right font-weight-bold" style="font-size: 16px;">
-															<div>Valor(R$):</div>
-														</th>
-														<th colspan="1" class="mr-1">
-															<div id="servicoValorTotal" class="text-center font-weight-bold" style="font-size: 15px;">R$ 0,00</div>
+														<th colspan="7" class="font-weight-bold" style="font-size: 16px;">
+														<div style="float: right;">
+															<div style="display:table-cell;padding-right:40px;">Valor(R$):</div>
+															<div id="servicoValorTotal" class="font-weight-bold" style="font-size: 15px;display:table-cell;">R$ 0,00</div>
+														</div>
 														</th>
 													</tr>
 												</tfoot>
