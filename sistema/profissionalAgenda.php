@@ -693,7 +693,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 
 			<!--Modal Editar Situação-->
 			<div id="page-modal-horario" class="custon-modal">
-				<div class="custon-modal-container" style="max-width: 600px;">
+				<div class="custon-modal-container" style="max-width: 750px;">
 					<div class="card custon-modal-content">
 						<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
 							<p id="tituloModal" class="h5"><!-- definido ao abrir modal--></p>
@@ -724,7 +724,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 
 											<div class="col-lg-2 mt-2">
 												<div class="col-lg-12">
-													<label>Intervalo <span class="text-danger">*</span></label>
+													<label>Intervalo(min)<span class="text-danger">*</span></label>
 												</div>
 												<div class="col-lg-12">
 													<input id="horaIntervalo" class="form-control" type="number" name="number">
