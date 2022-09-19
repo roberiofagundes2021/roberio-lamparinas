@@ -9,6 +9,9 @@ $_SESSION['SERVICOS'] = [];
 
 include('global_assets/php/conexao.php');
 
+$buscaDataHoje = $conn->query("SELECT CONVERT(varchar, getdate(), 23);");
+$dataHoje = $buscaDataHoje->fetch(PDO::FETCH_ASSOC);
+
 if(isset($_POST['iAgendamento'])){
 	$iAgendamento = $_POST['iAgendamento'];
 
@@ -17,9 +20,10 @@ if(isset($_POST['iAgendamento'])){
 	FROM Agendamento
 	JOIN Situacao ON SituaId = AgendSituacao
 	JOIN Cliente ON ClienId = AgendCliente
+	JOIN AtendimentoModalidade ON  Agendamento.AgendModalidade = AtendimentoModalidade.AtModId
 	WHERE AgendId = $iAgendamento";
 	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
+	$row = $result->fetch(PDO::FETCH_ASSOC);	
 }
 
 // a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
@@ -76,19 +80,19 @@ if(isset($_POST['iAgendamento'])){
 			:
 			'<script>
 				var agendamento = null;
+				var dataHoje = '.json_encode($dataHoje).';
+				dataHoje = dataHoje[""];
 			</script>';
 	?>
 	
 	<script type="text/javascript" >
 		$(document).ready(function() {
-			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
-			dataAtual = dataAtual.split(' ')[0]
-			dataAtual = dataAtual.split('/')[2]+'-'+dataAtual.split('/')[1]+'-'+dataAtual.split('/')[0]
-			$('#data').val(dataAtual)
-
+			
 			$('#servicoTable').hide()
 			alteraSituacao()
 			getCmbs()
+
+			console.log(agendamento);
 			
 			// se existir agendamento os dados serão preenchidos ao carregar a página
 			if(agendamento){
@@ -97,6 +101,9 @@ if(isset($_POST['iAgendamento'])){
 				$('#tipoRequest').val('EDITAR')
 				checkServicos(agendamento.AgendId)
 				alteraSituacao(agendamento.SituaChave);
+			}
+			else{
+				$('#data').val(dataHoje)
 			}
 
 			$('#salvarPaciente').on('click', function(e){
