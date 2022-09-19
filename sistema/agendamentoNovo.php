@@ -799,7 +799,7 @@ if(isset($_POST['iAgendamento'])){
 									<table class="table" id="servicoTable">
 										<thead>
 											<tr class="bg-slate text-center">
-												<th>Procedimento</th>
+												<th>Serviço</th>
 												<th>Médico</th>
 												<th>Data do Atendimento</th>
 												<th>Horário</th>
