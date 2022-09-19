@@ -9,8 +9,7 @@ $_SESSION['SERVICOS'] = [];
 
 include('global_assets/php/conexao.php');
 
-$buscaDataHoje = $conn->query("SELECT CONVERT(varchar, getdate(), 23);");
-$dataHoje = $buscaDataHoje->fetch(PDO::FETCH_ASSOC);
+$dataHoje = date("Y-m-d");
 
 if(isset($_POST['iAgendamento'])){
 	$iAgendamento = $_POST['iAgendamento'];
@@ -81,7 +80,6 @@ if(isset($_POST['iAgendamento'])){
 			'<script>
 				var agendamento = null;
 				var dataHoje = '.json_encode($dataHoje).';
-				dataHoje = dataHoje[""];
 			</script>';
 	?>
 	
