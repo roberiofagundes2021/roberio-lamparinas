@@ -87,13 +87,22 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	<style>
-		.excluirContainer{
+		/* .excluirContainer{
 			width:100%;
 			height:220px;
 			padding:10px;
 			background-color:#f99d9d;
 			color:red;
 			opacity:0.2;
+		} */
+		.excluirContainer {
+			width: 100%;
+			height: 220px;
+			padding: 10px;
+			background-color: #ccc;
+			color: #333;
+			opacity: 0.2;
+			border: 1px solid #333;
 		}
 	</style>
 
@@ -285,12 +294,28 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 						eventDragStart: function(event,jsEvent){
 							$('#excluirContainer').show();
 						},
-						eventDragStop: function(event,jsEvent) {
-							// alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+						eventDragStop: function(event,jsEvent) {							
+							/* 	basicamente o calculo é feito olhando sempre o tamanho do componente "excluirContainer"
+								pega a posição onde foi solto o item (jsEvent.pageX) depois verifica se essa
+								posição é maior que a posição onde se inicia o componente e menor
+								que o tamanho do mesmo(largura) somado com o valor onde ela se inicia(posicaoX)
+								ou seja:
+								larguraVerificacao = "true" se posicaoDrop > inicioComponente &&
+								posicaoDrop < (inicioComponente+largura)
+								dessa forma temos:
+								larguraVerificacao = 100 > 96 && 100 < (96+200)?true:false
+								aplicando a mesma lógica para a altura(posicaoY)
+							*/
 
-							console.log('X: '+jsEvent.pageX)
-							console.log('Y: '+jsEvent.pageY)
-							if((jsEvent.pageX < 370 && jsEvent.pageX > 97) && (jsEvent.pageY < 580 && jsEvent.pageY > 289)){
+							let largura = $('#excluirContainer').width()
+							let altura = $('#excluirContainer').height()
+							let posicaoX = $('#excluirContainer').offset().left
+							let posicaoY = $('#excluirContainer').offset().top
+
+							let larguraVerificacao = jsEvent.pageX > posicaoX && jsEvent.pageX < (posicaoX + largura)?true:false
+							let alturaVerificacao = jsEvent.pageY > posicaoY && jsEvent.pageY < (posicaoY + altura)?true:false
+
+							if(larguraVerificacao && alturaVerificacao){
 								new PNotify({
 									title: 'Confirmação',
 									text: 'Deseja excluir esse item da agenda?',
@@ -501,12 +526,28 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 						eventDragStart: function(event,jsEvent){
 							$('#excluirContainer').show();
 						},
-						eventDragStop: function(event,jsEvent) {
-							// alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+						eventDragStop: function(event,jsEvent) {							
+							/* 	basicamente o calculo é feito olhando sempre o tamanho do componente "excluirContainer"
+								pega a posição onde foi solto o item (jsEvent.pageX) depois verifica se essa
+								posição é maior que a posição onde se inicia o componente e menor
+								que o tamanho do mesmo(largura) somado com o valor onde ela se inicia(posicaoX)
+								ou seja:
+								larguraVerificacao = "true" se posicaoDrop > inicioComponente &&
+								posicaoDrop < (inicioComponente+largura)
+								dessa forma temos:
+								larguraVerificacao = 100 > 96 && 100 < (96+200)?true:false
+								aplicando a mesma lógica para a altura(posicaoY)
+							*/
 
-							console.log('X: '+jsEvent.pageX)
-							console.log('Y: '+jsEvent.pageY)
-							if((jsEvent.pageX < 330 && jsEvent.pageX > 100) && (jsEvent.pageY < 550 && jsEvent.pageY > 350)){
+							let largura = $('#excluirContainer').width()
+							let altura = $('#excluirContainer').height()
+							let posicaoX = $('#excluirContainer').offset().left
+							let posicaoY = $('#excluirContainer').offset().top
+
+							let larguraVerificacao = jsEvent.pageX > posicaoX && jsEvent.pageX < (posicaoX + largura)?true:false
+							let alturaVerificacao = jsEvent.pageY > posicaoY && jsEvent.pageY < (posicaoY + altura)?true:false
+
+							if(larguraVerificacao && alturaVerificacao){
 								new PNotify({
 									title: 'Confirmação',
 									text: 'Deseja excluir esse item da agenda?',
@@ -553,8 +594,8 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									addclass: 'stack-modal',
 									stack: { dir1: 'down', dir2: 'right', modal: false },
 								})
-								$('#excluirContainer').hide();
 							}
+							$('#excluirContainer').hide();
 						},
 						isRTL: false
 					});
@@ -698,7 +739,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 
 									<div class="">
 										<div id="excluirContainer" class="excluirContainer text-center">
-											<i style="font-size:200px;" class="fab-icon-open icon-trash"></i>
+											<i style="font-size:50px; padding-top:70px" class="fab-icon-open icon-trash"></i>
 										</div>
 									</div>
 								</div>
