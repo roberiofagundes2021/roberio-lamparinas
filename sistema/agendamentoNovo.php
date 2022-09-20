@@ -9,6 +9,8 @@ $_SESSION['SERVICOS'] = [];
 
 include('global_assets/php/conexao.php');
 
+$dataHoje = date("Y-m-d");
+
 if(isset($_POST['iAgendamento'])){
 	$iAgendamento = $_POST['iAgendamento'];
 
@@ -17,9 +19,10 @@ if(isset($_POST['iAgendamento'])){
 	FROM Agendamento
 	JOIN Situacao ON SituaId = AgendSituacao
 	JOIN Cliente ON ClienId = AgendCliente
+	JOIN AtendimentoModalidade ON  Agendamento.AgendModalidade = AtendimentoModalidade.AtModId
 	WHERE AgendId = $iAgendamento";
 	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
+	$row = $result->fetch(PDO::FETCH_ASSOC);	
 }
 
 // a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
@@ -76,19 +79,18 @@ if(isset($_POST['iAgendamento'])){
 			:
 			'<script>
 				var agendamento = null;
+				var dataHoje = '.json_encode($dataHoje).';
 			</script>';
 	?>
 	
 	<script type="text/javascript" >
 		$(document).ready(function() {
-			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
-			dataAtual = dataAtual.split(' ')[0]
-			dataAtual = dataAtual.split('/')[2]+'-'+dataAtual.split('/')[1]+'-'+dataAtual.split('/')[0]
-			$('#data').val(dataAtual)
-
+			
 			$('#servicoTable').hide()
 			alteraSituacao()
 			getCmbs()
+
+			console.log(agendamento);
 			
 			// se existir agendamento os dados serão preenchidos ao carregar a página
 			if(agendamento){
@@ -97,6 +99,9 @@ if(isset($_POST['iAgendamento'])){
 				$('#tipoRequest').val('EDITAR')
 				checkServicos(agendamento.AgendId)
 				alteraSituacao(agendamento.SituaChave);
+			}
+			else{
+				$('#data').val(dataHoje)
 			}
 
 			$('#salvarPaciente').on('click', function(e){
@@ -725,7 +730,7 @@ if(isset($_POST['iAgendamento'])){
 
 									<!-- campos -->
 									<div class="col-lg-3">
-										<input id="data" name="data" type="date" class="form-control">
+										<input id="data" name="data" type="date" class="form-control"  readonly>
 									</div>
 									<div class="col-lg-6 row m-0"> 
 										<div class="col-lg-10">
@@ -799,7 +804,7 @@ if(isset($_POST['iAgendamento'])){
 									<table class="table" id="servicoTable">
 										<thead>
 											<tr class="bg-slate text-center">
-												<th>Procedimento</th>
+												<th>Serviço</th>
 												<th>Médico</th>
 												<th>Data do Atendimento</th>
 												<th>Horário</th>

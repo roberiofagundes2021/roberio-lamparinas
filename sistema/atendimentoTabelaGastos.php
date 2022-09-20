@@ -188,11 +188,11 @@ if ($row['ClienSexo'] == 'F'){
 			});
 
 			divTotal = `<div class="row">
-                            <div class="col-lg-8">
+                            <div class="col-lg-9">
 								<button class="btn btn-lg btn-principal" id="fecharConta">Fechar Conta</button>
 								<a href="atendimento.php" class="btn btn-basic" role="button">Voltar</a>
 							</div>
-							<div id="tabelaValores" class="col-lg-4">	
+							<div id="tabelaValores" class="col-lg-3"  style="margin-left:-40px;">	
 								<div style='font-weight: bold;'>Desconto: </div> <br> 
 								<div style='font-weight: bold;'>TOTAL A PAGAR: </div>
 							</div>
