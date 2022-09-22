@@ -13,7 +13,7 @@ if(isset($_POST['inputServicoId'])){
 	
 	try{
 		
-		$sql = "SELECT SrVenId,SrVenNome,  SrVenPlanoConta, SrVenDetalhamento, SrVenValorCusto, SrVenOutrasDespesas, 
+		$sql = "SELECT SrVenId, SrVenCodigo, SrVenNome, SrVenPlanoConta, SrVenEspecialidade, SrVenDetalhamento, SrVenValorCusto, SrVenOutrasDespesas, 
                        SrVenCustoFinal, SrVenMargemLucro, SrVenValorVenda, SituaChave
 				FROM ServicoVenda
 				JOIN Situacao on SituaId = SrVenStatus
@@ -46,16 +46,18 @@ if(isset($_POST['inputNome'])){
 
 		$conn->beginTransaction(); 
 		
-		$sql = "UPDATE ServicoVenda SET SrVenNome = :sNome, SrVenPlanoConta = :sPlanoConta, SrVenDetalhamento = :sDetalhamento, 
-		               SrVenValorCusto = :fValorCusto, SrVenOutrasDespesas = :fOutrasDespesas, SrVenCustoFinal = :fCustoFinal, 
+		$sql = "UPDATE ServicoVenda SET SrVenCodigo = :sCodigo, SrVenNome = :sNome, SrVenPlanoConta = :sPlanoConta, SrVenEspecialidade = :iEspecialidade,
+					   SrVenDetalhamento = :sDetalhamento, SrVenValorCusto = :fValorCusto, SrVenOutrasDespesas = :fOutrasDespesas, SrVenCustoFinal = :fCustoFinal, 
 					   SrVenMargemLucro = :fMargemLucro, SrVenValorVenda = :fValorVenda, SrVenUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE SrVenId = :iServico ";
 
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
+						':sCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
 						':sPlanoConta' => $_POST['cmbPlanoConta'],
+						':iEspecialidade' => $_POST['cmbEspecialidade'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
@@ -102,23 +104,21 @@ if(isset($_POST['inputNome'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<!-- /theme JS files -->	
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
 		
-		
-
-        $(document).ready(function() {
+		$(document).ready(function() {
 
 			//Limpa o campo Nome quando for digitado só espaços em branco
 			$("#inputNome").on('blur', function(e){
@@ -284,15 +284,24 @@ if(isset($_POST['inputNome'])){
                                 <div class="media-body">
 
                                     <div class="row">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputCodigo">Código</label>
+												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="<?php echo $row['SrVenCodigo']; ?>">
+											</div>
+										</div>
+										
 
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-9">
                                             <div class="form-group">
                                                 <label for="inputNome">Nome <span class="text-danger">*</span></label>
                                                 <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['SrVenNome']; ?>" required>
                                             </div>
-                                        </div>
-                                        
-                                        <div class="col-lg-6">
+                                        </div>                                                                                                    
+                                    </div>
+
+									<div class="row">
+										<div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="cmbPlanoConta">Plano de Conta <span class="text-danger">*</span></label>
                                                 <select id="cmbPlanoConta" name="cmbPlanoConta" class="form-control form-control-select2" required>
@@ -314,8 +323,30 @@ if(isset($_POST['inputNome'])){
                                                 </select>
                                             </div>
                                         </div>
-                                                                                                                                            
-                                    </div>
+
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbEspecialidade">Especialidade <span class="text-danger">*</span></label>
+												<select id="cmbEspecialidade" name="cmbEspecialidade" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
+													<?php 
+														$sql = "SELECT EspecId, EspecNome
+																FROM Especialidade
+																JOIN Situacao on SituaId = EspecStatus
+																WHERE EspecUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY EspecNome ASC";
+														$result = $conn->query($sql);
+														$rowEspecialidade = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($rowEspecialidade as $item) {
+															$seleciona = $item['EspecId'] == $row['SrVenEspecialidade'] ? "selected" : "";
+                                                            print('<option value="' . $item['EspecId'] . '" '. $seleciona .'>'. $item['EspecNome'] . '</option>');
+														}
+													?>
+												</select>
+											</div>
+										</div>
+									</div>
 
                                     <div class="row">
                                         <div class="col-lg-12">
