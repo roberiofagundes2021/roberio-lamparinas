@@ -86,10 +86,30 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+	<style>
+		/* .excluirContainer{
+			width:100%;
+			height:220px;
+			padding:10px;
+			background-color:#f99d9d;
+			color:red;
+			opacity:0.2;
+		} */
+		.excluirContainer {
+			width: 100%;
+			height: 220px;
+			padding: 10px;
+			background-color: #ccc;
+			color: #333;
+			opacity: 0.2;
+			border: 1px solid #333;
+		}
+	</style>
 
 	<script type="text/javascript" >
 		$(document).ready(function(){
 			getAgenda()
+			$('#excluirContainer').hide();
 
 			$('#salvarAgenda').on('click', ()=>{
 				$.ajax({
@@ -271,10 +291,31 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 								}
 							});
 						},
-						eventDragStop: function(event,jsEvent) {
-							// alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+						eventDragStart: function(event,jsEvent){
+							$('#excluirContainer').show();
+						},
+						eventDragStop: function(event,jsEvent) {							
+							/* 	basicamente o calculo é feito olhando sempre o tamanho do componente "excluirContainer"
+								pega a posição onde foi solto o item (jsEvent.pageX) depois verifica se essa
+								posição é maior que a posição onde se inicia o componente e menor
+								que o tamanho do mesmo(largura) somado com o valor onde ela se inicia(posicaoX)
+								ou seja:
+								larguraVerificacao = "true" se posicaoDrop > inicioComponente &&
+								posicaoDrop < (inicioComponente+largura)
+								dessa forma temos:
+								larguraVerificacao = 100 > 96 && 100 < (96+200)?true:false
+								aplicando a mesma lógica para a altura(posicaoY)
+							*/
 
-							if((jsEvent.pageX < 330 && jsEvent.pageX > 100) && (jsEvent.pageY < 900 && jsEvent.pageY > 350)){
+							let largura = $('#excluirContainer').width()
+							let altura = $('#excluirContainer').height()
+							let posicaoX = $('#excluirContainer').offset().left
+							let posicaoY = $('#excluirContainer').offset().top
+
+							let larguraVerificacao = jsEvent.pageX > posicaoX && jsEvent.pageX < (posicaoX + largura)?true:false
+							let alturaVerificacao = jsEvent.pageY > posicaoY && jsEvent.pageY < (posicaoY + altura)?true:false
+
+							if(larguraVerificacao && alturaVerificacao){
 								new PNotify({
 									title: 'Confirmação',
 									text: 'Deseja excluir esse item da agenda?',
@@ -322,6 +363,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									stack: { dir1: 'down', dir2: 'right', modal: false },
 								})
 							}
+							$('#excluirContainer').hide();
 						},
 						isRTL: false
 					});
@@ -481,10 +523,31 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 								}
 							});
 						},
-						eventDragStop: function(event,jsEvent) {
-							// alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+						eventDragStart: function(event,jsEvent){
+							$('#excluirContainer').show();
+						},
+						eventDragStop: function(event,jsEvent) {							
+							/* 	basicamente o calculo é feito olhando sempre o tamanho do componente "excluirContainer"
+								pega a posição onde foi solto o item (jsEvent.pageX) depois verifica se essa
+								posição é maior que a posição onde se inicia o componente e menor
+								que o tamanho do mesmo(largura) somado com o valor onde ela se inicia(posicaoX)
+								ou seja:
+								larguraVerificacao = "true" se posicaoDrop > inicioComponente &&
+								posicaoDrop < (inicioComponente+largura)
+								dessa forma temos:
+								larguraVerificacao = 100 > 96 && 100 < (96+200)?true:false
+								aplicando a mesma lógica para a altura(posicaoY)
+							*/
 
-							if((jsEvent.pageX < 330 && jsEvent.pageX > 100) && (jsEvent.pageY < 900 && jsEvent.pageY > 350)){
+							let largura = $('#excluirContainer').width()
+							let altura = $('#excluirContainer').height()
+							let posicaoX = $('#excluirContainer').offset().left
+							let posicaoY = $('#excluirContainer').offset().top
+
+							let larguraVerificacao = jsEvent.pageX > posicaoX && jsEvent.pageX < (posicaoX + largura)?true:false
+							let alturaVerificacao = jsEvent.pageY > posicaoY && jsEvent.pageY < (posicaoY + altura)?true:false
+
+							if(larguraVerificacao && alturaVerificacao){
 								new PNotify({
 									title: 'Confirmação',
 									text: 'Deseja excluir esse item da agenda?',
@@ -532,6 +595,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									stack: { dir1: 'down', dir2: 'right', modal: false },
 								})
 							}
+							$('#excluirContainer').hide();
 						},
 						isRTL: false
 					});
@@ -674,7 +738,9 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									</div>
 
 									<div class="">
-										
+										<div id="excluirContainer" class="excluirContainer text-center">
+											<i style="font-size:50px; padding-top:70px" class="fab-icon-open icon-trash"></i>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -693,7 +759,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 
 			<!--Modal Editar Situação-->
 			<div id="page-modal-horario" class="custon-modal">
-				<div class="custon-modal-container" style="max-width: 600px;">
+				<div class="custon-modal-container" style="max-width: 750px;">
 					<div class="card custon-modal-content">
 						<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
 							<p id="tituloModal" class="h5"><!-- definido ao abrir modal--></p>
@@ -724,7 +790,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 
 											<div class="col-lg-2 mt-2">
 												<div class="col-lg-12">
-													<label>Intervalo <span class="text-danger">*</span></label>
+													<label>Intervalo(min)<span class="text-danger">*</span></label>
 												</div>
 												<div class="col-lg-12">
 													<input id="horaIntervalo" class="form-control" type="number" name="number">

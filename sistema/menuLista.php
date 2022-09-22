@@ -37,7 +37,6 @@ include_once("sessao.php");
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
-		getAllMenus()
 
         $(document).ready(function() {
         	$('#tblMenu').DataTable({
@@ -134,6 +133,7 @@ include_once("sessao.php");
 
 			_componentSelect2();
 			/* Fim: Tabela Personalizada */
+			getAllMenus()
         }); // document.ready
 
 		function atualizaMenu(id){

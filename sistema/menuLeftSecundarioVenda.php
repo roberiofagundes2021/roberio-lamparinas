@@ -88,7 +88,7 @@
 			<div class="card-body p-0">
 				<?php if($ClaChave == 'AMBULATORIAL'){?>
 					<ul class="nav nav-sidebar" data-nav-type="accordion">
-						<li class="nav-item-header"><b><?php echo "".strtoupper($ClaNome); ?></b></li>
+						<li style="padding: 20px 0px 0px 20px;"><h2 style="font-weight: 500"><?php echo "".strtoupper($ClaNome); ?></b></li>
 
 						<li class="nav-item-divider"></li>
 
