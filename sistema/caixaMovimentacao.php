@@ -665,11 +665,13 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                     success: function(resposta) {
                         //Essa condicional acontece quando n há registros no banco
                         if(resposta == 'abrirCaixa') {
-                            $("#caixaEmOperacao").hide();
+                            $(".caixaEmOperacao").hide();
                         }else {
                             //Essa situação é quando há registros, porém o caixa está fechado
                             if(resposta.SituaChave == 'FECHADO') {
-                                $("#caixaEmOperacao").hide();
+                                $(".caixaEmOperacao").hide();
+                            }else {
+                                $(".caixaEmOperacao").show();
                             }
                             
                             $("#inputAberturaCaixaId").val(resposta.CxAbeId);
@@ -761,6 +763,8 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
             <!-- Content area -->
             <div class="content">
+
+                <?php include_once("botoesCaixa.php"); ?>
 
                 <!-- Info blocks -->
                 <div class="row">
