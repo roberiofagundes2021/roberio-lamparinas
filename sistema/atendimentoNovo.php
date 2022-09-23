@@ -1466,28 +1466,10 @@ if($iAtendimento){
 
 						<div id="informacoes" class="card ">
 							<div id="novoPaciente" class="">
-								<div class="card-header header-elements-inline" style="margin-left:10px;">
-									<h5 class="text-uppercase font-weight-bold">Dados Pessoais do paciente</h5>
-								</div>
-								<div class="card-body">
-									<div class="row" style="margin-left:2px;">
-										<div class="col-lg-4">
-											<div class="form-group">
-												<div class="form-check form-check-inline">
-													<input class="form-input-styled" id="fisica" name="pessoaTipo" type="radio" checked />
-													<label class="form-check-label" for="fisica">Física</label>
-												</div>
-
-												<div class="form-check form-check-inline">
-													<input class="form-input-styled" id="juridica" name="pessoaTipo" type="radio" />
-													<label class="form-check-label" for="juridica">Jurídica</label>
-												</div>
-											</div>
-										</div>	
-									</div>										
-
-									<div class="col-lg-12 my-3 text-black-50">
-										<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
+								<div class="card-body">	
+									
+									<div class="card-header header-elements-inline" style="margin-left: -10px;">
+										<h5 class="text-uppercase font-weight-bold">Dados Pessoais do paciente</h5>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
@@ -1857,22 +1839,6 @@ if($iAtendimento){
 
 									<div class="card-header header-elements-inline" style="margin-left: -10px;">
 										<h5 class="text-uppercase font-weight-bold">Dados Pessoais do paciente</h5>
-									</div>
-
-									<div class="row col-lg-12">
-										<div class="col-lg-1 text-center">
-											<input class="mr-1" id="fisicaNew" name="pessoaTipo" type="radio" checked />
-											<label for="fisica">Física</label>
-										</div>
-
-										<div class="col-lg-1 text-center">
-											<input class="mr-1" id="juridicaNew" name="pessoaTipo" type="radio" />
-											<label for="juridica">Jurídica</label>
-										</div>
-									</div>
-
-									<div class="col-lg-12 my-3 text-black-50">
-										<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
