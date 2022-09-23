@@ -392,7 +392,6 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 				if($(element).hasClass('multiselect-item')){
 					let check = $(element).children().children().first();
                     let value = $(check).val()
-					console.log(value)
 					check.click((e) => {
 						try {
 						    $.post(
@@ -544,7 +543,6 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 						cmbCentroDeCustos: cmbCentroDeCustosReq,
 						cmbPlanoContas: cmbPlanoContasReq,
 					};
-					// console.log(request)
 					/* Adicionando os dados do filtro para o formulário que será enviado para o exportar */
 
 					$("#quantityPages").val(quantityPages)
@@ -556,14 +554,9 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 					$("#inputDataFim").val()
 					$("#inputCentroDeCustos").val(cmbCentroDeCustosReq)
 					$("#inputPlanoContas").val(cmbPlanoContasReq)
-					// console.log($("#cmbPlanoContas").val())
 
 					const form = $("#formFluxoDeCaixaExportar").children()
-					// console.log(form)
-					form.each((i, e)=>{
-                       console.log($(e).val())
-					})
-
+					
 					$('#dataResponse').html(msg);
 
 					try {
@@ -646,7 +639,19 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 													<span class="input-group-prepend">
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
-													<input type="date" id="inputDataInicio" name="inputDataInicio"  min="1800-01-01" max="2100-12-31"  class="form-control" placeholder="Data Início" value="" >
+
+													<?php $dataInicio = date("Y-m-d",strtotime("-4 days")); ?>
+													<input 
+														type="date" 
+														id="inputDataInicio"
+														name="inputDataInicio" 
+														min="1800-01-01"
+														max="2100-12-31" 
+														class="form-control"
+														placeholder="Data Início"
+														value="<?php echo $dataInicio ?>" 
+													>
+													
 												</div>
 											</div>
 										</div>
@@ -658,7 +663,20 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 													<span class="input-group-prepend">
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
-													<input type="date" id="inputDataFim" name="inputDataFim"  min="1800-01-01" max="2100-12-31" class="form-control" placeholder="Data Fim" value="" >
+													<?php $dataFim = date("Y-m-d"); ?>
+													<input 
+														type="date" 
+														id="inputDataFim" 
+														name="inputDataFim"  
+														min="1800-01-01" 
+														max="2100-12-31" 
+														class="form-control" 
+														placeholder="Data Fim"
+														value="<?php echo $dataFim ?>" 
+														
+													>	
+														
+
 												</div>
 											</div>
 										</div>
