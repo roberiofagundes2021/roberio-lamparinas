@@ -505,6 +505,9 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
 
             _componentSelect2();
 
+            //Para mostrar os botões ocultos do caixa
+            $(".caixaEmOperacao").show();
+
             function inputsValorGaveta() {
                 var contadorLinha = $("#tblFechamentoCaixa tr").length;
                 
@@ -705,6 +708,8 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
 
             <!-- Content area -->
             <div class="content">
+
+                <?php include_once("botoesCaixa.php"); ?>
 
                 <!-- Info blocks -->
                 <div class="row">

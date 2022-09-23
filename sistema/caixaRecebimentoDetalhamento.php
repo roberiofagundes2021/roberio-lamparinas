@@ -88,7 +88,8 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
     <script type="text/javascript">
         $(document).ready(function () {
-
+            //Para mostrar os botões ocultos do caixa
+            $(".caixaEmOperacao").show();
         });
     </script>
 
@@ -110,6 +111,8 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
             <!-- Content area -->
             <div class="content">
+
+                <?php include_once("botoesCaixa.php"); ?>
 
                 <!-- Info blocks -->
                 <div class="row">

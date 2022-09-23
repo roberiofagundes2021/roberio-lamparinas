@@ -10,15 +10,17 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "INSERT INTO ServicoVenda (SrVenNome, SrVenPlanoConta, SrVenDetalhamento, SrVenValorCusto, SrVenOutrasDespesas, SrVenCustoFinal, 
+		$sql = "INSERT INTO ServicoVenda (SrVenCodigo, SrVenNome, SrVenPlanoConta, SrVenEspecialidade, SrVenDetalhamento, SrVenValorCusto, SrVenOutrasDespesas, SrVenCustoFinal, 
 		                                  SrVenMargemLucro, SrVenValorVenda, SrVenStatus, SrVenUsuarioAtualizador, SrVenUnidade) 
-				VALUES ( :sNome, :sPlanoConta, :sDetalhamento, :fValorCusto, :fOutrasDespesas, :fCustoFinal, 
+				VALUES ( :sCodigo, :sNome, :sPlanoConta, :iEspecialidade, :sDetalhamento, :fValorCusto, :fOutrasDespesas, :fCustoFinal, 
 				         :fMargemLucro, :fValorVenda, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
+						':sCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
 						':sPlanoConta' => $_POST['cmbPlanoConta'],
+						':iEspecialidade' => $_POST['cmbEspecialidade'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
@@ -60,17 +62,17 @@ if(isset($_POST['inputNome'])){
 	<?php include_once("head.php"); ?>
 	
 	<!-- Theme JS files -->
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
 	<!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
-
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 	<!-- /theme JS files -->
 
 	<!-- Adicionando Javascript -->
@@ -241,12 +243,21 @@ if(isset($_POST['inputNome'])){
 								
 								<div class="media-body">
 									<div class="row">	
-										<div class="col-lg-6">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputCodigo">Código</label>
+												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código">
+											</div>
+										</div>
+										<div class="col-lg-9">
 											<div class="form-group">
 												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" required>
 											</div>
 										</div>
+									</div>
+
+									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="cmbPlanoConta">Plano de Conta <span class="text-danger">*</span></label>
@@ -265,6 +276,27 @@ if(isset($_POST['inputNome'])){
 															print('<option value="'.$item['PlConId'].'">'.$item['PlConNome'].'</option>');
 														}
 													
+													?>
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="cmbEspecialidade">Especialidade <span class="text-danger">*</span></label>
+												<select id="cmbEspecialidade" name="cmbEspecialidade" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
+													<?php 
+														$sql = "SELECT EspecId, EspecNome
+																FROM Especialidade
+																JOIN Situacao on SituaId = EspecStatus
+																WHERE EspecUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																ORDER BY EspecNome ASC";
+														$result = $conn->query($sql);
+														$rowEspecialidade = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($rowEspecialidade as $item) {
+															print('<option value="' . $item['EspecId'] . '">'. $item['EspecNome'] . '</option>');
+														}
 													?>
 												</select>
 											</div>
