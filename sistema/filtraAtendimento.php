@@ -26,6 +26,8 @@ try{
 		];
 	}
 
+	// feito consultas para buscar de acordo com a classificação do atendimento
+	// (ATENDIMENTOSAMBULATORIAIS, ATENDIMENTOSHOSPITALARES, ATENDIMENTOSELETIVOS)
 	if($tipoRequest == 'ATENDIMENTOS'){
 		$acesso = $_POST['acesso'];
 		$array = [];
