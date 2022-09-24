@@ -138,6 +138,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					}
 				} else if(Tipo == 'agenda'){
 					document.formProfissional.action = "profissionalAgenda.php";
+				} else if(Tipo == 'servico'){
+					document.formProfissional.action = "profissionalServico.php";
 				}
 			}
 			document.formProfissional.submit();
@@ -248,6 +250,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															<div class="dropdown-divider"></div>
 																<a href="#" onclick="atualizaProfissional(1,'.$item['ProfiId'].', \''.$item['ProfiNome'].'\','.$item['ProfiStatus'].', \'historico\');" class="dropdown-item" title="Histórico"><i class="icon-stack"></i> Histórico</a>
 																<a href="#" onclick="atualizaProfissional(1,'.$item['ProfiId'].', \''.$item['ProfiNome'].'\','.$item['ProfiStatus'].', \'agenda\');" class="dropdown-item" title="Agenda"><i class="icon-calendar2"></i> Agenda</a>
+																<a href="#" onclick="atualizaProfissional(1,'.$item['ProfiId'].', \''.$item['ProfiNome'].'\','.$item['ProfiStatus'].', \'servico\');" class="dropdown-item" title="Serviço"><i class="icon-diff"></i> Serviço</a>
 														</div>
 													</div>
 												</div>
