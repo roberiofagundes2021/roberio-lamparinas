@@ -829,7 +829,7 @@ try{
 
 		$paciente = [
 			'id' => 'NOVO',
-			'pessoaTipo' => isset($_POST['pessoaTipo'])?$_POST['pessoaTipo']:'F',
+			'pessoaTipo' =>'F',
 			'prontuario' => isset($_POST['prontuario'])?$_POST['prontuario']:'null',
 			'nome' => isset($_POST['nome'])?$_POST['nome']:'null',
 			'cpf' => isset($_POST['cpf'])?$_POST['cpf']:'null',
@@ -971,7 +971,7 @@ try{
 			}
 	
 			$sql = "UPDATE Cliente SET 
-				ClienTipo= '$cliente[pessoaTipo]',
+				ClienTipo= 'F',
 				ClienNome= '$cliente[nome]',
 				ClienRazaoSocial= '$cliente[nome]',
 				ClienCpf= '$cliente[cpf]',

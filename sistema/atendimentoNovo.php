@@ -140,7 +140,6 @@ if($iAtendimento){
 					}
 					let paciente = $('#parentescoCadatrado').val()?{
 						'id': $('#paciente').val(),
-						'pessoaTipo': ($('#fisica').is(':checked')?'F':'J'),
 						'prontuario': $('#prontuario').val(),
 						'nome': $('#nome').val(),
 						'cpf': $('#cpf').val(),
@@ -511,7 +510,6 @@ if($iAtendimento){
 					dataType: 'json',
 					data:{
 						'tipoRequest': 'SALVARPACIENTE',
-						'pessoaTipo': $('#pessoaTipoNew').val(),
 						'prontuario': $('#prontuarioNew').val(),
 						'nome': $('#nomeNew').val(),
 						'cpf': $('#cpfNew').val(),
@@ -831,11 +829,6 @@ if($iAtendimento){
 					},
 					success: function(response) {
 						if(response.status == 'success'){
-							switch(response.tipoPessoa){
-								case 'F':$('#fisica').attr('checked', true);$('#juridica').attr('checked', false);break;
-								case 'J':$('#fisica').attr('checked', false);$('#juridica').attr('checked', true);break;
-							}
-	
 							$('#prontuario').val(response.prontuario)
 							$('#nome').val(response.nome)
 							$('#cpf').val(response.cpf)
