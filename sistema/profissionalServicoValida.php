@@ -4,14 +4,16 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['nomeVelho'])){
+if(isset($_POST['servicoVelho'])){
 	$sql = "SELECT *
 			FROM ProfissionalXServicoVenda
-			WHERE and PrXSVServicoVenda = '". $_POST['nomeNovo']."' and PrXSVServicoVenda <> '". $_POST['nomeVelho']."'";
+			WHERE PrXSVUnidade = ". $_SESSION['UnidadeId']. " and PrXSVProfissional = ". $_POST['profissionalId'] . " and 
+			PrXSVServicoVenda = ". $_POST['servicoNovo']." and PrXSVServicoVenda <> ". $_POST['servicoVelho'];
 } else{
 	$sql = "SELECT *
 			FROM ProfissionalXServicoVenda
-			WHERE PrXSVServicoVenda = '". $_POST['nome']."'";
+			WHERE PrXSVUnidade = ". $_SESSION['UnidadeId']. " and PrXSVProfissional = ". $_POST['profissionalId'] . " and 
+			PrXSVServicoVenda = ". $_POST['servicoNovo'];
 }
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
