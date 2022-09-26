@@ -6,12 +6,14 @@ $_SESSION['PaginaAtual'] = 'Novo Profissional';
 
 include('global_assets/php/conexao.php');
 
+$iUnidade = $_SESSION['UnidadeId'];
+
 if(isset($_POST['inputTipo'])){
 
 	try{		
 		$sql = "SELECT COUNT(isnull(ProfiCodigo,0)) as Codigo
 				FROM Profissional
-				Where ProfiUnidade = ".$_SESSION['UnidadeId']."";
+				Where ProfiUnidade = $iUnidade";
 		//echo $sql;die;
 		$result = $conn->query("$sql");
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -25,12 +27,12 @@ if(isset($_POST['inputTipo'])){
 	try{
 			
 		$sql = "INSERT INTO Profissional (ProfiCodigo, ProfiTipo, ProfiNome, ProfiRazaoSocial, ProfiCnpj, ProfiInscricaoMunicipal, ProfiInscricaoEstadual, 
-									    ProfiCpf, ProfiRg, ProfiOrgaoEmissor, ProfiUf, ProfiSexo, ProfiDtNascimento, ProfiProfissao, ProfiConselho, ProfiNumConselho, ProfiCNES, ProfiEspecialidade, 
+									    ProfiCpf, ProfiRg, ProfiOrgaoEmissor, ProfiUf, ProfiSexo, ProfiDtNascimento, ProfiProfissao, ProfiConselho, ProfiNumConselho, ProfiCNES, 
 									    ProfiCep, ProfiEndereco, ProfiNumero, ProfiComplemento, ProfiBairro, ProfiCidade, 
 										ProfiEstado, ProfiContato, ProfiTelefone, ProfiCelular, ProfiEmail, ProfiSite, ProfiObservacao, ProfiBanco, ProfiAgencia,
                                         ProfiConta, ProfiInformacaoAdicional, ProfiUsuario, ProfiStatus, ProfiUsuarioAtualizador, ProfiUnidade)
 				VALUES (:sCodigo,:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual,  
-						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sProfissao, :sConselho, :sNumConselho, :sCnes, :sEspecialidade, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
+						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sProfissao, :sConselho, :sNumConselho, :sCnes, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
 						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :sBanco, :sAgencia, :sConta, :sInformacaoAdicional, :iUsuario,
 						:bStatus, :iUsuarioAtualizador, :iUnidade)";
 							   
@@ -56,7 +58,6 @@ if(isset($_POST['inputTipo'])){
 			':sConselho' => $_POST['inputTipo'] == 'F' ? ($_POST['cmbConselho'] == '#' ? null : $_POST['cmbConselho']) : null,
             ':sNumConselho' => $_POST['inputTipo'] == 'F' ? $_POST['inputNumConselho'] : null,
             ':sCnes' => $_POST['inputTipo']  == 'J' ? $_POST['inputCnesPJ'] : $_POST['inputCnesPF'],
-            ':sEspecialidade' => $_POST['inputTipo'] == 'F' ? ($_POST['cmbEspecialidade'] == '#' ? null : $_POST['cmbEspecialidade']) : null,
 			':sCep' => $_POST['inputCep'],           
 			':sEndereco' => $_POST['inputEndereco'],
 			':sNumero' => $_POST['inputNumero'],
@@ -77,10 +78,24 @@ if(isset($_POST['inputTipo'])){
 			':iUsuario' => $_POST['cmbUsuario'],
 			':bStatus' => 1,
 			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iUnidade' => $_SESSION['UnidadeId']
+			':iUnidade' => $iUnidade
 			));
 		
 		$conn->commit();
+
+		$profissional = $conn->lastInsertId();
+
+		if($_POST['inputTipo'] == 'F'){
+			$sql = "INSERT INTO ProfissionalXEspecialidade(PrXEsProfissional,PrXEsEspecialidade,PrXEsUnidade)
+			VALUES ";
+
+			foreach($_POST['cmbEspecialidade'] as $item){
+				$sql .= "('$profissional', '$item', '$iUnidade'),";
+			}
+			$sql = substr($sql, 0, -1);
+			$conn->query($sql);
+		}
+
 
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Profissional incluído!!!";
@@ -617,8 +632,7 @@ if(isset($_POST['inputTipo'])){
                                                 
                                                     <div class="col-lg-3">
                                                         <label for="cmbEspecialidade">Especialidades</label>
-                                                        <select id="cmbEspecialidade" name="cmbEspecialidade" class="form-control select-search">
-                                                            <option value="#">Seleciona uma especialidade</option>
+														<select id="cmbEspecialidade" name="cmbEspecialidade[]" class="form-control select-search form-control-select2 select" multiple="multiple" data-fouc>
                                                             <?php
                                                             $sql = "SELECT EspecId, EspecNome
                                                                     FROM Especialidade
@@ -632,7 +646,7 @@ if(isset($_POST['inputTipo'])){
                                                                 print('<option value="' . $item['EspecId'] . '">' . $item['EspecNome'] . '</option>');
                                                             }
                                                             ?>
-                                                        </select>
+														</select>
                                                     </div>								
                                                 </div>										
                                             </div>
