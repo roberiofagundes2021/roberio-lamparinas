@@ -1,0 +1,93 @@
+<?php
+
+include_once("sessao.php");
+$_SESSION['PaginaAtual'] = 'Novo Cliente';
+include('global_assets/php/conexao.php');
+echo '<script language="javascript">';
+echo 'console.log("tst")';
+echo '</script>';
+try {
+	$sql = "SELECT COUNT(isnull(clienCodigo,0)) as Codigo
+				FROM Cliente
+				Where ClienUnidade = " . $_SESSION['UnidadeId'] . "";
+	//echo $sql;die;
+	$result = $conn->query("$sql");
+	$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);
+
+	$sCodigo = (int)$rowCodigo['Codigo'] + 1;
+	$sCodigo = str_pad($sCodigo, 6, "0", STR_PAD_LEFT);
+} catch (PDOException $e) {
+	echo 'Error1: ' . $e->getMessage();
+	die;
+}
+
+try {
+
+	$sql = "INSERT INTO Cliente (clienCodigo, ClienTipo, ClienNome, ClienRazaoSocial, ClienCnpj, ClienInscricaoMunicipal, ClienInscricaoEstadual, 
+									    ClienCpf, ClienRg, ClienOrgaoEmissor, ClienUf, ClienSexo, ClienDtNascimento, ClienNomePai, ClienNomeMae,
+										 ClienProfissao, ClienCartaoSus, ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
+										ClienEstado, ClienContato, ClienTelefone, ClienCelular, ClienEmail, ClienSite, ClienObservacao,
+									    ClienStatus, ClienUsuarioAtualizador, ClienUnidade)
+				VALUES (:sCodigo,:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual,  
+						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sProfissao, :sCartaoSus, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
+						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, 
+						:bStatus, :iUsuarioAtualizador, :iUnidade)";
+
+	$result = $conn->prepare($sql);
+
+	$conn->beginTransaction();
+	$_POST['inputTipo']="F";
+	$result->execute(array(
+		':sCodigo' => $sCodigo,
+		':sTipo' => $_POST['inputTipo'],
+		':sNome' => $_POST['inputTipo'] == 'J' ? $_POST['inputNomePJ'] : $_POST['inputNomePF'],
+		':sRazaoSocial' => $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null,
+		':sCnpj' => null,
+		':sInscricaoMunicipal' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null,
+		':sInscricaoEstadual' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoEstadual'] : null,
+		':sCpf' => $_POST['inputTipo'] == 'F' ? limpaCPF_CNPJ($_POST['inputCpf']) : null,
+		':sRg' => $_POST['inputTipo'] == 'F' ? $_POST['inputRg'] : null,
+		':sOrgaoEmissor' => $_POST['inputTipo'] == 'F' ? $_POST['inputEmissor'] : null,
+		':sUf' => $_POST['inputTipo'] == 'J' || $_POST['cmbUf'] == '#' ? null : $_POST['cmbUf'],
+		':sSexo' => $_POST['inputTipo'] == 'J' || $_POST['cmbSexo'] == '#' ? null : $_POST['cmbSexo'],
+		':dDtNascimento' => $_POST['inputTipo'] == 'F' ? ($_POST['inputDtNascimento'] == '' ? null : $_POST['inputDtNascimento']) : null,
+		':sNomePai' => $_POST['inputTipo'] == 'F' ? $_POST['inputNomePai'] : null,
+		':sNomeMae' => $_POST['inputTipo'] == 'F' ? $_POST['inputNomeMae'] : null,
+		':sProfissao' => $_POST['inputTipo'] == 'F' ? $_POST['cmbProfissao'] : null,
+		':sCartaoSus' => $_POST['inputTipo'] == 'F' ? $_POST['inputCartaoSus'] : null,
+		':sCep' => $_POST['inputCep'],
+		':sEndereco' => $_POST['inputEndereco'],
+		':sNumero' => $_POST['inputNumero'],
+		':sComplemento' => $_POST['inputComplemento'],
+		':sBairro' => $_POST['inputBairro'],
+		':sCidade' => $_POST['inputCidade'],
+		':sEstado' => $_POST['cmbEstado'],
+		':sContato' => $_POST['inputNomeContato'],
+		':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
+		':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
+		':sEmail' => $_POST['inputEmail'],
+		':sSite' => $_POST['inputSite'],
+		':sObservacao' => $_POST['txtareaObservacao'],
+		':bStatus' => 1,
+		':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+		':iUnidade' => $_SESSION['UnidadeId']
+	));
+
+	$conn->commit();
+
+	$_SESSION['msg']['titulo'] = "Sucesso";
+	$_SESSION['msg']['mensagem'] = "Cliente incluído!!!";
+	$_SESSION['msg']['tipo'] = "success";
+} catch (PDOException $e) {
+
+	$conn->rollback();
+
+	$_SESSION['msg']['titulo'] = "Erro";
+	$_SESSION['msg']['mensagem'] = "Erro ao incluir cliente!!!";
+	$_SESSION['msg']['tipo'] = "error";
+
+	echo 'Error: ' . $e->getMessage();
+	exit;
+}
+irpara("cliente.php");
+?>
