@@ -10,14 +10,26 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputProfissionalId'])){
 	 
 	$iProfissional = $_POST['inputProfissionalId'];
+	$iUnidade = $_SESSION['UnidadeId'];
 		
 	$sql = "SELECT *
 			FROM Profissional
 			WHERE ProfiId = $iProfissional ";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
-	
-	
+
+
+	$sql = "SELECT PrXEsId,PrXEsProfissional,PrXEsEspecialidade,PrXEsUnidade
+		FROM ProfissionalXEspecialidade
+		WHERE PrXEsProfissional = $iProfissional";
+	$result = $conn->query($sql);
+	$rowEspecialidades = $result->fetchAll(PDO::FETCH_ASSOC);
+
+	$arrayEspecialidades = [];
+
+	foreach($rowEspecialidades as $item){
+		array_push($arrayEspecialidades, $item['PrXEsEspecialidade']);
+	}
 						
 	$_SESSION['msg'] = array();
 
@@ -85,6 +97,22 @@ if(isset($_POST['inputTipo'])){
 						));
 			
 		$conn->commit();
+
+		$profissional = $conn->lastInsertId();
+
+		if($_POST['inputTipo'] == 'F'){
+			$sql = "DELETE FROM ProfissionalXEspecialidade WHERE PrXEsProfissional = $iProfissional and PrXEsUnidade = $iUnidade";
+			$conn->query($sql);
+
+			$sql = "INSERT INTO ProfissionalXEspecialidade(PrXEsProfissional,PrXEsEspecialidade,PrXEsUnidade)
+			VALUES ";
+
+			foreach($_POST['cmbEspecialidade'] as $item){
+				$sql .= "('$profissional', '$item', '$iUnidade'),";
+			}
+			$sql = substr($sql, 0, -1);
+			$conn->query($sql);
+		}
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Profissional alterado!!!";
@@ -639,24 +667,25 @@ if(isset($_POST['inputTipo'])){
                                                 
                                                     <div class="col-lg-3">
                                                         <label for="cmbEspecialidade">Especialidades</label>
-                                                        <select id="cmbEspecialidade" name="cmbEspecialidade" class="form-control select-search">
-                                                            <option value="#">Seleciona uma especialidade</option>
+                                                        <select id="cmbEspecialidade" name="cmbEspecialidade[]" class="form-control select-search form-control-select2 select" multiple="multiple" data-fouc>
                                                             <?php
-                                                            $sql = "SELECT EspecId, EspecNome
-                                                                    FROM Especialidade
-                                                                    JOIN Situacao on SituaId = EspecStatus
-                                                                    WHERE EspecUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                                    ORDER BY EspecNome ASC";
-                                                            $result = $conn->query($sql);
-                                                            $rowEspecialidade = $result->fetchAll(PDO::FETCH_ASSOC);
+																$sql = "SELECT EspecId, EspecNome
+																		FROM Especialidade
+																		JOIN Situacao on SituaId = EspecStatus
+																		WHERE EspecUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																		ORDER BY EspecNome ASC";
+																$result = $conn->query($sql);
+																$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-															foreach ($rowEspecialidade as $item) {
-																$seleciona = $item['EspecId'] == $row['ProfiEspecialidade'] ? "selected" : "";
-																print('<option value="' . $item['EspecId'] . '" '. $seleciona .'>'. $item['EspecNome'] . '</option>');
-															}
-
+																foreach ($row as $item) {
+																	if(in_array($item['EspecId'], $arrayEspecialidades)){
+																		print("<option selected value='$item[EspecId]'>$item[EspecNome]</option>");
+																	}else{
+																		print("<option value='$item[EspecId]'>$item[EspecNome]</option>");
+																	}
+																}
                                                             ?>
-                                                        </select>
+														</select>
                                                     </div>									
                                                 </div>										
                                             </div>
