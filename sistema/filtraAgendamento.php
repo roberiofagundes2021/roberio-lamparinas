@@ -218,8 +218,12 @@ try{
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'MEDICOS'){
+		$servico = $_POST['servico'];
+
 		$sql = "SELECT ProfiId,ProfiNome
-		FROM Profissional WHERE ProfiUnidade = $iUnidade";
+		FROM ProfissionalXServicoVenda
+		JOIN Profissional ON ProfiId = PrXSVProfissional
+		WHERE PrXSVServicoVenda = $servico and ProfiUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];

@@ -413,6 +413,28 @@ if($iAtendimento){
 				setPacienteAtribut(iPaciente)
 			});
 
+			$('#servico').on('change', function(e){
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'MEDICOS',
+						'servico': $(this).val()
+					},
+					success: function(response) {
+						setDataProfissional()
+						setHoraProfissional()
+						$('#medicos').empty();
+						$('#medicos').append(`<option value=''>selecione</option>`)
+						response.forEach(item => {
+							let opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#medicos').append(opt)
+						})
+					}
+				});
+			})
+
 			$('#parentescoCadatrado').on('change', function(){
 				let iResponsavel = $(this).val();
 				setResponsavelAtribut(iResponsavel)
@@ -715,23 +737,6 @@ if($iAtendimento){
 					response.forEach(item => {
 						let opt = `<option value="${item.id}">${item.nome}</option>`
 						$('#servico').append(opt)
-					})
-				}
-			});
-			// vai preencher cmbMedicos
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'MEDICOS'
-				},
-				success: function(response) {
-					$('#medico').empty();
-					$('#medico').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
-						$('#medico').append(opt)
 					})
 				}
 			});
@@ -1067,10 +1072,11 @@ if($iAtendimento){
 		}
 
 		function setDataProfissional(array){
-			$('#modalData').html('').show();
-			$('#modalData').html('<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">').show();
+			$('#dataAgenda').html('').show();
+			$('#dataAgenda').html('<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">').show();
 			
 			let arrayData = array?array:undefined;
+			console.log(array)
 			$('#dataAtendimento').pickadate({
 				weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
 				monthsFull: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
@@ -1390,7 +1396,7 @@ if($iAtendimento){
 											</div>
 											<div class="col-lg-2">
 												<select id="medicos" name="medicos" class="select-search">
-													<option value="" selected>selecionar</option>
+													<option value="" selected>selecione</option>
 												</select>
 											</div>
 											<div id="dataAgenda" class="col-lg-3 input-group">

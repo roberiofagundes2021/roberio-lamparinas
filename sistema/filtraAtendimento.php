@@ -854,7 +854,7 @@ try{
 			'email' => isset($_POST['email'])?$_POST['email']:'null',
 			'observacao' => isset($_POST['observacao'])?$_POST['observacao']:'null'
 		];
-		$sql = "INSERT INTO Cliente(ClienTipo,ClienNome,ClienRazaoSocial,
+		$sql = "INSERT INTO Cliente(ClienNome,
 			ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
 			ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
 			ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
@@ -970,10 +970,8 @@ try{
 				$conn->query($sql);
 			}
 	
-			$sql = "UPDATE Cliente SET 
-				ClienTipo= 'F',
+			$sql = "UPDATE Cliente SET
 				ClienNome= '$cliente[nome]',
-				ClienRazaoSocial= '$cliente[nome]',
 				ClienCpf= '$cliente[cpf]',
 				ClienRg= '$cliente[rg]',
 				ClienOrgaoEmissor= '$cliente[emissor]',
@@ -1118,7 +1116,7 @@ try{
 	} elseif ($tipoRequest == 'PACIENTE'){
 		$iPaciente = $_POST['iPaciente'];
 
-		$sql = "SELECT ClienId,ClienTipo,ClienNome,ClienRazaoSocial,
+		$sql = "SELECT ClienId,ClienNome,
 		ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
 		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
@@ -1131,7 +1129,6 @@ try{
 		if($row){
 			$array = [
 				'status' => 'success',
-				'tipoPessoa' => $row['ClienTipo'],
 				// 'prontuario' => $item['ClienId'],
 				'nome' => $row['ClienNome'],
 				'cpf' => $row['ClienCpf'],
@@ -1186,14 +1183,14 @@ try{
 	
 		// insere o novo usuário no banco
 		$sql = "INSERT INTO  Cliente(clienCodigo,ClienNome,ClienTelefone,ClienCelular,ClienEmail,ClienObservacao,
-		ClienTipo,ClienStatus,ClienUnidade,ClienUsuarioAtualizador)
+		ClienStatus,ClienUnidade,ClienUsuarioAtualizador)
 		VALUES ('$sCodigo','$nomePaciente','$telefone','$celular','$email','$observacao','F',1,$iUnidade,$usuarioId)";
 		$conn->query($sql);
 
 		$lestIdCliente = $conn->lastInsertId();
 
 		// busca todos os usuários com o novo inserido para adicionalo ja selecionado no select
-		$sql = "SELECT ClienId,ClienTipo,ClienCodigo,ClienNome,ClienRazaoSocial,ClienCnpj,
+		$sql = "SELECT ClienId,ClienCodigo,ClienNome,ClienCnpj,
 		ClienInscricaoMunicipal,ClienInscricaoEstadual,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
 		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienCartaoSus,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
@@ -1245,9 +1242,14 @@ try{
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'MEDICOS'){
+		$servico = $_POST['servico'];
+
 		$sql = "SELECT ProfiId,ProfiNome
-		FROM Profissional WHERE ProfiUnidade = $iUnidade";
+		FROM ProfissionalXServicoVenda
+		JOIN Profissional ON ProfiId = PrXSVProfissional
+		WHERE PrXSVServicoVenda = $servico and ProfiUnidade = $iUnidade";
 		$result = $conn->query($sql);
+		$result = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$array = [];
 		foreach($result as $item){
