@@ -233,7 +233,7 @@ else {
 											<div class="col-lg-3" id="CPF">
 												<div class="form-group">
 													<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
-													<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php echo formatarCPF_Cnpj($row['ClienCpf']); ?>" <?php if ($row['ClienTipo'] == 'F') echo "required"; ?>>
+													<input required type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php echo formatarCPF_Cnpj($row['ClienCpf']); ?>">
 												</div>
 											</div>
 

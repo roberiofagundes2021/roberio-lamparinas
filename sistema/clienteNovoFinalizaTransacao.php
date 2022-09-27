@@ -23,38 +23,31 @@ try {
 
 try {
 
-	$sql = "INSERT INTO Cliente (clienCodigo, ClienTipo, ClienNome, ClienRazaoSocial, ClienCnpj, ClienInscricaoMunicipal, ClienInscricaoEstadual, 
-									    ClienCpf, ClienRg, ClienOrgaoEmissor, ClienUf, ClienSexo, ClienDtNascimento, ClienNomePai, ClienNomeMae,
-										 ClienProfissao, ClienCartaoSus, ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
-										ClienEstado, ClienContato, ClienTelefone, ClienCelular, ClienEmail, ClienSite, ClienObservacao,
-									    ClienStatus, ClienUsuarioAtualizador, ClienUnidade)
-				VALUES (:sCodigo,:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual,  
-						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sProfissao, :sCartaoSus, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
+	$sql = "INSERT INTO Cliente (clienCodigo, ClienNome,  ClienCpf, ClienRg, ClienOrgaoEmissor, ClienUf, ClienSexo, ClienDtNascimento, ClienNomePai, ClienNomeMae,
+						ClienProfissao, ClienCartaoSus, ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
+						ClienEstado, ClienContato, ClienTelefone, ClienCelular, ClienEmail, ClienSite, ClienObservacao,
+						ClienStatus, ClienUsuarioAtualizador, ClienUnidade)
+				VALUES (:sCodigo, :sNome, :sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sProfissao, :sCartaoSus, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
 						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, 
 						:bStatus, :iUsuarioAtualizador, :iUnidade)";
 
 	$result = $conn->prepare($sql);
 
 	$conn->beginTransaction();
-	$_POST['inputTipo']="F";
+
 	$result->execute(array(
 		':sCodigo' => $sCodigo,
-		':sTipo' => $_POST['inputTipo'],
-		':sNome' => $_POST['inputTipo'] == 'J' ? $_POST['inputNomePJ'] : $_POST['inputNomePF'],
-		':sRazaoSocial' => $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null,
-		':sCnpj' => null,
-		':sInscricaoMunicipal' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null,
-		':sInscricaoEstadual' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoEstadual'] : null,
-		':sCpf' => $_POST['inputTipo'] == 'F' ? limpaCPF_CNPJ($_POST['inputCpf']) : null,
-		':sRg' => $_POST['inputTipo'] == 'F' ? $_POST['inputRg'] : null,
-		':sOrgaoEmissor' => $_POST['inputTipo'] == 'F' ? $_POST['inputEmissor'] : null,
-		':sUf' => $_POST['inputTipo'] == 'J' || $_POST['cmbUf'] == '#' ? null : $_POST['cmbUf'],
-		':sSexo' => $_POST['inputTipo'] == 'J' || $_POST['cmbSexo'] == '#' ? null : $_POST['cmbSexo'],
-		':dDtNascimento' => $_POST['inputTipo'] == 'F' ? ($_POST['inputDtNascimento'] == '' ? null : $_POST['inputDtNascimento']) : null,
-		':sNomePai' => $_POST['inputTipo'] == 'F' ? $_POST['inputNomePai'] : null,
-		':sNomeMae' => $_POST['inputTipo'] == 'F' ? $_POST['inputNomeMae'] : null,
-		':sProfissao' => $_POST['inputTipo'] == 'F' ? $_POST['cmbProfissao'] : null,
-		':sCartaoSus' => $_POST['inputTipo'] == 'F' ? $_POST['inputCartaoSus'] : null,
+		':sNome' => $_POST['inputNomePF'],
+		':sCpf' => limpaCPF_CNPJ($_POST['inputCpf']),
+		':sRg' => $_POST['inputRg'],
+		':sOrgaoEmissor' => $_POST['inputEmissor'],
+		':sUf' => $_POST['cmbUf'],
+		':sSexo' => $_POST['cmbSexo'],
+		':dDtNascimento' => $_POST['inputDtNascimento'],
+		':sNomePai' => $_POST['inputNomePai'],
+		':sNomeMae' => $_POST['inputNomeMae'],
+		':sProfissao' => $_POST['cmbProfissao'],
+		':sCartaoSus' => $_POST['inputCartaoSus'],
 		':sCep' => $_POST['inputCep'],
 		':sEndereco' => $_POST['inputEndereco'],
 		':sNumero' => $_POST['inputNumero'],
@@ -72,7 +65,7 @@ try {
 		':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 		':iUnidade' => $_SESSION['UnidadeId']
 	));
-
+	
 	$conn->commit();
 
 	$_SESSION['msg']['titulo'] = "Sucesso";

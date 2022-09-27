@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Cliente';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ClienId, ClienNome, ClienCpf, ClienCnpj, ClienTelefone, ClienCelular, ClienStatus, ClienEmail, SituaNome, SituaCor, SituaChave
+$sql = "SELECT ClienId, ClienNome, ClienCpf, ClienTelefone, ClienCelular, ClienStatus, ClienEmail, SituaNome, SituaCor, SituaChave
         FROM Cliente
         JOIN Situacao on SituaId = ClienStatus
         WHERE ClienUnidade = ". $_SESSION['UnidadeId'] ." 
@@ -57,7 +57,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //CPF/CNPJ
+					orderable: true,   //CPF
 					width: "20%",
 					targets: [1]
 				},				
@@ -208,7 +208,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 								<thead>
 									<tr class="bg-slate">
 										<th>Nome</th>
-										<th>CPF/CNPJ</th>
+										<th>CPF</th>
 										<th>Celular</th>										
 										<th>E-mail</th>
 										<th>Situação</th>
@@ -223,7 +223,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacao = $item['SituaChave'] == 'ATIVO' ? 'Ativo' : 'Inativo';
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
-										$documento = $item['ClienCnpj'] == NULL ? $item['ClienCpf'] : $item['ClienCnpj'];
+										$documento = $item['ClienCpf'];
 										$telefone = $item['ClienCelular'] == NULL ? $item['ClienTelefone'] : $item['ClienCelular'];
 										
 										print('

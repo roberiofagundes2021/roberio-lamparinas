@@ -76,10 +76,6 @@ include('global_assets/php/conexao.php');
 								$("#inputBairro").val(dados.bairro);
 								$("#inputCidade").val(dados.localidade);
 								$("#cmbEstado").val(dados.uf);
-								//$("#cmbEstado").find('option[value="MA"]').attr('selected','selected');
-								//$('#cmbEstado :selected').text();
-								//$("#cmbEstado").find('option:selected').text();
-								//document.getElementById("cmbEstado").options[5].selected = true;
 							} //end if.
 							else {
 								//CEP pesquisado não foi encontrado.
@@ -109,7 +105,6 @@ include('global_assets/php/conexao.php');
 				var cep = $("#inputCep").val()
 				cep = cep.replace(' ', '')
 				$("#inputCep").val(cep)
-
 
 				var inputNome = "";
 				var inputNomePF = $('#inputNomePF').val();
@@ -514,5 +509,4 @@ include('global_assets/php/conexao.php');
 	<!-- /page content -->
 
 </body>
-
 </html>
