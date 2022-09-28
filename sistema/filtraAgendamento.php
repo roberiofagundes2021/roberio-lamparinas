@@ -97,8 +97,8 @@ try{
 		]);
 	} elseif ($tipoRequest == 'PACIENTES'){
 	
-		$sql = "SELECT ClienId,ClienTipo,ClienCodigo,ClienNome,ClienRazaoSocial,ClienCnpj,
-		ClienInscricaoMunicipal,ClienInscricaoEstadual,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+		$sql = "SELECT ClienId,ClienCodigo,ClienNome
+		,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
 		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienCartaoSus,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
 		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
@@ -139,19 +139,14 @@ try{
 	
 		// insere o novo usuário no banco
 		$sql = "INSERT INTO  Cliente(clienCodigo,ClienNome,ClienTelefone,ClienCelular,ClienEmail,ClienObservacao,
-		ClienTipo,ClienStatus,ClienUnidade,ClienUsuarioAtualizador)
-		VALUES ('$sCodigo','$nomePaciente','$telefone','$celular','$email','$observacao','F',1,$iUnidade,$usuarioId)";
+		ClienStatus,ClienUnidade,ClienUsuarioAtualizador)
+		VALUES ('$sCodigo','$nomePaciente','$telefone','$celular','$email','$observacao',1,$iUnidade,$usuarioId)";
 		$conn->query($sql);
 
 		$lestIdCliente = $conn->lastInsertId();
 
 		// busca todos os usuários com o novo inserido para adicionalo ja selecionado no select
-		$sql = "SELECT ClienId,ClienTipo,ClienCodigo,ClienNome,ClienRazaoSocial,ClienCnpj,
-		ClienInscricaoMunicipal,ClienInscricaoEstadual,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienCartaoSus,ClienProfissao,ClienCep,ClienEndereco,
-		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
-		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
-		FROM Cliente";
+		$sql = "SELECT ClienId,ClienNome FROM Cliente";
 		$result = $conn->query($sql);
 
 		$array = [];
