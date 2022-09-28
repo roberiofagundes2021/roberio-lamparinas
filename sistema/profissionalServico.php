@@ -13,8 +13,9 @@ if(isset($_POST['inputProfissionalId'])){
 }
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT PrXSVServicoVenda, PrXSVRecebimento
+$sql = "SELECT PrXSVId, PrXSVServicoVenda, PrXSVRecebimento, PrXSVProfissional, SrVenNome
 		FROM ProfissionalXServicoVenda
+		JOIN ServicoVenda ON SrVenId = PrXSVServicoVenda 
 	    WHERE PrXSVUnidade = ". $_SESSION['UnidadeId'] ." AND PrXSVProfissional = $iProfissional
 		ORDER BY PrXSVServicoVenda ASC";
 $result = $conn->query($sql);
@@ -22,14 +23,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
 //Se estiver editando
-if(isset($_POST['inputProfissionaServicoId']) && $_POST['inputProfissionaServicoId']){
+if(isset($_POST['inputProfissionalServicoId']) && $_POST['inputProfissionalServicoId']){
 
 	//Essa consulta é para preencher o campo a ser editar
 	$sql = "SELECT *
 			FROM ProfissionalXServicoVenda
-			WHERE PrXSVProfissional = ". $_POST['inputProfissionaServicoId'];
+			WHERE PrXSVId = ". $_POST['inputProfissionalServicoId'];
 	$result = $conn->query($sql);
-	$rowProfissionaServico = $result->fetch(PDO::FETCH_ASSOC);
+	$rowProfissionaLServico = $result->fetch(PDO::FETCH_ASSOC);
 		
 	$_SESSION['msg'] = array();
 } 
@@ -42,29 +43,30 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
-			$sql = "UPDATE ProfissionalXServicoVenda SET PrXSVServicoVenda = :sServicoVenda, PrXSVRecebimento = :sRecebimento
-					WHERE PrXSVProfissional = :iProfissional";
+			$sql = "UPDATE ProfissionalXServicoVenda SET PrXSVProfissional = :iProfissional, PrXSVServicoVenda = :sServicoVenda, PrXSVRecebimento = :sRecebimento
+					WHERE PrXSVId = :iProfissionalServico";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
+							':iProfissional' => $iProfissional,
 							':sServicoVenda' => $_POST['inputServicoVenda'],
 							':sRecebimento' => $_POST['inputRecebimento'],
-							':iProfissional' => $_POST['inputProfissionaServicoId']
-							));
+							':iProfissionalServico' => $_POST['inputProfissionalServicoId']
+						));
 	
 			$_SESSION['msg']['mensagem'] = "Serviço do Profissional alterado!!!";
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO ProfissionalXServicoVenda (PrXSVProfissional, PrXSVServicoVenda,  PrXSVRecebimento,, PrXSVUnidade)
-					VALUES (:sServicoVenda,:sRecebimento, :iUnidade)";
+			$sql = "INSERT INTO ProfissionalXServicoVenda (PrXSVProfissional, PrXSVServicoVenda,  PrXSVRecebimento, PrXSVUnidade)
+					VALUES (:iProfissional, :sServicoVenda, :sRecebimento, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
                             ':iProfissional' => $iProfissional,
 							':sServicoVenda' => $_POST['inputServicoVenda'],
 							':sRecebimento' => $_POST['inputRecebimento'],
-							':iUnidade' => $_SESSION['UnidadeId'],
+							':iUnidade' => $_SESSION['UnidadeId']
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Serviço do Profissional incluído!!!";
@@ -121,7 +123,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<script type="text/javascript">
 
 		$(document).ready(function (){	
-			$('#tblProfissionaServico').DataTable( {
+			$('#tblProfissionalServico').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
@@ -175,15 +177,16 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				
 				e.preventDefault();
 				
-				var inputServicoVendaNovo = $('#inputServicoVenda').val();
-				var inputServicoVendaVelho = $('#inputServicoVendaNome').val();
-				var inputEstadoAtual = $('#inputEstadoAtual').val();				
+				var inputProfissionalId = $('#inputProfissionalId').val();
+				var inputServicoNovo = $('#inputServicoVenda').val();
+				var inputServicoVelho = $('#inputServicoVendaId').val();
+				var inputEstadoAtual = $('#inputEstadoAtual').val();
 
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
 					url: "profissionalServicoValida.php",
-					data: ('nomeNovo='+inputServicoVendaNovo+'&nomeVelho='+inputServicoVendaVelho+'&estadoAtual='+inputEstadoAtual),
+					data: ('servicoNovo='+inputServicoNovo+'&servicoVelho='+inputServicoVelho+'&profissionalId='+inputProfissionalId+'&estadoAtual='+inputEstadoAtual),
 					success: function(resposta){
 
 						if(resposta == 1){
@@ -197,7 +200,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
 						}						
 						
-						$( "#formProfissionaServico" ).submit();
+						$( "#formProfissionalServico" ).submit();
 					}
 				})
 									
@@ -205,23 +208,24 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-		function atualizaProfissionaServico(Permission, PrXSVProfissional, PrXSVServicoVenda, Tipo){
+		function atualizaProfissionaServico(Permission, PrXSVId, PrXSVProfissional, PrXSVServicoVenda, Tipo){
 		
 			if (Permission == 1){
-				document.getElementById('inputProfissionaServicoId').value = PrXSVProfissional;
-				document.getElementById('inputServicoVendaNome').value = PrXSVServicoVenda;
+				document.getElementById('inputProfissionalServicoId').value = PrXSVId;
+				document.getElementById('inputProfissionalId').value = PrXSVProfissional; 
+				document.getElementById('inputServicoVendaId').value = PrXSVServicoVenda;
 						
 				if (Tipo == 'edita'){	
 					document.getElementById('inputEstadoAtual').value = "EDITA";
-					document.formProfissionaServico.action = "profissionaServico.php";		
+					document.formProfissionalServico.action = "profissionalServico.php";		
 				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formProfissionaServico, "Tem certeza que deseja excluir esse serviço?", "profissionaServicoExclui.php");
+					confirmaExclusao(document.formProfissionalServico, "Tem certeza que deseja excluir esse serviço?", "profissionalServicoExclui.php");
 				} else if (Tipo == 'imprime'){
-					document.formProfissionaServico.action = "profissionaServicoImprime.php";
-					document.formProfissionaServico.setAttribute("target", "_blank");
+					document.formProfissionalServico.action = "profissionalServicoImprime.php";
+					document.formProfissionalServico.setAttribute("target", "_blank");
 				}
 				
-				document.formProfissionaServico.submit();
+				document.formProfissionalServico.submit();
 			} else{
 				alerta('Permissão Negada!','');
 			}
@@ -254,14 +258,15 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Serviços do Profissional </h3>
+								<h3 class="card-title">Relações de Serviços do Profissional </h3>
 							</div>
 
 							<div class="card-body">
-								<form name="formProfissionaServico" id="formProfissionaServico" method="post" class="form-validate-jquery">
+								<form name="formProfissionalServico" id="formProfissionalServico" method="post" class="form-validate-jquery">
 
-									<input type="hidden" id="inputProfissionaServicoId" name="inputProfissionaServicoId" value="<?php if (isset($_POST['inputProfissionaServicoId'])) echo $_POST['inputProfissionaServicoId']; ?>" >
-									<input type="hidden" id="inputServicoVendaNome" name="inputServicoVendaNome" value="<?php if (isset($_POST['inputServicoVendaNome'])) echo $_POST['inputServicoVendaNome']; ?>" >
+								    <input type="hidden" id="inputProfissionalId" name="inputProfissionalId" value="<?php if (isset($_POST['inputProfissionalId'])) echo $_POST['inputProfissionalId']; ?>" >
+									<input type="hidden" id="inputProfissionalServicoId" name="inputProfissionalServicoId" value="<?php if (isset($_POST['inputProfissionalServicoId'])) echo $_POST['inputProfissionalServicoId']; ?>" >
+									<input type="hidden" id="inputServicoVendaId" name="inputServicoVendaId" value="<?php if (isset($_POST['inputServicoVendaId'])) echo $_POST['inputServicoVendaId']; ?>" >
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
 									<div class="row">
@@ -279,7 +284,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 													$rowServicoVenda = $result->fetchAll(PDO::FETCH_ASSOC);
 													
 													foreach ($rowServicoVenda as $item){
-														$seleciona = $item['SrVenId'] == $rowProfissionaServico['PrXSVServicoVenda'] ? "selected" : "";
+														$seleciona = $item['SrVenId'] == $rowProfissionaLServico['PrXSVServicoVenda'] ? "selected" : "";
 														print('<option value="'.$item['SrVenId'].'" '. $seleciona .'>'.$item['SrVenNome'].'</option>');
 													}
 												
@@ -290,8 +295,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputRecebimento">Recebimento (%) <span class="text-danger"> *</span></label>
-												<input type="number" min="1" max="100" id="inputRecebimento" name="inputRecebimento" class="form-control" placeholder="Recebimento (%)" value="<?php if (isset($_POST['inputProfissionaServicoId'])) echo $rowProfissionaServico['PrXSVRecebimento']; ?>" required autofocus>
+												<label for="inputRecebimento">Recebimentos (%) <span class="text-danger"> *</span></label>
+												<input type="number" min="1" max="100" id="inputRecebimento" name="inputRecebimento" class="form-control" placeholder="Recebimento (%)" value="<?php if (isset($_POST['inputProfissionalServicoId'])) echo $rowProfissionaLServico['PrXSVRecebimento'];?>" required autofocus>
 											</div>
 										</div>
 										<div class="col-lg-3">
@@ -299,7 +304,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 												<?php
 
 													//editando
-													if (isset($_POST['inputProfissionaServicoId'])){
+													if (isset($_POST['inputProfissionalServicoId'])){
 														print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
 														print('<a href="profissional.php" class="btn btn-basic" role="button">Cancelar</a>');
 													} else{ //inserindo
@@ -313,11 +318,11 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								</form>
 							</div>
 							
-							<table id="tblProfissionaServico" class="table">
+							<table id="tblProfissionalServico" class="table">
 								<thead>
 									<tr class="bg-slate">
-										<th>Serviço</th>
-										<th>Recebimento</th>
+										<th>Serviços</th>
+										<th class="text-center">Recebimento</th>
 										<th class="text-center">Ações</th>
 									</tr>
 								</thead>
@@ -327,15 +332,15 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										
 										print('
 										<tr>
-											<td>'.$item['PrXSVServicoVenda'].'</td>
-											<td>'.$item['PrXSVRecebimento'].'</td>
+											<td>'.$item['SrVenNome'].'</td>
+											<td class="text-center">'.$item['PrXSVRecebimento'].'%</td>
 											');
 										
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaProfissionaServico(1,'.$item['PrXSVProfissional'].', \''.$item['PrXSVServicoVenda'].'\', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaProfissionaServico(1,'.$item['PrXSVProfissional'].', \''.$item['PrXSVServicoVenda'].'\', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaProfissionaServico(1,'.$item['PrXSVId'].','.$item['PrXSVProfissional'].', '.$item['PrXSVServicoVenda'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaProfissionaServico(1,'.$item['PrXSVId'].','.$item['PrXSVProfissional'].', '.$item['PrXSVServicoVenda'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>
