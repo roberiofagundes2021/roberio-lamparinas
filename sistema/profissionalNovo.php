@@ -141,7 +141,9 @@ if(isset($_POST['inputTipo'])){
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
+	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -632,7 +634,7 @@ if(isset($_POST['inputTipo'])){
                                                 
                                                     <div class="col-lg-3">
                                                         <label for="cmbEspecialidade">Especialidades</label>
-														<select id="cmbEspecialidade" name="cmbEspecialidade[]" class="form-control select-search form-control-select2 select" multiple="multiple" data-fouc>
+														<select id="cmbEspecialidade" name="cmbEspecialidade[]" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
                                                             <?php
                                                             $sql = "SELECT EspecId, EspecNome
                                                                     FROM Especialidade

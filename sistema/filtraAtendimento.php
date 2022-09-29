@@ -1190,8 +1190,7 @@ try{
 		$lestIdCliente = $conn->lastInsertId();
 
 		// busca todos os usuários com o novo inserido para adicionalo ja selecionado no select
-		$sql = "SELECT ClienId,ClienCodigo,ClienNome,ClienCnpj,
-		ClienInscricaoMunicipal,ClienInscricaoEstadual,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+		$sql = "SELECT ClienId,ClienCodigo,ClienNome,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
 		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienCartaoSus,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
 		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
