@@ -4,15 +4,25 @@ include_once("sessao.php");
 
 if(isset($_POST['id'])){
 	$id = $_POST['id'];
+	$isMenu = $_POST['isMenu'];
 
-	$sql = "SELECT MenuId,MenuNome,MenuUrl,MenuIco,ModulNome,MenuModulo,MenuModulo,MenuPai,MenuLevel,MenuOrdem,MenuSubMenu,MenuSetorPublico,
-	MenuSetorPrivado,MenuPosicao,MenuUsuarioAtualizador,MenuStatus
-	FROM Menu
-	JOIN Situacao ON SituaId = MenuStatus
-	JOIN Modulo ON ModulId = MenuModulo
-	WHERE SituaChave = 'ATIVO' and MenuId = $id";
-	$result = $conn->query($sql);
-	$rowMenu = $result->fetch(PDO::FETCH_ASSOC);
+	if($isMenu == 'menu'){
+		$sql = "SELECT MenuId,MenuNome,MenuUrl,MenuIco,ModulNome,MenuModulo,MenuModulo,MenuPai,MenuLevel,MenuOrdem,MenuSubMenu,MenuSetorPublico,
+		MenuSetorPrivado,MenuPosicao,MenuUsuarioAtualizador,MenuStatus, SituaId
+		FROM Menu
+		JOIN Situacao ON SituaId = MenuStatus
+		JOIN Modulo ON ModulId = MenuModulo
+		WHERE SituaChave = 'ATIVO' and MenuId = $id";
+		$result = $conn->query($sql);
+		$rowMenu = $result->fetch(PDO::FETCH_ASSOC);
+	} else {
+		$sql = "SELECT ModulId, ModulNome, ModulOrdem, SituaNome, SituaId
+		FROM Modulo
+		JOIN Situacao ON SituaId = ModulStatus
+		WHERE ModulId = $id";
+		$result = $conn->query($sql);
+		$rowMenu = $result->fetch(PDO::FETCH_ASSOC);
+	}
 }
 ?>
 
@@ -45,138 +55,198 @@ if(isset($_POST['id'])){
     <script type="text/javascript" >
 	
         $(document).ready(function() {
-        	
+			if($('#isMenuOrModulo').val() == 'menu'){
+				$('#tituloCadastro').html('Cadastrar Novo Menu')
+				$('#toMenu').show()
+				$('#toModulo').hide()
+			}else if($('#isMenuOrModulo').val() == 'modulo'){
+				$('#tituloCadastro').html('Cadastrar Novo Módulo')
+				$('#toMenu').hide()
+				$('#toModulo').show()
+			}else{
+				$('#tituloCadastro').html('Cadastrar Novo Menu')
+				$('#toMenu').show()
+				$('#toModulo').hide()
+			}
+
+        	$('#isMenu').on('change', function(e){
+				$('#tituloCadastro').html('Cadastrar Novo Menu')
+				$('#toMenu').show()
+				$('#toModulo').hide()
+			})
+			$('#isModulo').on('change', function(e){
+				$('#tituloCadastro').html('Cadastrar Novo Módulo')
+				$('#toMenu').hide()
+				$('#toModulo').show()
+			})
+
+			$('#btnAlterar').on('click', function(e){
+				$('#btnAlterar').html("Alterando... <img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px'>")
+				$('#btnAlterar').attr('disabled', true)
+
+				let msg = ''
+				let idMenu = $('#idMenu').val()
+				let tipo = 'ATUALIZAR'
+				let inputNome = $('#inputNome').val()
+				let inputNomeModulo = $('#inputNomeModulo').val()
+				let url = $('#url').val()
+				let icone = $('#icone').val()
+				let cmbModulo = $('#cmbModulo').val()
+				let menuPai = $('#cmbMenuPai').val()
+				let nivel = $('#nivel').val()
+				let ordem = $('#ordem').val()
+				let ordemModulo = $('#ordemModulo').val()
+				let subMenu = $('#subMenu').is(":checked")?1:0
+				let publico = $('#publico').is(":checked")?1:0
+				let privado = $('#privado').is(":checked")?1:0
+				let situacao = $('#cmbSituacao').val()
+				let situacaoModulo = $('#cmbSituacaoModulo').val();
+				let posicao = $('#cmbPosicao').val()
+				let isMenuOrModulo = $('#isMenuOrModulo').val()
+
+				if(isMenuOrModulo=='menu'){
+					switch(msg){
+						case inputNome: msg = 'Informe nome do menu'; break;
+						case url: msg = 'Informe a URL de destino'; break;
+						case cmbModulo: msg = 'Informe o módulo que o menu irá pertencer'; break;
+						case posicao: msg = 'Informe a posição do menu'; break;
+						case situacao: msg = 'Informe a situação do menu'; break;
+						default: msg = ''; break;
+					}
+				}else{
+					switch(msg){
+						case inputNomeModulo: msg = 'Informe nome do módulo'; break;
+						case situacaoModulo: msg = 'Informe a situação do módulo'; break;
+						default: msg = ''; break;
+					}
+				}
+
+				if(msg){
+					alerta('Informação obrigatória', msg, 'error')
+					$('#btnAlterar').html("Alterar")
+					$('#btnAlterar').attr('disabled', false)
+					return
+				}
+
+				$.ajax({
+					type: 'POST',
+					url: 'menuFiltra.php',
+					dataType: 'json',
+					data:{
+						'isMenu': isMenuOrModulo=='menu'?true:false,
+						'tipo': tipo,
+						'idMenu': idMenu,
+						'inputNome': inputNome?inputNome:inputNomeModulo,
+						'url': url,
+						'icone': icone,
+						'cmbModulo': cmbModulo,
+						'menuPai': menuPai,
+						'nivel': nivel,
+						'ordem': ordem,
+						'subMenu': subMenu,
+						'publico': publico,
+						'privado': privado,
+						'posicao': posicao,
+						'situacao': situacao?situacao:situacaoModulo
+					},
+					success: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
+						$('#btnAlterar').html("Alterar")
+						$('#btnAlterar').attr('disabled', false)
+						window.location.href = 'menuLista.php'
+					},
+					error: function(response) {
+						alerta('Erro', 'Contate um administrador', 'error');
+						$('#btnAlterar').html("Alterar")
+						$('#btnAlterar').attr('disabled', false)
+					}
+				});
+			})
+
+			$('#btnInserir').on('click', function(e){
+				$('#btnInserir').attr('onclick', '')
+				$('#btnInserir').attr('disabled', true)
+
+				let msg = ''
+				let idMenu = $('#idMenu').val()
+				let tipo = 'CRIAR'
+				let inputNome = $('#inputNome').val()
+				let inputNomeModulo = $('#inputNomeModulo').val()
+				let url = $('#url').val()
+				let icone = $('#icone').val()
+				let cmbModulo = $('#cmbModulo').val()
+				let menuPai = $('#cmbMenuPai').val()
+				let nivel = $('#nivel').val()
+				let ordem = $('#ordem').val()
+				let ordemModulo = $('#ordemModulo').val()
+				let subMenu = $('#subMenu').is(":checked")?1:0
+				let publico = $('#publico').is(":checked")?1:0
+				let privado = $('#privado').is(":checked")?1:0
+				let situacao = $('#cmbSituacao').val()
+				let situacaoModulo = $('#cmbSituacaoModulo').val();
+				let posicao = $('#cmbPosicao').val()
+				let isMenu = $('#isMenu').is(':checked')
+				
+				if(isMenu){
+					switch(msg){
+						case inputNome: msg = 'Informe nome do menu'; break;
+						case url: msg = 'Informe a URL de destino'; break;
+						case cmbModulo: msg = 'Informe o módulo que o menu irá pertencer'; break;
+						case posicao: msg = 'Informe a posição do menu'; break;
+						case situacao: msg = 'Informe a situação do menu'; break;
+						default: msg = ''; break;
+					}
+				}else{
+					switch(msg){
+						case inputNomeModulo: msg = 'Informe nome do módulo'; break;
+						case situacaoModulo: msg = 'Informe a situação do módulo'; break;
+						default: msg = ''; break;
+					}
+				}
+
+				if(msg){
+					alerta('Informação obrigatória', msg, 'error')
+					$('#btnInserir').html('Inserir')
+					$('#btnInserir').attr('disabled', false)
+					return
+				}
+
+				$.ajax({
+					type: 'POST',
+					url: 'menuFiltra.php',
+					dataType: 'json',
+					data:{
+						'isMenu': isMenu,
+						'idMenu': idMenu,
+						'tipo': tipo,
+						'inputNome': inputNome?inputNome:inputNomeModulo,
+						'url': url,
+						'icone': icone,
+						'cmbModulo': cmbModulo,
+						'menuPai': menuPai,
+						'nivel': nivel,
+						'ordem': ordem,
+						'subMenu': subMenu,
+						'publico': publico,
+						'privado': privado,
+						'posicao': posicao,
+						'situacao': situacao?situacao:situacaoModulo
+					},
+					success: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
+						$('#btnInserir').html('Inserir')
+						$('#btnInserir').attr('disabled', false)
+						window.location.href = 'menuLista.php'
+					},
+					error: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
+						$('#btnInserir').html('Inserir')
+						$('#btnInserir').attr('disabled', false)
+					}
+				});
+			})
 			
         }); // document.ready
-
-		function alterar(){
-			$('#btnAlterar').attr("onclick", "")
-			$('#btnAlterar').html("Alterando... <img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px'>")
-			let msg = ''
-			let idMenu = $('#idMenu').val()
-			let tipo = 'ATUALIZAR'
-			let inputNome = $('#inputNome').val()
-			let url = $('#url').val()
-			let icone = $('#icone').val()
-			let cmbModulo = $('#cmbModulo').val()
-			let menuPai = $('#cmbMenuPai').val()
-			let nivel = $('#nivel').val()
-			let ordem = $('#ordem').val()
-			let subMenu = $('#subMenu').is(":checked")?1:0
-			let publico = $('#publico').is(":checked")?1:0
-			let privado = $('#privado').is(":checked")?1:0
-			let posicao = $('#cmbPosicao').val()
-
-			switch(msg){
-				case inputNome: msg = 'Informe nome do menu'; break;
-				case url: msg = 'Informe a URL de destino'; break;
-				case cmbModulo: msg = 'Informe o módulo que o menu irá pertencer'; break;
-				case posicao: msg = 'Informe a posição do menu'; break;
-				default: msg = ''; break;
-			}
-
-			if(msg){
-				alerta('Informação obrigatória', msg, 'error')
-				$('#btnAlterar').html("Alterar")
-				$('#btnAlterar').attr("onclick", "alterar()")
-				return
-			}
-
-			$.ajax({
-				type: 'POST',
-				url: 'menuFiltra.php',
-				dataType: 'json',
-				data:{
-					'tipo': tipo,
-					'idMenu': idMenu,
-					'inputNome': inputNome,
-					'url': url,
-					'icone': icone,
-					'cmbModulo': cmbModulo,
-					'menuPai': menuPai,
-					'nivel': nivel,
-					'ordem': ordem,
-					'subMenu': subMenu,
-					'publico': publico,
-					'privado': privado,
-					'posicao': posicao
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.tipo);
-					$('#btnAlterar').html("Alterar")
-					$('#btnAlterar').attr("onclick", "alterar()")
-					window.location.href = 'menuLista.php'
-				},
-				error: function(response) {
-					alerta(response.titulo, response.menssagem, response.tipo);
-					$('#btnAlterar').html("Alterar")
-					$('#btnAlterar').attr("onclick", "alterar()")
-				}
-			});
-		}
-		function inserir(){
-			$('#btnInserir').attr('onclick', '')
-			$('#btnInserir').html("Inserindo... <img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px'>")			
-			let msg = ''
-			let tipo = 'CRIAR'
-			let inputNome = $('#inputNome').val()
-			let url = $('#url').val()
-			let icone = $('#icone').val()
-			let cmbModulo = $('#cmbModulo').val()
-			let menuPai = $('#cmbMenuPai').val()
-			let nivel = $('#nivel').val()
-			let ordem = $('#ordem').val()
-			let subMenu = $('#subMenu').is(":checked")?1:0
-			let publico = $('#publico').is(":checked")?1:0
-			let privado = $('#privado').is(":checked")?1:0
-			let posicao = $('#cmbPosicao').val()
-
-			switch(msg){
-				case inputNome: msg = 'Informe nome do menu'; break;
-				case url: msg = 'Informe a URL de destino'; break;
-				case cmbModulo: msg = 'Informe o módulo que o menu irá pertencer'; break;
-				case posicao: msg = 'Informe a posição do menu'; break;
-				default: msg = ''; break;
-			}
-
-			if(msg){
-				alerta('Informação obrigatória', msg, 'error')
-				$('#btnInserir').html('Inserir')
-				$('#btnInserir').attr('onclick', 'inserir()')
-				return
-			}
-
-			$.ajax({
-				type: 'POST',
-				url: 'menuFiltra.php',
-				dataType: 'json',
-				data:{
-					'tipo': tipo,
-					'inputNome': inputNome,
-					'url': url,
-					'icone': icone,
-					'cmbModulo': cmbModulo,
-					'menuPai': menuPai,
-					'nivel': nivel,
-					'ordem': ordem,
-					'subMenu': subMenu,
-					'publico': publico,
-					'privado': privado,
-					'posicao': posicao
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.tipo);
-					$('#btnInserir').html('Inserir')
-					$('#btnInserir').attr('onclick', 'inserir()')
-					window.location.href = 'menuLista.php'
-				},
-				error: function(response) {
-					alerta(response.titulo, response.menssagem, response.tipo);
-					$('#btnInserir').html('Inserir')
-					$('#btnInserir').attr('onclick', 'inserir()')
-				}
-			});
-		}
     </script>	
 	
 </head>
@@ -201,11 +271,25 @@ if(isset($_POST['id'])){
 				<div class="card">
 					<form name="formMenu" id="formMenu" method="post" class="form-validate">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Menu</h5>
+							<h5 id="tituloCadastro" class="text-uppercase font-weight-bold">Cadastrar Novo Menu</h5>
 						</div>
 						
 						<div class="card-body">
-							<div class="col-lg-12 row">
+							<?php
+								if(!isset($_POST['id'])){
+									echo "<div class='col-lg-12 row mb-4'>
+											<div class='col-lg-1'>
+												<label for='isMenu'>Menu</label>
+												<input id='isMenu' name='isMenu' type='radio' checked />
+											</div>
+											<div class='col-lg-1'>
+												<label for='isModulo'>Modulo</label>
+												<input id='isModulo' name='isMenu' type='radio' />
+											</div>
+										</div>";
+								}
+							?>
+							<div id="toMenu" class="col-lg-12 row">
 								<div class="col-lg-4">
 									<label>Nome<span class="text-danger"> *</span></label>
 								</div>
@@ -215,11 +299,20 @@ if(isset($_POST['id'])){
 								<div class="col-lg-2">
 									<label>Ícone</label>
 								</div>
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<label>Módulo<span class="text-danger"> *</span></label>
+								</div>
+								<div class="col-lg-2">
+									<label>Situação<span class="text-danger"> *</span></label>
 								</div>
 
 								<?php
+									$sql = "SELECT SituaId,SituaNome
+										FROM Situacao
+										WHERE SituaChave in ('ATIVO','INATIVO')";
+									$result = $conn->query($sql);
+									$rowSituacoes = $result->fetchAll(PDO::FETCH_ASSOC);
+									
 									$sql = "SELECT ModulId,ModulNome
 									FROM Modulo
 									JOIN Situacao ON SituaId = ModulStatus
@@ -235,21 +328,28 @@ if(isset($_POST['id'])){
 									$result = $conn->query($sql);
 									$rowMenuSelect = $result->fetchAll(PDO::FETCH_ASSOC);
 
-									$MenuId = isset($_POST['id'])?$rowMenu['MenuId']:'';
-									$MenuNome = isset($_POST['id'])?$rowMenu['MenuNome']:'';
-									$MenuUrl = isset($_POST['id'])?$rowMenu['MenuUrl']:'';
-									$MenuIco = isset($_POST['id'])?$rowMenu['MenuIco']:'';
-									$ModulNome = isset($_POST['id'])?$rowMenu['ModulNome']:'';
-									$MenuModulo = isset($_POST['id'])?$rowMenu['MenuModulo']:'';
-									$MenuPai = isset($_POST['id'])?$rowMenu['MenuPai']:'';
-									$MenuLevel = isset($_POST['id'])?$rowMenu['MenuLevel']:1;
-									$MenuOrdem = isset($_POST['id'])?$rowMenu['MenuOrdem']:1;
-									$MenuSubMenu = isset($_POST['id'])?($rowMenu['MenuSubMenu']?'checked':''):'';
-									$MenuSetorPublico = isset($_POST['id'])?($rowMenu['MenuSetorPublico']?'checked':''):'checked';
-									$MenuSetorPrivado = isset($_POST['id'])?($rowMenu['MenuSetorPrivado']?'checked':''):'checked';
-									$MenuPosicao = isset($_POST['id'])?$rowMenu['MenuPosicao']:'';
-									$MenuUsuarioAtualizador = isset($_POST['id'])?$rowMenu['MenuUsuarioAtualizador']:'';
-									$MenuStatus = isset($_POST['id'])?$rowMenu['MenuStatus']:1;
+									$optionsSituacao = "<option value=''>Selecione</option>";
+
+									foreach($rowSituacoes as $item){
+										$selected = isset($_POST['id']) && $isMenu == 'menu'?($item['SituaId'] == $rowMenu['SituaId']?'selected':''):'';
+										$optionsSituacao .= "<option $selected value='$item[SituaId]'>$item[SituaNome]</option>";
+									}
+
+									$MenuId = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuId']:'';
+									$MenuNome = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuNome']:'';
+									$MenuUrl = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuUrl']:'';
+									$MenuIco = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuIco']:'';
+									$ModulNome = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['ModulNome']:'';
+									$MenuModulo = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuModulo']:'';
+									$MenuPai = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuPai']:'';
+									$MenuLevel = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuLevel']:1;
+									$MenuOrdem = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuOrdem']:1;
+									$MenuSubMenu = isset($_POST['id']) && $isMenu == 'menu'?($rowMenu['MenuSubMenu']?'checked':''):'';
+									$MenuSetorPublico = isset($_POST['id']) && $isMenu == 'menu'?($rowMenu['MenuSetorPublico']?'checked':''):'checked';
+									$MenuSetorPrivado = isset($_POST['id']) && $isMenu == 'menu'?($rowMenu['MenuSetorPrivado']?'checked':''):'checked';
+									$MenuPosicao = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuPosicao']:'';
+									$MenuUsuarioAtualizador = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuUsuarioAtualizador']:'';
+									$MenuStatus = isset($_POST['id']) && $isMenu == 'menu'?$rowMenu['MenuStatus']:1;
 
 									$optionsModulo = "<option value=''>selecione</option>";
 									$optionsMenu = "<option value=''>selecione</option>";
@@ -269,7 +369,7 @@ if(isset($_POST['id'])){
 										$optionsMenu .= "<option $options value='$id'>$nome</option>";
 									}
 									$optionsPosicao = "<option value=''>Selecione</option>";
-									if(isset($_POST['id'])){
+									if(isset($_POST['id']) && $isMenu == 'menu'){
 										$optionsPosicao .= $rowMenu['MenuPosicao'] == 'CONFIGURADOR'?"<option selected value='CONFIGURADOR'>CONFIGURADOR</option>":"<option value='CONFIGURADOR'>CONFIGURADOR</option>";
 										$optionsPosicao .= $rowMenu['MenuPosicao'] == 'PRINCIPAL'?"<option selected value='PRINCIPAL'>PRINCIPAL</option>":"<option value='PRINCIPAL'>PRINCIPAL</option>";
 										$optionsPosicao .= $rowMenu['MenuPosicao'] == 'APOIO'?"<option selected value='APOIO'>APOIO</option>":"<option value='APOIO'>APOIO</option>";
@@ -279,10 +379,6 @@ if(isset($_POST['id'])){
 										<option value='CONFIGURADOR'>CONFIGURADOR</option>
 										<option value='PRINCIPAL'>PRINCIPAL</option>
 										<option value='APOIO'>APOIO</option>";
-									}
-
-									if(isset($_POST['id'])){
-										echo "<input type='hidden' id='idMenu' name='idMenu' value='$MenuId'>";
 									}
 
 									echo "
@@ -295,9 +391,14 @@ if(isset($_POST['id'])){
 										<div class='col-lg-2'>
 											<input type='text' id='icone' value='$MenuIco' name='icone' class='form-control' placeholder='Ícone'>
 										</div>	
-										<div class='col-lg-4'>
+										<div class='col-lg-2'>
 											<select id='cmbModulo' name='cmbModulo' class='select-search' required>
 												$optionsModulo
+											</select>
+										</div>
+										<div class='col-lg-2'>
+											<select id='cmbSituacao' name='cmbSituacao' class='form-control-select2' required>
+												$optionsSituacao
 											</select>
 										</div>
 										<div class='form-group col-lg-12 row mt-4'>
@@ -351,13 +452,61 @@ if(isset($_POST['id'])){
 										</div>";
 								?>
 							</div>
+							<div id="toModulo" class="col-lg-12 row">
+								<div class="col-lg-6">
+									<label>Nome<span class="text-danger"> *</span></label>
+								</div>
+								<div class="col-lg-2">
+									<label>Ordem<span class="text-danger"> *</span></label>
+								</div>
+								<div class="col-lg-4">
+									<label>Situação</label>
+								</div>
+								<?php
+									$sql = "SELECT SituaId,SituaNome
+										FROM Situacao
+										WHERE SituaChave in ('ATIVO','INATIVO')";
+									$result = $conn->query($sql);
+									$rowSituacoes = $result->fetchAll(PDO::FETCH_ASSOC);
+
+									$optionsSituacao = "<option value=''>Selecione</option>";
+
+									foreach($rowSituacoes as $item){
+										$selected = isset($_POST['id']) && $isMenu == 'modulo'?($item['SituaId'] == $rowMenu['SituaId']?'selected':''):'';
+										$optionsSituacao .= "<option $selected value='$item[SituaId]'>$item[SituaNome]</option>";
+									}
+
+									$MenuId = isset($_POST['id']) && $isMenu == 'modulo'?$rowMenu['ModulId']:'';
+									$MenuNome = isset($_POST['id']) && $isMenu == 'modulo'?$rowMenu['ModulNome']:'';
+									$MenuOrdem = isset($_POST['id']) && $isMenu == 'modulo'?$rowMenu['ModulOrdem']:1;
+
+									echo "<div class='col-lg-6'>
+											<input type='text' id='inputNomeModulo' value='$MenuNome' name='inputNomeModulo' class='form-control' placeholder='Módulo Nome' required autofocus>
+										</div>
+										<div class='col-lg-2'>
+											<input type='number' id='ordemModulo' value='$MenuOrdem' name='ordemModulo' value='1' class='form-control'>
+										</div>
+										<div class='col-lg-4'>
+											<select id='cmbSituacaoModulo' name='cmbSituacaoModulo' class='form-control-select2' required>
+												$optionsSituacao
+											</select>
+										</div>";
+								?>
+							</div>
+
+							<?php
+								if(isset($_POST['id'])){
+									echo "<input type='hidden' id='idMenu' name='idMenu' value='$MenuId'>";
+									echo "<input type='hidden' id='isMenuOrModulo' name='isMenuOrModulo' value='$isMenu'>";
+								}
+							?>
 						</div>
 					</form>
 					<div class="row ml-3" style="margin-top: 40px;">
 						<div class="col-lg-12">								
 							<div class="form-group">
 								<?php
-									echo isset($_POST['id'])?'<button id="btnAlterar" onclick="alterar()" class="btn btn-lg btn-principal" type="submit">Alterar</button>':'<button id="btnInserir" onclick="inserir()" class="btn btn-lg btn-principal" type="submit">Inserir</button>';
+									echo isset($_POST['id'])?'<button id="btnAlterar" class="btn btn-lg btn-principal" type="submit">Alterar</button>':'<button id="btnInserir" class="btn btn-lg btn-principal" type="submit">Inserir</button>';
 								?>	
 								<a href="menuLista.php" class="btn btn-basic" role="button">Cancelar</a>
 							</div>
