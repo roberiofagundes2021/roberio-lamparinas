@@ -333,7 +333,26 @@ else {
 										</div>
 
 										<div class="row">
-											<div class="col-lg-12">
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="cmbEstadoCivil">Estado Civil</label>
+													<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+														<option value="#">Selecione um estado civil</option>
+														<option value="ST" <?php if ($row['ClienEstadoCivil'] == 'ST') echo "selected"; ?> >Solteiro</option>
+														<option value="CS" <?php if ($row['ClienEstadoCivil'] == 'CS') echo "selected"; ?> >Casado</option>
+														<option value="SP" <?php if ($row['ClienEstadoCivil'] == 'SP') echo "selected"; ?> >Separado</option>
+														<option value="DV" <?php if ($row['ClienEstadoCivil'] == 'DV') echo "selected"; ?> >Divorciado</option>
+														<option value="VI" <?php if ($row['ClienEstadoCivil'] == 'VI') echo "selected"; ?> >Viúvo</option>
+													</select>
+												</div>
+											</div>	
+											<div class="col-lg-4">
+											    <div class="form-group">
+													<label for="inputNaturalidade">Naturalidade</label>
+												    <input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade" value="<?php echo $row['ClienNaturalidade']; ?>">
+											    </div>
+										    </div>
+											<div class="col-lg-4">
 												<label for="cmbProfissao">Profissão</label>
 												<select id="cmbProfissao" name="cmbProfissao" class="form-control form-control-select2">
 													<option value="">Selecione uma profissão</option>

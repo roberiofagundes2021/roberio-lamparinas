@@ -311,7 +311,26 @@ include('global_assets/php/conexao.php');
 										</div>
 
 										<div class="row">
-											<div class="col-lg-12">
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="cmbEstadoCivil">Estado Civil</label>
+													<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+														<option value="#">Selecione um estado civil</option>
+														<option value="ST">Solteiro</option>
+														<option value="CS">Casado</option>
+														<option value="SP">Separado</option>
+														<option value="DV">Divorciado</option>
+														<option value="VI">Viúvo</option>
+													</select>
+												</div>
+											</div>	
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputNaturalidade">Naturalidade</label>
+													<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+												</div>
+											</div>
+											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="cmbProfissao">Profissão</label>
 													<select id="cmbProfissao" name="cmbProfissao" class="form-control form-control-select2">

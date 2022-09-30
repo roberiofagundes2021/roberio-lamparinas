@@ -24,12 +24,11 @@ try {
 try {
 
 	$sql = "INSERT INTO Cliente (clienCodigo, ClienNome,  ClienCpf, ClienRg, ClienOrgaoEmissor, ClienUf, ClienSexo, ClienDtNascimento, ClienNomePai, ClienNomeMae,
-						ClienProfissao, ClienCartaoSus, ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
-						ClienEstado, ClienContato, ClienTelefone, ClienCelular, ClienEmail, ClienSite, ClienObservacao,
-						ClienStatus, ClienUsuarioAtualizador, ClienUnidade)
-				VALUES (:sCodigo, :sNome, :sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sProfissao, :sCartaoSus, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
-						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, 
-						:bStatus, :iUsuarioAtualizador, :iUnidade)";
+	 				 	ClienEstadoCivil, ClienNaturalidade, ClienProfissao, ClienCartaoSus, ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
+						ClienEstado, ClienContato, ClienTelefone, ClienCelular, ClienEmail, ClienSite, ClienObservacao, ClienStatus, ClienUsuarioAtualizador, ClienUnidade)
+				VALUES (:sCodigo, :sNome, :sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sEstadoCivil, :sNaturalidade,
+				        :sProfissao, :sCartaoSus, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, :sCidade, :sEstado, :sContato, :sTelefone, :sCelular, 
+						:sEmail, :sSite, :sObservacao, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 
 	$result = $conn->prepare($sql);
 
@@ -46,6 +45,8 @@ try {
 		':dDtNascimento' => $_POST['inputDtNascimento'],
 		':sNomePai' => $_POST['inputNomePai'],
 		':sNomeMae' => $_POST['inputNomeMae'],
+		':sEstadoCivil' => $_POST['cmbEstadoCivil'],
+		':sNaturalidade' => $_POST['inputNaturalidade'],
 		':sProfissao' => $_POST['cmbProfissao'],
 		':sCartaoSus' => $_POST['inputCartaoSus'],
 		':sCep' => $_POST['inputCep'],
