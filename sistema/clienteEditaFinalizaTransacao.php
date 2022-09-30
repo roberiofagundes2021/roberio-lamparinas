@@ -7,14 +7,12 @@ try{
 
     $conn->beginTransaction();
     
-    $sql = "UPDATE Cliente SET 	  ClienCodigo = :sCodigo,  ClienNome = :sNome, ClienCpf = :sCpf, ClienRg = :sRg, 
-                                    ClienOrgaoEmissor = :sOrgaoEmissor, ClienUf = :sUf,
-                                    ClienSexo = :sSexo, ClienDtNascimento = :dDtNascimento, ClienNomePai = :sNomePai, ClienNomeMae = :sNomeMae, 
-                                    ClienProfissao = :sProfissao, ClienCartaoSus = :sCartaoSus, ClienCep = :sCep, ClienEndereco = :sEndereco, 
-                                    ClienNumero = :sNumero, ClienComplemento = :sComplemento, ClienBairro = :sBairro, 
-                                    ClienCidade = :sCidade, ClienEstado = :sEstado, ClienContato = :sContato, ClienTelefone = :sTelefone, 
-                                    ClienCelular = :sCelular, ClienEmail = :sEmail, ClienSite = :sSite, ClienObservacao = :sObservacao,
-                                    ClienUsuarioAtualizador = :iUsuarioAtualizador
+    $sql = "UPDATE Cliente SET 	ClienCodigo = :sCodigo,  ClienNome = :sNome, ClienCpf = :sCpf, ClienRg = :sRg, ClienOrgaoEmissor = :sOrgaoEmissor,
+                                ClienUf = :sUf, ClienSexo = :sSexo, ClienDtNascimento = :dDtNascimento, ClienNomePai = :sNomePai, ClienNomeMae = :sNomeMae,
+                                ClienEstadoCivil = :sEstadoCivil, ClienNaturalidade = :sNaturalidade, ClienProfissao = :sProfissao, ClienCartaoSus = :sCartaoSus,
+                                ClienCep = :sCep, ClienEndereco = :sEndereco, ClienNumero = :sNumero, ClienComplemento = :sComplemento, ClienBairro = :sBairro, 
+                                ClienCidade = :sCidade, ClienEstado = :sEstado, ClienContato = :sContato, ClienTelefone = :sTelefone, ClienCelular = :sCelular,
+                                ClienEmail = :sEmail, ClienSite = :sSite, ClienObservacao = :sObservacao, ClienUsuarioAtualizador = :iUsuarioAtualizador
             WHERE ClienId = :iCliente";
     $result = $conn->prepare($sql);						
     $_POST['inputTipo']="F";
@@ -23,12 +21,14 @@ try{
                     ':sNome' => $_POST['inputNomePF'],
                     ':sCpf' => limpaCPF_CNPJ($_POST['inputCpf']),
                     ':sRg' =>  $_POST['inputRg'],
-                    ':sOrgaoEmissor' => $_POST['inputEmissor'],
+                    ':sOrgaoEmissor' => $_POST['inputEmissor'], 
                     ':sUf' => $_POST['cmbUf'],
                     ':sSexo' => $_POST['cmbSexo'],
                     ':dDtNascimento' => $_POST['inputDtNascimento'],
                     ':sNomePai' => $_POST['inputNomePai'],
                     ':sNomeMae' => $_POST['inputNomeMae'],
+                    ':sEstadoCivil' => $_POST['cmbEstadoCivil'],
+					':sNaturalidade' => $_POST['inputNaturalidade'],
                     ':sProfissao' => $_POST['cmbProfissao'],
                     ':sCartaoSus' => $_POST['inputCartaoSus'],
                     ':sCep' => trim($_POST['inputCep']) == "" ? null : $_POST['inputCep'],

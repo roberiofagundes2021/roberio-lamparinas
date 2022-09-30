@@ -85,7 +85,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		echo 'Error: ' . $e->getMessage();
 	}
 
-	irpara("profissional.php");
+	irpara("profissionalServico.php");
 }
 
 
@@ -190,7 +190,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					success: function(resposta){
 
 						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
+							alerta('Atenção','Esse serviço já havia sido informado para esse profissional !','error');
 							return false;
 						}
 
@@ -264,7 +264,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							<div class="card-body">
 								<form name="formProfissionalServico" id="formProfissionalServico" method="post" class="form-validate-jquery">
 
-								    <input type="hidden" id="inputProfissionalId" name="inputProfissionalId" value="<?php if (isset($_POST['inputProfissionalId'])) echo $_POST['inputProfissionalId']; ?>" >
+								    <input type="hidden" id="inputProfissionalId" name="inputProfissionalId"  value="<?php echo $iProfissional; ?>" >
 									<input type="hidden" id="inputProfissionalServicoId" name="inputProfissionalServicoId" value="<?php if (isset($_POST['inputProfissionalServicoId'])) echo $_POST['inputProfissionalServicoId']; ?>" >
 									<input type="hidden" id="inputServicoVendaId" name="inputServicoVendaId" value="<?php if (isset($_POST['inputServicoVendaId'])) echo $_POST['inputServicoVendaId']; ?>" >
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >

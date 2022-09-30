@@ -1,6 +1,6 @@
-<?php 
+<?php
 
-include_once("sessao.php"); 
+include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Novo Atendimento';
 
@@ -14,10 +14,10 @@ $_SESSION['atendimento'] = [
 
 // a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
 
-$iAtendimento = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:false;
+$iAtendimento = isset($_POST['iAtendimentoId']) ? $_POST['iAtendimentoId'] : false;
 $iUnidade = $_SESSION['UnidadeId'];
 
-if($iAtendimento){
+if ($iAtendimento) {
 	$sql = "SELECT AtendId,AtendAgendamento,AtendNumRegistro,AtendDataRegistro,AtendCliente,AtendModalidade,
 	AtendResponsavel,AtendClassificacao,AtendObservacao,AtendSituacao,AtendUsuarioAtualizador,AtendUnidade,
 	SituaNome,SituaChave
@@ -31,6 +31,7 @@ if($iAtendimento){
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -73,22 +74,22 @@ if($iAtendimento){
 				},
 				transitionEffect: 'fade',
 				autoFocus: true,
-				onStepChanging: function (event, currentIndex, newIndex) {
-					let error = $('#paciente').val()?true:false
+				onStepChanging: function(event, currentIndex, newIndex) {
+					let error = $('#paciente').val() ? true : false
 
 					// esse switch serve para mostrar ou ocultar os dados da tela
 					// de acordo com a etapa do steppers
-					switch(newIndex){
+					switch (newIndex) {
 						case 0:
 							$('#dadosPaciente').show();
-							($('#paciente').val()?$('#novoPaciente').show()&$('#informacoes').show():$('#novoPaciente').hide()&$('#informacoes').hide());
+							($('#paciente').val() ? $('#novoPaciente').show() & $('#informacoes').show() : $('#novoPaciente').hide() & $('#informacoes').hide());
 							$('#dadosResponsavel').hide();
 							$('#novoResponsavel').hide()
 							$('#dadosAtendimento').hide();
 							break;
 						case 1:
 							$('#dadosResponsavel').show();
-							($('#parentescoCadatrado').val()?$('#novoResponsavel').show()&$('#informacoes').show():$('#novoResponsavel').hide()&$('#informacoes').hide());
+							($('#parentescoCadatrado').val() ? $('#novoResponsavel').show() & $('#informacoes').show() : $('#novoResponsavel').hide() & $('#informacoes').hide());
 							$('#novoPaciente').hide();
 							$('#dadosPaciente').hide();
 							$('#dadosAtendimento').hide();
@@ -102,10 +103,12 @@ if($iAtendimento){
 							$('#informacoes').hide();
 							break;
 						default:
-							$('#novoPaciente').hide();$('#novoResponsavel').hide();$('#informacoes').hide();
+							$('#novoPaciente').hide();
+							$('#novoResponsavel').hide();
+							$('#informacoes').hide();
 							break;
 					}
-	
+
 					// Allways allow previous action even if the current form is not valid!
 					if (currentIndex > newIndex) {
 						return true;
@@ -119,26 +122,37 @@ if($iAtendimento){
 					form.validate().settings.ignore = ':disabled,:hidden';
 					return form.valid();
 				},
-				onFinishing: function (event, currentIndex) {
+				onFinishing: function(event, currentIndex) {
 					form.validate().settings.ignore = ':disabled';
 					return form.valid();
 				},
-				onFinished: function (event, currentIndex) {
+				onFinished: function(event, currentIndex) {
 					event.preventDefault();
 					let menssageError = ''
-	
-					switch(menssageError){
-						case $('#dataRegistro').val(): menssageError = 'informe a data de registro'; $('#dataRegistro').focus();break;
-						case $('#modalidade').val(): menssageError = 'informe a modalidade'; $('#modalidade').focus();break;
-						case $('#classificacao').val(): menssageError = 'informe a classificação'; $('#classificacao').focus();break;
-						default: menssageError = ''; break;
+
+					switch (menssageError) {
+						case $('#dataRegistro').val():
+							menssageError = 'informe a data de registro';
+							$('#dataRegistro').focus();
+							break;
+						case $('#modalidade').val():
+							menssageError = 'informe a modalidade';
+							$('#modalidade').focus();
+							break;
+						case $('#classificacao').val():
+							menssageError = 'informe a classificação';
+							$('#classificacao').focus();
+							break;
+						default:
+							menssageError = '';
+							break;
 					}
-	
-					if(menssageError){
+
+					if (menssageError) {
 						alerta('Campo Obrigatório!', menssageError, 'error')
 						return
 					}
-					let paciente = $('#parentescoCadatrado').val()?{
+					let paciente = $('#parentescoCadatrado').val() ? {
 						'id': $('#paciente').val(),
 						'prontuario': $('#prontuario').val(),
 						'nome': $('#nome').val(),
@@ -164,34 +178,34 @@ if($iAtendimento){
 						'celular': $('#celular').val(),
 						'email': $('#email').val(),
 						'observacao': $('#observacao').val()
-					}:null
+					} : null
 
-					let responsavel = $('#parentescoCadatrado').val()?{
-						'id':$('#parentescoCadatrado').val(),
-						'nomeResp':$('#nomeResp').val(),
-						'parentescoResp':$('#parentescoResp').val(),
-						'nascimentoResp':$('#nascimentoResp').val(),
-						'cepResp':$('#cepResp').val(),
-						'enderecoResp':$('#enderecoResp').val(),
-						'numeroResp':$('#numeroResp').val(),
-						'complementoResp':$('#complementoResp').val(),
-						'bairroResp':$('#bairroResp').val(),
-						'cidadeResp':$('#cidadeResp').val(),
-						'estadoResp':$('#estadoResp').val(),
-						'telefoneResp':$('#telefoneResp').val(),
-						'celularResp':$('#celularResp').val(),
-						'emailResp':$('#emailResp').val(),
-						'observacaoResp':$('#observacaoResp').val()
-					}:null
-	
+					let responsavel = $('#parentescoCadatrado').val() ? {
+						'id': $('#parentescoCadatrado').val(),
+						'nomeResp': $('#nomeResp').val(),
+						'parentescoResp': $('#parentescoResp').val(),
+						'nascimentoResp': $('#nascimentoResp').val(),
+						'cepResp': $('#cepResp').val(),
+						'enderecoResp': $('#enderecoResp').val(),
+						'numeroResp': $('#numeroResp').val(),
+						'complementoResp': $('#complementoResp').val(),
+						'bairroResp': $('#bairroResp').val(),
+						'cidadeResp': $('#cidadeResp').val(),
+						'estadoResp': $('#estadoResp').val(),
+						'telefoneResp': $('#telefoneResp').val(),
+						'celularResp': $('#celularResp').val(),
+						'emailResp': $('#emailResp').val(),
+						'observacaoResp': $('#observacaoResp').val()
+					} : null
+
 					$.ajax({
 						type: 'POST',
 						url: 'filtraAtendimento.php',
 						dataType: 'json',
-						data:{
+						data: {
 							'tipoRequest': 'SALVARATENDIMENTO',
-							'cliente':paciente,
-							'responsavel':responsavel,
+							'cliente': paciente,
+							'responsavel': responsavel,
 							'dataRegistro': $('#dataRegistro').val(),
 							'modalidade': $('#modalidade').val(),
 							'classificacao': $('#classificacao').val(),
@@ -199,7 +213,7 @@ if($iAtendimento){
 							'situacao': $('#situacao').val()
 						},
 						success: function(response) {
-							if(response.status == 'success'){
+							if (response.status == 'success') {
 								alerta(response.titulo, response.menssagem, response.status)
 								window.location.href = 'atendimento.php'
 							} else {
@@ -221,25 +235,25 @@ if($iAtendimento){
 				unhighlight: function(element, errorClass) {
 					$(element).removeClass(errorClass);
 				},
-	
+
 				// Different components require proper error label placement
 				errorPlacement: function(error, element) {
-	
+
 					// Unstyled checkboxes, radios
 					if (element.parents().hasClass('form-check')) {
-						error.appendTo( element.parents('.form-check').parent() );
+						error.appendTo(element.parents('.form-check').parent());
 					}
-	
+
 					// Input with icons and Select2
 					else if (element.parents().hasClass('form-group-feedback') || element.hasClass('select2-hidden-accessible')) {
-						error.appendTo( element.parent() );
+						error.appendTo(element.parent());
 					}
-	
+
 					// Input group, styled file input
 					else if (element.parent().is('.uniform-uploader, .uniform-select') || element.parents().hasClass('input-group')) {
-						error.appendTo( element.parent().parent() );
+						error.appendTo(element.parent().parent());
 					}
-	
+
 					// Other elements
 					else {
 						error.insertAfter(element);
@@ -253,29 +267,29 @@ if($iAtendimento){
 			});
 
 			// vai impedir de deixar o usuário seguir em frente antes de selecionar um paciente
-			$('.actions a').each(function(index,element){
-				if($(element).attr('href') == '#next'){
-					$(element).attr('href','#')
-					$(element).on('click', function(e){
+			$('.actions a').each(function(index, element) {
+				if ($(element).attr('href') == '#next') {
+					$(element).attr('href', '#')
+					$(element).on('click', function(e) {
 						$('#dadosPaciente').submit()
 					})
 				}
 			})
 		})
-	</script>	
+	</script>
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-    <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-    <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-    <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-    <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
+	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	
+
 	<script src="global_assets/js/plugins/ui/moment/moment.min.js"></script>
 	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>
 	<script src="global_assets/js/plugins/pickers/anytime.min.js"></script>
@@ -287,30 +301,30 @@ if($iAtendimento){
 
 	<!-- Plugin para corrigir a ordenação por data. Caso a URL dê problema algum dia, salvei esses 2 arquivos na pasta global_assets/js/lamparinas -->
 	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>	
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 
 	<!-- Modal -->
 	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>
-    
-    <!-- Validação -->
+
+	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
-	
+
 	<?php
-		// essa parte do código transforma uma variáve php em Js para ser utilizado 
-		echo $iAtendimento?
-			'<script>
-				var atendimento = '.json_encode($row).';
+	// essa parte do código transforma uma variáve php em Js para ser utilizado 
+	echo $iAtendimento ?
+		'<script>
+				var atendimento = ' . json_encode($row) . ';
 			</script>'
-			:
-			'<script>
+		:
+		'<script>
 				var atendimento = null;
 			</script>';
 	?>
 
-	<script type="text/javascript" >
+	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#dadosPaciente').show()
 			$('#dadosResponsavel').hide()
@@ -326,40 +340,59 @@ if($iAtendimento){
 			$('.actions').append(`<a class='col-lg-2 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>`)
 			$('#cancelar').insertBefore('.actionContent')
 
-			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
+			let dataAtual = new Date().toLocaleString("pt-BR", {
+				timeZone: "America/Bahia"
+			})
 			dataAtual = dataAtual.split(' ')[0]
-			dataAtual = dataAtual.split('/')[2]+'-'+dataAtual.split('/')[1]+'-'+dataAtual.split('/')[0]
+			dataAtual = dataAtual.split('/')[2] + '-' + dataAtual.split('/')[1] + '-' + dataAtual.split('/')[0]
 			$('#dataRegistro').val(dataAtual)
 
 			$('#servicoTable').hide()
 			getCmbs()
 			checkServicos()
 
-			if(atendimento){
+			if (atendimento) {
 				$('#dataRegistro').val(atendimento.AtendDataRegistro)
 				$('#observacao').val(atendimento.AtendObservacao)
 				$('#tipoRequest').val('EDITAR')
 			}
 
-			$('#incluirServico').on('click', function(e){
+			$('#incluirServico').on('click', function(e) {
 				e.preventDefault();
 				let menssageError = ''
-				let servico  = $('#servico').val()
-				let medicos  = $('#medicos').val()
-				let dataAtendimento  = $('#dataAtendimento').val()
-				let horaAtendimento  = $('#horaAtendimento').val()
-				let localAtendimento  = $('#localAtendimento').val()
+				let servico = $('#servico').val()
+				let medicos = $('#medicos').val()
+				let dataAtendimento = $('#dataAtendimento').val()
+				let horaAtendimento = $('#horaAtendimento').val()
+				let localAtendimento = $('#localAtendimento').val()
 
-				switch(menssageError){
-					case servico: menssageError = 'informe o serviço'; $('#servico').focus();break;
-					case medicos: menssageError = 'informe o médico'; $('#medicos').focus();break;
-					case dataAtendimento: menssageError = 'informe uma data'; $('#dataAtendimento').focus();break;
-					case horaAtendimento: menssageError = 'informe o horário'; $('#horaAtendimento').focus();break;
-					case localAtendimento: menssageError = 'informe o local de atendimento'; $('#localAtendimento').focus();break;
-					default: menssageError = ''; break;
+				switch (menssageError) {
+					case servico:
+						menssageError = 'informe o serviço';
+						$('#servico').focus();
+						break;
+					case medicos:
+						menssageError = 'informe o médico';
+						$('#medicos').focus();
+						break;
+					case dataAtendimento:
+						menssageError = 'informe uma data';
+						$('#dataAtendimento').focus();
+						break;
+					case horaAtendimento:
+						menssageError = 'informe o horário';
+						$('#horaAtendimento').focus();
+						break;
+					case localAtendimento:
+						menssageError = 'informe o local de atendimento';
+						$('#localAtendimento').focus();
+						break;
+					default:
+						menssageError = '';
+						break;
 				}
 
-				if(menssageError){
+				if (menssageError) {
 					alerta('Campo Obrigatório!', menssageError, 'error')
 					return
 				}
@@ -368,7 +401,7 @@ if($iAtendimento){
 					type: 'POST',
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
-					data:{
+					data: {
 						'tipoRequest': 'ADICIONARSERVICO',
 						'servico': servico,
 						'medicos': medicos,
@@ -377,7 +410,7 @@ if($iAtendimento){
 						'localAtendimento': localAtendimento
 					},
 					success: function(response) {
-						if(response.status == 'success'){
+						if (response.status == 'success') {
 							resetServicoCmb()
 							checkServicos()
 							alerta(response.titulo, response.menssagem, response.status)
@@ -392,33 +425,33 @@ if($iAtendimento){
 			})
 
 			// btn de adicionar novo responsavel
-			$('#addResponsavel').on('click', function(e){
+			$('#addResponsavel').on('click', function(e) {
 				e.preventDefault()
 				$('#page-modal-responsavel').fadeIn(200)
 			})
 
-			$('#paciente').on('change', function(){
+			$('#paciente').on('change', function() {
 				let iPaciente = $(this).val()
-				$('.actions a').each(function(index,element){
-					if($(element).attr('href') == '#' || $(element).attr('href') == '#next'){
-						let href = $('#paciente').val()?'#next':'#'
-						$(element).attr('href',href)
+				$('.actions a').each(function(index, element) {
+					if ($(element).attr('href') == '#' || $(element).attr('href') == '#next') {
+						let href = $('#paciente').val() ? '#next' : '#'
+						$(element).attr('href', href)
 					}
 				})
-				$('.steps ul li').each(function(index,element){
-					if(!$('#paciente').val() && index > 0){
-						$(element).attr('class','disabled')
+				$('.steps ul li').each(function(index, element) {
+					if (!$('#paciente').val() && index > 0) {
+						$(element).attr('class', 'disabled')
 					}
 				})
 				setPacienteAtribut(iPaciente)
 			});
 
-			$('#servico').on('change', function(e){
+			$('#servico').on('change', function(e) {
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
-					data:{
+					data: {
 						'tipoRequest': 'MEDICOS',
 						'servico': $(this).val()
 					},
@@ -435,7 +468,7 @@ if($iAtendimento){
 				});
 			})
 
-			$('#parentescoCadatrado').on('change', function(){
+			$('#parentescoCadatrado').on('change', function() {
 				let iResponsavel = $(this).val();
 				setResponsavelAtribut(iResponsavel)
 				// if(iResponsavel){
@@ -464,10 +497,10 @@ if($iAtendimento){
 				// }
 			});
 
-			$('#medicos').on('change', function(){
+			$('#medicos').on('change', function() {
 				let iMedico = $(this).val()
 
-				if(!iMedico){
+				if (!iMedico) {
 					setHoraProfissional()
 					setDataProfissional()
 					return
@@ -476,12 +509,12 @@ if($iAtendimento){
 					type: 'POST',
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
-					data:{
+					data: {
 						'tipoRequest': 'SETDATAPROFISSIONAL',
 						'iMedico': iMedico,
 					},
 					success: function(response) {
-						if(response.status == 'success'){
+						if (response.status == 'success') {
 							setDataProfissional(response.arrayData)
 							$('#dataAtendimento').focus()
 
@@ -492,36 +525,98 @@ if($iAtendimento){
 				});
 			});
 
-			$('#salvarPacienteModal').on('click', function(e){
+			$('#salvarPacienteModal').on('click', function(e) {
 				e.preventDefault()
 
 				let menssageError = ''
 
-				switch(menssageError){
-					case $('#prontuarioNew').val(): menssageError = 'Informe o prontuário!!';$('#prontuarioNew').focus();break;
-					case $('#nomeNew').val(): menssageError = 'Informe o nome!!';$('#nomeNew').focus();break;
-					case $('#cpfNew').val(): menssageError = 'Informe o CPF!!';$('#cpfNew').focus();break;
-					case $('#rgNew').val(): menssageError = 'Informe o RG!!';$('#rgNew').focus();break;
-					case $('#emissorNew').val(): menssageError = 'Informe o emissor!!';$('#emissorNew').focus();break;
-					case $('#ufNew').val(): menssageError = 'Informe o UF!!';$('#ufNew').focus();break;
-					case $('#sexoNew').val(): menssageError = 'Informe o sexo!!';$('#sexoNew').focus();break;
-					case $('#nascimentoNew').val(): menssageError = 'Informe a data de nascimento!!';$('#nascimentoNew').focus();break;
-					case $('#nomePaiNew').val(): menssageError = 'Informe o nome do pai!!';$('#nomePaiNew').focus();break;
-					case $('#nomeMaeNew').val(): menssageError = 'Informe o nome da mãe!!';$('#nomeMaeNew').focus();break;
-					case $('#profissaoNew').val(): menssageError = 'Informe a profissão!!';$('#profissaoNew').focus();break;
-					case $('#cepNew').val(): menssageError = 'Informe o CEP!!';$('#cepNew').focus();break;
-					case $('#enderecoNew').val(): menssageError = 'Informe o endereço!!';$('#enderecoNew').focus();break;
-					case $('#numeroNew').val(): menssageError = 'Informe o número!!';$('#numeroNew').focus();break;
-					case $('#bairroNew').val(): menssageError = 'Informe o bairro!!';$('#bairroNew').focus();break;
-					case $('#cidadeNew').val(): menssageError = 'Informe a cidade!!';$('#cidadeNew').focus();break;
-					case $('#estadoNew').val(): menssageError = 'Informe o estado!!';$('#estadoNew').focus();break;
-					case $('#contatoNew').val(): menssageError = 'Informe o nome do contato!!';$('#contatoNew').focus();break;
-					case $('#telefoneNew').val()||$('#celularNew').val(): menssageError = 'Informe o telefone ou celular!!';$('#telefoneNew').val()||$('#celularNew').focus();break;
-					case $('#emailNew').val(): menssageError = 'Informe um e-mail!!';$('#emailNew').focus();break;
-					default: menssageError = '';break;
+				switch (menssageError) {
+					case $('#prontuarioNew').val():
+						menssageError = 'Informe o prontuário!!';
+						$('#prontuarioNew').focus();
+						break;
+					case $('#nomeNew').val():
+						menssageError = 'Informe o nome!!';
+						$('#nomeNew').focus();
+						break;
+					case $('#cpfNew').val():
+						menssageError = 'Informe o CPF!!';
+						$('#cpfNew').focus();
+						break;
+					case $('#rgNew').val():
+						menssageError = 'Informe o RG!!';
+						$('#rgNew').focus();
+						break;
+					case $('#emissorNew').val():
+						menssageError = 'Informe o emissor!!';
+						$('#emissorNew').focus();
+						break;
+					case $('#ufNew').val():
+						menssageError = 'Informe o UF!!';
+						$('#ufNew').focus();
+						break;
+					case $('#sexoNew').val():
+						menssageError = 'Informe o sexo!!';
+						$('#sexoNew').focus();
+						break;
+					case $('#nascimentoNew').val():
+						menssageError = 'Informe a data de nascimento!!';
+						$('#nascimentoNew').focus();
+						break;
+					case $('#nomePaiNew').val():
+						menssageError = 'Informe o nome do pai!!';
+						$('#nomePaiNew').focus();
+						break;
+					case $('#nomeMaeNew').val():
+						menssageError = 'Informe o nome da mãe!!';
+						$('#nomeMaeNew').focus();
+						break;
+					case $('#profissaoNew').val():
+						menssageError = 'Informe a profissão!!';
+						$('#profissaoNew').focus();
+						break;
+					case $('#cepNew').val():
+						menssageError = 'Informe o CEP!!';
+						$('#cepNew').focus();
+						break;
+					case $('#enderecoNew').val():
+						menssageError = 'Informe o endereço!!';
+						$('#enderecoNew').focus();
+						break;
+					case $('#numeroNew').val():
+						menssageError = 'Informe o número!!';
+						$('#numeroNew').focus();
+						break;
+					case $('#bairroNew').val():
+						menssageError = 'Informe o bairro!!';
+						$('#bairroNew').focus();
+						break;
+					case $('#cidadeNew').val():
+						menssageError = 'Informe a cidade!!';
+						$('#cidadeNew').focus();
+						break;
+					case $('#estadoNew').val():
+						menssageError = 'Informe o estado!!';
+						$('#estadoNew').focus();
+						break;
+					case $('#contatoNew').val():
+						menssageError = 'Informe o nome do contato!!';
+						$('#contatoNew').focus();
+						break;
+					case $('#telefoneNew').val() || $('#celularNew').val():
+						menssageError = 'Informe o telefone ou celular!!';
+						$('#telefoneNew').val() || $('#celularNew').focus();
+						break;
+					case $('#emailNew').val():
+						menssageError = 'Informe um e-mail!!';
+						$('#emailNew').focus();
+						break;
+					default:
+						menssageError = '';
+						break;
 				}
 
-				if(menssageError){
+				if (menssageError) {
 					alerta('Campo Obrigatório!', menssageError, 'error')
 					return
 				}
@@ -530,7 +625,7 @@ if($iAtendimento){
 					type: 'POST',
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
-					data:{
+					data: {
 						'tipoRequest': 'SALVARPACIENTE',
 						'prontuario': $('#prontuarioNew').val(),
 						'nome': $('#nomeNew').val(),
@@ -557,40 +652,75 @@ if($iAtendimento){
 						'observacao': $('#observacaoNew').val()
 					},
 					success: function(response) {
-						if(response.status == 'success'){
-							alerta(response.titulo,response.menssagem,response.status)
+						if (response.status == 'success') {
+							alerta(response.titulo, response.menssagem, response.status)
 							getCmbs({
-								'pacienteID':response.id
+								'pacienteID': response.id
 							})
 							$('#page-modal-paciente').fadeOut(200)
-						}else{
-							alerta(response.titulo,response.menssagem,response.status)
+						} else {
+							alerta(response.titulo, response.menssagem, response.status)
 						}
 					}
 				});
 			})
 
-			$('#salvarResponsavelModal').on('click', function(e){
+			$('#salvarResponsavelModal').on('click', function(e) {
 				e.preventDefault()
 
 				let menssageError = ''
 
-				switch(menssageError){
-					case $('#nomeRespNew').val():menssageError = 'Informe o nome!!';$('#nomeResp').focus();break;
-					case $('#parentescoRespNew').val():menssageError ='Informe o grau de parentesco!!';$('#parentescoResp').focus();break;
-					case $('#nascimentoRespNew').val():menssageError='Informe a data de nascimento';$('#nascimentoResp').focus();break;
-					case $('#cepRespNew').val():menssageError='Informe o CEP';$('#cepResp').focus();break;
-					case $('#enderecoRespNew').val():menssageError='Informe o endereço';$('#enderecoResp').focus();break;
-					case $('#numeroRespNew').val():menssageError='Informe o número';$('#numeroResp').focus();break;
-					case $('#bairroRespNew').val():menssageError='Informe o bairro';$('#bairroResp').focus();break;
-					case $('#cidadeRespNew').val():menssageError='Informe a cidade';$('#cidadeResp').focus();break;
-					case $('#estadoRespNew').val():menssageError='Informe o estado';$('#estadoResp').focus();break;
-					case $('#celularRespNew').val()||$('#telefoneResp').val():menssageError='Informe um contato';$('#telefoneResp').focus();break;
-					case $('#emailRespNew').val():menssageError='Informe um e-mail';$('#emailResp').focus();break;
-					default: menssageError = '';break;
+				switch (menssageError) {
+					case $('#nomeRespNew').val():
+						menssageError = 'Informe o nome!!';
+						$('#nomeResp').focus();
+						break;
+					case $('#parentescoRespNew').val():
+						menssageError = 'Informe o grau de parentesco!!';
+						$('#parentescoResp').focus();
+						break;
+					case $('#nascimentoRespNew').val():
+						menssageError = 'Informe a data de nascimento';
+						$('#nascimentoResp').focus();
+						break;
+					case $('#cepRespNew').val():
+						menssageError = 'Informe o CEP';
+						$('#cepResp').focus();
+						break;
+					case $('#enderecoRespNew').val():
+						menssageError = 'Informe o endereço';
+						$('#enderecoResp').focus();
+						break;
+					case $('#numeroRespNew').val():
+						menssageError = 'Informe o número';
+						$('#numeroResp').focus();
+						break;
+					case $('#bairroRespNew').val():
+						menssageError = 'Informe o bairro';
+						$('#bairroResp').focus();
+						break;
+					case $('#cidadeRespNew').val():
+						menssageError = 'Informe a cidade';
+						$('#cidadeResp').focus();
+						break;
+					case $('#estadoRespNew').val():
+						menssageError = 'Informe o estado';
+						$('#estadoResp').focus();
+						break;
+					case $('#celularRespNew').val() || $('#telefoneResp').val():
+						menssageError = 'Informe um contato';
+						$('#telefoneResp').focus();
+						break;
+					case $('#emailRespNew').val():
+						menssageError = 'Informe um e-mail';
+						$('#emailResp').focus();
+						break;
+					default:
+						menssageError = '';
+						break;
 				}
 
-				if(menssageError){
+				if (menssageError) {
 					alerta('Campo Obrigatório!', menssageError, 'error')
 					return
 				}
@@ -599,70 +729,70 @@ if($iAtendimento){
 					type: 'POST',
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
-					data:{
+					data: {
 						'tipoRequest': 'SALVARRESPONSAVEL',
-						'pacienteId':$('#paciente').val(),
-						'nomeResp':$('#nomeRespNew').val(),
-						'parentescoResp':$('#parentescoRespNew').val(),
-						'nascimentoResp':$('#nascimentoRespNew').val(),
-						'cepResp':$('#cepRespNew').val(),
-						'enderecoResp':$('#enderecoRespNew').val(),
-						'numeroResp':$('#numeroRespNew').val(),
-						'complementoResp':$('#observacaoRespNew').val(),
-						'bairroResp':$('#bairroRespNew').val(),
-						'cidadeResp':$('#cidadeRespNew').val(),
-						'estadoResp':$('#estadoRespNew').val(),
-						'telefoneResp':$('#telefoneRespNew').val(),
-						'celularResp':$('#celularRespNew').val(),
-						'emailResp':$('#emailRespNew').val(),
-						'observacaoResp':$('#complementoRespNew').val()
+						'pacienteId': $('#paciente').val(),
+						'nomeResp': $('#nomeRespNew').val(),
+						'parentescoResp': $('#parentescoRespNew').val(),
+						'nascimentoResp': $('#nascimentoRespNew').val(),
+						'cepResp': $('#cepRespNew').val(),
+						'enderecoResp': $('#enderecoRespNew').val(),
+						'numeroResp': $('#numeroRespNew').val(),
+						'complementoResp': $('#observacaoRespNew').val(),
+						'bairroResp': $('#bairroRespNew').val(),
+						'cidadeResp': $('#cidadeRespNew').val(),
+						'estadoResp': $('#estadoRespNew').val(),
+						'telefoneResp': $('#telefoneRespNew').val(),
+						'celularResp': $('#celularRespNew').val(),
+						'emailResp': $('#emailRespNew').val(),
+						'observacaoResp': $('#complementoRespNew').val()
 					},
 					success: function(response) {
-						if(response.status == 'success'){
-							alerta(response.titulo,response.menssagem,response.status)
+						if (response.status == 'success') {
+							alerta(response.titulo, response.menssagem, response.status)
 							getCmbs({
-								'responsavelID':response.paciente
+								'responsavelID': response.paciente
 							})
 							$('#page-modal-responsavel').fadeOut(200)
-						}else{
-							alerta(response.titulo,response.menssagem,response.status)
+						} else {
+							alerta(response.titulo, response.menssagem, response.status)
 						}
 					}
 				});
 			})
 
-			$('#addPaciente').on('click', function(e){
+			$('#addPaciente').on('click', function(e) {
 				e.preventDefault();
 				$('#page-modal-paciente').fadeIn(200)
 			})
 
-			$('#modalPaciente-close-x').on('click', ()=>{
+			$('#modalPaciente-close-x').on('click', () => {
 				$('#iAtendimento').val('')
 				$('#page-modal-paciente').fadeOut(200)
 			})
-			$('#modalResponsavel-close-x').on('click', ()=>{
+			$('#modalResponsavel-close-x').on('click', () => {
 				$('#iAtendimento').val('')
 				$('#page-modal-responsavel').fadeOut(200)
 			})
 
-			$('#formServicoAtendimento').submit(function(e){
+			$('#formServicoAtendimento').submit(function(e) {
 				e.preventDefault()
 				console.log()
 			})
-			$('#dados').submit(function(e){
+			$('#dados').submit(function(e) {
 				e.preventDefault()
 			})
 
 			resetServicoCmb()
 		});
 
-		function getCmbs(obj){
+		function getCmbs(obj) {
 			// vai preencher cmbPaciente
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'PACIENTES'
 				},
 				success: function(response) {
@@ -673,26 +803,26 @@ if($iAtendimento){
 					// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
 					// logo esses valores deveram vir preenchido com os dados desse atendimento
 
-					if(obj && obj.pacienteID ){
-						response.forEach(item =>{
-							if(obj.pacienteID == item.id){
+					if (obj && obj.pacienteID) {
+						response.forEach(item => {
+							if (obj.pacienteID == item.id) {
 								opt = `<option selected value="${item.id}">${item.nome}</option>`
 								setPacienteAtribut(item.id)
-							}else{
+							} else {
 								opt = `<option value="${item.id}">${item.nome}</option>`
 							}
 							$('#paciente').append(opt)
 						})
-					} else if(atendimento){
-						response.forEach(item =>{
-							opt = atendimento.AtendCliente  == item.id?
-							 `<option selected value="${item.id}">${item.nome}</option>`:
-							 `<option value="${item.id}">${item.nome}</option>`
-							 $('#paciente').append(opt)
+					} else if (atendimento) {
+						response.forEach(item => {
+							opt = atendimento.AtendCliente == item.id ?
+								`<option selected value="${item.id}">${item.nome}</option>` :
+								`<option value="${item.id}">${item.nome}</option>`
+							$('#paciente').append(opt)
 						})
 						setPacienteAtribut(atendimento.AtendCliente)
 					} else {
-						response.forEach(item =>{
+						response.forEach(item => {
 							opt = opt = `<option value="${item.id}">${item.nome}</option>`
 							$('#paciente').append(opt)
 						})
@@ -704,7 +834,7 @@ if($iAtendimento){
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'MODALIDADES'
 				},
 				success: function(response) {
@@ -714,8 +844,8 @@ if($iAtendimento){
 						let opt = ''
 						// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
 						// logo esses valores deveram vir preenchido com os dados desse atendimento
-						if(atendimento){
-							 opt = atendimento.AtendModalidade == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
+						if (atendimento) {
+							opt = atendimento.AtendModalidade == item.id ? `<option selected value="${item.id}">${item.nome}</option>` : `<option value="${item.id}">${item.nome}</option>`
 						} else {
 							opt = `<option value="${item.id}">${item.nome}</option>`
 						}
@@ -728,7 +858,7 @@ if($iAtendimento){
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'SERVICOS'
 				},
 				success: function(response) {
@@ -745,7 +875,7 @@ if($iAtendimento){
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'LOCALATENDIMENTO'
 				},
 				success: function(response) {
@@ -762,56 +892,55 @@ if($iAtendimento){
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'RESPONSAVEIS'
 				},
 				success: function(response) {
 					let opt = ''
-					if(obj && obj.responsavelID){
+					if (obj && obj.responsavelID) {
 						$('#parentescoCadatrado').html("<option value=''>selecione</option>")
-						response.data.forEach(function (item){
-							if(obj.responsavelID == item.id){
-								opt = '<option selected value="'+item.id+'">'+item.nome+'</option>'
+						response.data.forEach(function(item) {
+							if (obj.responsavelID == item.id) {
+								opt = '<option selected value="' + item.id + '">' + item.nome + '</option>'
 								setResponsavelAtribut(item.id)
-							}else{
-								opt = '<option value="'+item.id+'">'+item.nome+'</option>'
+							} else {
+								opt = '<option value="' + item.id + '">' + item.nome + '</option>'
 							}
 							$('#parentescoCadatrado').append(opt);
 						});
-					} else if(atendimento){
-						response.data.forEach(function (item){
-							opt = atendimento.AtendResponsavel  == item.id?
-							 `<option selected value="${item.id}">${item.nome}</option>`:
-							 `<option value="${item.id}">${item.nome}</option>`
-							 $('#parentescoCadatrado').append(opt)
+					} else if (atendimento) {
+						response.data.forEach(function(item) {
+							opt = atendimento.AtendResponsavel == item.id ?
+								`<option selected value="${item.id}">${item.nome}</option>` :
+								`<option value="${item.id}">${item.nome}</option>`
+							$('#parentescoCadatrado').append(opt)
 						})
 						setResponsavelAtribut(atendimento.AtendResponsavel)
 					} else {
 						$('#parentescoCadatrado').html("<option selected value=''>selecione</option>")
-						response.data.forEach(function(item, index){
-							$('#parentescoCadatrado').append('<option value="'+item.id+'">'+item.nome+'</option>');
+						response.data.forEach(function(item, index) {
+							$('#parentescoCadatrado').append('<option value="' + item.id + '">' + item.nome + '</option>');
 						});
 					}
 				},
-				error: function(response) {
-				}
+				error: function(response) {}
 			});
 			// vai preencher cmbClassificacao
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'CLASSIFICACAO'
 				},
 				success: function(response) {
 					$('#classificacao').empty();
 					$('#classificacao').append(`<option value=''>Selecione</option>`)
-					
-					response.forEach(item =>{
+
+					response.forEach(item => {
 						let opt = ''
-						if(atendimento){
-							 opt = atendimento.AtendClassificacao == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
+						if (atendimento) {
+							opt = atendimento.AtendClassificacao == item.id ? `<option selected value="${item.id}">${item.nome}</option>` : `<option value="${item.id}">${item.nome}</option>`
 						} else {
 							opt = `<option value="${item.id}">${item.nome}</option>`
 						}
@@ -822,18 +951,18 @@ if($iAtendimento){
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o paciente
-		function setPacienteAtribut(iPaciente){
-			if(iPaciente){
+		function setPacienteAtribut(iPaciente) {
+			if (iPaciente) {
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
-					data:{
+					data: {
 						'tipoRequest': 'PACIENTE',
 						'iPaciente': iPaciente
 					},
 					success: function(response) {
-						if(response.status == 'success'){
+						if (response.status == 'success') {
 							$('#prontuario').val(response.prontuario)
 							$('#nome').val(response.nome)
 							$('#cpf').val(response.cpf)
@@ -860,14 +989,13 @@ if($iAtendimento){
 							$('#observacao').val(response.observacao)
 							$('#novoPaciente').show()
 							$('#informacoes').show()
-						}else{
+						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 							$('#novoPaciente').hide()
 							$('#informacoes').hide()
 						}
 					},
-					error: function(response) {
-					}
+					error: function(response) {}
 				});
 			} else {
 				$('#prontuario').val('')
@@ -900,18 +1028,18 @@ if($iAtendimento){
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o responsável
-		function setResponsavelAtribut(iResponsavel){
-			if(iResponsavel){
+		function setResponsavelAtribut(iResponsavel) {
+			if (iResponsavel) {
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
-					data:{
+					data: {
 						'tipoRequest': 'RESPONSAVEL',
 						'iResponsavel': iResponsavel
 					},
 					success: function(response) {
-						if(response.status == 'success'){
+						if (response.status == 'success') {
 							$('#nomeResp').val(response.data.nomeResp)
 							$('#parentescoResp').val(response.data.parentescoResp)
 							$('#nascimentoResp').val(response.data.nascimentoResp)
@@ -926,7 +1054,7 @@ if($iAtendimento){
 							$('#celularResp').val(response.data.celularResp)
 							$('#emailResp').val(response.data.emailResp)
 							$('#observacaoResp').val(response.data.observacaoResp)
-	
+
 							$('#informacoes').show()
 							$('#novoResponsavel').show()
 						} else {
@@ -935,8 +1063,7 @@ if($iAtendimento){
 							$('#informacoes').hide()
 						}
 					},
-					error: function(response) {
-					}
+					error: function(response) {}
 				});
 			} else {
 				$('#nomeResp').val('')
@@ -958,12 +1085,12 @@ if($iAtendimento){
 			}
 		}
 
-		function excluiServico(id){
+		function excluiServico(id) {
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'EXCLUISERVICO',
 					'id': id
 				},
@@ -974,18 +1101,18 @@ if($iAtendimento){
 			});
 		}
 
-		function checkServicos(){
+		function checkServicos() {
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'CHECKSERVICO',
-					'iAtendimento': atendimento?atendimento['AtendId']:''
+					'iAtendimento': atendimento ? atendimento['AtendId'] : ''
 				},
 				success: async function(response) {
-					statusServicos = response.array.length?true:false;
-					if(statusServicos){
+					statusServicos = response.array.length ? true : false;
+					if (statusServicos) {
 						$('#dataServico').html('');
 
 						let HTML = ''
@@ -1008,20 +1135,20 @@ if($iAtendimento){
 						$('#servicoValorTotal').html(`${float2moeda(response.valorTotal)}`).show();
 						$('#dataServico').html(HTML).show();
 						$('#servicoTable').show();
-					}else{
+					} else {
 						$('#servicoTable').hide();
 					}
 				}
 			});
 		}
 
-		function resetServicoCmb(){
+		function resetServicoCmb() {
 			// vai preencher cmbServicos
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'SERVICOS'
 				},
 				success: function(response) {
@@ -1038,7 +1165,7 @@ if($iAtendimento){
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'MEDICOS'
 				},
 				success: function(response) {
@@ -1055,7 +1182,7 @@ if($iAtendimento){
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
-				data:{
+				data: {
 					'tipoRequest': 'LOCALATENDIMENTO'
 				},
 				success: function(response) {
@@ -1071,11 +1198,11 @@ if($iAtendimento){
 			$('#horaAtendimento').val('')
 		}
 
-		function setDataProfissional(array){
+		function setDataProfissional(array) {
 			$('#dataAgenda').html('').show();
 			$('#dataAgenda').html('<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">').show();
-			
-			let arrayData = array?array:undefined;
+
+			let arrayData = array ? array : undefined;
 			console.log(array)
 			$('#dataAtendimento').pickadate({
 				weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
@@ -1100,26 +1227,26 @@ if($iAtendimento){
 					// console.log('onStart event')
 				},
 				onRender: function() {
-					$('.picker__day').each(function(){
+					$('.picker__day').each(function() {
 						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
 						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
 
-						if(hasClass){
-							$(this).addClass((hasSelected?
-							'':
-							'font-weight-bold text-black border'))
+						if (hasClass) {
+							$(this).addClass((hasSelected ?
+								'' :
+								'font-weight-bold text-black border'))
 						}
 					})
 				},
 				onOpen: function() {
-					$('.picker__day').each(function(){
+					$('.picker__day').each(function() {
 						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
 						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
 
-						if(hasClass){
-							$(this).addClass((hasSelected?
-							'':
-							'font-weight-bold text-black border'))
+						if (hasClass) {
+							$(this).addClass((hasSelected ?
+								'' :
+								'font-weight-bold text-black border'))
 						}
 					})
 				},
@@ -1130,20 +1257,22 @@ if($iAtendimento){
 					// console.log('onStop event')
 				},
 				onSet: function(context) {
-					let data = new Date(context.select).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+					let data = new Date(context.select).toLocaleString("pt-BR", {
+						timeZone: "America/Bahia"
+					});
 					data = data.split(' ')[0]; // Formatando a string padrão: "dd/mm/yyyy HH:MM:SS" => "dd/mm/yyyy"
 					let iMedico = $('#medicos').val();
 					$.ajax({
 						type: 'POST',
 						url: 'filtraAtendimento.php',
 						dataType: 'json',
-						data:{
+						data: {
 							'tipoRequest': 'SETHORAPROFISSIONAL',
 							'data': data,
 							'iMedico': iMedico
 						},
 						success: function(response) {
-							if(response.status == 'success'){
+							if (response.status == 'success') {
 								setHoraProfissional(response.arrayHora, response.intervalo)
 								$('#horaAtendimento').focus()
 							} else {
@@ -1155,16 +1284,16 @@ if($iAtendimento){
 			});
 		}
 
-		function setHoraProfissional(array,interv){
+		function setHoraProfissional(array, interv) {
 			$('#modalHora').html('');
 			$('#modalHora').html('<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">');
 
-			let intervalo = interv?interv:30
+			let intervalo = interv ? interv : 30
 			// doc: https://amsul.ca/pickadate.js/time/
 			$('#horaAtendimento').pickatime({
 				// Regras
 				interval: intervalo,
-				disable: array?array:undefined,
+				disable: array ? array : undefined,
 
 				// Formats
 				format: 'HH:i',
@@ -1172,11 +1301,11 @@ if($iAtendimento){
 				formatSubmit: undefined,
 				hiddenPrefix: undefined,
 				hiddenSuffix: '_submit',
-				
+
 				// Time limits
 				min: undefined,
 				max: undefined,
-				
+
 				// Close on a user action
 				closeOnSelect: true,
 				closeOnClear: true,
@@ -1194,7 +1323,9 @@ if($iAtendimento){
 					let dataHora = `${data} ${hora}`
 
 					// somente para atribuir à variável "dataHora" um valor do tipo DataTime
-					dataHora = new Date(dataHora).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
+					dataHora = new Date(dataHora).toLocaleString("pt-BR", {
+						timeZone: "America/Bahia"
+					});
 				},
 				onStart: undefined,
 				onRender: undefined,
@@ -1213,13 +1344,13 @@ if($iAtendimento){
 
 	<!-- Page content -->
 	<div class="page-content">
-		
+
 		<?php include_once("menu-left.php"); ?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
 
-			<?php include_once("cabecalho.php"); ?>	
+			<?php include_once("cabecalho.php"); ?>
 
 			<!-- Content area -->
 			<div class="content">
@@ -1267,7 +1398,7 @@ if($iAtendimento){
 										</div>
 										<div class="col-5">
 											<select id="paciente" name="paciente" class="select-search" required>
-												
+
 											</select>
 										</div>
 										<div class="col-1">
@@ -1291,7 +1422,7 @@ if($iAtendimento){
 										</div>
 										<div class="col-1">
 											<span class="action btn btn-principal legitRipple" id="addResponsavel" style="user-select: none;">
-											NOVO RESPONSÁVEL
+												NOVO RESPONSÁVEL
 											</span>
 										</div>
 									</div>
@@ -1304,8 +1435,8 @@ if($iAtendimento){
 										<div class="col-lg-12 mb-4 row mt-4">
 											<!-- titulos -->
 											<?php
-												if($iAtendimento){
-													echo "
+											if ($iAtendimento) {
+												echo "
 														<div class='col-lg-2'>
 															<label>Nº Registro</label>
 														</div>
@@ -1336,8 +1467,8 @@ if($iAtendimento){
 																<option value='' selected>selecionar</option>
 															</select>
 														</div>";
-												} else {
-													echo "
+											} else {
+												echo "
 														<div class='col-lg-4'>
 															<label>Data do Registro</label>
 														</div>
@@ -1362,7 +1493,7 @@ if($iAtendimento){
 																<option value='' selected>selecionar</option>
 															</select>
 														</div>";
-												}
+											}
 											?>
 										</div>
 
@@ -1402,7 +1533,7 @@ if($iAtendimento){
 											<div id="dataAgenda" class="col-lg-3 input-group">
 												<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">
 											</div>
-											<div id="modalHora" class="col-lg-2">										
+											<div id="modalHora" class="col-lg-2">
 												<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
 											</div>
 											<div class="col-lg-2">
@@ -1412,7 +1543,7 @@ if($iAtendimento){
 											</div>
 											<!-- btnAddServico -->
 											<div class="col-lg-1 text-right">
-												<button id="incluirServico" class="btn btn-lg btn-principal" data-tipo="INCLUIRSERVICO" >
+												<button id="incluirServico" class="btn btn-lg btn-principal" data-tipo="INCLUIRSERVICO">
 													<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
 												</button>
 											</div>
@@ -1422,25 +1553,29 @@ if($iAtendimento){
 											<table class="table" id="servicoTable">
 												<thead>
 													<tr class="bg-slate text-center">
-														<th>Serviço</th>
-														<th>Médico</th>
-														<th>Data do Atendimento</th>
-														<th>Horário</th>
-														<th>Local</th>			
-														<th>Valor</th>
-														<th class="text-center">Ações</th>
+														<th style="width: 15rem;">Serviço</th>
+														<th style="width: 15rem;">Médico</th>
+														<th style="width: 11rem;">Data do Atendimento</th>
+														<th style="width: 6rem;">Horário</th>
+														<th style="width: 18rem;">Local</th>
+														<th style="width: 7rem;">Valor</th>
+														<th class="text-center" style="width: 5rem;">Ações</th>
 													</tr>
 												</thead>
 												<tbody id="dataServico">
-													
+
 												</tbody>
 												<tfoot>
 													<tr>
-														<th colspan="7" class="font-weight-bold" style="font-size: 16px;">
-														<div style="float: right;">
-															<div style="display:table-cell;padding-right:40px;">Valor(R$):</div>
-															<div id="servicoValorTotal" class="font-weight-bold" style="font-size: 15px;display:table-cell;">R$ 0,00</div>
-														</div>
+														<th colspan="6" class="font-weight-bold" style="font-size: 16px; width: 72rem;">
+															<div style="float: right;">
+																<div style="display:table-cell;padding-right:40px;">Valor(R$):</div>
+																<div id="servicoValorTotal" class="font-weight-bold" style="font-size: 15px;display:table-cell;">R$ 0,00</div>
+															</div>
+														</th>
+
+														<th style="width: 5rem;">
+
 														</th>
 													</tr>
 												</tfoot>
@@ -1465,8 +1600,8 @@ if($iAtendimento){
 
 						<div id="informacoes" class="card ">
 							<div id="novoPaciente" class="">
-								<div class="card-body">	
-									
+								<div class="card-body">
+
 									<div class="card-header header-elements-inline" style="margin-left: -10px;">
 										<h5 class="text-uppercase font-weight-bold">Dados Pessoais do paciente</h5>
 									</div>
@@ -1521,26 +1656,26 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-2">
-											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG" required >
+											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG" required>
 										</div>
 										<div class="col-lg-3">
-											<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor" required >
+											<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor" required>
 										</div>
 										<div class="col-lg-2">
-											<select id="uf" name="uf" class="select-search" required >
+											<select id="uf" name="uf" class="select-search" required>
 												<option value="" selected>selecionar</option>
 												<option value='BA'>BA</option>
 											</select>
 										</div>
 										<div class="col-lg-2">
-											<select id="sexo" name="sexo" class="form-control form-control-select2" required >
+											<select id="sexo" name="sexo" class="form-control form-control-select2" required>
 												<option value="" selected>selecionar</option>
 												<option value="M">Masculino</option>
 												<option value="F">Feminino</option>
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa" required >
+											<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa" required>
 										</div>
 									</div>
 
@@ -1555,10 +1690,10 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-6">
-											<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai" required >
+											<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai" required>
 										</div>
 										<div class="col-lg-6">
-											<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe" required >
+											<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe" required>
 										</div>
 									</div>
 
@@ -1570,7 +1705,7 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-12">
-											<select id="profissao" name="profissao" class="form-control form-control-select2" required >
+											<select id="profissao" name="profissao" class="form-control form-control-select2" required>
 												<option selected value="">selecionar</option>
 												<option value="1">Teste</option>
 											</select>
@@ -1598,16 +1733,16 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-3">
-											<input id="cep" name="cep" type="text" class="form-control" placeholder="CEP" required >
+											<input id="cep" name="cep" type="text" class="form-control" placeholder="CEP" required>
 										</div>
 										<div class="col-lg-4">
-											<input id="endereco" name="endereco" type="text" class="form-control" placeholder="EX.: Rua, Av" required >
+											<input id="endereco" name="endereco" type="text" class="form-control" placeholder="EX.: Rua, Av" required>
 										</div>
 										<div class="col-lg-2">
-											<input id="numero" name="numero" type="text" class="form-control" placeholder="Número" required >
+											<input id="numero" name="numero" type="text" class="form-control" placeholder="Número" required>
 										</div>
 										<div class="col-lg-3">
-											<input id="complemento" name="complemento" type="text" class="form-control" placeholder="Complemento" >
+											<input id="complemento" name="complemento" type="text" class="form-control" placeholder="Complemento">
 										</div>
 									</div>
 
@@ -1625,13 +1760,13 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="bairro" name="bairro" type="text" class="form-control" placeholder="Bairro" required >
+											<input id="bairro" name="bairro" type="text" class="form-control" placeholder="Bairro" required>
 										</div>
 										<div class="col-lg-4">
-											<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade" required >
+											<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade" required>
 										</div>
 										<div class="col-lg-4">
-											<input id="estado" name="estado" type="text" class="form-control" placeholder="Estado" required >
+											<input id="estado" name="estado" type="text" class="form-control" placeholder="Estado" required>
 										</div>
 									</div>
 
@@ -1656,16 +1791,16 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-3">
-											<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato" required >
+											<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato" required>
 										</div>
 										<div class="col-lg-3">
-											<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com." required >
+											<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com." required>
 										</div>
 										<div class="col-lg-3">
-											<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular" required >
+											<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular" required>
 										</div>
 										<div class="col-lg-3">
-											<input id="email" name="email" type="text" class="form-control" placeholder="E-mail" required >
+											<input id="email" name="email" type="text" class="form-control" placeholder="E-mail" required>
 										</div>
 									</div>
 
@@ -1677,7 +1812,7 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-12">
-											<textarea id="observacao" name="observacao" class="form-control" placeholder="Observações" ></textarea>
+											<textarea id="observacao" name="observacao" class="form-control" placeholder="Observações"></textarea>
 										</div>
 									</div>
 								</div>
@@ -1701,17 +1836,17 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome" >
+											<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome">
 										</div>
 										<div class="col-lg-4">
-											<select id="parentescoResp" name="parentesco" class="form-control form-control-select2" >
+											<select id="parentescoResp" name="parentesco" class="form-control form-control-select2">
 												<option value="" selected>selecionar</option>
 												<option value="tio">Tia/Tio</option>
 												<option value="pai">Mãe/Pai</option>
 											</select>
 										</div>
 										<div class="col-lg-4">
-											<input id="nascimentoResp" name="nascimentoResp" type="date" class="form-control" >
+											<input id="nascimentoResp" name="nascimentoResp" type="date" class="form-control">
 										</div>
 									</div>
 
@@ -1736,16 +1871,16 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-3">
-											<input id="cepResp" name="cepResp" type="text" class="form-control" placeholder="CEP" >
+											<input id="cepResp" name="cepResp" type="text" class="form-control" placeholder="CEP">
 										</div>
 										<div class="col-lg-4">
-											<input id="enderecoResp" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av" >
+											<input id="enderecoResp" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av">
 										</div>
 										<div class="col-lg-2">
-											<input id="numeroResp" name="numeroResp" type="text" class="form-control" placeholder="Número" >
+											<input id="numeroResp" name="numeroResp" type="text" class="form-control" placeholder="Número">
 										</div>
 										<div class="col-lg-3">
-											<input id="complementoResp" name="complementoResp" type="text" class="form-control" placeholder="Complemento" >
+											<input id="complementoResp" name="complementoResp" type="text" class="form-control" placeholder="Complemento">
 										</div>
 									</div>
 
@@ -1763,13 +1898,13 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="bairroResp" name="bairroResp" type="text" class="form-control" placeholder="Bairro" >
+											<input id="bairroResp" name="bairroResp" type="text" class="form-control" placeholder="Bairro">
 										</div>
 										<div class="col-lg-4">
-											<input id="cidadeResp" name="cidadeResp" type="text" class="form-control" placeholder="Cidade" >
+											<input id="cidadeResp" name="cidadeResp" type="text" class="form-control" placeholder="Cidade">
 										</div>
 										<div class="col-lg-4">
-											<input id="estadoResp" name="estadoResp" type="text" class="form-control" placeholder="Estado" >
+											<input id="estadoResp" name="estadoResp" type="text" class="form-control" placeholder="Estado">
 										</div>
 									</div>
 
@@ -1791,13 +1926,13 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="telefoneResp" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com." >
+											<input id="telefoneResp" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com.">
 										</div>
 										<div class="col-lg-4">
-											<input id="celularResp" name="celularResp" type="text" class="form-control" placeholder="Celular" >
+											<input id="celularResp" name="celularResp" type="text" class="form-control" placeholder="Celular">
 										</div>
 										<div class="col-lg-4">
-											<input id="emailResp" name="emailResp" type="text" class="form-control" placeholder="E-mail" >
+											<input id="emailResp" name="emailResp" type="text" class="form-control" placeholder="E-mail">
 										</div>
 									</div>
 
@@ -1809,10 +1944,10 @@ if($iAtendimento){
 
 										<!-- campos -->
 										<div class="col-lg-12">
-											<textarea id="observacaoResp" name="observacaoResp" class="form-control" placeholder="Observações" ></textarea>
+											<textarea id="observacaoResp" name="observacaoResp" class="form-control" placeholder="Observações"></textarea>
 										</div>
 									</div>
-								</div>	
+								</div>
 							</div>
 						</div>
 					</div>
@@ -2058,7 +2193,7 @@ if($iAtendimento){
 			</div>
 		</div>
 	</div>
-	
+
 	<div id="page-modal-responsavel" class="custon-modal">
 		<div class="custon-modal-container" style="max-width: 800px;">
 			<div class="card custon-modal-content">
