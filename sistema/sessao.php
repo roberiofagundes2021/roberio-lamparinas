@@ -228,3 +228,12 @@ if (array_key_exists('OrdemCompraIdEmpenho', $_SESSION) && !in_array(basename($_
 	unset($_SESSION['OrdemCompraNumero']);
 	unset($_SESSION['OrdemCompraSituacao']);
 }
+
+$arquivosServicoProfissional = array(
+	'profissionalServico.php', 'profissionalServicoExclui.php', 'profissionalServicoValida.php'
+);
+
+if (array_key_exists('Servico_ProfissionalId', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosServicoProfissional)) {
+	unset($_SESSION['Servico_ProfissionalId']);
+}
+

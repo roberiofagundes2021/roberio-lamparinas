@@ -12,7 +12,7 @@ if(isset($_POST['inputProfissionalServicoId'])){
 		
 		$sql = "DELETE FROM ProfissionalXServicoVenda
 				WHERE PrXSVId = :id";
-		$result = $conn->prepare("$sql");
+		$result = $conn->prepare($sql);
 		$result->bindParam(':id', $iProfissionalXServicoVenda); 
 		$result->execute();
 		

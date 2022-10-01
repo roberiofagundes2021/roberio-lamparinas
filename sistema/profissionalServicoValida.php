@@ -7,12 +7,12 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['servicoVelho'])){ 
 	$sql = "SELECT PrXSVId
 			FROM ProfissionalXServicoVenda
-			WHERE PrXSVUnidade = ".$_SESSION['UnidadeId']." and PrXSVProfissional = ". $_POST['profissionalId'] . " and 
+			WHERE PrXSVUnidade = ".$_SESSION['UnidadeId']." and PrXSVProfissional = ". $_SESSION['Servico_ProfissionalId'] . " and 
 			PrXSVServicoVenda = '". $_POST['servicoNovo']."' and PrXSVServicoVenda <> '". $_POST['servicoVelho']."'";
 } else{
 	$sql = "SELECT PrXSVId
 			FROM ProfissionalXServicoVenda
-			WHERE PrXSVUnidade = ".$_SESSION['UnidadeId']."  and PrXSVProfissional = ". $_POST['profissionalId'] . "  and 
+			WHERE PrXSVUnidade = ".$_SESSION['UnidadeId']."  and PrXSVProfissional = ". $_SESSION['Servico_ProfissionalId'] . "  and 
 			PrXSVServicoVenda = '". $_POST['servicoNovo']."'";
 }
 $result = $conn->query($sql);

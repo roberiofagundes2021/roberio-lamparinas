@@ -25,7 +25,7 @@ $sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, ClienId, ClienCo
 
      //Essa consulta é para preencher o sexo
     if ($rowPaciente['ClienSexo'] == 'F'){
-        $sexo = 'Femenino';
+        $sexo = 'Feminino';
     } else{
         $sexo = 'Masculino';
     }
