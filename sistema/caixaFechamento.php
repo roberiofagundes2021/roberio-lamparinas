@@ -718,16 +718,12 @@ if(isset($_POST['inputAberturaCaixaId']) || isset($_POST['aberturaCaixaId'])) {
                         <div class="card">
                             <div class="card-header bg-white" >
                                 <div class="row d-flex ">
-                                    <div class="col-lg-8">
+                                    <div class="col-lg-10">
                                         <h3 class="card-title">Fechamento de Caixa</h3>
                                     </div>
 
-                                    <div class="col-lg-2" style="margin-top: 5px;">
+                                    <div class="col-lg-2 text-right" style="margin-top: 5px;">
                                         <h5>Data: <?php echo date('d/m/Y'); ?>
-                                    </div>
-
-                                    <div class="col-lg-2" style="margin-top: 5px;">
-                                        <h5>Operador: <?php echo nomeSobrenome($_SESSION['UsuarNome'], 1); ?></h5>
                                     </div>
                                 </div>
                             </div>

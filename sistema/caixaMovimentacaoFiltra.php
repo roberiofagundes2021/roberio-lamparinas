@@ -57,7 +57,6 @@ if ($stringPagamento != '') {
     $stringPagamento .= ' and ';
 }
 
-//Falta o id da abertura do caixa
 $sql_movimentacao    = "SELECT CxRecId as ID, AtendNumRegistro, ClienNome as HISTORICO, CxRecDataHora as DATAHORA, CxRecAtendimento as ATENDIMENTO, FrPagNome, 
                                 CxRecValor, CxRecValorTotal as TOTAL, SituaNome, SituaChave, 'Recebimento' as TIPO
                         FROM CaixaRecebimento
