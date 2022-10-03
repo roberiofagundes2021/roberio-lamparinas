@@ -114,6 +114,46 @@ include_once("sessao.php");
 					}
 				}
 			});
+			$('#tblModulo').DataTable({
+				"order": [
+					[0, "asc"]
+				],
+				autoWidth: false,
+				responsive: true,
+				columnDefs: [{
+						orderable: true, //Nome
+						width: "50%",
+						targets: [0]
+					},
+					{
+						orderable: false, //Posicao
+						width: "10%",
+						targets: [1]
+					},
+					{
+						orderable: true, //Situacao
+						width: "30%",
+						targets: [2]
+					},
+					{
+						orderable: false, //Acoes
+						width: "10%",
+						targets: [3]
+					},
+				],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: {
+						'first': 'Primeira',
+						'last': 'Última',
+						'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+						'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+					}
+				}
+			});
 
 			$('#body').addClass('sidebar-xs')
 			// Select2 for length menu styling
@@ -136,25 +176,27 @@ include_once("sessao.php");
 			getAllMenus()
         }); // document.ready
 
-		function atualizaMenu(id){
+		function atualizaMenu(id, tipo){
 			$('#id').val(id)
+			$('#isMenu').val(tipo)
 			$('#formMenu').submit()
 		}
-		function excluirMenu(id){
+		function excluirMenu(id, tipo){
 			$.ajax({
 				type: 'POST',
 				url: 'menuFiltra.php',
 				dataType: 'json',
 				data:{
 					'tipo': 'EXCLUIR',
-					'idMenu': id
+					'idMenu': id,
+					'isMenu': tipo
 				},
 				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.tipo);
+					alerta(response.titulo, response.menssagem, response.status);
 					getAllMenus()
 				},
 				error: function(response) {
-					alerta(response.titulo, response.menssagem, response.tipo);
+					alerta(response.titulo, response.menssagem, response.status);
 				}
 			});
 		}
@@ -169,13 +211,21 @@ include_once("sessao.php");
 					'tipo': 'ALL'
 				},
 				success: function(response) {
-					let table = $('#tblMenu').DataTable().clear().draw()
+					$('#tblMenu').DataTable().clear().draw()
+					tableMen = $('#tblMenu').DataTable()
+					let rowNodeMen
 
-					table = $('#tblMenu').DataTable()
-					let rowNode
+					response.menus.forEach(item => {
+						rowNodeMen = tableMen.row.add(item.data).draw().node()
+						// $(rowNode).attr('class', 'text-center')
+						// $(rowNode).find('td:eq(7)').attr('data-agendamento', `${item.identify.iAgendamento}`)
+					})
 
-					response.forEach(item => {
-						rowNode = table.row.add(item.data).draw().node()
+					$('#tblModulo').DataTable().clear().draw()
+					tableMod = $('#tblModulo').DataTable()
+					let rowNodeMod
+					response.modulos.forEach(item => {
+						rowNodeMod = tableMod.row.add(item.data).draw().node()
 						// $(rowNode).attr('class', 'text-center')
 						// $(rowNode).find('td:eq(7)').attr('data-agendamento', `${item.identify.iAgendamento}`)
 					})
@@ -238,8 +288,23 @@ include_once("sessao.php");
 							</tbody>
 						</table>
 					</div>
+					<div class="card-body">
+						<table class="table" id="tblModulo">
+							<thead>
+								<tr class="bg-slate">
+									<th>Nome</th>
+									<th>Ordem</th>
+									<th>Situação</th>
+									<th class="text-center">Ações</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
 					<form name="formMenu" id="formMenu" method="post" action="menuCriar.php">
 						<input id='id' type='hidden' name='id' value=''>
+						<input id='isMenu' type='hidden' name='isMenu' value=''>
 					</form>
 				</div>
 			</div>

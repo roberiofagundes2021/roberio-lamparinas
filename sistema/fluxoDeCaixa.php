@@ -640,7 +640,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 														<span class="input-group-text"><i class="icon-calendar22"></i></span>
 													</span>
 
-													<?php $dataInicio = date("Y-m-d",strtotime("-4 days")); ?>
+													<?php $dataInicio = date("Y-m-d",strtotime("-3 days")); ?>
 													<input 
 														type="date" 
 														id="inputDataInicio"

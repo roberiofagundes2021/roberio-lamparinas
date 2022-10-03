@@ -182,6 +182,28 @@ if(isset($_POST['iAgendamento'])){
 				});
 			})
 
+			$('#servico').on('change', function(e){
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAgendamento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'MEDICOS',
+						'servico': $(this).val()
+					},
+					success: function(response) {
+						setDataProfissional()
+						setHoraProfissional()
+						$('#medico').empty();
+						$('#medico').append(`<option value=''>Selecione</option>`)
+						response.forEach(item => {
+							let opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#medico').append(opt)
+						})
+					}
+				});
+			})
+
 			$('#inserirServico').on('click', function(e){
 				e.preventDefault()
 				// vai preencher a tabela servico e inseri-lo no array de servicos
@@ -570,23 +592,6 @@ if(isset($_POST['iAgendamento'])){
 					})
 				}
 			});
-			// vai preencher cmbMedicos
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAgendamento.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'MEDICOS'
-				},
-				success: function(response) {
-					$('#medico').empty();
-					$('#medico').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
-						$('#medico').append(opt)
-					})
-				}
-			});
 			// vai preencher cmbLocalAtendimento
 			$.ajax({
 				type: 'POST',
@@ -625,22 +630,8 @@ if(isset($_POST['iAgendamento'])){
 				}
 			});
 			// vai preencher cmbMedicos
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAgendamento.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'MEDICOS'
-				},
-				success: function(response) {
-					$('#medico').empty();
-					$('#medico').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
-						$('#medico').append(opt)
-					})
-				}
-			});
+			$('#medico').empty();
+			$('#medico').append(`<option value=''>Selecione</option>`)
 			// vai preencher cmbLocalAtendimento
 			$.ajax({
 				type: 'POST',
@@ -776,12 +767,12 @@ if(isset($_POST['iAgendamento'])){
 									<!-- campos -->
 									<div class="col-lg-2">
 										<select id="servico" name="servico" class="select-search" required>
-											<!--  -->
+											<option value=''>Selecione</option>
 										</select>
 									</div>
 									<div class="col-lg-2">
 										<select id="medico" name="medico" class="select-search" required>
-											<!--  -->
+											<option value=''>Selecione</option>
 										</select>
 									</div>
 									<div id="dataAgenda" class="col-lg-3 input-group">

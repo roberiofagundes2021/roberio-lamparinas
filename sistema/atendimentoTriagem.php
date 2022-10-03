@@ -55,7 +55,7 @@ $iAtendimentoId = $row['AtendId'];
 
 //Essa consulta é para preencher o sexo
 if ($row['ClienSexo'] == 'F'){
-    $sexo = 'Femenino';
+    $sexo = 'Feminino';
 } else{
     $sexo = 'Masculino';
 }
@@ -419,7 +419,7 @@ if (isset($_POST['inputAlergia']) ){
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
-												<label>Responsavel  : <?php echo $row['ClResNome']; ?></label>
+												<label>Responsável  : <?php echo $row['ClResNome']; ?></label>
 											</div>
 										</div>
 									</div>

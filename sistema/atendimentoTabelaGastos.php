@@ -56,7 +56,7 @@ $iAtendimentoHistoricoId = $row['AtendId'];
 
 //Essa consulta é para preencher o sexo
 if ($row['ClienSexo'] == 'F'){
-    $sexo = 'Femenino';
+    $sexo = 'Feminino';
 } else{
     $sexo = 'Masculino';
 }
