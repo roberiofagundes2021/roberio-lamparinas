@@ -252,10 +252,14 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 					<div class="col-lg-12">
 						<!-- Basic responsive configuration -->
 						<div class="card">
-							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relações de Serviços do Profissional </h3>
+							<div class="card-header">
+								<div class="header-elements-inline">
+									<h3 class="card-title">Relações de Serviços do Profissional </h3>
+									<div class="header-elements">
+										<div><a href="profissional.php" role="button"><< Relação de Profissional</a>&nbsp;&nbsp;&nbsp;</div>
+									</div>
+								</div>
 							</div>
-
 							<div class="card-body">
 								<form name="formProfissionalServico" id="formProfissionalServico" method="post" class="form-validate-jquery">
 
