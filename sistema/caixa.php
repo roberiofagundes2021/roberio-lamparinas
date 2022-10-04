@@ -7,8 +7,9 @@ $_SESSION['PaginaAtual'] = 'Caixa';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT CaixaId, CaixaNome, CaixaStatus, SituaNome, SituaCor, SituaChave
+$sql = "SELECT CaixaId, CaixaNome, CaixaContaBanco, CaixaStatus, CnBanNome, SituaNome, SituaCor, SituaChave
 		FROM Caixa
+		JOIN ContaBanco ON CnBanId = CaixaContaBanco
 		JOIN Situacao on SituaId = CaixaStatus
 	    WHERE CaixaUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY CaixaNome ASC";
@@ -20,7 +21,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 if(isset($_POST['inputCaixaId']) && $_POST['inputCaixaId']){
 
 	//Essa consulta é para preencher o campo Nome com a caixa a ser editar
-	$sql = "SELECT CaixaId, CaixaNome
+	$sql = "SELECT CaixaId, CaixaNome, CaixaContaBanco
 			FROM Caixa
 			WHERE CaixaId = " . $_POST['inputCaixaId'];
 	$result = $conn->query($sql);
@@ -37,12 +38,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
-			$sql = "UPDATE Caixa SET CaixaNome = :sNome, CaixaUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE Caixa SET CaixaNome = :sNome, CaixaContaBanco = :sContaBanco, CaixaUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE CaixaId = :iCaixa";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sContaBanco' => $_POST['cmbContaBanco'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iCaixa' => $_POST['inputCaixaId']
 							));
@@ -51,12 +53,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO Caixa (CaixaNome, CaixaStatus, CaixaUsuarioAtualizador, CaixaUnidade)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO Caixa (CaixaNome, CaixaContaBanco, CaixaStatus, CaixaUsuarioAtualizador, CaixaUnidade)
+					VALUES (:sNome, :sCaixaContaBanco, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sCaixaContaBanco' => $_POST['cmbContaBanco'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId'],
@@ -98,6 +101,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
@@ -120,18 +124,23 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			    columnDefs: [
 				{
 					orderable: true,   //Caixa
-					width: "80%",
+					width: "40%",
 					targets: [0]
+				},
+				{
+					orderable: true,   //Caixa
+					width: "40%",
+					targets: [1]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "10%",
-					targets: [1]
+					targets: [2]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [2]
+					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -268,13 +277,33 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputNome">Nome do Caixa <span class="text-danger"> *</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Caixa" value="<?php if (isset($_POST['inputCaixaId'])) echo $rowCaixa['CaixaNome']; ?>" required autofocus>
 											</div>
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-5">
+											<label for="cmbContaBanco">Conta / Banco<span class="text-danger"> *</span></label>
+											<select id="cmbContaBanco" name="cmbContaBanco" class="form-control select-search" required>
+												<option value="">Selecione</option>
+												<?php 
+													$sql = "SELECT CnBanId, CnBanNome
+															FROM ContaBanco
+															JOIN Situacao ON SituaId = CnBanStatus
+															WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " AND SituaChave = 'ATIVO'
+														    ORDER BY CnBanNome ASC";
+													$result = $conn->query($sql);
+													$rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+													
+													foreach ($rowContaBanco as $item){
+														$seleciona = $item['CnBanId'] == $rowCaixa['CaixaContaBanco'] ? "selected" : "";
+														print('<option value="'.$item['CnBanId'].'" '. $seleciona .'>'.$item['CnBanNome'].'</option>');
+													}
+												?>
+											</select>
+										</div>
+										<div class="col-lg-3">
 											<div class="form-group" style="padding-top:25px;">
 												<?php
 
@@ -297,6 +326,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								<thead>
 									<tr class="bg-slate">
 										<th>Caixa</th>
+										<th>Conta / Banco</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -312,6 +342,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										print('
 										<tr>
 											<td>'.$item['CaixaNome'].'</td>
+											<td>'.$item['CnBanNome'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaCaixa(1,'.$item['CaixaId'].', \''.addslashes($item['CaixaNome']).'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
