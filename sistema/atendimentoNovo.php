@@ -1721,7 +1721,7 @@ if ($iAtendimento) {
 										<div class="col-lg-3">
 											<label>CEP <span class="text-danger">*</span></label>
 										</div>
-										<div class="col-lg-4">,
+										<div class="col-lg-4">
 											<label>Endereço <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-2">
