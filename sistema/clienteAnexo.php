@@ -148,22 +148,20 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<h3 class="card-title">Relação de Anexos</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-										<a href="clienteAnexo.php" class="list-icons-item" data-action="reload"></a>
-										<!--<a class="list-icons-item" data-action="remove"></a>-->
-									</div>
-								</div>
 							</div>
 
 							<div class="card-body">
-								A relação abaixo faz referência aos Anexos do cliente <span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['nomeCliente']; ?> </span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
-								
-								<div class="text-right"><a href="cliente.php" role="button"><< Cliente</a>&nbsp;&nbsp;&nbsp;
-								<a href="clienteAnexoNovo.php" class="btn btn-principal" role="button">Novo Anexo</a></div>
-							</div>
-							
+								<div class="row">
+									<div class="col-lg-8">
+										A relação abaixo faz referência aos Anexos do cliente <span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['nomeCliente']; ?> </span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
+									</div>
+									<div class= " text-right" style="margin-left: 85px;">
+										<a href="cliente.php" role="button"><< Relação de Cliente</a>&nbsp;&nbsp;&nbsp;
+									</div>
+									<div class= " text-right">
+										<a href="clienteAnexoNovo.php" class="btn btn-principal" role="button">Novo Anexo</a></div>
+									</div>
+								</div>
 							<table class="table" id="tblClienteAnexo">
 								<thead>
 									<tr class="bg-slate">
