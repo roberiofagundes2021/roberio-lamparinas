@@ -1839,11 +1839,7 @@ if ($iAtendimento) {
 											<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome">
 										</div>
 										<div class="col-lg-4">
-											<select id="parentescoResp" name="parentesco" class="form-control form-control-select2">
-												<option value="" selected>selecionar</option>
-												<option value="tio">Tia/Tio</option>
-												<option value="pai">Mãe/Pai</option>
-											</select>
+											<input id="parentescoResp" name="parentesco" type="text" class="form-control" placeholder="Parentesco">
 										</div>
 										<div class="col-lg-4">
 											<input id="nascimentoResp" name="nascimentoResp" type="date" class="form-control">
@@ -2226,11 +2222,7 @@ if ($iAtendimento) {
 											<input id="nomeRespNew" name="nomeResp" type="text" class="form-control" placeholder="Nome">
 										</div>
 										<div class="col-lg-4">
-											<select id="parentescoRespNew" name="parentesco" class="form-control form-control-select2">
-												<option value="" selected>selecionar</option>
-												<option value="tio">Tia/Tio</option>
-												<option value="pai">Mãe/Pai</option>
-											</select>
+											<input id="parentescoRespNew" name="parentesco" type="text" class="form-control" placeholder="Parentesco">
 										</div>
 										<div class="col-lg-4">
 											<input id="nascimentoRespNew" name="nascimentoResp" type="date" class="form-control">
