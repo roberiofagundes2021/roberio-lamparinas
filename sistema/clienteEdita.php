@@ -526,13 +526,14 @@ else {
 		</div>
 		<!-- /content area -->
 
-		<?php include_once("footer.php"); ?>
 
 	</div>
 	<!-- /main content -->
 
 	</div>
 	<!-- /page content -->
+	
+	<?php include_once("footer.php"); ?>
 
 </body>
 </html>
