@@ -6,6 +6,10 @@ if(isset($_POST['id'])){
 	$id = $_POST['id'];
 	$isMenu = $_POST['isMenu'];
 
+	$MenuId='';
+	$MenuNome='';
+	$MenuOrdem='';
+
 	if($isMenu == 'menu'){
 		$sql = "SELECT MenuId,MenuNome,MenuUrl,MenuIco,ModulNome,MenuModulo,MenuModulo,MenuPai,MenuLevel,MenuOrdem,MenuSubMenu,MenuSetorPublico,
 		MenuSetorPrivado,MenuPosicao,MenuUsuarioAtualizador,MenuStatus, SituaId
@@ -476,9 +480,9 @@ if(isset($_POST['id'])){
 										$optionsSituacao .= "<option $selected value='$item[SituaId]'>$item[SituaNome]</option>";
 									}
 
-									$MenuId = isset($_POST['id']) && $isMenu == 'modulo'?$rowMenu['ModulId']:'';
-									$MenuNome = isset($_POST['id']) && $isMenu == 'modulo'?$rowMenu['ModulNome']:'';
-									$MenuOrdem = isset($_POST['id']) && $isMenu == 'modulo'?$rowMenu['ModulOrdem']:1;
+									$MenuId = isset($_POST['id']) && $isMenu == 'modulo'?$rowMenu['ModulId']:$MenuId;
+									$MenuNome = isset($_POST['id']) && $isMenu == 'modulo'?$rowMenu['ModulNome']:$MenuNome;
+									$MenuOrdem = isset($_POST['id']) && $isMenu == 'modulo'?$rowMenu['ModulOrdem']:$MenuOrdem ;
 
 									echo "<div class='col-lg-6'>
 											<input type='text' id='inputNomeModulo' value='$MenuNome' name='inputNomeModulo' class='form-control' placeholder='Módulo Nome' required autofocus>
