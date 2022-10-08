@@ -107,13 +107,13 @@
   }
 
   //Recupera o parâmetro pra saber se a empresa é pública ou privada
-  $sqlParametro = "SELECT ParamEmpresaPublica 
-                   FROM Parametro
-                   WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
-  $resultParametro = $conn->query($sqlParametro);
-  $parametro = $resultParametro->fetch(PDO::FETCH_ASSOC);	
+  // $sqlParametro = "SELECT ParamEmpresaPublica 
+  //                  FROM Parametro
+  //                  WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+  // $resultParametro = $conn->query($sqlParametro);
+  // $parametro = $resultParametro->fetch(PDO::FETCH_ASSOC);	
   
-  $empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
+  // $empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
 ?>
 
 <!-- Main sidebar -->
@@ -214,17 +214,15 @@
                   
                   //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
                   if($visualizar == 1){
-                    if ((($empresa == 'Publica' && $men['MenuSetorPublico']) || ($empresa == 'Privada' && $men['MenuSetorPrivado']))){
-                        echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
-                          '<a href="'.$men['MenuUrl'].'"';
-                          if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
-                            {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
-                          echo '<i class="'.$men['MenuIco'].'"></i>
-                          <span>'.
-                            $men['MenuNome']
-                          .'</span>
-                        </a>';
-                    }
+                    echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
+                      '<a href="'.$men['MenuUrl'].'"';
+                      if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
+                        {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
+                      echo '<i class="'.$men['MenuIco'].'"></i>
+                      <span>'.
+                        $men['MenuNome']
+                      .'</span>
+                    </a>';
                   }
 
                   if($men['MenuSubMenu'] == 1) {
@@ -236,10 +234,8 @@
                       if($men_f['MenuPai'] == $men['MenuId'] && $visualizar_f == 1 && $men_f['MenuPosicao']=='PRINCIPAL'){
                         // mostra todos os submenus e caso a rota destino(MenuUrl) seja "estoqueMinimoImprime.php"
                         // ele abrirá em uma nova aba
-                        if (($empresa == 'Publica' && $men_f['MenuSetorPublico']) || ($empresa == 'Privada' && $men_f['MenuSetorPrivado'])){
-                          echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link"'
-                          .($men_f['MenuUrl']=='estoqueMinimoImprime.php'? ' target="_blank" >':'>').$men_f['MenuNome'].'</a></li>';
-                        }
+                        echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link"'
+                        .($men_f['MenuUrl']=='estoqueMinimoImprime.php'? ' target="_blank" >':'>').$men_f['MenuNome'].'</a></li>';
                       } 
                     } 
                     
