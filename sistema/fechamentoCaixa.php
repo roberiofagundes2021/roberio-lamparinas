@@ -41,7 +41,8 @@ $iUnidade = $_SESSION['UnidadeId'];
 	
 	<script type="text/javascript">
 		$(document).ready(function() {
-			$('#caixas').hide()
+
+			$('#tblCaixa').hide();
 			
 			$('#filtrar').on('click', function(e){
 				e.preventDefault()
@@ -69,9 +70,9 @@ $iUnidade = $_SESSION['UnidadeId'];
 							await response.forEach(item => {
 								HTML += `
 								<tr class='servicoItem'>
-									<td class="text-center">${item.fechamento}</td>
-									<td class="text-center">${item.caixa}</td>
-									<td class="text-center">${item.operador}</td>
+									<td class="text-left">${item.fechamento}</td>
+									<td class="text-left">${item.caixa}</td>
+									<td class="text-left">${item.operador}</td>
 									<td class="text-right">R$ ${float2moeda(item.saldo)}</td>
 									<td class="text-center">${item.acao}</td>
 								</tr>`
@@ -85,10 +86,10 @@ $iUnidade = $_SESSION['UnidadeId'];
 									$('#formCaixa').submit()
 								})
 							})
-							$('#caixas').show()
+							$('#tblCaixa').show()
 						} else {
 							$('#contentCaixas').html('<tr class="odd text-center"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>')
-							$('#caixas').show()
+							$('#tblCaixa').show()
 						}
 					}
 				});
@@ -131,7 +132,7 @@ $iUnidade = $_SESSION['UnidadeId'];
 							<div class="card-body">
 								<form name="formFluxoOperacional" method="post">
 									<div class="row">
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputDataInicio">Data Início <span class="text-danger">*</span></label>
 												<div class="input-group">
@@ -155,7 +156,7 @@ $iUnidade = $_SESSION['UnidadeId'];
 											</div>
 										</div>
 
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputDataFim">Data Fim <span class="text-danger">*</span></label>
 												<div class="input-group">
@@ -177,7 +178,7 @@ $iUnidade = $_SESSION['UnidadeId'];
 											</div>
 										</div>
 
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group" >
 												<label for="cmbOperadores">Operador</label>
 												<select id="cmbOperadores" name="cmbOperadores" class="form-control multiselect-select-all-filtering" multiple="multiple" data-fouc>
@@ -198,7 +199,7 @@ $iUnidade = $_SESSION['UnidadeId'];
 											</div>
 										</div>
 
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<div class="form-group" >
 												<label for="cmbCaixas">Caixa</label>
 												<select id="cmbCaixas" name="cmbCaixas" class="form-control multiselect-select-all-filtering" multiple="multiple" data-fouc>
@@ -225,29 +226,19 @@ $iUnidade = $_SESSION['UnidadeId'];
 							</div>
 
 							<div>
-								<table class="table" id="caixas">
+								<table id="tblCaixa" class="table">
 									<thead>
 										<tr class="bg-slate text-center">
-											<th>Data de fechamento</th>
-											<th>Caixa</th>
-											<th>Operador</th>
-											<th>Saldo final</th>
+											<th class="text-left">Data do Fechamento</th>
+											<th class="text-left">Caixa</th>
+											<th class="text-left">Operador</th>
+											<th class="text-right">Saldo Final</th>
 											<th class="text-center">Ações</th>
 										</tr>
 									</thead>
 									<tbody id="contentCaixas">
 										
 									</tbody>
-									<!-- <tfoot>
-										<tr>
-											<th colspan="5" class="text-right font-weight-bold" style="font-size: 16px;">
-												<div>Valor(R$):</div>
-											</th>
-											<th colspan="1" class="mr-1">
-												<div id="servicoValorTotal" class="text-center font-weight-bold" style="font-size: 15px;">R$ 0,00</div>
-											</th>
-										</tr>
-									</tfoot> -->
 								</table>
 							</div>
 
