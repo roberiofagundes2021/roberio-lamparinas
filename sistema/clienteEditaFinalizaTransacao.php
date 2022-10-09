@@ -29,7 +29,7 @@ try{
                     ':sNomeMae' => $_POST['inputNomeMae'],
                     ':sEstadoCivil' => $_POST['cmbEstadoCivil'],
 					':sNaturalidade' => $_POST['inputNaturalidade'],
-                    ':sProfissao' => $_POST['cmbProfissao'],
+                    ':sProfissao' => $_POST['inputProfissao'],
                     ':sCartaoSus' => $_POST['inputCartaoSus'],
                     ':sCep' => trim($_POST['inputCep']) == "" ? null : $_POST['inputCep'],
                     ':sEndereco' => $_POST['inputEndereco'],

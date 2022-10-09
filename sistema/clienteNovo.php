@@ -332,23 +332,10 @@ include('global_assets/php/conexao.php');
 											</div>
 											<div class="col-lg-4">
 												<div class="form-group">
-													<label for="cmbProfissao">Profissão</label>
-													<select id="cmbProfissao" name="cmbProfissao" class="form-control form-control-select2">
-														<option value="">Seleciona uma profissão</option>
-														<?php
-														$sql = "SELECT ProfiId, ProfiNome
-																		FROM Profissao
-																		JOIN Situacao on SituaId = ProfiStatus
-																		WHERE ProfiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																		ORDER BY ProfiNome ASC";
-														$result = $conn->query($sql);
-														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+													<label for="inputProfissao">Profissão</label>
+												<input type="text" id="inputProfissao" name="inputProfissao" class="form-control" placeholder="Profissão" >											
 
-														foreach ($row as $item) {
-															print('<option value="' . $item['ProfiId'] . '">' . $item['ProfiNome'] . '</option>');
-														}
-														?>
-													</select>
+												
 												</div>
 											</div>
 										</div>

@@ -353,24 +353,8 @@ else {
 											    </div>
 										    </div>
 											<div class="col-lg-4">
-												<label for="cmbProfissao">Profissão</label>
-												<select id="cmbProfissao" name="cmbProfissao" class="form-control form-control-select2">
-													<option value="">Selecione uma profissão</option>
-													<?php
-													$sql = "SELECT ProfiId, ProfiNome
-																FROM Profissao
-																JOIN Situacao on SituaId = ProfiStatus
-																WHERE ProfiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-																ORDER BY ProfiNome ASC";
-													$result = $conn->query($sql);
-													$rowProfissao = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													foreach ($rowProfissao as $item) {
-														$seleciona = $item['ProfiId'] == $row['ClienProfissao'] ? "selected" : "";
-														print('<option value="' . $item['ProfiId'] . '" ' . $seleciona . '>' . $item['ProfiNome'] . '</option>');
-													}
-													?>
-												</select>
+												<label for="inputProfissao">Profissão</label>
+												<input type="text" id="inputProfissao" name="inputProfissao" class="form-control" placeholder="Profissão" value="<?php echo $row['ClienProfissao']; ?>">											
 											</div>
 										</div>
 									</div> <!-- Fim dadosPF -->
@@ -542,13 +526,14 @@ else {
 		</div>
 		<!-- /content area -->
 
-		<?php include_once("footer.php"); ?>
 
 	</div>
 	<!-- /main content -->
 
 	</div>
 	<!-- /page content -->
+	
+	<?php include_once("footer.php"); ?>
 
 </body>
 </html>

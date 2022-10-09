@@ -68,13 +68,22 @@ if(isset($_POST['inputNome'])){
     $rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 
     // esse select traz todos os perfis padrões com as respectivas PerfiChave
-    $sql = "SELECT PaPerPerfil,PaPerMenu,PaPerVisualizar,PaPerAtualizar,PaPerExcluir,PaPerInserir,PaPerSuperAdmin,
-    PerfiChave
+    $sql = "SELECT PaPerPerfil,PaPerMenu,MenuSetorPublico,MenuSetorPrivado,PaPerVisualizar,
+    PaPerAtualizar,PaPerExcluir,PaPerInserir,PaPerSuperAdmin,PerfiChave
     FROM PadraoPermissao
     JOIN Perfil ON PerfiId = PaPerPerfil
     JOIN Menu ON MenuId = PaPerMenu";
     $result = $conn->query($sql);
     $rowPerfilPadrao = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    //Recupera o parâmetro pra saber se a empresa é pública ou privada
+  $sqlParametro = "SELECT ParamEmpresaPublica 
+    FROM Parametro
+    WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+  $resultParametro = $conn->query($sqlParametro);
+  $parametro = $resultParametro->fetch(PDO::FETCH_ASSOC);
+
+  $empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
 
 
     $cont = 0;
@@ -83,11 +92,19 @@ if(isset($_POST['inputNome'])){
     foreach ($rowPerfil as $itemPerfil){
       foreach($rowPerfilPadrao as $rowPerPad){
         if($itemPerfil['PerfiChave'] == $rowPerPad['PerfiChave']){
+
+          // nessa parte é verificado se a empresa é publica ou privada, assim verifica-se se cada menu
+          // possui permissão de aparecer para esses tipos (publica/privada), caso publica, por exemplo, é atribuido o valor predefinido
+          // no padrão caso o menu possa ser vispo por empresa publica, caso contrario ira setar como 0
+          // permitindo que, caso necessario, o administrador altere essa condição apenas na empresa específica
+          $empresaPermissao = $empresa=='Publica'?$rowPerPad['MenuSetorPublico']:$rowPerPad['MenuSetorPrivado'];
+          $visualizar = $empresaPermissao?$rowPerPad['PaPerVisualizar']:0;
+
           $sqlPerfilXPermissao .= " (".$itemPerfil['PerfiId'].", ".$rowPerPad['PaPerMenu'].", ".$unidadeIdNovo.", ".$rowPerPad['PaPerInserir'].",".
-          $rowPerPad['PaPerVisualizar'].", ".$rowPerPad['PaPerAtualizar'].", ".$rowPerPad['PaPerExcluir'].", ".$rowPerPad['PaPerSuperAdmin']."),";
+          $visualizar.", ".$rowPerPad['PaPerAtualizar'].", ".$rowPerPad['PaPerExcluir'].", ".$rowPerPad['PaPerSuperAdmin']."),";
     
           $sqlPadraoPerfilXPermissao .= " (".$itemPerfil['PerfiId'].", ".$rowPerPad['PaPerMenu'].", ".$unidadeIdNovo.", ".$rowPerPad['PaPerInserir'].",".
-          $rowPerPad['PaPerVisualizar'].", ".$rowPerPad['PaPerAtualizar'].", ".$rowPerPad['PaPerExcluir'].", ".$rowPerPad['PaPerSuperAdmin']."),";  
+          $visualizar.", ".$rowPerPad['PaPerAtualizar'].", ".$rowPerPad['PaPerExcluir'].", ".$rowPerPad['PaPerSuperAdmin']."),";  
 
           $cont++;
 

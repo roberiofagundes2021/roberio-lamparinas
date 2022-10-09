@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Profissionais';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProfiId, ProfiNome, ProfiCpf, ProfiCnpj, ProfiTelefone, ProfiCelular, ProfiStatus, ProfiEmail, SituaNome, SituaCor, SituaChave
+$sql = "SELECT ProfiId, ProfiNome,ProfiTipo, ProfiCpf, ProfiCnpj, ProfiTelefone, ProfiCelular, ProfiStatus, ProfiEmail, SituaNome, SituaCor, SituaChave
         FROM Profissional
         JOIN Situacao on SituaId = ProfiStatus
         WHERE ProfiUnidade = ". $_SESSION['UnidadeId'] ." 
@@ -222,7 +222,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacao = $item['SituaChave'] == 'ATIVO' ? 'Ativo' : 'Inativo';
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
-										$documento = $item['ProfiCnpj'] == NULL ? $item['ProfiCpf'] : $item['ProfiCnpj'];
+										$documento = $item['ProfiTipo'] == 'F' || $item['ProfiTipo'] == 'f' ? $item['ProfiCpf'] : $item['ProfiCnpj'];
 										$telefone = $item['ProfiCelular'] == NULL ? $item['ProfiTelefone'] : $item['ProfiCelular'];
 										
 										print('

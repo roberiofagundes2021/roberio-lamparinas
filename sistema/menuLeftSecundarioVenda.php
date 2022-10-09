@@ -137,10 +137,13 @@
 					</ul>
 				<?php }elseif($ClaChave == 'ELETIVO'){ ?>
 					<ul class="nav nav-sidebar" data-nav-type="accordion">
-						<li class="nav-item-header"><?php echo "".strtoupper($ClaNome)." - ".strtoupper($Cliente); ?></li>
+					<li style="padding: 20px 0px 0px 20px;"><h2 style="font-weight: 500"><?php echo "".strtoupper($ClaNome); ?></b></li>
 
-						<li class="nav-item-divider"></li>
+					<li class="nav-item-divider"></li>
 
+					<li class="nav-item-header"><?php echo strtoupper($Cliente). "<br>Prontuário: " .$prontuario ; ?></li>
+
+					<li class="nav-item-divider"></li>
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='atendimentoEletivo'><i class="icon-certificate"></i> Atendimento Eletivo</a>
 						</li>
@@ -182,10 +185,13 @@
 					</ul>
 				<?php }elseif($ClaChave == 'INTERNACAO'){ ?>
 					<ul class="nav nav-sidebar" data-nav-type="accordion">
-						<li class="nav-item-header"><?php echo "".strtoupper($ClaNome)." - ".strtoupper($Cliente); ?></li>
+					<li style="padding: 20px 0px 0px 20px;"><h2 style="font-weight: 500"><?php echo "".strtoupper($ClaNome); ?></b></li>
 
-						<li class="nav-item-divider"></li>
+					<li class="nav-item-divider"></li>
 
+					<li class="nav-item-header"><?php echo strtoupper($Cliente). "<br>Prontuário: " .$prontuario ; ?></li>
+
+					<li class="nav-item-divider"></li>
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='leitos'><i class="icon-certificate"></i> Leitos</a>
 						</li>
