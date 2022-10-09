@@ -236,9 +236,7 @@ try{
     
     $_SESSION['msg']['titulo'] = "Sucesso";
     $_SESSION['msg']['mensagem'] = "Fechamento do Caixa Concluído!!!";
-    $_SESSION['msg']['tipo'] = "success";
-    
-    
+    $_SESSION['msg']['tipo'] = "success";  
 } catch(PDOException $e) {
     
     $conn->rollback();
