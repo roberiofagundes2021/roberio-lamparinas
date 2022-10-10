@@ -201,9 +201,11 @@ $count = count($row);
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaCentroCusto('.$atualizar.','.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$item['CnCusStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaCentroCusto('.$excluir.','.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$item['CnCusStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
-													</div>
+														<a href="#" onclick="atualizaCentroCusto('.$atualizar.','.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$item['CnCusStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>');
+														if ($item['CnCusNome'] != 'Atendimento Eletivo' && $item['CnCusNome'] != 'Atendimento Ambulatorial' && $item['CnCusNome'] != 'Atendimento Internação') {
+															print('<a href="#" onclick="atualizaCentroCusto('.$excluir.','.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$item['CnCusStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>');
+														}
+													print('</div>
 												</div>
 											</td>
 										</tr>');
