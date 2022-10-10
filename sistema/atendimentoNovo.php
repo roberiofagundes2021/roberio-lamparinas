@@ -865,7 +865,7 @@ if ($iAtendimento) {
 					$('#servico').empty();
 					$('#servico').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
+						let opt = `<option value="${item.id}">${item.id} - ${item.nome}</option>`
 						$('#servico').append(opt)
 					})
 				}
@@ -1155,7 +1155,7 @@ if ($iAtendimento) {
 					$('#servico').empty();
 					$('#servico').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
+						let opt = `<option value="${item.id}">${item.id} - ${item.nome}</option>`
 						$('#servico').append(opt)
 					})
 				}

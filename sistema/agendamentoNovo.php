@@ -543,9 +543,9 @@ if(isset($_POST['iAgendamento'])){
 						// caso exista algo na variável agendamento significa que o usuário esta alterando um valor
 						// logo esses valores deveram vir preenchido com os dados desse agendamento
 						if(agendamento){
-							 opt = agendamento.AgendCliente == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
+							 opt = agendamento.AgendCliente == item.id?`<option selected value="${item.id}">${item.id} - ${item.nome}</option>`:`<option value="${item.id}">${item.id} - ${item.nome}</option>`
 						} else {
-							opt = `<option value="${item.id}">${item.nome}</option>`
+							opt = `<option value="${item.id}">${item.id} - ${item.nome}</option>`
 						}
 						$('#paciente').append(opt)
 					})
@@ -587,7 +587,7 @@ if(isset($_POST['iAgendamento'])){
 					$('#servico').empty();
 					$('#servico').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
+						let opt = `<option value="${item.id}">${item.id} - ${item.nome}</option>`
 						$('#servico').append(opt)
 					})
 				}
@@ -624,7 +624,7 @@ if(isset($_POST['iAgendamento'])){
 					$('#servico').empty();
 					$('#servico').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
+						let opt = `<option value="${item.id}">${item.id} - ${item.nome}</option>`
 						$('#servico').append(opt)
 					})
 				}
