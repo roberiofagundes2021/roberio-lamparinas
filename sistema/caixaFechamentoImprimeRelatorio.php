@@ -10,7 +10,6 @@ require_once 'global_assets/php/vendor/autoload.php';
 require_once 'global_assets/php/funcoesgerais.php';
 
 //$_SESSION['EmpreId']
-
 if(!isset($_POST['idCaixaAbertura'])) { 
     irpara("caixaMovimentacao.php");
 }
@@ -18,6 +17,13 @@ if(!isset($_POST['idCaixaAbertura'])) {
 $aberturaCaixaId = $_POST['idCaixaAbertura'];
 
 $operador = nomeSobrenome($_SESSION['UsuarNome'], 2);
+
+//Consulta os principais dados do Fechamento do Caixa
+$sql_caixaAbertura =   "SELECT CxAbeDataHoraFechamento, CxAbeSaldoInicial
+                        FROM CaixaAbertura
+                        WHERE CxAbeId = $aberturaCaixaId and CxAbeUnidade = $_SESSION[UnidadeId]";
+$resultCaixaAbertura  = $conn->query($sql_caixaAbertura);
+$rowCaixaAbertura = $resultCaixaAbertura->fetch(PDO::FETCH_ASSOC);
 
 $sql_relatorio_diario    = "SELECT FrPagNome, sum(CxRecValorTotal) as TOTAL, 'Recebimento' as TIPO, CxAbeValorTransferido
                         FROM CaixaRecebimento
@@ -142,9 +148,9 @@ try {
                     <!--Esse estilo é utilizado paara as tabelas alinhadas ficarem no top da tag td da tabela alinhadora-->
                     <td style='padding-right: 2%; vertical-align:middle !important'>";
     
-    $arrayDatafechamento = explode(' ', $rowMovimentacao[0]['CxAbeDataHoraFechamento']);
+    $arrayDatafechamento = explode(' ', $rowCaixaAbertura['CxAbeDataHoraFechamento']);
     $datafechamento = $arrayDatafechamento[0];
-    $saldoInicial = $rowMovimentacao[0]['CxAbeSaldoInicial'];
+    $saldoInicial = $rowCaixaAbertura['CxAbeSaldoInicial'];
     //Tabela que está alinha a esquerda (Neste caso - RELATÓRIO DIÁRIO DO CAIXA)
     $html .=  "
                         <table class='table table-hover tabelaPrincipal' style='width:700px; border-collapse: collapse;'>
