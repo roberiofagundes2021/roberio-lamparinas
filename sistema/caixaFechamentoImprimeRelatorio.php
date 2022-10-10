@@ -24,14 +24,14 @@ $sql_relatorio_diario    = "SELECT FrPagNome, sum(CxRecValorTotal) as TOTAL, 'Re
                         JOIN CaixaAbertura on CxAbeId = CxRecCaixaAbertura
                         JOIN FormaPagamento on FrPagId = CxRecFormaPagamento
                         JOIN Atendimento on AtendId = CxRecAtendimento
-                        WHERE CxAbeId = $aberturaCaixaId and CxAbeOperador = $_SESSION[UsuarId] and CxRecUnidade = $_SESSION[UnidadeId]
+                        WHERE CxAbeId = $aberturaCaixaId and CxRecUnidade = $_SESSION[UnidadeId]
                         GROUP BY FrPagNome, CxAbeValorTransferido
                         UNION 
                         SELECT FrPagNome, sum((CxPagValor * -1)) as TOTAL, 'Pagamento' as TIPO, CxAbeValorTransferido                     
                         FROM CaixaPagamento
                         JOIN CaixaAbertura on CxAbeId = CxPagCaixaAbertura
                         JOIN FormaPagamento on FrPagId = CxPagFormaPagamento
-                        WHERE CxAbeId = $aberturaCaixaId and CxAbeOperador = $_SESSION[UsuarId] and CxPagUnidade = $_SESSION[UnidadeId]
+                        WHERE CxAbeId = $aberturaCaixaId and CxPagUnidade = $_SESSION[UnidadeId]
                         GROUP BY FrPagNome, CxAbeValorTransferido";
 $resultRelatorioDiario  = $conn->query($sql_relatorio_diario);
 $rowRelatorioDiario = $resultRelatorioDiario->fetchAll(PDO::FETCH_ASSOC);
@@ -43,7 +43,7 @@ $sql_atendimento    = "SELECT sum(AtXSeValor) as grupoValor, sum(AtXSeDesconto) 
                                 JOIN Atendimento on AtendId = CxRecAtendimento
                                 JOIN AtendimentoXServico on AtendId = AtXSeAtendimento
                                 JOIN Profissional ON ProfiId = AtXSeProfissional
-                                WHERE CxAbeId = $aberturaCaixaId and CxAbeOperador = $_SESSION[UsuarId] and CxRecUnidade = $_SESSION[UnidadeId]
+                                WHERE CxAbeId = $aberturaCaixaId and CxRecUnidade = $_SESSION[UnidadeId]
                                 GROUP BY ProfiNome";
 $resultAtendimento  = $conn->query($sql_atendimento);
 $rowAtendimento = $resultAtendimento->fetchAll(PDO::FETCH_ASSOC);
@@ -55,7 +55,7 @@ $sql_servicos    = "SELECT sum(AtXSeValor) as grupoValor, sum(AtXSeDesconto) as 
                         JOIN Atendimento on AtendId = CxRecAtendimento
                         JOIN AtendimentoXServico on AtendId = AtXSeAtendimento
                         JOIN ServicoVenda on SrVenId = AtXSeServico
-                        WHERE CxAbeId = $aberturaCaixaId and CxAbeOperador = $_SESSION[UsuarId] and CxRecUnidade = $_SESSION[UnidadeId]
+                        WHERE CxAbeId = $aberturaCaixaId and CxRecUnidade = $_SESSION[UnidadeId]
                         GROUP BY SrVenNome";
 $resultServicos  = $conn->query($sql_servicos);
 $rowServicos = $resultServicos->fetchAll(PDO::FETCH_ASSOC);
@@ -70,7 +70,7 @@ $sql_movimentacao    = "SELECT ClienNome as HISTORICO, sum(AtXSeValor) as grupoV
                         JOIN AtendimentoXServico on AtendId = AtXSeAtendimento
                         JOIN AtendimentoLocal on AtLocId = AtXSeAtendimentoLocal
                         JOIN Profissional ON ProfiId = AtXSeProfissional
-                        WHERE CxAbeId = $aberturaCaixaId and CxAbeOperador = $_SESSION[UsuarId] and CxRecUnidade = $_SESSION[UnidadeId]
+                        WHERE CxAbeId = $aberturaCaixaId and CxRecUnidade = $_SESSION[UnidadeId]
                         GROUP BY ClienNome, ProfiNome, AtendObservacao, CxAbeDataHoraFechamento, CxAbeSaldoInicial";
 $resultMovimentacao  = $conn->query($sql_movimentacao);
 $rowMovimentacao = $resultMovimentacao->fetchAll(PDO::FETCH_ASSOC);
@@ -170,6 +170,7 @@ try {
 
     $total = $saldoInicial;
     $recebido = 0;
+    $pago = 0;
     foreach($rowRelatorioDiario as $item) {
         $total += $item['TOTAL'];
         $tipo = $item['TIPO'];
