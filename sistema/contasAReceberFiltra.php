@@ -24,7 +24,7 @@ include('global_assets/php/conexao.php');
         empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
         empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
 
-        if ($_POST['statusTipo'] == 'ARECEBER') {
+        if ($_POST['statusTipo'] == 'ARECEBER' || $_POST['statusTipo'] == 'ESTORNADO') {
             $args[]  = "CnAReDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
         } else {
             $args[]  = "CnAReDtRecebimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
@@ -50,7 +50,11 @@ include('global_assets/php/conexao.php');
     }
 
     if (!empty($_POST['cmbStatus'])) {
-        $args[]  = "CnAReStatus = " . $_POST['cmbStatus'] . " ";
+        if($_POST['cmbStatus'] != 'Estornado') {
+            $args[]  = "CnAReStatus = " . $_POST['cmbStatus'] . " and CnAReJustificativaEstorno is null ";
+        }else {
+            $args[]  = "CnAReStatus = 13 and CnAReJustificativaEstorno is not null ";
+        }
         $_SESSION['ContRecStatus'] = $_POST['cmbStatus'];
     }
 
@@ -82,7 +86,7 @@ include('global_assets/php/conexao.php');
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
         count($rowData) >= 1 ? $cont = 1 : $cont = 0;
-    }
+    } 
 
     if ($cont == 1) {
         $cont = 0;
@@ -92,44 +96,8 @@ include('global_assets/php/conexao.php');
         foreach ($rowData as $item) {
             $cont++;
             $status = $item['CnAReStatus'] == 13 ? 'À Receber' : 'Recebido';
-            $data = $_POST['statusTipo'] == 'ARECEBER' ? mostraData($item['CnAReDtVencimento']) : mostraData($item['CnAReDtRecebimento']);
+            $data = $_POST['statusTipo'] == 'ARECEBER' || $_POST['statusTipo'] == 'ESTORNADO' ? mostraData($item['CnAReDtVencimento']) : mostraData($item['CnAReDtRecebimento']);
             
-            /*
-            print('
-            
-            <tr>
-                <td class="even">
-                    <input type="checkbox" id="check' . $cont . '">
-                    <input type="hidden" value="' . $item["CnAReId"] . '">
-                </td>
-                <td class="even"><p class="m-0">' . $data . '</p><input type="hidden" value="' . $item["CnAReDtVencimento"] . '"></td>
-                <td class="even"><a href=#" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'edita\')">' . $item["CnAReDescricao"] . '</a></td>
-                <td class="even">' . $item["ClienNome"] . '</td>
-                <td class="even" style="text-align: center">' . $item["CnAReNumDocumento"] . '</td>
-                <td class="even" style="text-align: right; padding-right:1.5rem;">' . mostraValor($item["CnAReValorAReceber"]) . '</td>
-                <td class="even" style="text-align: center">' . $status . '</td>
-                <td class="even d-flex flex-row justify-content-around align-content-center" style="text-align: center">
-                <div class="list-icons">
-                    <div class="list-icons list-icons-extended">
-                    <a href="#" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>
-                    <a href="#" onclick="atualizaContasAReceber('.$_POST['permissionExclui'].','.$item["CnAReId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>
-				        <div class="dropdown">													
-				        	<a href="#" class="list-icons-item" data-toggle="dropdown">
-				        		<i class="icon-menu9"></i>
-				    
-				        	<div class="dropdown-menu dropdown-menu-right">
-                                <a href="#" class="dropdown-item btnParcelar"  data-popup="tooltip" data-placement="bottom" title="Parcelar"><i class="icon-file-text2"></i> Parcelar</a>
-                                <a href="#" class="dropdown-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Produto"><i class="icon-file-empty"></i></a>
-				        	</div>
-				        </div>
-				    </div>
-                   
-                    </div>
-                </td>
-            </tr>
-            ');
-            */
-
             $visibilidade = ($status == 'Recebido') ? 'none' : 'block';
             
             $estornamento =  (!isset($item['CnAReJustificativaEstorno']) || $status == 'Recebido') ? 'none' : 'block';
@@ -138,7 +106,7 @@ include('global_assets/php/conexao.php');
 
             $checkbox = '<input type="checkbox" id="check'.$cont.'" style="display: '.$visibilidade.';"> <input type="hidden" value="'.$item["CnAReId"].'">';
             
-            $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$item["CnAReDtVencimento"].'">';
+            $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$data.'">';
 
             $descricao = '<a href=#" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'edita\')">' . $item["CnAReDescricao"] . '</a>';
             

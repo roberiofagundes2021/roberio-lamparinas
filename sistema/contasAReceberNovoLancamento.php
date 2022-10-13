@@ -1169,6 +1169,46 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                 <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>"  <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'RECEBIDO') echo 'disabled' ?>  readOnly>
                                             </div>
                                         </div>
+
+                                        <div class="col-lg-5">
+                                            <div class="form-group">
+                                                <label for="cmbCliente">Cliente <span class="text-danger">*</span></label>
+                                                <select id="cmbCliente" name="cmbCliente" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'RECEBIDO') echo 'disabled' ?> required>
+                                                    <option value="">Selecionar</option>
+                                                    <?php
+                                                    try {
+                                                        $sql = "SELECT ClienId, ClienNome
+                                                                  FROM Cliente
+                                                                  JOIN Situacao 
+                                                                    ON SituaId = ClienStatus
+                                                                 WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                              ORDER BY ClienNome ASC";
+
+                                                        $result = $conn->query($sql);
+                                                        $rowCliente = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                        try {
+                                                            foreach ($rowCliente as $item) {
+                                                                if (isset($lancamento)) {
+                                                                    if ($lancamento['CnAReCliente'] == $item['ClienId']) {
+                                                                        print('<option value="' . $item['ClienId'] . '" selected>' . $item['ClienNome'] . '</option>');
+                                                                    } else {
+                                                                        print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
+                                                                    }
+                                                                } else {
+                                                                    print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
+                                                                }
+                                                            }
+                                                        } catch (Exception $e) {
+                                                            echo 'Error: ',  $e->getMessage(), "\n";
+                                                        }
+                                                    } catch (Exception $e) {
+                                                        echo 'Error: ',  $e->getMessage(), "\n";
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+
                                         <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbPlanoContas">Plano de Contas <span class="text-danger">*</span></label>
@@ -1205,46 +1245,6 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                         echo 'Error: ',  $e->getMessage(), "\n";
                                                     }
 
-                                                    ?>
-                                                </select>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="col-lg-5">
-                                            <div class="form-group">
-                                                <label for="cmbCliente">Cliente <span class="text-danger">*</span></label>
-                                                <select id="cmbCliente" name="cmbCliente" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'RECEBIDO') echo 'disabled' ?> required>
-                                                    <option value="">Selecionar</option>
-                                                    <?php
-                                                    try {
-                                                        $sql = "SELECT ClienId, ClienNome
-                                                                  FROM Cliente
-                                                                  JOIN Situacao 
-                                                                    ON SituaId = ClienStatus
-                                                                 WHERE ClienUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                              ORDER BY ClienNome ASC";
-
-                                                        $result = $conn->query($sql);
-                                                        $rowCliente = $result->fetchAll(PDO::FETCH_ASSOC);
-                                                        try {
-                                                            foreach ($rowCliente as $item) {
-                                                                if (isset($lancamento)) {
-                                                                    if ($lancamento['CnAReCliente'] == $item['ClienId']) {
-                                                                        print('<option value="' . $item['ClienId'] . '" selected>' . $item['ClienNome'] . '</option>');
-                                                                    } else {
-                                                                        print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
-                                                                    }
-                                                                } else {
-                                                                    print('<option value="' . $item['ClienId'] . '">' . $item['ClienNome'] . '</option>');
-                                                                }
-                                                            }
-                                                        } catch (Exception $e) {
-                                                            echo 'Error: ',  $e->getMessage(), "\n";
-                                                        }
-                                                    } catch (Exception $e) {
-                                                        echo 'Error: ',  $e->getMessage(), "\n";
-                                                    }
                                                     ?>
                                                 </select>
                                             </div>

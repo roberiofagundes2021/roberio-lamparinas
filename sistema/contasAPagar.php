@@ -1035,24 +1035,24 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                     <?php
                                                         $sql = "SELECT SituaId, SituaNome, SituaChave
                                                                 FROM Situacao
-                                                                WHERE SituaStatus = 1
+                                                                WHERE SituaStatus = 1 AND SituaChave IN ('APAGAR', 'PAGO')
                                                                 ORDER BY SituaNome ASC";
                                                         $result = $conn->query($sql);
                                                         $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
     
                                                         foreach ($rowSituacao as $item) {
-                                                            if($item['SituaChave'] == 'APAGAR' || $item['SituaChave'] == 'PAGO'){
-                                                                if(isset($_SESSION['ContPagStatus'])){
-                                                                    if($item['SituaId'] == $_SESSION['ContPagStatus']){
-                                                                        print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
-                                                                    } else {
-                                                                        print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
-                                                                    }
+                                                            if(isset($_SESSION['ContPagStatus'])){
+                                                                if($item['SituaId'] == $_SESSION['ContPagStatus']){
+                                                                    print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
                                                                 } else {
                                                                     print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
                                                                 }
+                                                            } else {
+                                                                print('<option value="' . $item['SituaId'].'|'.$item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
                                                             }
                                                         }
+                                                        $seleciona = isset($_SESSION['ContRecStatus']) && $_SESSION['ContRecStatus'] == 0 ? 'selected' : '';
+                                                        print('<option value="Estornado|ESTORNADO" '.$seleciona.'>Estornado</option>');
                                                     ?>
                                                 </select>
                                             </div>
