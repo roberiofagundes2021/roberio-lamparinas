@@ -18,7 +18,7 @@ if (!empty($_POST['inputPeriodoDe']) || !empty($_POST['inputAte'])) {
     empty($_POST['inputPeriodoDe']) ? $inputPeriodoDe = '1900-01-01' : $inputPeriodoDe = $_POST['inputPeriodoDe'];
     empty($_POST['inputAte']) ? $inputAte = '2100-01-01' : $inputAte = $_POST['inputAte'];
 
-    if($_POST['statusTipo'] == 'APAGAR'){
+    if($_POST['statusTipo'] == 'APAGAR' || $_POST['statusTipo'] == 'ESTORNADO'){
         $args[]  = "CnAPaDtVencimento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";
     } else {
         $args[]  = "CnAPaDtPagamento BETWEEN '" . $inputPeriodoDe . "' and '" . $inputAte . "' ";                
@@ -44,7 +44,11 @@ if (!empty($_POST['cmbPlanoContas'])) {
 }
 
 if (!empty($_POST['cmbStatus'])) {
-    $args[]  = "CnApaStatus = " . $_POST['cmbStatus'] . " ";
+    if($_POST['cmbStatus'] != 'Estornado') {
+        $args[]  = "CnAPaStatus = " . $_POST['cmbStatus'] . " and CnAPaJustificativaEstorno is null ";
+    }else {
+        $args[]  = "CnApaStatus = 11 and CnAPAJustificativaEstorno is not null ";
+    }
     $_SESSION['ContPagStatus'] = $_POST['cmbStatus'];
 }
 
@@ -76,7 +80,7 @@ if ($cont == 1) {
     foreach ($rowData as $item) {
         $cont++;     
         $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Pago';
-        $data = $_POST['statusTipo'] == 'APAGAR' ? mostraData($item['CnAPaDtVencimento']) : mostraData($item['CnAPaDtPagamento']);
+        $data = $_POST['statusTipo'] == 'APAGAR' || $_POST['statusTipo'] == 'ESTORNADO' ? mostraData($item['CnAPaDtVencimento']) : mostraData($item['CnAPaDtPagamento']);
 
         $visibilidade = ($status == 'Pago') ? 'none' : 'block';
 
@@ -86,7 +90,7 @@ if ($cont == 1) {
 
         $checkbox = '<input type="checkbox" id="check'.$cont.'" style="display: '.$visibilidade.';"> <input type="hidden" value="'.$item["CnAPaId"].'">';
         
-        $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$item["CnAPaDtVencimento"].'">';
+        $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$data.'">';
 
         $descricao = '<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\')">' . $item["CnAPaDescricao"] . '</a>';
         

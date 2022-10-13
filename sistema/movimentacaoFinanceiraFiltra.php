@@ -89,6 +89,10 @@ function queryPesquisa(){
             $argsCr[]  = "CnAReTransferencia > 0";
             $argsCp[]  = "CnAPaTransferencia > 0";
 
+        }else if ($status[0] == 'Estornado'){
+            $argsCp[]  = "CnAPaStatus = 11";
+            $argsCr[]  = "CnAReStatus = 13";
+
         }
         $_SESSION['MovFinancStatus'] = $_POST['cmbStatus'];
     }else {
@@ -120,9 +124,11 @@ function queryPesquisa(){
                            TIPO = 'P' ,
                            CODTRANSFREC = 0,
                            CnAPaTransferencia as CODTRANSFPAG,
-                           CNAPACONTABANCO AS CONTABANCO
+                           CNAPACONTABANCO AS CONTABANCO,
+                           SITUACHAVE
                     FROM ContasAPagar  
-                    JOIN FORNECEDOR on FORNEID = CNAPAFORNECEDOR";
+                    JOIN FORNECEDOR on FORNEID = CNAPAFORNECEDOR
+                    JOIN SITUACAO on SITUAID = CNAPASTATUS";
                     if (isset($argsCenCustCp)) {
                         $sql .= " $argsCenCustCp ";
                     }
@@ -139,9 +145,11 @@ function queryPesquisa(){
                            TIPO = 'R' , 
                            CnAReTransferencia as CODTRANSFREC, 
                            CODTRANSFPAG = 0,
-                           CNARECONTABANCO AS CONTABANCO
+                           CNARECONTABANCO AS CONTABANCO,
+                           SITUACHAVE
                     FROM ContasAReceber  
-                    JOIN CLIENTE on CLIENID = CNARECLIENTE";
+                    JOIN CLIENTE on CLIENID = CNARECLIENTE
+                    JOIN SITUACAO on SITUAID = CNARESTATUS";
                     if (isset($argsCenCustCr)) {
                         $sql .= " $argsCenCustCr ";
                     }
@@ -158,9 +166,12 @@ function queryPesquisa(){
                            TIPO = 'R' , 
                            CnAReTransferencia as CODTRANSFREC, 
                            CODTRANSFPAG = 0,
-                           CNARECONTABANCO AS CONTABANCO
+                           CNARECONTABANCO AS CONTABANCO,
+                           CNAREJUSTIFICATIVAESTORNO AS JUSTIFICATIVAESTORNO,
+                           SITUACHAVE
                     FROM ContasAReceber 
-                    JOIN CLIENTE on CLIENID = CNARECLIENTE";
+                    JOIN CLIENTE on CLIENID = CNARECLIENTE
+                    JOIN SITUACAO on SITUAID = CNARESTATUS";
                     if (isset($argsCenCustCr)) {
                         $sql .= " $argsCenCustCr ";
                     }
@@ -168,16 +179,19 @@ function queryPesquisa(){
                     UNION 
                     SELECT CNAPAID AS ID, 
                            CNAPADTPAGAMENTO AS DATA, 
-                           CNAPADESCRICAO AS HISTORICO, 
                            FORNENOME AS FORNECEDOR,
+                           CNAPADESCRICAO AS HISTORICO, 
                            CnAPANUMDOCUMENTO AS NUMDOC, 
                            CNAPAVALORPAGO as TOTAL, 
                            TIPO = 'P' ,
                            CODTRANSFREC = 0 ,
                            CnAPaTransferencia as CODTRANSFPAG,
-                           CNAPACONTABANCO AS CONTABANCO
+                           CNAPACONTABANCO AS CONTABANCO,
+                           CNAPAJUSTIFICATIVAESTORNO AS JUSTIFICATIVAESTORNO,
+                           SITUACHAVE
                     FROM ContasAPagar 
-                    JOIN FORNECEDOR on FORNEID = CNAPAFORNECEDOR";
+                    JOIN FORNECEDOR on FORNEID = CNAPAFORNECEDOR
+                    JOIN SITUACAO on SITUAID = CNAPASTATUS";
                     if (isset($argsCenCustCp)) {
                         $sql .= " $argsCenCustCp ";
                     }
@@ -207,117 +221,6 @@ function queryPesquisa(){
             }
         
             $data = mostraData($item['DATA']);
-
-            /*
-            $print = "
-                <tr>
-                    <td class='even'><p class='m-0'>" . $data . "</p><input type='hidden' value='" . $item['DATA'] . "'></td>";
-
-
-                    //HISTÓRICO
-                    if (intval($item['CODTRANSFREC']) > 0){
-                        $print .= "<td class='even'><a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['CODTRANSFREC'].", \"T\", \"edita\");'>" . $item['HISTORICO'] . "</a></td>";
-                                   
-                    } else if (intval($item['CODTRANSFPAG']) > 0) {
-                        $print .= "<td class='even'><a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['CODTRANSFPAG'].", \"T\", \"edita\");'>" . $item['HISTORICO'] . "</a></td>";
-
-                    } else if ($item['TIPO'] === 'R'){
-                        $print .= "<td class='even'><a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['ID'].", \"R\", \"edita\");'>" . $item['HISTORICO'] . "</a></td>";
-
-                    } else if ($item['TIPO'] === 'P') {
-                        $print .= "<td class='even'><a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['ID'].", \"P\", \"edita\");'>" . $item['HISTORICO'] . "</a></td>";
-                    }
-
-
-                    //CONTA CAIXA
-                    if (isset($item['CONTABANCO']) && $item['CONTABANCO'] != 0) {
-                        $sql = "SELECT  CnBanNome
-                                  FROM  ContaBanco
-                                  JOIN  Situacao 
-                                    ON  SituaId = CnBanStatus
-                                 WHERE  CnBanUnidade = " . $_SESSION['UnidadeId'] . " 
-                                   AND  SituaChave = 'ATIVO'
-                                   AND  CnBanId = ". $item['CONTABANCO'] ."";
-                        $result = $conn->query($sql);
-                        $ContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                        $print .= "<td class='even' style='text-align: left;'>" . $ContaBanco[0]['CnBanNome'] . "</td>";
-                    } else {
-                        $print .= "<td class='even' style='text-align: left;'></td>";
-                    }
-
-
-                    //NUMERO DO DOCUMENTO
-                    $print .= "<td class='even' style='text-align: left;width: 15%;'>" . $item['NUMDOC'] . "</td>";
-
-                    
-                    if ($item['TIPO'] === 'R'){
-                        //ENTRADA
-                        $print .= "<td class='even' style='color:green;text-align: right;padding-right:40px;'>" . mostraValor($item['TOTAL']) . "</td>
-                                   <td class='even'></td>";
-                    } else {
-                        //SAIDA
-                        $print .= "<td class='even'></td>
-                                   <td class='even' style='color:red;text-align: right;padding-right:40px;'>" . mostraValor($item['TOTAL']) . "</td>";
-                    }
-
-                    
-                    //APLICANDO ESTILO NA COLUNA SALDO
-                    if ($saldo < 0) {
-                        $print .= "<td class='even' style='color: red;text-align: right;padding-right:40px;'>" . mostraValor($saldo) . "</td>";
-                    }
-                    else {
-                        $print .= "<td class='even' style='color: green;text-align: right;padding-right:40px;'>" . mostraValor($saldo) . "</td>";
-                    }
-                    
-                    //MENU EDITAR E EXCLUIR
-                    $print .= '
-                    <td class="even d-flex flex-row justify-content-around align-content-center" style="text-align: center">
-                        <div class="list-icons">
-                            <div class="list-icons list-icons-extended"> ';
-
-                                //BOTAO EDITAR
-                                if (intval($item["CODTRANSFREC"]) > 0){
-                                    //$print .= '<a href="movimentacaoFinanceiraTransferencia.php?lancamentoId=' . $item["CODTRANSFREC"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                                    $print .= ' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["CODTRANSFREC"].', \'T\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                                } else if (intval($item["CODTRANSFPAG"]) > 0) {
-                                    //$print .= '<a href="movimentacaoFinanceiraTransferencia.php?lancamentoId=' . $item["CODTRANSFPAG"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                                    $print .= ' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["CODTRANSFPAG"].', \'T\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                                } else if ($item["TIPO"] === "R"){
-                                    //$print .= '<a href="movimentacaoFinanceiraRecebimento.php?lancamentoId=' . $item["ID"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                                    $print .= ' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'R\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                                } else if ($item["TIPO"] === "P") {
-                                    //$print .= '<a href="movimentacaoFinanceiraPagamento.php?lancamentoId=' . $item["ID"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                                    $print .= ' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'P\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                                }
-                                
-                                //BOTAO EXCLUIR
-                                if (intval($item["CODTRANSFREC"]) > 0){
-                                    $print .= 
-                                       // '<a href="#" idContaExcluir="' . $item["CODTRANSFREC"] . '" tipo="T" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
-                                        '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFREC"].', \'T\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
-            
-                                } else if (intval($item["CODTRANSFPAG"]) > 0) {
-                                    $print .= 
-                                       // '<a href="#" idContaExcluir="' . $item["CODTRANSFPAG"] . '" tipo="T" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
-                                        '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFPAG"].', \'T\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
-                                    } else if  ($item["TIPO"] === "R"){
-                                        $print .= 
-                                          // '<a href="#" idContaExcluir="' . $item["ID"] . '" tipo="' . $item["TIPO"] . '" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
-                                        '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["ID"].', \'R\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
-                                    } else if ($item["TIPO"] === "P") {
-                                        $print .= 
-                                        // '<a href="#" idContaExcluir="' . $item["ID"] . '" tipo="' . $item["TIPO"] . '" class="list-icons-item excluirConta"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
-                                        '<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["ID"].', \'P\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>';
-                                    }
-                                $print .= '
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            ';
-            print($print);
-            */
 
             //HISTÓRICO
             if (intval($item['CODTRANSFREC']) > 0){
@@ -373,39 +276,48 @@ function queryPesquisa(){
             }
             
             //MENU EDITAR E EXCLUIR
-            $acoes = '
-            <div class="list-icons">
-                <div class="list-icons list-icons-extended"> ';
+            if($item['SITUACHAVE'] == 'PAGO' || $item['SITUACHAVE'] == 'RECEBIDO') {
+                $acoes = '
+                <div class="list-icons">
+                    <div class="list-icons list-icons-extended"> ';
+    
+                        //BOTAO EDITAR
+                        /*
+                        if (intval($item["CODTRANSFREC"]) > 0){
+                            //$acoes .= '<a href="movimentacaoFinanceiraTransferencia.php?lancamentoId=' . $item["CODTRANSFREC"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
+                            $acoes .= $_POST['permissionAtualiza']?' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["CODTRANSFREC"].', \'T\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':"";
+                        } else if (intval($item["CODTRANSFPAG"]) > 0) {
+                            //$acoes .= '<a href="movimentacaoFinanceiraTransferencia.php?lancamentoId=' . $item["CODTRANSFPAG"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
+                            $acoes .= $_POST['permissionAtualiza']?' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["CODTRANSFPAG"].', \'T\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':"";
+                        } else if ($item["TIPO"] === "R"){
+                            //$acoes .= '<a href="movimentacaoFinanceiraRecebimento.php?lancamentoId=' . $item["ID"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
+                            $acoes .= $_POST['permissionAtualiza']?' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'R\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':"";
+                        } else if ($item["TIPO"] === "P") {
+                            //$acoes .= '<a href="movimentacaoFinanceiraPagamento.php?lancamentoId=' . $item["ID"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
+                            $acoes .= $_POST['permissionAtualiza']?' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'P\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':"";
+                        }*/
+                        
+                        //BOTAO EXCLUIR
+                        if (intval($item["CODTRANSFREC"]) > 0){
+                            $acoes .= $_POST['permissionExclui']?'<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFREC"].', \'T\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>':"";
+                        } else if (intval($item["CODTRANSFPAG"]) > 0) {
+                            $acoes .= $_POST['permissionExclui']?'<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFPAG"].', \'T\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>':"";
+                        } else if  ($item["TIPO"] === "R"){
+                            $acoes .= $_POST['permissionExclui']?'<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'R\', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>':"";
+                        } else if ($item["TIPO"] === "P") {
+                            $acoes .= $_POST['permissionExclui']?'<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'P\', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>':"";
+                        }
+                        $acoes .= '
+                    </div>
+                </div>';
+            }else {
+                $justificativaEstornamento = (isset($item['JUSTIFICATIVAESTORNO'])) ? $item['JUSTIFICATIVAESTORNO'] : '';
 
-                    //BOTAO EDITAR
-                    /*
-                    if (intval($item["CODTRANSFREC"]) > 0){
-                        //$acoes .= '<a href="movimentacaoFinanceiraTransferencia.php?lancamentoId=' . $item["CODTRANSFREC"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                        $acoes .= $_POST['permissionAtualiza']?' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["CODTRANSFREC"].', \'T\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':"";
-                    } else if (intval($item["CODTRANSFPAG"]) > 0) {
-                        //$acoes .= '<a href="movimentacaoFinanceiraTransferencia.php?lancamentoId=' . $item["CODTRANSFPAG"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                        $acoes .= $_POST['permissionAtualiza']?' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["CODTRANSFPAG"].', \'T\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':"";
-                    } else if ($item["TIPO"] === "R"){
-                        //$acoes .= '<a href="movimentacaoFinanceiraRecebimento.php?lancamentoId=' . $item["ID"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                        $acoes .= $_POST['permissionAtualiza']?' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'R\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':"";
-                    } else if ($item["TIPO"] === "P") {
-                        //$acoes .= '<a href="movimentacaoFinanceiraPagamento.php?lancamentoId=' . $item["ID"] . '" class="list-icons-item editarLancamento"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>';
-                        $acoes .= $_POST['permissionAtualiza']?' <a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'P\', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':"";
-                    }*/
-                    
-                    //BOTAO EXCLUIR
-                    if (intval($item["CODTRANSFREC"]) > 0){
-                        $acoes .= $_POST['permissionExclui']?'<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFREC"].', \'T\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>':"";
-                    } else if (intval($item["CODTRANSFPAG"]) > 0) {
-                        $acoes .= $_POST['permissionExclui']?'<a href="#" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionExclui'].','.$item["CODTRANSFPAG"].', \'T\', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin" title="'.$_POST['permissionExclui'].'"></i></a>':"";
-                    } else if  ($item["TIPO"] === "R"){
-                        $acoes .= $_POST['permissionExclui']?'<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'R\', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>':"";
-                    } else if ($item["TIPO"] === "P") {
-                        $acoes .= $_POST['permissionExclui']?'<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaMovimentacaoFinanceira('.$_POST['permissionAtualiza'].','.$item["ID"].', \'P\', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>':"";
-                    }
-                    $acoes .= '
-                </div>
-            </div>';
+                $acoes = '
+                <div class="list-icons">
+                    <a href="#" class="list-icons-item" data-toggle="modal" data-target="#modal_mini-justificativa-estorno"  onclick="estornoJustificativa(\''.$justificativaEstornamento.'\');" data-popup="tooltip" data-placement="bottom"title="Motivo do estorno"><i class="icon-info3"></i></a>
+                </div>';
+            }
 
             $array = [
                 'data'=>[
