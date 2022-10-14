@@ -66,49 +66,54 @@ include('global_assets/php/conexao.php');
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{
-					orderable: true,   //Data
+					orderable: true,   //Data - Hora
 					width: "10%",
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Horario
-					width: "5%",
+					orderable: true,   //Paciente
+					width: "15%",
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Paciente
-					width: "10%",
+					orderable: true,   //Idade
+					width: "5%",
 					targets: [2]
 				},				
 				{ 
-					orderable: true,   //Médico
+					orderable: true,   //Profissional
 					width: "10%",
 					targets: [3]
 				},
 				{ 
-					orderable: true,   //Prrocedimento
-					width: "10%",
+					orderable: true,   //Cbo
+					width: "15%",
 					targets: [4]
 				},
 				{ 
-					orderable: true,   //Modalidade
+					orderable: true,   //Procedimento
 					width: "15%",
 					targets: [5]
 				},
 				{ 
-					orderable: true,   //Contato
-					width: "20%",
+					orderable: true,   //Modalidade
+					width: "10%",
 					targets: [6]
 				},
 				{
-					orderable: true,   //Situação
+					orderable: true,   //Contato
 					width: "10%",
 					targets: [7]
 				},
+				{
+					orderable: true,   //Situacao
+					width: "5%",
+					targets: [8]
+				},
 				{ 
 					orderable: true,   //Ações
-					width: "10%",
-					targets: [8]
+					width: "5%",
+					targets: [9]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -335,10 +340,11 @@ include('global_assets/php/conexao.php');
 							<table class="table" id="AgendamentoTable">
 								<thead>
 									<tr class="bg-slate text-center">
-										<th>Data</th>
-										<th>Horario</th>
+										<th>Data / Hora</th>
 										<th>Paciente</th>
-										<th>Médico</th>
+										<th>Idade</th>
+										<th>Profissional</th>
+										<th>CBO</th>
 										<th>Procedimento</th>			
 										<th>Modalidade</th>
 										<th>Contato</th>

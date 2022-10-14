@@ -417,3 +417,22 @@ function calculaIdade($datanascimento){
 
 	return $interval->y . " anos, " . $interval->m." meses, ".$interval->d." dias";
 }
+
+//calcula a idade simples
+function calculaIdadeSimples($datanascimento){
+
+	$date1 = new DateTime($datanascimento);
+	$date2 = new DateTime();
+	$interval = $date1->diff($date2); 
+
+	if ($interval->y > 0) {
+		return $interval->y > 1 ? $interval->y . " anos" : $interval->y . " ano";		
+	} else if ($interval->y <=0 && $interval->m > 0) {		
+		return $interval->m > 1 ? $interval->m . " meses" : $interval->m . " mês";
+	} else if($interval-y <= 0 && $interval->m <=0 && $interval->d > 0){
+		return $interval->d > 1 ? $interval->d . " dias" : $interval->y . " dia";
+	} else {
+		return "Fora dos Padrões Normais";
+	}
+	
+}
