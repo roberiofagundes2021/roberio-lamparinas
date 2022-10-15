@@ -20,13 +20,14 @@ try{
 	if($tipoRequest == 'AGENDAMENTOS'){		
 		$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
 		AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
-		AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-		SituaCor,ProfiNome,AtLocNome, SrVenNome
+		AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,ClienDtNascimento,
+		SituaCor,Profissional.ProfiNome as ProfissionalNome,AtLocNome, SrVenNome, ProfiCbo, Profissao.ProfiNome as ProfissaoNome
 		FROM Agendamento
 		JOIN AtendimentoModalidade ON AtModId = AgendModalidade
 		JOIN Situacao ON SituaId = AgendSituacao
 		JOIN Cliente ON ClienId = AgendCliente
-		JOIN Profissional ON ProfiId = AgendProfissional
+		JOIN Profissional ON Profissional.ProfiId = AgendProfissional
+		JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
 		JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 		JOIN ServicoVenda ON SrVenId = AgendServico
 		WHERE AgendUnidade = $iUnidade";
@@ -45,10 +46,11 @@ try{
 			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
 			array_push($array, [
 				'data' => [
-					mostraData($item['AgendData']),
-					mostraHora($item['AgendHorario']),
+					mostraData($item['AgendData']) . " - " . mostraHora($item['AgendHorario']),					
 					$item['ClienNome'],
-					$item['ProfiNome'],
+					calculaIdadeSimples($item['ClienDtNascimento']),
+					$item['ProfissionalNome'],
+					$item['ProfiCbo'] . " - " . $item['ProfissaoNome'],
 					$item['SrVenNome'],
 					$item['AtModNome'],
 					$contato,
@@ -62,7 +64,7 @@ try{
 				]
 			]);
 		}
-	
+		//var_dump(json_encode($array));die;
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'SITUACOES'){
 		$sql = "SELECT SituaId,SituaNome,SituaChave,SituaStatus,SituaUsuarioAtualizador,SituaCor

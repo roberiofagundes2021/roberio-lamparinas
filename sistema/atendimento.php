@@ -76,54 +76,59 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{
-					orderable: true,   //Data
+					orderable: true,   //Data - hora
 					width: "10%",
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Horario
-					width: "10%",
+					orderable: true,   //Espera
+					width: "5%",
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Espera
+					orderable: true,   //Prontuario
 					width: "5%",
 					targets: [2]
 				},
 				{ 
-					orderable: true,   //Prontuário
-					width: "10%",
+					orderable: true,   //Paciente
+					width: "15%",
 					targets: [3]
 				},
 				{ 
-					orderable: true,   //Paciente
-					width: "20%",
+					orderable: true,   //idade
+					width: "10%",
 					targets: [4]
 				},
 				{ 
 					orderable: true,   //Profissional
-					width: "10%",
+					width: "15%",
 					targets: [5]
 				},
 				{ 
-					orderable: true,   //Modalidade
-					width: "20%",
+					orderable: true,   //cbo
+					width: "10%",
 					targets: [6]
 				},
 				{ 
-					orderable: true,   //Procedimento
+					orderable: true,   //modalidade
 					width: "5%",
 					targets: [7]
 				},
 				{ 
-					orderable: true,   //Situação
+					orderable: true,   // Procedimento
 					width: "5%",
 					targets: [8]
 				},
 				{ 
-					orderable: true,   //Ações
+					orderable: true,   // Situacao
 					width: "5%",
 					targets: [9]
+				},
+				{ 
+					orderable: true,   // acoes
+					width: "5%",
+					targets: [10]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -144,54 +149,59 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{
-					orderable: true,   //Data
+					orderable: true,   //Data - hora
 					width: "10%",
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Horario
-					width: "10%",
+					orderable: true,   // Espera
+					width: "5%",
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Espera
+					orderable: true,   // Nº Registro
 					width: "5%",
 					targets: [2]
 				},				
 				{ 
-					orderable: true,   //Nº Registro
+					orderable: true,   // Prontuario
 					width: "5%",
 					targets: [3]
 				},
 				{ 
-					orderable: true,   //Prontuário
-					width: "5%",
+					orderable: true,   // Paciente
+					width: "15%",
 					targets: [4]
 				},
 				{ 
-					orderable: true,   //Paciente
-					width: "20%",
+					orderable: true,   // Idade
+					width: "10%",
 					targets: [5]
 				},
 				{ 
 					orderable: true,   //Profissional
-					width: "10%",
+					width: "15%",
 					targets: [6]
 				},
 				{ 
-					orderable: true,   //Modalidade
-					width: "20%",
+					orderable: true,   // Cbo
+					width: "10%",
 					targets: [7]
 				},
 				{ 
-					orderable: true,   //Procedimento
+					orderable: true,   //Modalidade
 					width: "5%",
 					targets: [8]
 				},
 				{ 
-					orderable: true,   //Situação
+					orderable: true,   //Procedimento
 					width: "5%",
 					targets: [9]
+				},
+				{ 
+					orderable: true,   // Situação
+					width: "5%",
+					targets: [10]
 				},
 				{ 
 					orderable: true,   //Ações
@@ -637,12 +647,13 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 								<table class="table" id="AgendamentoTable">
 									<thead>
 										<tr class="bg-slate text-center">
-											<th>Data</th>
-											<th>Horario</th>
+											<th>Data / Hora</th>
 											<th>Espera</th>
 											<th>Prontuário</th>			
 											<th>Paciente</th>
+											<th>Idade</th>
 											<th>Profissional</th>
+											<th>CBO</th>
 											<th>Modalidade</th>
 											<th>Procedimento</th>
 											<th>Situação</th>
@@ -668,13 +679,14 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 								<table class="table" id="AtendimentoTable">
 									<thead>
 										<tr class="bg-slate text-center">
-											<th>Data</th>
-											<th>Horario</th>
+											<th>Data / Hora</th>
 											<th>Espera</th>
 											<th>Nº Registro</th>
 											<th>Prontuário</th>			
 											<th>Paciente</th>
+											<th>Idade</th>
 											<th>Profissional</th>
+											<th>CBO</th>
 											<th>Modalidade</th>
 											<th>Procedimento</th>
 											<th>Situação</th>
