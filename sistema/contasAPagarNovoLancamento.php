@@ -23,8 +23,7 @@ if (isset($_POST['cmbPlanoContas'])) {
                 if (intval($_POST['inputPagamentoParcial']) != 0) {
                     $sql = "SELECT SituaId
                             FROM Situacao
-                            WHERE SituaChave = 'APAGAR'
-                     ";
+                            WHERE SituaChave = 'APAGAR'";
                     $result = $conn->query($sql);
                     $situacaoPagamentoParcial = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -1318,6 +1317,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
 
             function pagamento() {
                 if($('#inputValor').val() == '') {
+                    $('#inputValor').focus();
                     var menssagem = 'Por favor informe um valor a pagar e em seguida o centro de custo!'
                     alerta('Atenção', menssagem, 'error')
                     
@@ -1544,6 +1544,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                 }
 
                 let centros = $('#cmbCentroCusto').val();
+                let tipoConta = 'DESPESA'
                 let HTML = ''
                 let HTML_TOTAL = ''
                 
@@ -1553,7 +1554,8 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                         url: "filtraCentroCustoXContasRetorna.php",
                         data: { 
                             centroCustos: centros,
-                            conta: idConta 
+                            conta: idConta,
+                            tipo: tipoConta
                         },
                         dataType:"json",
                         success: function(response){
@@ -2143,10 +2145,10 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                     <option value="">Selecionar</option>
                                                     <?php
                                                     $sql = "SELECT CnBanId, CnBanNome
-												        			FROM ContaBanco
-												        			JOIN Situacao on SituaId = CnBanStatus
-												        			WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-												        			ORDER BY CnBanNome ASC";
+                                                            FROM ContaBanco
+                                                            JOIN Situacao on SituaId = CnBanStatus
+                                                            WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                            ORDER BY CnBanNome ASC";
                                                     $result = $conn->query($sql);
                                                     $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
                                                     foreach ($rowContaBanco as $item) {
@@ -2509,8 +2511,8 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                     if(isset($itemCentroCusto['CAPXCCentroCusto'])) {
                                                         foreach($listCentroCusto as $CentroCusto){
                                                             $seleciona = '';
-                                                            foreach ($rowCentroCusto as $teste) {
-                                                                if($CentroCusto['CnCusId'] == $teste['CAPXCCentroCusto'])
+                                                            foreach ($rowCentroCusto as $centroCusto) {
+                                                                if($CentroCusto['CnCusId'] == $centroCusto['CAPXCCentroCusto'])
                                                                     $seleciona = "selected";
                                                             }
 

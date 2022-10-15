@@ -49,7 +49,7 @@ if (isset($_POST['cmbPlanoContas'])) {
             }
 
             try {
-
+            
             $sql = "UPDATE ContasAReceber SET       CnAReDtEmissao                    = :dDtEmissao,
                                                     CnARePlanoContas                  = :iPlanoContas,  
                                                     CnAReCliente                      = :iCliente, 
@@ -114,10 +114,13 @@ if (isset($_POST['cmbPlanoContas'])) {
                     ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
                     ':iUnidade'             => intval($_SESSION['UnidadeId'])
                 ));
+
+                $idContaAReceber = $_POST['inputContaId'];
             } catch (Exception $e) {
                 echo 'Error: ',  $e->getMessage(), "\n";
             }
-
+        
+            $recebimentoParcial = false;
 
             if (isset($_POST['inputRecebimentoParcial'])) {
                 if (intval($_POST['inputRecebimentoParcial']) != 0) {
@@ -129,8 +132,8 @@ if (isset($_POST['cmbPlanoContas'])) {
 
                     $result = $conn->query($sql);
                     $situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-                    $sql = "INSERT INTO ContasAReceber ( CnAReDtEmissao,
+                    
+                $sql = "INSERT INTO ContasAReceber ( CnAReDtEmissao,
                                                         CnARePlanoContas, 
                                                         CnAReCliente,
                                                         CnAReDescricao,
@@ -198,13 +201,13 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':iCliente'             => intval($_POST['cmbCliente']),
                         ':sDescricao'           => $_POST['inputDescricao'],
                         ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
-                        ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
-                        ':iVenda'               =>  null,
+                        ':iContaBanco'          => null,
+                        ':iFormaPagamento'      => null,
+                        ':iVenda'               => null,
                         ':dDtVencimento'        => $_POST['inputDataVencimento'],
-                        ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                        ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
-                        ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
+                        ':fValorAReceber'       => floatval(gravaValor($_POST['inputRecebimentoParcial'])),
+                        ':dDtRecebimento'       => null,
+                        ':fValorRecebido'       => null,
                         ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
                         ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
                         ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
@@ -223,6 +226,290 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
                         ':iUnidade'             => intval($_SESSION['UnidadeId'])
                     ));
+
+                    $idContaAreceberParcial = $conn->lastInsertId();
+                    $recebimentoParcial = true;
+                }
+            }
+
+            if($recebimentoParcial) {
+                $valorRecebidoParcialmente = floatval(gravaValor($_POST['inputValor']));
+                $valorReceberParcialmente = $_POST['inputRecebimentoParcial'];
+                $totalParcialmente = $valorRecebidoParcialmente + $valorReceberParcialmente;
+                
+                $percentualAReceberParcialmente = ($valorReceberParcialmente * 100) / $totalParcialmente;
+                $percentualRecebidoParcialmente = ($valorRecebidoParcialmente * 100) / $totalParcialmente;
+
+                $registros = intval($_POST['totalRegistros']);
+
+                for($x=0; $x < $registros; $x++){
+                    //$keyNome = 'inputCentroNome-'.$x;
+                    $keyId = 'inputIdCentro-'.$x;
+                    $centroCusto = $_POST[$keyId];
+                    $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                    $valor = str_replace(',', '.', $valor);
+
+                    $valor = ($percentualAReceberParcialmente / 100) * $valor;
+                    $valor;
+                    
+                $sql = "INSERT INTO ContasAReceberXCentroCusto ( CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CARXCUsuarioAtualizador, CARXCUnidade)
+                            VALUES ( :iContasAReceber, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                    $result = $conn->prepare($sql);
+
+                    $result->execute(array(
+
+                        ':iContasAReceber' => $idContaAreceberParcial,
+                        ':iCentroCusto' => $centroCusto,
+                        ':iValor' => $valor,
+                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                        ':iUnidade' => $_SESSION['UnidadeId']
+                    ));
+                    
+                }
+
+                $sql = "SELECT CARXCCentroCusto
+                        FROM ContasAReceberXCentroCusto
+                        WHERE CARXCContasAReceber = $idContaAReceber";
+                $resultQuantContaAPagarXCentroCusto = $conn->query($sql);
+                $centroCustoBancoDeDados = $resultQuantContaAPagarXCentroCusto->fetchAll(PDO::FETCH_ASSOC);
+    
+                $registros = intval($_POST['totalRegistros']);
+                $controle = true;
+                $i = 0;
+                
+                for($x=0; $x < $registros; $x++){
+                    $keyId = 'inputIdCentro-'.$x;
+                    $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                    $valor = str_replace(',', '.', $valor);
+    
+                    $centroCusto = $_POST[$keyId];
+                    $valor;
+                    $valor = ($percentualRecebidoParcialmente / 100) * $valor;
+                    $valor;
+                    $arrayControleCentroCustoSistema[] = $centroCusto;
+                    $arrayCentroCusto[$i]['idCentroCusto'] = $centroCusto;
+                    $arrayCentroCusto[$i]['valorCentroCusto'] = $valor;
+    
+                    foreach($centroCustoBancoDeDados as $idCentroContaAtualiza) {
+                        if($idCentroContaAtualiza['CARXCCentroCusto'] == $centroCusto) {
+                            
+                        $sql = "UPDATE ContasAReceberXCentroCusto SET CARXCValor = :fValor, CARXCUsuarioAtualizador = :iUsuarioAtualizador
+                                    WHERE CARXCCentroCusto = $centroCusto AND CARXCContasAReceber = $idContaAReceber";
+                            $result = $conn->prepare($sql);
+    
+                            $result->execute(array(
+                                ':fValor' => $valor,
+                                ':iUsuarioAtualizador' => $_SESSION['UsuarId']
+                            ));
+                            
+
+                            $arrayControle[] = $centroCusto;
+                            $arrayIdAntigoCentroCusto[$i]['idCentroCusto'] = $idCentroContaAtualiza['CARXCCentroCusto'];
+                            $arrayIdAntigoCentroCusto[$i]['valorCentroCusto'] = $valor;
+                        }
+                        if($controle) {
+                            $arrayBancoDeDados[] = $idCentroContaAtualiza['CARXCCentroCusto'];
+                        }
+                    }
+                    $controle = false;
+    
+                    $i++;
+                }
+    
+                if(isset($arrayControle)) {
+                    $arrayCentroCustoInsere = pegaDiferencaArray($arrayControleCentroCustoSistema, $arrayControle);
+                    if($arrayCentroCustoInsere) {
+                        foreach($arrayCentroCustoInsere as $idCentroCusto) {
+                            foreach($arrayCentroCusto as $insereCentroCusto) {
+                                if($insereCentroCusto['idCentroCusto'] == $idCentroCusto) {
+                                    
+                                $sql = "INSERT INTO ContasAReceberXCentroCusto ( CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CARXCUsuarioAtualizador, CARXCUnidade)
+                                            VALUES ( :iContasAReceber, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                                    $result = $conn->prepare($sql);
+    
+                                    $result->execute(array(
+    
+                                        ':iContasAReceber' => $idContaAReceber,
+                                        ':iCentroCusto' => $insereCentroCusto['idCentroCusto'],
+                                        ':iValor' => $insereCentroCusto['valorCentroCusto'],
+                                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                        ':iUnidade' => $_SESSION['UnidadeId']
+                                    ));
+                                    
+                                }
+                            }
+                        }
+                    }
+        
+                    $arrayCentroCustoDeleta = pegaDiferencaArray($arrayBancoDeDados, $arrayControle);
+                    if($arrayCentroCustoDeleta) {
+                        foreach($arrayCentroCustoDeleta as $deletaCentroCusto) {
+                            
+                        $sql = "DELETE FROM ContasAReceberXCentroCusto
+                                    WHERE CARXCCentroCusto = :iCentroCusto AND CARXCContasAReceber = :iContaAPagar";
+                            $result = $conn->prepare($sql);
+                            
+                            $result->execute(array(
+                                ':iCentroCusto' => $deletaCentroCusto,
+                                ':iContaAPagar' => $idContaAReceber
+                            ));
+                            
+                        }
+                    }
+                }else {
+                    foreach($arrayControleCentroCustoSistema as $novoCentroCusto) {
+                        foreach($arrayCentroCusto as $insereCentroCusto) {
+                            if($insereCentroCusto['idCentroCusto'] == $novoCentroCusto) {
+                                
+                            $sql = "INSERT INTO ContasAReceberXCentroCusto ( CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CARXCUsuarioAtualizador, CARXCUnidade)
+                                        VALUES ( :iContasAReceber, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                                $result = $conn->prepare($sql);
+    
+                                $result->execute(array(
+    
+                                    ':iContasAReceber' => $idContaAReceber,
+                                    ':iCentroCusto' => $insereCentroCusto['idCentroCusto'],
+                                    ':iValor' => $insereCentroCusto['valorCentroCusto'],
+                                    ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                    ':iUnidade' => $_SESSION['UnidadeId']
+                                ));
+                                
+                            }
+                        }
+                    }
+    
+                    foreach($arrayBancoDeDados as $deletaCentroCusto) {
+                        
+                    $sql = "DELETE FROM ContasAReceberXCentroCusto
+                                WHERE CARXCCentroCusto = :iCentroCusto AND CARXCContasAReceber = :iContaAPagar";
+                        $result = $conn->prepare($sql);
+                        
+                        $result->execute(array(
+                            ':iCentroCusto' => $deletaCentroCusto,
+                            ':iContaAPagar' => $idContaAReceber
+                        ));
+                        
+                    }
+                }
+            }else {
+                $sql = "SELECT CARXCCentroCusto
+                        FROM ContasAReceberXCentroCusto
+                        WHERE CARXCContasAReceber = $idContaAReceber";
+                $resultQuantContaAPagarXCentroCusto = $conn->query($sql);
+                $centroCustoBancoDeDados = $resultQuantContaAPagarXCentroCusto->fetchAll(PDO::FETCH_ASSOC);
+    
+                $registros = intval($_POST['totalRegistros']);
+                $controle = true;
+                $i = 0;
+
+                for($x=0; $x < $registros; $x++){
+                    $keyId = 'inputIdCentro-'.$x;
+                    $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                    $valor = str_replace(',', '.', $valor);
+    
+                    $centroCusto = $_POST[$keyId];
+                    $valor;
+                    $arrayControleCentroCustoSistema[] = $centroCusto;
+                    $arrayCentroCusto[$i]['idCentroCusto'] = $centroCusto;
+                    $arrayCentroCusto[$i]['valorCentroCusto'] = $valor;
+    
+                    foreach($centroCustoBancoDeDados as $idCentroContaAtualiza) {
+                        if($idCentroContaAtualiza['CARXCCentroCusto'] == $centroCusto) {
+                            $sql = "UPDATE ContasAReceberXCentroCusto SET CARXCValor = :fValor, CARXCUsuarioAtualizador = :iUsuarioAtualizador
+                                    WHERE CARXCCentroCusto = $centroCusto AND CARXCContasAReceber = $idContaAReceber";
+                            $result = $conn->prepare($sql);
+    
+                            $result->execute(array(
+                                ':fValor' => $valor,
+                                ':iUsuarioAtualizador' => $_SESSION['UsuarId']
+                            ));
+                            
+    
+                            $arrayControle[] = $centroCusto;
+                            $arrayIdAntigoCentroCusto[$i]['idCentroCusto'] = $idCentroContaAtualiza['CARXCCentroCusto'];
+                            $arrayIdAntigoCentroCusto[$i]['valorCentroCusto'] = $valor;
+                        }
+                        if($controle) {
+                            $arrayBancoDeDados[] = $idCentroContaAtualiza['CARXCCentroCusto'];
+                        }
+                    }
+                    $controle = false;
+    
+                    $i++;
+                }
+
+                if(isset($arrayControle)) {
+                    $arrayCentroCustoInsere = pegaDiferencaArray($arrayControleCentroCustoSistema, $arrayControle);
+                    if($arrayCentroCustoInsere) {
+                        foreach($arrayCentroCustoInsere as $idCentroCusto) {
+                            foreach($arrayCentroCusto as $insereCentroCusto) {
+                                if($insereCentroCusto['idCentroCusto'] == $idCentroCusto) {
+                                    $sql = "INSERT INTO ContasAReceberXCentroCusto ( CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CARXCUsuarioAtualizador, CARXCUnidade)
+                                            VALUES ( :iContasAReceber, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                                    $result = $conn->prepare($sql);
+    
+                                    $result->execute(array(
+    
+                                        ':iContasAReceber' => $idContaAReceber,
+                                        ':iCentroCusto' => $insereCentroCusto['idCentroCusto'],
+                                        ':iValor' => $insereCentroCusto['valorCentroCusto'],
+                                        ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                        ':iUnidade' => $_SESSION['UnidadeId']
+                                    ));
+                                    
+                                }
+                            }
+                        }
+                    }
+        
+                    $arrayCentroCustoDeleta = pegaDiferencaArray($arrayBancoDeDados, $arrayControle);
+                    if($arrayCentroCustoDeleta) {
+                        foreach($arrayCentroCustoDeleta as $deletaCentroCusto) {
+                            $sql = "DELETE FROM ContasAReceberXCentroCusto
+                                    WHERE CARXCCentroCusto = :iCentroCusto AND CARXCContasAReceber = :iContaAPagar";
+                            $result = $conn->prepare($sql);
+                            
+                            $result->execute(array(
+                                ':iCentroCusto' => $deletaCentroCusto,
+                                ':iContaAPagar' => $idContaAReceber
+                            ));
+                            
+                        }
+                    }
+                }else {
+                    foreach($arrayControleCentroCustoSistema as $novoCentroCusto) {
+                        foreach($arrayCentroCusto as $insereCentroCusto) {
+                            if($insereCentroCusto['idCentroCusto'] == $novoCentroCusto) {
+                                $sql = "INSERT INTO ContasAReceberXCentroCusto ( CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CARXCUsuarioAtualizador, CARXCUnidade)
+                                        VALUES ( :iContasAReceber, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                                $result = $conn->prepare($sql);
+    
+                                $result->execute(array(
+    
+                                    ':iContasAReceber' => $idContaAReceber,
+                                    ':iCentroCusto' => $insereCentroCusto['idCentroCusto'],
+                                    ':iValor' => $insereCentroCusto['valorCentroCusto'],
+                                    ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                    ':iUnidade' => $_SESSION['UnidadeId']
+                                ));
+                                
+                            }
+                        }
+                    }
+    
+                    if(isset($arrayBancoDeDados)) {
+                        foreach($arrayBancoDeDados as $deletaCentroCusto) {
+                            $sql = "DELETE FROM ContasAReceberXCentroCusto
+                                    WHERE CARXCCentroCusto = :iCentroCusto AND CARXCContasAReceber = :iContaAPagar";
+                            $result = $conn->prepare($sql);
+                            
+                            $result->execute(array(
+                                ':iCentroCusto' => $deletaCentroCusto,
+                                ':iContaAPagar' => $idContaAReceber
+                            ));
+                            
+                        }
+                    }
                 }
             }
 
@@ -280,6 +567,68 @@ if (isset($_POST['cmbPlanoContas'])) {
                             ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                             ':iUnidade' => $_SESSION['UnidadeId']
                         ));
+
+                        $idContaAReceber = $conn->lastInsertId();
+
+                        $registros = intval($_POST['totalRegistros']);
+
+                        $proporcaoCentroCusto = 0;
+                        //Para verificar valor do parcelamento
+                        for($x=0; $x < $registros; $x++) {
+                            $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                            $valor = str_replace(',', '.', $valor);
+
+                            $valor = mostraValor(($valor) / $numParcelas);
+                            $valor = str_replace('.', '', $valor);
+                            $valor = str_replace(',', '.', $valor);
+
+                            $proporcaoCentroCusto += $valor;
+                        }
+
+                        $proporcaoCentroCustoVerdadeiro = false;
+                        $teste = 0;
+                        if(floatval(gravaValor($_POST['inputParcelaValorAReceber' . $i . ''])) != $proporcaoCentroCusto) {
+                            $valParcela = floatval(gravaValor($_POST['inputParcelaValorAReceber' . $i . '']));
+                            $diferenca = $valParcela - $proporcaoCentroCusto;
+
+                            $proporcaoCentroCustoVerdadeiro = true;
+                        }
+
+                        for($x=0; $x < $registros; $x++){
+                            $keyNome = 'inputCentroNome-'.$x;
+                            $keyId = 'inputIdCentro-'.$x;
+                            $centroCusto = $_POST[$keyId];
+                            $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                            $valor = str_replace(',', '.', $valor);
+
+                            if($proporcaoCentroCustoVerdadeiro) {
+                                $soma = 0;
+                                $soma = ($x == 0) ? $diferenca : 0;
+                                
+                                $valor = mostraValor(($valor) / $numParcelas);
+                                $valor = str_replace('.', '', $valor);
+                                $valor = str_replace(',', '.', $valor);
+                                $valor += $soma;
+                                
+                            }else {
+                                $valor = mostraValor(($valor) / $numParcelas);
+                                $valor = str_replace('.', '', $valor);
+                                $valor = str_replace(',', '.', $valor);
+                            }
+
+                            $sql = "INSERT INTO ContasAReceberXCentroCusto ( CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CARXCUsuarioAtualizador, CARXCUnidade)
+                                    VALUES ( :iContasAReceber, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                            $result = $conn->prepare($sql);
+
+                            $result->execute(array(
+
+                                ':iContasAReceber' => $idContaAReceber,
+                                ':iCentroCusto' => $centroCusto,
+                                ':iValor' => $valor,
+                                ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                                ':iUnidade' => $_SESSION['UnidadeId']
+                            ));
+                        }
                     } catch (Exception $e) {
                         echo 'Error: ',  $e->getMessage(), "\n";
                     }
@@ -405,9 +754,13 @@ if (isset($_POST['cmbPlanoContas'])) {
                         ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
                         ':iUnidade'             => intval($_SESSION['UnidadeId'])
                     ));
+
+                    $idContaAReceber = $conn->lastInsertId();
                 } catch (Exception $e) {
                     echo 'Error: ',  $e->getMessage(), "\n";
                 }
+
+                $recebimentoParcial = false;
 
                 if (isset($_POST['inputRecebimentoParcial'])) {
                     if (intval($_POST['inputRecebimentoParcial']) != 0) {
@@ -483,39 +836,118 @@ if (isset($_POST['cmbPlanoContas'])) {
 
                             $result = $conn->prepare($sql);
                             $result->execute(array(
-                               ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
-                        ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
-                        ':iCliente'             => intval($_POST['cmbCliente']),
-                        ':sDescricao'           => $_POST['inputDescricao'],
-                        ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
-                        ':iContaBanco'          => isset($_POST['cmbContaBanco']) ? intval($_POST['cmbContaBanco']) : null,
-                        ':iFormaPagamento'      => isset($idFormaPagamento) ? $idFormaPagamento : null,
-                        ':iVenda'               =>  null,
-                        ':dDtVencimento'        => $_POST['inputDataVencimento'],
-                        ':fValorAReceber'       => floatval(gravaValor($_POST['inputValor'])),
-                        ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
-                        ':fValorRecebido'       => isset($_POST['inputValorTotalRecebido']) ? floatval(gravaValor($_POST['inputValorTotalRecebido'])) : null,
-                        ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
-                        ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
-                        ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
-                        ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
-                        ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
-                        ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
-                        ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
-                        ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
-                        ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
-                        ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
-                        ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
-                        ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
-                        ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
-                        ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
-                        ':iStatus'              => intval($situacao['SituaId']),
-                        ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
-                        ':iUnidade'             => intval($_SESSION['UnidadeId'])
+                                ':dDtEmissao'           => isset($_POST['inputDataEmissao']) ? $_POST['inputDataEmissao'] : null,
+                                ':iPlanoContas'         => isset($_POST['cmbPlanoContas']) ? intval($_POST['cmbPlanoContas']) : null,
+                                ':iCliente'             => intval($_POST['cmbCliente']),
+                                ':sDescricao'           => $_POST['inputDescricao'],
+                                ':sNumDocumento'        => isset($_POST['inputNumeroDocumento']) ? $_POST['inputNumeroDocumento'] : null,
+                                ':iContaBanco'          => null,
+                                ':iFormaPagamento'      => null,
+                                ':iVenda'               => null,
+                                ':dDtVencimento'        => $_POST['inputDataVencimento'],
+                                ':fValorAReceber'       => floatval(gravaValor($_POST['inputRecebimentoParcial'])),
+                                ':dDtRecebimento'       => isset($_POST['inputDataRecebimento']) ? $_POST['inputDataRecebimento'] : null,
+                                ':fValorRecebido'       => null,
+                                ':sTipoJuros'           => isset($_POST['cmbTipoJurosJD']) ? $_POST['cmbTipoJurosJD'] : null,
+                                ':fJuros'               => isset($_POST['inputJurosJD']) ? floatval(gravaValor($_POST['inputJurosJD'])) : null,
+                                ':sTipoDesconto'        => isset($_POST['cmbTipoDescontoJD']) ? $_POST['cmbTipoDescontoJD'] : null,
+                                ':fDesconto'            => isset($_POST['inputDescontoJD']) ? floatval(gravaValor($_POST['inputDescontoJD'])) : null,
+                                ':sObservacao'          => isset($_POST['inputObservacao']) ? $_POST['inputObservacao'] : null,
+                                ':sNumCheque'           => isset($_POST['inputNumCheque']) ? $_POST['inputNumCheque'] : null,
+                                ':fValorCheque'         => isset($_POST['inputValorCheque']) ? floatval(gravaValor($_POST['inputValorCheque'])) : null,
+                                ':dDtEmissaoCheque'     => isset($_POST['inputDtEmissaoCheque']) ? $_POST['inputDtEmissaoCheque'] : null,
+                                ':dDtVencimentoCheque'  => isset($_POST['inputDtVencimentoCheque']) ? $_POST['inputDtVencimentoCheque'] : null,
+                                ':iBancoCheque'         => isset($_POST['cmbBancoCheque']) ? intval($_POST['cmbBancoCheque']) : null,
+                                ':iAgenciaCheque'       => isset($_POST['inputAgenciaCheque']) ? $_POST['inputAgenciaCheque'] : null,
+                                ':iContaCheque'         => isset($_POST['inputContaCheque']) ? $_POST['inputContaCheque'] : null,
+                                ':iNomeCheque'          => isset($_POST['inputNomeCheque']) ? $_POST['inputNomeCheque'] : null,
+                                ':iCpfCheque'           => isset($_POST['inputCpfCheque']) ? $_POST['inputCpfCheque'] : null,   
+                                ':iStatus'              => intval($situacao['SituaId']),
+                                ':iUsuarioAtualizador'  => intval($_SESSION['UsuarId']),
+                                ':iUnidade'             => intval($_SESSION['UnidadeId'])
                             ));
+
+                        $idContaAreceberParcial = $conn->lastInsertId();
+                        $recebimentoParcial = true;
                         } catch (Exception $e) {
                             echo 'Error: ',  $e->getMessage(), "\n";
                         }
+                    }
+                }
+
+                if($recebimentoParcial) {
+                    $valorRecebidoParcialmente = floatval(gravaValor($_POST['inputValor']));
+                    $valorReceberParcialmente = $_POST['inputRecebimentoParcial'];
+                    $totalParcialmente = $valorRecebidoParcialmente + $valorReceberParcialmente;
+                    
+                    $percentualAReceberParcialmente = ($valorReceberParcialmente * 100) / $totalParcialmente;
+                    $percentualRecebidoParcialmente = ($valorRecebidoParcialmente * 100) / $totalParcialmente;
+
+                    $registros = intval($_POST['totalRegistros']);
+                    for($x=0; $x < $registros; $x++){
+                        //$keyNome = 'inputCentroNome-'.$x;
+                        $keyId = 'inputIdCentro-'.$x;
+                        $centroCusto = $_POST[$keyId];
+                        $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                        $valor = str_replace(',', '.', $valor);
+
+                        $valor = ($percentualAReceberParcialmente / 100) * $valor;
+
+                        $sql = "INSERT INTO ContasAReceberXCentroCusto ( CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CARXCUsuarioAtualizador, CARXCUnidade)
+                                VALUES ( :iContasAReceber, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                        $result = $conn->prepare($sql);
+    
+                        $result->execute(array(
+                            ':iContasAReceber' => $idContaAreceberParcial,
+                            ':iCentroCusto' => $centroCusto,
+                            ':iValor' => $valor,
+                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                            ':iUnidade' => $_SESSION['UnidadeId']
+                        ));
+                    }
+
+                    for($x=0; $x < $registros; $x++){
+                        //$keyNome = 'inputCentroNome-'.$x;
+                        $keyId = 'inputIdCentro-'.$x;
+                        $centroCusto = $_POST[$keyId];
+                        $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                        $valor = str_replace(',', '.', $valor);
+    
+                        $valor = ($percentualRecebidoParcialmente / 100) * $valor;
+
+                        $sql = "INSERT INTO ContasAReceberXCentroCusto ( CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CARXCUsuarioAtualizador, CARXCUnidade)
+                                VALUES ( :iContasAReceber, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                        $result = $conn->prepare($sql);
+    
+                        $result->execute(array(
+                            ':iContasAReceber' => $idContaAReceber,
+                            ':iCentroCusto' => $centroCusto,
+                            ':iValor' => $valor,
+                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                            ':iUnidade' => $_SESSION['UnidadeId']
+                        ));
+                    }
+                }else {
+                    $registros = intval($_POST['totalRegistros']);
+                    for($x=0; $x < $registros; $x++){
+                        //$keyNome = 'inputCentroNome-'.$x;
+                        $keyId = 'inputIdCentro-'.$x;
+                        $valor = str_replace('.', '', $_POST['inputCentroValor-'.$x]);
+                        $valor = str_replace(',', '.', $valor);
+    
+                        $centroCusto = $_POST[$keyId];
+    
+                        $sql = "INSERT INTO ContasAReceberXCentroCusto ( CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CARXCUsuarioAtualizador, CARXCUnidade)
+                                VALUES ( :iContasAReceber, :iCentroCusto, :iValor, :iUsuarioAtualizador, :iUnidade)";
+                        $result = $conn->prepare($sql);
+    
+                        $result->execute(array(
+                            ':iContasAReceber' => $idContaAReceber,
+                            ':iCentroCusto' => $centroCusto,
+                            ':iValor' => $valor,
+                            ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+                            ':iUnidade' => $_SESSION['UnidadeId']
+                        ));
                     }
                 }
             }
@@ -533,7 +965,7 @@ if (isset($_POST['cmbPlanoContas'])) {
             die;
         }
     }
-
+    
     if(isset($_POST['inputControlador'])) {
         irpara("movimentacaoFinanceiraConciliacao.php");
     }else {
@@ -584,6 +1016,20 @@ if (isset($_POST['inputContasAReceberId']) && $_POST['inputContasAReceberId'] !=
 
         $result = $conn->query($sql);
         $lancamento = $result->fetch(PDO::FETCH_ASSOC);
+
+        // pesquisa o Centro de Custo
+        $sqlCentroCusto = "SELECT CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CnCusId, CnCusCodigo, CnCusNome
+            FROM ContasAReceberXCentroCusto
+            JOIN CentroCusto on CnCusId = CARXCCentroCusto
+            WHERE CARXCContasAReceber = " . $_POST['inputContasAReceberId'] . "";
+        $resultCentroCusto = $conn->query($sqlCentroCusto);
+        $rowCentroCusto = $resultCentroCusto->fetchAll(PDO::FETCH_ASSOC);
+
+        $sqlLiquidacao = "SELECT CARXCCentroCusto
+        FROM ContasAReceberXCentroCusto
+        WHERE CARXCContasAReceber = " . $_POST['inputContasAReceberId'] . "";
+        $resultItemCentroCusto = $conn->query($sqlLiquidacao);
+        $itemCentroCusto = $resultItemCentroCusto->fetch(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         echo 'Error: ',  $e->getMessage(), "\n";
     }
@@ -628,10 +1074,32 @@ if (isset($_POST['inputContasAReceberId']) && $_POST['inputContasAReceberId'] !=
 
         $result = $conn->query($sql);
         $lancamento = $result->fetch(PDO::FETCH_ASSOC);
+
+        // pesquisa o Centro de Custo
+        $sqlCentroCusto = "SELECT CARXCContasAReceber, CARXCCentroCusto, CARXCValor, CnCusId, CnCusCodigo, CnCusNome
+            FROM ContasAReceberXCentroCusto
+            JOIN CentroCusto on CnCusId = CARXCCentroCusto
+            WHERE CARXCContasAReceber = " . $_POST['inputConciliacaoId'] . "";
+        $resultCentroCusto = $conn->query($sqlCentroCusto);
+        $rowCentroCusto = $resultCentroCusto->fetchAll(PDO::FETCH_ASSOC);
+
+        $sqlLiquidacao = "SELECT CARXCCentroCusto
+        FROM ContasAReceberXCentroCusto
+        WHERE CARXCContasAReceber = " . $_POST['inputConciliacaoId'] . "";
+        $resultItemCentroCusto = $conn->query($sqlLiquidacao);
+        $itemCentroCusto = $resultItemCentroCusto->fetch(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         echo 'Error: ',  $e->getMessage(), "\n";
     }
 }
+
+$sql = "SELECT ParamEmpresaPublica
+        FROM Parametro
+        WHERE ParamEmpresa = " . $_SESSION['EmpreId'];
+$result = $conn->query($sql);
+$rowParametro = $result->fetch(PDO::FETCH_ASSOC);
+
+$empresaPublica = ($rowParametro['ParamEmpresaPublica'] == 1) ? true : false;
 
 $dataInicio = date("Y-m-d");
 
@@ -660,6 +1128,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 
     <script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+    <script src="global_assets/js/demo_pages/form_select2.js"></script>
     <script src="global_assets/js/demo_pages/form_layouts.js"></script>
     <script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
@@ -987,6 +1456,31 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
 
 
             function pagamento() {
+                if($('#inputValor').val() == '') {
+                    var menssagem = 'Por favor informe um valor a receber e em seguida o centro de custo!'
+                    alerta('Atenção', menssagem, 'error')
+                    
+                    return false
+                }
+                
+                if($('#cmbCentroCusto').val() == '') {
+                    var menssagem = 'Por favor informe o centro de custo !'
+                    alerta('Atenção', menssagem, 'error')
+                    
+                    return false
+                }
+
+                if(!valorMaiorQZero())
+                    return false
+
+                var response = calculaValorTotal()
+                if(!response.status){
+                    var menssagem = 'Os valores dos centros de custos devem bater com o total do Valor a receber (R$ '+parseFloat(response.val).toFixed(2).replace('.', ',')+') !'
+                    alerta('Atenção', menssagem, 'error')
+                    
+                    return false
+                }
+
                 let valorTotal = $('#inputValor').val()
                 let valorRecebido = $('#inputValorTotalRecebido').val()
 
@@ -1096,10 +1590,14 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
             if ($('#inputValor').val() == '') {
                 document.getElementById('btnParcelar').style =
                 "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
+            }else{
+                $("#valorAPagarCentroCusto").html('<h6><span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">R$ '+$('#inputValor').val()+'</span></h6>')
             }
 
             $("#inputValor").on('input', function(element){
                 if($(this).val() == ''){
+                    $("#valorAPagarCentroCusto").html('')
+
                     document.getElementById('btnParcelar').style =
                     "color: currentColor; cursor: not-allowed; opacity: 0.5; text-decoration: none; pointer-events: none; margin-top: 5px";
                 }else{
@@ -1108,6 +1606,8 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
             });
 
             $("#inputValor").blur(function(){
+                $("#valorAPagarCentroCusto").html('<h6><span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">R$ '+$('#inputValor').val()+'</span></h6>')
+
                 let parcelas = $("#cmbParcelas").val()
                 if(parcelas > 1) {
                     var menssagem = 'Valor do parcelamento alterado! Clique em OK para confirmar'
@@ -1116,7 +1616,442 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     $('#gerarParcelas').click()
                 }
             });
+
+            function centroCusto() {
+                $("#centroCusto").on('click', (e) => {
+                    e.preventDefault()
+                    if($('#inputValor').val() == '') {
+                        $('#inputValor').focus();
+                        var menssagem = 'Por favor informe um valor a receber!'
+                        alerta('Atenção', menssagem, 'error')
+                    }else {
+                        e.preventDefault()
+                        $('#pageCentroCusto').fadeIn(200);
+                        $('.cardJuDes').css('width', '500px').css('margin', '0px auto')
+                    }
+                })
+
+                $('#modalCloseCentroCusto').on('click', function() {
+                    $('#pageCentroCusto').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                })
+            }
+
+            centroCusto();
+
+            $('#submitForm').on('click', function(e){
+                e.preventDefault();
+
+                if(!valorMaiorQZero())
+                    return false
+
+                var response = calculaValorTotal()
+                if(response.status){
+                    $('#pageCentroCusto').fadeOut(200);
+                    $('body').css('overflow', 'scroll');
+                } else {
+                    var menssagem = 'Os valores dos centros de custos devem bater com o total do Valor a receber (R$ '+float2moeda(parseFloat(response.val))+') !'
+                    alerta('Atenção', menssagem, 'error')
+                }
+            })
+
+            centroCustoExiste()
+
+            if(centroCustoExiste()) {
+                let idConta = "<?php echo isset($lancamento['CnAReId']) ? $lancamento['CnAReId'] : 0; ?>"
+                let movimentacao = "<?php echo isset($lancamento['CnAReMovimentacao']) ? true : false; ?>"
+                let editavel = true
+                
+                if(contaSituacao()) {
+                    editavel = (contaSituacao() == 'RECEBIDO') ? false : true;
+                }
+
+                let centros = $('#cmbCentroCusto').val();
+                let tipoConta = 'RECEITA'
+                let HTML = ''
+                let HTML_TOTAL = ''
+                
+                if (centros.length){
+                    $.ajax({
+                        method: "POST",
+                        url: "filtraCentroCustoXContasRetorna.php",
+                        data: { 
+                            centroCustos: centros,
+                            conta: idConta,
+                            tipo: tipoConta
+                        },
+                        dataType:"json",
+                        success: function(response){
+                            if (response.length){
+                                $('#relacaoCentroCusto').show()
+                                if(editavel && !movimentacao) {
+                                    HTML = HTML + `
+                                    <div class="row" style="margin-top: 8px;">
+                                        <div class="col-lg-9">
+                                            <div class="row">
+                                                <div class="col-lg-1" style="min-width: 50x">
+                                                    <label for=''><strong>Item</strong></label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label for=''><strong>Código</strong></label>
+                                                </div>
+                                                <div class="col-lg-9">
+                                                    <label for=''><strong>Centro de Custo</strong></label>
+                                                </div>
+                                            </div>
+                                        </div>
+        
+                                        <div class="col-lg-2">
+                                            <label for=''><strong>Valor</strong></label>
+                                        </div>
+        
+                                        <div class="col-lg-1">
+                                            <label for=''><strong>Resetar</strong></label>
+                                        </div>
+                                    </div>`;
+                                }else {
+                                    HTML = HTML + `
+                                        <div class="row" style="margin-top: 8px;">
+                                            <div class="col-lg-10">
+                                                <div class="row">
+                                                    <div class="col-lg-1" style="min-width: 50x">
+                                                        <label for=''><strong>Item</strong></label>
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <label for=''><strong>Código</strong></label>
+                                                    </div>
+                                                    <div class="col-lg-9">
+                                                        <label for=''><strong>Centro de Custo</strong></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+            
+                                            <div class="col-lg-2">
+                                                <label for=''><strong>Valor</strong></label>
+                                            </div>
+                                        </div>`;
+                                }
+                                let totalCentroCusto = 0
+                                for(var x=0; x<response.length; x++){
+                                    var centro = response[x]
+                                    totalCentroCusto += centro.CARXCValor
+
+                                    $('#totalRegistros').val(response.length)
+
+                                    if(editavel && !movimentacao) {
+                                        HTML = HTML + `
+                                        <div class="row" style="margin-top: 8px;">
+                                            <div class="col-lg-9">
+                                                <div class="row">
+                                                    <div class="col-lg-1" style="min-width: 50x">
+                                                        <input type="text" id="inputItem-`+x+`" name="inputItem1" class="form-control-border-off" value="`+(x+1)+`" readOnly>
+                                                        <input type="hidden" id="inputIdCentro-`+x+`" name="inputIdCentro-`+x+`" value="`+centro.CnCusId+`">
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <input type="text" id="inputCentroCodigo-`+x+`" name="inputCentroCodigo-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusCodigo+`" readOnly>
+                                                    </div>
+                                                    <div class="col-lg-9">
+                                                        <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusNome+`" readOnly>
+                                                    </div>
+                                                </div>
+                                            </div>
+            
+                                            <div class="col-lg-2">
+                                                <input type="" class="form-control-border Valor text-right pula" id="inputCentroValor-${x}" name="inputCentroValor-${x}" onChange="calculaValorTotal(${x})" onkeypress="pula(event)" value="`+float2moeda(centro.CARXCValor)+`" autocomplete="off" ${editavel}>
+                                            </div>
+            
+                                            <div class="col-sm-1 btn" style="text-align:center;" onClick="reset('inputCentroValor-${x}', 0)">
+                                                <i class="icon-reset" title="Resetar"></i>
+                                            </div>
+                                        </div>`;
+                                    }else {
+                                        HTML = HTML + `
+                                        <div class="row" style="margin-top: 8px;">
+                                            <div class="col-lg-10">
+                                                <div class="row">
+                                                    <div class="col-lg-1" style="min-width: 50x">
+                                                        <input type="text" id="inputItem-`+x+`" name="inputItem1" class="form-control-border-off" value="`+(x+1)+`" readOnly>
+                                                        <input type="hidden" id="inputIdCentro-`+x+`" name="inputIdCentro-`+x+`" value="`+centro.CnCusId+`">
+                                                    </div>
+                                                    <div class="col-lg-2">
+                                                        <input type="text" id="inputCentroCodigo-`+x+`" name="inputCentroCodigo-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusCodigo+`" readOnly>
+                                                    </div>
+                                                    <div class="col-lg-9">
+                                                        <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusNome+`" readOnly>
+                                                    </div>
+                                                </div>
+                                            </div>
+            
+                                            <div class="col-lg-2">
+                                                <input type="" class="form-control-border Valor text-right pula" id="inputCentroValor-${x}" name="inputCentroValor-${x}" onChange="calculaValorTotal(${x})" onkeypress="pula(event)" value="`+float2moeda(centro.CARXCValor)+`" autocomplete="off" ${editavel} readOnly>
+                                            </div>
+                                        </div>`;
+                                    }
+                                }
+                                if(editavel && !movimentacao) {
+                                    HTML_TOTAL = `
+                                    <div class="col-lg-7">
+                                        <div class="row">
+                                            <div class="col-lg-1"></div>
+                                            <div class="col-lg-11"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2" style="padding-top: 5px; text-align: right;">
+                                        <h5><b>Total:</b></h5>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="R$ " readOnly>
+                                    </div>
+                                    <div class="col-lg-1 btn" style="text-align:center;" onClick="reset('all', 0)">
+                                        <i class="icon-reset" title="Resetar Todos"></i>
+                                    </div>
+                                `
+                                }else {
+                                    HTML_TOTAL = `
+                                        <div class="col-lg-8">
+                                            <div class="row">
+                                                <div class="col-lg-1"></div>
+                                                <div class="col-lg-11"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2" style="padding-top: 5px; text-align: right;">
+                                            <h5><b>Total:</b></h5>
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="R$ " readOnly>
+                                        </div>
+                                    `
+                                }
+                            }
+                            var response = calculaValorTotal()
+
+                            $('#centroCustoContent').html(HTML).show();
+                            $('#centroCustoContentTotal').html(HTML_TOTAL).show();
+                            $('#inputTotalGeral').val('R$ ' + float2moeda(response.val));
+                    }})
+                }else{
+                    $('#centroCustoContent').html(HTML).show();
+                    $('#centroCustoContentTotal').html(HTML_TOTAL).show();
+                    $('#inputTotalGeral').val('R$ ' + 0);
+                    $('#relacaoCentroCusto').hide()
+                }
+            } 
+
+            $('#cmbCentroCusto').on('change', function(){
+                var centros = $('#cmbCentroCusto').val();
+                var HTML = ''
+                var HTML_TOTAL = ''
+                
+                if (centros.length){
+                    $.ajax({
+                        method: "POST",
+                        url: "filtraCentroCusto.php",
+                        data: { centroCustos: centros },
+                        dataType:"json",
+                        success: function(response){
+                            if (response.length){
+                                $('#relacaoCentroCusto').show()
+                                HTML = HTML + `
+                                    <div class="row" style="margin-top: 8px;">
+                                        <div class="col-lg-9">
+                                            <div class="row">
+                                                <div class="col-lg-1" style="min-width: 50x">
+                                                    <label for=''><strong>Item</strong></label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label for=''><strong>Código</strong></label>
+                                                </div>
+                                                <div class="col-lg-9">
+                                                    <label for=''><strong>Centro de Custo</strong></label>
+                                                </div>
+                                            </div>
+                                        </div>
+        
+                                        <div class="col-lg-2">
+                                            <label for=''><strong>Valor</strong></label>
+                                        </div>
+        
+                                        <div class="col-lg-1">
+                                            <label for=''><strong>Resetar</strong></label>
+                                        </div>
+                                    </div>`;
+                                for(var x=0; x<response.length; x++){
+                                    var centro = response[x]
+
+                                    $('#totalRegistros').val(response.length)
+
+                                    HTML = HTML + `
+                                    <div class="row" style="margin-top: 8px;">
+                                        <div class="col-lg-9">
+                                            <div class="row">
+                                                <div class="col-lg-1" style="min-width: 50x">
+                                                    <input type="text" id="inputItem-`+x+`" name="inputItem1" class="form-control-border-off" value="`+(x+1)+`" readOnly>
+                                                    <input type="hidden" id="inputIdCentro-`+x+`" name="inputIdCentro-`+x+`" value="`+centro.CnCusId+`">
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <input type="text" id="inputCentroCodigo-`+x+`" name="inputCentroCodigo-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusCodigo+`" readOnly>
+                                                </div>
+                                                <div class="col-lg-9">
+                                                    <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusNome+`" readOnly>
+                                                </div>
+                                            </div>
+                                        </div>
+        
+                                        <div class="col-lg-2">
+                                            <input type="" class="form-control-border Valor text-right pula" id="inputCentroValor-${x}" name="inputCentroValor-${x}" onChange="calculaValorTotal(${x})" onkeypress="pula(event)" value="" autocomplete="off">
+                                        </div>
+        
+                                        <div class="col-sm-1 btn" style="text-align:center;" onClick="reset('inputCentroValor-${x}', 0)">
+                                            <i class="icon-reset" title="Resetar"></i>
+                                        </div>
+                                    </div>`;
+                                }
+                                HTML_TOTAL = `
+                                    <div class="col-lg-7">
+                                        <div class="row">
+                                            <div class="col-lg-1"></div>
+                                            <div class="col-lg-11"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2" style="padding-top: 5px; text-align: right;">
+                                        <h5><b>Total:</b></h5>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <input type="text" id="inputTotalGeral" name="inputTotalGeral" class="form-control-border-off text-right" value="R$ 0" readOnly>
+                                    </div>
+                                    <div class="col-lg-1 btn" style="text-align:center;" onClick="reset('all', 0)">
+                                        <i class="icon-reset" title="Resetar Todos"></i>
+                                    </div>
+                                `
+                            }
+                            $('#centroCustoContent').html(HTML).show();
+                            $('#centroCustoContentTotal').html(HTML_TOTAL).show();
+                            $('#inputTotalGeral').val('R$ ' + 0);
+                        }})
+                }else{
+                    $('#centroCustoContent').html(HTML).show();
+                    $('#centroCustoContentTotal').html(HTML_TOTAL).show();
+                    $('#inputTotalGeral').val('R$ ' + 0);
+                    $('#relacaoCentroCusto').hide()
+                }
+            })
         })
+
+        function pula(e){
+			/*
+			* verifica se o evento é Keycode (para IE e outros browsers)
+			* se não for pega o evento Which (Firefox)
+			*/
+			var tecla = (e.keyCode?e.keyCode:e.which);
+
+			/* verifica se a tecla pressionada foi o ENTER */
+			if(tecla == 13){
+				/* guarda o seletor do campo que foi pressionado Enter */
+				var array_campo = document.getElementsByClassName('pula');
+
+				/* pega o indice do elemento*/
+				var id = e.path[0].id.split('-')
+				id = 'inputCentroValor-' + (parseInt(id[1])+1)
+
+				/*soma mais um ao indice e verifica se não é null
+				*se não for é porque existe outro elemento
+				*/
+
+				if(document.getElementById(id)){
+					document.getElementById(id).focus()
+				} else {
+					document.getElementById(e.path[0].id).blur()
+                }
+			} else {
+				return e;
+			}
+
+			/* impede o sumbit caso esteja dentro de um form */
+			e.preventDefault(e);
+			return false;
+		}
+
+        function reset(id, val){
+            if (id === 'all'){
+                var total = parseFloat($('#totalRegistros').val())
+                for(var x=0; x<total; x++){
+                    $('#inputCentroValor-'+x).val(float2moeda(0))
+                }
+            } else {
+                $('#'+id).val(float2moeda(val))
+            }
+            calculaValorTotal()
+        }
+
+        function calculaValorTotal(id){
+            var totalValorAPagar = parseFloat($('#inputValor').val().replaceAll('.', '').replace(',', '.'))
+            var ValTotal = 0
+            var total = parseFloat($('#totalRegistros').val())
+            var valor = id !== undefined ? parseFloat($('#inputCentroValor-'+id).val().replaceAll('.', '').replace(',', '.')) : 0
+            var cont = 0
+
+            $('#inputCentroValor-'+id).val(float2moeda(valor))
+
+            for(var x=0; x<total; x++){
+                ValTotal += parseFloat($(`#inputCentroValor-${x}`).val()) ? parseFloat($(`#inputCentroValor-${x}`).val().replaceAll('.', '').replace(',', '.')) : 0
+                
+            }
+
+            if (id !== undefined){
+                if(ValTotal > totalValorAPagar){
+                    cont = ValTotal - totalValorAPagar
+                    ValTotal = ValTotal - cont
+                    $('#inputCentroValor-'+id).val(float2moeda(valor - cont))
+                }
+            }
+            ValTotal = (ValTotal).toFixed(2)
+            var newValue = float2moeda(ValTotal) //parseFloat(ValTotal).toFixed(2).replace('.', ',')
+            $('#inputTotalGeral').val(`R$ ${newValue}`)
+            // retorna o status para quando for submeter o sistema verificar
+            // se o valor está batendo com o total
+            if (ValTotal != totalValorAPagar && total > 0){
+                var obj = {
+                    status: false,
+                    val: totalValorAPagar
+                }
+                return obj
+            } else {
+                var obj = {
+                    status: true,
+                    val: totalValorAPagar
+                }
+                return obj
+            }
+        }
+
+        function valorMaiorQZero() {
+            let x
+                let registros = $(`#totalRegistros`).val()
+                for(x=0; x < registros; x++){
+                    keyNome = $(`#inputCentroNome-${x}`).val()
+                    valor = $(`#inputCentroValor-${x}`).val();
+
+                    if(keyNome != ''){
+                        if(valor == '0,00' || valor == '') {
+                            var menssagem = 'Há uma centro de conta vazio ou igual a R$0,00!'
+                            alerta('Atenção', menssagem, 'error')
+
+                            return false
+                        }
+                    }
+                }
+                return true
+        }
+
+        function centroCustoExiste() {
+            let existeCentroCusto = "<?php echo $existeCentroCusto = (isset($itemCentroCusto['CARXCCentroCusto'])) ? true : false; ?>"
+            return existeCentroCusto
+        }
+
+        function contaSituacao() {
+            let contaRecebida = "<?php echo $contaRecebida = (isset($lancamento['SituaChave'])) ? $lancamento['SituaChave'] : false; ?>"
+            return contaRecebida
+        }
     </script>
 
 </head>
@@ -1163,14 +2098,14 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     }
                                     ?>
                                     <div class="row">
-                                        <div class="col-lg-3">
+                                        <div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="inputDataEmissao">Data de Emissão</label>
                                                 <input type="date" id="inputDataEmissao" name="inputDataEmissao" class="form-control" placeholder="Data" value="<?php echo date("Y-m-d") ?>"  <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'RECEBIDO') echo 'disabled' ?>  readOnly>
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-5">
+                                        <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="cmbCliente">Cliente <span class="text-danger">*</span></label>
                                                 <select id="cmbCliente" name="cmbCliente" class="form-control form-control-select2" <?php  if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'RECEBIDO') echo 'disabled' ?> required>
@@ -1248,6 +2183,10 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                     ?>
                                                 </select>
                                             </div>
+                                        </div>
+
+                                        <div class="col-lg-2 m-auto text-center">
+                                            <button id="centroCusto" type="button" class="btn bg-slate btn-sm">CENTRO DE CUSTO</button>
                                         </div>
                                     </div>
 
@@ -1338,7 +2277,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     </div>
 
                                     <?php
-                                    if (isset($lancamento) && $lancamento['CnAReContaBanco'] != null || isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'ARECEBER') {
+                                    if (isset($lancamento) && $lancamento['CnAReContaBanco'] != null && $lancamento['CnAReContaBanco'] != 0) {
                                         $mostrar = '';
                                     } else {
                                         $mostrar = 'style="display:none;"';
@@ -1353,10 +2292,10 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                     <?php
                                                     try {
                                                         $sql = "SELECT CnBanId, CnBanNome
-                                                                            FROM ContaBanco
-                                                                            JOIN Situacao on SituaId = CnBanStatus
-                                                                            WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                                            ORDER BY CnBanNome ASC";
+                                                                FROM ContaBanco
+                                                                JOIN Situacao on SituaId = CnBanStatus
+                                                                WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                                ORDER BY CnBanNome ASC";
                                                         $result = $conn->query($sql);
                                                         $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1713,6 +2652,120 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                             <div class="form-group">
                                                 <a class="btn btn-lg btn-principal" id="salvarJurosDescontos">Ok</a>
                                                 <a id="modalCloseJurosDescontos" class="btn btn-basic" role="button">Cancelar</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--------------------------------------------------------------------------------------->
+
+                    <!--Modal Centro de Custo-->
+                    <div id="pageCentroCusto" class="custon-modal" style="overflow-y:auto;">
+                        <div class="custon-modal-container">
+                            <div class="card custon-modal-content">
+                                <div class="custon-modal-title">
+                                    <i class=""></i>
+                                    <p class="h3">Centro de Custos</p>
+                                    <i class=""></i>
+                                </div>
+                                <div class="px-5 pt-5">
+                                    <div id="valorAPagarCentroCusto" class="d-flex justify-content-center">
+                                    </div>
+                                    <div class="d-flex flex-row p-2">
+                                        <div class='<?php echo $tamanho = (isset($rowNotaFiscal['MvAneArquivo'])) ? 'col-lg-10' : 'col-lg-12'; ?>'>
+                                            <div class="form-group">
+                                                <label for="cmbCentroCusto" class="ml-1">Centro de Custo <span class="text-danger">*</span></label>
+                                                <?php
+                                                    $sql = "SELECT CnCusId, CnCusNome
+                                                            FROM CentroCusto
+                                                            JOIN Situacao on SituaId = CnCusStatus
+                                                            WHERE SituaChave = 'ATIVO' AND CnCusUnidade = ".$_SESSION['UnidadeId']."
+                                                            ORDER BY CnCusNome ASC";
+                                                    $result = $conn->query($sql);
+                                                    $listCentroCusto = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                    $disabled = ((isset($lancamento['SituaChave']) && $lancamento['SituaChave'] == 'RECEBIDO') || (isset($lancamento['CnAPaMovimentacao']) && $empresaPublica))? 'disabled':'';
+
+                                                    $selectCencust = "<select id='cmbCentroCusto' $disabled name='cmbCentroCusto[]' class='form-control select' multiple='multiple' autofocus data-fouc>";
+                                                    
+                                                    if(isset($itemCentroCusto['CARXCCentroCusto'])) {
+                                                        foreach($listCentroCusto as $CentroCusto){
+                                                            $seleciona = '';
+                                                            foreach ($rowCentroCusto as $centroCusto) {
+                                                                if($CentroCusto['CnCusId'] == $centroCusto['CARXCCentroCusto'])
+                                                                    $seleciona = "selected";
+                                                            }
+
+                                                            $selectCencust .= "<option value='".$CentroCusto['CnCusId']."' $seleciona>".$CentroCusto["CnCusNome"]."</option>";
+                                                        }
+                                                    }else {
+                                                        foreach($listCentroCusto as $CentroCusto){
+                                                            $selectCencust .= "<option value='".$CentroCusto['CnCusId']."'>".$CentroCusto["CnCusNome"]."</option>";
+                                                        }
+                                                    }
+                                                    
+                                                    $selectCencust .= "</select>";
+                                                    echo $selectCencust;
+                                                ?>
+                                                <hr style="margin-top: -1px;">
+                                            </div>
+                                        </div>
+
+                                        <input type="hidden" id='todosCentroCusto' name='todosCentroCusto[]'>
+
+                                        <div class="col-lg-2 d-flex justify-content-center" style="display : <?php echo $visibilidade = (isset($rowNotaFiscal['MvAneArquivo'])) ? 'block' : 'none'; ?>">
+                                            <?php
+                                            if (isset($rowNotaFiscal['MvAneArquivo'])){
+                                                echo '
+                                                <span class="input-group-prepend m-auto" style="cursor: pointer;">
+                                                    <a href="global_assets/anexos/movimentacao/'.$rowNotaFiscal['MvAneArquivo'].'" target="_blank" title="Abrir Nota Fiscal">
+                                                        <span class="input-group-text" style="color: red;"><i class="icon-file-pdf"></i></span>
+                                                    </a>
+                                                </span>';
+                                            }                                                              
+                                            ?>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body" id="relacaoCentroCusto" style="<?php echo $visibiçidade = (isset($itemCentroCusto['CARXCCentroCusto'])) ? 'display: block;' : 'display: none;'; ?>">
+                                    <?php
+                                        if(isset($lancamento['CnAPaMovimentacao'])) {
+                                            if(!$empresaPublica) {
+                                                print('<p class="mb-3">Abaixo estão listados todos os centros de custos selecionados. Para atualizar os valores, basta preencher a coluna <code>Valor</code> e depois clicar em <b>OK</b>.</p>');
+                                            }
+                                        }else {
+                                            if(!isset($lancamento['SituaChave'])){
+                                                print('<p class="mb-3">Abaixo estão listados todos os centros de custos selecionados. Para atualizar os valores, basta preencher a coluna <code>Valor</code> e depois clicar em <b>OK</b>.</p>');    
+                                            }else if(isset($lancamento['SituaChave']) && $lancamento['SituaChave'] != 'PAGO') {
+                                                print('<p class="mb-3">Abaixo estão listados todos os centros de custos selecionados. Para atualizar os valores, basta preencher a coluna <code>Valor</code> e depois clicar em <b>OK</b>.</p>');
+                                            }
+                                        }
+                                    ?>
+
+                                    <div class="row" style="margin-bottom: -20px;">
+                                        
+                                    </div>
+                                    <div id="centroCustoContent">
+                                        
+                                    </div>
+
+                                    <div id="centroCustoContentTotal" class="row" style="margin-top: 8px;">
+                                        
+                                    </div>
+
+                                    <input type="hidden" id="totalRegistros" name="totalRegistros" value="0" >
+                                    
+                                </div>
+
+                                <div class="card-footer mt-2 d-flex flex-column">
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
+                                                <a class="btn btn-lg btn-principal" id="submitForm">OK</a>
+                                                <a id="modalCloseCentroCusto" class="btn btn-basic" role="button">Cancelar</a>
                                             </div>
                                         </div>
                                     </div>
