@@ -10,7 +10,7 @@ if(isset($_POST['inputCentroCustoId'])){
 	
 	$iCentroCusto = $_POST['inputCentroCustoId'];
 		
-	$sql = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusDetalhamento
+	$sql = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusNomePersonalizado, CnCusDetalhamento
 			FROM CentroCusto
 			WHERE CnCusId = $iCentroCusto ";
 	$result = $conn->query($sql);
@@ -26,7 +26,7 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE CentroCusto SET CnCusCodigo = :iCodigo, CnCusNome = :sNome, 
+		$sql = "UPDATE CentroCusto SET CnCusCodigo = :iCodigo, CnCusNome = :sNome, CnCusNomePersonalizado = :sNomePersonalizado, 
 				CnCusDetalhamento = :sDetalhamento, CnCusUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE CnCusId = :iCentroCusto";
 		$result = $conn->prepare($sql);
@@ -34,6 +34,7 @@ if(isset($_POST['inputNome'])){
 		$result->execute(array(
 						':iCodigo' => $_POST['inputCodigo'],
 						':sNome' => $_POST['inputNome'],
+						':sNomePersonalizado' => isset($_POST['inputNomePersonalizado']) ? $_POST['inputNomePersonalizado'] : null,
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iCentroCusto' => $_POST['inputCentroCustoId']
@@ -144,13 +145,23 @@ if(isset($_POST['inputNome'])){
 										<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="<?php echo $row['CnCusCodigo']; ?>" required autofocus>
 									</div>
 								</div>
-
-								<div class="col-lg-10">
+								<div class="col-lg-5">
 									<div class="form-group">
-										<label for="inputNome">Centro de Custo<span class="text-danger"> *</span></label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Centro de Custo" value="<?php echo $row['CnCusNome']; ?>" required >
+										<label for="inputNome">Centro de Custo <?php if ($row['CnCusNome'] == 'Atendimento Eletivo' || $row['CnCusNome'] == 'Atendimento Ambulatorial'|| $row['CnCusNome'] == 'Atendimento Internação') { echo "(sugerido pelo sistema)"; } else { echo ""; }?><span class="text-danger"> *</span></label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Centro de Custo" value="<?php echo $row['CnCusNome']; ?>" required  <?php if ($row['CnCusNome'] == 'Atendimento Eletivo' || $row['CnCusNome'] == 'Atendimento Ambulatorial'|| $row['CnCusNome'] == 'Atendimento Internação') { echo "readonly"; } else { echo ""; }?> >
 									</div>
 								</div>
+								<?php
+									if ($row['CnCusNome'] == 'Atendimento Eletivo' || $row['CnCusNome'] == 'Atendimento Ambulatorial' || $row['CnCusNome'] == 'Atendimento Internação') {
+									
+										print('	<div class="col-lg-5">
+											<div class="form-group">
+												<label for="inputNomePersonalizado">Centro de Custo (nome personalizado)</label>
+												<input type="text" id="inputNomePersonalizado" name="inputNomePersonalizado" class="form-control" placeholder="Título personalizado" value="'); echo $row['CnCusNomePersonalizado']; print('">
+											</div>
+										</div>');
+									}
+								?>	
 							</div>
 							<div class="row">
 								<div class="col-lg-12">

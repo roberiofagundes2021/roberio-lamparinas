@@ -262,6 +262,39 @@ if(isset($_POST['inputNome'])){
       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
       ':iUnidade' => $unidadeIdNovo
     ));
+
+
+    /* Após criar a Unidade deve se cadastrar os centros de custo por padrão para essa Unidade nova criada */
+    
+    $sql = "INSERT INTO CentroCusto (CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, CnCusUsuarioAtualizador, CnCusUnidade)
+            VALUES (:iCodigo, :sNome, :sDetalhamento, :iStatus, :iUsuarioAtualizador, :iUnidade)";
+    $result = $conn->prepare($sql);
+
+    $result->execute(array(
+      ':iCodigo' => 01,
+      ':sNome' =>'Atendimento Ambulatorial',
+      ':sDetalhamento' =>'Centro de custo padrão do sistema',
+      ':iStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':iCodigo' => 02,
+      ':sNome' =>'Atendimento Eletivo',
+      ':sDetalhamento' =>'Centro de custo padrão do sistema',
+      ':iStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':iCodigo' => 03,
+      ':sNome' =>'Atendimento Internação',
+      ':sDetalhamento' =>'Centro de custo padrão do sistema',
+      ':iStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
 					
 		$conn->commit();			
 

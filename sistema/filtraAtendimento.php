@@ -35,13 +35,14 @@ try{
 		if($acesso == 'ATENDIMENTO'){
 			$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
 				AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
-				AgendObservacao,ClienNome,ClienCodigo,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-				SituaCor,ProfiNome,AtLocNome, SrVenNome
+				AgendObservacao,ClienNome,ClienCodigo,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave, ClienDtNascimento,
+				SituaCor,Profissional.ProfiNome as ProfissionalNome,AtLocNome, SrVenNome, ProfiCbo, Profissao.ProfiNome as ProfissaoNome
 				FROM Agendamento
 				JOIN AtendimentoModalidade ON AtModId = AgendModalidade
 				JOIN Situacao ON SituaId = AgendSituacao
 				JOIN Cliente ON ClienId = AgendCliente
-				JOIN Profissional ON ProfiId = AgendProfissional
+				JOIN Profissional ON Profissional.ProfiId = AgendProfissional
+				JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
 				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 				JOIN ServicoVenda ON SrVenId = AgendServico
 				WHERE AgendUnidade = $iUnidade";
@@ -49,14 +50,16 @@ try{
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			$sql = "SELECT AtendId,AtendNumRegistro,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtendClassificacao,
-				AtendObservacao,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,
-				ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,ProfiNome,SrVenNome
+				AtendObservacao,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto, ClienDtNascimento,
+				ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,Profissional.ProfiNome as ProfissionalNome,SrVenNome, 
+				Profissao.ProfiNome as ProfissaoNome, ProfiCbo
 				FROM AtendimentoXServico
 				JOIN Atendimento ON AtendId = AtXSeAtendimento
 				JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 				JOIN Situacao ON SituaId = AtendSituacao
 				JOIN Cliente ON ClienId = AtendCliente
-				JOIN Profissional ON ProfiId = AtXSeProfissional
+				JOIN Profissional ON Profissional.ProfiId = AtXSeProfissional
+				JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
 				JOIN ServicoVenda ON SrVenId = AtXSeServico
 				JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
 				WHERE AtendUnidade = $iUnidade";
@@ -94,12 +97,13 @@ try{
 				
 				array_push($dataAgendamento, [
 					'data' => [
-						mostraData($item['AgendData']), // Data
-						mostraHora($item['AgendHorario']), // Horario
+						mostraData($item['AgendData']) . " - " . mostraHora($item['AgendHorario']), // Data - Hora
 						$difference,  // Espera
 						$item['ClienCodigo'],  // Prontuário
 						$item['ClienNome'],  // Paciente
-						$item['ProfiNome'],  // Profissional
+						calculaIdadeSimples($item['ClienDtNascimento']), // Idade Paciente
+						$item['ProfissionalNome'],  // Profissional
+						$item['ProfiCbo'] . " - " . $item['ProfissaoNome'], // Cbo Profissional
 						$item['AtModNome'],  // Modalidade
 						$item['SrVenNome'],  // Procedimento
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
@@ -141,13 +145,14 @@ try{
 				
 				array_push($dataAtendimento, [
 					'data' => [
-						mostraData($item['AtXSeData']), // Data
-						mostraHora($item['AtXSeHorario']), // Horario
+						mostraData($item['AtXSeData']) . " - " . mostraHora($item['AtXSeHorario']), // Data - Hora
 						$difference,  // Espera
 						$item['AtendNumRegistro'],  // Nº Registro
 						$item['ClienCodigo'],  // Prontuário
 						$item['ClienNome'],  // Paciente
-						$item['ProfiNome'],  // Profissional
+						calculaIdadeSimples($item['ClienDtNascimento']), // Idade paciente
+						$item['ProfissionalNome'],  // Profissional
+						$item['ProfiCbo'] . " - " . $item['ProfissaoNome'], // Cbo Profissional
 						$item['AtModNome'],  // Modalidade
 						$item['SrVenNome'],  // Procedimento
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação

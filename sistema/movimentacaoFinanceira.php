@@ -426,6 +426,11 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
       document.formMovimentacaoFinanceira.action = "contasEstornar.php";
       document.formMovimentacaoFinanceira.submit();
     }
+
+    //Essa função preenche o pop-up Justificativa de estorno
+    function estornoJustificativa(justificativa) {
+        $('#txtJustificativa').val(justificativa);
+    }
   </script>
 
 </head>
@@ -667,25 +672,25 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                             try {
                                 $sql = "SELECT SituaId, SituaNome, SituaChave
                                         FROM Situacao
-                                        WHERE SituaStatus = 1
+                                        WHERE SituaStatus = 1 AND SituaChave IN ('PAGO', 'RECEBIDO', 'TRANSFERIDO')
                                         ORDER BY SituaNome ASC";
                                 $result = $conn->query($sql);
                                 $rowSituacao = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                 try {
                                     foreach ($rowSituacao as $item) {
-                                        if ($item['SituaChave'] == 'RECEBIDO' || $item['SituaChave'] === 'PAGO' || $item['SituaChave'] === 'TRANSFERIDO') {
-                                            if (isset($_SESSION['MovFinancStatus'])) {
-                                                if ($item['SituaId'] == $_SESSION['MovFinancStatus']) {
-                                                    print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
-                                                } else {
-                                                    print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
-                                                }
-                                            } else {
-                                                print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
-                                            }
-                                        }
+                                      if (isset($_SESSION['MovFinancStatus'])) {
+                                          if ($item['SituaId'] == $_SESSION['MovFinancStatus']) {
+                                              print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '" selected>' . $item['SituaNome'] . '</option>');
+                                          } else {
+                                              print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
+                                          }
+                                      } else {
+                                          print('<option value="' . $item['SituaId'] . '|' . $item['SituaChave'] . '">' . $item['SituaNome'] . '</option>');
+                                      }
                                     }
+                                    $seleciona = isset($_SESSION['ContRecStatus']) && $_SESSION['ContRecStatus'] == 0 ? 'selected' : '';
+                                    print('<option value="Estornado|ESTORNADO" '.$seleciona.'>Estornado</option>');
                                 } catch (Exception $e) {
                                     echo 'Exceção capturada: ',  $e->getMessage(), "\n";
                                 }
@@ -761,6 +766,30 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     <div class="modal-footer">
                         <button type="button" class="btn btn-basic" data-dismiss="modal">Cancelar</button>
                         <button onclick= estornaConta() type="button" class="btn bg-slate">Estornar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Modal justificativa de estorno-->
+        <div id="modal_mini-justificativa-estorno" class="modal fade" tabindex="-1">
+            <div class="modal-dialog modal-xs">
+                <div class="modal-content">
+                    <div class="custon-modal-title">
+                        <i class=""></i>
+                        <p class="h3">Justificativa do estorno</p>
+                        <i class=""></i>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <textarea rows="5" cols="3" id="txtJustificativa" name="txtJustificativa" class="form-control" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn bg-slate" data-dismiss="modal">Ok</button>
                     </div>
                 </div>
             </div>

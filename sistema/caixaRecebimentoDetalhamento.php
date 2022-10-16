@@ -215,9 +215,9 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
                                         $valorTotalServicos += $item['AtXSeValor'];
                                         $desconto += $item['AtXSeDesconto'];
-
-                                        $valorFinal += $valorTotalServicos - $desconto;
                                     }
+                                    
+                                    $valorFinal += $valorTotalServicos - $desconto;
                                     
                                     echo '
                                     <div class="row mb-3">
@@ -263,9 +263,9 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
                                         $valorTotalProdutos += $item['AtXPrValor'];
                                         $desconto += $item['AtXPrDesconto'];
-
-                                        $valorFinal += $valorTotalProdutos - $desconto;
                                     }
+
+                                    $valorFinal += $valorTotalProdutos - $desconto;
                                     
                                     echo '
                                     <div class="row mb-3">
