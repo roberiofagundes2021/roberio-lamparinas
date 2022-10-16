@@ -100,11 +100,11 @@ if(isset($_POST['inputNome'])){
           $empresaPermissao = $empresa=='Publica'?$rowPerPad['MenuSetorPublico']:$rowPerPad['MenuSetorPrivado'];
           $visualizar = $empresaPermissao?$rowPerPad['PaPerVisualizar']:0;
 
-          $sqlPerfilXPermissao .= " (".$itemPerfil['PerfiId'].", ".$rowPerPad['PaPerMenu'].", ".$unidadeIdNovo.", ".$rowPerPad['PaPerInserir'].",".
-          $visualizar.", ".$rowPerPad['PaPerAtualizar'].", ".$rowPerPad['PaPerExcluir'].", ".$rowPerPad['PaPerSuperAdmin']."),";
+          $sqlPerfilXPermissao .= " ('$itemPerfil[PerfiId]', '$rowPerPad[PaPerMenu]', '$unidadeIdNovo', '$rowPerPad[PaPerInserir]',
+          '$visualizar', '$rowPerPad[PaPerAtualizar]', '$rowPerPad[PaPerExcluir]', '$rowPerPad[PaPerSuperAdmin]'),";
     
-          $sqlPadraoPerfilXPermissao .= " (".$itemPerfil['PerfiId'].", ".$rowPerPad['PaPerMenu'].", ".$unidadeIdNovo.", ".$rowPerPad['PaPerInserir'].",".
-          $visualizar.", ".$rowPerPad['PaPerAtualizar'].", ".$rowPerPad['PaPerExcluir'].", ".$rowPerPad['PaPerSuperAdmin']."),";  
+          $sqlPadraoPerfilXPermissao .=  "('$itemPerfil[PerfiId]', '$rowPerPad[PaPerMenu]', '$unidadeIdNovo', '$rowPerPad[PaPerInserir]',
+          '$visualizar', '$rowPerPad[PaPerAtualizar]', '$rowPerPad[PaPerExcluir]', '$rowPerPad[PaPerSuperAdmin]'),";  
 
           $cont++;
 
