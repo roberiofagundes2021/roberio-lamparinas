@@ -80,15 +80,26 @@ include('global_assets/php/conexao.php');
                 FROM ContasAReceber
                 LEFT JOIN Cliente on ClienId = CnAReCliente
                 JOIN Situacao on SituaId = CnAReStatus
-                WHERE " . $string . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
+                WHERE " . $string . " CnAReAgrupamento is null and CnAReUnidade = " . $_SESSION['UnidadeId'] . "
             ";
         $result = $conn->query($sql);
         $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
-        count($rowData) >= 1 ? $cont = 1 : $cont = 0;
+        count($rowData) >= 1 ? $ExisteConsulta = 1 : $ExisteConsulta = 0;
+
+        $sql = "SELECT CnAgrDescricaoAgrupamento, SituaNome, SUM(CnAReValorRecebido) as VALORAGRUPAMENTO, CnAReAgrupamento, CnAgrDtPagamento
+                FROM ContasAReceber
+                JOIN ContasAgrupadas on CnAgrId = CnAReAgrupamento
+                JOIN Situacao on SituaId = CnAReStatus
+                WHERE " . $string . " CnAReUnidade = " . $_SESSION['UnidadeId'] . "
+                GROUP BY CnAReAgrupamento, SituaNome, CnAgrDtPagamento, CnAgrDescricaoAgrupamento";
+        $resultAgrupamento = $conn->query($sql);
+        $rowAgrupamento = $resultAgrupamento->fetchAll(PDO::FETCH_ASSOC);
+    
+        count($rowAgrupamento) >= 1 ? $ExisteAgrupamento = 1 : $ExisteAgrupamento = 0;
     } 
 
-    if ($cont == 1) {
+    if ($ExisteConsulta == 1) {
         $cont = 0;
         //print('<input type="hidden" id="elementosGrid" value="' . count($rowData) . '">');
 
@@ -122,8 +133,7 @@ include('global_assets/php/conexao.php');
                 $acaoConta = ($status == 'Recebido') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : 
                                                        '<a href="#" onclick="atualizaContasAReceber('.$_POST['permissionExclui'].','.$item["CnAReId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
             }else {
-                $acaoConta = ($status == 'Recebido') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>
-                                                        <a href="#" data-toggle="modal" data-target="#modal_consultaPagamentoAgrupado" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \''.$consultaAgrupamento.'\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Pagamento agrupado"><i class="icon-stack3"></i></a>' : 
+                $acaoConta = ($status == 'Recebido') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].','.$item["CnAReId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : 
                                                        '<a href="#" onclick="atualizaContasAReceber('.$_POST['permissionExclui'].','.$item["CnAReId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
             }
 
@@ -163,7 +173,58 @@ include('global_assets/php/conexao.php');
 
             array_push($arrayData,$array);
         }
+    }
 
+    if($ExisteAgrupamento == 1) {
+        foreach ($rowAgrupamento as $item) {
+            $status = $item['SituaNome'];
+            $data = mostraData($item['CnAgrDtPagamento']);
+    
+            $justificativaEstornamento = '';
+            $consultaAgrupamento = (isset($item['CnAReAgrupamento'])) ? 'consultaPagamento#'.$item['CnAReAgrupamento'] : '';
+    
+            $checkbox = '';
+            
+            $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$data.'">';
+    
+            $descricao = '<a href="#" data-toggle="modal" data-target="#modal_consultaPagamentoAgrupado" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].', 0, \''.$consultaAgrupamento.'\');" data-popup="tooltip" data-placement="bottom">' . $item["CnAgrDescricaoAgrupamento"] . '</a>';
+            
+            $favorecido = '';
+    
+            $numDoc = '';
+    
+            $valorTotal = mostraValor($item["VALORAGRUPAMENTO"]);
+    
+            $status = $status;
+    
+            $acoes = '
+                <div class="list-icons">
+                    <div class="list-icons list-icons-extended">
+                        <a href="#" data-toggle="modal" data-target="#modal_consultaPagamentoAgrupado" onclick="atualizaContasAReceber('.$_POST['permissionAtualiza'].', 0, \''.$consultaAgrupamento.'\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Pagamento agrupado"><i class="icon-stack3"></i></a>
+                    </div>
+                </div>';
+    
+            $array = [
+                'data'=>[
+                    isset($checkbox) ? $checkbox : null, 
+                    isset($vencimento) ? $vencimento : null,
+                    isset($descricao) ? $descricao : null, 
+                    isset($favorecido) ? $favorecido : null, 
+                    isset($numDoc) ? $numDoc : null, 
+                    isset($valorTotal) ? $valorTotal : null, 
+                    isset($status) ? $status : null, 
+                    isset($acoes) ? $acoes : null
+                ],
+                'identify'=>[
+                    
+                ]
+            ];
+    
+            array_push($arrayData,$array);
+        }
+    }
+
+    if ($ExisteConsulta == 1 || $ExisteAgrupamento == 1) {
         print(json_encode($arrayData));
     }
 //}

@@ -772,6 +772,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
             tipoConta = 'R'
             agrupamento = agrupamento.split("#")
             agrupamentoId = agrupamento[1]
+            let permissaoAtualiza = "<?php echo $atualizar; ?>"
 
             let HTML = ''
             $.ajax({
@@ -835,8 +836,8 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     ${x+1}
                                     <input type="hidden" id="idPA${x}"">
                                 </p>
-                                <div class="form-group col-4 p-2">
-                                    <input type="text" class="form-control" value="${consulta.CnAReDescricao}" readonly>
+                                <div class="form-group col-4 p-2 mt-2">
+                                    <a href="#" onclick="atualizaContasAReceber(${permissaoAtualiza},${consulta.CnAReId}, \'edita\')">${consulta.CnAReDescricao}</a>
                                 </div>
                                 <div class="form-group col-3 p-2">
                                     <input type="text" class="form-control" value="${consulta.CnAReNumDocumento}" readonly>

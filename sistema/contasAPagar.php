@@ -777,6 +777,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
             tipoConta = 'P'
             agrupamento = agrupamento.split("#")
             agrupamentoId = agrupamento[1]
+            let permissaoAtualiza = "<?php echo $atualizar; ?>"
 
             let HTML = ''
             $.ajax({
@@ -833,6 +834,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                         <div class="d-flex flex-column" style="overflow-Y: scroll; max-height: 200px">`;
                         for(let x = 0; x < response.length; x++) {
                             let consulta = response[x]
+                            let notaFiscal = consulta.CnAPaNotaFiscal != null ? consulta.CnAPaNotaFiscal : ''
 
                             HTML = HTML + `
                             <div class="d-flex flex-row justify-content-center">
@@ -840,11 +842,11 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     ${x+1}
                                     <input type="hidden" id="idPA${x}"">
                                 </p>
-                                <div class="form-group col-4 p-2">
-                                    <input type="text" class="form-control" value="${consulta.CnAPaDescricao}" readonly>
+                                <div class="form-group col-4 p-2 mt-2">
+                                    <a href="#" onclick="atualizaContasAPagar(${permissaoAtualiza},${consulta.CnAPaId}, \'edita\')">${consulta.CnAPaDescricao}</a>
                                 </div>
                                 <div class="form-group col-3 p-2">
-                                    <input type="text" class="form-control" value="${consulta.CnAPaNotaFiscal}" readonly>
+                                    <input type="text" class="form-control" value="${notaFiscal}" readonly>
                                 </div>
                                 <div class="form-group col-3 p-2 pr-4">
                                     <input type="text" class="form-control text-right" value="${float2moeda(consulta.CnAPaValorPago)}" readonly>

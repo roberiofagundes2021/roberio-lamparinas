@@ -181,7 +181,8 @@ $arquivosContasAReceber = array(
 	'contasAReceber.php', 'contasAReceberNovoLancamento.php',
 	'contasAReceberFiltra.php', 'contasAReceberExclui.php',
 	'contasAReceberRecebimentoAgrupado.php', 'contasAReceberParcelamento.php',
-	'resumoFinanceiroFiltra.php', 'contasEstornar.php', 'filtraContasAgrupadas.php'
+	'resumoFinanceiroFiltra.php', 'contasEstornar.php', 'filtraContasAgrupadas.php',
+	'filtraCentroCustoXContasRetorna.php', 'filtraCentroCusto.php'
 );
 
 if ((array_key_exists('ContRecPeriodoDe', $_SESSION)
