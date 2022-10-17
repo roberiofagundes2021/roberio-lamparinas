@@ -45,7 +45,7 @@ try{
 				JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
 				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 				JOIN ServicoVenda ON SrVenId = AgendServico
-				WHERE AgendUnidade = $iUnidade";
+				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADOVENDA','CONFIRMADO','CANCELADO','FILAESPERA')";
 			$result = $conn->query($sql);
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
