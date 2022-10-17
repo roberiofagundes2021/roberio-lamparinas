@@ -408,7 +408,7 @@ include('global_assets/php/conexao.php');
 				<!-- /content area -->
 
 				<!-- inf block -->
-				<form id="formEdita" method="POST" action="agendamentoNovo.php">
+				<form id="formEdita" method="POST" action="agendamentoEdita.php">
 					<input id="iAgendamento" name="iAgendamento" type="hidden" value="" />
 				</form>
 

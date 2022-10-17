@@ -111,7 +111,7 @@ try{
 					'identify' => [
 						'situacao' => $item['SituaChave'],
 						'iAgendamento' => $item['AgendId'],
-						'sObservacao' => $item['AgendObservacao']
+						'sJustificativa' => $item['AgendObservacao']
 					]
 				]);
 			}
@@ -160,7 +160,7 @@ try{
 					'identify' => [
 						'situacao' => $item['SituaChave'],
 						'iAtendimento' => $item['AtendId'],
-						'sObservacao' => $item['AtendObservacao']
+						'sJustificativa' => $item['AtendObservacao']
 					]
 				]);
 			}
@@ -255,7 +255,7 @@ try{
 					'identify' => [
 						'situacao' => $item['SituaChave'],
 						'iAtendimento' => $item['AtendId'],
-						'sObservacao' => $item['AtendObservacao']
+						'sJustificativa' => $item['AtendObservacao']
 					]]);
 			}
 			foreach($rowAtendido as $item){
@@ -299,7 +299,7 @@ try{
 					'identify' => [
 						'situacao' => $item['SituaChave'],
 						'iAtendimento' => $item['AtendId'],
-						'sObservacao' => $item['AtendObservacao'],
+						'sJustificativa' => $item['AtendObservacao'],
 						'AtClaChave' => $item['AtClaChave'],
 						'AtClaNome' => $item['AtClaNome']
 					]
@@ -404,7 +404,7 @@ try{
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sObservacao' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao']
 				]]);
 		}
 		foreach($rowAtendido as $item){
@@ -448,7 +448,7 @@ try{
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sObservacao' => $item['AtendObservacao'],
+					'sJustificativa' => $item['AtendObservacao'],
 					'AtClaChave' => $item['AtClaChave'],
 					'AtClaNome' => $item['AtClaNome']
 				]
@@ -552,7 +552,7 @@ try{
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sObservacao' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao']
 				]]);
 		}
 		foreach($rowAtendido as $item){
@@ -596,7 +596,7 @@ try{
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sObservacao' => $item['AtendObservacao'],
+					'sJustificativa' => $item['AtendObservacao'],
 					'AtClaChave' => $item['AtClaChave'],
 					'AtClaNome' => $item['AtClaNome']
 				]
@@ -700,7 +700,7 @@ try{
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sObservacao' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao']
 				]]);
 		}
 		foreach($rowAtendido as $item){
@@ -744,7 +744,7 @@ try{
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sObservacao' => $item['AtendObservacao'],
+					'sJustificativa' => $item['AtendObservacao'],
 					'AtClaChave' => $item['AtClaChave'],
 					'AtClaNome' => $item['AtClaNome']
 				]
@@ -763,7 +763,7 @@ try{
 	} elseif ($tipoRequest == 'SITUACOES'){
 		$sql = "SELECT SituaId,SituaNome,SituaChave
 		FROM Situacao
-		WHERE SituaChave in ('AGENDADOVENDA','ATENDIDOVENDA','EMESPERAVENDA','LIBERADOVENDA')";
+		WHERE SituaChave in ('AGENDADOVENDA','CONFIRMADO','CANCELADO','FILAESPERA')";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -795,9 +795,9 @@ try{
 	} elseif ($tipoRequest === 'MUDARSITUACAO'){
 		$iAtendimento = $_POST['iAtendimento'];
 		$situacao = $_POST['iSituacao'];
-		$sObservacao = $_POST['sObservacao'];
+		$sJustificativa = $_POST['sJustificativa'];
 	
-		$sql = "UPDATE Atendimento set AtendSituacao = '$situacao', AtendObservacao = '$sObservacao'
+		$sql = "UPDATE Atendimento set AtendSituacao = '$situacao', AtendJustificativa = '$sJustificativa'
 		WHERE AtendId = $iAtendimento";
 		$result = $conn->query($sql);
 

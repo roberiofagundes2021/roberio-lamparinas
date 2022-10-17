@@ -293,7 +293,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 			$('#modal-close-x').on('click', ()=>{
 				$('#iAtendimento').val('')
-				$('#observacaoModal').html('').show()
+				$('#justificativaModal').html('').show()
 				$('#page-modal-situacao').fadeOut(200);
 			})
 
@@ -380,19 +380,19 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						'tipoRequest': 'MUDARSITUACAO',
 						'iAtendimento': $('#iAtendimento').val(),
 						'iSituacao': $('#cmbSituacao').val(),
-						'sObservacao': $('#observacaoModal').val()
+						'sJustificativa': $('#justificativaModal').val()
 					},
 					success: function(response) {
 						alerta(response.titulo, response.menssagem, response.status);
 						$('#iAtendimento').val('')
-						$('#observacaoModal').val('')
+						$('#justificativaModal').val('')
 						$('#page-modal-situacao').fadeOut(200);
 						getAtendimentos();
 					},
 					error: function(response) {
 						alerta(response.titulo, response.menssagem, response.status);
 						$('#iAtendimento').val('')
-						$('#observacaoModal').val('')
+						$('#justificativaModal').val('')
 						$('#page-modal-situacao').fadeOut(200);
 						getAtendimentos();
 					}
@@ -441,11 +441,17 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 		}
 
 		function atualizaAtendimento(element){
-			let Id = $(element).data('tipo')=='ATENDIMENTO'?$(element).data('atendimento'):$(element).data('agendamento')
+			let Id
+			if($(element).data('tipo')=='ATENDIMENTO'){
+				Id = $(element).data('atendimento')
+				$('#dadosPost').attr('action','atendimentoEdita.php')
+			}else{
+				Id = $(element).data('agendamento')
+				$('#dadosPost').attr('action','agendamentoEdita.php')
+			}
 			$('#idAtendimentoAgendamento').val(Id)
 			$('#AtendimentoAgendamento').val($(element).data('tipo'))
 
-			$('#dadosPost').attr('action', 'atendimentoEdita.php')
 			$('#dadosPost').submit()
 		}
 
@@ -483,14 +489,15 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					// primeiro limpa os valores para adicionar novos evitando duplicação
 					$('#cmbSituacao').empty()
 					$('#iAtendimento').val('')
-					$('#observacaoModal').val('')
+					$('#justificativaModal').val('')
 
 					response.forEach(item => {
 						let opt = item.SituaChave === situacao? `<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#cmbSituacao').append(opt)
 					})
+					console.log(element)
 					$('#iAtendimento').val($(element).data('atendimento'))
-					$('#observacaoModal').val($(element).data('observacao'))
+					$('#justificativaModal').val($(element).data('observacao'))
 
 					$('#page-modal-situacao').fadeIn(200);
 				}
@@ -521,8 +528,8 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							rowNodeAgendamento = tableAgendamento.row.add(item.data).draw().node()
 							$(rowNodeAgendamento).attr('class', 'text-center')
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAgendamento}`)
-							$(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							$(rowNodeAgendamento).find('td:eq(9)').attr('data-observacao', `${item.identify.sObservacao}`)
+							$(rowNodeAgendamento).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
+							// $(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						})
 
 						$('#AtendimentoTable').DataTable().clear().draw()
@@ -533,9 +540,9 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						await response.dataAtendimento.forEach(item => {
 							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
 							$(rowNodeAtendimento).attr('class', 'text-center')
-							$(rowNodeAgendamento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+							$(rowNodeAtendimento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sJustificativa}`)
 							$(rowNodeAtendimento).find('td:eq(10)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sObservacao}`)
 						})
 					} else if (response.acesso == 'PROFISSIONAL'){
 						let tableE = $('#AtendimentoTableEspera').DataTable().clear().draw()
@@ -550,7 +557,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							rowNodeE = tableE.row.add(item.data).draw().node()
 							$(rowNodeE).attr('class', 'text-center')
 							$(rowNodeE).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeE).find('td:eq(9)').attr('data-observacao', `${item.identify.sObservacao}`)
+							$(rowNodeE).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
 						})
 						response.dataAtendido.forEach(item => {
 							rowNodeA = tableA.row.add(item.data).draw().node()
@@ -558,7 +565,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							$(rowNodeA).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeA).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 							$(rowNodeA).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeA).find('td:eq(9)').attr('data-observacao', `${item.identify.sObservacao}`)
+							$(rowNodeA).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
 						})
 	
 					}
@@ -811,12 +818,12 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 												<div class="col-lg-12 mt-4">
 													<!-- titulos -->
 													<div class="col-lg-12">
-														<label>Observação <span class="text-danger">*</span></label>
+														<label>Justificativa <span class="text-danger">*</span></label>
 													</div>
 
 													<!-- campos -->
 													<div class="col-lg-12">
-														<textarea id="observacaoModal" name="observacaoModal" class="form-control" placeholder="Observações"></textarea>
+														<textarea id="justificativaModal" name="justificativaModal" class="form-control" placeholder="Justificativa"></textarea>
 													</div>
 												</div>
 											</div>

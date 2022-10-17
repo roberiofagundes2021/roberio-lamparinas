@@ -12,21 +12,6 @@ $_SESSION['atendimento'] = [
 	'atendimentoServicos' => []
 ];
 
-// a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
-
-$iAtendimento = isset($_POST['iAtendimentoId']) ? $_POST['iAtendimentoId'] : false;
-$iUnidade = $_SESSION['UnidadeId'];
-
-if ($iAtendimento) {
-	$sql = "SELECT AtendId,AtendAgendamento,AtendNumRegistro,AtendDataRegistro,AtendCliente,AtendModalidade,
-	AtendResponsavel,AtendClassificacao,AtendObservacao,AtendSituacao,AtendUsuarioAtualizador,AtendUnidade,
-	SituaNome,SituaChave
-	FROM Atendimento
-	JOIN Situacao ON SituaId = AtendSituacao
-	WHERE AtendId = $iAtendimento and AtendUnidade = $iUnidade";
-	$result = $conn->query($sql);
-	$row = $result->fetch(PDO::FETCH_ASSOC);
-}
 ?>
 
 <!DOCTYPE html>
@@ -311,19 +296,6 @@ if ($iAtendimento) {
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
-
-	<?php
-	// essa parte do código transforma uma variáve php em Js para ser utilizado 
-	echo $iAtendimento ?
-		'<script>
-				var atendimento = ' . json_encode($row) . ';
-			</script>'
-		:
-		'<script>
-				var atendimento = null;
-			</script>';
-	?>
-
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#dadosPaciente').show()
@@ -340,9 +312,7 @@ if ($iAtendimento) {
 			$('.actions').append(`<a class='col-lg-2 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>`)
 			$('#cancelar').insertBefore('.actionContent')
 
-			let dataAtual = new Date().toLocaleString("pt-BR", {
-				timeZone: "America/Bahia"
-			})
+			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
 			dataAtual = dataAtual.split(' ')[0]
 			dataAtual = dataAtual.split('/')[2] + '-' + dataAtual.split('/')[1] + '-' + dataAtual.split('/')[0]
 			$('#dataRegistro').val(dataAtual)
@@ -777,7 +747,6 @@ if ($iAtendimento) {
 
 			$('#formServicoAtendimento').submit(function(e) {
 				e.preventDefault()
-				console.log()
 			})
 			$('#dados').submit(function(e) {
 				e.preventDefault()
@@ -799,34 +768,10 @@ if ($iAtendimento) {
 					$('#paciente').empty();
 					$('#paciente').append(`<option value=''>selecione</option>`)
 					let opt = ''
-
-					// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
-					// logo esses valores deveram vir preenchido com os dados desse atendimento
-
-					if (obj && obj.pacienteID) {
-						response.forEach(item => {
-							if (obj.pacienteID == item.id) {
-								opt = `<option selected value="${item.id}">${item.nome}</option>`
-								setPacienteAtribut(item.id)
-							} else {
-								opt = `<option value="${item.id}">${item.nome}</option>`
-							}
-							$('#paciente').append(opt)
-						})
-					} else if (atendimento) {
-						response.forEach(item => {
-							opt = atendimento.AtendCliente == item.id ?
-								`<option selected value="${item.id}">${item.nome}</option>` :
-								`<option value="${item.id}">${item.nome}</option>`
-							$('#paciente').append(opt)
-						})
-						setPacienteAtribut(atendimento.AtendCliente)
-					} else {
-						response.forEach(item => {
-							opt = opt = `<option value="${item.id}">${item.nome}</option>`
-							$('#paciente').append(opt)
-						})
-					}
+					response.forEach(item => {
+						opt = opt = `<option value="${item.id}">${item.nome}</option>`
+						$('#paciente').append(opt)
+					})
 				}
 			});
 			// vai preencher cmbModalidade
@@ -842,13 +787,7 @@ if ($iAtendimento) {
 					$('#modalidade').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
 						let opt = ''
-						// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
-						// logo esses valores deveram vir preenchido com os dados desse atendimento
-						if (atendimento) {
-							opt = atendimento.AtendModalidade == item.id ? `<option selected value="${item.id}">${item.nome}</option>` : `<option value="${item.id}">${item.nome}</option>`
-						} else {
-							opt = `<option value="${item.id}">${item.nome}</option>`
-						}
+						opt = `<option value="${item.id}">${item.nome}</option>`
 						$('#modalidade').append(opt)
 					})
 				}
@@ -897,31 +836,10 @@ if ($iAtendimento) {
 				},
 				success: function(response) {
 					let opt = ''
-					if (obj && obj.responsavelID) {
-						$('#parentescoCadatrado').html("<option value=''>selecione</option>")
-						response.data.forEach(function(item) {
-							if (obj.responsavelID == item.id) {
-								opt = '<option selected value="' + item.id + '">' + item.nome + '</option>'
-								setResponsavelAtribut(item.id)
-							} else {
-								opt = '<option value="' + item.id + '">' + item.nome + '</option>'
-							}
-							$('#parentescoCadatrado').append(opt);
-						});
-					} else if (atendimento) {
-						response.data.forEach(function(item) {
-							opt = atendimento.AtendResponsavel == item.id ?
-								`<option selected value="${item.id}">${item.nome}</option>` :
-								`<option value="${item.id}">${item.nome}</option>`
-							$('#parentescoCadatrado').append(opt)
-						})
-						setResponsavelAtribut(atendimento.AtendResponsavel)
-					} else {
-						$('#parentescoCadatrado').html("<option selected value=''>selecione</option>")
-						response.data.forEach(function(item, index) {
-							$('#parentescoCadatrado').append('<option value="' + item.id + '">' + item.nome + '</option>');
-						});
-					}
+					$('#parentescoCadatrado').html("<option selected value=''>selecione</option>")
+					response.data.forEach(function(item, index) {
+						$('#parentescoCadatrado').append('<option value="' + item.id + '">' + item.nome + '</option>');
+					});
 				},
 				error: function(response) {}
 			});
@@ -939,11 +857,7 @@ if ($iAtendimento) {
 
 					response.forEach(item => {
 						let opt = ''
-						if (atendimento) {
-							opt = atendimento.AtendClassificacao == item.id ? `<option selected value="${item.id}">${item.nome}</option>` : `<option value="${item.id}">${item.nome}</option>`
-						} else {
-							opt = `<option value="${item.id}">${item.nome}</option>`
-						}
+						opt = `<option value="${item.id}">${item.nome}</option>`
 						$('#classificacao').append(opt)
 					})
 				}
