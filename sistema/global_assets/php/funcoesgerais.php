@@ -429,7 +429,7 @@ function calculaIdadeSimples($datanascimento){
 		return $interval->y > 1 ? $interval->y . " anos" : $interval->y . " ano";		
 	} else if ($interval->y <=0 && $interval->m > 0) {		
 		return $interval->m > 1 ? $interval->m . " meses" : $interval->m . " mês";
-	} else if($interval-y <= 0 && $interval->m <=0 && $interval->d > 0){
+	} else if($interval->y <= 0 && $interval->m <=0 && $interval->d > 0){
 		return $interval->d > 1 ? $interval->d . " dias" : $interval->y . " dia";
 	} else {
 		return "Fora dos Padrões Normais";
