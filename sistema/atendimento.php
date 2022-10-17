@@ -526,7 +526,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 	
 						await response.dataAgendamento.forEach(item => {
 							rowNodeAgendamento = tableAgendamento.row.add(item.data).draw().node()
-							$(rowNodeAgendamento).attr('class', 'text-center')
+							$(rowNodeAgendamento).attr('class', 'text-left')
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAgendamento}`)
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
 							// $(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
@@ -539,8 +539,9 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 						await response.dataAtendimento.forEach(item => {
 							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
-							$(rowNodeAtendimento).attr('class', 'text-center')
-							$(rowNodeAtendimento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+
+							$(rowNodeAtendimento).attr('class', 'text-left')
+							$(rowNodeAgendamento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sJustificativa}`)
 							$(rowNodeAtendimento).find('td:eq(10)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						})
@@ -555,13 +556,13 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 	
 						response.dataEspera.forEach(item => {
 							rowNodeE = tableE.row.add(item.data).draw().node()
-							$(rowNodeE).attr('class', 'text-center')
+							$(rowNodeE).attr('class', 'text-left')
 							$(rowNodeE).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeE).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
 						})
 						response.dataAtendido.forEach(item => {
 							rowNodeA = tableA.row.add(item.data).draw().node()
-							$(rowNodeA).attr('class', 'text-center')
+							$(rowNodeA).attr('class', 'text-left')
 							$(rowNodeA).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeA).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 							$(rowNodeA).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
@@ -648,7 +649,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 								<table class="table" id="AgendamentoTable">
 									<thead>
-										<tr class="bg-slate text-center">
+										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>
 											<th>Espera</th>
 											<th>Prontuário</th>			
@@ -680,7 +681,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 								<table class="table" id="AtendimentoTable">
 									<thead>
-										<tr class="bg-slate text-center">
+										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>
 											<th>Espera</th>
 											<th>Nº Registro</th>
@@ -738,7 +739,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 								<table class="table" id="AtendimentoTableEspera">
 									<thead>
-										<tr class="bg-slate text-center">
+										<tr class="bg-slate text-left">
 											<th>Data</th>
 											<th>Horario</th>
 											<th>Espera</th>
@@ -770,7 +771,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 								<table class="table" id="AtendimentoTableAtendido">
 									<thead>
-										<tr class="bg-slate text-center">
+										<tr class="bg-slate text-left">
 											<th>Data</th>
 											<th>Horario</th>
 											<th>Espera</th>

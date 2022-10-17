@@ -208,7 +208,7 @@ include('global_assets/php/conexao.php');
 
 					response.forEach(item => {
 						rowNode = table.row.add(item.data).draw().node()
-						$(rowNode).attr('class', 'text-center')
+						$(rowNode).attr('class', 'text-left')
 						$(rowNode).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						$(rowNode).find('td:eq(7)').attr('data-agendamento', `${item.identify.iAgendamento}`)
 						$(rowNode).find('td:eq(7)').attr('data-observacao', `${item.identify.sObservacao}`)
@@ -339,7 +339,7 @@ include('global_assets/php/conexao.php');
 
 							<table class="table" id="AgendamentoTable">
 								<thead>
-									<tr class="bg-slate text-center">
+									<tr class="bg-slate text-left">
 										<th>Data / Hora</th>
 										<th>Paciente</th>
 										<th>Idade</th>
