@@ -532,7 +532,7 @@ $dataHoje = date("Y-m-d");
 					$('#servico').empty();
 					$('#servico').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.id} - ${item.nome}</option>`
+						let opt = `<option value="${item.id}">${item.codigo} - ${item.nome}</option>`
 						$('#servico').append(opt)
 					})
 				}
@@ -569,7 +569,7 @@ $dataHoje = date("Y-m-d");
 					$('#servico').empty();
 					$('#servico').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.id} - ${item.nome}</option>`
+						let opt = `<option value="${item.id}">${item.codigo} - ${item.nome}</option>`
 						$('#servico').append(opt)
 					})
 				}
