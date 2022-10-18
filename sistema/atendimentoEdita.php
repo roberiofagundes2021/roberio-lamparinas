@@ -325,12 +325,12 @@ if ($tipo == 'ATENDIMENTO') {
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#dadosPaciente').show()
+			$('#informacoes').show()
+			$('#novoPaciente').show()
+
 			$('#dadosResponsavel').hide()
 			$('#dadosAtendimento').hide()
-			$('#informacoes').hide()
-
 			$('#servicoTable').hide()
-			$('#novoPaciente').hide()
 			$('#novoResponsavel').hide()
 
 			$('.actions').addClass('col-lg-12 row')
@@ -440,7 +440,7 @@ if ($tipo == 'ATENDIMENTO') {
 						$(element).attr('class', 'disabled')
 					}
 				})
-				setPacienteAtribut(iPaciente)
+				setPacienteAtribut()
 			});
 
 			$('#servico').on('change', function(e) {
@@ -467,7 +467,7 @@ if ($tipo == 'ATENDIMENTO') {
 
 			$('#parentescoCadatrado').on('change', function() {
 				let iResponsavel = $(this).val();
-				setResponsavelAtribut(iResponsavel)
+				setResponsavelAtribut()
 				// if(iResponsavel){
 				// 	$.ajax({
 				// 		type: 'POST',
@@ -801,12 +801,13 @@ if ($tipo == 'ATENDIMENTO') {
 					// logo esses valores deveram vir preenchido com os dados desse atendimento
 
 					response.forEach(item => {
-						opt = atendimento.AgAtCliente == item.id ?
+						let id = obj?obj.pacienteID:atendimento.AgAtCliente
+						opt = id == item.id ?
 							`<option selected value="${item.id}">${item.nome}</option>` :
 							`<option value="${item.id}">${item.nome}</option>`
 						$('#paciente').append(opt)
 					})
-					setPacienteAtribut(atendimento.AgAtCliente)
+					setPacienteAtribut()
 				}
 			});
 			// vai preencher cmbModalidade
@@ -874,12 +875,13 @@ if ($tipo == 'ATENDIMENTO') {
 				success: function(response) {
 					let opt = ''
 					response.data.forEach(function(item) {
-						opt = atendimento.AgAtResponsavel == item.id ?
-							`<option selected value="${item.id}">${item.nome}</option>` :
-							`<option value="${item.id}">${item.nome}</option>`
+						let id = obj?obj.responsavelID:atendimento.AgAtResponsavel
+						opt = id == item.id ?
+								`<option selected value="${item.id}">${item.nome}</option>` :
+								`<option value="${item.id}">${item.nome}</option>`
 						$('#parentescoCadatrado').append(opt)
 					})
-					setResponsavelAtribut(atendimento.AgAtResponsavel)
+					setResponsavelAtribut()
 				},
 				error: function(response) {}
 			});
@@ -907,7 +909,8 @@ if ($tipo == 'ATENDIMENTO') {
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o paciente
-		function setPacienteAtribut(iPaciente) {
+		function setPacienteAtribut() {
+			iPaciente = $('#paciente').val()
 			if (iPaciente) {
 				$.ajax({
 					type: 'POST',
@@ -925,8 +928,6 @@ if ($tipo == 'ATENDIMENTO') {
 							$('#cns').val(response.cns)
 							$('#rg').val(response.rg)
 							$('#emissor').val(response.emissor)
-							$('#uf').val(response.uf)
-							$('#sexo').val(response.sexo)
 							$('#nascimento').val(response.nascimento)
 							$('#nomePai').val(response.nomePai)
 							$('#nomeMae').val(response.nomeMae)
@@ -937,14 +938,31 @@ if ($tipo == 'ATENDIMENTO') {
 							$('#complemento').val(response.complemento)
 							$('#bairro').val(response.bairro)
 							$('#cidade').val(response.cidade)
-							$('#estado').val(response.estado)
 							$('#contato').val(response.contato)
 							$('#telefone').val(response.telefone)
 							$('#celular').val(response.celular)
 							$('#email').val(response.email)
 							$('#observacao').val(response.observacao)
-							$('#novoPaciente').show()
-							$('#informacoes').show()
+
+							$('#uf').val(response.uf)
+							$('#estado').val(response.estado)
+							$('#sexo').val(response.sexo)
+
+							$('#uf').children("option").each(function(index, item){
+								if($(item).val() == response.uf){
+									$(item).change()
+								}
+							})
+							$('#estado').children("option").each(function(index, item){
+								if($(item).val() == response.estado){
+									$(item).change()
+								}
+							})
+							$('#sexo').children("option").each(function(index, item){
+								if($(item).val() == response.sexo){
+									$(item).change()
+								}
+							})
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 							$('#novoPaciente').hide()
@@ -993,7 +1011,8 @@ if ($tipo == 'ATENDIMENTO') {
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o responsável
-		function setResponsavelAtribut(iResponsavel) {
+		function setResponsavelAtribut() {
+			iResponsavel = $('#parentescoCadatrado').val()
 			if (iResponsavel) {
 				$.ajax({
 					type: 'POST',
@@ -1020,8 +1039,11 @@ if ($tipo == 'ATENDIMENTO') {
 							$('#emailResp').val(response.data.emailResp)
 							$('#observacaoResp').val(response.data.observacaoResp)
 
-							$('#informacoes').show()
-							$('#novoResponsavel').show()
+							$('#estadoResp').children("option").each(function(index, item){
+								if($(item).val() == response.data.estadoResp){
+									$(item).change()
+								}
+							})
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 							$('#novoResponsavel').hide()
@@ -1599,9 +1621,36 @@ if ($tipo == 'ATENDIMENTO') {
 											<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor" required>
 										</div>
 										<div class="col-lg-2">
-											<select id="uf" name="uf" class="select-search" required>
-												<option value="" selected>selecionar</option>
-												<option value='BA'>BA</option>
+											<select id="uf" name="uf" class="form-control form-control-select2" placeholder="UF" required>
+												<option value="">Selecione</option>
+												<option value="AC">AC</option>
+												<option value="AL">AL</option>
+												<option value="AP">AP</option>
+												<option value="AM">AM</option>
+												<option value="BA">BA</option>
+												<option value="CE">CE</option>
+												<option value="DF">DF</option>
+												<option value="ES">ES</option>
+												<option value="GO">GO</option>
+												<option value="MA">MA</option>
+												<option value="MT">MT</option>
+												<option value="MS">MS</option>
+												<option value="MG">MG</option>
+												<option value="PA">PA</option>
+												<option value="PB">PB</option>
+												<option value="PR">PR</option>
+												<option value="PE">PE</option>
+												<option value="PI">PI</option>
+												<option value="RJ">RJ</option>
+												<option value="RN">RN</option>
+												<option value="RS">RS</option>
+												<option value="RO">RO</option>
+												<option value="RR">RR</option>
+												<option value="SC">SC</option>
+												<option value="SP">SP</option>
+												<option value="SE">SE</option>
+												<option value="TO">TO</option>
+												<option value="ES">ES</option>	
 											</select>
 										</div>
 										<div class="col-lg-2">
@@ -1642,10 +1691,7 @@ if ($tipo == 'ATENDIMENTO') {
 
 										<!-- campos -->
 										<div class="col-lg-12">
-											<select id="profissao" name="profissao" class="form-control form-control-select2" required>
-												<option selected value="">selecionar</option>
-												<option value="1">Teste</option>
-											</select>
+											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão" required>
 										</div>
 									</div>
 
@@ -1703,7 +1749,37 @@ if ($tipo == 'ATENDIMENTO') {
 											<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade" required>
 										</div>
 										<div class="col-lg-4">
-											<input id="estado" name="estado" type="text" class="form-control" placeholder="Estado" required>
+											<select id="estado" name="estado" class="form-control form-control-select2" placeholder="Estado" required>
+												<option value="#">Selecione um estado</option>
+												<option value="AC">Acre</option>
+												<option value="AL">Alagoas</option>
+												<option value="AP">Amapá</option>
+												<option value="AM">Amazonas</option>
+												<option value="BA">Bahia</option>
+												<option value="CE">Ceará</option>
+												<option value="DF">Distrito Federal</option>
+												<option value="ES">Espírito Santo</option>
+												<option value="GO">Goiás</option>
+												<option value="MA">Maranhão</option>
+												<option value="MT">Mato Grosso</option>
+												<option value="MS">Mato Grosso do Sul</option>
+												<option value="MG">Minas Gerais</option>
+												<option value="PA">Pará</option>
+												<option value="PB">Paraíba</option>
+												<option value="PR">Paraná</option>
+												<option value="PE">Pernambuco</option>
+												<option value="PI">Piauí</option>
+												<option value="RJ">Rio de Janeiro</option>
+												<option value="RN">Rio Grande do Norte</option>
+												<option value="RS">Rio Grande do Sul</option>
+												<option value="RO">Rondônia</option>
+												<option value="RR">Roraima</option>
+												<option value="SC">Santa Catarina</option>
+												<option value="SP">São Paulo</option>
+												<option value="SE">Sergipe</option>
+												<option value="TO">Tocantins</option>
+												<option value="ES">Estrangeiro</option>	
+											</select>
 										</div>
 									</div>
 
@@ -1762,13 +1838,13 @@ if ($tipo == 'ATENDIMENTO') {
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
-											<label>Nome</label>
+											<label>Nome <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Parentesco</label>
+											<label>Parentesco <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Nascimento</label>
+											<label>Nascimento <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
@@ -1790,13 +1866,13 @@ if ($tipo == 'ATENDIMENTO') {
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
-											<label>CEP</label>
+											<label>CEP <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Endereço</label>
+											<label>Endereço <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-2">
-											<label>Nº</label>
+											<label>Nº <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-3">
 											<label>Complemento</label>
@@ -1820,13 +1896,13 @@ if ($tipo == 'ATENDIMENTO') {
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
-											<label>Bairro</label>
+											<label>Bairro <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Cidade</label>
+											<label>Cidade <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Estado</label>
+											<label>Estado <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
@@ -1837,7 +1913,37 @@ if ($tipo == 'ATENDIMENTO') {
 											<input id="cidadeResp" name="cidadeResp" type="text" class="form-control" placeholder="Cidade">
 										</div>
 										<div class="col-lg-4">
-											<input id="estadoResp" name="estadoResp" type="text" class="form-control" placeholder="Estado">
+											<select id="estadoResp" name="estadoResp" class="form-control form-control-select2" placeholder="Estado" required>
+												<option value="#">Selecione um estado</option>
+												<option value="AC">Acre</option>
+												<option value="AL">Alagoas</option>
+												<option value="AP">Amapá</option>
+												<option value="AM">Amazonas</option>
+												<option value="BA">Bahia</option>
+												<option value="CE">Ceará</option>
+												<option value="DF">Distrito Federal</option>
+												<option value="ES">Espírito Santo</option>
+												<option value="GO">Goiás</option>
+												<option value="MA">Maranhão</option>
+												<option value="MT">Mato Grosso</option>
+												<option value="MS">Mato Grosso do Sul</option>
+												<option value="MG">Minas Gerais</option>
+												<option value="PA">Pará</option>
+												<option value="PB">Paraíba</option>
+												<option value="PR">Paraná</option>
+												<option value="PE">Pernambuco</option>
+												<option value="PI">Piauí</option>
+												<option value="RJ">Rio de Janeiro</option>
+												<option value="RN">Rio Grande do Norte</option>
+												<option value="RS">Rio Grande do Sul</option>
+												<option value="RO">Rondônia</option>
+												<option value="RR">Roraima</option>
+												<option value="SC">Santa Catarina</option>
+												<option value="SP">São Paulo</option>
+												<option value="SE">Sergipe</option>
+												<option value="TO">Tocantins</option>
+												<option value="ES">Estrangeiro</option>
+											</select>
 										</div>
 									</div>
 
@@ -1854,7 +1960,7 @@ if ($tipo == 'ATENDIMENTO') {
 											<label>Celular</label>
 										</div>
 										<div class="col-lg-4">
-											<label>E-mail</label>
+											<label>E-mail <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
@@ -2007,10 +2113,7 @@ if ($tipo == 'ATENDIMENTO') {
 
 										<!-- campos -->
 										<div class="col-lg-12">
-											<select id="profissaoNew" name="profissaoNew" class="form-control form-control-select2" required>
-												<option selected value="">selecionar</option>
-												<option value="1">Teste</option>
-											</select>
+											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão" required>
 										</div>
 									</div>
 
@@ -2068,7 +2171,37 @@ if ($tipo == 'ATENDIMENTO') {
 											<input id="cidadeNew" name="cidadeNew" type="text" class="form-control" placeholder="Cidade" required>
 										</div>
 										<div class="col-lg-4">
-											<input id="estadoNew" name="estadoNew" type="text" class="form-control" placeholder="Estado" required>
+											<select id="estadoNew" name="estadoNew" class="form-control form-control-select2" placeholder="Estado" required>
+												<option value="#">Selecione um estado</option>
+												<option value="AC">Acre</option>
+												<option value="AL">Alagoas</option>
+												<option value="AP">Amapá</option>
+												<option value="AM">Amazonas</option>
+												<option value="BA">Bahia</option>
+												<option value="CE">Ceará</option>
+												<option value="DF">Distrito Federal</option>
+												<option value="ES">Espírito Santo</option>
+												<option value="GO">Goiás</option>
+												<option value="MA">Maranhão</option>
+												<option value="MT">Mato Grosso</option>
+												<option value="MS">Mato Grosso do Sul</option>
+												<option value="MG">Minas Gerais</option>
+												<option value="PA">Pará</option>
+												<option value="PB">Paraíba</option>
+												<option value="PR">Paraná</option>
+												<option value="PE">Pernambuco</option>
+												<option value="PI">Piauí</option>
+												<option value="RJ">Rio de Janeiro</option>
+												<option value="RN">Rio Grande do Norte</option>
+												<option value="RS">Rio Grande do Sul</option>
+												<option value="RO">Rondônia</option>
+												<option value="RR">Roraima</option>
+												<option value="SC">Santa Catarina</option>
+												<option value="SP">São Paulo</option>
+												<option value="SE">Sergipe</option>
+												<option value="TO">Tocantins</option>
+												<option value="ES">Estrangeiro</option>	
+											</select>
 										</div>
 									</div>
 
@@ -2145,13 +2278,13 @@ if ($tipo == 'ATENDIMENTO') {
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
-											<label>Nome</label>
+											<label>Nome <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Parentesco</label>
+											<label>Parentesco <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Nascimento</label>
+											<label>Nascimento <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
@@ -2173,13 +2306,13 @@ if ($tipo == 'ATENDIMENTO') {
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
-											<label>CEP</label>
+											<label>CEP <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Endereço</label>
+											<label>Endereço <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-2">
-											<label>Nº</label>
+											<label>Nº <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-3">
 											<label>Complemento</label>
@@ -2203,13 +2336,13 @@ if ($tipo == 'ATENDIMENTO') {
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
-											<label>Bairro</label>
+											<label>Bairro <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Cidade</label>
+											<label>Cidade <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Estado</label>
+											<label>Estado <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
@@ -2220,7 +2353,37 @@ if ($tipo == 'ATENDIMENTO') {
 											<input id="cidadeRespNew" name="cidadeResp" type="text" class="form-control" placeholder="Cidade">
 										</div>
 										<div class="col-lg-4">
-											<input id="estadoRespNew" name="estadoResp" type="text" class="form-control" placeholder="Estado">
+											<select id="estadoRespNew" name="estadoRespNew" class="form-control form-control-select2" placeholder="Estado" required>
+												<option value="#">Selecione um estado</option>
+												<option value="AC">Acre</option>
+												<option value="AL">Alagoas</option>
+												<option value="AP">Amapá</option>
+												<option value="AM">Amazonas</option>
+												<option value="BA">Bahia</option>
+												<option value="CE">Ceará</option>
+												<option value="DF">Distrito Federal</option>
+												<option value="ES">Espírito Santo</option>
+												<option value="GO">Goiás</option>
+												<option value="MA">Maranhão</option>
+												<option value="MT">Mato Grosso</option>
+												<option value="MS">Mato Grosso do Sul</option>
+												<option value="MG">Minas Gerais</option>
+												<option value="PA">Pará</option>
+												<option value="PB">Paraíba</option>
+												<option value="PR">Paraná</option>
+												<option value="PE">Pernambuco</option>
+												<option value="PI">Piauí</option>
+												<option value="RJ">Rio de Janeiro</option>
+												<option value="RN">Rio Grande do Norte</option>
+												<option value="RS">Rio Grande do Sul</option>
+												<option value="RO">Rondônia</option>
+												<option value="RR">Roraima</option>
+												<option value="SC">Santa Catarina</option>
+												<option value="SP">São Paulo</option>
+												<option value="SE">Sergipe</option>
+												<option value="TO">Tocantins</option>
+												<option value="ES">Estrangeiro</option>	
+											</select>
 										</div>
 									</div>
 
@@ -2231,13 +2394,13 @@ if ($tipo == 'ATENDIMENTO') {
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
-											<label>Telefone</label>
+											<label>Telefone <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Celular</label>
+											<label>Celular <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>E-mail</label>
+											<label>E-mail <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
