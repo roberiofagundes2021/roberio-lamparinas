@@ -1267,7 +1267,7 @@ try{
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'SERVICOS'){
-		$sql = "SELECT SrVenId,SrVenNome
+		$sql = "SELECT SrVenId,SrVenNome,SrVenCodigo
 		FROM ServicoVenda WHERE SrVenUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
@@ -1276,6 +1276,7 @@ try{
 			array_push($array,[
 				'id' => $item['SrVenId'],
 				'nome' => $item['SrVenNome'],
+				'codigo' => $item['SrVenCodigo'],
 			]);
 		}
 
