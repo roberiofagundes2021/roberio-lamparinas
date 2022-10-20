@@ -153,6 +153,10 @@ include('global_assets/php/conexao.php');
 				$('#observacaoModal').html('').show()
 				$('#page-modal-situacao').fadeOut(200);
 			})
+			$('#modal-auditoria-close-x').on('click', ()=>{
+				$('#dataAuditoria').html('')
+				$('#page-modal-auditoria').fadeOut(200);
+			})
 
 			$('#cmbSituacao').on('change', ()=>{
 				let cmbSituacao = $('#cmbSituacao').val();
@@ -188,6 +192,36 @@ include('global_assets/php/conexao.php');
 			})
 			
 		});
+
+		function auditoria(element){
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAgendamento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'AUDITORIA',
+					'tipo':$(element).data('tipo'),
+					'id':$(element).data('id'),
+				},
+				success: async function(response) {
+					$('#dataAuditoria').empty()
+					if(response.status == 'success'){
+						let data = new Date(response.auditoria.dataRegistro).toLocaleString("pt-BR", {timeZone: "America/Bahia"})
+						let dataRegistro = new Date(response.auditoria.dtHrRegistro).toLocaleString("pt-BR", {timeZone: "America/Bahia"})
+						let tds = `
+						<tr class="text-center">
+							<td>${response.auditoria.UsuarNome}</td>
+							<td>${data.split(' ')[0]} ${response.auditoria.horaRegistro.split('.')[0]}</td>
+							<td>${response.auditoria.ClienNome}</td>
+							<td>${dataRegistro.split(' ')[0]}</td>
+						</tr>
+						`;
+						$('#dataAuditoria').html(tds)
+						$('#page-modal-auditoria').fadeIn();
+					}
+				}
+			});
+		}
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function getAgendamentos(){
@@ -401,6 +435,36 @@ include('global_assets/php/conexao.php');
 									</div>
 								</div>
 								<div class="text-right m-2"><button id="mudarSituacao" class="btn btn-principal" role="button">Confirmar</button></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Modal Auditoria-->
+                <div id="page-modal-auditoria" class="custon-modal">
+                    <div class="custon-modal-container" style="max-width: 800px;">
+                        <div class="card custon-modal-content">
+                            <div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+                                <p class="h5">Auditoria</p>
+                                <i id="modal-auditoria-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+                            </div>
+							<div class="px-0">
+								<div class="d-flex flex-row">
+									<div class="col-lg-12">
+										<table class="table mb-4" id="auditoriaTable">
+											<thead>
+												<tr class="bg-slate text-center">
+													<th style="width: 35%;">Atendente</th>
+													<th style="width: 30%;">Data/Hora</th>
+													<th style="width: 35%;">Paciente</th>
+													<th style="width: 20%">Atualização</th>
+												</tr>
+											</thead>
+											<tbody id="dataAuditoria">
+
+											</tbody>
+										</table>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>

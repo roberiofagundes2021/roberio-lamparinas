@@ -38,9 +38,11 @@ try{
 		foreach($row as $item){
 			$att = "<a style='color: black' href='#' onclick='atualizaAgendamento(\"EDITA\", $item[AgendId])' class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 			$exc = "<a style='color: black' href='#' onclick='atualizaAgendamento(\"EXCLUI\", $item[AgendId])' class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
+			$aud = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AgendId]'><i class='icon-search4' title='Auditoria'></i></a>";
 			$acoes = "<div class='list-icons'>
 						${att}
 						${exc}
+						${aud}
 					</div>";
 		
 			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
@@ -574,6 +576,25 @@ try{
 		echo json_encode([
 			'arrayHora' => $arrayHora,
 			'intervalo'=> $intervalo,
+			'status' => 'success',
+			'titulo' => 'Data',
+			'menssagem' => 'Hora do profissional selecionado!!!',
+		]);
+	} elseif ($tipoRequest == 'AUDITORIA'){
+		$tipo = $_POST['tipo'];
+		$id = $_POST['id'];
+
+		$sql = "SELECT UsuarNome,ProfiNome, ClienNome, AgendData as dataRegistro, AgendHorario as horaRegistro, AgendDataRegistro as dtHrRegistro
+			FROM Agendamento
+			JOIN Cliente ON ClienId = AgendCliente
+			JOIN Profissional ON ProfiId = AgendProfissional
+			JOIN Usuario ON UsuarId = AgendUsuarioAtualizador
+			WHERE AgendUnidade = $iUnidade and AgendId = $id";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode([
+			'auditoria' => $row,
 			'status' => 'success',
 			'titulo' => 'Data',
 			'menssagem' => 'Hora do profissional selecionado!!!',

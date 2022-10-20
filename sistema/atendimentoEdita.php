@@ -425,7 +425,6 @@ if ($tipo == 'ATENDIMENTO') {
 			})
 
 			$('#paciente').on('change', function() {
-				let iPaciente = $(this).val()
 				$('.actions a').each(function(index, element) {
 					if ($(element).attr('href') == '#' || $(element).attr('href') == '#next') {
 						let href = $('#paciente').val() ? '#next' : '#'
@@ -466,32 +465,7 @@ if ($tipo == 'ATENDIMENTO') {
 			})
 
 			$('#parentescoCadatrado').on('change', function() {
-				let iResponsavel = $(this).val();
 				setResponsavelAtribut()
-				// if(iResponsavel){
-				// 	$.ajax({
-				// 		type: 'POST',
-				// 		url: 'filtraAtendimento.php',
-				// 		dataType: 'json',
-				// 		data:{
-				// 			'tipoRequest': 'RESPONSAVEL',
-				// 			'iResponsavel': iResponsavel
-				// 		},
-				// 		success: function(response) {
-				// 			if(response.status == 'success'){
-				// 				setResponsavelAtribut(response.data.id)
-				// 				$('#novoResponsavel').show()
-				// 				$('#informacoes').show()
-				// 			}else{
-				// 				alerta(response.titulo, response.menssagem, response.status)
-				// 				$('#novoResponsavel').hide()
-				// 				$('#informacoes').hide()
-				// 			}
-				// 		},
-				// 		error: function(response) {
-				// 		}
-				// 	});
-				// }
 			});
 
 			$('#medicos').on('change', function() {

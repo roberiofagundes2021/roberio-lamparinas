@@ -35,7 +35,7 @@ try{
 		if($acesso == 'ATENDIMENTO'){
 			$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
 				AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
-				AgendObservacao,ClienNome,ClienCodigo,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave, ClienDtNascimento,
+				AgendObservacao,AgendJustificativa,ClienNome,ClienCodigo,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave, ClienDtNascimento,
 				SituaCor,Profissional.ProfiNome as ProfissionalNome,AtLocNome, SrVenNome, ProfiCbo, Profissao.ProfiNome as ProfissaoNome
 				FROM Agendamento
 				JOIN AtendimentoModalidade ON AtModId = AgendModalidade
@@ -50,7 +50,7 @@ try{
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			$sql = "SELECT AtendId,AtendNumRegistro,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtendClassificacao,
-				AtendObservacao,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto, ClienDtNascimento,
+				AtendObservacao,AtendJustificativa,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto, ClienDtNascimento,
 				ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,Profissional.ProfiNome as ProfissionalNome,SrVenNome, 
 				Profissao.ProfiNome as ProfissaoNome, ProfiCbo
 				FROM AtendimentoXServico
@@ -71,9 +71,11 @@ try{
 			foreach($rowAgendamento as $item){
 				$att = "<a style='color: black' href='#' data-tipo='AGENDAMENTO' onclick='atualizaAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				$exc = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='excluiAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
+				$aud = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AgendId]'><i class='icon-search4' title='Auditoria'></i></a>";
 				$acoes = "<div class='list-icons'>
 							$att
 							$exc
+							$aud
 							<div class='dropdown'>													
 								<a href='#' class='list-icons-item' data-toggle='dropdown'>
 									<i class='icon-menu9'></i>
@@ -111,16 +113,18 @@ try{
 					'identify' => [
 						'situacao' => $item['SituaChave'],
 						'iAgendamento' => $item['AgendId'],
-						'sJustificativa' => $item['AgendObservacao']
+						'sJustificativa' => $item['AgendJustificativa']
 					]
 				]);
 			}
 			foreach($rowAtendimento as $item){
 				$att = "<a class='list-icons-item' onclick='atualizaAtendimento(this)' href='#' data-tipo='ATENDIMENTO' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				$exc = "<a class='list-icons-item' onclick='excluiAtendimento(this)'href='#' data-tipo='ATENDIMENTO' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
+				$aud = "<a style='color: black' href='#'  data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-search4' title='Auditoria'></i></a>";
 				$acoes = "<div class='list-icons'>
 							$att
 							$exc
+							$aud
 							<div class='dropdown'>													
 								<a href='#' class='list-icons-item' data-toggle='dropdown'>
 									<i class='icon-menu9'></i>
@@ -160,7 +164,7 @@ try{
 					'identify' => [
 						'situacao' => $item['SituaChave'],
 						'iAtendimento' => $item['AtendId'],
-						'sJustificativa' => $item['AtendObservacao']
+						'sJustificativa' => $item['AtendJustificativa']
 					]
 				]);
 			}
@@ -761,9 +765,12 @@ try{
 	
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'SITUACOES'){
+		$tipo = $_POST['tipo'];
+		$list = $tipo == 'AGENDAMENTO'?"'AGENDADOVENDA','CONFIRMADO','CANCELADO','FILAESPERA'":
+		"'AGENDADOVENDA','ATENDIDOVENDA','EMESPERAVENDA','LIBERADOVENDA'";
 		$sql = "SELECT SituaId,SituaNome,SituaChave
 		FROM Situacao
-		WHERE SituaChave in ('AGENDADOVENDA','CONFIRMADO','CANCELADO','FILAESPERA')";
+		WHERE SituaChave in ($list)";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -794,10 +801,13 @@ try{
 		echo json_encode($array);
 	} elseif ($tipoRequest === 'MUDARSITUACAO'){
 		$iAtendimento = $_POST['iAtendimento'];
+		$tipo = $_POST['tipo'];
 		$situacao = $_POST['iSituacao'];
 		$sJustificativa = $_POST['sJustificativa'];
 	
-		$sql = "UPDATE Atendimento set AtendSituacao = '$situacao', AtendJustificativa = '$sJustificativa'
+		$sql = $tipo == 'AGENDAMENTO'? "UPDATE Agendamento set AgendSituacao = '$situacao', AgendJustificativa = '$sJustificativa'
+		WHERE AgendId = $iAtendimento":
+		"UPDATE Atendimento set AtendSituacao = '$situacao', AtendJustificativa = '$sJustificativa'
 		WHERE AtendId = $iAtendimento";
 		$result = $conn->query($sql);
 
@@ -1009,10 +1019,11 @@ try{
 				$sql = substr($sql, 0, -1);
 				$conn->query($sql);
 			}
-	
+			
 			$sql = "UPDATE Cliente SET
 				ClienNome= '$cliente[nome]',
 				ClienCpf= '$cliente[cpf]',
+				ClienCartaoSus= '$cliente[cns]',
 				ClienRg= '$cliente[rg]',
 				ClienOrgaoEmissor= '$cliente[emissor]',
 				ClienUf= '$cliente[uf]',
@@ -1156,10 +1167,10 @@ try{
 	} elseif ($tipoRequest == 'PACIENTE'){
 		$iPaciente = $_POST['iPaciente'];
 
-		$sql = "SELECT ClienId,ClienNome,
+		$sql = "SELECT ClienId,ClienNome,ClienCodigo,
 		ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
 		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
-		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
+		ClienNumero,ClienCartaoSus,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 		ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente WHERE ClienId = $iPaciente and ClienUnidade = $iUnidade";
 		$result = $conn->query($sql);
@@ -1169,10 +1180,10 @@ try{
 		if($row){
 			$array = [
 				'status' => 'success',
-				// 'prontuario' => $item['ClienId'],
+				'prontuario' => $row['ClienCodigo'],
 				'nome' => $row['ClienNome'],
 				'cpf' => $row['ClienCpf'],
-				// 'cns' => $row['ClienId'],
+				'cns' => $row['ClienCartaoSus'],
 				'rg' => $row['ClienRg'],
 				'emissor' => $row['ClienOrgaoEmissor'],
 				'uf' => $row['ClienUf'],
@@ -1591,6 +1602,31 @@ try{
 		echo json_encode([
 			'arrayHora' => $arrayHora,
 			'intervalo'=> $intervalo,
+			'status' => 'success',
+			'titulo' => 'Data',
+			'menssagem' => 'Hora do profissional selecionado!!!',
+		]);
+	} elseif ($tipoRequest == 'AUDITORIA'){
+		$tipo = $_POST['tipo'];
+		$id = $_POST['id'];
+
+		$sql = $tipo == 'AGENDAMENTO'? "SELECT UsuarNome, ProfiNome, ClienNome, AgendData as dataRegistro, AgendHorario as horaRegistro, AgendDataRegistro as dtHrRegistro
+			FROM Agendamento
+			JOIN Cliente ON ClienId = AgendCliente
+			JOIN Profissional ON ProfiId = AgendProfissional
+			JOIN Usuario ON UsuarId = AgendUsuarioAtualizador
+			WHERE AgendUnidade = $iUnidade and AgendId = $id":
+			"SELECT UsuarNome, ProfiNome, ClienNome, AtXSeData as dataRegistro, AtXSeHorario as horaRegistro, AtendDataRegistro as dtHrRegistro
+			FROM Atendimento
+			JOIN AtendimentoXServico ON AtXSeAtendimento = AtendId
+			JOIN Cliente ON ClienId = AtendCliente
+			JOIN Usuario ON UsuarId = AtXSeUsuarioAtualizador
+			JOIN Profissional ON ProfiId = AtXSeProfissional";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode([
+			'auditoria' => $row,
 			'status' => 'success',
 			'titulo' => 'Data',
 			'menssagem' => 'Hora do profissional selecionado!!!',

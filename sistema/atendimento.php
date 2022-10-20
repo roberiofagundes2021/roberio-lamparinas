@@ -150,12 +150,12 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				responsive: true,
 			    columnDefs: [{
 					orderable: true,   //Data - hora
-					width: "10%",
+					width: "20%",
 					targets: [0]
 				},
 				{ 
 					orderable: true,   // Espera
-					width: "5%",
+					width: "10%",
 					targets: [1]
 				},
 				{ 
@@ -170,7 +170,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				},
 				{ 
 					orderable: true,   // Paciente
-					width: "15%",
+					width: "10%",
 					targets: [4]
 				},
 				{ 
@@ -180,7 +180,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				},
 				{ 
 					orderable: true,   //Profissional
-					width: "15%",
+					width: "10%",
 					targets: [6]
 				},
 				{ 
@@ -296,6 +296,10 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				$('#justificativaModal').html('').show()
 				$('#page-modal-situacao').fadeOut(200);
 			})
+			$('#modal-auditoria-close-x').on('click', ()=>{
+				$('#dataAuditoria').html('')
+				$('#page-modal-auditoria').fadeOut(200);
+			})
 
 			/* Início: Tabela Personalizada do Setor Publico */
 			$('#AtendimentoTableAtendido').DataTable({
@@ -378,6 +382,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					dataType: 'json',
 					data:{
 						'tipoRequest': 'MUDARSITUACAO',
+						'tipo': $('#tipo').val(),
 						'iAtendimento': $('#iAtendimento').val(),
 						'iSituacao': $('#cmbSituacao').val(),
 						'sJustificativa': $('#justificativaModal').val()
@@ -440,6 +445,34 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 			});
 		}
 
+		function auditoria(element){
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'AUDITORIA',
+					'tipo':$(element).data('tipo'),
+					'id':$(element).data('id'),
+				},
+				success: async function(response) {
+					$('#dataAuditoria').empty()
+					let data = new Date(response.auditoria.dataRegistro).toLocaleString("pt-BR", {timeZone: "America/Bahia"})
+					let dataRegistro = new Date(response.auditoria.dtHrRegistro).toLocaleString("pt-BR", {timeZone: "America/Bahia"})
+					let tds = `
+					<tr class="text-center">
+						<td>${response.auditoria.UsuarNome}</td>
+						<td>${data.split(' ')[0]} ${response.auditoria.horaRegistro.split('.')[0]}</td>
+						<td>${response.auditoria.ClienNome}</td>
+						<td>${dataRegistro.split(' ')[0]}</td>
+					</tr>
+					`;
+					$('#dataAuditoria').html(tds)
+					$('#page-modal-auditoria').fadeIn();
+				}
+			});
+		}
+
 		function atualizaAtendimento(element){
 			let Id
 			if($(element).data('tipo')=='ATENDIMENTO'){
@@ -483,7 +516,8 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
 				data:{
-					'tipoRequest': 'SITUACOES'
+					'tipoRequest': 'SITUACOES',
+					'tipo': $(element).data('tipo')
 				},
 				success: function(response) {
 					// primeiro limpa os valores para adicionar novos evitando duplicação
@@ -495,9 +529,9 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						let opt = item.SituaChave === situacao? `<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#cmbSituacao').append(opt)
 					})
-					console.log(element)
 					$('#iAtendimento').val($(element).data('atendimento'))
 					$('#justificativaModal').val($(element).data('observacao'))
+					$('#tipo').val($(element).data('tipo'))
 
 					$('#page-modal-situacao').fadeIn(200);
 				}
@@ -529,7 +563,8 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							$(rowNodeAgendamento).attr('class', 'text-left')
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAgendamento}`)
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
-							// $(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+							$(rowNodeAgendamento).find('td:eq(9)').attr('data-tipo', 'AGENDAMENTO')
+							$(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						})
 
 						$('#AtendimentoTable').DataTable().clear().draw()
@@ -540,10 +575,14 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						await response.dataAtendimento.forEach(item => {
 							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
 
+							console.log(item)
 							$(rowNodeAtendimento).attr('class', 'text-left')
-							$(rowNodeAgendamento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+							$(rowNodeAtendimento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sJustificativa}`)
-							$(rowNodeAtendimento).find('td:eq(10)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+							$(rowNodeAtendimento).find('td:eq(10)').attr('data-tipo', 'ATENDIMENTO')
+							// if(item.identify.situacao == "EMESPERAVENDA" || item.identify.situacao == "LIBERADOVENDA"){
+								$(rowNodeAtendimento).find('td:eq(10)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+							// }
 						})
 					} else if (response.acesso == 'PROFISSIONAL'){
 						let tableE = $('#AtendimentoTableEspera').DataTable().clear().draw()
@@ -599,6 +638,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 			<!-- Content area -->
 			<div class="content">
 				<form id='dadosPost' method="POST">
+					<input type='hidden' id='tipo' name='tipo' value='' />
 					<input type='hidden' id='idAtendimentoAgendamento' name='idAtendimentoAgendamento' value='' />
 					<input type='hidden' id='AtendimentoAgendamento' name='AtendimentoAgendamento' value='' />
 					<input type='hidden' id='iAtendimentoEletivoId' name='iAtendimentoEletivoId' value='' />
@@ -833,6 +873,36 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 								</div>
 								<div class="text-right m-2">
 									<button id="mudarSituacao" class="btn btn-principal" role="button">Confirmar</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--Modal Auditoria-->
+                <div id="page-modal-auditoria" class="custon-modal">
+                    <div class="custon-modal-container" style="max-width: 800px;">
+                        <div class="card custon-modal-content">
+                            <div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+                                <p class="h5">Auditoria</p>
+                                <i id="modal-auditoria-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+                            </div>
+							<div class="px-0">
+								<div class="d-flex flex-row">
+									<div class="col-lg-12">
+										<table class="table mb-4" id="auditoriaTable">
+											<thead>
+												<tr class="bg-slate text-center">
+													<th style="width: 35%;">Atendente</th>
+													<th style="width: 30%;">Data/Hora</th>
+													<th style="width: 35%;">Paciente</th>
+													<th style="width: 20%">Atualização</th>
+												</tr>
+											</thead>
+											<tbody id="dataAuditoria">
+
+											</tbody>
+										</table>
+									</div>
 								</div>
 							</div>
 						</div>
