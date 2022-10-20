@@ -365,8 +365,8 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
 
     Filtrar();
 
-    $('#novoLacamento').on('click', (e) => {
-      location.href = "movimentacaoFinanceiraPagamento.php";
+    $('#novaTransferencia').on('click', (e) => {
+      location.href = "movimentacaoFinanceiraTransferencia.php";
       return false;
     })
 
@@ -397,21 +397,13 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
     imprime()  
   });
 
-  function atualizaMovimentacaoFinanceira(Permission, MovimentacaoFinanceiraId, TipoMov, Tipo) {
+  function atualizaMovimentacaoFinanceira(Permission, MovimentacaoFinanceiraId, Tipo) {
 
     document.getElementById('inputMovimentacaoFinanceiraId').value = MovimentacaoFinanceiraId;
-    document.getElementById('tipoMovId').value = TipoMov;
     document.getElementById('inputPermissionAtualiza').value = Permission; 
 
     if (Tipo == 'novo' || Tipo == 'edita') {
-        
-        if (TipoMov == 'T'){
           document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraTransferencia.php";
-        } else if (TipoMov == 'R'){
-          document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraRecebimento.php";
-        } else {
-          document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraPagamento.php";
-        }          
     } else if (Tipo == 'exclui') {
         if(Permission){
             confirmaExclusao(document.formMovimentacaoFinanceira, "Tem certeza que deseja excluir essa Movimentação ?", "movimentacaoFinanceiraExclui.php");
@@ -485,7 +477,6 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
 
                 <form name="contaExclui" method="POST">
                   <input type="hidden" name="idMov" id="idMov">
-                  <input type="hidden" name="tipoMov" id="tipoMov">
                 </form>
 
                 <form name="formMovimentacao" method="post" class="p-3">
@@ -708,7 +699,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                       <button id="submitPesquisar" class="btn btn-principal">Pesquisar</button>
 
 											<?php 
-												echo $inserir?"<button id='novoLacamento' class='btn btn-outline bg-slate-600 text-slate-600 border-slate'>Novo Lançamento</button>":"";
+												echo $inserir?"<button id='novaTransferencia' class='btn btn-outline bg-slate-600 text-slate-600 border-slate'>Nova Transferência</button>":"";
 											?>
 
                       <button id="imprimir" class="btn bg-secondary"><i class="icon-printer2"></i></button>
@@ -753,7 +744,6 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
         <!-- /info blocks -->
         <form name="formMovimentacaoFinanceira" method="post">
 					<input type="hidden" id="inputPermissionAtualiza" name="inputPermissionAtualiza">
-          <input type="hidden" id="tipoMovId" name="tipoMovId">
 					<input type="hidden" id="inputMovimentacaoFinanceiraId" name="inputMovimentacaoFinanceiraId" >
           <input type="hidden" id="inputConciliacaoId" name="inputConciliacaoId" >
         </form>

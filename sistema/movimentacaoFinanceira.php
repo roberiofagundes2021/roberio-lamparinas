@@ -383,21 +383,13 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
     });
 
     //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-    function atualizaMovimentacaoFinanceira(Permission, MovimentacaoFinanceiraId, TipoMov, Tipo) {
+    function atualizaMovimentacaoFinanceira(Permission, MovimentacaoFinanceiraId, Tipo) {
 
       document.getElementById('inputMovimentacaoFinanceiraId').value = MovimentacaoFinanceiraId;
-      document.getElementById('tipoMov').value = TipoMov;
       document.getElementById('inputPermissionAtualiza').value = Permission;
 
       if (Tipo == 'novo' || Tipo == 'edita') {
-          
-          if (TipoMov == 'T'){
             document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraTransferencia.php";
-          } else if (TipoMov == 'R'){
-            document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraRecebimento.php";
-          } else {
-            document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraPagamento.php";
-          }          
       } else if (Tipo == 'exclui') {
           if(Permission){
               confirmaExclusao(document.formMovimentacaoFinanceira, "Tem certeza que deseja excluir essa Movimentação ?", "movimentacaoFinanceiraExclui.php");

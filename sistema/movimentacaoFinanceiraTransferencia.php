@@ -2,7 +2,7 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Financeiro / Movimentação do Financeiro / Novo Lançamento';
+$_SESSION['PaginaAtual'] = 'Financeiro / Movimentação do Financeiro / Nova Transferência';
 
 include('global_assets/php/conexao.php');
 
@@ -61,12 +61,12 @@ if (isset($_POST['inputDataEmissao'])) {
         ));
 
         $_SESSION['msg']['titulo'] = "Sucesso";
-        $_SESSION['msg']['mensagem'] = "Lançamento editado!!!";
+        $_SESSION['msg']['mensagem'] = "Transferência editada!!!";
         $_SESSION['msg']['tipo'] = "success";
         
       } catch (PDOException $e) {
         $_SESSION['msg']['titulo'] = "Erro";
-        $_SESSION['msg']['mensagem'] = "Erro ao editar lançamento!!!";
+        $_SESSION['msg']['mensagem'] = "Erro ao editar transferência!!!";
         $_SESSION['msg']['tipo'] = "error";
 
         echo 'Error: ' . $e->getMessage();
@@ -219,13 +219,13 @@ if (isset($_POST['inputDataEmissao'])) {
           }
         
           $_SESSION['msg']['titulo'] = "Sucesso";
-          $_SESSION['msg']['mensagem'] = "Lançamento incluído!!!";
+          $_SESSION['msg']['mensagem'] = "Transferência incluída!!!";
           $_SESSION['msg']['tipo'] = "success";
         }
 
       } catch (PDOException $e) {
         $_SESSION['msg']['titulo'] = "Erro";
-        $_SESSION['msg']['mensagem'] = "Erro ao incluir Lançamento!!!";
+        $_SESSION['msg']['mensagem'] = "Erro ao incluir Transferência!!!";
         $_SESSION['msg']['tipo'] = "error";
         echo 'Error: ' . $e->getMessage();
         die;
@@ -379,49 +379,14 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                 <div class="card-header header-elements-inline">
                   <?php 
                   if(isset($_SESSION['MovFinancPermissionAtualiza'])) {
-                    echo "<h3 class='card-title'>Editar Lançamento (Transferência)</h3>";
+                    echo "<h3 class='card-title'>Editar Transferência</h3>";
                   }else {
-                    echo "<h3 class='card-title'>Novo Lançamento</h3>";
+                    echo "<h3 class='card-title'>Nova Transferência</h3>";
                   }
                   ?>
                 </div>
 
                 <div class="card-body">
-
-                 <?php 
-                  if(!isset($lancamento)) {
-                    echo '
-                      <br />
-                      <div class="row">
-                        <div class="col-lg-12">
-                          <div class="form-group">
-                            <div class="form-check form-check-inline">
-                              <label class="form-check-label">
-                                <input type="radio" name="inputTipo" value="P" class="form-input-styled" onclick="selecionaTipo(`P`)" data-fouc>
-                                Pagamento
-                              </label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <label class="form-check-label">
-                                <input type="radio" name="inputTipo" value="R" class="form-input-styled" onclick="selecionaTipo(`R`)" data-fouc>
-                                Recebimento
-                              </label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                              <label class="form-check-label">
-                                <input type="radio" name="inputTipo" value="T" class="form-input-styled" onclick="selecionaTipo(`T`)" data-fouc checked>
-                                Transferência
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ';
-                  }
-                  ?>
-
-                  <br />
-
                   <?php
                     if (isset($lancamento)) {
                         echo '<input type="hidden" name="inputContaId" value="' . $lancamento['CnTraId'] . '">';
@@ -611,9 +576,9 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                     </div>
                   <?php } else { ?>
                   <?php 
-                    if (isset($_SESSION['MovFinancPermissionAtualiza'])) {
+                    //if (isset($_SESSION['MovFinancPermissionAtualiza'])) {
                         echo' <button id="salvar" class="btn btn-principal">Salvar</button>';
-                    }
+                    //}
                   ?>
                     
                     <?php if($_SESSION['Conciliacao'] === true) { ?>

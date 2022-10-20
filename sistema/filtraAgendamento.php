@@ -188,7 +188,7 @@ try{
 		// SrVenUsuarioAtualizador,SrVenUnidade
 		// FROM Servico WHERE SrVenUnidade = $iUnidade";
 
-		$sql = "SELECT SrVenId,SrVenNome
+		$sql = "SELECT SrVenId,SrVenNome,SrVenCodigo
 		FROM ServicoVenda WHERE SrVenUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
@@ -197,6 +197,7 @@ try{
 			array_push($array,[
 				'id' => $item['SrVenId'],
 				'nome' => $item['SrVenNome'],
+				'codigo' => $item['SrVenCodigo']
 			]);
 		}
 

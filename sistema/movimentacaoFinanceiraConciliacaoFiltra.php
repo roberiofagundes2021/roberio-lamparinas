@@ -334,16 +334,16 @@ function queryPesquisa(){
 
             //HISTÓRICO
             if (intval($item['CODTRANSFREC']) > 0){
-                $historico = "<a href='#' onclick='atualizaMovimentacaoFinanceira(1,".$item['CODTRANSFREC'].", \"T\", \"edita\");'>" . $item['HISTORICO'] . "</a>";
+                $historico = "<a href='#' onclick='atualizaMovimentacaoFinanceira(1,".$item['CODTRANSFREC'].", \"edita\");'>" . $item['HISTORICO'] . "</a>";
                            
             } else if (intval($item['CODTRANSFPAG']) > 0) {
-                $historico = "<a href='#' onclick='atualizaMovimentacaoFinanceira(1,".$item['CODTRANSFPAG'].", \"T\", \"edita\");'>" . $item['HISTORICO'] . "</a>";
+                $historico = "<a href='#' onclick='atualizaMovimentacaoFinanceira(1,".$item['CODTRANSFPAG'].", \"edita\");'>" . $item['HISTORICO'] . "</a>";
 
             } else if ($item['TIPO'] === 'R'){
-                $historico = "<a href='#' onclick='atualizaMovimentacaoFinanceira(1,".$item['ID'].", \"R\", \"edita\");'>" . $item['HISTORICO'] . "</a>";
+                $historico = "<a href='#' onclick='atualizaMovimentacaoFinanceira(1,".$item['ID'].", \"edita\");'>" . $item['HISTORICO'] . "</a>";
 
             } else if ($item['TIPO'] === 'P') {
-                $historico = "<a href='#' onclick='atualizaMovimentacaoFinanceira(1,".$item['ID'].", \"P\", \"edita\");'>" . $item['HISTORICO'] . "</a>";
+                $historico = "<a href='#' onclick='atualizaMovimentacaoFinanceira(1,".$item['ID'].", \"edita\");'>" . $item['HISTORICO'] . "</a>";
             }
 
             //NUMERO DO DOCUMENTO
