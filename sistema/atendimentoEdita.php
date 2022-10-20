@@ -12,6 +12,34 @@ $_SESSION['atendimento'] = [
 	'atendimentoServicos' => []
 ];
 
+// a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
+if(!isset($_POST['idAtendimentoAgendamento'])){
+	irpara('atendimento.php');
+}
+$iAtendimento = $_POST['idAtendimentoAgendamento'];
+$tipo = $_POST['AtendimentoAgendamento'];
+$iUnidade = $_SESSION['UnidadeId'];
+
+if ($tipo == 'ATENDIMENTO') {
+	$sql = "SELECT AtendId as AgAtId,AtendNumRegistro as AgAtNumRegistro,AtendDataRegistro as AgAtdataRegistro,
+	AtendCliente as AgAtCliente,AtendModalidade as AgAtModalidade,AtendResponsavel as AgAtResponsavel,
+	AtendClassificacao as AgAtClassificacao,AtendObservacao as AgAtObservacao,
+	SituaNome,SituaChave
+	FROM Atendimento
+	JOIN Situacao ON SituaId = AtendSituacao
+	WHERE AtendId = $iAtendimento and AtendUnidade = $iUnidade";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+} else {
+	$sql = "SELECT AgendId as AgAtId,'----' as AgAtNumRegistro,AgendDataRegistro as AgAtdataRegistro,AgendCliente as AgAtCliente,
+		AgendModalidade as AgAtModalidade,AgendClienteResponsavel as AgAtResponsavel,'----' as AgAtClassificacao,
+		AgendObservacao as AgAtObservacao,SituaNome,SituaChave
+		FROM Agendamento
+		JOIN Situacao ON SituaId = AgendSituacao
+		WHERE AgendId = $iAtendimento and AgendUnidade = $iUnidade";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
+}
 ?>
 
 <!DOCTYPE html>
@@ -195,7 +223,10 @@ $_SESSION['atendimento'] = [
 							'modalidade': $('#modalidade').val(),
 							'classificacao': $('#classificacao').val(),
 							'observacao': $('#observacaoAtendimento').val(),
-							'situacao': $('#situacao').val()
+							'situacao': $('#situacao').val(),
+							'tipo': '<?php echo $tipo ?>',
+							'status': 'EDITA',
+							'iAtendimento': '<?php echo $iAtendimento ?>'
 						},
 						success: function(response) {
 							if (response.status == 'success') {
@@ -250,16 +281,6 @@ $_SESSION['atendimento'] = [
 					}
 				}
 			});
-
-			// vai impedir de deixar o usuário seguir em frente antes de selecionar um paciente
-			$('.actions a').each(function(index, element) {
-				if ($(element).attr('href') == '#next') {
-					$(element).attr('href', '#')
-					$(element).on('click', function(e) {
-						$('#dadosPaciente').submit()
-					})
-				}
-			})
 		})
 	</script>
 	<!-- Theme JS files -->
@@ -296,15 +317,20 @@ $_SESSION['atendimento'] = [
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
+	<?php
+		// essa parte do código transforma uma variáve php em Js para ser utilizado 
+		echo '<script> var atendimento = '.json_encode($row).'</script>';
+	?>
+
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$('#dadosPaciente').show()
+			$('#informacoes').show()
+			$('#novoPaciente').show()
+
 			$('#dadosResponsavel').hide()
 			$('#dadosAtendimento').hide()
-			$('#informacoes').hide()
-
 			$('#servicoTable').hide()
-			$('#novoPaciente').hide()
 			$('#novoResponsavel').hide()
 
 			$('.actions').addClass('col-lg-12 row')
@@ -320,6 +346,10 @@ $_SESSION['atendimento'] = [
 			$('#servicoTable').hide()
 			getCmbs()
 			checkServicos()
+
+			$('#dataRegistro').val(atendimento.AgAtdataRegistro)
+			$('#observacao').val(atendimento.AgAtObservacao)
+			$('#tipoRequest').val('EDITAR')
 
 			$('#incluirServico').on('click', function(e) {
 				e.preventDefault();
@@ -401,13 +431,16 @@ $_SESSION['atendimento'] = [
 						let href = $('#paciente').val() ? '#next' : '#'
 						$(element).attr('href', href)
 					}
+					$(element).on('click', function(e){
+						$('#dadosPaciente').submit()
+					})
 				})
 				$('.steps ul li').each(function(index, element) {
 					if (!$('#paciente').val() && index > 0) {
 						$(element).attr('class', 'disabled')
 					}
 				})
-				setPacienteAtribut(iPaciente)
+				setPacienteAtribut()
 			});
 
 			$('#servico').on('change', function(e) {
@@ -434,7 +467,7 @@ $_SESSION['atendimento'] = [
 
 			$('#parentescoCadatrado').on('change', function() {
 				let iResponsavel = $(this).val();
-				setResponsavelAtribut(iResponsavel)
+				setResponsavelAtribut()
 				// if(iResponsavel){
 				// 	$.ajax({
 				// 		type: 'POST',
@@ -741,6 +774,7 @@ $_SESSION['atendimento'] = [
 
 			$('#formServicoAtendimento').submit(function(e) {
 				e.preventDefault()
+				console.log()
 			})
 			$('#dados').submit(function(e) {
 				e.preventDefault()
@@ -762,10 +796,18 @@ $_SESSION['atendimento'] = [
 					$('#paciente').empty();
 					$('#paciente').append(`<option value=''>selecione</option>`)
 					let opt = ''
+
+					// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
+					// logo esses valores deveram vir preenchido com os dados desse atendimento
+
 					response.forEach(item => {
-						opt = opt = `<option value="${item.id}">${item.nome}</option>`
+						let id = obj?obj.pacienteID:atendimento.AgAtCliente
+						opt = id == item.id ?
+							`<option selected value="${item.id}">${item.nome}</option>` :
+							`<option value="${item.id}">${item.nome}</option>`
 						$('#paciente').append(opt)
 					})
+					setPacienteAtribut()
 				}
 			});
 			// vai preencher cmbModalidade
@@ -781,7 +823,9 @@ $_SESSION['atendimento'] = [
 					$('#modalidade').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
 						let opt = ''
-						opt = `<option value="${item.id}">${item.nome}</option>`
+						opt = atendimento.AgAtModalidade == item.id ?
+							`<option selected value="${item.id}">${item.nome}</option>`:
+							`<option value="${item.id}">${item.nome}</option>`
 						$('#modalidade').append(opt)
 					})
 				}
@@ -830,10 +874,14 @@ $_SESSION['atendimento'] = [
 				},
 				success: function(response) {
 					let opt = ''
-					$('#parentescoCadatrado').html("<option selected value=''>selecione</option>")
-					response.data.forEach(function(item, index) {
-						$('#parentescoCadatrado').append('<option value="' + item.id + '">' + item.nome + '</option>');
-					});
+					response.data.forEach(function(item) {
+						let id = obj?obj.responsavelID:atendimento.AgAtResponsavel
+						opt = id == item.id ?
+								`<option selected value="${item.id}">${item.nome}</option>` :
+								`<option value="${item.id}">${item.nome}</option>`
+						$('#parentescoCadatrado').append(opt)
+					})
+					setResponsavelAtribut()
 				},
 				error: function(response) {}
 			});
@@ -851,7 +899,9 @@ $_SESSION['atendimento'] = [
 
 					response.forEach(item => {
 						let opt = ''
-						opt = `<option value="${item.id}">${item.nome}</option>`
+						opt = atendimento.AgAtClassificacao == item.id ?
+							`<option selected value="${item.id}">${item.nome}</option>`:
+							`<option value="${item.id}">${item.nome}</option>`
 						$('#classificacao').append(opt)
 					})
 				}
@@ -913,8 +963,6 @@ $_SESSION['atendimento'] = [
 									$(item).change()
 								}
 							})
-							$('#novoPaciente').show()
-							$('#informacoes').show()
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 							$('#novoPaciente').hide()
@@ -996,9 +1044,6 @@ $_SESSION['atendimento'] = [
 									$(item).change()
 								}
 							})
-
-							$('#informacoes').show()
-							$('#novoResponsavel').show()
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 							$('#novoResponsavel').hide()
@@ -1049,7 +1094,9 @@ $_SESSION['atendimento'] = [
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
 				data: {
-					'tipoRequest': 'CHECKSERVICO'
+					'tipoRequest': 'CHECKSERVICO',
+					'iAtendimento': atendimento.AgAtId,
+					'tipo': '<?php echo $tipo ?>'
 				},
 				success: async function(response) {
 					statusServicos = response.array.length ? true : false;
@@ -1058,20 +1105,22 @@ $_SESSION['atendimento'] = [
 
 						let HTML = ''
 						response.array.forEach(item => {
-							let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
-							let acoes = `<div class='list-icons'>
-										${exc}
-									</div>`;
-							HTML += `
-							<tr class='servicoItem'>
-								<td class="text-center">${item.servico}</td>
-								<td class="text-center">${item.medico}</td>
-								<td class="text-center">${item.sData}</td>
-								<td class="text-center">${item.hora}</td>
-								<td class="text-center">${item.local}</td>
-								<td class="text-right">R$ ${float2moeda(item.valor)}</td>
-								<td class="text-center">${acoes}</td>
-							</tr>`
+							if(item.status != 'rem'){
+								let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
+								let acoes = `<div class='list-icons'>
+											${exc}
+										</div>`;
+								HTML += `
+								<tr class='servicoItem'>
+									<td class="text-center">${item.servico}</td>
+									<td class="text-center">${item.medico}</td>
+									<td class="text-center">${item.sData}</td>
+									<td class="text-center">${item.hora}</td>
+									<td class="text-center">${item.local}</td>
+									<td class="text-right">R$ ${float2moeda(item.valor)}</td>
+									<td class="text-center">${acoes}</td>
+								</tr>`
+							}
 						})
 						$('#servicoValorTotal').html(`${float2moeda(response.valorTotal)}`).show();
 						$('#dataServico').html(HTML).show();
@@ -1375,10 +1424,13 @@ $_SESSION['atendimento'] = [
 									<div class="card-body">
 										<div class="col-lg-12 mb-4 row mt-4">
 											<!-- titulos -->
+											<div class='col-lg-2'>
+												<label>Nº Registro</label>
+											</div>
 											<div class='col-lg-4'>
 												<label>Data do Registro</label>
 											</div>
-											<div class='col-lg-4'>
+											<div class='col-lg-2'>
 												<label>Modalidade <span class='text-danger'>*</span></label>
 											</div>
 											<div class='col-lg-4'>
@@ -1386,10 +1438,13 @@ $_SESSION['atendimento'] = [
 											</div>
 
 											<!-- campos -->
+											<div class='col-lg-2'>
+												<input id='numeroRegistro' name='numeroRegistro' type='text' class='form-control' placeholder='Nº Registro' readOnly value='<?php echo $row['AgAtNumRegistro']?>' >
+											</div>
 											<div class='col-lg-4'>
 												<input id='dataRegistro' name='dataRegistro' type='date' class='form-control' placeholder='Nome' readOnly>
 											</div>
-											<div class='col-lg-4'>
+											<div class='col-lg-2'>
 												<select id='modalidade' name='modalidade' class='select-search' required>
 													<option value='' selected>selecionar</option>
 												</select>
@@ -2015,36 +2070,9 @@ $_SESSION['atendimento'] = [
 											<input id="emissorNew" name="emissorNew" type="text" class="form-control" placeholder="Orgão Emissor" required>
 										</div>
 										<div class="col-lg-2">
-											<select id="ufNew" name="ufNew" class="form-control form-control-select2" placeholder="UF" required>
-												<option value="">Selecione</option>
-												<option value="AC">AC</option>
-												<option value="AL">AL</option>
-												<option value="AP">AP</option>
-												<option value="AM">AM</option>
-												<option value="BA">BA</option>
-												<option value="CE">CE</option>
-												<option value="DF">DF</option>
-												<option value="ES">ES</option>
-												<option value="GO">GO</option>
-												<option value="MA">MA</option>
-												<option value="MT">MT</option>
-												<option value="MS">MS</option>
-												<option value="MG">MG</option>
-												<option value="PA">PA</option>
-												<option value="PB">PB</option>
-												<option value="PR">PR</option>
-												<option value="PE">PE</option>
-												<option value="PI">PI</option>
-												<option value="RJ">RJ</option>
-												<option value="RN">RN</option>
-												<option value="RS">RS</option>
-												<option value="RO">RO</option>
-												<option value="RR">RR</option>
-												<option value="SC">SC</option>
-												<option value="SP">SP</option>
-												<option value="SE">SE</option>
-												<option value="TO">TO</option>
-												<option value="ES">ES</option>	
+											<select id="ufNew" name="ufNew" class="select-search" required>
+												<option value="" selected>selecionar</option>
+												<option value='BA'>BA</option>
 											</select>
 										</div>
 										<div class="col-lg-2">

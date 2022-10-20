@@ -8,7 +8,7 @@ $tipoConta = $_POST['tipoConta'];
 $agrupamentoId = $_POST['agrupamentoId'];
 
 if($tipoConta == 'P') {
-    $sqlAgrupamento = "SELECT CnAPaDescricao, CnAPaNotaFiscal, CnAPaDtPagamento, CnAPaFormaPagamento, CnAPaContaBanco, CnAPaValorPago,
+    $sqlAgrupamento = "SELECT CnAPaId, CnAPaDescricao, CnAPaNotaFiscal, CnAPaDtPagamento, CnAPaFormaPagamento, CnAPaContaBanco, CnAPaValorPago,
                     CnAgrDescricaoAgrupamento, CnAgrValorTotal
                     FROM  ContasAPagar 
                     JOIN ContasAgrupadas on CnAgrId = CnAPaAgrupamento
@@ -18,7 +18,7 @@ if($tipoConta == 'P') {
     $resultPagamentoAgrupado = $conn->query($sqlAgrupamento);
     $pagamentoAgrupado = $resultPagamentoAgrupado->fetchAll(PDO::FETCH_ASSOC);
 }else {
-    $sqlAgrupamento = "SELECT CnAReDescricao, CnAReNumDocumento, CnAReDtRecebimento, CnAReFormaPagamento, CnAReContaBanco, CnAReValorRecebido,
+    $sqlAgrupamento = "SELECT CnAReId, CnAReDescricao, CnAReNumDocumento, CnAReDtRecebimento, CnAReFormaPagamento, CnAReContaBanco, CnAReValorRecebido,
                     CnAgrDescricaoAgrupamento, CnAgrValorTotal
                     FROM  ContasAReceber 
                     JOIN ContasAgrupadas on CnAgrId = CnAReAgrupamento

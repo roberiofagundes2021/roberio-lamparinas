@@ -293,7 +293,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 			$('#modal-close-x').on('click', ()=>{
 				$('#iAtendimento').val('')
-				$('#observacaoModal').html('').show()
+				$('#justificativaModal').html('').show()
 				$('#page-modal-situacao').fadeOut(200);
 			})
 
@@ -380,19 +380,19 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						'tipoRequest': 'MUDARSITUACAO',
 						'iAtendimento': $('#iAtendimento').val(),
 						'iSituacao': $('#cmbSituacao').val(),
-						'sObservacao': $('#observacaoModal').val()
+						'sJustificativa': $('#justificativaModal').val()
 					},
 					success: function(response) {
 						alerta(response.titulo, response.menssagem, response.status);
 						$('#iAtendimento').val('')
-						$('#observacaoModal').val('')
+						$('#justificativaModal').val('')
 						$('#page-modal-situacao').fadeOut(200);
 						getAtendimentos();
 					},
 					error: function(response) {
 						alerta(response.titulo, response.menssagem, response.status);
 						$('#iAtendimento').val('')
-						$('#observacaoModal').val('')
+						$('#justificativaModal').val('')
 						$('#page-modal-situacao').fadeOut(200);
 						getAtendimentos();
 					}
@@ -428,7 +428,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					let AtClaChave = $(this).data('clachave')
 					let AtClaNome = $(this).data('clanome')
 
-					$('#iAtendimentoId').val(iAtendimento)
+					$('#idAtendimentoAgendamento').val(iAtendimento)
 					$('#iAtendimentoEletivoId').val(iAtendimentoEletivo)
 					$('#ClaChave').val(AtClaChave)
 					$('#ClaNome').val(AtClaNome)
@@ -438,42 +438,43 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					$('#dadosPost').submit()
 				})
 			});
+		}
 
-			// btn para editar ou excluir atendimento
-			$('.atualizaAtendimento').each(function() {
-				$(this).on('click',function(e){
-					e.preventDefault()
-					let atendimento = $(this).data('atendimento')
+		function atualizaAtendimento(element){
+			let Id
+			if($(element).data('tipo')=='ATENDIMENTO'){
+				Id = $(element).data('atendimento')
+				$('#dadosPost').attr('action','atendimentoEdita.php')
+			}else{
+				Id = $(element).data('agendamento')
+				$('#dadosPost').attr('action','agendamentoEdita.php')
+			}
+			$('#idAtendimentoAgendamento').val(Id)
+			$('#AtendimentoAgendamento').val($(element).data('tipo'))
 
-					$('#iAtendimentoId').val(atendimento)
-					$('#dadosPost').attr('action', 'atendimentoNovo.php')
-					$('#dadosPost').submit()
-				})
-			})
+			$('#dadosPost').submit()
+		}
 
-			$('.excluiAtendimento').each(function() {
-				$(this).on('click',function(e){
-					e.preventDefault()
-					let atendimento = $(this).data('atendimento')
-					$.ajax({
-						type: 'POST',
-						url: 'filtraAtendimento.php',
-						dataType: 'json',
-						data: {
-							'tipoRequest': 'EXCLUI',
-							'iAtendimento': atendimento
-						},
-						success: function(response) {
-							if(response.status  == 'success'){
-								alerta(response.titulo, response.menssagem, response.status)
-								getAtendimentos()
-							} else {
-								alerta(response.titulo, response.menssagem, response.status)
-							}
-						}
-					});
-				})
-			})
+		function excluiAtendimento(element){
+			e.preventDefault()
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'EXCLUI',
+					'id': $(element).data('tipo')=='ATENDIMENTO'?$(element).data('atendimento'):$(element).data('agendamento'),
+					'tipo': $(element).data('tipo')
+				},
+				success: function(response) {
+					if(response.status  == 'success'){
+						alerta(response.titulo, response.menssagem, response.status)
+						getAtendimentos()
+					} else {
+						alerta(response.titulo, response.menssagem, response.status)
+					}
+				}
+			});
 		}
 
 		function alteraSituacao(situacao, element){
@@ -488,14 +489,15 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					// primeiro limpa os valores para adicionar novos evitando duplicação
 					$('#cmbSituacao').empty()
 					$('#iAtendimento').val('')
-					$('#observacaoModal').val('')
+					$('#justificativaModal').val('')
 
 					response.forEach(item => {
 						let opt = item.SituaChave === situacao? `<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#cmbSituacao').append(opt)
 					})
+					console.log(element)
 					$('#iAtendimento').val($(element).data('atendimento'))
-					$('#observacaoModal').val($(element).data('observacao'))
+					$('#justificativaModal').val($(element).data('observacao'))
 
 					$('#page-modal-situacao').fadeIn(200);
 				}
@@ -513,7 +515,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					'tipoRequest': 'ATENDIMENTOS',
 					'acesso': acessoTipo
 				},
-				success: function(response) {
+				success: async function(response) {
 					//|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
 
 					if(response.acesso == 'ATENDIMENTO'){
@@ -522,13 +524,12 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						tableAgendamento = $('#AgendamentoTable').DataTable()
 						let rowNodeAgendamento
 	
-						response.dataAgendamento.forEach(item => {
+						await response.dataAgendamento.forEach(item => {
 							rowNodeAgendamento = tableAgendamento.row.add(item.data).draw().node()
-							$(rowNodeAgendamento).attr('class', 'text-center')
-							$(rowNodeAgendamento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							$(rowNodeAgendamento).find('td:eq(10)').attr('data-observacao', `${item.identify.sObservacao}`)
-							$(rowNodeAgendamento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+							$(rowNodeAgendamento).attr('class', 'text-left')
+							$(rowNodeAgendamento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAgendamento}`)
+							$(rowNodeAgendamento).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
+							// $(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						})
 
 						$('#AtendimentoTable').DataTable().clear().draw()
@@ -536,12 +537,13 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						tableAtendimento = $('#AtendimentoTable').DataTable()
 						let rowNodeAtendimento
 
-						response.dataAtendimento.forEach(item => {
+						await response.dataAtendimento.forEach(item => {
 							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
-							$(rowNodeAtendimento).attr('class', 'text-center')
-							$(rowNodeAtendimento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeAtendimento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							$(rowNodeAtendimento).find('td:eq(9)').attr('data-observacao', `${item.identify.sObservacao}`)
+
+							$(rowNodeAtendimento).attr('class', 'text-left')
+							$(rowNodeAgendamento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sJustificativa}`)
+							$(rowNodeAtendimento).find('td:eq(10)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						})
 					} else if (response.acesso == 'PROFISSIONAL'){
 						let tableE = $('#AtendimentoTableEspera').DataTable().clear().draw()
@@ -554,17 +556,17 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 	
 						response.dataEspera.forEach(item => {
 							rowNodeE = tableE.row.add(item.data).draw().node()
-							$(rowNodeE).attr('class', 'text-center')
+							$(rowNodeE).attr('class', 'text-left')
 							$(rowNodeE).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeE).find('td:eq(9)').attr('data-observacao', `${item.identify.sObservacao}`)
+							$(rowNodeE).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
 						})
 						response.dataAtendido.forEach(item => {
 							rowNodeA = tableA.row.add(item.data).draw().node()
-							$(rowNodeA).attr('class', 'text-center')
+							$(rowNodeA).attr('class', 'text-left')
 							$(rowNodeA).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeA).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 							$(rowNodeA).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeA).find('td:eq(9)').attr('data-observacao', `${item.identify.sObservacao}`)
+							$(rowNodeA).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
 						})
 	
 					}
@@ -597,7 +599,8 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 			<!-- Content area -->
 			<div class="content">
 				<form id='dadosPost' method="POST">
-					<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='' />
+					<input type='hidden' id='idAtendimentoAgendamento' name='idAtendimentoAgendamento' value='' />
+					<input type='hidden' id='AtendimentoAgendamento' name='AtendimentoAgendamento' value='' />
 					<input type='hidden' id='iAtendimentoEletivoId' name='iAtendimentoEletivoId' value='' />
 					<input type='hidden' id='ClaChave' name='ClaChave' value='' />
 					<input type='hidden' id='ClaNome' name='ClaNome' value='' />
@@ -646,7 +649,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 								<table class="table" id="AgendamentoTable">
 									<thead>
-										<tr class="bg-slate text-center">
+										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>
 											<th>Espera</th>
 											<th>Prontuário</th>			
@@ -678,7 +681,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 								<table class="table" id="AtendimentoTable">
 									<thead>
-										<tr class="bg-slate text-center">
+										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>
 											<th>Espera</th>
 											<th>Nº Registro</th>
@@ -736,7 +739,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 								<table class="table" id="AtendimentoTableEspera">
 									<thead>
-										<tr class="bg-slate text-center">
+										<tr class="bg-slate text-left">
 											<th>Data</th>
 											<th>Horario</th>
 											<th>Espera</th>
@@ -768,7 +771,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 								<table class="table" id="AtendimentoTableAtendido">
 									<thead>
-										<tr class="bg-slate text-center">
+										<tr class="bg-slate text-left">
 											<th>Data</th>
 											<th>Horario</th>
 											<th>Espera</th>
@@ -816,12 +819,12 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 												<div class="col-lg-12 mt-4">
 													<!-- titulos -->
 													<div class="col-lg-12">
-														<label>Observação <span class="text-danger">*</span></label>
+														<label>Justificativa <span class="text-danger">*</span></label>
 													</div>
 
 													<!-- campos -->
 													<div class="col-lg-12">
-														<textarea id="observacaoModal" name="observacaoModal" class="form-control" placeholder="Observações"></textarea>
+														<textarea id="justificativaModal" name="justificativaModal" class="form-control" placeholder="Justificativa"></textarea>
 													</div>
 												</div>
 											</div>

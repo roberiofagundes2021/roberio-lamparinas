@@ -11,6 +11,20 @@ include('global_assets/php/conexao.php');
 
 $dataHoje = date("Y-m-d");
 
+$iAgendamento = isset($_POST['iAgendamento'])?$_POST['iAgendamento']:$_POST['idAtendimentoAgendamento'];
+
+$sql = "SELECT AgendId,AgendDataRegistro,AgendCliente,AgendModalidade,AgendClienteResponsavel,
+AgendObservacao,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor
+FROM Agendamento
+JOIN Situacao ON SituaId = AgendSituacao
+JOIN Cliente ON ClienId = AgendCliente
+JOIN AtendimentoModalidade ON  Agendamento.AgendModalidade = AtendimentoModalidade.AtModId
+WHERE AgendId = $iAgendamento";
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+
+// a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
+
 ?>
 
 <!DOCTYPE html>
@@ -53,6 +67,11 @@ $dataHoje = date("Y-m-d");
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
+	<?php
+		// essa parte do código transforma uma variáve php em Js para ser utilizado 
+		echo '<script> var agendamento = '.json_encode($row).' </script>';
+	?>
 	
 	<script type="text/javascript" >
 		$(document).ready(function() {
@@ -61,7 +80,12 @@ $dataHoje = date("Y-m-d");
 			alteraSituacao()
 			getCmbs()
 			
-			$('#data').val('<?php echo $dataHoje ?>')
+			// se existir agendamento os dados serão preenchidos ao carregar a página
+			$('#data').val(agendamento.AgendDataRegistro)
+			$('#observacao').val(agendamento.AgendObservacao)
+			$('#tipoRequest').val('EDITAR')
+			checkServicos(agendamento.AgendId)
+			alteraSituacao(agendamento.SituaChave);
 
 			$('#salvarPaciente').on('click', function(e){
 				e.preventDefault()
@@ -498,7 +522,10 @@ $dataHoje = date("Y-m-d");
 					$('#paciente').empty();
 					$('#paciente').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.id} - ${item.nome}</option>`
+						let opt = ''
+						// caso exista algo na variável agendamento significa que o usuário esta alterando um valor
+						// logo esses valores deveram vir preenchido com os dados desse agendamento
+						opt = agendamento.AgendCliente == item.id?`<option selected value="${item.id}">${item.id} - ${item.nome}</option>`:`<option value="${item.id}">${item.id} - ${item.nome}</option>`
 						$('#paciente').append(opt)
 					})
 				}
@@ -515,7 +542,10 @@ $dataHoje = date("Y-m-d");
 					$('#modalidade').empty();
 					$('#modalidade').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
+						let opt = ''
+						// caso exista algo na variável agendamento significa que o usuário esta alterando um valor
+						// logo esses valores deveram vir preenchido com os dados desse agendamento
+						opt = agendamento.AgendModalidade == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#modalidade').append(opt)
 					})
 				}
@@ -532,7 +562,7 @@ $dataHoje = date("Y-m-d");
 					$('#servico').empty();
 					$('#servico').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.codigo} - ${item.nome}</option>`
+						let opt = `<option value="${item.id}">${item.id} - ${item.nome}</option>`
 						$('#servico').append(opt)
 					})
 				}
@@ -569,7 +599,7 @@ $dataHoje = date("Y-m-d");
 					$('#servico').empty();
 					$('#servico').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.codigo} - ${item.nome}</option>`
+						let opt = `<option value="${item.id}">${item.id} - ${item.nome}</option>`
 						$('#servico').append(opt)
 					})
 				}
@@ -643,7 +673,7 @@ $dataHoje = date("Y-m-d");
 							<!-- dados do agendamento -->
 							<div id="agendamento" class="formDados card-body" style="display: block; margin-top:-20px;" >
 								<div class="card-header header-elements-inline" style="margin-left:-10px;">
-									<h5 class='text-uppercase font-weight-bold'>CADASTRO DO AGENDAMENTO</h5>
+									<h5 class='text-uppercase font-weight-bold'>EDITAR AGENDAMENTO</h5>
 								</div>
 
 								<!-- esses inputs são para validar o tipo de operação que será feito no
@@ -664,7 +694,7 @@ $dataHoje = date("Y-m-d");
 
 									<!-- campos -->
 									<div class="col-lg-3">
-										<input id="data" name="data" type="date" class="form-control" readonly>
+										<input id="data" name="data" type="date" class="form-control"  readonly>
 									</div>
 									<div class="col-lg-6 row m-0"> 
 										<div class="col-lg-10">

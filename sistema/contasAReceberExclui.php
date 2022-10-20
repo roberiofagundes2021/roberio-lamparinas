@@ -9,6 +9,11 @@ if (isset($_POST['inputContasAReceberId'])) {
 	$id = $_POST['inputContasAReceberId'];
 
 	try {
+		$sql = "DELETE FROM ContasAReceberXCentroCusto
+				WHERE CARXCContasAReceber = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $id); 
+		$result->execute();
 
 		$sql = "DELETE FROM ContasAReceber
 				WHERE CnAReId = :id";

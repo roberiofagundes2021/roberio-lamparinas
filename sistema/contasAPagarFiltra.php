@@ -60,23 +60,34 @@ if (count($args) >= 1) {
         $string .= ' and ';
     }
 
-    $sql = "SELECT * 
+    $sql = "SELECT  CnAPaId, CnAPaDescricao, CnAPaStatus, CnAPaValorAPagar, CnAPaDtVencimento, CnAPaDtPagamento, CnAPaJustificativaEstorno, 
+                    CnAPaNotaFiscal, CnAPaAgrupamento, ForneNome 
             FROM ContasAPagar
             LEFT JOIN Fornecedor on ForneId = CnAPaFornecedor
             JOIN Situacao on SituaId = CnApaStatus
-            WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
-        ";
+            WHERE " . $string . " CnAPaAgrupamento is null and CnAPaUnidade = " . $_SESSION['UnidadeId'] . "";
     $result = $conn->query($sql);
     $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 
-    count($rowData) >= 1 ? $cont = 1 : $cont = 0;
+    count($rowData) >= 1 ? $ExisteConsulta = 1 : $ExisteConsulta = 0;
+
+    $sql = "SELECT CnAgrDescricaoAgrupamento, SituaNome, SUM(CnAPaValorPago) as VALORAGRUPAMENTO, CnAPaAgrupamento, CnAgrDtPagamento
+            FROM ContasAPagar
+            JOIN ContasAgrupadas on CnAgrId = CnAPaAgrupamento
+            JOIN Situacao on SituaId = CnAPaStatus
+            WHERE " . $string . " CnAPaUnidade = " . $_SESSION['UnidadeId'] . "
+            GROUP BY CnAPaAgrupamento, SituaNome, CnAgrDtPagamento, CnAgrDescricaoAgrupamento";
+    $resultAgrupamento = $conn->query($sql);
+    $rowAgrupamento = $resultAgrupamento->fetchAll(PDO::FETCH_ASSOC);
+
+    count($rowAgrupamento) >= 1 ? $ExisteAgrupamento = 1 : $ExisteAgrupamento = 0;
 }
 
-if ($cont == 1) {
+$arrayData = [];
+if ($ExisteConsulta == 1) {
     $cont = 0;
     //print('<input type="hidden" id="elementosGrid" value="'.count($rowData).'">');
 
-    $arrayData = [];
     foreach ($rowData as $item) {
         $cont++;     
         $status = $item['CnAPaStatus'] == 11 ? 'À Pagar' : 'Pago';
@@ -106,8 +117,7 @@ if ($cont == 1) {
             $acaoConta = ($status == 'Pago') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : 
             '<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
         }else {
-            $acaoConta = ($status == 'Pago') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>
-                                                <a href="#" data-toggle="modal" data-target="#modal_consultaPagamentoAgrupado" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \''.$consultaAgrupamento.'\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Pagamento agrupado"><i class="icon-stack3"></i></a>' : 
+            $acaoConta = ($status == 'Pago') ? '<a href="#" data-toggle="modal" data-target="#modal_mini-estornar" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'estornar\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Estornar Conta"><i class="icon-undo2"></i></a>' : 
                                                 '<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionExclui'].','.$item["CnAPaId"].', \'exclui\');"  class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Excluir Conta"><i class="icon-bin"></i></a>';
         }
 
@@ -117,7 +127,7 @@ if ($cont == 1) {
                 <div class="list-icons list-icons-extended">'.
                     ($_POST['permissionAtualiza']?'<a href="#" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].','.$item["CnAPaId"].', \'edita\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Editar Conta"><i class="icon-pencil7"></i></a>':'')
                     .($_POST['permissionExclui']?$acaoConta:'').
-                    '<a href="#" class="list-icons-item" data-toggle="modal" data-target="#modal_mini-justificativa-estorno" onclick="estornoJustificativa(\''.$justificativaEstornamento.'\');"  data-popup="tooltip" data-placement="bottom"title="Motivo do estorno" style="display: '.$estornamento.';"><i class="icon-info3"></i></a>
+                    '<a href="#" class="list-icons-item" data-toggle="modal" data-target="#modal_mini-justificativa-estorno" onclick="estornoJustificativa(\''.$justificativaEstornamento.'\');"  data-popup="tooltip" data-placement="bottom" title="Motivo do estorno" style="display: '.$estornamento.';"><i class="icon-info3"></i></a>
                     <!-- Retirado ícone de parcelar
                     <div class="dropdown" style="display: '.$visibilidade.';">													
                         <a href="#" class="list-icons-item" data-toggle="dropdown">
@@ -147,7 +157,58 @@ if ($cont == 1) {
         ];
 
         array_push($arrayData,$array);
-    }
+    }   
+}
 
+if($ExisteAgrupamento == 1) {
+    foreach ($rowAgrupamento as $item) {
+        $status = $item['SituaNome'];
+        $data = mostraData($item['CnAgrDtPagamento']);
+
+        $justificativaEstornamento = '';
+        $consultaAgrupamento = (isset($item['CnAPaAgrupamento'])) ? 'consultaPagamento#'.$item['CnAPaAgrupamento'] : '';
+
+        $checkbox = '';
+        
+        $vencimento = '<p class="m-0">' . $data . '</p><input type="hidden" value="'.$data.'">';
+
+        $descricao = '<a href="#"  data-toggle="modal" data-target="#modal_consultaPagamentoAgrupado" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].', 0, \''.$consultaAgrupamento.'\');" data-popup="tooltip" data-placement="bottom">' . $item["CnAgrDescricaoAgrupamento"] . '</a>';
+        
+        $favorecido = '';
+
+        $numDoc = '';
+
+        $valorTotal = mostraValor($item["VALORAGRUPAMENTO"]);
+
+        $status = $status;
+
+        $acoes = '
+            <div class="list-icons">
+                <div class="list-icons list-icons-extended">
+                    <a href="#" data-toggle="modal" data-target="#modal_consultaPagamentoAgrupado" onclick="atualizaContasAPagar('.$_POST['permissionAtualiza'].', 0, \''.$consultaAgrupamento.'\');" class="list-icons-item"  data-popup="tooltip" data-placement="bottom" title="Pagamento agrupado"><i class="icon-stack3"></i></a>
+                </div>
+            </div>';
+
+        $array = [
+            'data'=>[
+                isset($checkbox) ? $checkbox : null, 
+                isset($vencimento) ? $vencimento : null,
+                isset($descricao) ? $descricao : null, 
+                isset($favorecido) ? $favorecido : null, 
+                isset($numDoc) ? $numDoc : null, 
+                isset($valorTotal) ? $valorTotal : null, 
+                isset($status) ? $status : null, 
+                isset($acoes) ? $acoes : null
+            ],
+            'identify'=>[
+                
+            ]
+        ];
+
+        array_push($arrayData,$array);
+    }
+}
+
+if ($ExisteConsulta == 1 || $ExisteAgrupamento == 1) {
     print(json_encode($arrayData));
 }
