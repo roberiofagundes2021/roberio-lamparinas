@@ -28,9 +28,10 @@ $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
 
 
 //Essa consulta é para verificar  o profissional
-$sql = "SELECT UsuarId, ProfiUsuario, ProfiId, ProfiNome
+$sql = "SELECT UsuarId, ProfiUsuario, Profissional.ProfiId, Profissional.ProfiNome, ProfiNumConselho, ProfiCbo
 		FROM Usuario
 		JOIN Profissional ON ProfiUsuario = UsuarId
+		JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
 		WHERE UsuarId =  ". $_SESSION['UsuarId'] . " ";
 $result = $conn->query($sql);
 $rowUser = $result->fetch(PDO::FETCH_ASSOC);
@@ -96,7 +97,8 @@ if (isset($_POST['inputAlergia']) ){
 			$sql = "UPDATE AtendimentoTriagem SET AtTriAtendimento = :sAtendimento, AtTriData = :dData, AtTriHoraInicio = :sHoraInicio, AtTriHoraFim  = :sHoraFim, AtTriProfissional = :sProfissional, AtTriPressaoSistolica = :sPressaoSistolica, AtTriPressaoDiatolica = :sPressaoDiatolica,
 			                                      AtTriFreqCardiaca = :sFreqCardiaca,  AtTriFreqRespiratoria = :sFreqRespiratoria, AtTriTempAXI = :sTempAXI, AtTriSPO = :sSPO, AtTriHGT = :sHGT, AtTriQueixaPrincipal = :sQueixaPrincipal, AtTriPeso = :sPeso, AtTriAltura = :sAltura,  
 												  AtTriAlergia = :sAlergia, AtTriAlergiaDescricao = :sAlergiaDescricao, AtTriDiabetes = :sDiabetes, AtTriDiabetesDescricao = :sDiabetesDescricao, AtTriHipertensao = :sHipertensao, AtTriHipertensaoDescricao = :sHipertensaoDescricao,  
-												  AtTriNeoplasia = :sNeoplasia, AtTriNeoplasiaDescricao = :sNeoplasiaDescricao, AtTriUsoMedicamento = :sUsoMedicamento, AtTriUsoMedicamentoDescricao = :sUsoMedicamentoDescricao, AtTriObservacao = :sObservacao, AtTriUnidade = :iUnidade	  
+												  AtTriNeoplasia = :sNeoplasia, AtTriNeoplasiaDescricao = :sNeoplasiaDescricao, AtTriUsoMedicamento = :sUsoMedicamento, AtTriUsoMedicamentoDescricao = :sUsoMedicamentoDescricao, AtTriObservacao = :sObservacao, AtTriUnidade = :iUnidade,
+												  AtTriCiap2 = :sMotivoQueixaSelect , AtTriMotivoConsulta = :sMotivoQueixa, AtTriMomentoColeta = :sMomentoColeta, AtTriImc = :sImc, AtTriGuicemiaCapilar = :sGlicemiaCapilar
 					WHERE AtTriId = :iAtendimentoTriagem";
 			$result = $conn->prepare($sql);
 					
@@ -128,7 +130,13 @@ if (isset($_POST['inputAlergia']) ){
 				':sUsoMedicamentoDescricao' => $_POST['inputUsoMedicamentoDescricao'],
 				':sObservacao' => $_POST['txtareaObservacao'] == "" ? null : $_POST['txtareaObservacao'],
 				':iUnidade' => $_SESSION['UnidadeId'],
-				':iAtendimentoTriagem' => $iAtendimentoTriagemId 
+				':sMotivoQueixaSelect' => $_POST['cmbMotivo'] == "" ? null : $_POST['cmbMotivo'],
+				':sMotivoQueixa' => $_POST['summernoteMotivo'] == "" ? null : $_POST['summernoteMotivo'],
+				':sMomentoColeta' => $_POST['inputMomentoColeta'] == "" ? null : $_POST['inputMomentoColeta'],
+				':sImc' => $_POST['inputImc'] == "" ? null : $_POST['inputImc'],
+				':sGlicemiaCapilar' => $_POST['inputGlicemiaCapilar'] == "" ? null : $_POST['inputGlicemiaCapilar'],
+				':iAtendimentoTriagem' => $iAtendimentoTriagemId
+
 				));
 
 			$_SESSION['msg']['mensagem'] = "Triagem alterada!!!";
@@ -138,10 +146,12 @@ if (isset($_POST['inputAlergia']) ){
 
 			$sql = "INSERT INTO AtendimentoTriagem (AtTriAtendimento, AtTriData, AtTriHoraInicio, AtTriHoraFim, AtTriProfissional, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca,  AtTriFreqRespiratoria,
 			                                        AtTriTempAXI, AtTriSPO, AtTriHGT, AtTriQueixaPrincipal, AtTriPeso, AtTriAltura, AtTriAlergia, AtTriAlergiaDescricao, AtTriDiabetes, AtTriDiabetesDescricao, 
-													AtTriHipertensao, AtTriHipertensaoDescricao, AtTriNeoplasia, AtTriNeoplasiaDescricao, AtTriUsoMedicamento, AtTriUsoMedicamentoDescricao, AtTriObservacao, AtTriUnidade)
+													AtTriHipertensao, AtTriHipertensaoDescricao, AtTriNeoplasia, AtTriNeoplasiaDescricao, AtTriUsoMedicamento, AtTriUsoMedicamentoDescricao, AtTriObservacao, AtTriUnidade,
+													AtTriCiap2, AtTriMotivoConsulta, AtTriMomentoColeta, AtTriImc, AtTriGuicemiaCapilar)
 						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional, :sPressaoSistolica, :sPressaoDiatolica, :sFreqCardiaca, :sFreqRespiratoria,
 						        :sTempAXI, :sSPO, :sHGT, :sQueixaPrincipal, :sPeso, :sAltura, :sAlergia, :sAlergiaDescricao, :sDiabetes, :sDiabetesDescricao, 
-								:sHipertensao, :sHipertensaoDescricao, :sNeoplasia, :sNeoplasiaDescricao, :sUsoMedicamento, :sUsoMedicamentoDescricao, :sObservacao, :iUnidade )";
+								:sHipertensao, :sHipertensaoDescricao, :sNeoplasia, :sNeoplasiaDescricao, :sUsoMedicamento, :sUsoMedicamentoDescricao, :sObservacao, :iUnidade,
+								:sMotivoQueixaSelect, :sMotivoQueixa, :sMomentoColeta, :sImc , :sGlicemiaCapilar )";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -171,7 +181,13 @@ if (isset($_POST['inputAlergia']) ){
 				':sUsoMedicamento' => $_POST['inputUsoMedicamento'] == "" ? null : $_POST['inputUsoMedicamento'],
 				':sUsoMedicamentoDescricao' => $_POST['inputUsoMedicamentoDescricao'],
 				':sObservacao' => $_POST['txtareaObservacao'] == "" ? null : $_POST['txtareaObservacao'],
-				':iUnidade' => $_SESSION['UnidadeId']
+				':iUnidade' => $_SESSION['UnidadeId'],
+				':sMotivoQueixaSelect' => $_POST['cmbMotivo'] == "" ? null : $_POST['cmbMotivo'],
+				':sMotivoQueixa' => $_POST['summernoteMotivo'] == "" ? null : $_POST['summernoteMotivo'],
+				':sMomentoColeta' => $_POST['inputMomentoColeta'] == "" ? null : $_POST['inputMomentoColeta'],
+				':sImc' => $_POST['inputImc'] == "" ? null : $_POST['inputImc'],
+				':sGlicemiaCapilar' => $_POST['inputGlicemiaCapilar'] == "" ? null : $_POST['inputGlicemiaCapilar']
+
 			));
 
 			$_SESSION['msg']['mensagem'] = "Triagem incluída!!!";
@@ -258,6 +274,58 @@ if (isset($_POST['inputAlergia']) ){
 
 			$('#summernote').summernote();
             $('#summernoteQueixa').summernote();
+            $('#summernoteMotivo').summernote();
+			$('#servicoTable').hide();
+
+			addProcedimentosPadrao();
+			checkServicos();
+
+			$('#incluirServico').on('click', function(e) {
+				e.preventDefault();
+
+				let menssageError = '';
+				let procedimento = $('#cmbProcRealizado').val();
+				let triagemId = $('#iAtTriId').val();
+
+				switch (menssageError) {
+					case procedimento:
+						menssageError = 'Informe o Procedimento';
+						$('#cmbProcRealizado').focus();
+						break;
+					default:
+						menssageError = '';
+						break;
+				}
+
+				if (menssageError) {
+					alerta('Campo Obrigatório!', menssageError, 'error')
+					return
+				}
+
+				//chamar requisicao
+				$.ajax({
+					type: 'POST',
+					url: 'filtraTriagem.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'ADICIONARPROCEDIMENTO',
+						'procedimento': procedimento,
+						'triagemId': triagemId			
+					},
+					success: function(response) {
+						if (response.status == 'success') {
+							checkServicos()
+							alerta(response.titulo, response.menssagem, response.status)
+						} else {
+							alerta(response.titulo, response.menssagem, response.status);
+						}
+					},
+					error: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
+					}
+				});
+
+			});
 			
 			$('#enviar').on('click', function(e){
 			
@@ -268,6 +336,97 @@ if (isset($_POST['inputAlergia']) ){
 			})
 
 		}); //document.ready
+
+
+		function addProcedimentosPadrao() {
+
+			let triagemId = $('#iAtTriId').val();
+
+			$.ajax({
+				type: 'POST',
+				url: 'filtraTriagem.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest' : 'ADDPROCEDIMENTOSPADRAO',
+					'triagemId' : triagemId
+				},
+				success: function(response) {
+					if (response.status == 'success') {
+						checkServicos()							
+					}					
+				}
+			});
+			
+		}
+
+		function checkServicos() {
+
+			let triagemId = $('#iAtTriId').val();
+
+			$.ajax({
+			type: 'POST',
+				url: 'filtraTriagem.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'CHECKSERVICO',
+					'triagemId': triagemId
+				},
+				success: async function(response) {
+					statusServicos = response.array.length ? true : false;
+					if (statusServicos) {
+
+						$('#dataServico').html('');
+
+						let HTML = '';
+
+						response.array.forEach(item => {
+
+							let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.AtTXSTriagem}\", \"${item.AtTXSServicoVenda}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Procedimento'></i></a>`;
+							let acoes = `<div class='list-icons'>
+										${exc}
+									</div>`;
+							HTML += `
+							<tr class='servicoItem'>
+								<td class="text-center"> ${item.SrVenCodigo} - ${item.SrVenNome}</td>
+								<td class="text-center">${acoes}</td>
+							</tr>`;
+
+						});
+
+						$('#dataServico').html(HTML).show();
+						$('#servicoTable').show();
+
+					}else {
+						$('#servicoTable').hide();
+					}
+				}
+			});
+
+		}
+
+		function excluiServico(idTriagem, idServico) {
+				
+				$.ajax({
+					type: 'POST',
+					url: 'filtraTriagem.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'EXCLUIPROCEDIMENTO',
+						'idTriagem': idTriagem,
+						'idServico' : idServico
+					},
+					success: function(response) {
+
+						if (response.status == 'success') {
+							checkServicos()
+							alerta(response.titulo, response.menssagem, response.status)
+						} else {
+							alerta(response.titulo, response.menssagem, response.status);
+						}
+						
+					}
+				});
+			}
 
 
 		function selecionaAlergiaDescricao(tipo) {
@@ -309,7 +468,28 @@ if (isset($_POST['inputAlergia']) ){
 				document.getElementById('dadosMedicamento').style.display = "none";
 			}
 		}
-		
+
+		function addGridProcRealizados(proc) {
+			/* caso precise alterar a função para adicionar o procedimento quando preencher os campos
+			onkeyup: addGridProcRealizados('inputSinVitais'), addGridProcRealizados('inputAntropometria'), addGridProcRealizados('inputGlicemia')
+			if (proc == 'inputSinVitais') { }
+			if (proc == 'inputAntropometria') { }
+			if (proc == 'inputGlicemia') { }
+			*/
+		}
+
+		function calcularImc() {
+
+			let peso = $('#inputPeso').val();
+			let altura = $('#inputAltura').val();
+			peso = parseFloat(peso);
+			altura = altura.replace(",", "");
+			altura = altura / 100;
+			imc = peso / (altura * altura);
+			$('#inputImc').val(parseFloat(imc).toFixed(2));
+
+		}
+
 	</script>
 
 </head>
@@ -348,6 +528,7 @@ if (isset($_POST['inputAlergia']) ){
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
 							?>
+							<input type='hidden' id='iAtTriId' name='iAtTriId' value='<?php echo $iAtendimentoTriagemId != null ? $iAtendimentoTriagemId : '' ?>' />
 							<div class="card">
 								<div class="card-header header-elements-inline">
 									<h3 class="card-title"><b>TRIAGEM</b></h3>
@@ -456,9 +637,53 @@ if (isset($_POST['inputAlergia']) ){
 
 							<div class="card">
 
+								<div class="card-body" >
+									<div class="row" style="margin-top: 20px;">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="">Motivo da Consulta (CIAP2)</label>
+												<select id="cmbMotivo" name="cmbMotivo" class="form-control form-control-select2">
+													<option value="">Selecione um Motivo</option>
+
+													<?php
+														$sql = "SELECT Ciap2Id,Ciap2Descricao
+																FROM Ciap2
+																ORDER BY Ciap2Descricao ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($row as $item) {
+															if (isset($iAtendimentoTriagemId) && ($rowTriagem['AtTriCiap2'] ==  $item['Ciap2Id']) ) {																
+																print('<option value="' . $item['Ciap2Id'] . '" selected>' . $item['Ciap2Descricao'] . '</option>');
+															} else {
+																print('<option value="' . $item['Ciap2Id'] . '">' . $item['Ciap2Descricao'] . '</option>');
+															}
+															
+														}
+													?>
+
+												</select>
+											</div>
+										</div>
+									</div>
+
+									<div class="row" style="margin-top: 20px;" >
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label for="">Motivo da Consulta (descricao)</label>
+												<textarea rows="5" cols="5"  id="summernoteMotivo" name="summernoteMotivo" class="form-control" placeholder="Descrição (Queixa principal)"><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriMotivoConsulta']; ?></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="card-header header-elements-inline">
+									<h3 class="card-title">Sinais Vitais</h3>
+								</div>
+
 								<div class="card-body">
 
-									<div class="row" style="margin-top: 20px;">
+									<div class="row" >
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputPressaoArterial">Pressão Arterial</label>
@@ -490,7 +715,12 @@ if (isset($_POST['inputAlergia']) ){
 										<div class="col-lg-2" style="margin-right: 20px;">
 											<div class="form-group">
 												<label for="inputRespiratoria">Frequência Respitatória </label>
-												<input type="number" id="inputRespiratoria" name="inputRespiratoria" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqRespiratoria']; ?>">
+												<div class="input-group">												
+													<input type="number" onKeyUp="" id="inputRespiratoria" name="inputRespiratoria" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqRespiratoria']; ?>">
+													<span class="input-group-prepend">
+														<span class="input-group-text">mpm</span>	
+													</span>
+												</div>
 											</div>
 										</div>
 										
@@ -508,8 +738,13 @@ if (isset($_POST['inputAlergia']) ){
 										</div>
 										<div class="col-lg-1" style="margin-right: 20px;">
 											<div class="form-group">
-											<label for="inputSPO">SpO2 </label>
-												<input type="number" id="inputSPO" name="inputSPO" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriSPO']; ?>">
+												<label for="inputSPO">SPO<sub>2</sub> </label>
+												<div class="input-group">
+													<input type="number" onKeyUp="" id="inputSPO" name="inputSPO" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriSPO']; ?>">
+													<span class="input-group-prepend">
+														<span class="input-group-text">%</span>	
+													</span>
+												</div>
 											</div>
 										</div>
 										<div class="col-lg-1">
@@ -519,22 +754,21 @@ if (isset($_POST['inputAlergia']) ){
 											</div>
 										</div>
 									</div>
-                                   	<br>
-									<div class="row">
-										<div class="col-lg-12">
-											<div class="form-group">
-												<label for="txtareaQueixaPrincipal">Queixa Principal </label>
-												<textarea rows="5" cols="5"  id="summernoteQueixa" name="txtareaQueixaPrincipal" class="form-control" placeholder="Descrição (Queixa principal)"><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriQueixaPrincipal']; ?></textarea>
-											</div>
-										</div>
-									</div>
-									<br>
+
+								</div>
+
+								<div class="card-header header-elements-inline">
+									<h3 class="card-title">Antropometria</h3>
+								</div>
+
+								<div class="card-body">
+
 									<div class="row">
 										<div class="col-lg-2"  style="margin-right: 20px;">
 											<div class="form-group">
 												<label for="inputPeso">Peso </label>
 												<div class="input-group">
-												<input type="text" onKeyUp="moeda(this)" maxLength="6" id="inputPeso" name="inputPeso" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo mostraValor($rowTriagem['AtTriPeso']); ?>">
+												<input type="text" onKeyUp="moeda(this); calcularImc() "  maxLength="6" id="inputPeso" name="inputPeso" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo mostraValor($rowTriagem['AtTriPeso']); ?>">
 													<span class="input-group-prepend">
 														<span class="input-group-text">Kg</span>		
 													</span>
@@ -546,7 +780,7 @@ if (isset($_POST['inputAlergia']) ){
 											<div class="form-group">
 												<label for="inputAltura">Altura </label>
 												<div class="input-group">
-												<input type="text" onKeyUp="moeda(this)" maxLength="6" id="inputAltura" name="inputAltura" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo mostraValor($rowTriagem['AtTriAltura']); ?>">
+												<input type="text" onKeyUp="moeda(this); calcularImc()" maxLength="6" id="inputAltura" name="inputAltura" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo mostraValor($rowTriagem['AtTriAltura']); ?>">
 													<span class="input-group-prepend">
 														<span class="input-group-text">Cm</span>
 													</span>
@@ -554,7 +788,52 @@ if (isset($_POST['inputAlergia']) ){
 												</div>
 											</div>
 										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputAltura">IMC </label>
+												<div class="input-group">
+													<input type="number" maxLength="6" id="inputImc" name="inputImc" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriImc']; ?>" readonly>																										
+												</div>
+											</div>
+										</div>
 									</div>
+
+								</div>
+
+								<div class="card-header header-elements-inline">
+									<h3 class="card-title">Glicemia</h3>
+								</div>
+
+								<div class="card-body">
+
+									<div class="row">
+										<div class="col-lg-2"  style="margin-right: 20px;">
+											<div class="form-group">
+												<label for="inputGlicemiaCapilar">Glicemia Capilar </label>
+												<div class="input-group">
+												<input type="text" onKeyUp="" maxLength="3" id="inputGlicemiaCapilar" name="inputGlicemiaCapilar" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriGuicemiaCapilar']; ?>">
+													<span class="input-group-prepend">
+														<span class="input-group-text">mg/dL</span>		
+													</span>
+													
+												</div>
+											</div>
+										</div>
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputMomentoColeta">Momento da Coleta </label>
+												<div class="input-group">
+													<input type="time"  maxLength="6" id="inputMomentoColeta" name="inputMomentoColeta" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo mostraHora($rowTriagem['AtTriMomentoColeta']); ?>">																			
+												</div>
+											</div>
+										</div>
+
+									</div>
+
+								</div>
+
+								<div class="card-body">                 										
 									<br>
 									<div class="row">
 										<div class="col-lg-2"  style="margin-right: 20px;">
@@ -689,18 +968,71 @@ if (isset($_POST['inputAlergia']) ){
 									</div>	
 									<br>
 									<div class="row">
-										<div class="col-lg-12">
+
+										<div class="col-lg-5">
 											<div class="form-group">
-												<label for="txtareaObservacao">Observação </label>
-												<textarea rows="5" cols="5"  id="summernote" name="txtareaObservacao" class="form-control" placeholder="Corpo do receituário (informe aqui o texto que você queira que apareça no receituário)" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriObservacao']; ?></textarea>
+												<label for="">Procedimentos Realizado </label>
+
+												<div class="row">
+													
+													<div class="col-lg-11">														
+														<select id="cmbProcRealizado" name="cmbProcRealizado" class="form-control form-control-select2">
+															<option value="" selected>Selecione um Procedimento</option>
+
+															<?php
+                                                            $sql = "SELECT SrVenId,SrVenCodigo, SrVenNome
+																	FROM ServicoVenda
+																	WHERE SrVenUnidade = ". $_SESSION['UnidadeId'] ."
+																	ORDER BY SrVenNome ASC";
+                                                            $result = $conn->query($sql);
+                                                            $row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                            foreach ($row as $item) {
+                                                                print('<option value="' . $item['SrVenId'] . '">' . $item['SrVenCodigo'] . ' - ' . $item['SrVenNome'] . '</option>');
+                                                            }
+                                                            ?>
+
+														</select>
+													</div>
+																										
+													<div class="col-lg-1">
+														<button id="incluirServico" class="btn btn-lg btn-light" data-tipo="INCLUIRSERVICO">
+															<i class="icon-plus3 p-0" style="cursor: pointer; color: black"></i>
+														</button>														
+													</div>
+
+												</div>
+
+											</div>
+
+											<div class="row">
+												<div class="col-lg-12">
+
+													<table class="table" id="servicoTable">
+														<thead>
+															<tr class="bg-slate text-center">
+																<th >Procedimento</th>
+																<th></th>
+																
+															</tr>
+														</thead>
+														<tbody id="dataServico">
+	
+														</tbody>
+													</table>
+
+												</div>
 											</div>
 										</div>
+										
 									</div>
 
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-												<button class="btn btn-lg btn-principal" id="enviar">Salvar</button>
+												<button class="btn btn-lg btn-success" id="enviar">Salvar</button>
+												<button class="btn btn-lg btn-secondary" id="imprimir" style="margin-left: 5px;" >Imprimir</button>
+
 												<a href="atendimento.php" class="btn btn-basic" role="button">Cancelar</a>
 											</div>
 										</div>
