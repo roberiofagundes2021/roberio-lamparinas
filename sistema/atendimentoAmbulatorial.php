@@ -42,12 +42,13 @@ $userId = $rowUser['ProfissionalId'];
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, AtendClassificacaoRisco, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
                ClienNomeMae, ClienCartaoSus, ClienCelular, ClienStatus, ClienUsuarioAtualizador, ClienUnidade, ClResNome, AtTriPeso,
-			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI
+			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI, AtPrMCor
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
 		LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 		LEFT JOIN AtendimentoTriagem ON AtTriAtendimento = AtendId
+		LEFT JOIN AtendimentoProtocoloManchester ON AtPrMId = AtendClassificacaoRisco
 		JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE  AtendId = $iAtendimentoId 
 		ORDER BY AtendNumRegistro ASC";
@@ -365,8 +366,8 @@ if (isset($_POST['inputInicio']) ){
 												<div class="form-group" style="margin-left: -15px;">
 													<h5 class="text-uppercase font-weight-bold">Risco/Vulnerabilidade</h5>
 												</div>
-												<div class="form-group" style="margin-left: -15px; margin-Top: -10px;" >
-													<input type="color" value=" <?php echo $row['AtendClassificacaoRisco']; ?>" readOnly>
+												<div class="form-group" style="margin-left: -15px; margin-Top: -10px; height: 40px; width: 40px; background-color: <?php echo $row['AtPrMCor']; ?>; border-radius: 50px;" >
+
 												</div>
 											</div>	
 											<div class="card-body" style="margin-Top: -25px;">
