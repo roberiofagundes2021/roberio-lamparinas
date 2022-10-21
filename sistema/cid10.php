@@ -98,7 +98,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Lamparinas | Cid10</title>
 
-	<?php include_once("head.php"); ?>
+	<?php include_once("head.php"); ?> 
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
@@ -116,9 +116,9 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
-	
-	
-	<script type="text/javascript">
+  
+
+<script type="text/javascript">
 
 		$(document).ready(function (){	
 			$('#tblCid10').DataTable( {
@@ -297,8 +297,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<div class="col-lg-2">
 											<div class="form-group">
 												<label for="cmbCapitulo">Capítulo<span class="text-danger"> *</span></label>
-												<select id="cmbCapitulo" name="cmbCapitulo" class="form-control" required>
-													<option value="">Selecione um capítulo</option>
+												<select id="cmbCapitulo" name="cmbCapitulo" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<option value="I" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'I') echo "selected"; }?> >I</option>
 													<option value="II" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'II') echo "selected"; }?> >II</option>
 													<option value="III" <?php if (isset($_POST['inputCid10Id'])) { if ($rowCid10['Cid10Capitulo'] == 'III') echo "selected"; }?> >III</option>
