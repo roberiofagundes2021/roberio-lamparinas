@@ -418,7 +418,7 @@ if(isset($_POST['inputTipo'])){
 	
 </head>
 
-<body class="navbar-top">
+<body class="navbar-top sidebar-xs">
 
 	<?php include_once("topo.php"); ?>	
 
