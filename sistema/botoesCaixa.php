@@ -4,11 +4,11 @@
             <div class="col-7">
                 <div class="row">
                     <div class="col-3">
-                        <button id="btnPdv" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple" style="width: 100%;">PDV</button>
+                        <button id="btnPdv" class="btn btn-outline bg-slate-600 text-slate-600 border-slate <?php echo $_SESSION['PaginaAtual'] =='Caixa PDV' ? "active" : "" ?> legitRipple" style="width: 100%;">PDV</button>
                     </div>
 
                     <div class="col-3">
-                        <a href="caixaMovimentacao.php" type="button" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple" style="width: 100%;">
+                        <a href="caixaMovimentacao.php" type="button" class="btn btn-outline bg-slate-600 text-slate-600 border-slate <?php echo $_SESSION['PaginaAtual'] =='Movimentação do Caixa' ? "active" : "" ?> legitRipple" style="width: 100%;">
                             <span style="font-size: 11px;">Movimentação</span>
                         </a>   
                     </div>
@@ -20,7 +20,7 @@
                     </div>
                     
                     <div class="col-3">
-                        <button id="btnFechamento" type="button" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple caixaEmOperacao" style="width: 100%; display: none;">
+                        <button id="btnFechamento" type="button" class="btn btn-outline bg-slate-600 text-slate-600 border-slate legitRipple caixaEmOperacao <?php echo $_SESSION['PaginaAtual'] =='Caixa Fechamento' ? "active" : "" ?>" style="width: 100%; display: none;">
                             <span style="font-size: 11px;">Fechamento</span>
                         </button>   
                     </div>    
