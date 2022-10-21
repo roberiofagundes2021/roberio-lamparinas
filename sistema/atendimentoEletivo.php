@@ -236,7 +236,7 @@ if (isset($_POST['txtareaConteudo']) ){
 									<div class="row">
 										<div class="col-lg-9">
 											<div class="form-group" >
-												<label for="inputNome">Anamnese do Paciente </label>
+												<label for="inputNome"><h4>Anamnese do Paciente</h4></label>
 												<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Corpo do anamnese (informe aqui o texto que você queira que apareça no anamnese)" > <?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleAnamnese']; ?> </textarea>
 											</div>
 										</div>
@@ -245,8 +245,8 @@ if (isset($_POST['txtareaConteudo']) ){
 												<div class="form-group" style="margin-left: -15px;">
 													<h5 class="text-uppercase font-weight-bold">Risco/Vulnerabilidade</h5>
 												</div>
-												<div class="form-group" style="margin-left: -15px; margin-Top: -10px;" >
-													<input type="color" value=" <?php echo $row['AtendClassificacaoRisco']; ?>" readOnly>
+												<div class="form-group" style="margin-left: -15px; margin-Top: -10px; height: 40px; width: 40px; background-color: <?php //echo $row['AtPrMCor']; ?>; border-radius: 50px;" >
+
 												</div>
 											</div>	
 											<div class="card-body" style="margin-Top: -25px;">
@@ -255,11 +255,11 @@ if (isset($_POST['txtareaConteudo']) ){
 												</div>
 												
 												<div class="form-group" style="margin-left: -15px; margin-Top: -10px;" >
-													<label>Peso: <?php echo $row['AtTriPeso']; ?> Kg</label>
+													<label>Peso: <?php echo mostraValor($row['AtTriPeso']); ?> Kg</label>
 													<br>
-													<label>Altura: <?php echo $row['AtTriAltura']; ?> cm</label>
+													<label>Altura: <?php echo mostraValor($row['AtTriAltura']); ?> cm</label>
 													<br>
-													<label>IMC: <?php echo $row['AtTriImc']; ?> Kg/m2</label>
+													<label>IMC: <?php echo mostraValor($row['AtTriImc']); ?> Kg/m2</label>
 													<br>
 													<label>Pressão Arterial: <?php echo $row['AtTriPressaoSistolica']; ?>/<?php echo $row['AtTriPressaoDiatolica']; ?> mmHg</label>
 													<br>

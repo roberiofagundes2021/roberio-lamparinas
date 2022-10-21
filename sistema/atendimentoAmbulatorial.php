@@ -274,6 +274,92 @@ if (isset($_POST['inputInicio']) ){
 
 								<div class="card-body">
 									<div class="row">
+										<div class="col-lg-9">
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse1-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.0. Queixa Principal (QP)</a>   
+														<div class="collapse" id="collapse1-link" style="">
+															<div class="mt-3">
+																<textarea rows="5" cols="5"  id="summernote1" name="txtareaConteudo1" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na queixa principal)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbQueixaPrincipal']; ?> </textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse2-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.1. História da Moléstia Atual (HMA)</a>   
+														<div class="collapse" id="collapse2-link" style="">
+															<div class="mt-3">
+																<textarea rows="5" cols="5"  id="summernote2" name="txtareaConteudo2" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça nna história da moléstia atual)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbHistoriaMolestiaAtual']; ?> </textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse3-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.2. Exame Físico</a>   
+														<div class="collapse" id="collapse3-link" style="">
+															<div class="mt-3">
+																<textarea rows="5" cols="5"  id="summernote3" name="txtareaConteudo3" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça no exame físico)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbExameFisico']; ?> </textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse4-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.3. Suspeita Diagnóstico</a>   
+														<div class="collapse" id="collapse4-link" style="">
+															<div class="mt-3">
+																<textarea rows="5" cols="5"  id="summernote4" name="txtareaConteudo4" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na suspeita de diaginostico)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbSuspeitaDiagnostico']; ?> </textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse5-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.4. Exame Solicitado</a>   
+														<div class="collapse" id="collapse5-link" style="">
+															<div class="mt-3">
+																<textarea rows="5" cols="5"  id="summernote5" name="txtareaConteudo5" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na solicitação de exames)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbExameSolicitado']; ?> </textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse6-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.5. Prescrição</a>   
+														<div class="collapse" id="collapse6-link" style="">
+															<div class="mt-3">
+																<textarea rows="5" cols="5"  id="summernote6" name="txtareaConteudo6" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na prescrição)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbPrescricao']; ?> </textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse7-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.6. Outras Observações</a>   
+														<div class="collapse" id="collapse7-link" style="">
+															<div class="mt-3">
+																<textarea rows="5" cols="5"  id="summernote7" name="txtareaConteudo7" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça no observação)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbOutrasObservacoes']; ?> </textarea>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
 										<div class="col-lg-3">
 											<div class="card-body" style="margin-Top: -20px;">
 												<div class="form-group" style="margin-left: -15px;">
@@ -302,90 +388,6 @@ if (isset($_POST['inputInicio']) ){
 													<label>Temperatura AXI: <?php echo $row['AtTriTempAXI']; ?> ºC</label>
 												</div>
 											</div>	
-										</div>	
-									</div>
-									<div class="row">
-										<div class="col-lg-12">
-											<div class="form-group">
-                                                <a href="#collapse1-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.0. Queixa Principal (QP)</a>   
-                                                <div class="collapse" id="collapse1-link" style="">
-                                                    <div class="mt-3">
-                                                        <textarea rows="5" cols="5"  id="summernote1" name="txtareaConteudo1" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na queixa principal)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbQueixaPrincipal']; ?> </textarea>
-                                                    </div>
-                                                </div>
-											</div>
-										</div>
-									</div>
-                                    <div class="row">
-										<div class="col-lg-12">
-											<div class="form-group">
-                                                <a href="#collapse2-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.1. História da Moléstia Atual (HMA)</a>   
-                                                <div class="collapse" id="collapse2-link" style="">
-                                                    <div class="mt-3">
-                                                        <textarea rows="5" cols="5"  id="summernote2" name="txtareaConteudo2" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça nna história da moléstia atual)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbHistoriaMolestiaAtual']; ?> </textarea>
-                                                    </div>
-                                                </div>
-											</div>
-										</div>
-									</div>
-                                    <div class="row">
-										<div class="col-lg-12">
-											<div class="form-group">
-                                                <a href="#collapse3-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.2. Exame Físico</a>   
-                                                <div class="collapse" id="collapse3-link" style="">
-                                                    <div class="mt-3">
-                                                        <textarea rows="5" cols="5"  id="summernote3" name="txtareaConteudo3" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça no exame físico)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbExameFisico']; ?> </textarea>
-                                                    </div>
-                                                </div>
-											</div>
-										</div>
-									</div>
-                                    <div class="row">
-										<div class="col-lg-12">
-											<div class="form-group">
-                                                <a href="#collapse4-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.3. Suspeita Diagnóstico</a>   
-                                                <div class="collapse" id="collapse4-link" style="">
-                                                    <div class="mt-3">
-                                                        <textarea rows="5" cols="5"  id="summernote4" name="txtareaConteudo4" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na suspeita de diaginostico)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbSuspeitaDiagnostico']; ?> </textarea>
-                                                    </div>
-                                                </div>
-											</div>
-										</div>
-									</div>
-                                    <div class="row">
-										<div class="col-lg-12">
-											<div class="form-group">
-                                                <a href="#collapse5-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.4. Exame Solicitado</a>   
-                                                <div class="collapse" id="collapse5-link" style="">
-                                                    <div class="mt-3">
-                                                        <textarea rows="5" cols="5"  id="summernote5" name="txtareaConteudo5" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na solicitação de exames)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbExameSolicitado']; ?> </textarea>
-                                                    </div>
-                                                </div>
-											</div>
-										</div>
-									</div>
-                                    <div class="row">
-										<div class="col-lg-12">
-											<div class="form-group">
-                                                <a href="#collapse6-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.5. Prescrição</a>   
-                                                <div class="collapse" id="collapse6-link" style="">
-                                                    <div class="mt-3">
-                                                        <textarea rows="5" cols="5"  id="summernote6" name="txtareaConteudo6" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na prescrição)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbPrescricao']; ?> </textarea>
-                                                    </div>
-                                                </div>
-											</div>
-										</div>
-									</div>
-                                    <div class="row">
-										<div class="col-lg-12">
-											<div class="form-group">
-                                                <a href="#collapse7-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"> 1.6. Outras Observações</a>   
-                                                <div class="collapse" id="collapse7-link" style="">
-                                                    <div class="mt-3">
-                                                        <textarea rows="5" cols="5"  id="summernote7" name="txtareaConteudo7" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça no observação)" > <?php if (isset($iAtendimentoAmbulatorialId )) echo $rowAmbulatorial['AtAmbOutrasObservacoes']; ?> </textarea>
-                                                    </div>
-                                                </div>
-											</div>
 										</div>
 									</div>
 									<div class="row">
