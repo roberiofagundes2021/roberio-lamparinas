@@ -27,6 +27,21 @@ $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
+//CONSULTA MOVIDA PARA MESMA PÁGINA PARA VERIFICAÇÃO MAIS RÁPIDA 
+$sql_saldoInicial    = "SELECT CxAbeId, CaixaNome, CxAbeCaixa, CxAbeDataHoraAbertura, CxAbeDataHoraFechamento, SituaChave
+            FROM CaixaAbertura
+            JOIN Caixa on CaixaId = CxAbeCaixa
+            JOIN Situacao on SituaId = CxAbeStatus
+            WHERE CxAbeOperador = ".$_SESSION['UsuarId']." AND CxAbeUnidade = $_SESSION[UnidadeId]
+            ORDER BY CxAbeId DESC";
+$resultSaldoInicial  = $conn->query($sql_saldoInicial);
+
+if ($rowSaldoInicial = $resultSaldoInicial->fetch(PDO::FETCH_ASSOC)) {
+    $rowREsult = $rowSaldoInicial;
+} else {
+    $rowResult = 'abrirCaixa';
+}
+
 $abrirPopUpCaixaAbertura = isset($_GET['paginaredirecionada']) ? 1 : 0;
 
 $data = date("Y-m-d");
@@ -70,7 +85,8 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
     <script type="text/javascript">
         $(document).ready(function () {
 
-            $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
+            $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data
+            consultaSituacaoCaixa();
 
             /* Início: Tabela Personalizada */
             $('#tblMovimentacao').DataTable({
@@ -654,36 +670,25 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                 })
             }) 
 
-            //Função para determinar a visibilidade de Retirada e Fechamento do caixa no "Resumo do Caixa"
+            //Função para determinar a visibilidade de Retirada e Fechamento do caixa no "Resumo do Caixa" --- REFATORADA COM PHP
             function consultaSituacaoCaixa() {
-                let urlConsultaAberturaCaixa = "consultaAberturaCaixa.php";
 
-                $.ajax({
-                    type: "POST",
-                    url: urlConsultaAberturaCaixa,
-                    dataType: "json",
-                    success: function(resposta) {
-                        //Essa condicional acontece quando n há registros no banco
-                        if(resposta == 'abrirCaixa') {
-                            $(".caixaEmOperacao").hide();
-                        }else {
-                            //Essa situação é quando há registros, porém o caixa está fechado
-                            if(resposta.SituaChave == 'FECHADO') {
-                                $(".caixaEmOperacao").hide();
-                            }else {
-                                $(".caixaEmOperacao").show();
-                            }
-                            
-                            $("#inputAberturaCaixaId").val(resposta.CxAbeId);
-                            $("#inputCaixaId").val(resposta.CxAbeCaixa);
-                            $("#inputSaldoInicial").val(float2moeda(resposta.CxAbeSaldoFinal));
-                        }
-                    }
-                })
+                <?php if($rowResult == 'abrirCaixa') { ?>
+                    $(".caixaEmOperacao").hide();
+                <?php } else { ?>
+                    <?php if($rowResult['SituaChave'] == 'FECHADO') { ?>
+                        $(".caixaEmOperacao").hide();
+                    <?php } else { ?>
+                        $(".caixaEmOperacao").show();
+                    <?php } ?>
+                    $("#inputAberturaCaixaId").val(<?php echo $rowResult['CxAbeId']; ?>);
+                    $("#inputCaixaId").val(<?php echo $rowResult['CxAbeCaixa']; ?>);
+                    $("#inputSaldoInicial").val(float2moeda(<?php echo $rowResult['CxAbeSaldoFinal']; ?>));
+                <?php } ?>
+                
             }
-
-            consultaSituacaoCaixa();
-        });
+                    
+        });//DOCUMENT READY
 
         function verificaPopUpAberturaCaixa() {
             let abriPopUpAberturaCaixa = '<?php echo $abrirPopUpAberturaCaixa; ?>'
