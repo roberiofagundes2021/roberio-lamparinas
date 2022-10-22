@@ -880,6 +880,8 @@ try{
 			'nascimento' => isset($_POST['nascimento'])?$_POST['nascimento']:'null',
 			'nomePai' => isset($_POST['nomePai'])?$_POST['nomePai']:'null',
 			'nomeMae' => isset($_POST['nomeMae'])?$_POST['nomeMae']:'null',
+			'estadoCivil' => isset($_POST['estadoCivil'])?$_POST['estadoCivil']:'null',
+			'naturalidade' => isset($_POST['naturalidade'])?$_POST['naturalidade']:'null',
 			'profissao' => isset($_POST['profissao'])?$_POST['profissao']:'null',
 			'cep' => isset($_POST['cep'])?$_POST['cep']:'null',
 			'endereco' => isset($_POST['endereco'])?$_POST['endereco']:'null',
@@ -896,13 +898,13 @@ try{
 		];
 		$sql = "INSERT INTO Cliente(ClienNome,
 			ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-			ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
+			ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 			ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 			ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade)
 			VALUES('$paciente[pessoaTipo]','$paciente[nome]','$paciente[nome]','$paciente[cpf]','$paciente[rg]',
 			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[nascimento]','$paciente[nomePai]','$paciente[nomeMae]',
-			'$paciente[profissao]','$paciente[cep]','$paciente[endereco]','$paciente[numero]','$paciente[complemento]',
-			'$paciente[bairro]','$paciente[cidade]','$paciente[estado]','$paciente[contato]','$paciente[telefone]',
+			'$paciente[estadoCivil]','$paciente[naturalidade]','$paciente[profissao]','$paciente[cep]','$paciente[endereco]','$paciente[numero]',
+			'$paciente[complemento]','$paciente[bairro]','$paciente[cidade]','$paciente[estado]','$paciente[contato]','$paciente[telefone]',
 			'$paciente[celular]','$paciente[email]','$paciente[observacao]','$rowStatus[SituaId]','$usuarioId','$iUnidade')";
 		$conn->query($sql);
 		$pacienteId = $conn->lastInsertId();
@@ -1041,6 +1043,8 @@ try{
 				ClienDtNascimento= '$cliente[nascimento]',
 				ClienNomePai= '$cliente[nomePai]',
 				ClienNomeMae= '$cliente[nomeMae]',
+				ClienEstadoCivil= '$cliente[estadoCivil]',
+				ClienNaturalidade= '$cliente[naturalidade]',
 				ClienProfissao= '$cliente[profissao]',
 				ClienCep= '$cliente[cep]',
 				ClienEndereco= '$cliente[endereco]',
@@ -1179,7 +1183,7 @@ try{
 
 		$sql = "SELECT ClienId,ClienNome,ClienCodigo,
 		ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienCartaoSus,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 		ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente WHERE ClienId = $iPaciente and ClienUnidade = $iUnidade";
@@ -1201,6 +1205,8 @@ try{
 				'nascimento' => $row['ClienDtNascimento'],
 				'nomePai' => $row['ClienNomePai'],
 				'nomeMae' => $row['ClienNomeMae'],
+				'estadoCivil' => $row['ClienEstadoCivil'],
+				'naturalidade' => $row['ClienNaturalidade'],
 				'profissao' => $row['ClienProfissao'],
 				'cep' => $row['ClienCep'],
 				'endereco' => $row['ClienEndereco'],
@@ -1252,7 +1258,7 @@ try{
 
 		// busca todos os usuários com o novo inserido para adicionalo ja selecionado no select
 		$sql = "SELECT ClienId,ClienCodigo,ClienNome,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienCartaoSus,ClienProfissao,ClienCep,ClienEndereco,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
 		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente";
