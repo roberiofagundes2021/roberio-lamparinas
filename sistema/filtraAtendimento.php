@@ -629,7 +629,7 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtPrMCor
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -638,6 +638,7 @@ try{
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+			LEFT JOIN AtendimentoProtocoloManchester ON AtPrMId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtXSeId DESC";
@@ -646,7 +647,7 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtPrMCor
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -655,6 +656,7 @@ try{
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+			LEFT JOIN AtendimentoProtocoloManchester ON AtPrMId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtXSeId DESC";
@@ -685,6 +687,10 @@ try{
 							</div>
 						</div>
 					</div>";
+			
+					$classificacao = "<div class='list-icons'>
+										<div style='height: 25px; width: 25px; background-color: $item[AtPrMCor]; border-radius: 13px;' >
+									</div>";
 		
 			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
 			
@@ -697,7 +703,7 @@ try{
 					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
-					'Risco**',  // Risco
+					$classificacao,  // Risco
 					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
@@ -728,6 +734,10 @@ try{
 							</div>
 						</div>
 					</div>";
+					
+			$classificacao = "<div class='list-icons'>
+								<div style='height: 25px; width: 25px; background-color: $item[AtPrMCor]; border-radius: 13px;' >
+							</div>";
 		
 			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
 			
@@ -741,7 +751,7 @@ try{
 					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
-					'Risco**',  // Risco
+					$classificacao,  // Risco
 					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
