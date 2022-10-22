@@ -185,7 +185,7 @@ $acesso = 'ATENDIMENTO';
 				},
 				{ 
 					orderable: true,   //Risco
-					width: "20%",
+					width: "10%",
 					targets: [7]
 				},
 				{ 
@@ -260,7 +260,7 @@ $acesso = 'ATENDIMENTO';
 				},
 				{ 
 					orderable: true,   //Risco
-					width: "20%",
+					width: "10%",
 					targets: [7]
 				},
 				{ 
@@ -595,7 +595,7 @@ $acesso = 'ATENDIMENTO';
 											<th>Prontuário</th>			
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Risco</th>
+											<th>Classificação de Risco</th>
 											<th>Situação</th>
 											<th class="text-center">Ações</th>
 										</tr>
@@ -620,7 +620,7 @@ $acesso = 'ATENDIMENTO';
 											<th>Prontuário</th>			
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Risco</th>
+											<th>Classificação de Risco</th>
 											<th>Situação</th>
 											<th class="text-center">Ações</th>
 										</tr>
