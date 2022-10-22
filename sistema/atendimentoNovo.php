@@ -911,6 +911,7 @@ $_SESSION['atendimento'] = [
 							$('#uf').val(response.uf)
 							$('#estado').val(response.estado)
 							$('#sexo').val(response.sexo)
+							$('#estadoCivil').val(response.estadoCivil)
 
 							$('#uf').children("option").each(function(index, item){
 								if($(item).val() == response.uf){
@@ -924,6 +925,11 @@ $_SESSION['atendimento'] = [
 							})
 							$('#sexo').children("option").each(function(index, item){
 								if($(item).val() == response.sexo){
+									$(item).change()
+								}
+							})
+							$('#estadoCivil').children("option").each(function(index, item){
+								if($(item).val() == response.estadoCivil){
 									$(item).change()
 								}
 							})
