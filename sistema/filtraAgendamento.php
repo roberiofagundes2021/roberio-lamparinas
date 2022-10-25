@@ -526,7 +526,8 @@ try{
 		$iMedico = $_POST['iMedico'];
 
 		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
-		FROM ProfissionalAgenda WHERE PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade";
+		FROM ProfissionalAgenda WHERE PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade
+		ORDER BY PrAgeData ASC";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -574,7 +575,20 @@ try{
 			]);
 		}
 
+		$sql = "SELECT AgendHorario 
+		FROM Agendamento
+		WHERE AgendData = '$data' AND AgendProfissional = $iMedico AND AgendUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row2 = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$horariosIndisp = [];
+		foreach ($row2 as $item ) {		
+			$horaA = explode(':', $item['AgendHorario']);
+			array_push($horariosIndisp, [ intval($horaA[0]), intval($horaA[1]) ] );		
+		}
+
 		echo json_encode([
+			'horariosIndisp' => $horariosIndisp,
 			'arrayHora' => $arrayHora,
 			'intervalo'=> $intervalo,
 			'status' => 'success',

@@ -1581,7 +1581,8 @@ try{
 		$iMedico = $_POST['iMedico'];
 
 		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
-		FROM ProfissionalAgenda WHERE PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade";
+		FROM ProfissionalAgenda WHERE PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade
+		ORDER BY PrAgeData ASC";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 

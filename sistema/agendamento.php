@@ -82,12 +82,12 @@ include('global_assets/php/conexao.php');
 				},				
 				{ 
 					orderable: true,   //Profissional
-					width: "10%",
+					width: "15%",
 					targets: [3]
 				},
 				{ 
 					orderable: true,   //Cbo
-					width: "15%",
+					width: "10%",
 					targets: [4]
 				},
 				{ 
