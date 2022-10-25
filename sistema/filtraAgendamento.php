@@ -356,7 +356,7 @@ try{
 		]);
 		irpara('agendamento.php');
 	} elseif ($tipoRequest == 'EXCLUI'){
-		$iAgendamento = $_POST['iAgendamento'];
+		$iAgendamento = $_POST['id'];
 	
 		$sql = "DELETE FROM AgendamentoXServico WHERE AgXSeAgendamento = $iAgendamento
 		and AgXSeUnidade = $iUnidade";

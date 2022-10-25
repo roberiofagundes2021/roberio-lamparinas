@@ -200,7 +200,7 @@ $_SESSION['atendimento'] = [
 						success: function(response) {
 							if (response.status == 'success') {
 								alerta(response.titulo, response.menssagem, response.status)
-								window.location.href = 'atendimento.php'
+								// window.location.href = 'atendimento.php'
 							} else {
 								alerta(response.titulo, response.menssagem, response.status);
 							}
@@ -493,12 +493,7 @@ $_SESSION['atendimento'] = [
 				e.preventDefault()
 
 				let menssageError = ''
-
 				switch (menssageError) {
-					case $('#prontuarioNew').val():
-						menssageError = 'Informe o prontuário!!';
-						$('#prontuarioNew').focus();
-						break;
 					case $('#nomeNew').val():
 						menssageError = 'Informe o nome!!';
 						$('#nomeNew').focus();
@@ -507,74 +502,6 @@ $_SESSION['atendimento'] = [
 						menssageError = 'Informe o CPF!!';
 						$('#cpfNew').focus();
 						break;
-					case $('#rgNew').val():
-						menssageError = 'Informe o RG!!';
-						$('#rgNew').focus();
-						break;
-					case $('#emissorNew').val():
-						menssageError = 'Informe o emissor!!';
-						$('#emissorNew').focus();
-						break;
-					case $('#ufNew').val():
-						menssageError = 'Informe o UF!!';
-						$('#ufNew').focus();
-						break;
-					case $('#sexoNew').val():
-						menssageError = 'Informe o sexo!!';
-						$('#sexoNew').focus();
-						break;
-					case $('#nascimentoNew').val():
-						menssageError = 'Informe a data de nascimento!!';
-						$('#nascimentoNew').focus();
-						break;
-					case $('#nomePaiNew').val():
-						menssageError = 'Informe o nome do pai!!';
-						$('#nomePaiNew').focus();
-						break;
-					case $('#nomeMaeNew').val():
-						menssageError = 'Informe o nome da mãe!!';
-						$('#nomeMaeNew').focus();
-						break;
-					case $('#profissaoNew').val():
-						menssageError = 'Informe a profissão!!';
-						$('#profissaoNew').focus();
-						break;
-					case $('#cepNew').val():
-						menssageError = 'Informe o CEP!!';
-						$('#cepNew').focus();
-						break;
-					case $('#enderecoNew').val():
-						menssageError = 'Informe o endereço!!';
-						$('#enderecoNew').focus();
-						break;
-					case $('#numeroNew').val():
-						menssageError = 'Informe o número!!';
-						$('#numeroNew').focus();
-						break;
-					case $('#bairroNew').val():
-						menssageError = 'Informe o bairro!!';
-						$('#bairroNew').focus();
-						break;
-					case $('#cidadeNew').val():
-						menssageError = 'Informe a cidade!!';
-						$('#cidadeNew').focus();
-						break;
-					case $('#estadoNew').val():
-						menssageError = 'Informe o estado!!';
-						$('#estadoNew').focus();
-						break;
-					case $('#contatoNew').val():
-						menssageError = 'Informe o nome do contato!!';
-						$('#contatoNew').focus();
-						break;
-					case $('#telefoneNew').val() || $('#celularNew').val():
-						menssageError = 'Informe o telefone ou celular!!';
-						$('#telefoneNew').val() || $('#celularNew').focus();
-						break;
-					case $('#emailNew').val():
-						menssageError = 'Informe um e-mail!!';
-						$('#emailNew').focus();
-						break;
 					default:
 						menssageError = '';
 						break;
@@ -582,6 +509,10 @@ $_SESSION['atendimento'] = [
 
 				if (menssageError) {
 					alerta('Campo Obrigatório!', menssageError, 'error')
+					return
+				}
+				if(!validaCPF($('#cpfNew').val())){
+					alerta('CPF Inválido!', 'Digite um CPF válido!!', 'error')
 					return
 				}
 
@@ -613,14 +544,18 @@ $_SESSION['atendimento'] = [
 						'telefone': $('#telefoneNew').val(),
 						'celular': $('#celularNew').val(),
 						'email': $('#emailNew').val(),
+						'estadoCivil': $('#cmbEstadoCivil').val(),
+						'naturalidade': $('#inputNaturalidade').val(),
+						'site': $('#siteNew').val(),
 						'observacao': $('#observacaoNew').val()
 					},
-					success: function(response) {
+					success: async function(response) {
 						if (response.status == 'success') {
 							alerta(response.titulo, response.menssagem, response.status)
-							getCmbs({
+							await getCmbs({
 								'pacienteID': response.id
 							})
+							setPacienteAtribut(response.id)
 							$('#page-modal-paciente').fadeOut(200)
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
@@ -638,46 +573,6 @@ $_SESSION['atendimento'] = [
 					case $('#nomeRespNew').val():
 						menssageError = 'Informe o nome!!';
 						$('#nomeResp').focus();
-						break;
-					case $('#parentescoRespNew').val():
-						menssageError = 'Informe o grau de parentesco!!';
-						$('#parentescoResp').focus();
-						break;
-					case $('#nascimentoRespNew').val():
-						menssageError = 'Informe a data de nascimento';
-						$('#nascimentoResp').focus();
-						break;
-					case $('#cepRespNew').val():
-						menssageError = 'Informe o CEP';
-						$('#cepResp').focus();
-						break;
-					case $('#enderecoRespNew').val():
-						menssageError = 'Informe o endereço';
-						$('#enderecoResp').focus();
-						break;
-					case $('#numeroRespNew').val():
-						menssageError = 'Informe o número';
-						$('#numeroResp').focus();
-						break;
-					case $('#bairroRespNew').val():
-						menssageError = 'Informe o bairro';
-						$('#bairroResp').focus();
-						break;
-					case $('#cidadeRespNew').val():
-						menssageError = 'Informe a cidade';
-						$('#cidadeResp').focus();
-						break;
-					case $('#estadoRespNew').val():
-						menssageError = 'Informe o estado';
-						$('#estadoResp').focus();
-						break;
-					case $('#celularRespNew').val() || $('#telefoneResp').val():
-						menssageError = 'Informe um contato';
-						$('#telefoneResp').focus();
-						break;
-					case $('#emailRespNew').val():
-						menssageError = 'Informe um e-mail';
-						$('#emailResp').focus();
 						break;
 					default:
 						menssageError = '';
@@ -711,12 +606,13 @@ $_SESSION['atendimento'] = [
 						'emailResp': $('#emailRespNew').val(),
 						'observacaoResp': $('#complementoRespNew').val()
 					},
-					success: function(response) {
+					success: async function(response) {
 						if (response.status == 'success') {
 							alerta(response.titulo, response.menssagem, response.status)
-							getCmbs({
-								'responsavelID': response.paciente
+							await getCmbs({
+								'responsavelID': response.responsavel
 							})
+							setResponsavelAtribut(response.responsavel)
 							$('#page-modal-responsavel').fadeOut(200)
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
@@ -738,6 +634,124 @@ $_SESSION['atendimento'] = [
 				$('#iAtendimento').val('')
 				$('#page-modal-responsavel').fadeOut(200)
 			})
+
+			//Esta função será executada quando o campo cep perder o foco.
+			$("#cepNew").blur(function() {
+				//$("#cmbEstado").removeClass("form-control-select2");
+
+				//Nova variável "cep" somente com dígitos.
+				var cep = $(this).val().replace(/\D/g, '');
+
+				//Verifica se campo cep possui valor informado.
+				if (cep != "") {
+
+					//Expressão regular para validar o CEP.
+					var validacep = /^[0-9]{8}$/;
+
+					//Valida o formato do CEP.
+					if (validacep.test(cep)) {
+
+						//Preenche os campos com "..." enquanto consulta webservice.
+						$("#enderecoNew").val("...");
+						$("#bairroNew").val("...");
+						$("#cidadeNew").val("...");
+						$("#estadoNew").val("...");
+
+						//Consulta o webservice viacep.com.br/
+						$.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
+
+							if (!("erro" in dados)) {
+
+								//Atualiza os campos com os valores da consulta.
+								$("#enderecoNew").val(dados.logradouro);
+								$("#bairroNew").val(dados.bairro);
+								$("#cidadeNew").val(dados.localidade);
+								
+								$("#estadoNew").val(dados.uf);
+								$('#estadoNew').children("option").each(function(index, item){									
+									if($(item).val().toUpperCase() == dados.uf.toUpperCase()){
+										$(item).change()
+									}
+								})
+							} //end if.
+							else {
+								//CEP pesquisado não foi encontrado.
+								limpa_formulário_cep();
+								alerta("Erro", "CEP não encontrado.", "erro");
+							}
+						});
+					} //end if.
+					else {
+						//cep é inválido.
+						$("#inputCep").val("");
+						limpa_formulário_cep();
+						alerta("Erro", "Formato de CEP inválido.", "erro");
+					}
+				} //end if.
+				else {
+					//cep sem valor, limpa formulário.
+					limpa_formulário_cep();
+				}
+			}); //cep
+
+			//Esta função será executada quando o campo cep perder o foco.
+			$("#cepRespNew").blur(function() {
+				//$("#cmbEstado").removeClass("form-control-select2");
+
+				//Nova variável "cep" somente com dígitos.
+				var cep = $(this).val().replace(/\D/g, '');
+
+				//Verifica se campo cep possui valor informado.
+				if (cep != "") {
+
+					//Expressão regular para validar o CEP.
+					var validacep = /^[0-9]{8}$/;
+
+					//Valida o formato do CEP.
+					if (validacep.test(cep)) {
+
+						//Preenche os campos com "..." enquanto consulta webservice.
+						$("#enderecoRespNew").val("...");
+						$("#bairroRespNew").val("...");
+						$("#cidadeRespNew").val("...");
+						$("#estadoRespNew").val("...");
+
+						//Consulta o webservice viacep.com.br/
+						$.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
+
+							if (!("erro" in dados)) {
+
+								//Atualiza os campos com os valores da consulta.
+								$("#enderecoRespNew").val(dados.logradouro);
+								$("#bairroRespNew").val(dados.bairro);
+								$("#cidadeRespNew").val(dados.localidade);
+								
+								$("#estadoRespNew").val(dados.uf);
+								$('#estadoRespNew').children("option").each(function(index, item){									
+									if($(item).val().toUpperCase() == dados.uf.toUpperCase()){
+										$(item).change()
+									}
+								})
+							} //end if.
+							else {
+								//CEP pesquisado não foi encontrado.
+								limpa_formulário_cep();
+								alerta("Erro", "CEP não encontrado.", "erro");
+							}
+						});
+					} //end if.
+					else {
+						//cep é inválido.
+						$("#inputCep").val("");
+						limpa_formulário_cep();
+						alerta("Erro", "Formato de CEP inválido.", "erro");
+					}
+				} //end if.
+				else {
+					//cep sem valor, limpa formulário.
+					limpa_formulário_cep();
+				}
+			}); //cep
 
 			$('#formServicoAtendimento').submit(function(e) {
 				e.preventDefault()
@@ -763,7 +777,8 @@ $_SESSION['atendimento'] = [
 					$('#paciente').append(`<option value=''>selecione</option>`)
 					let opt = ''
 					response.forEach(item => {
-						opt = opt = `<option value="${item.id}">${item.nome}</option>`
+						let id = obj && obj.pacienteID? obj.pacienteID:null
+						opt = id == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#paciente').append(opt)
 					})
 				}
@@ -832,8 +847,11 @@ $_SESSION['atendimento'] = [
 					let opt = ''
 					$('#parentescoCadatrado').html("<option selected value=''>selecione</option>")
 					response.data.forEach(function(item, index) {
-						$('#parentescoCadatrado').append('<option value="' + item.id + '">' + item.nome + '</option>');
+						let id = obj && obj.responsavelID? obj.responsavelID:null
+						opt = id == item.id?`<option selected value='${item.id}'>${item.nome}</option>`:`<option value='${item.id}'>${item.nome}</option>`
+						$('#parentescoCadatrado').append(opt);
 					});
+					
 				},
 				error: function(response) {}
 			});
@@ -858,9 +876,30 @@ $_SESSION['atendimento'] = [
 			});
 		}
 
+		function validaCPF(strCPF) {
+			var Soma;
+			var Resto;
+			Soma = 0;
+			if (strCPF == "00000000000") return false;
+
+			for (i = 1; i <= 9; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (11 - i);
+			Resto = (Soma * 10) % 11;
+
+			if ((Resto == 10) || (Resto == 11)) Resto = 0;
+			if (Resto != parseInt(strCPF.substring(9, 10))) return false;
+
+			Soma = 0;
+			for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (12 - i);
+			Resto = (Soma * 10) % 11;
+
+			if ((Resto == 10) || (Resto == 11)) Resto = 0;
+			if (Resto != parseInt(strCPF.substring(10, 11))) return false;
+			return true;
+		}
+
 		// essa função vai setar os atributos nos campos quando for selecionado o paciente
-		function setPacienteAtribut() {
-			iPaciente = $('#paciente').val()
+		function setPacienteAtribut(id) {
+			iPaciente = id?id:$('#paciente').val()
 			if (iPaciente) {
 				$.ajax({
 					type: 'POST',
@@ -953,7 +992,7 @@ $_SESSION['atendimento'] = [
 			}
 
 			$('.actions a').each(function(index, element) {
-				if ($(element).attr('href') == '#next' && !$('#paciente').val()) {
+				if ($(element).attr('href') == '#next' && !iPaciente) {
 					$(element).attr('href', '#')
 					$(element).on('click', function(e){
 						$('#dadosPaciente').submit()
@@ -963,8 +1002,8 @@ $_SESSION['atendimento'] = [
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o responsável
-		function setResponsavelAtribut() {
-			iResponsavel = $('#parentescoCadatrado').val()
+		function setResponsavelAtribut(id) {
+			iResponsavel = id?id:$('#parentescoCadatrado').val()
 			if (iResponsavel) {
 				$.ajax({
 					type: 'POST',
@@ -1049,7 +1088,8 @@ $_SESSION['atendimento'] = [
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
 				data: {
-					'tipoRequest': 'CHECKSERVICO'
+					'tipoRequest': 'CHECKSERVICO',
+					'tipo': 'ATENDIMENTO'
 				},
 				success: async function(response) {
 					statusServicos = response.array.length ? true : false;
@@ -1513,7 +1553,7 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
-											<label>Prontuário <span class="text-danger">*</span></label>
+											<label>Prontuário</label>
 										</div>
 										<div class="col-lg-3">
 											<label>Nome <span class="text-danger">*</span></label>
@@ -1543,30 +1583,30 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-2">
-											<label>RG <span class="text-danger">*</span></label>
+											<label>RG</label>
 										</div>
 										<div class="col-lg-3">
-											<label>Emissor <span class="text-danger">*</span></label>
+											<label>Emissor</label>
 										</div>
 										<div class="col-lg-2">
-											<label>UF <span class="text-danger">*</span></label>
+											<label>UF</label>
 										</div>
 										<div class="col-lg-2">
-											<label>Sexo <span class="text-danger">*</span></label>
+											<label>Sexo</label>
 										</div>
 										<div class="col-lg-3">
-											<label>Data de Nascimento <span class="text-danger">*</span></label>
+											<label>Data de Nascimento</label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-2">
-											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG" required>
+											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG">
 										</div>
 										<div class="col-lg-3">
-											<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor" required>
+											<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor">
 										</div>
 										<div class="col-lg-2">
-											<select id="uf" name="uf" class="form-control form-control-select2" placeholder="UF" required>
+											<select id="uf" name="uf" class="form-control form-control-select2" placeholder="UF">
 												<option value="">Selecione</option>
 												<option value="AC">AC</option>
 												<option value="AL">AL</option>
@@ -1599,44 +1639,44 @@ $_SESSION['atendimento'] = [
 											</select>
 										</div>
 										<div class="col-lg-2">
-											<select id="sexo" name="sexo" class="form-control form-control-select2" required>
+											<select id="sexo" name="sexo" class="form-control form-control-select2">
 												<option value="" selected>selecionar</option>
 												<option value="M">Masculino</option>
 												<option value="F">Feminino</option>
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa" required>
+											<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa">
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-6">
-											<label>Nome do Pai <span class="text-danger">*</span></label>
+											<label>Nome do Pai</label>
 										</div>
 										<div class="col-lg-6">
-											<label>Nome da Mãe <span class="text-danger">*</span></label>
+											<label>Nome da Mãe</label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-6">
-											<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai" required>
+											<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai">
 										</div>
 										<div class="col-lg-6">
-											<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe" required>
+											<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe">
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-12">
-											<label>Profissão <span class="text-danger">*</span></label>
+											<label>Profissão</label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-12">
-											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão" required>
+											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão">
 										</div>
 									</div>
 
@@ -1647,13 +1687,13 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
-											<label>CEP <span class="text-danger">*</span></label>
+											<label>CEP</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Endereço <span class="text-danger">*</span></label>
+											<label>Endereço</label>
 										</div>
 										<div class="col-lg-2">
-											<label>Nº <span class="text-danger">*</span></label>
+											<label>Nº</label>
 										</div>
 										<div class="col-lg-3">
 											<label>Complemento</label>
@@ -1661,13 +1701,13 @@ $_SESSION['atendimento'] = [
 
 										<!-- campos -->
 										<div class="col-lg-3">
-											<input id="cep" name="cep" type="text" class="form-control" placeholder="CEP" required>
+											<input id="cep" name="cep" type="text" class="form-control" placeholder="CEP">
 										</div>
 										<div class="col-lg-4">
-											<input id="endereco" name="endereco" type="text" class="form-control" placeholder="EX.: Rua, Av" required>
+											<input id="endereco" name="endereco" type="text" class="form-control" placeholder="EX.: Rua, Av">
 										</div>
 										<div class="col-lg-2">
-											<input id="numero" name="numero" type="text" class="form-control" placeholder="Número" required>
+											<input id="numero" name="numero" type="text" class="form-control" placeholder="Número">
 										</div>
 										<div class="col-lg-3">
 											<input id="complemento" name="complemento" type="text" class="form-control" placeholder="Complemento">
@@ -1677,24 +1717,24 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
-											<label>Bairro <span class="text-danger">*</span></label>
+											<label>Bairro</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Cidade <span class="text-danger">*</span></label>
+											<label>Cidade</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Estado <span class="text-danger">*</span></label>
+											<label>Estado</label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="bairro" name="bairro" type="text" class="form-control" placeholder="Bairro" required>
+											<input id="bairro" name="bairro" type="text" class="form-control" placeholder="Bairro">
 										</div>
 										<div class="col-lg-4">
-											<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade" required>
+											<input id="cidade" name="cidade" type="text" class="form-control" placeholder="Cidade">
 										</div>
 										<div class="col-lg-4">
-											<select id="estado" name="estado" class="form-control form-control-select2" placeholder="Estado" required>
+											<select id="estado" name="estado" class="form-control form-control-select2" placeholder="Estado">
 												<option value="#">Selecione um estado</option>
 												<option value="AC">Acre</option>
 												<option value="AL">Alagoas</option>
@@ -1735,30 +1775,30 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
-											<label>Nome <span class="text-danger">*</span></label>
+											<label>Nome</label>
 										</div>
 										<div class="col-lg-3">
-											<label>Telefone <span class="text-danger">*</span></label>
+											<label>Telefone</label>
 										</div>
 										<div class="col-lg-3">
-											<label>Celular <span class="text-danger">*</span></label>
+											<label>Celular</label>
 										</div>
 										<div class="col-lg-3">
-											<label>E-mail <span class="text-danger">*</span></label>
+											<label>E-mail</label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-3">
-											<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato" required>
+											<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato">
 										</div>
 										<div class="col-lg-3">
-											<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com." required>
+											<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com.">
 										</div>
 										<div class="col-lg-3">
-											<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular" required>
+											<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular">
 										</div>
 										<div class="col-lg-3">
-											<input id="email" name="email" type="text" class="form-control" placeholder="E-mail" required>
+											<input id="email" name="email" type="text" class="form-control" placeholder="E-mail">
 										</div>
 									</div>
 
@@ -1786,15 +1826,15 @@ $_SESSION['atendimento'] = [
 											<label>Nome <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Parentesco <span class="text-danger">*</span></label>
+											<label>Parentesco</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Nascimento <span class="text-danger">*</span></label>
+											<label>Nascimento</label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome">
+											<input id="nomeResp" name="nomeResp" type="text" class="form-control" placeholder="Nome" required>
 										</div>
 										<div class="col-lg-4">
 											<input id="parentescoResp" name="parentesco" type="text" class="form-control" placeholder="Parentesco">
@@ -1811,13 +1851,13 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
-											<label>CEP <span class="text-danger">*</span></label>
+											<label>CEP</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Endereço <span class="text-danger">*</span></label>
+											<label>Endereço</label>
 										</div>
 										<div class="col-lg-2">
-											<label>Nº <span class="text-danger">*</span></label>
+											<label>Nº</label>
 										</div>
 										<div class="col-lg-3">
 											<label>Complemento</label>
@@ -1841,13 +1881,13 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
-											<label>Bairro <span class="text-danger">*</span></label>
+											<label>Bairro</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Cidade <span class="text-danger">*</span></label>
+											<label>Cidade</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Estado <span class="text-danger">*</span></label>
+											<label>Estado</label>
 										</div>
 
 										<!-- campos -->
@@ -1858,7 +1898,7 @@ $_SESSION['atendimento'] = [
 											<input id="cidadeResp" name="cidadeResp" type="text" class="form-control" placeholder="Cidade">
 										</div>
 										<div class="col-lg-4">
-											<select id="estadoResp" name="estadoResp" class="form-control form-control-select2" placeholder="Estado" required>
+											<select id="estadoResp" name="estadoResp" class="form-control form-control-select2" placeholder="Estado">
 												<option value="#">Selecione um estado</option>
 												<option value="AC">Acre</option>
 												<option value="AL">Alagoas</option>
@@ -1905,7 +1945,7 @@ $_SESSION['atendimento'] = [
 											<label>Celular</label>
 										</div>
 										<div class="col-lg-4">
-											<label>E-mail <span class="text-danger">*</span></label>
+											<label>E-mail</label>
 										</div>
 
 										<!-- campos -->
@@ -1961,30 +2001,24 @@ $_SESSION['atendimento'] = [
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
-										<div class="col-lg-3">
-											<label>Prontuário <span class="text-danger">*</span></label>
-										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<label>Nome <span class="text-danger">*</span></label>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<label>CPF <span class="text-danger">*</span></label>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<label>CNS</label>
 										</div>
 
 										<!-- campos -->
-										<div class="col-lg-3">
-											<input id="prontuarioNew" name="prontuarioNew" type="text" class="form-control" placeholder="Prontuário Eletrônico">
+										<div class="col-lg-4">
+											<input id="nomeNew" name="nomeNew" type="text" class="form-control" placeholder="Nome completo">
 										</div>
-										<div class="col-lg-3">
-											<input id="nomeNew" name="nomeNew" type="text" class="form-control" placeholder="Nome completo" required>
+										<div class="col-lg-4">
+											<input id="cpfNew" name="cpfNew" type="text" class="form-control" placeholder="CPF">
 										</div>
-										<div class="col-lg-3">
-											<input id="cpfNew" name="cpfNew" type="text" class="form-control" placeholder="CPF" required>
-										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<input id="cnsNew" name="cnsNew" type="text" class="form-control" placeholder="Cartão do SUS">
 										</div>
 									</div>
@@ -1992,30 +2026,30 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-2">
-											<label>RG <span class="text-danger">*</span></label>
+											<label>RG</label>
 										</div>
 										<div class="col-lg-3">
-											<label>Emissor <span class="text-danger">*</span></label>
+											<label>Emissor</label>
 										</div>
 										<div class="col-lg-2">
-											<label>UF <span class="text-danger">*</span></label>
+											<label>UF</label>
 										</div>
 										<div class="col-lg-2">
-											<label>Sexo <span class="text-danger">*</span></label>
+											<label>Sexo</label>
 										</div>
 										<div class="col-lg-3">
-											<label>Data de Nascimento <span class="text-danger">*</span></label>
+											<label>Data de Nascimento</label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-2">
-											<input id="rgNew" name="rgNew" type="text" class="form-control" placeholder="RG" required>
+											<input id="rgNew" name="rgNew" type="text" class="form-control" placeholder="RG">
 										</div>
 										<div class="col-lg-3">
-											<input id="emissorNew" name="emissorNew" type="text" class="form-control" placeholder="Orgão Emissor" required>
+											<input id="emissorNew" name="emissorNew" type="text" class="form-control" placeholder="Orgão Emissor">
 										</div>
 										<div class="col-lg-2">
-											<select id="ufNew" name="ufNew" class="form-control form-control-select2" placeholder="UF" required>
+											<select id="ufNew" name="ufNew" class="form-control form-control-select2" placeholder="UF">
 												<option value="">Selecione</option>
 												<option value="AC">AC</option>
 												<option value="AL">AL</option>
@@ -2048,44 +2082,64 @@ $_SESSION['atendimento'] = [
 											</select>
 										</div>
 										<div class="col-lg-2">
-											<select id="sexoNew" name="sexoNew" class="form-control form-control-select2" required>
+											<select id="sexoNew" name="sexoNew" class="form-control form-control-select2">
 												<option value="" selected>selecionar</option>
 												<option value="M">Masculino</option>
 												<option value="F">Feminino</option>
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<input id="nascimentoNew" name="nascimentoNew" type="date" class="form-control" placeholder="dd/mm/aaaa" required>
+											<input id="nascimentoNew" name="nascimentoNew" type="date" class="form-control" placeholder="dd/mm/aaaa">
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-6">
-											<label>Nome do Pai <span class="text-danger">*</span></label>
+											<label>Nome do Pai</label>
 										</div>
 										<div class="col-lg-6">
-											<label>Nome da Mãe <span class="text-danger">*</span></label>
+											<label>Nome da Mãe</label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-6">
-											<input id="nomePaiNew" name="nomePaiNew" type="text" class="form-control" placeholder="Nome do Pai" required>
+											<input id="nomePaiNew" name="nomePaiNew" type="text" class="form-control" placeholder="Nome do Pai">
 										</div>
 										<div class="col-lg-6">
-											<input id="nomeMaeNew" name="nomeMaeNew" type="text" class="form-control" placeholder="Nome da Mãe" required>
+											<input id="nomeMaeNew" name="nomeMaeNew" type="text" class="form-control" placeholder="Nome da Mãe">
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
-										<div class="col-lg-12">
-											<label>Profissão <span class="text-danger">*</span></label>
+										<div class="col-lg-3">
+											<label>Estado Civil</label>
+										</div>
+										<div class="col-lg-3">
+											<label>Naturalidade</label>
+										</div>
+										<div class="col-lg-6">
+											<label>Profissão</label>
 										</div>
 
 										<!-- campos -->
-										<div class="col-lg-12">
-											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão" required>
+
+										<div class="col-lg-3">
+											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+												<option value="#">Selecione</option>
+												<option value="ST">Solteiro</option>
+												<option value="CS">Casado</option>
+												<option value="SP">Separado</option>
+												<option value="DV">Divorciado</option>
+												<option value="VI">Viúvo</option>
+											</select>
+										</div>
+										<div class="col-lg-3">
+											<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+										</div>
+										<div class="col-lg-6">
+											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão">
 										</div>
 									</div>
 
@@ -2096,13 +2150,13 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
-											<label>CEP <span class="text-danger">*</span></label>
+											<label>CEP</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Endereço <span class="text-danger">*</span></label>
+											<label>Endereço</label>
 										</div>
 										<div class="col-lg-2">
-											<label>Nº <span class="text-danger">*</span></label>
+											<label>Nº</label>
 										</div>
 										<div class="col-lg-3">
 											<label>Complemento</label>
@@ -2110,13 +2164,13 @@ $_SESSION['atendimento'] = [
 
 										<!-- campos -->
 										<div class="col-lg-3">
-											<input id="cepNew" name="cepNew" type="text" class="form-control" placeholder="CEP" required>
+											<input id="cepNew" name="cepNew" type="text" class="form-control" placeholder="CEP">
 										</div>
 										<div class="col-lg-4">
-											<input id="enderecoNew" name="enderecoNew" type="text" class="form-control" placeholder="EX.: Rua, Av" required>
+											<input id="enderecoNew" name="enderecoNew" type="text" class="form-control" placeholder="EX.: Rua, Av">
 										</div>
 										<div class="col-lg-2">
-											<input id="numeroNew" name="numeroNew" type="text" class="form-control" placeholder="Número" required>
+											<input id="numeroNew" name="numeroNew" type="text" class="form-control" placeholder="Número">
 										</div>
 										<div class="col-lg-3">
 											<input id="complementoNew" name="complementoNew" type="text" class="form-control" placeholder="Complemento">
@@ -2126,24 +2180,24 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
-											<label>Bairro <span class="text-danger">*</span></label>
+											<label>Bairro</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Cidade <span class="text-danger">*</span></label>
+											<label>Cidade</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Estado <span class="text-danger">*</span></label>
+											<label>Estado</label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="bairroNew" name="bairroNew" type="text" class="form-control" placeholder="Bairro" required>
+											<input id="bairroNew" name="bairroNew" type="text" class="form-control" placeholder="Bairro">
 										</div>
 										<div class="col-lg-4">
-											<input id="cidadeNew" name="cidadeNew" type="text" class="form-control" placeholder="Cidade" required>
+											<input id="cidadeNew" name="cidadeNew" type="text" class="form-control" placeholder="Cidade">
 										</div>
 										<div class="col-lg-4">
-											<select id="estadoNew" name="estadoNew" class="form-control form-control-select2" placeholder="Estado" required>
+											<select id="estadoNew" name="estadoNew" class="form-control form-control-select2" placeholder="Estado">
 												<option value="#">Selecione um estado</option>
 												<option value="AC">Acre</option>
 												<option value="AL">Alagoas</option>
@@ -2183,31 +2237,37 @@ $_SESSION['atendimento'] = [
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
-										<div class="col-lg-3">
-											<label>Nome <span class="text-danger">*</span></label>
+										<div class="col-lg-4">
+											<label>Nome</label>
 										</div>
-										<div class="col-lg-3">
-											<label>Telefone <span class="text-danger">*</span></label>
+										<div class="col-lg-2">
+											<label>Telefone</label>
 										</div>
-										<div class="col-lg-3">
-											<label>Celular <span class="text-danger">*</span></label>
+										<div class="col-lg-2">
+											<label>Celular</label>
 										</div>
-										<div class="col-lg-3">
-											<label>E-mail <span class="text-danger">*</span></label>
+										<div class="col-lg-2">
+											<label>E-mail</label>
+										</div>
+										<div class="col-lg-2">
+											<label>Site</label>
 										</div>
 
 										<!-- campos -->
-										<div class="col-lg-3">
-											<input id="contatoNew" name="contatoNew" type="text" class="form-control" placeholder="Contato" required>
+										<div class="col-lg-4">
+											<input id="contatoNew" name="contatoNew" type="text" class="form-control" placeholder="Contato">
 										</div>
-										<div class="col-lg-3">
-											<input id="telefoneNew" name="telefoneNew" type="text" class="form-control" placeholder="Res. / Com." required>
+										<div class="col-lg-2">
+											<input id="telefoneNew" name="telefoneNew" type="text" class="form-control" placeholder="Res. / Com.">
 										</div>
-										<div class="col-lg-3">
-											<input id="celularNew" name="celularNew" type="text" class="form-control" placeholder="Celular" required>
+										<div class="col-lg-2">
+											<input id="celularNew" name="celularNew" type="text" class="form-control" placeholder="Celular">
 										</div>
-										<div class="col-lg-3">
-											<input id="emailNew" name="emailNew" type="text" class="form-control" placeholder="E-mail" required>
+										<div class="col-lg-2">
+											<input id="emailNew" name="emailNew" type="text" class="form-control" placeholder="E-mail">
+										</div>
+										<div class="col-lg-2">
+											<input id="siteNew" name="siteNew" type="text" class="form-control" placeholder="Site">
 										</div>
 									</div>
 
@@ -2253,15 +2313,15 @@ $_SESSION['atendimento'] = [
 											<label>Nome <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
-											<label>Parentesco <span class="text-danger">*</span></label>
+											<label>Parentesco</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Nascimento <span class="text-danger">*</span></label>
+											<label>Nascimento</label>
 										</div>
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="nomeRespNew" name="nomeResp" type="text" class="form-control" placeholder="Nome">
+											<input id="nomeRespNew" name="nomeResp" type="text" class="form-control" placeholder="Nome" required>
 										</div>
 										<div class="col-lg-4">
 											<input id="parentescoRespNew" name="parentesco" type="text" class="form-control" placeholder="Parentesco">
@@ -2278,13 +2338,13 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
-											<label>CEP <span class="text-danger">*</span></label>
+											<label>CEP</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Endereço <span class="text-danger">*</span></label>
+											<label>Endereço</label>
 										</div>
 										<div class="col-lg-2">
-											<label>Nº <span class="text-danger">*</span></label>
+											<label>Nº</label>
 										</div>
 										<div class="col-lg-3">
 											<label>Complemento</label>
@@ -2308,13 +2368,13 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
-											<label>Bairro <span class="text-danger">*</span></label>
+											<label>Bairro</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Cidade <span class="text-danger">*</span></label>
+											<label>Cidade</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Estado <span class="text-danger">*</span></label>
+											<label>Estado</label>
 										</div>
 
 										<!-- campos -->
@@ -2325,7 +2385,7 @@ $_SESSION['atendimento'] = [
 											<input id="cidadeRespNew" name="cidadeResp" type="text" class="form-control" placeholder="Cidade">
 										</div>
 										<div class="col-lg-4">
-											<select id="estadoRespNew" name="estadoRespNew" class="form-control form-control-select2" placeholder="Estado" required>
+											<select id="estadoRespNew" name="estadoRespNew" class="form-control form-control-select2" placeholder="Estado">
 												<option value="#">Selecione um estado</option>
 												<option value="AC">Acre</option>
 												<option value="AL">Alagoas</option>
@@ -2366,13 +2426,13 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-4">
-											<label>Telefone <span class="text-danger">*</span></label>
+											<label>Telefone</label>
 										</div>
 										<div class="col-lg-4">
-											<label>Celular <span class="text-danger">*</span></label>
+											<label>Celular</label>
 										</div>
 										<div class="col-lg-4">
-											<label>E-mail <span class="text-danger">*</span></label>
+											<label>E-mail</label>
 										</div>
 
 										<!-- campos -->

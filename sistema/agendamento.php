@@ -280,23 +280,8 @@ include('global_assets/php/conexao.php');
 				$('#iAgendamento').val(iAgendamento)
 				$('#formEdita').submit()
 			} else if(tipo == 'EXCLUI'){
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAgendamento.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'EXCLUI',
-						'iAgendamento': iAgendamento
-					},
-					success: function(response) {
-						if(response.status == 'success'){
-							alerta(response.titulo, response.menssagem, response.status)
-							getAgendamentos();
-						}else{
-							alerta(response.titulo, response.menssagem, response.status)
-						}
-					}
-				});
+				// (url, texto, tipoRequest, id, acaoSuccess)
+				confirmaExclusaoAjax('filtraAgendamento.php', 'Excluir agendamento?', 'EXCLUI', iAgendamento, getAgendamentos)
 			}
 		}
 

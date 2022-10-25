@@ -376,6 +376,10 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 			})
 
 			$('#mudarSituacao').on('click', ()=>{
+				if(!$('#justificativaModal').val()){
+					alerta('Justificativa!', 'Informe a justificativa!!', 'error')
+					return
+				}
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAtendimento.php',
@@ -489,25 +493,11 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 		}
 
 		function excluiAtendimento(element){
-			e.preventDefault()
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data: {
-					'tipoRequest': 'EXCLUI',
-					'id': $(element).data('tipo')=='ATENDIMENTO'?$(element).data('atendimento'):$(element).data('agendamento'),
-					'tipo': $(element).data('tipo')
-				},
-				success: function(response) {
-					if(response.status  == 'success'){
-						alerta(response.titulo, response.menssagem, response.status)
-						getAtendimentos()
-					} else {
-						alerta(response.titulo, response.menssagem, response.status)
-					}
-				}
-			});
+			let url = $(element).data('tipo')=='ATENDIMENTO'?'filtraAtendimento.php':'filtraAgendamento.php'
+			let text = $(element).data('tipo')=='ATENDIMENTO'?'Excluir atendimento?':'Excluir agendamento?'
+			let id = $(element).data('tipo')=='ATENDIMENTO'?$(element).data('atendimento'):$(element).data('agendamento')
+			// (url, texto, tipoRequest, id)
+			confirmaExclusaoAjax(url, text, 'EXCLUI', id, getAtendimentos)
 		}
 
 		function alteraSituacao(situacao, element){
@@ -525,6 +515,10 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					$('#iAtendimento').val('')
 					$('#justificativaModal').val('')
 
+					$('#tituloModalSituacao').html('')
+					let titulo = $(element).data('tipo') == 'ATENDIMENTO'?'Situação do Atendimento':'Situação do Agendamento'
+					$('#tituloModalSituacao').html(titulo)
+
 					response.forEach(item => {
 						let opt = item.SituaChave === situacao? `<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#cmbSituacao').append(opt)
@@ -533,7 +527,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					$('#justificativaModal').val($(element).data('observacao'))
 					$('#tipo').val($(element).data('tipo'))
 
-					$('#page-modal-situacao').fadeIn(200);
+					$('#page-modal-situacao').fadeIn(200)
 				}
 			});
 		}
@@ -575,14 +569,13 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						await response.dataAtendimento.forEach(item => {
 							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
 
-							console.log(item)
 							$(rowNodeAtendimento).attr('class', 'text-left')
 							$(rowNodeAtendimento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sJustificativa}`)
 							$(rowNodeAtendimento).find('td:eq(10)').attr('data-tipo', 'ATENDIMENTO')
-							// if(item.identify.situacao == "EMESPERAVENDA" || item.identify.situacao == "LIBERADOVENDA"){
+							if(item.identify.situacao == "EMESPERAVENDA" || item.identify.situacao == "LIBERADOVENDA"){
 								$(rowNodeAtendimento).find('td:eq(10)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							// }
+							}
 						})
 					} else if (response.acesso == 'PROFISSIONAL'){
 						let tableE = $('#AtendimentoTableEspera').DataTable().clear().draw()
@@ -838,7 +831,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
                     <div class="custon-modal-container" style="max-width: 300px;">
                         <div class="card custon-modal-content">
                             <div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
-                                <p class="h5">Situação do Atendimento</p>
+                                <p class="h5" id="tituloModalSituacao">Situação do Atendimento</p>
                                 <i id="modal-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
                             </div>
 							<div class="px-0">
