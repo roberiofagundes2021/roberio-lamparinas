@@ -45,7 +45,7 @@ try{
 				JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
 				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 				JOIN ServicoVenda ON SrVenId = AgendServico
-				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADOVENDA','CONFIRMADO','CANCELADO','FILAESPERA')";
+				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADOVENDA','CONFIRMADO','FILAESPERA')";
 			$result = $conn->query($sql);
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -54,14 +54,14 @@ try{
 				ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,Profissional.ProfiNome as ProfissionalNome,SrVenNome, 
 				Profissao.ProfiNome as ProfissaoNome, ProfiCbo
 				FROM AtendimentoXServico
-				JOIN Atendimento ON AtendId = AtXSeAtendimento
-				JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-				JOIN Situacao ON SituaId = AtendSituacao
-				JOIN Cliente ON ClienId = AtendCliente
-				JOIN Profissional ON Profissional.ProfiId = AtXSeProfissional
-				JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
-				JOIN ServicoVenda ON SrVenId = AtXSeServico
-				JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
+				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
+				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+				LEFT JOIN Situacao ON SituaId = AtendSituacao
+				LEFT JOIN Cliente ON ClienId = AtendCliente
+				LEFT JOIN Profissional ON Profissional.ProfiId = AtXSeProfissional
+				LEFT JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
+				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+				LEFT JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
 				WHERE AtendUnidade = $iUnidade";
 			$result = $conn->query($sql);
 			$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -777,7 +777,7 @@ try{
 	} elseif ($tipoRequest == 'SITUACOES'){
 		$tipo = $_POST['tipo'];
 		$list = $tipo == 'AGENDAMENTO'?"'AGENDADOVENDA','CONFIRMADO','CANCELADO','FILAESPERA'":
-		"'AGENDADOVENDA','ATENDIDOVENDA','EMESPERAVENDA','LIBERADOVENDA'";
+		"'NAOESPEROU'";
 		$sql = "SELECT SituaId,SituaNome,SituaChave
 		FROM Situacao
 		WHERE SituaChave in ($list)";
@@ -827,7 +827,7 @@ try{
 			'menssagem' => 'Situação alterada com sucesso!!!',
 		]);
 	} elseif ($tipoRequest == 'EXCLUI'){
-		$iAtendimento = $_POST['iAtendimento'];
+		$iAtendimento = $_POST['id'];
 
 		$sql = "DELETE FROM AtendimentoAtestadoMedico WHERE AtAMeAtendimento = $iAtendimento
 		and AtAMeUnidade = $iUnidade";
@@ -869,7 +869,6 @@ try{
 
 		$paciente = [
 			'id' => 'NOVO',
-			'pessoaTipo' =>'F',
 			'prontuario' => isset($_POST['prontuario'])?$_POST['prontuario']:'null',
 			'nome' => isset($_POST['nome'])?$_POST['nome']:'null',
 			'cpf' => isset($_POST['cpf'])?$_POST['cpf']:'null',
@@ -877,9 +876,11 @@ try{
 			'emissor' => isset($_POST['emissor'])?$_POST['emissor']:'null',
 			'uf' => isset($_POST['uf'])?$_POST['uf']:'null',
 			'sexo' => isset($_POST['sexo'])?$_POST['sexo']:'null',
-			'nascimento' => isset($_POST['nascimento'])?$_POST['nascimento']:'null',
+			'nascimento' => isset($_POST['nascimento'])?$_POST['nascimento']:'',
 			'nomePai' => isset($_POST['nomePai'])?$_POST['nomePai']:'null',
 			'nomeMae' => isset($_POST['nomeMae'])?$_POST['nomeMae']:'null',
+			'estadoCivil' => isset($_POST['estadoCivil'])?$_POST['estadoCivil']:'null',
+			'naturalidade' => isset($_POST['naturalidade'])?$_POST['naturalidade']:'null',
 			'profissao' => isset($_POST['profissao'])?$_POST['profissao']:'null',
 			'cep' => isset($_POST['cep'])?$_POST['cep']:'null',
 			'endereco' => isset($_POST['endereco'])?$_POST['endereco']:'null',
@@ -892,15 +893,20 @@ try{
 			'telefone' => isset($_POST['telefone'])?$_POST['telefone']:'null',
 			'celular' => isset($_POST['celular'])?$_POST['celular']:'null',
 			'email' => isset($_POST['email'])?$_POST['email']:'null',
+			'estadoCivil' => isset($_POST['estadoCivil'])?$_POST['estadoCivil']:'null',
+			'naturalidade' => isset($_POST['naturalidade'])?$_POST['naturalidade']:'null',
+			'site' => isset($_POST['site'])?$_POST['site']:'null',
 			'observacao' => isset($_POST['observacao'])?$_POST['observacao']:'null'
 		];
-		$sql = "INSERT INTO Cliente(ClienNome,
-			ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+		$cod = '';
+		$sql = "INSERT INTO Cliente(ClienCodigo,ClienNome,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+			ClienSite,ClienNaturalidade,ClienEstadoCivil,
 			ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
 			ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 			ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade)
-			VALUES('$paciente[pessoaTipo]','$paciente[nome]','$paciente[nome]','$paciente[cpf]','$paciente[rg]',
-			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[nascimento]','$paciente[nomePai]','$paciente[nomeMae]',
+			VALUES('$cod','$paciente[nome]','$paciente[cpf]','$paciente[rg]',
+			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[site]','$paciente[naturalidade]','$paciente[estadoCivil]',
+			'$paciente[nascimento]','$paciente[nomePai]','$paciente[nomeMae]',
 			'$paciente[profissao]','$paciente[cep]','$paciente[endereco]','$paciente[numero]','$paciente[complemento]',
 			'$paciente[bairro]','$paciente[cidade]','$paciente[estado]','$paciente[contato]','$paciente[telefone]',
 			'$paciente[celular]','$paciente[email]','$paciente[observacao]','$rowStatus[SituaId]','$usuarioId','$iUnidade')";
@@ -945,7 +951,7 @@ try{
 			'titulo' => 'Responsável',
 			'status' => 'success',
 			'menssagem' => 'Responsável adicionado!!',
-			'paciente' => $responsavelId
+			'responsavel' => $responsavelId
 		]);
 	} elseif($tipoRequest == 'SALVARATENDIMENTO'){
 		$atendimentoServicos = $_SESSION['atendimento']['atendimentoServicos'];
@@ -969,10 +975,10 @@ try{
 		$cliente = $_POST['cliente'];
 		$responsavel = $_POST['responsavel'];
 		$tipo = isset($_POST['tipo'])?$_POST['tipo']:null;
-		$iAtendimento = $_POST['iAtendimento'];
+		$iAtendimento = isset($_POST['iAtendimento'])?$_POST['iAtendimento']:null;
 		$status = isset($_POST['status'])?$_POST['status']:null;
 
-		if($cliente['id'] && $iAtendimento){
+		if($cliente['id']){
 			$mes = explode('-',$atendimento['dataRegistro']);
 			$mes = $mes[1];
 	
@@ -1016,6 +1022,7 @@ try{
 		
 				$iAtendimento = $conn->lastInsertId();
 			}
+			$teste = $sql;
 			if(COUNT($atendimentoServicos)){
 				$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
 				AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
@@ -1041,6 +1048,8 @@ try{
 				ClienDtNascimento= '$cliente[nascimento]',
 				ClienNomePai= '$cliente[nomePai]',
 				ClienNomeMae= '$cliente[nomeMae]',
+				ClienEstadoCivil= '$cliente[estadoCivil]',
+				ClienNaturalidade= '$cliente[naturalidade]',
 				ClienProfissao= '$cliente[profissao]',
 				ClienCep= '$cliente[cep]',
 				ClienEndereco= '$cliente[endereco]',
@@ -1088,7 +1097,8 @@ try{
 			echo json_encode([
 				'titulo' => 'Atendimento',
 				'status' => 'success',
-				'menssagem' => 'Atendimento cadastrado!!'
+				'menssagem' => 'Atendimento cadastrado!!',
+				'teste'=>$teste
 			]);
 		}else{
 			echo json_encode([
@@ -1179,7 +1189,7 @@ try{
 
 		$sql = "SELECT ClienId,ClienNome,ClienCodigo,
 		ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienCartaoSus,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 		ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente WHERE ClienId = $iPaciente and ClienUnidade = $iUnidade";
@@ -1201,6 +1211,8 @@ try{
 				'nascimento' => $row['ClienDtNascimento'],
 				'nomePai' => $row['ClienNomePai'],
 				'nomeMae' => $row['ClienNomeMae'],
+				'estadoCivil' => $row['ClienEstadoCivil'],
+				'naturalidade' => $row['ClienNaturalidade'],
 				'profissao' => $row['ClienProfissao'],
 				'cep' => $row['ClienCep'],
 				'endereco' => $row['ClienEndereco'],
@@ -1252,7 +1264,7 @@ try{
 
 		// busca todos os usuários com o novo inserido para adicionalo ja selecionado no select
 		$sql = "SELECT ClienId,ClienCodigo,ClienNome,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienCartaoSus,ClienProfissao,ClienCep,ClienEndereco,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
 		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente";

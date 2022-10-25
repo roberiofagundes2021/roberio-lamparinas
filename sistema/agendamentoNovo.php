@@ -58,7 +58,7 @@ $dataHoje = date("Y-m-d");
 		$(document).ready(function() {
 			
 			$('#servicoTable').hide()
-			alteraSituacao()
+			alteraSituacao('AGENDADOVENDA')
 			getCmbs()
 			
 			$('#data').val('<?php echo $dataHoje ?>')
@@ -309,11 +309,11 @@ $dataHoje = date("Y-m-d");
 								</div>`;
 						HTML += `
 						<tr class='servicoItem'>
-							<td class="text-center">${item.servico}</td>
-							<td class="text-center">${item.medico}</td>
-							<td class="text-center">${item.sData}</td>
-							<td class="text-center">${item.hora}</td>
-							<td class="text-center">${item.local}</td>
+							<td class="text-left">${item.servico}</td>
+							<td class="text-left">${item.medico}</td>
+							<td class="text-left">${item.sData}</td>
+							<td class="text-left">${item.hora}</td>
+							<td class="text-left">${item.local}</td>
 							<td class="text-right">R$ ${float2moeda(item.valor)}</td>
 							<td class="text-center">${acoes}</td>
 						</tr>`
@@ -323,7 +323,7 @@ $dataHoje = date("Y-m-d");
 					}else{
 						$('#servicoTable').hide();
 					}
-					$('#servicoValorTotal').html(`${float2moeda(response.valorTotal)}`).show();
+					$('#servicoValorTotal').html(`R$ ${float2moeda(response.valorTotal)}`).show();
 					$('#dataServico').html(HTML).show();
 				}
 			});
@@ -609,7 +609,7 @@ $dataHoje = date("Y-m-d");
 				success: function(response) {
 					$('#iAgendamento').val($(element).data('agendamento'))
 					$('#cmbSituacao').empty()
-					$('#cmbSituacao').append("<option selected value=''>selecione</option>")
+					$('#cmbSituacao').append("<option selected value=''>Selecione</option>")
 					response.forEach(item => {
 						let opt = item.SituaChave === situacao? `<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#cmbSituacao').append(opt)
@@ -641,7 +641,7 @@ $dataHoje = date("Y-m-d");
 					<div class="col-lg-12">
 						<div class="card">
 							<!-- dados do agendamento -->
-							<div id="agendamento" class="formDados card-body" style="display: block; margin-top:-20px;" >
+							<div id="agendamento" class="formDados card-body" style="display: block; margin-top:-10px;" >
 								<div class="card-header header-elements-inline" style="margin-left:-10px;">
 									<h5 class='text-uppercase font-weight-bold'>CADASTRO DO AGENDAMENTO</h5>
 								</div>
@@ -734,16 +734,16 @@ $dataHoje = date("Y-m-d");
 									</div>
 								</div>
 
-								<div class="col-lg-12">
+								<div class="col-lg-12 mt-2">
 									<table class="table" id="servicoTable">
 										<thead>
-											<tr class="bg-slate text-center">
+											<tr class="bg-slate">
 												<th>Serviço</th>
 												<th>Médico</th>
 												<th>Data do Atendimento</th>
 												<th>Horário</th>
 												<th>Local</th>			
-												<th>Valor</th>
+												<th class="text-right">Valor</th>
 												<th class="text-center">Ações</th>
 											</tr>
 										</thead>
@@ -756,8 +756,10 @@ $dataHoje = date("Y-m-d");
 													<div>Valor(R$):</div>
 												</th>
 												<th colspan="1" class="mr-1">
-													<div id="servicoValorTotal" class="text-center font-weight-bold" style="font-size: 15px;">R$ 0,00</div>
+													<div id="servicoValorTotal" class="text-right font-weight-bold" style="font-size: 15px;">R$ 0,00</div>
 												</th>
+												<th colspan="1" class="mr-1">
+												</th>	
 											</tr>
 										</tfoot>
 									</table>
@@ -775,17 +777,18 @@ $dataHoje = date("Y-m-d");
 									</div>
 								</div>
 
-								<div class="col-lg-12">
-									<label>Situação <span class="text-danger">*</span></label>
-									<div class="form-group col-lg-2">
-										<select id="cmbSituacao" name="cmbSituacao" class="form-control form-control-select2" required>
+								<div class="col-lg-12 row">
+									
+									<div class="col-lg-2">
+										<label>Situação <span class="text-danger">*</span></label>
+										<select id="cmbSituacao" name="cmbSituacao" class="select-search" required>
 											<!--  -->
 										</select>
 									</div>
 								</div>
 
 								<!-- botões -->
-								<div class="col-lg-12 ml-2 my-4 row">
+								<div class="col-lg-12 mt-4 mb-2 row">
 									<button class="btn btn-lg btn-principal" id="salvarAgendamento" data-tipo="AGENDAMENTO" >salvar</button>
 									<a href="agendamento.php" class="btn btn-lg" id="cancelar">Cancelar</a>
 								</div>

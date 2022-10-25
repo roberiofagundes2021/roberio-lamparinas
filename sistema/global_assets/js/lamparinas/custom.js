@@ -79,6 +79,59 @@ function confirmaExclusao(form, texto, acao, acaoComplete) {
 		});
 }
 
+function confirmaExclusaoAjax(url, texto, tipoRequest, id, acaoSucces) {
+	new PNotify({
+		title: 'Confirmação',
+		text: texto,
+		icon: 'icon-question4',
+		hide: false,
+		confirm: {
+			confirm: true,
+			buttons: [
+				{
+					text: 'Sim',
+					primary: true,
+					click: function (notice) {
+						$.ajax({
+							type: 'POST',
+							url: url,
+							dataType: 'json',
+							data: {
+								'tipoRequest': tipoRequest,
+								'id': id
+							},
+							success: function(response) {
+								if(response.status  == 'success'){
+									alerta(response.titulo, response.menssagem, response.status)
+									acaoSucces()
+								} else {
+									alerta(response.titulo, response.menssagem, response.status)
+								}
+							}
+						});
+						notice.remove();
+					},
+				},
+				{
+					text: 'Não',
+					click: function (notice) {
+						notice.remove();
+					},
+				},
+			],
+		},
+		buttons: {
+			closer: false,
+			sticker: false,
+		},
+		history: {
+			history: false,
+		},
+		addclass: 'stack-modal',
+		stack: { dir1: 'down', dir2: 'right', modal: false },
+	})
+}
+
 function confirmaReset(form, texto, acao, id) {
 	new PNotify({
 		title: 'Confirmação',
