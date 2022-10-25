@@ -629,7 +629,7 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtPrMCor
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -638,6 +638,7 @@ try{
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+			LEFT JOIN AtendimentoProtocoloManchester ON AtPrMId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtXSeId DESC";
@@ -646,7 +647,7 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtPrMCor
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -655,6 +656,7 @@ try{
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+			LEFT JOIN AtendimentoProtocoloManchester ON AtPrMId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtXSeId DESC";
@@ -685,6 +687,10 @@ try{
 							</div>
 						</div>
 					</div>";
+			
+					$classificacao = "<div class='list-icons'>
+										<div style='height: 25px; width: 25px; background-color: $item[AtPrMCor]; border-radius: 13px;' >
+									</div>";
 		
 			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
 			
@@ -697,7 +703,7 @@ try{
 					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
-					'Risco**',  // Risco
+					$classificacao,  // Risco
 					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
@@ -728,6 +734,10 @@ try{
 							</div>
 						</div>
 					</div>";
+					
+			$classificacao = "<div class='list-icons'>
+								<div style='height: 25px; width: 25px; background-color: $item[AtPrMCor]; border-radius: 13px;' >
+							</div>";
 		
 			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
 			
@@ -741,7 +751,7 @@ try{
 					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
-					'Risco**',  // Risco
+					$classificacao,  // Risco
 					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
@@ -869,6 +879,8 @@ try{
 			'nascimento' => isset($_POST['nascimento'])?$_POST['nascimento']:'',
 			'nomePai' => isset($_POST['nomePai'])?$_POST['nomePai']:'null',
 			'nomeMae' => isset($_POST['nomeMae'])?$_POST['nomeMae']:'null',
+			'estadoCivil' => isset($_POST['estadoCivil'])?$_POST['estadoCivil']:'null',
+			'naturalidade' => isset($_POST['naturalidade'])?$_POST['naturalidade']:'null',
 			'profissao' => isset($_POST['profissao'])?$_POST['profissao']:'null',
 			'cep' => isset($_POST['cep'])?$_POST['cep']:'null',
 			'endereco' => isset($_POST['endereco'])?$_POST['endereco']:'null',
@@ -1036,6 +1048,8 @@ try{
 				ClienDtNascimento= '$cliente[nascimento]',
 				ClienNomePai= '$cliente[nomePai]',
 				ClienNomeMae= '$cliente[nomeMae]',
+				ClienEstadoCivil= '$cliente[estadoCivil]',
+				ClienNaturalidade= '$cliente[naturalidade]',
 				ClienProfissao= '$cliente[profissao]',
 				ClienCep= '$cliente[cep]',
 				ClienEndereco= '$cliente[endereco]',
@@ -1175,7 +1189,7 @@ try{
 
 		$sql = "SELECT ClienId,ClienNome,ClienCodigo,
 		ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienCartaoSus,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 		ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente WHERE ClienId = $iPaciente and ClienUnidade = $iUnidade";
@@ -1197,6 +1211,8 @@ try{
 				'nascimento' => $row['ClienDtNascimento'],
 				'nomePai' => $row['ClienNomePai'],
 				'nomeMae' => $row['ClienNomeMae'],
+				'estadoCivil' => $row['ClienEstadoCivil'],
+				'naturalidade' => $row['ClienNaturalidade'],
 				'profissao' => $row['ClienProfissao'],
 				'cep' => $row['ClienCep'],
 				'endereco' => $row['ClienEndereco'],
@@ -1248,7 +1264,7 @@ try{
 
 		// busca todos os usuários com o novo inserido para adicionalo ja selecionado no select
 		$sql = "SELECT ClienId,ClienCodigo,ClienNome,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienCartaoSus,ClienProfissao,ClienCep,ClienEndereco,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
 		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente";

@@ -27,13 +27,16 @@ $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
 
 //Essa consulta é para verificar  o profissional
-$sql = "SELECT UsuarId, ProfiUsuario, ProfiId, ProfiNome
+$sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo
 		FROM Usuario
-		JOIN Profissional ON ProfiUsuario = UsuarId
+		JOIN Profissional A ON A.ProfiUsuario = UsuarId
+		LEFT JOIN Profissao B ON B.ProfiId = A.ProfiProfissao
+		LEFT JOIN ProfissionalConselho ON PrConId = ProfiConselho
 		WHERE UsuarId =  ". $_SESSION['UsuarId'] . " ";
 $result = $conn->query($sql);
 $rowUser = $result->fetch(PDO::FETCH_ASSOC);
-$userId = $rowUser['ProfiId'];
+$userId = $rowUser['ProfissionalId'];
+
 
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
@@ -246,105 +249,7 @@ if (isset($_POST['txtareaConteudo']) ){
 								</div>
 							</div>
 
-							<div class="card">
-								<div class="card-header header-elements-inline">
-									<h3 class="card-title">Dados do Paciente</h3>
-									<div class="header-elements">
-										<div class="list-icons">
-											<a class="list-icons-item" data-action="collapse"></a>
-										</div>
-									</div>
-								</div>
-								<div class="card-body">
-									<div class="row">
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label>Prontuário Eletrônico  : <?php echo $row['ClienCodigo']; ?></label>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label>Nº do Registro  : <?php echo $row['AtendNumRegistro']; ?></label>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label>Modalidade : <?php echo $row['AtModNome'] ; ?></label>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label>CNS  : <?php echo $row['ClienCartaoSus']; ?></label>
-											</div>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-lg-6">
-										<h4><b><?php echo strtoupper($row['ClienNome']); ?></b></h4>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label>Sexo : <?php echo $sexo ; ?></label>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label>Telefone  : <?php echo $row['ClienCelular']; ?></label>
-											</div>
-										</div>
-									</div>
-									<div class="row">
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label>Data Nascimento  : <?php echo mostraData($row['ClienDtNascimento']); ?></label>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label>Idade: <?php echo calculaIdade($row['ClienDtNascimento']); ?></label>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label>Mãe : <?php echo $row['ClienNomeMae'] ; ?></label>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label>Responsável  : <?php echo $row['ClResNome']; ?></label>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="card-body">
-									<div class="row">
-										<div class="col-lg-3">
-										<div class="form-group">
-												<label for="inputData">Data</label>
-												<input type="text" id="inputData" name="inputData" class="form-control" value="<?php if (isset($iAtendimentoAtestadoMedicoId )){ echo $DataAtendimento;} else { echo date('d/m/Y'); } ?>" readOnly> 
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputInicio">Início do Atendimento</label>
-												<input type="text" id="inputInicio" name="inputInicio" class="form-control"  value="<?php if (isset($iAtendimentoAtestadoMedicoId )){ echo $HoraInicio;} else { echo date('H:i'); } ?>" readOnly>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputFim">Témino do Atendimento</label>
-												<input type="text" id="inputFim" name="inputFim" class="form-control" value="<?php if (isset($iAtendimentoAtestadoMedicoId )) echo $HoraFim; ?>" readOnly>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputProfissional">Profissional</label>
-												<input type="text" id="inputProfissional" name="inputProfissional" class="form-control"  value="<?php echo $rowUser['ProfiNome']; ?>" readOnly>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
+							<div> <?php include ('atendimentoDadosPaciente.php'); ?> </div>
 
 							<div class="card">
 

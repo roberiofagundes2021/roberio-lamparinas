@@ -150,6 +150,8 @@ $_SESSION['atendimento'] = [
 						'nascimento': $('#nascimento').val(),
 						'nomePai': $('#nomePai').val(),
 						'nomeMae': $('#nomeMae').val(),
+						'estadoCivil': $('#estadoCivil').val(),
+						'naturalidade': $('#naturalidade').val(),
 						'profissao': $('#profissao').val(),
 						'cep': $('#cep').val(),
 						'endereco': $('#endereco').val(),
@@ -532,6 +534,8 @@ $_SESSION['atendimento'] = [
 						'nascimento': $('#nascimentoNew').val(),
 						'nomePai': $('#nomePaiNew').val(),
 						'nomeMae': $('#nomeMaeNew').val(),
+						'estadoCivil': $('#estadoCivilNew').val(),
+						'naturalidade': $('#naturalidadeNew').val(),
 						'profissao': $('#profissaoNew').val(),
 						'cep': $('#cepNew').val(),
 						'endereco': $('#enderecoNew').val(),
@@ -901,7 +905,7 @@ $_SESSION['atendimento'] = [
 		function setPacienteAtribut(id) {
 			iPaciente = id?id:$('#paciente').val()
 			if (iPaciente) {
-				$.ajax({
+				$.ajax({ 
 					type: 'POST',
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
@@ -920,6 +924,8 @@ $_SESSION['atendimento'] = [
 							$('#nascimento').val(response.nascimento)
 							$('#nomePai').val(response.nomePai)
 							$('#nomeMae').val(response.nomeMae)
+							$('#estadoCivil').val(response.estadoCivil)
+							$('#naturalidade').val(response.naturalidade)
 							$('#profissao').val(response.profissao)
 							$('#cep').val(response.cep)
 							$('#endereco').val(response.endereco)
@@ -936,6 +942,7 @@ $_SESSION['atendimento'] = [
 							$('#uf').val(response.uf)
 							$('#estado').val(response.estado)
 							$('#sexo').val(response.sexo)
+							$('#estadoCivil').val(response.estadoCivil)
 
 							$('#uf').children("option").each(function(index, item){
 								if($(item).val() == response.uf){
@@ -949,6 +956,11 @@ $_SESSION['atendimento'] = [
 							})
 							$('#sexo').children("option").each(function(index, item){
 								if($(item).val() == response.sexo){
+									$(item).change()
+								}
+							})
+							$('#estadoCivil').children("option").each(function(index, item){
+								if($(item).val() == response.estadoCivil){
 									$(item).change()
 								}
 							})
@@ -974,6 +986,8 @@ $_SESSION['atendimento'] = [
 				$('#nascimento').val('')
 				$('#nomePai').val('')
 				$('#nomeMae').val('')
+				$('#estadoCivil').val('')
+				$('#naturalidade').val('')
 				$('#profissao').val('')
 				$('#cep').val('')
 				$('#endereco').val('')
@@ -1670,13 +1684,32 @@ $_SESSION['atendimento'] = [
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
-										<div class="col-lg-12">
-											<label>Profissão</label>
+										<div class="col-lg-4">
+											<label>Estado Civil </label>
+										</div>
+										<div class="col-lg-4">
+											<label>Naturalidade</span></label>
+										</div>
+										<div class="col-lg-4">
+											<label>Profissão <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
-										<div class="col-lg-12">
-											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão">
+										<div class="col-lg-4">
+											<select id="estadoCivil" name="estadoCivil" class="form-control form-control-select2">
+												<option value="" selected>selecionar</option>
+												<option value="ST">Solteiro</option>
+												<option value="CS">Casado</option>
+												<option value="SP">Separado</option>
+												<option value="DV">Divorciado</option>
+												<option value="VI">Viúvo</option>
+											</select>
+										</div>
+										<div class="col-lg-4">
+											<input id="naturalidade" name="naturalidade" type="text" class="form-control" placeholder="Naturalidade">
+										</div>
+										<div class="col-lg-4">
+											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão" required>
 										</div>
 									</div>
 
@@ -2135,11 +2168,11 @@ $_SESSION['atendimento'] = [
 												<option value="VI">Viúvo</option>
 											</select>
 										</div>
-										<div class="col-lg-3">
-											<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+										<div class="col-lg-4">
+											<input id="naturalidadeNew" name="naturalidadeNew" type="text" class="form-control" placeholder="Naturalidade">
 										</div>
-										<div class="col-lg-6">
-											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão">
+										<div class="col-lg-4">
+											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão" required>
 										</div>
 									</div>
 
