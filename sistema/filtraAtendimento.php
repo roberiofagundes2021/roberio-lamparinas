@@ -867,6 +867,16 @@ try{
 		$result = $conn->query($sql);
 		$rowStatus = $result->fetch(PDO::FETCH_ASSOC);
 
+		$sql = "SELECT COUNT(isnull(clienCodigo,0)) as Codigo
+				FROM Cliente
+				Where ClienUnidade = " . $_SESSION['UnidadeId'] . "";
+		//echo $sql;die;
+		$result = $conn->query("$sql");
+		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);
+
+		$cod = (int)$rowCodigo['Codigo'] + 1;
+		$cod = str_pad($cod, 6, "0", STR_PAD_LEFT);
+
 		$paciente = [
 			'id' => 'NOVO',
 			'prontuario' => isset($_POST['prontuario'])?$_POST['prontuario']:'null',
