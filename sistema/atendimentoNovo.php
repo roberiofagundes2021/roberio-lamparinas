@@ -1218,6 +1218,7 @@ $_SESSION['atendimento'] = [
 				formatSubmit: 'dd/mm/yyyy',
 				format: 'dd/mm/yyyy',
 				disable: array,
+				min: array && array[1],
 				onStart: function() {
 					// console.log('onStart event')
 				},
@@ -1282,7 +1283,8 @@ $_SESSION['atendimento'] = [
 		function setHoraProfissional(array, interv) {
 			$('#modalHora').html('');
 			$('#modalHora').html('<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">');
-
+			hInicio = array ? array[1].from : undefined;
+			hFim = array ? array[1].to : undefined;
 			let intervalo = interv ? interv : 30
 			// doc: https://amsul.ca/pickadate.js/time/
 			$('#horaAtendimento').pickatime({
@@ -1298,8 +1300,8 @@ $_SESSION['atendimento'] = [
 				hiddenSuffix: '_submit',
 
 				// Time limits
-				min: undefined,
-				max: undefined,
+				min: hInicio,
+				max: hFim,
 
 				// Close on a user action
 				closeOnSelect: true,

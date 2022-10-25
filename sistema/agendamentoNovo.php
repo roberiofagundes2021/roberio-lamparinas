@@ -354,6 +354,7 @@ $dataHoje = date("Y-m-d");
 				formatSubmit: 'dd/mm/yyyy',
 				format: 'dd/mm/yyyy',
 				disable: array,
+				min: array && array[1],
 				onStart: function() {
 					// console.log('onStart event')
 				},
@@ -403,7 +404,7 @@ $dataHoje = date("Y-m-d");
 						},
 						success: function(response) {
 							if(response.status == 'success'){
-								setHoraProfissional(response.arrayHora, response.intervalo)
+								setHoraProfissional(response.arrayHora, response.intervalo, response.horariosIndisp)
 								$('#horaAtendimento').focus()
 							} else {
 								alerta(response.titulo, response.menssagem, response.status)
@@ -415,16 +416,17 @@ $dataHoje = date("Y-m-d");
 			});
 		}
 
-		function setHoraProfissional(array,interv){
+		function setHoraProfissional(array,interv, horariosIndisp){
 			$('#modalHora').html('').show();
 			$('#modalHora').html('<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">');
-
+			hInicio = array ? array[1].from : undefined;
+			hFim = array ? array[1].to : undefined;
 			let intervalo = interv?interv:30
 			// doc: https://amsul.ca/pickadate.js/time/
 			$('#horaAtendimento').pickatime({
 				// Regras
 				interval: intervalo,
-				disable: array?array:undefined,
+				disable: horariosIndisp,
 				// disable: [
 				// 	[1,30],
 				// ],
@@ -437,8 +439,8 @@ $dataHoje = date("Y-m-d");
 				hiddenSuffix: '_submit',
 				
 				// Time limits
-				min: undefined,
-				max: undefined,
+				min: hInicio,
+				max: hFim,
 				
 				// Close on a user action
 				closeOnSelect: true,
