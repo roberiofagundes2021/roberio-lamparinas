@@ -1230,7 +1230,9 @@ $_SESSION['atendimento'] = [
 						if (hasClass) {
 							$(this).addClass((hasSelected ?
 								'' :
-								'font-weight-bold text-black border'))
+								'font-weight-bold text-black border picker__day--highlighted'))
+						}else{
+							$(this).removeClass('picker__day--highlighted');//remover o destaque do dias que n estão disponíves para agendamento
 						}
 					})
 				},
@@ -1242,7 +1244,9 @@ $_SESSION['atendimento'] = [
 						if (hasClass) {
 							$(this).addClass((hasSelected ?
 								'' :
-								'font-weight-bold text-black border'))
+								'font-weight-bold text-black border picker__day--highlighted'))
+						}else{
+							$(this).removeClass('picker__day--highlighted');//remover o destaque do dias que n estão disponíves para agendamento
 						}
 					})
 				},
