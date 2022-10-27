@@ -23,10 +23,10 @@ try {
 
 try {
 
-	$sql = "INSERT INTO Cliente (clienCodigo, ClienNome,  ClienCpf, ClienRg, ClienOrgaoEmissor, ClienUf, ClienSexo, ClienDtNascimento, ClienNomePai, ClienNomeMae,
-	 				 	ClienEstadoCivil, ClienNaturalidade, ClienProfissao, ClienCartaoSus, ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
+	$sql = "INSERT INTO Cliente (clienCodigo, ClienNome, ClienNomeSocial,  ClienCpf, ClienRg, ClienOrgaoEmissor, ClienUf, ClienSexo, ClienDtNascimento, ClienNomePai, ClienNomeMae,
+	 				 	ClienRacaCor, ClienEstadoCivil, ClienNaturalidade, ClienProfissao, ClienCartaoSus, ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
 						ClienEstado, ClienContato, ClienTelefone, ClienCelular, ClienEmail, ClienSite, ClienObservacao, ClienStatus, ClienUsuarioAtualizador, ClienUnidade)
-				VALUES (:sCodigo, :sNome, :sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sEstadoCivil, :sNaturalidade,
+				VALUES (:sCodigo, :sNome, :sNomeSocial, :sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sRacaCor, :sEstadoCivil, :sNaturalidade,
 				        :sProfissao, :sCartaoSus, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, :sCidade, :sEstado, :sContato, :sTelefone, :sCelular, 
 						:sEmail, :sSite, :sObservacao, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 
@@ -37,6 +37,7 @@ try {
 	$result->execute(array(
 		':sCodigo' => $sCodigo,
 		':sNome' => $_POST['inputNomePF'],
+		':sNomeSocial' => $_POST['inputNomeSocial'],
 		':sCpf' => limpaCPF_CNPJ($_POST['inputCpf']),
 		':sRg' => $_POST['inputRg'],
 		':sOrgaoEmissor' => $_POST['inputEmissor'],
@@ -45,6 +46,7 @@ try {
 		':dDtNascimento' => $_POST['inputDtNascimento'],
 		':sNomePai' => $_POST['inputNomePai'],
 		':sNomeMae' => $_POST['inputNomeMae'],
+		':sRacaCor' => $_POST['cmbRacaCor'],
 		':sEstadoCivil' => $_POST['cmbEstadoCivil'],
 		':sNaturalidade' => $_POST['inputNaturalidade'],
 		':sProfissao' => $_POST['inputProfissao'],

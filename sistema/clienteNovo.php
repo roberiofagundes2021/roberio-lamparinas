@@ -201,21 +201,28 @@ include('global_assets/php/conexao.php');
 								<div class="col-lg-12">
 									<div id="dadosPF">
 										<div class="row">
-											<div class="col-lg-6">
+											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="inputNomePF">Nome<span class="text-danger"> *</span></label>
 													<input type="text" id="inputNomePF" name="inputNomePF" class="form-control" placeholder="Nome Completo" required autofocus>
 												</div>
 											</div>
 
-											<div class="col-lg-3">
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="inputNomeSocial">Nome Social</label>
+													<input type="text" id="inputNomeSocial" name="inputNomeSocial" class="form-control" placeholder="Nome Social">
+												</div>
+											</div>
+
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
 													<input type="text" id="inputCpf" name="inputCpf" class="form-control" data-mask="999.999.999-99" required>
 												</div>
 											</div>
 
-											<div class="col-lg-3">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputCartaoSus">CNS</label>
 													<input type="text" id="inputCartaoSus" name="inputCartaoSus" class="form-control" placeholder="Cartão do SUS">
@@ -295,17 +302,31 @@ include('global_assets/php/conexao.php');
 										</div>
 
 										<div class="row">
-											<div class="col-lg-6">
+											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="inputNomePai">Nome do Pai</label>
 													<input type="text" id="inputNomePai" name="inputNomePai" class="form-control" placeholder="Nome do Pai">
 												</div>
 											</div>
 
-											<div class="col-lg-6">
+											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="inputNomeMae">Nome da Mãe</label>
 													<input type="text" id="inputNomeMae" name="inputNomeMae" class="form-control" placeholder="Nome da Mãe">
+												</div>
+											</div>
+											
+											<div class="col-lg-4">
+												<div class="form-group">
+													<label for="cmbRacaCor">Raça/Cor</label>
+													<select id="cmbRacaCor" name="cmbRacaCor" class="form-control form-control-select2">
+														<option value="#">Selecione a Raça/Cor</option>
+														<option value="Branca">Branca</option>
+														<option value="Preta">Preta</option>
+														<option value="Parda">Parda</option>
+														<option value="Amarela">Amarela</option>
+														<option value="Indigena">Indígena</option>
+													</select>
 												</div>
 											</div>
 										</div>
