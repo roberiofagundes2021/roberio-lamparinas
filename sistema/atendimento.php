@@ -447,6 +447,15 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					$('#dadosPost').submit()
 				})
 			});
+			$('.newAtendimento').each(function(index,element){
+				console.log(element)
+				$(element).on('click', function(e){
+					$('#tipo').val($(element).data('tipo'))
+					$('#idAtendimentoAgendamento').val($(element).data('agendamento'))
+					$('#dadosPost').attr('action','atendimentoEdita.php')
+					$('#dadosPost').submit()
+				})
+			})
 		}
 
 		function auditoria(element){
@@ -555,7 +564,12 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						await response.dataAgendamento.forEach(item => {
 							rowNodeAgendamento = tableAgendamento.row.add(item.data).draw().node()
 							$(rowNodeAgendamento).attr('class', 'text-left')
-							$(rowNodeAgendamento).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAgendamento}`)
+							$(rowNodeAgendamento).find('td:eq(3)').addClass('newAtendimento')
+							$(rowNodeAgendamento).find('td:eq(3)').attr('style', 'cursor: pointer;')
+							$(rowNodeAgendamento).find('td:eq(3)').attr('data-agendamento', `${item.identify.iAgendamento}`)
+							$(rowNodeAgendamento).find('td:eq(3)').attr('data-tipo', 'AGENDAMENTO')
+
+							$(rowNodeAgendamento).find('td:eq(9)').attr('data-agendamento', `${item.identify.iAgendamento}`)
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-tipo', 'AGENDAMENTO')
 							$(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
