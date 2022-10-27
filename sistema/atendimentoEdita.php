@@ -165,7 +165,7 @@ if ($tipo == 'ATENDIMENTO') {
 						alerta('Campo Obrigatório!', menssageError, 'error')
 						return
 					}
-					let paciente = $('#parentescoCadatrado').val() ? {
+					let paciente = $('#paciente').val() ? {
 						'id': $('#paciente').val(),
 						'prontuario': $('#prontuario').val(),
 						'nome': $('#nome').val(),
@@ -180,7 +180,6 @@ if ($tipo == 'ATENDIMENTO') {
 						'nomeMae': $('#nomeMae').val(),
 						'estadoCivil':$('#cmbEstadoCivil').val(),
 						'naturalidade':$('#inputNaturalidade').val(),
-						'profissao': $('#profissao').val(),
 						'profissao': $('#profissao').val(),
 						'cep': $('#cep').val(),
 						'endereco': $('#endereco').val(),
@@ -1685,7 +1684,6 @@ if ($tipo == 'ATENDIMENTO') {
 												<option value="SP">SP</option>
 												<option value="SE">SE</option>
 												<option value="TO">TO</option>
-												<option value="ES">ES</option>	
 											</select>
 										</div>
 										<div class="col-lg-2">
@@ -2148,7 +2146,6 @@ if ($tipo == 'ATENDIMENTO') {
 												<option value="SP">SP</option>
 												<option value="SE">SE</option>
 												<option value="TO">TO</option>
-												<option value="ES">ES</option>	
 											</select>
 										</div>
 										<div class="col-lg-2">

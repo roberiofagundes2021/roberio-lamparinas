@@ -137,7 +137,7 @@ $_SESSION['atendimento'] = [
 						alerta('Campo Obrigatório!', menssageError, 'error')
 						return
 					}
-					let paciente = $('#parentescoCadatrado').val() ? {
+					let paciente = $('#paciente').val() ? {
 						'id': $('#paciente').val(),
 						'prontuario': $('#prontuario').val(),
 						'nome': $('#nome').val(),
@@ -150,8 +150,8 @@ $_SESSION['atendimento'] = [
 						'nascimento': $('#nascimento').val(),
 						'nomePai': $('#nomePai').val(),
 						'nomeMae': $('#nomeMae').val(),
-						'estadoCivil': $('#estadoCivil').val(),
-						'naturalidade': $('#naturalidade').val(),
+						'estadoCivil':$('#cmbEstadoCivil').val(),
+						'naturalidade':$('#inputNaturalidade').val(),
 						'profissao': $('#profissao').val(),
 						'cep': $('#cep').val(),
 						'endereco': $('#endereco').val(),
@@ -202,7 +202,7 @@ $_SESSION['atendimento'] = [
 						success: function(response) {
 							if (response.status == 'success') {
 								alerta(response.titulo, response.menssagem, response.status)
-								// window.location.href = 'atendimento.php'
+								window.location.href = 'atendimento.php'
 							} else {
 								alerta(response.titulo, response.menssagem, response.status);
 							}
@@ -534,9 +534,9 @@ $_SESSION['atendimento'] = [
 						'nascimento': $('#nascimentoNew').val(),
 						'nomePai': $('#nomePaiNew').val(),
 						'nomeMae': $('#nomeMaeNew').val(),
-						'estadoCivil': $('#estadoCivilNew').val(),
-						'naturalidade': $('#naturalidadeNew').val(),
 						'profissao': $('#profissaoNew').val(),
+						'estadoCivil': $('#cmbEstadoCivilNew').val(),
+						'naturalidade': $('#inputNaturalidadeNew').val(),
 						'cep': $('#cepNew').val(),
 						'endereco': $('#enderecoNew').val(),
 						'numero': $('#numeroNew').val(),
@@ -548,8 +548,6 @@ $_SESSION['atendimento'] = [
 						'telefone': $('#telefoneNew').val(),
 						'celular': $('#celularNew').val(),
 						'email': $('#emailNew').val(),
-						'estadoCivil': $('#cmbEstadoCivil').val(),
-						'naturalidade': $('#inputNaturalidade').val(),
 						'site': $('#siteNew').val(),
 						'observacao': $('#observacaoNew').val()
 					},
@@ -1655,7 +1653,6 @@ $_SESSION['atendimento'] = [
 												<option value="SP">SP</option>
 												<option value="SE">SE</option>
 												<option value="TO">TO</option>
-												<option value="ES">ES</option>	
 											</select>
 										</div>
 										<div class="col-lg-2">
@@ -1690,20 +1687,21 @@ $_SESSION['atendimento'] = [
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
-										<div class="col-lg-4">
-											<label>Estado Civil </label>
+										<div class="col-lg-3">
+											<label>Estado Civil</label>
 										</div>
-										<div class="col-lg-4">
-											<label>Naturalidade</span></label>
+										<div class="col-lg-3">
+											<label>Naturalidade</label>
 										</div>
-										<div class="col-lg-4">
-											<label>Profissão <span class="text-danger">*</span></label>
+										<div class="col-lg-6">
+											<label>Profissão</label>
 										</div>
 
 										<!-- campos -->
-										<div class="col-lg-4">
-											<select id="estadoCivil" name="estadoCivil" class="form-control form-control-select2">
-												<option value="" selected>selecionar</option>
+
+										<div class="col-lg-3">
+											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+												<option value="#">Selecione</option>
 												<option value="ST">Solteiro</option>
 												<option value="CS">Casado</option>
 												<option value="SP">Separado</option>
@@ -1711,11 +1709,11 @@ $_SESSION['atendimento'] = [
 												<option value="VI">Viúvo</option>
 											</select>
 										</div>
-										<div class="col-lg-4">
-											<input id="naturalidade" name="naturalidade" type="text" class="form-control" placeholder="Naturalidade">
+										<div class="col-lg-3">
+											<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
 										</div>
-										<div class="col-lg-4">
-											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão" required>
+										<div class="col-lg-6">
+											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão">
 										</div>
 									</div>
 
@@ -1802,7 +1800,7 @@ $_SESSION['atendimento'] = [
 												<option value="SP">São Paulo</option>
 												<option value="SE">Sergipe</option>
 												<option value="TO">Tocantins</option>
-												<option value="ES">Estrangeiro</option>	
+												<option value="NA">Estrangeiro</option>	
 											</select>
 										</div>
 									</div>
@@ -2117,7 +2115,6 @@ $_SESSION['atendimento'] = [
 												<option value="SP">SP</option>
 												<option value="SE">SE</option>
 												<option value="TO">TO</option>
-												<option value="ES">ES</option>	
 											</select>
 										</div>
 										<div class="col-lg-2">
@@ -2165,7 +2162,7 @@ $_SESSION['atendimento'] = [
 										<!-- campos -->
 
 										<div class="col-lg-3">
-											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+											<select id="cmbEstadoCivilNew" name="cmbEstadoCivilNew" class="form-control form-control-select2">
 												<option value="#">Selecione</option>
 												<option value="ST">Solteiro</option>
 												<option value="CS">Casado</option>
@@ -2174,11 +2171,11 @@ $_SESSION['atendimento'] = [
 												<option value="VI">Viúvo</option>
 											</select>
 										</div>
-										<div class="col-lg-4">
-											<input id="naturalidadeNew" name="naturalidadeNew" type="text" class="form-control" placeholder="Naturalidade">
+										<div class="col-lg-3">
+											<input type="text" id="inputNaturalidadeNew" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
 										</div>
-										<div class="col-lg-4">
-											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão" required>
+										<div class="col-lg-6">
+											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão">
 										</div>
 									</div>
 
