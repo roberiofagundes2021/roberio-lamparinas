@@ -45,7 +45,8 @@ try{
 				JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
 				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 				JOIN ServicoVenda ON SrVenId = AgendServico
-				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADOVENDA','CONFIRMADO','FILAESPERA')";
+				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADOVENDA','CONFIRMADO','FILAESPERA')
+				and AgendAtendimento is null";
 			$result = $conn->query($sql);
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -71,7 +72,7 @@ try{
 			foreach($rowAgendamento as $item){
 				$att = "<a style='color: black' href='#' data-tipo='AGENDAMENTO' onclick='atualizaAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				$exc = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='excluiAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
-				$aud = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AgendId]'><i class='icon-search4' title='Auditoria'></i></a>";
+				$aud = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AgendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
 				$acoes = "<div class='list-icons'>
 							$att
 							$exc
@@ -120,7 +121,7 @@ try{
 			foreach($rowAtendimento as $item){
 				$att = "<a class='list-icons-item' onclick='atualizaAtendimento(this)' href='#' data-tipo='ATENDIMENTO' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				$exc = "<a class='list-icons-item' onclick='excluiAtendimento(this)'href='#' data-tipo='ATENDIMENTO' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
-				$aud = "<a style='color: black' href='#'  data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-search4' title='Auditoria'></i></a>";
+				$aud = "<a style='color: black' href='#'  data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
 				$acoes = "<div class='list-icons'>
 							$att
 							$exc
@@ -985,7 +986,10 @@ try{
 		$cliente = $_POST['cliente'];
 		$responsavel = $_POST['responsavel'];
 		$tipo = isset($_POST['tipo'])?$_POST['tipo']:null;
+
 		$iAtendimento = isset($_POST['iAtendimento'])?$_POST['iAtendimento']:null;
+		$iAgendamento = $tipo=='AGENDAMENTO'?$iAtendimento:null;
+
 		$status = isset($_POST['status'])?$_POST['status']:null;
 
 		if($cliente['id']){
@@ -1031,21 +1035,23 @@ try{
 				$conn->query($sql);
 		
 				$iAtendimento = $conn->lastInsertId();
-			}
-			$teste = $sql;
-			if(COUNT($atendimentoServicos)){
-				$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
-				AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
-				VALUES ";
-		
-				foreach($atendimentoServicos as $atendimentoServico){
-					$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]',
-					'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
-					'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
+				if($iAgendamento){
+					$sql = "UPDATE Agendamento SET AgendAtendimento=$iAtendimento WHERE AgendId = $iAgendamento";
+					$conn->query($sql);
 				}
-				$sql = substr($sql, 0, -1);
-				$conn->query($sql);
 			}
+
+			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
+			AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
+			VALUES ";
+	
+			foreach($atendimentoServicos as $atendimentoServico){
+				$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]',
+				'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
+				'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
+			}
+			$sql = substr($sql, 0, -1);
+			$conn->query($sql);
 			
 			$sql = "UPDATE Cliente SET
 				ClienNome= '$cliente[nome]',
@@ -1107,8 +1113,7 @@ try{
 			echo json_encode([
 				'titulo' => 'Atendimento',
 				'status' => 'success',
-				'menssagem' => 'Atendimento cadastrado!!',
-				'teste'=>$teste
+				'menssagem' => 'Atendimento cadastrado!!'
 			]);
 		}else{
 			echo json_encode([

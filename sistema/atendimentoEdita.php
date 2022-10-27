@@ -178,6 +178,9 @@ if ($tipo == 'ATENDIMENTO') {
 						'nascimento': $('#nascimento').val(),
 						'nomePai': $('#nomePai').val(),
 						'nomeMae': $('#nomeMae').val(),
+						'estadoCivil':$('#cmbEstadoCivil').val(),
+						'naturalidade':$('#inputNaturalidade').val(),
+						'profissao': $('#profissao').val(),
 						'profissao': $('#profissao').val(),
 						'cep': $('#cep').val(),
 						'endereco': $('#endereco').val(),
@@ -540,6 +543,8 @@ if ($tipo == 'ATENDIMENTO') {
 						'nomePai': $('#nomePaiNew').val(),
 						'nomeMae': $('#nomeMaeNew').val(),
 						'profissao': $('#profissaoNew').val(),
+						'estadoCivil': $('#cmbEstadoCivilNew').val(),
+						'naturalidade': $('#inputNaturalidadeNew').val(),
 						'cep': $('#cepNew').val(),
 						'endereco': $('#enderecoNew').val(),
 						'numero': $('#numeroNew').val(),
@@ -551,8 +556,6 @@ if ($tipo == 'ATENDIMENTO') {
 						'telefone': $('#telefoneNew').val(),
 						'celular': $('#celularNew').val(),
 						'email': $('#emailNew').val(),
-						'estadoCivil': $('#cmbEstadoCivil').val(),
-						'naturalidade': $('#inputNaturalidade').val(),
 						'site': $('#siteNew').val(),
 						'observacao': $('#observacaoNew').val()
 					},
@@ -869,6 +872,8 @@ if ($tipo == 'ATENDIMENTO') {
 					'tipoRequest': 'RESPONSAVEIS'
 				},
 				success: function(response) {
+					$('#parentescoCadatrado').empty()
+					$('#parentescoCadatrado').append('<option value="">Selecione</option>')
 					let opt = ''
 					response.data.forEach(function(item) {
 						let id = obj?obj.responsavelID:atendimento.AgAtResponsavel
@@ -948,6 +953,8 @@ if ($tipo == 'ATENDIMENTO') {
 							$('#nascimento').val(response.nascimento)
 							$('#nomePai').val(response.nomePai)
 							$('#nomeMae').val(response.nomeMae)
+							$('#cmbEstadoCivil').val(response.estadoCivil)
+							$('#inputNaturalidade').val(response.naturalidade)
 							$('#profissao').val(response.profissao)
 							$('#cep').val(response.cep)
 							$('#endereco').val(response.endereco)
@@ -964,6 +971,12 @@ if ($tipo == 'ATENDIMENTO') {
 							$('#uf').val(response.uf)
 							$('#estado').val(response.estado)
 							$('#sexo').val(response.sexo)
+
+							$('#cmbEstadoCivil').children("option").each(function(index, item){
+								if($(item).val() == response.estadoCivil){
+									$(item).change()
+								}
+							})
 
 							$('#uf').children("option").each(function(index, item){
 								if($(item).val() == response.uf){
@@ -1707,12 +1720,32 @@ if ($tipo == 'ATENDIMENTO') {
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
-										<div class="col-lg-12">
+										<div class="col-lg-3">
+											<label>Estado Civil</label>
+										</div>
+										<div class="col-lg-3">
+											<label>Naturalidade</label>
+										</div>
+										<div class="col-lg-6">
 											<label>Profissão</label>
 										</div>
 
 										<!-- campos -->
-										<div class="col-lg-12">
+
+										<div class="col-lg-3">
+											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+												<option value="#">Selecione</option>
+												<option value="ST">Solteiro</option>
+												<option value="CS">Casado</option>
+												<option value="SP">Separado</option>
+												<option value="DV">Divorciado</option>
+												<option value="VI">Viúvo</option>
+											</select>
+										</div>
+										<div class="col-lg-3">
+											<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+										</div>
+										<div class="col-lg-6">
 											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão">
 										</div>
 									</div>
@@ -1800,7 +1833,7 @@ if ($tipo == 'ATENDIMENTO') {
 												<option value="SP">São Paulo</option>
 												<option value="SE">Sergipe</option>
 												<option value="TO">Tocantins</option>
-												<option value="ES">Estrangeiro</option>	
+												<option value="NA">Estrangeiro</option>	
 											</select>
 										</div>
 									</div>
@@ -2163,7 +2196,7 @@ if ($tipo == 'ATENDIMENTO') {
 										<!-- campos -->
 
 										<div class="col-lg-3">
-											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+											<select id="cmbEstadoCivilNew" name="cmbEstadoCivilNew" class="form-control form-control-select2">
 												<option value="#">Selecione</option>
 												<option value="ST">Solteiro</option>
 												<option value="CS">Casado</option>
@@ -2173,7 +2206,7 @@ if ($tipo == 'ATENDIMENTO') {
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+											<input type="text" id="inputNaturalidadeNew" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
 										</div>
 										<div class="col-lg-6">
 											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão">
