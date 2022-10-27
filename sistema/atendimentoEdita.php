@@ -165,7 +165,7 @@ if ($tipo == 'ATENDIMENTO') {
 						alerta('Campo Obrigatório!', menssageError, 'error')
 						return
 					}
-					let paciente = $('#parentescoCadatrado').val() ? {
+					let paciente = $('#paciente').val() ? {
 						'id': $('#paciente').val(),
 						'prontuario': $('#prontuario').val(),
 						'nome': $('#nome').val(),
@@ -178,6 +178,8 @@ if ($tipo == 'ATENDIMENTO') {
 						'nascimento': $('#nascimento').val(),
 						'nomePai': $('#nomePai').val(),
 						'nomeMae': $('#nomeMae').val(),
+						'estadoCivil':$('#cmbEstadoCivil').val(),
+						'naturalidade':$('#inputNaturalidade').val(),
 						'profissao': $('#profissao').val(),
 						'cep': $('#cep').val(),
 						'endereco': $('#endereco').val(),
@@ -540,6 +542,8 @@ if ($tipo == 'ATENDIMENTO') {
 						'nomePai': $('#nomePaiNew').val(),
 						'nomeMae': $('#nomeMaeNew').val(),
 						'profissao': $('#profissaoNew').val(),
+						'estadoCivil': $('#cmbEstadoCivilNew').val(),
+						'naturalidade': $('#inputNaturalidadeNew').val(),
 						'cep': $('#cepNew').val(),
 						'endereco': $('#enderecoNew').val(),
 						'numero': $('#numeroNew').val(),
@@ -551,8 +555,6 @@ if ($tipo == 'ATENDIMENTO') {
 						'telefone': $('#telefoneNew').val(),
 						'celular': $('#celularNew').val(),
 						'email': $('#emailNew').val(),
-						'estadoCivil': $('#cmbEstadoCivil').val(),
-						'naturalidade': $('#inputNaturalidade').val(),
 						'site': $('#siteNew').val(),
 						'observacao': $('#observacaoNew').val()
 					},
@@ -869,6 +871,8 @@ if ($tipo == 'ATENDIMENTO') {
 					'tipoRequest': 'RESPONSAVEIS'
 				},
 				success: function(response) {
+					$('#parentescoCadatrado').empty()
+					$('#parentescoCadatrado').append('<option value="">Selecione</option>')
 					let opt = ''
 					response.data.forEach(function(item) {
 						let id = obj?obj.responsavelID:atendimento.AgAtResponsavel
@@ -948,6 +952,8 @@ if ($tipo == 'ATENDIMENTO') {
 							$('#nascimento').val(response.nascimento)
 							$('#nomePai').val(response.nomePai)
 							$('#nomeMae').val(response.nomeMae)
+							$('#cmbEstadoCivil').val(response.estadoCivil)
+							$('#inputNaturalidade').val(response.naturalidade)
 							$('#profissao').val(response.profissao)
 							$('#cep').val(response.cep)
 							$('#endereco').val(response.endereco)
@@ -964,6 +970,12 @@ if ($tipo == 'ATENDIMENTO') {
 							$('#uf').val(response.uf)
 							$('#estado').val(response.estado)
 							$('#sexo').val(response.sexo)
+
+							$('#cmbEstadoCivil').children("option").each(function(index, item){
+								if($(item).val() == response.estadoCivil){
+									$(item).change()
+								}
+							})
 
 							$('#uf').children("option").each(function(index, item){
 								if($(item).val() == response.uf){
@@ -1235,6 +1247,7 @@ if ($tipo == 'ATENDIMENTO') {
 				formatSubmit: 'dd/mm/yyyy',
 				format: 'dd/mm/yyyy',
 				disable: array,
+				min: array && array[1],
 				onStart: function() {
 					// console.log('onStart event')
 				},
@@ -1246,7 +1259,9 @@ if ($tipo == 'ATENDIMENTO') {
 						if (hasClass) {
 							$(this).addClass((hasSelected ?
 								'' :
-								'font-weight-bold text-black border'))
+								'font-weight-bold text-black border picker__day--highlighted'))
+						}else{
+							$(this).removeClass('picker__day--highlighted');//remover o destaque do dias que n estão disponíves para agendamento
 						}
 					})
 				},
@@ -1258,7 +1273,9 @@ if ($tipo == 'ATENDIMENTO') {
 						if (hasClass) {
 							$(this).addClass((hasSelected ?
 								'' :
-								'font-weight-bold text-black border'))
+								'font-weight-bold text-black border picker__day--highlighted'))
+						}else{
+							$(this).removeClass('picker__day--highlighted');//remover o destaque do dias que n estão disponíves para agendamento
 						}
 					})
 				},
@@ -1285,7 +1302,7 @@ if ($tipo == 'ATENDIMENTO') {
 						},
 						success: function(response) {
 							if (response.status == 'success') {
-								setHoraProfissional(response.arrayHora, response.intervalo)
+								setHoraProfissional(response.arrayHora, response.intervalo, response.horariosIndisp)
 								$('#horaAtendimento').focus()
 							} else {
 								alerta(response.titulo, response.menssagem, response.status)
@@ -1296,16 +1313,17 @@ if ($tipo == 'ATENDIMENTO') {
 			});
 		}
 
-		function setHoraProfissional(array, interv) {
+		function setHoraProfissional(array, interv, horariosIndisp) {
 			$('#modalHora').html('');
 			$('#modalHora').html('<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">');
-
+			hInicio = array ? array[1].from : undefined;
+			hFim = array ? array[1].to : undefined;
 			let intervalo = interv ? interv : 30
 			// doc: https://amsul.ca/pickadate.js/time/
 			$('#horaAtendimento').pickatime({
 				// Regras
 				interval: intervalo,
-				disable: array ? array : undefined,
+				disable: horariosIndisp,
 
 				// Formats
 				format: 'HH:i',
@@ -1315,8 +1333,8 @@ if ($tipo == 'ATENDIMENTO') {
 				hiddenSuffix: '_submit',
 
 				// Time limits
-				min: undefined,
-				max: undefined,
+				min: hInicio,
+				max: hFim,
 
 				// Close on a user action
 				closeOnSelect: true,
@@ -1672,7 +1690,6 @@ if ($tipo == 'ATENDIMENTO') {
 												<option value="SP">SP</option>
 												<option value="SE">SE</option>
 												<option value="TO">TO</option>
-												<option value="ES">ES</option>	
 											</select>
 										</div>
 										<div class="col-lg-2">
@@ -1707,12 +1724,32 @@ if ($tipo == 'ATENDIMENTO') {
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
-										<div class="col-lg-12">
+										<div class="col-lg-3">
+											<label>Estado Civil</label>
+										</div>
+										<div class="col-lg-3">
+											<label>Naturalidade</label>
+										</div>
+										<div class="col-lg-6">
 											<label>Profissão</label>
 										</div>
 
 										<!-- campos -->
-										<div class="col-lg-12">
+
+										<div class="col-lg-3">
+											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+												<option value="#">Selecione</option>
+												<option value="ST">Solteiro</option>
+												<option value="CS">Casado</option>
+												<option value="SP">Separado</option>
+												<option value="DV">Divorciado</option>
+												<option value="VI">Viúvo</option>
+											</select>
+										</div>
+										<div class="col-lg-3">
+											<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+										</div>
+										<div class="col-lg-6">
 											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão">
 										</div>
 									</div>
@@ -1800,7 +1837,7 @@ if ($tipo == 'ATENDIMENTO') {
 												<option value="SP">São Paulo</option>
 												<option value="SE">Sergipe</option>
 												<option value="TO">Tocantins</option>
-												<option value="ES">Estrangeiro</option>	
+												<option value="NA">Estrangeiro</option>	
 											</select>
 										</div>
 									</div>
@@ -2115,7 +2152,6 @@ if ($tipo == 'ATENDIMENTO') {
 												<option value="SP">SP</option>
 												<option value="SE">SE</option>
 												<option value="TO">TO</option>
-												<option value="ES">ES</option>	
 											</select>
 										</div>
 										<div class="col-lg-2">
@@ -2163,7 +2199,7 @@ if ($tipo == 'ATENDIMENTO') {
 										<!-- campos -->
 
 										<div class="col-lg-3">
-											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+											<select id="cmbEstadoCivilNew" name="cmbEstadoCivilNew" class="form-control form-control-select2">
 												<option value="#">Selecione</option>
 												<option value="ST">Solteiro</option>
 												<option value="CS">Casado</option>
@@ -2173,7 +2209,7 @@ if ($tipo == 'ATENDIMENTO') {
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+											<input type="text" id="inputNaturalidadeNew" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
 										</div>
 										<div class="col-lg-6">
 											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão">

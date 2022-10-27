@@ -45,7 +45,8 @@ try{
 				JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
 				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 				JOIN ServicoVenda ON SrVenId = AgendServico
-				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADOVENDA','CONFIRMADO','FILAESPERA')";
+				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADOVENDA','CONFIRMADO','FILAESPERA')
+				and AgendAtendimento is null";
 			$result = $conn->query($sql);
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -120,7 +121,7 @@ try{
 			foreach($rowAtendimento as $item){
 				$att = "<a class='list-icons-item' onclick='atualizaAtendimento(this)' href='#' data-tipo='ATENDIMENTO' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 				$exc = "<a class='list-icons-item' onclick='excluiAtendimento(this)'href='#' data-tipo='ATENDIMENTO' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
-				$aud = "<a style='color: black' href='#'  data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-search4' title='Auditoria'></i></a>";
+				$aud = "<a style='color: black' href='#'  data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
 				$acoes = "<div class='list-icons'>
 							$att
 							$exc
@@ -1028,7 +1029,10 @@ try{
 		$cliente = $_POST['cliente'];
 		$responsavel = $_POST['responsavel'];
 		$tipo = isset($_POST['tipo'])?$_POST['tipo']:null;
+
 		$iAtendimento = isset($_POST['iAtendimento'])?$_POST['iAtendimento']:null;
+		$iAgendamento = $tipo!='ATENDIMENTO'?$iAtendimento:null;
+
 		$status = isset($_POST['status'])?$_POST['status']:null;
 
 		if($cliente['id']){
@@ -1074,21 +1078,23 @@ try{
 				$conn->query($sql);
 		
 				$iAtendimento = $conn->lastInsertId();
-			}
-			$teste = $sql;
-			if(COUNT($atendimentoServicos)){
-				$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
-				AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
-				VALUES ";
-		
-				foreach($atendimentoServicos as $atendimentoServico){
-					$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]',
-					'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
-					'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
+				if($iAgendamento){
+					$sql = "UPDATE Agendamento SET AgendAtendimento=$iAtendimento WHERE AgendId = $iAgendamento";
+					$conn->query($sql);
 				}
-				$sql = substr($sql, 0, -1);
-				$conn->query($sql);
 			}
+
+			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
+			AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
+			VALUES ";
+	
+			foreach($atendimentoServicos as $atendimentoServico){
+				$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]',
+				'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
+				'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
+			}
+			$sql = substr($sql, 0, -1);
+			$conn->query($sql);
 			
 			$sql = "UPDATE Cliente SET
 				ClienNome= '$cliente[nome]',
@@ -1152,8 +1158,7 @@ try{
 			echo json_encode([
 				'titulo' => 'Atendimento',
 				'status' => 'success',
-				'menssagem' => 'Atendimento cadastrado!!',
-				'teste'=>$teste
+				'menssagem' => 'Atendimento cadastrado!!'
 			]);
 		}else{
 			echo json_encode([
@@ -1541,19 +1546,19 @@ try{
 			if(isset($_POST['iAtendimento']) && $_POST['iAtendimento']){
 				$iAtendimento = $_POST['iAtendimento'];
 	
-				$sql = "SELECT AgXSeId,AgXSeAgendamento,AgXSeServico,AgXSeProfissional,AgXSeData,AgXSeHorario,
-					AgXSeAtendimentoLocal,AgXSeUsuarioAtualizador,AgXSeUnidade,
-					ProfiId,AtLocId,AtLocNome,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-					SituaCor,ProfiNome,SrVenNome,SrVenValorVenda,SrVenId
-					FROM AgendamentoXServico
-					JOIN Agendamento ON AgendId = AgXSeAgendamento
-					JOIN AtendimentoModalidade ON AtModId = AgendModalidade
-					JOIN Situacao ON SituaId = AgendSituacao
-					JOIN Cliente ON ClienId = AgendCliente
-					JOIN Profissional ON ProfiId = AgXSeProfissional
-					JOIN AtendimentoLocal ON AtLocId = AgXSeAtendimentoLocal
-					JOIN ServicoVenda ON SrVenId = AgXSeServico
-					WHERE AgXSeUnidade = $iUnidade and AgXSeAgendamento = $iAtendimento";
+				$sql = "SELECT AgendId,ProfiId,AtLocId,AgendProfissional,AgendAtendimentoLocal,AgendDataRegistro,
+				AgendData,AgendHorario,AtModNome,
+				AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
+				AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
+				SituaCor,ProfiNome,AtLocNome,SrVenNome,SrVenValorVenda,SrVenId
+				FROM Agendamento
+				JOIN AtendimentoModalidade ON AtModId = AgendModalidade
+				JOIN Situacao ON SituaId = AgendSituacao
+				JOIN Cliente ON ClienId = AgendCliente
+				JOIN Profissional ON ProfiId = AgendProfissional
+				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
+				JOIN ServicoVenda ON SrVenId = AgendServico
+				WHERE AgendId = $iAtendimento and AgendUnidade = $iUnidade";
 				$result = $conn->query($sql);
 				$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
 	
@@ -1568,7 +1573,7 @@ try{
 					}
 					if(!$inArray){
 						array_push($atendimentoSessao, [
-							'id' => "$item[SrVenId]#$item[ProfiId]#$item[AtLocId]",
+							'id' => "$item[AgendServico]#$item[ProfiId]#$item[AtLocId]",
 							'iServico' => $item['SrVenId'],
 							'iMedico' => $item['ProfiId'],
 							'iLocal' => $item['AtLocId'],
@@ -1576,9 +1581,9 @@ try{
 							'servico' => $item['SrVenNome'],
 							'medico' => $item['ProfiNome'],
 							'local' => $item['AtLocNome'],
-							'sData' => mostraData($item['AgXSeData']),
-							'data' => $item['AgXSeData'],
-							'hora' => mostraHora($item['AgXSeHorario']),
+							'sData' => mostraData($item['AgendData']),
+							'data' => $item['AgendData'],
+							'hora' => mostraHora($item['AgendHorario']),
 							'valor' => $item['SrVenValorVenda'],
 							'status' => 'att'
 						]);
