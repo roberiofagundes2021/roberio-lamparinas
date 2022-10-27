@@ -38,7 +38,7 @@ try{
 		foreach($row as $item){
 			$att = "<a style='color: black' href='#' onclick='atualizaAgendamento(\"EDITA\", $item[AgendId])' class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 			$exc = "<a style='color: black' href='#' onclick='atualizaAgendamento(\"EXCLUI\", $item[AgendId])' class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
-			$aud = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AgendId]'><i class='icon-search4' title='Auditoria'></i></a>";
+			$aud = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AgendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
 			$acoes = "<div class='list-icons'>
 						${att}
 						${exc}
