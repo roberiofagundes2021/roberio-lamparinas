@@ -230,14 +230,21 @@ else {
 												</div>
 											</div>
 
-											<div class="col-lg-3" id="CPF">
+											<div class="col-lg-2">
+												<div class="form-group">
+												<label for="inputNomePF">Nome Social</label>
+													<input type="text" id="inputNomeSocial" name="inputNomeSocial" class="form-control" placeholder="Nome Social" value="<?php echo $row['ClienNomeSocial']; ?>">
+												</div>
+											</div>
+
+											<div class="col-lg-2" id="CPF">
 												<div class="form-group">
 													<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
 													<input required type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php echo formatarCPF_Cnpj($row['ClienCpf']); ?>">
 												</div>
 											</div>
 
-											<div class="col-lg-3">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputCartaoSus">CNS</label>
 													<input type="text" id="inputCartaoSus" name="inputCartaoSus" class="form-control" placeholder="Cartão do SUS" value="<?php echo $row['ClienCartaoSus']; ?>">
@@ -317,19 +324,34 @@ else {
 										</div>
 
 										<div class="row">
-											<div class="col-lg-6">
+											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="inputNomePai">Nome do Pai</label>
 													<input type="text" id="inputNomePai" name="inputNomePai" class="form-control" placeholder="Nome do Pai" value="<?php echo $row['ClienNomePai']; ?>">
 												</div>
 											</div>
 
-											<div class="col-lg-6">
+											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="inputNomeMae">Nome da Mãe</label>
 													<input type="text" id="inputNomeMae" name="inputNomeMae" class="form-control" placeholder="Nome da Mãe" value="<?php echo $row['ClienNomeMae']; ?>">
 												</div>
 											</div>
+
+											<div class="col-lg-4">
+											<div class="form-group">
+													<label for="cmbRacaCor">Raça/Cor</label>
+													<select id="cmbRacaCor" name="cmbRacaCor" class="form-control form-control-select2">
+														<option value="#">Selecione a Raça/Cor</option>
+														<option value="Branca" <?php if ($row['ClienRacaCor'] == 'Branca') echo "selected"; ?> >Branca</option>
+														<option value="Preta" <?php if ($row['ClienRacaCor'] == 'Preta') echo "selected"; ?> >Preta</option>
+														<option value="Parda" <?php if ($row['ClienRacaCor'] == 'Parda') echo "selected"; ?> >Parda</option>
+														<option value="Amarela" <?php if ($row['ClienRacaCor'] == 'Amarela') echo "selected"; ?> >Amarela</option>
+														<option value="Indigena" <?php if ($row['ClienRacaCor'] == 'Indigena') echo "selected"; ?> >Indígena</option>
+													</select>
+												</div>
+												
+											</div>	
 										</div>
 
 										<div class="row">
