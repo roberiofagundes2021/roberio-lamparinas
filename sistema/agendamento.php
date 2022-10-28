@@ -243,9 +243,9 @@ include('global_assets/php/conexao.php');
 					response.forEach(item => {
 						rowNode = table.row.add(item.data).draw().node()
 						$(rowNode).attr('class', 'text-left')
-						$(rowNode).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-						$(rowNode).find('td:eq(7)').attr('data-agendamento', `${item.identify.iAgendamento}`)
-						$(rowNode).find('td:eq(7)').attr('data-observacao', `${item.identify.sObservacao}`)
+						$(rowNode).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+						$(rowNode).find('td:eq(8)').attr('data-agendamento', `${item.identify.iAgendamento}`)
+						$(rowNode).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})
 				}
 			});

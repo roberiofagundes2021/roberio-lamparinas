@@ -113,15 +113,15 @@ try{
 					],
 					'identify' => [
 						'situacao' => $item['SituaChave'],
-						'iAgendamento' => $item['AgendId'],
+						'id' => $item['AgendId'],
 						'sJustificativa' => $item['AgendJustificativa']
 					]
 				]);
 			}
 			foreach($rowAtendimento as $item){
-				$att = "<a class='list-icons-item' onclick='atualizaAtendimento(this)' href='#' data-tipo='ATENDIMENTO' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
-				$exc = "<a class='list-icons-item' onclick='excluiAtendimento(this)'href='#' data-tipo='ATENDIMENTO' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
-				$aud = "<a style='color: black' href='#'  data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
+				$att = "<a class='list-icons-item' href='#' data-tipo='ATENDIMENTO' onclick='atualizaAtendimento(this)' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
+				$exc = "<a class='list-icons-item' href='#' data-tipo='ATENDIMENTO' onclick='excluiAtendimento(this)' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
+				$aud = "<a style='color: black' href='#' data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
 				$acoes = "<div class='list-icons'>
 							$att
 							$exc
@@ -164,7 +164,7 @@ try{
 					],
 					'identify' => [
 						'situacao' => $item['SituaChave'],
-						'iAtendimento' => $item['AtendId'],
+						'id' => $item['AtendId'],
 						'sJustificativa' => $item['AtendJustificativa']
 					]
 				]);
@@ -264,7 +264,7 @@ try{
 					],
 					'identify' => [
 						'situacao' => $item['SituaChave'],
-						'iAtendimento' => $item['AtendId'],
+						'id' => $item['AtendId'],
 						'sJustificativa' => $item['AtendObservacao']
 					]]);
 			}
@@ -313,7 +313,7 @@ try{
 					],
 					'identify' => [
 						'situacao' => $item['SituaChave'],
-						'iAtendimento' => $item['AtendId'],
+						'id' => $item['AtendId'],
 						'sJustificativa' => $item['AtendObservacao'],
 						'AtClaChave' => $item['AtClaChave'],
 						'AtClaNome' => $item['AtClaNome']

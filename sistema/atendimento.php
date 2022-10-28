@@ -532,7 +532,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						let opt = item.SituaChave === situacao? `<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#cmbSituacao').append(opt)
 					})
-					$('#iAtendimento').val($(element).data('atendimento'))
+					$('#iAtendimento').val($(element).data('id'))
 					$('#justificativaModal').val($(element).data('observacao'))
 					$('#tipo').val($(element).data('tipo'))
 
@@ -566,10 +566,8 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							$(rowNodeAgendamento).attr('class', 'text-left')
 							$(rowNodeAgendamento).find('td:eq(3)').addClass('newAtendimento')
 							$(rowNodeAgendamento).find('td:eq(3)').attr('style', 'cursor: pointer;')
-							$(rowNodeAgendamento).find('td:eq(3)').attr('data-agendamento', `${item.identify.iAgendamento}`)
-							$(rowNodeAgendamento).find('td:eq(3)').attr('data-tipo', 'AGENDAMENTO')
 
-							$(rowNodeAgendamento).find('td:eq(9)').attr('data-agendamento', `${item.identify.iAgendamento}`)
+							$(rowNodeAgendamento).find('td:eq(9)').attr('data-id', `${item.identify.id}`)
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-tipo', 'AGENDAMENTO')
 							$(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
@@ -584,7 +582,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
 
 							$(rowNodeAtendimento).attr('class', 'text-left')
-							$(rowNodeAtendimento).find('td:eq(10)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+							$(rowNodeAtendimento).find('td:eq(10)').attr('data-id', `${item.identify.iAtendimento}`)
 							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sJustificativa}`)
 							$(rowNodeAtendimento).find('td:eq(10)').attr('data-tipo', 'ATENDIMENTO')
 							if(item.identify.situacao == "EMESPERAVENDA" || item.identify.situacao == "LIBERADOVENDA"){
