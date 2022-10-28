@@ -386,7 +386,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					dataType: 'json',
 					data:{
 						'tipoRequest': 'MUDARSITUACAO',
-						'tipo': $('#tipo').val(),
+						'tipo': $('#AtendimentoAgendamento').val(),
 						'iAtendimento': $('#iAtendimento').val(),
 						'iSituacao': $('#cmbSituacao').val(),
 						'sJustificativa': $('#justificativaModal').val()
@@ -447,15 +447,13 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					$('#dadosPost').submit()
 				})
 			});
-			$('.newAtendimento').each(function(index,element){
-				console.log(element)
-				$(element).on('click', function(e){
-					$('#tipo').val($(element).data('tipo'))
-					$('#idAtendimentoAgendamento').val($(element).data('agendamento'))
-					$('#dadosPost').attr('action','atendimentoEdita.php')
-					$('#dadosPost').submit()
-				})
-			})
+		}
+
+		function newAtendimento(element){
+			$('#AtendimentoAgendamento').val($(element).data('tipo'))
+			$('#idAtendimentoAgendamento').val($(element).data('id'))
+			$('#dadosPost').attr('action','atendimentoEdita.php')
+			$('#dadosPost').submit()
 		}
 
 		function auditoria(element){
@@ -534,7 +532,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					})
 					$('#iAtendimento').val($(element).data('id'))
 					$('#justificativaModal').val($(element).data('observacao'))
-					$('#tipo').val($(element).data('tipo'))
+					$('#AtendimentoAgendamento').val($(element).data('tipo'))
 
 					$('#page-modal-situacao').fadeIn(200)
 				}
@@ -564,13 +562,22 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						await response.dataAgendamento.forEach(item => {
 							rowNodeAgendamento = tableAgendamento.row.add(item.data).draw().node()
 							$(rowNodeAgendamento).attr('class', 'text-left')
-							$(rowNodeAgendamento).find('td:eq(3)').addClass('newAtendimento')
-							$(rowNodeAgendamento).find('td:eq(3)').attr('style', 'cursor: pointer;')
 
+							// esse trecho serve para o link no nome do paciente
+							$(rowNodeAgendamento).find('td:eq(3)').addClass('text-primary')
+							$(rowNodeAgendamento).find('td:eq(3)').attr('style', 'cursor: pointer;')
+							$(rowNodeAgendamento).find('td:eq(3)').attr('title', 'Transformar o agendamento em atendimento')
+							$(rowNodeAgendamento).find('td:eq(3)').attr('data-id', `${item.identify.id}`)
+							$(rowNodeAgendamento).find('td:eq(3)').attr('data-tipo', 'AGENDAMENTO')
+							$(rowNodeAgendamento).find('td:eq(3)').attr('onclick', 'newAtendimento(this)')
+							// <end>
+
+							// esse trecho serve para o atributos no campo situação de cada linha
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-id', `${item.identify.id}`)
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
 							$(rowNodeAgendamento).find('td:eq(9)').attr('data-tipo', 'AGENDAMENTO')
 							$(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+							// <end>
 						})
 
 						$('#AtendimentoTable').DataTable().clear().draw()
@@ -581,13 +588,17 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						await response.dataAtendimento.forEach(item => {
 							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
 
+							// esse trecho serve para o atributos no campo situação de cada linha
 							$(rowNodeAtendimento).attr('class', 'text-left')
 							$(rowNodeAtendimento).find('td:eq(10)').attr('data-id', `${item.identify.iAtendimento}`)
 							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sJustificativa}`)
 							$(rowNodeAtendimento).find('td:eq(10)').attr('data-tipo', 'ATENDIMENTO')
+
+							// essa opção de alterar situação só vai estar disponível caso o status seja "Em espera" ou "Liberado"
 							if(item.identify.situacao == "EMESPERAVENDA" || item.identify.situacao == "LIBERADOVENDA"){
 								$(rowNodeAtendimento).find('td:eq(10)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 							}
+							// <end>
 						})
 					} else if (response.acesso == 'PROFISSIONAL'){
 						let tableE = $('#AtendimentoTableEspera').DataTable().clear().draw()
@@ -643,7 +654,6 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 			<!-- Content area -->
 			<div class="content">
 				<form id='dadosPost' method="POST">
-					<input type='hidden' id='tipo' name='tipo' value='' />
 					<input type='hidden' id='idAtendimentoAgendamento' name='idAtendimentoAgendamento' value='' />
 					<input type='hidden' id='AtendimentoAgendamento' name='AtendimentoAgendamento' value='' />
 					<input type='hidden' id='iAtendimentoEletivoId' name='iAtendimentoEletivoId' value='' />
