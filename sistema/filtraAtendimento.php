@@ -1095,10 +1095,21 @@ try{
 			}
 			$sql = substr($sql, 0, -1);
 			$conn->query($sql);
+
+			/* OBS.:
+				essas duas variáveis ($nomeSocial e $racaCor) são provisórias pois no arquivo atendimentoNovo.php
+				e atendimentoEdita.php
+				os campos "nomeSocial" e "racaCor" estão incoerentes, eles existem no modal de novo cliente mas não existem
+				na tela onde mostra os dados do paciente selecionado
+				(essa tela serve para editar os dados do paciente tambem, por isso deve ter) 
+			*/
+
+			$nomeSocial = isset($cliente['nomeSocial'])?$cliente['nomeSocial']:null;
+			$racaCor = isset($cliente['racaCor'])?$cliente['racaCor']:null;
 			
 			$sql = "UPDATE Cliente SET
 				ClienNome= '$cliente[nome]',
-				ClienNomeSocial= '$cliente[nomeSocial]',
+				ClienNomeSocial= '$nomeSocial',
 				ClienCpf= '$cliente[cpf]',
 				ClienCartaoSus= '$cliente[cns]',
 				ClienRg= '$cliente[rg]',
@@ -1108,7 +1119,7 @@ try{
 				ClienDtNascimento= '$cliente[nascimento]',
 				ClienNomePai= '$cliente[nomePai]',
 				ClienNomeMae= '$cliente[nomeMae]',
-				ClienRacaCor= '$cliente[racaCor]',
+				ClienRacaCor= '$racaCor',
 				ClienEstadoCivil= '$cliente[estadoCivil]',
 				ClienNaturalidade= '$cliente[naturalidade]',
 				ClienProfissao= '$cliente[profissao]',
