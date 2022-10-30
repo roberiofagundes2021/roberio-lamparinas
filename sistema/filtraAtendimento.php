@@ -25,6 +25,14 @@ try{
 			'atendimentoServicos' => []
 		];
 	}
+	
+ 	 // feito consultas para buscar a profissão do profissional do atendimento
+	$sql = "SELECT Profissao.ProfiNome as ProfissaoNome
+			FROM Profissional
+			JOIN Profissao ON Profissao.ProfiId = Profissional.ProfiProfissao
+			WHERE ProfiUsuario = $usuarioId";
+	$result = $conn->query($sql);
+	$rowProfissao = $result->fetch(PDO::FETCH_ASSOC);
 
 	// feito consultas para buscar de acordo com a classificação do atendimento
 	// (ATENDIMENTOSAMBULATORIAIS, ATENDIMENTOSHOSPITALARES, ATENDIMENTOSELETIVOS)
@@ -233,16 +241,16 @@ try{
 								</a>
 
 								<div class='dropdown-menu dropdown-menu-right'>
-									<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
-									<!-- <div class='dropdown-divider'></div> -->
+									<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>";
+									if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de Enfermagem') {
+										"<div class='dropdown-divider'></div>
+										<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
+										<div class='dropdown-divider'></div>
+										<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
+										<div class='dropdown-divider'></div>
+										<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>";
+									}
+									"<!-- <div class='dropdown-divider'></div> -->
 								</div>
 							</div>
 						</div>";
@@ -284,12 +292,6 @@ try{
 									<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 									<div class='dropdown-divider'></div>
 									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
 									<!-- <div class='dropdown-divider'></div> -->
 								</div>
 							</div>
@@ -391,17 +393,17 @@ try{
 								<i class='icon-menu9'></i>
 							</a>
 
-							<div class='dropdown-menu dropdown-menu-right'>
-								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
-								<!-- <div class='dropdown-divider'></div> -->
+							<div class='dropdown-menu dropdown-menu-right'> 
+								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>";
+								if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de Enfermagem') {
+									"<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>";
+								}	
+								"<!-- <div class='dropdown-divider'></div> -->
 							</div>
 						</div>
 					</div>";
@@ -443,12 +445,6 @@ try{
 								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
 								<!-- <div class='dropdown-divider'></div> -->
 							</div>
 						</div>
@@ -550,16 +546,16 @@ try{
 							</a>
 
 							<div class='dropdown-menu dropdown-menu-right'>
-								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
-								<!-- <div class='dropdown-divider'></div> -->
+								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>";
+								if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de Enfermagem') {
+									"<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>";
+								}
+									"<!-- <div class='dropdown-divider'></div> -->
 							</div>
 						</div>
 					</div>";
@@ -601,12 +597,6 @@ try{
 								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
 								<!-- <div class='dropdown-divider'></div> -->
 							</div>
 						</div>
@@ -710,16 +700,16 @@ try{
 							</a>
 
 							<div class='dropdown-menu dropdown-menu-right'>
-								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
-								<div class='dropdown-divider'></div>	
-								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
-								<!-- <div class='dropdown-divider'></div> -->
+								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>");
+								if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de Enfermagem') {
+									"<div class='dropdown-divider'></div>	
+									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>");
+								}
+								"<!-- <div class='dropdown-divider'></div> -->
 							</div>
 						</div>
 					</div>";
@@ -765,12 +755,6 @@ try{
 								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
 								<!-- <div class='dropdown-divider'></div> -->
 							</div>
 						</div>
