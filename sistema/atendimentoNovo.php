@@ -166,6 +166,7 @@ $_SESSION['atendimento'] = [
 						'telefone': $('#telefone').val(),
 						'celular': $('#celular').val(),
 						'email': $('#email').val(),
+						'site': $('#site').val(),
 						'observacao': $('#observacao').val()
 					} : null
 
@@ -519,7 +520,7 @@ $_SESSION['atendimento'] = [
 					alerta('CPF Inválido!', 'Digite um CPF válido!!', 'error')
 					return
 				}
-			
+
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAtendimento.php',
@@ -530,6 +531,7 @@ $_SESSION['atendimento'] = [
 						'nome': $('#nomeNew').val(),
 						'nomeSocial': $('#nomeSocialNew').val(),
 						'cpf': $('#cpfNew').val(),
+						'cns': $('#cnsNew').val(),
 						'rg': $('#rgNew').val(),
 						'emissor': $('#emissorNew').val(),
 						'uf': $('#ufNew').val(),
@@ -537,11 +539,10 @@ $_SESSION['atendimento'] = [
 						'nascimento': $('#nascimentoNew').val(),
 						'nomePai': $('#nomePaiNew').val(),
 						'nomeMae': $('#nomeMaeNew').val(),
-						'estadoCivil': $('#estadoCivilNew').val(),
+						'racaCor': $('#racaCorNew').val(),
 						'naturalidade': $('#naturalidadeNew').val(),
 						'profissao': $('#profissaoNew').val(),
 						'estadoCivil': $('#cmbEstadoCivilNew').val(),
-						'naturalidade': $('#inputNaturalidadeNew').val(),
 						'cep': $('#cepNew').val(),
 						'endereco': $('#enderecoNew').val(),
 						'numero': $('#numeroNew').val(),
@@ -553,8 +554,6 @@ $_SESSION['atendimento'] = [
 						'telefone': $('#telefoneNew').val(),
 						'celular': $('#celularNew').val(),
 						'email': $('#emailNew').val(),
-						'estadoCivil': $('#cmbEstadoCivil').val(),
-						'naturalidade': $('#inputNaturalidade').val(),
 						'site': $('#siteNew').val(),
 						'observacao': $('#observacaoNew').val()
 					},
@@ -944,6 +943,7 @@ $_SESSION['atendimento'] = [
 							$('#telefone').val(response.telefone)
 							$('#celular').val(response.celular)
 							$('#email').val(response.email)
+							$('#site').val(response.site)
 							$('#observacao').val(response.observacao)
 
 							$('#uf').val(response.uf)
@@ -1009,6 +1009,7 @@ $_SESSION['atendimento'] = [
 				$('#telefone').val('')
 				$('#celular').val('')
 				$('#email').val('')
+				$('#site').val('')
 				$('#observacao').val('')
 				$('#novoPaciente').hide()
 				$('#informacoes').hide()
@@ -1588,10 +1589,10 @@ $_SESSION['atendimento'] = [
 											<label>Nome <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-3">
-											<label>CPF <span class="text-danger">*</span></label>
+											<label>Nome Social</label>
 										</div>
 										<div class="col-lg-3">
-											<label>CNS</label>
+											<label>CPF <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
@@ -1602,15 +1603,18 @@ $_SESSION['atendimento'] = [
 											<input id="nome" name="nome" type="text" class="form-control" placeholder="Nome completo" required>
 										</div>
 										<div class="col-lg-3">
-											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required>
+											<input id="nomeSocial" name="nomeSocial" type="text" class="form-control" placeholder="Nome	Social">
 										</div>
 										<div class="col-lg-3">
-											<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS">
+											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required>
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>CNS</label>
+										</div>
 										<div class="col-lg-2">
 											<label>RG</label>
 										</div>
@@ -1620,14 +1624,11 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-2">
 											<label>UF</label>
 										</div>
-										<div class="col-lg-2">
-											<label>Sexo</label>
-										</div>
-										<div class="col-lg-3">
-											<label>Data de Nascimento</label>
-										</div>
 
 										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS">
+										</div>
 										<div class="col-lg-2">
 											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG">
 										</div>
@@ -1666,6 +1667,24 @@ $_SESSION['atendimento'] = [
 												<option value="TO">TO</option>
 											</select>
 										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-2">
+											<label>Sexo</label>
+										</div>
+										<div class="col-lg-2">
+											<label>Data de Nascimento</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Nome do Pai</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Nome da Mãe</label>
+										</div>
+
+										<!-- campos -->
 										<div class="col-lg-2">
 											<select id="sexo" name="sexo" class="form-control form-control-select2">
 												<option value="" selected>selecionar</option>
@@ -1673,25 +1692,13 @@ $_SESSION['atendimento'] = [
 												<option value="F">Feminino</option>
 											</select>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa">
 										</div>
-									</div>
-
-									<div class="col-lg-12 mb-4 row">
-										<!-- titulos -->
-										<div class="col-lg-6">
-											<label>Nome do Pai</label>
-										</div>
-										<div class="col-lg-6">
-											<label>Nome da Mãe</label>
-										</div>
-
-										<!-- campos -->
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai">
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe">
 										</div>
 									</div>
@@ -1699,17 +1706,29 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
+											<label>Raça/Cor</label>
+										</div>
+										<div class="col-lg-3">
 											<label>Estado Civil</label>
 										</div>
 										<div class="col-lg-3">
 											<label>Naturalidade</label>
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-3">
 											<label>Profissão</label>
 										</div>
 
 										<!-- campos -->
-
+										<div class="col-lg-3">
+											<select id="racaCor" name="racaCor" class="form-control form-control-select2">
+												<option value="#">Selecione a Raça/Cor</option>
+												<option value="Branca">Branca</option>
+												<option value="Preta">Preta</option>
+												<option value="Parda">Parda</option>
+												<option value="Amarela">Amarela</option>
+												<option value="Indígena">Indígena</option>
+											</select>
+										</div>
 										<div class="col-lg-3">
 											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
 												<option value="#">Selecione</option>
@@ -1723,7 +1742,7 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-3">
 											<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-3">
 											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão">
 										</div>
 									</div>
@@ -2048,42 +2067,67 @@ $_SESSION['atendimento'] = [
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-6">
 											<label>Nome <span class="text-danger">*</span></label>
-											<input id="nomeNew" name="nomeNew" type="text" class="form-control" placeholder="Nome completo">
 										</div>
-
 										<div class="col-lg-6">
 											<label>Nome Social</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-6">
+											<input id="nomeNew" name="nomeNew" type="text" class="form-control" placeholder="Nome completo">
+										</div>
+										<div class="col-lg-6">
 											<input id="nomeSocialNew" name="nomeSocialNew" type="text" class="form-control" placeholder="Nome Social">
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-4">
 											<label>CPF <span class="text-danger">*</span></label>
-											<input id="cpfNew" name="cpfNew" type="text" class="form-control" placeholder="CPF">
 										</div>
-
 										<div class="col-lg-4">
 											<label>CNS</label>
-											<input id="cnsNew" name="cnsNew" type="text" class="form-control" placeholder="Cartão do SUS">
 										</div>
-
 										<div class="col-lg-4">
 											<label>RG</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="cpfNew" name="cpfNew" type="text" class="form-control" placeholder="CPF">
+										</div>
+										<div class="col-lg-4">
+											<input id="cnsNew" name="cnsNew" type="text" class="form-control" placeholder="Cartão do SUS">
+										</div>
+										<div class="col-lg-4">
 											<input id="rgNew" name="rgNew" type="text" class="form-control" placeholder="RG">
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-3">
 											<label>Emissor</label>
-											<input id="emissorNew" name="emissorNew" type="text" class="form-control" placeholder="Orgão Emissor">
 										</div>
-
 										<div class="col-lg-2">
 											<label>UF</label>
+										</div>
+										<div class="col-lg-3">
+											<label>Sexo</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Data de Nascimento</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="emissorNew" name="emissorNew" type="text" class="form-control" placeholder="Orgão Emissor">
+										</div>
+										<div class="col-lg-2">
 											<select id="ufNew" name="ufNew" class="form-control form-control-select2" placeholder="UF">
 												<option value="">Selecione</option>
 												<option value="AC">AC</option>
@@ -2116,7 +2160,6 @@ $_SESSION['atendimento'] = [
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<label>Sexo</label>
 											<select id="sexoNew" name="sexoNew" class="form-control form-control-select2">
 												<option value="" selected>selecionar</option>
 												<option value="M">Masculino</option>
@@ -2124,26 +2167,45 @@ $_SESSION['atendimento'] = [
 											</select>
 										</div>
 										<div class="col-lg-4">
-											<label>Data de Nascimento</label>
 											<input id="nascimentoNew" name="nascimentoNew" type="date" class="form-control" placeholder="dd/mm/aaaa">
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-6">
 											<label>Nome do Pai</label>
-											<input id="nomePaiNew" name="nomePaiNew" type="text" class="form-control" placeholder="Nome do Pai">
 										</div>
-
 										<div class="col-lg-6">
 											<label>Nome da Mãe</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-6">
+											<input id="nomePaiNew" name="nomePaiNew" type="text" class="form-control" placeholder="Nome do Pai">
+										</div>
+										<div class="col-lg-6">
 											<input id="nomeMaeNew" name="nomeMaeNew" type="text" class="form-control" placeholder="Nome da Mãe">
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-3">
 											<label>Raça/Cor</label>
+										</div>
+										<div class="col-lg-3">
+											<label>Estado Civil</label>
+										</div>
+										<div class="col-lg-3">
+											<label>Naturalidade</label>
+										</div>
+										<div class="col-lg-3">
+											<label>Profissão</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
 											<select id="racaCorNew" name="racaCorNew" class="form-control form-control-select2">
 												<option value="#">Selecione a Raça/Cor</option>
 												<option value="Branca">Branca</option>
@@ -2154,16 +2216,7 @@ $_SESSION['atendimento'] = [
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<label>Naturalidade</label>
-										</div>
-										<div class="col-lg-6">
-											<label>Profissão</label>
-										</div>
-
-										<!-- campos -->
-
-										<div class="col-lg-3">
-											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+											<select id="cmbEstadoCivilNew" name="cmbEstadoCivilNew" class="form-control form-control-select2">
 												<option value="#">Selecione</option>
 												<option value="ST">Solteiro</option>
 												<option value="CS">Casado</option>
@@ -2172,10 +2225,10 @@ $_SESSION['atendimento'] = [
 												<option value="VI">Viúvo</option>
 											</select>
 										</div>
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<input id="naturalidadeNew" name="naturalidadeNew" type="text" class="form-control" placeholder="Naturalidade">
 										</div>
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão" required>
 										</div>
 									</div>
@@ -2185,20 +2238,31 @@ $_SESSION['atendimento'] = [
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-3">
 											<label>CEP</label>
-											<input id="cepNew" name="cepNew" type="text" class="form-control" placeholder="CEP">
 										</div>
 										<div class="col-lg-4">
 											<label>Endereço</label>
-											<input id="enderecoNew" name="enderecoNew" type="text" class="form-control" placeholder="EX.: Rua, Av">
 										</div>
 										<div class="col-lg-2">
 											<label>Nº</label>
-											<input id="numeroNew" name="numeroNew" type="text" class="form-control" placeholder="Número">
 										</div>
 										<div class="col-lg-3">
 											<label>Complemento</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="cepNew" name="cepNew" type="text" class="form-control" placeholder="CEP">
+										</div>
+										<div class="col-lg-4">
+											<input id="enderecoNew" name="enderecoNew" type="text" class="form-control" placeholder="EX.: Rua, Av">
+										</div>
+										<div class="col-lg-2">
+											<input id="numeroNew" name="numeroNew" type="text" class="form-control" placeholder="Número">
+										</div>
+										<div class="col-lg-3">
 											<input id="complementoNew" name="complementoNew" type="text" class="form-control" placeholder="Complemento">
 										</div>
 									</div>
@@ -2207,14 +2271,22 @@ $_SESSION['atendimento'] = [
 										<!-- titulos -->
 										<div class="col-lg-4">
 											<label>Bairro</label>
-											<input id="bairroNew" name="bairroNew" type="text" class="form-control" placeholder="Bairro">
 										</div>
 										<div class="col-lg-4">
 											<label>Cidade</label>
-											<input id="cidadeNew" name="cidadeNew" type="text" class="form-control" placeholder="Cidade">
 										</div>
 										<div class="col-lg-4">
 											<label>Estado</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="bairroNew" name="bairroNew" type="text" class="form-control" placeholder="Bairro">
+										</div>
+										<div class="col-lg-4">
+											<input id="cidadeNew" name="cidadeNew" type="text" class="form-control" placeholder="Cidade">
+										</div>
+										<div class="col-lg-4">
 											<select id="estadoNew" name="estadoNew" class="form-control form-control-select2" placeholder="Estado">
 												<option value="#">Selecione um estado</option>
 												<option value="AC">Acre</option>
@@ -2257,29 +2329,46 @@ $_SESSION['atendimento'] = [
 										<!-- titulos -->
 										<div class="col-lg-4">
 											<label>Nome</label>
-											<input id="contatoNew" name="contatoNew" type="text" class="form-control" placeholder="Contato">
 										</div>
 										<div class="col-lg-2">
 											<label>Telefone</label>
-											<input id="telefoneNew" name="telefoneNew" type="text" class="form-control" placeholder="Res. / Com.">
 										</div>
 										<div class="col-lg-2">
 											<label>Celular</label>
-											<input id="celularNew" name="celularNew" type="text" class="form-control" placeholder="Celular">
 										</div>
 										<div class="col-lg-2">
 											<label>E-mail</label>
-											<input id="emailNew" name="emailNew" type="text" class="form-control" placeholder="E-mail">
 										</div>
 										<div class="col-lg-2">
 											<label>Site</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="contatoNew" name="contatoNew" type="text" class="form-control" placeholder="Contato">
+										</div>
+										<div class="col-lg-2">
+											<input id="telefoneNew" name="telefoneNew" type="text" class="form-control" placeholder="Res. / Com.">
+										</div>
+										<div class="col-lg-2">
+											<input id="celularNew" name="celularNew" type="text" class="form-control" placeholder="Celular">
+										</div>
+										<div class="col-lg-2">
+											<input id="emailNew" name="emailNew" type="text" class="form-control" placeholder="E-mail">
+										</div>
+										<div class="col-lg-2">
 											<input id="siteNew" name="siteNew" type="text" class="form-control" placeholder="Site">
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-12">
 											<label>Observação</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-12">
 											<textarea id="observacaoNew" name="observacaoNew" class="form-control" placeholder="Observações"></textarea>
 										</div>
 									</div>
@@ -2309,18 +2398,25 @@ $_SESSION['atendimento'] = [
 										<h5 class="text-uppercase font-weight-bold">Dados Pessoais do responsável</h5>
 									</div>
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-4">
 											<label>Nome <span class="text-danger">*</span></label>
-											<input id="nomeRespNew" name="nomeResp" type="text" class="form-control" placeholder="Nome" required>
 										</div>
-
 										<div class="col-lg-4">
 											<label>Parentesco</label>
-											<input id="parentescoRespNew" name="parentesco" type="text" class="form-control" placeholder="Parentesco">
 										</div>
-
 										<div class="col-lg-4">
 											<label>Nascimento</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="nomeRespNew" name="nomeResp" type="text" class="form-control" placeholder="Nome" required>
+										</div>
+										<div class="col-lg-4">
+											<input id="parentescoRespNew" name="parentesco" type="text" class="form-control" placeholder="Parentesco">
+										</div>
+										<div class="col-lg-4">
 											<input id="nascimentoRespNew" name="nascimentoResp" type="date" class="form-control">
 										</div>
 									</div>
@@ -2330,23 +2426,31 @@ $_SESSION['atendimento'] = [
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-3">
 											<label>CEP</label>
-											<input id="cepRespNew" name="cepResp" type="text" class="form-control" placeholder="CEP">
 										</div>
-
 										<div class="col-lg-4">
 											<label>Endereço</label>
-											<input id="enderecoRespNew" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av">
 										</div>
-										
 										<div class="col-lg-2">
 											<label>Nº</label>
-											<input id="numeroRespNew" name="numeroResp" type="text" class="form-control" placeholder="Número">
 										</div>
-
 										<div class="col-lg-3">
 											<label>Complemento</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="cepRespNew" name="cepResp" type="text" class="form-control" placeholder="CEP">
+										</div>
+										<div class="col-lg-4">
+											<input id="enderecoRespNew" name="enderecoResp" type="text" class="form-control" placeholder="EX.: Rua, Av">
+										</div>
+										<div class="col-lg-2">
+											<input id="numeroRespNew" name="numeroResp" type="text" class="form-control" placeholder="Número">
+										</div>
+										<div class="col-lg-3">
 											<input id="complementoRespNew" name="complementoResp" type="text" class="form-control" placeholder="Complemento">
 										</div>
 									</div>
@@ -2355,14 +2459,22 @@ $_SESSION['atendimento'] = [
 										<!-- titulos -->
 										<div class="col-lg-4">
 											<label>Bairro</label>
-											<input id="bairroRespNew" name="bairroResp" type="text" class="form-control" placeholder="Bairro">
 										</div>
 										<div class="col-lg-4">
 											<label>Cidade</label>
-											<input id="cidadeRespNew" name="cidadeResp" type="text" class="form-control" placeholder="Cidade">
 										</div>
 										<div class="col-lg-4">
 											<label>Estado</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="bairroRespNew" name="bairroResp" type="text" class="form-control" placeholder="Bairro">
+										</div>
+										<div class="col-lg-4">
+											<input id="cidadeRespNew" name="cidadeResp" type="text" class="form-control" placeholder="Cidade">
+										</div>
+										<div class="col-lg-4">
 											<select id="estadoRespNew" name="estadoRespNew" class="form-control form-control-select2" placeholder="Estado">
 												<option value="#">Selecione um estado</option>
 												<option value="AC">Acre</option>
@@ -2402,23 +2514,37 @@ $_SESSION['atendimento'] = [
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-4">
 											<label>Telefone</label>
-											<input id="telefoneRespNew" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com.">
 										</div>
 										<div class="col-lg-4">
 											<label>Celular</label>
-											<input id="celularRespNew" name="celularResp" type="text" class="form-control" placeholder="Celular">
 										</div>
 										<div class="col-lg-4">
 											<label>E-mail</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-4">
+											<input id="telefoneRespNew" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com.">
+										</div>
+										<div class="col-lg-4">
+											<input id="celularRespNew" name="celularResp" type="text" class="form-control" placeholder="Celular">
+										</div>
+										<div class="col-lg-4">
 											<input id="emailRespNew" name="emailResp" type="text" class="form-control" placeholder="E-mail">
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-12">
 											<label>Observação</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-12">
 											<textarea id="observacaoRespNew" name="observacaoResp" class="form-control" placeholder="Observações"></textarea>
 										</div>
 									</div>

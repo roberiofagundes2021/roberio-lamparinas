@@ -895,7 +895,6 @@ try{
 		$sql = "SELECT COUNT(isnull(clienCodigo,0)) as Codigo
 				FROM Cliente
 				Where ClienUnidade = " . $_SESSION['UnidadeId'] . "";
-		//echo $sql;die;
 		$result = $conn->query("$sql");
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -908,6 +907,7 @@ try{
 			'nome' => isset($_POST['nome'])?$_POST['nome']:'null',
 			'nomeSocial' => isset($_POST['nomeSocial'])?$_POST['nomeSocial']:'null',
 			'cpf' => isset($_POST['cpf'])?$_POST['cpf']:'null',
+			'cns' => isset($_POST['cns'])?$_POST['cns']:'null',
 			'rg' => isset($_POST['rg'])?$_POST['rg']:'null',
 			'emissor' => isset($_POST['emissor'])?$_POST['emissor']:'null',
 			'uf' => isset($_POST['uf'])?$_POST['uf']:'null',
@@ -935,13 +935,12 @@ try{
 			'site' => isset($_POST['site'])?$_POST['site']:'null',
 			'observacao' => isset($_POST['observacao'])?$_POST['observacao']:'null'
 		];
-		$cod = '';
-		$sql = "INSERT INTO Cliente(ClienCodigo,ClienNome,ClienNomeSocial,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+		$sql = "INSERT INTO Cliente(ClienCodigo,ClienNome,ClienNomeSocial,ClienCpf,ClienCartaoSus,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
 			ClienSite,ClienNaturalidade,ClienRacaCor,ClienEstadoCivil,
 			ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
 			ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 			ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade)
-			VALUES('$cod','$paciente[nome]','$paciente[nomeSocial]','$paciente[cpf]','$paciente[rg]',
+			VALUES('$cod','$paciente[nome]','$paciente[nomeSocial]','$paciente[cpf]','$paciente[cns]','$paciente[rg]',
 			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[site]','$paciente[naturalidade]','$paciente[racaCor]',
 			'$paciente[estadoCivil]',
 			'$paciente[nascimento]','$paciente[nomePai]','$paciente[nomeMae]',
