@@ -209,7 +209,7 @@ include('global_assets/php/conexao.php');
 						let data = new Date(response.auditoria.dataRegistro).toLocaleString("pt-BR", {timeZone: "America/Bahia"})
 						let dataRegistro = new Date(response.auditoria.dtHrRegistro).toLocaleString("pt-BR", {timeZone: "America/Bahia"})
 						let tds = `
-						<tr class="text-center">
+						<tr>
 							<td>${response.auditoria.UsuarNome}</td>
 							<td>${data.split(' ')[0]} ${response.auditoria.horaRegistro.split('.')[0]}</td>
 							<td>${response.auditoria.ClienNome}</td>
@@ -437,7 +437,7 @@ include('global_assets/php/conexao.php');
 									<div class="col-lg-12">
 										<table class="table mb-4" id="auditoriaTable">
 											<thead>
-												<tr class="bg-slate text-center">
+												<tr>
 													<th style="width: 35%;">Atendente</th>
 													<th style="width: 30%;">Data/Hora</th>
 													<th style="width: 35%;">Paciente</th>
