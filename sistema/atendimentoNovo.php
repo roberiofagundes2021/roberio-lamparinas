@@ -152,8 +152,8 @@ $_SESSION['atendimento'] = [
 						'nomePai': $('#nomePai').val(),
 						'nomeMae': $('#nomeMae').val(),
 						'racaCor': $('#racaCor').val(),
-						'estadoCivil': $('#cmbEstadoCivil').val(),
-						'naturalidade': $('#inputNaturalidade').val(),
+						'estadoCivil': $('#estadoCivil').val(),
+						'naturalidade': $('#naturalidade').val(),
 						'profissao': $('#profissao').val(),
 						'cep': $('#cep').val(),
 						'endereco': $('#endereco').val(),
@@ -541,7 +541,7 @@ $_SESSION['atendimento'] = [
 						'racaCor': $('#racaCorNew').val(),
 						'naturalidade': $('#naturalidadeNew').val(),
 						'profissao': $('#profissaoNew').val(),
-						'estadoCivil': $('#cmbEstadoCivilNew').val(),
+						'estadoCivil': $('#estadoCivilNew').val(),
 						'cep': $('#cepNew').val(),
 						'endereco': $('#enderecoNew').val(),
 						'numero': $('#numeroNew').val(),
@@ -1729,7 +1729,7 @@ $_SESSION['atendimento'] = [
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
+											<select id="estadoCivil" name="estadoCivil" class="form-control form-control-select2">
 												<option value="#">Selecione</option>
 												<option value="ST">Solteiro</option>
 												<option value="CS">Casado</option>
@@ -1739,7 +1739,7 @@ $_SESSION['atendimento'] = [
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+											<input type="text" id="naturalidade" name="naturalidade" class="form-control" placeholder="Naturalidade">
 										</div>
 										<div class="col-lg-3">
 											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão">
@@ -2215,7 +2215,7 @@ $_SESSION['atendimento'] = [
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<select id="cmbEstadoCivilNew" name="cmbEstadoCivilNew" class="form-control form-control-select2">
+											<select id="estadoCivilNew" name="estadoCivilNew" class="form-control form-control-select2">
 												<option value="#">Selecione</option>
 												<option value="ST">Solteiro</option>
 												<option value="CS">Casado</option>
