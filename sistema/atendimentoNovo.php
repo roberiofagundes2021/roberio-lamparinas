@@ -152,8 +152,8 @@ $_SESSION['atendimento'] = [
 						'nomePai': $('#nomePai').val(),
 						'nomeMae': $('#nomeMae').val(),
 						'racaCor': $('#racaCor').val(),
-						'estadoCivil': $('#estadoCivil').val(),
-						'naturalidade': $('#naturalidade').val(),
+						'estadoCivil': $('#cmbEstadoCivil').val(),
+						'naturalidade': $('#inputNaturalidade').val(),
 						'profissao': $('#profissao').val(),
 						'cep': $('#cep').val(),
 						'endereco': $('#endereco').val(),
@@ -187,7 +187,6 @@ $_SESSION['atendimento'] = [
 						'emailResp': $('#emailResp').val(),
 						'observacaoResp': $('#observacaoResp').val()
 					} : null
-
 					$.ajax({
 						type: 'POST',
 						url: 'filtraAtendimento.php',
