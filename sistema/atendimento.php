@@ -423,6 +423,13 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				});
 			};
 
+			$(function() {
+				$('.btn-grid').click(function(){
+					$('.btn-grid').removeClass('active');
+					$(this).addClass('active');     
+				});
+			});
+
 			_componentSelect2();
 			
 			/* Fim: Tabela Personalizada */
@@ -633,6 +640,22 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 		function submeterAgendaMedica(){ 
 			document.formAgendaMedica.submit();
 		}
+
+		function mudarGrid(grid){
+
+			if (grid == 'atendimentos') {
+				document.getElementById("card-title").innerText = "Atendimentos";
+				document.getElementById("box-atendimentos").style.display = 'block';
+				document.getElementById("box-agendamentos").style.display = 'none';
+			}
+			if (grid == 'agendamentos') {
+				document.getElementById("card-title").innerText = "Agendamentos";
+				document.getElementById("box-agendamentos").style.display = 'block';
+				document.getElementById("box-atendimentos").style.display = 'none';			
+			}
+
+		}
+
 	</script>
 
 </head>
@@ -687,75 +710,80 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 													<i class="icon-printer2"></i>																						
 												</a>
 											</div>
-										</div>	
+										</div>
+										
+										<div class="col-lg-12">	
+											<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('agendamentos')" >Agendamentos</button>
+											<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendimentos')" >Atendimentos</button>
+										</div>
+
 									</div>
 								</div>
-							</div>
-							<!-- Agendamentos -->
-							<div class="card">
-								<div class="card-header header-elements-inline">
-									<h3 class="card-title">Agendamentos</h3>
-									<div class="header-elements">
-										<div class="list-icons">
-											<a class="list-icons-item" data-action="collapse"></a>
+
+								<div class="card-body">
+									<div class="row">
+										<div class="col-md-9">
+											<h3 class="card-title" id="card-title">Agendamentos</h3>
 										</div>
 									</div>
+									
 								</div>
 
-								<table class="table" id="AgendamentoTable">
-									<thead>
-										<tr class="bg-slate text-left">
-											<th>Data / Hora</th>
-											<th>Espera</th>
-											<th>Prontuário</th>			
-											<th>Paciente</th>
-											<th>Idade</th>
-											<th>Profissional</th>
-											<th>CBO</th>
-											<th>Modalidade</th>
-											<th>Procedimento</th>
-											<th>Situação</th>
-											<th class="text-center">Ações</th>
-										</tr>
-									</thead>
-									<tbody>
 
-									</tbody>
-								</table>
-							</div>
- 							<!-- Atendimentos -->
-							<div class="card">
-								<div class="card-header header-elements-inline">
-									<h3 class="card-title">Atendimentos</h3>
-									<div class="header-elements">
-										<div class="list-icons">
-											<a class="list-icons-item" data-action="collapse"></a>
-										</div>
-									</div>
+
+								<!-- Agendamentos -->
+								<div id="box-agendamentos" style="display: block;">
+									<table class="table" id="AgendamentoTable">
+										<thead>
+											<tr class="bg-slate text-left">
+												<th>Data / Hora</th>
+												<th>Espera</th>
+												<th>Prontuário</th>			
+												<th>Paciente</th>
+												<th>Idade</th>
+												<th>Profissional</th>
+												<th>CBO</th>
+												<th>Modalidade</th>
+												<th>Procedimento</th>
+												<th>Situação</th>
+												<th class="text-center">Ações</th>
+											</tr>
+										</thead>
+										<tbody>
+
+										</tbody>
+									</table>
 								</div>
 
-								<table class="table" id="AtendimentoTable">
-									<thead>
-										<tr class="bg-slate text-left">
-											<th>Data / Hora</th>
-											<th>Espera</th>
-											<th>Nº Registro</th>
-											<th>Prontuário</th>			
-											<th>Paciente</th>
-											<th>Idade</th>
-											<th>Profissional</th>
-											<th>CBO</th>
-											<th>Modalidade</th>
-											<th>Procedimento</th>
-											<th>Situação</th>
-											<th class="text-center">Ações</th>
-										</tr>
-									</thead>
-									<tbody>
+								<!-- Atendimentos -->
+								<div id="box-atendimentos" style="display: none;">
 
-									</tbody>
-								</table>
-							</div>
+									<div class="card-body" style="padding: 0px"></div>
+									<table class="table" id="AtendimentoTable">
+										<thead>
+											<tr class="bg-slate text-left">
+												<th>Data / Hora</th>
+												<th>Espera</th>
+												<th>Nº Registro</th>
+												<th>Prontuário</th>			
+												<th>Paciente</th>
+												<th>Idade</th>
+												<th>Profissional</th>
+												<th>CBO</th>
+												<th>Modalidade</th>
+												<th>Procedimento</th>
+												<th>Situação</th>
+												<th class="text-center">Ações</th>
+											</tr>
+										</thead>
+										<tbody>
+
+										</tbody>
+									</table>
+								</div>
+
+                            <!-- FIM DIV CARD -->
+							</div>														
 						</div>
 					</div>
 				<?php } elseif ($acesso == 'PROFISSIONAL'){ ?>

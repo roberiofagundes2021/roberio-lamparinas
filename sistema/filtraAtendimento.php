@@ -39,6 +39,7 @@ try{
 	if($tipoRequest == 'ATENDIMENTOS'){
 		$acesso = $_POST['acesso'];
 		$array = [];
+		$hoje = date('Y-m-d');
 
 		if($acesso == 'ATENDIMENTO'){
 			$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
@@ -54,6 +55,7 @@ try{
 				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 				JOIN ServicoVenda ON SrVenId = AgendServico
 				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADOVENDA','CONFIRMADO','FILAESPERA')
+				AND AgendData = '$hoje'
 				and AgendAtendimento is null";
 			$result = $conn->query($sql);
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
