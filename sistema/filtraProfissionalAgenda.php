@@ -180,6 +180,7 @@ try{
 		}
 
 		$arraySql = [];
+		$arraySqlUpdate = [];
 
 		foreach($arrayAgenda as $item){
 			$start = explode(' ',$item['start']); //"22-08-2022 09:00:00"
@@ -195,7 +196,16 @@ try{
 
 				array_push($arraySql, $sql);
 			} elseif($item['tipInsert'] == 'ATT'){
-				$sql = "UPDATE ProfissionalAgenda SET
+
+				$sql = "SELECT SituaId  FROM Situacao WHERE (SituaNome = 'Reagendar' OR SituaChave = 'REAGENDAR') AND SituaStatus = 1";
+				$result = $conn->query($sql);
+				$idSituaReag = $result->fetch(PDO::FETCH_ASSOC);			
+				
+				$sql = "SELECT PrAgeData, PrAgeAtendimentoLocal FROM ProfissionalAgenda WHERE PrAgeId = $item[id]";
+				$result = $conn->query($sql);
+				$oldDataELocal = $result->fetch(PDO::FETCH_ASSOC);
+				
+				$sql = "$idSituaReag[SituaId];$oldDataELocal[PrAgeData];$data;$oldDataELocal[PrAgeAtendimentoLocal]" . "<>" . "UPDATE ProfissionalAgenda SET
 				PrAgeData='$data',
 				PrAgeIntervalo='$intervalo',
 				PrAgeHoraInicio='$start[1]',
@@ -204,7 +214,7 @@ try{
 				PrAgeUsuarioAtualizador='$usuarioId'
 				WHERE PrAgeId = $item[id]";
 
-				array_push($arraySql, $sql);
+				array_push($arraySqlUpdate, $sql);
 			} elseif($item['tipInsert'] == 'REMOVE'){
 				$sql = "DELETE FROM ProfissionalAgenda WHERE PrAgeId = $item[id]";
 
@@ -214,6 +224,27 @@ try{
 		if(COUNT($arraySql)){
 			foreach($arraySql as $sql){
 				$conn->query($sql);
+			}
+		}
+		if (COUNT($arraySqlUpdate)) {
+
+			foreach ($arraySqlUpdate as $array ) {
+
+				$reagendar = explode(';', explode('<>',$array)[0])[0];
+				$oldData = explode(';', explode('<>',$array)[0])[1];
+				$newData = str_replace('/', '-', explode(';', explode('<>',$array)[0])[2]);
+				$local = explode(';', explode('<>',$array)[0])[3];
+
+				if($newData != $oldData){
+					$sql= "UPDATE Agendamento 
+							SET AgendSituacao = '$reagendar'
+							WHERE AgendData = '$oldData' 
+							AND AgendProfissional = '$iProfissional'
+							AND AgendAtendimento IS NULL";	
+					$conn->query($sql);		
+				}
+				
+				$conn->query(explode('<>',$array)[1]);
 			}
 		}
 		echo json_encode([
