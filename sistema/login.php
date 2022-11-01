@@ -70,25 +70,28 @@ if(isset($_POST['usuario'])){
 		$usuaId = $row[0]['UsuarId'];
 
 		if ($count == 0){
-			$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";			
+			$erro[] = "A licença da sua empresa expirou. Procure o Gestor do Contrato do sistema \"Lamparinas\" na sua empresa.";
 		} else if ($count > 1 and !isset($_POST['empresa'])){
 			$erro[] = "Você está vinculado em mais de uma empresa. Informe qual deseja acessar.";
 		} else {
-				if(!$newUser) {
-					$sql = "SELECT UsuarId, UsuarNome, UsuarLogin, UnidaId, UnidaNome, UsXUnResumoFinanceiro, EmpreId, EmpreNomeFantasia, EmpreFoto,
-							PerfiChave
-							FROM UsuarioXUnidade
-							JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
-							JOIN Empresa on EmpreId = EXUXPEmpresa
-							JOIN Unidade on UnidaId = UsXUnUnidade
-							JOIN Usuario on UsuarId = EXUXPUsuario
-							JOIN Perfil on PerfiId = EXUXPPerfil
-							WHERE EXUXPUsuario = ".$row[0]['UsuarId'];
-					$sql .= isset($_POST['empresa'])?" and EXUXPEmpresa = $_POST[empresa]":"";
-					$sql .= isset($_POST['unidade'])?" and UnidaId = $_POST[unidade]":"";
-					$result = $conn->query($sql);
-					$rowUnidade = $result->fetch(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
+			if(!$newUser) {
+				$sql = "SELECT UsuarId, UsuarNome, UsuarLogin, UnidaId, UnidaNome, UsXUnResumoFinanceiro, EmpreId, EmpreNomeFantasia, EmpreFoto,
+						PerfiChave
+						FROM UsuarioXUnidade
+						JOIN EmpresaXUsuarioXPerfil on EXUXPId = UsXUnEmpresaUsuarioPerfil
+						JOIN Empresa on EmpreId = EXUXPEmpresa
+						JOIN Unidade on UnidaId = UsXUnUnidade
+						JOIN Usuario on UsuarId = EXUXPUsuario
+						JOIN Perfil on PerfiId = EXUXPPerfil
+						WHERE EXUXPUsuario = ".$row[0]['UsuarId'];
+				$sql .= isset($_POST['empresa'])?" and EXUXPEmpresa = $_POST[empresa]":"";
+				$sql .= isset($_POST['unidade'])?" and UnidaId = $_POST[unidade]":"";
+				$result = $conn->query($sql);
+				$rowUnidade = $result->fetch(PDO::FETCH_ASSOC);  //Pega o número de registros associados a essa consulta
 				
+				if(!$rowUnidade){
+					$erro[] = "O usuário não possui Lotação. Por favor contate um administrador!";
+				}else{
 					//Pra esse caso aqui só vai vim um registro mesmo, daí precisa do [0] sem fazer o foreach
 					$_SESSION['UsuarId'] = $rowUnidade['UsuarId'];
 					$_SESSION['UsuarLogin'] = $rowUnidade['UsuarLogin'];
@@ -100,10 +103,11 @@ if(isset($_POST['usuario'])){
 					$_SESSION['UnidadeNome'] = $rowUnidade['UnidaNome'];
 					$_SESSION['PerfiChave'] = $rowUnidade['PerfiChave'];
 					$_SESSION['ResumoFinanceiro'] = $rowUnidade['UsXUnResumoFinanceiro'];
-
+	
 					unset($_SESSION['UsuarSenha']);
 					
-					irpara("index.php");		
+					irpara("index.php");
+				}
 			}
 		}
 	}

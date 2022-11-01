@@ -141,6 +141,7 @@ $_SESSION['atendimento'] = [
 						'id': $('#paciente').val(),
 						'prontuario': $('#prontuario').val(),
 						'nome': $('#nome').val(),
+						'nomeSocial': $('#nomeSocial').val(),
 						'cpf': $('#cpf').val(),
 						'cns': $('#cns').val(),
 						'rg': $('#rg').val(),
@@ -150,8 +151,9 @@ $_SESSION['atendimento'] = [
 						'nascimento': $('#nascimento').val(),
 						'nomePai': $('#nomePai').val(),
 						'nomeMae': $('#nomeMae').val(),
-						'estadoCivil':$('#cmbEstadoCivil').val(),
-						'naturalidade':$('#inputNaturalidade').val(),
+						'racaCor': $('#racaCor').val(),
+						'estadoCivil': $('#estadoCivil').val(),
+						'naturalidade': $('#naturalidade').val(),
 						'profissao': $('#profissao').val(),
 						'cep': $('#cep').val(),
 						'endereco': $('#endereco').val(),
@@ -164,6 +166,7 @@ $_SESSION['atendimento'] = [
 						'telefone': $('#telefone').val(),
 						'celular': $('#celular').val(),
 						'email': $('#email').val(),
+						'site': $('#site').val(),
 						'observacao': $('#observacao').val()
 					} : null
 
@@ -526,7 +529,9 @@ $_SESSION['atendimento'] = [
 						'tipoRequest': 'SALVARPACIENTE',
 						'prontuario': $('#prontuarioNew').val(),
 						'nome': $('#nomeNew').val(),
+						'nomeSocial': $('#nomeSocialNew').val(),
 						'cpf': $('#cpfNew').val(),
+						'cns': $('#cnsNew').val(),
 						'rg': $('#rgNew').val(),
 						'emissor': $('#emissorNew').val(),
 						'uf': $('#ufNew').val(),
@@ -534,9 +539,10 @@ $_SESSION['atendimento'] = [
 						'nascimento': $('#nascimentoNew').val(),
 						'nomePai': $('#nomePaiNew').val(),
 						'nomeMae': $('#nomeMaeNew').val(),
+						'racaCor': $('#racaCorNew').val(),
+						'naturalidade': $('#naturalidadeNew').val(),
 						'profissao': $('#profissaoNew').val(),
 						'estadoCivil': $('#cmbEstadoCivilNew').val(),
-						'naturalidade': $('#inputNaturalidadeNew').val(),
 						'cep': $('#cepNew').val(),
 						'endereco': $('#enderecoNew').val(),
 						'numero': $('#numeroNew').val(),
@@ -915,6 +921,7 @@ $_SESSION['atendimento'] = [
 						if (response.status == 'success') {
 							$('#prontuario').val(response.prontuario)
 							$('#nome').val(response.nome)
+							$('#nomeSocial').val(response.nomeSocial)
 							$('#cpf').val(response.cpf)
 							$('#cns').val(response.cns)
 							$('#rg').val(response.rg)
@@ -922,6 +929,7 @@ $_SESSION['atendimento'] = [
 							$('#nascimento').val(response.nascimento)
 							$('#nomePai').val(response.nomePai)
 							$('#nomeMae').val(response.nomeMae)
+							$('#racaCor').val(response.racaCor)
 							$('#estadoCivil').val(response.estadoCivil)
 							$('#naturalidade').val(response.naturalidade)
 							$('#profissao').val(response.profissao)
@@ -935,6 +943,7 @@ $_SESSION['atendimento'] = [
 							$('#telefone').val(response.telefone)
 							$('#celular').val(response.celular)
 							$('#email').val(response.email)
+							$('#site').val(response.site)
 							$('#observacao').val(response.observacao)
 
 							$('#uf').val(response.uf)
@@ -975,6 +984,7 @@ $_SESSION['atendimento'] = [
 			} else {
 				$('#prontuario').val('')
 				$('#nome').val('')
+				$('#nomeSocial').val('')
 				$('#cpf').val('')
 				$('#cns').val('')
 				$('#rg').val('')
@@ -984,6 +994,7 @@ $_SESSION['atendimento'] = [
 				$('#nascimento').val('')
 				$('#nomePai').val('')
 				$('#nomeMae').val('')
+				$('#racaCor').val('')
 				$('#estadoCivil').val('')
 				$('#naturalidade').val('')
 				$('#profissao').val('')
@@ -998,6 +1009,7 @@ $_SESSION['atendimento'] = [
 				$('#telefone').val('')
 				$('#celular').val('')
 				$('#email').val('')
+				$('#site').val('')
 				$('#observacao').val('')
 				$('#novoPaciente').hide()
 				$('#informacoes').hide()
@@ -1577,10 +1589,10 @@ $_SESSION['atendimento'] = [
 											<label>Nome <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-3">
-											<label>CPF <span class="text-danger">*</span></label>
+											<label>Nome Social</label>
 										</div>
 										<div class="col-lg-3">
-											<label>CNS</label>
+											<label>CPF <span class="text-danger">*</span></label>
 										</div>
 
 										<!-- campos -->
@@ -1591,15 +1603,18 @@ $_SESSION['atendimento'] = [
 											<input id="nome" name="nome" type="text" class="form-control" placeholder="Nome completo" required>
 										</div>
 										<div class="col-lg-3">
-											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required>
+											<input id="nomeSocial" name="nomeSocial" type="text" class="form-control" placeholder="Nome	Social">
 										</div>
 										<div class="col-lg-3">
-											<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS">
+											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required>
 										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
+										<div class="col-lg-3">
+											<label>CNS</label>
+										</div>
 										<div class="col-lg-2">
 											<label>RG</label>
 										</div>
@@ -1609,14 +1624,11 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-2">
 											<label>UF</label>
 										</div>
-										<div class="col-lg-2">
-											<label>Sexo</label>
-										</div>
-										<div class="col-lg-3">
-											<label>Data de Nascimento</label>
-										</div>
 
 										<!-- campos -->
+										<div class="col-lg-3">
+											<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS">
+										</div>
 										<div class="col-lg-2">
 											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG">
 										</div>
@@ -1655,6 +1667,24 @@ $_SESSION['atendimento'] = [
 												<option value="TO">TO</option>
 											</select>
 										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
+										<div class="col-lg-2">
+											<label>Sexo</label>
+										</div>
+										<div class="col-lg-2">
+											<label>Data de Nascimento</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Nome do Pai</label>
+										</div>
+										<div class="col-lg-4">
+											<label>Nome da Mãe</label>
+										</div>
+
+										<!-- campos -->
 										<div class="col-lg-2">
 											<select id="sexo" name="sexo" class="form-control form-control-select2">
 												<option value="" selected>selecionar</option>
@@ -1662,25 +1692,13 @@ $_SESSION['atendimento'] = [
 												<option value="F">Feminino</option>
 											</select>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<input id="nascimento" name="nascimento" type="date" class="form-control" placeholder="dd/mm/aaaa">
 										</div>
-									</div>
-
-									<div class="col-lg-12 mb-4 row">
-										<!-- titulos -->
-										<div class="col-lg-6">
-											<label>Nome do Pai</label>
-										</div>
-										<div class="col-lg-6">
-											<label>Nome da Mãe</label>
-										</div>
-
-										<!-- campos -->
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<input id="nomePai" name="nomePai" type="text" class="form-control" placeholder="Nome do Pai">
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<input id="nomeMae" name="nomeMae" type="text" class="form-control" placeholder="Nome da Mãe">
 										</div>
 									</div>
@@ -1688,17 +1706,29 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
+											<label>Raça/Cor</label>
+										</div>
+										<div class="col-lg-3">
 											<label>Estado Civil</label>
 										</div>
 										<div class="col-lg-3">
 											<label>Naturalidade</label>
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-3">
 											<label>Profissão</label>
 										</div>
 
 										<!-- campos -->
-
+										<div class="col-lg-3">
+											<select id="racaCor" name="racaCor" class="form-control form-control-select2">
+												<option value="#">Selecione a Raça/Cor</option>
+												<option value="Branca">Branca</option>
+												<option value="Preta">Preta</option>
+												<option value="Parda">Parda</option>
+												<option value="Amarela">Amarela</option>
+												<option value="Indígena">Indígena</option>
+											</select>
+										</div>
 										<div class="col-lg-3">
 											<select id="cmbEstadoCivil" name="cmbEstadoCivil" class="form-control form-control-select2">
 												<option value="#">Selecione</option>
@@ -1712,7 +1742,7 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-3">
 											<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-3">
 											<input id="profissao" name="profissao" type="text" class="form-control" placeholder="Profissão">
 										</div>
 									</div>
@@ -2020,13 +2050,13 @@ $_SESSION['atendimento'] = [
 
 	<!--Modal-->
 	<div id="page-modal-paciente" class="custon-modal">
-		<div class="custon-modal-container" style="max-width: 800px;">
-			<div class="card custon-modal-content">
+		<div class="custon-modal-container" style="max-width: 800px; height: 95%;">
+			<div class="card custon-modal-content" style="height: 95%;">
 				<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
 					<p class="h5">Novo paciente</p>
 					<i id="modalPaciente-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
 				</div>
-				<div class="px-0">
+				<div class="px-0" style="overflow-y: scroll;">
 					<div class="d-flex flex-row">
 						<div class="col-lg-12">
 							<form id="novoPaciente" name="alterarSituacao" method="POST" class="form-validate-jquery">
@@ -2038,50 +2068,62 @@ $_SESSION['atendimento'] = [
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
-										<div class="col-lg-4">
+										<div class="col-lg-6">
 											<label>Nome <span class="text-danger">*</span></label>
 										</div>
+										<div class="col-lg-6">
+											<label>Nome Social</label>
+										</div>
+
+										<!-- campos -->
+										<div class="col-lg-6">
+											<input id="nomeNew" name="nomeNew" type="text" class="form-control" placeholder="Nome completo">
+										</div>
+										<div class="col-lg-6">
+											<input id="nomeSocialNew" name="nomeSocialNew" type="text" class="form-control" placeholder="Nome Social">
+										</div>
+									</div>
+
+									<div class="col-lg-12 mb-4 row">
+										<!-- titulos -->
 										<div class="col-lg-4">
 											<label>CPF <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-4">
 											<label>CNS</label>
 										</div>
+										<div class="col-lg-4">
+											<label>RG</label>
+										</div>
 
 										<!-- campos -->
-										<div class="col-lg-4">
-											<input id="nomeNew" name="nomeNew" type="text" class="form-control" placeholder="Nome completo">
-										</div>
 										<div class="col-lg-4">
 											<input id="cpfNew" name="cpfNew" type="text" class="form-control" placeholder="CPF">
 										</div>
 										<div class="col-lg-4">
 											<input id="cnsNew" name="cnsNew" type="text" class="form-control" placeholder="Cartão do SUS">
 										</div>
+										<div class="col-lg-4">
+											<input id="rgNew" name="rgNew" type="text" class="form-control" placeholder="RG">
+										</div>
 									</div>
 
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
-										<div class="col-lg-2">
-											<label>RG</label>
-										</div>
 										<div class="col-lg-3">
 											<label>Emissor</label>
 										</div>
 										<div class="col-lg-2">
 											<label>UF</label>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<label>Sexo</label>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<label>Data de Nascimento</label>
 										</div>
 
 										<!-- campos -->
-										<div class="col-lg-2">
-											<input id="rgNew" name="rgNew" type="text" class="form-control" placeholder="RG">
-										</div>
 										<div class="col-lg-3">
 											<input id="emissorNew" name="emissorNew" type="text" class="form-control" placeholder="Orgão Emissor">
 										</div>
@@ -2117,14 +2159,14 @@ $_SESSION['atendimento'] = [
 												<option value="TO">TO</option>
 											</select>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<select id="sexoNew" name="sexoNew" class="form-control form-control-select2">
 												<option value="" selected>selecionar</option>
 												<option value="M">Masculino</option>
 												<option value="F">Feminino</option>
 											</select>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<input id="nascimentoNew" name="nascimentoNew" type="date" class="form-control" placeholder="dd/mm/aaaa">
 										</div>
 									</div>
@@ -2150,17 +2192,29 @@ $_SESSION['atendimento'] = [
 									<div class="col-lg-12 mb-4 row">
 										<!-- titulos -->
 										<div class="col-lg-3">
+											<label>Raça/Cor</label>
+										</div>
+										<div class="col-lg-3">
 											<label>Estado Civil</label>
 										</div>
 										<div class="col-lg-3">
 											<label>Naturalidade</label>
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-3">
 											<label>Profissão</label>
 										</div>
 
 										<!-- campos -->
-
+										<div class="col-lg-3">
+											<select id="racaCorNew" name="racaCorNew" class="form-control form-control-select2">
+												<option value="#">Selecione a Raça/Cor</option>
+												<option value="Branca">Branca</option>
+												<option value="Preta">Preta</option>
+												<option value="Parda">Parda</option>
+												<option value="Amarela">Amarela</option>
+												<option value="Indígena">Indígena</option>
+											</select>
+										</div>
 										<div class="col-lg-3">
 											<select id="cmbEstadoCivilNew" name="cmbEstadoCivilNew" class="form-control form-control-select2">
 												<option value="#">Selecione</option>
@@ -2172,10 +2226,10 @@ $_SESSION['atendimento'] = [
 											</select>
 										</div>
 										<div class="col-lg-3">
-											<input type="text" id="inputNaturalidadeNew" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+											<input id="naturalidadeNew" name="naturalidadeNew" type="text" class="form-control" placeholder="Naturalidade">
 										</div>
-										<div class="col-lg-6">
-											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão">
+										<div class="col-lg-3">
+											<input id="profissaoNew" name="profissaoNew" type="text" class="form-control" placeholder="Profissão" required>
 										</div>
 									</div>
 

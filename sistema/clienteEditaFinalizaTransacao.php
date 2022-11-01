@@ -7,9 +7,9 @@ try{
 
     $conn->beginTransaction();
     
-    $sql = "UPDATE Cliente SET 	ClienCodigo = :sCodigo,  ClienNome = :sNome, ClienCpf = :sCpf, ClienRg = :sRg, ClienOrgaoEmissor = :sOrgaoEmissor,
+    $sql = "UPDATE Cliente SET 	ClienCodigo = :sCodigo,  ClienNome = :sNome, ClienNomeSocial = :sNomeSocial, ClienCpf = :sCpf, ClienRg = :sRg, ClienOrgaoEmissor = :sOrgaoEmissor,
                                 ClienUf = :sUf, ClienSexo = :sSexo, ClienDtNascimento = :dDtNascimento, ClienNomePai = :sNomePai, ClienNomeMae = :sNomeMae,
-                                ClienEstadoCivil = :sEstadoCivil, ClienNaturalidade = :sNaturalidade, ClienProfissao = :sProfissao, ClienCartaoSus = :sCartaoSus,
+                                ClienRacaCor = :sRacaCor, ClienEstadoCivil = :sEstadoCivil, ClienNaturalidade = :sNaturalidade, ClienProfissao = :sProfissao, ClienCartaoSus = :sCartaoSus,
                                 ClienCep = :sCep, ClienEndereco = :sEndereco, ClienNumero = :sNumero, ClienComplemento = :sComplemento, ClienBairro = :sBairro, 
                                 ClienCidade = :sCidade, ClienEstado = :sEstado, ClienContato = :sContato, ClienTelefone = :sTelefone, ClienCelular = :sCelular,
                                 ClienEmail = :sEmail, ClienSite = :sSite, ClienObservacao = :sObservacao, ClienUsuarioAtualizador = :iUsuarioAtualizador
@@ -19,6 +19,7 @@ try{
     $result->execute(array(
                     ':sCodigo' => $_POST['inputCodigo'],
                     ':sNome' => $_POST['inputNomePF'],
+                    ':sNomeSocial' => $_POST['inputNomeSocial'],
                     ':sCpf' => limpaCPF_CNPJ($_POST['inputCpf']),
                     ':sRg' =>  $_POST['inputRg'],
                     ':sOrgaoEmissor' => $_POST['inputEmissor'], 
@@ -27,6 +28,7 @@ try{
                     ':dDtNascimento' => $_POST['inputDtNascimento'],
                     ':sNomePai' => $_POST['inputNomePai'],
                     ':sNomeMae' => $_POST['inputNomeMae'],
+                    ':sRacaCor' => $_POST['cmbRacaCor'],
                     ':sEstadoCivil' => $_POST['cmbEstadoCivil'],
 					':sNaturalidade' => $_POST['inputNaturalidade'],
                     ':sProfissao' => $_POST['inputProfissao'],

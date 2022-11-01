@@ -25,6 +25,14 @@ try{
 			'atendimentoServicos' => []
 		];
 	}
+	
+ 	 // feito consultas para buscar a profissão do profissional do atendimento
+	$sql = "SELECT Profissao.ProfiNome as ProfissaoNome
+			FROM Profissional
+			JOIN Profissao ON Profissao.ProfiId = Profissional.ProfiProfissao
+			WHERE ProfiUsuario = $usuarioId";
+	$result = $conn->query($sql);
+	$rowProfissao = $result->fetch(PDO::FETCH_ASSOC);
 
 	// feito consultas para buscar de acordo com a classificação do atendimento
 	// (ATENDIMENTOSAMBULATORIAIS, ATENDIMENTOSHOSPITALARES, ATENDIMENTOSELETIVOS)
@@ -113,15 +121,15 @@ try{
 					],
 					'identify' => [
 						'situacao' => $item['SituaChave'],
-						'iAgendamento' => $item['AgendId'],
+						'id' => $item['AgendId'],
 						'sJustificativa' => $item['AgendJustificativa']
 					]
 				]);
 			}
 			foreach($rowAtendimento as $item){
-				$att = "<a class='list-icons-item' onclick='atualizaAtendimento(this)' href='#' data-tipo='ATENDIMENTO' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
-				$exc = "<a class='list-icons-item' onclick='excluiAtendimento(this)'href='#' data-tipo='ATENDIMENTO' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
-				$aud = "<a style='color: black' href='#'  data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
+				$att = "<a class='list-icons-item' href='#' data-tipo='ATENDIMENTO' onclick='atualizaAtendimento(this)' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
+				$exc = "<a class='list-icons-item' href='#' data-tipo='ATENDIMENTO' onclick='excluiAtendimento(this)' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
+				$aud = "<a style='color: black' href='#' data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
 				$acoes = "<div class='list-icons'>
 							$att
 							$exc
@@ -164,7 +172,7 @@ try{
 					],
 					'identify' => [
 						'situacao' => $item['SituaChave'],
-						'iAtendimento' => $item['AtendId'],
+						'id' => $item['AtendId'],
 						'sJustificativa' => $item['AtendJustificativa']
 					]
 				]);
@@ -236,12 +244,6 @@ try{
 									<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 									<div class='dropdown-divider'></div>
 									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
 									<!-- <div class='dropdown-divider'></div> -->
 								</div>
 							</div>
@@ -264,7 +266,7 @@ try{
 					],
 					'identify' => [
 						'situacao' => $item['SituaChave'],
-						'iAtendimento' => $item['AtendId'],
+						'id' => $item['AtendId'],
 						'sJustificativa' => $item['AtendObservacao']
 					]]);
 			}
@@ -284,12 +286,6 @@ try{
 									<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 									<div class='dropdown-divider'></div>
 									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
 									<!-- <div class='dropdown-divider'></div> -->
 								</div>
 							</div>
@@ -313,7 +309,7 @@ try{
 					],
 					'identify' => [
 						'situacao' => $item['SituaChave'],
-						'iAtendimento' => $item['AtendId'],
+						'id' => $item['AtendId'],
 						'sJustificativa' => $item['AtendObservacao'],
 						'AtClaChave' => $item['AtClaChave'],
 						'AtClaNome' => $item['AtClaNome']
@@ -391,18 +387,17 @@ try{
 								<i class='icon-menu9'></i>
 							</a>
 
-							<div class='dropdown-menu dropdown-menu-right'>
-								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
-								<!-- <div class='dropdown-divider'></div> -->
-							</div>
+							<div class='dropdown-menu dropdown-menu-right'> 
+								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>";
+								if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {
+									$acoes .="<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>";
+								}	
+							$acoes .=" </div>
 						</div>
 					</div>";
 		
@@ -443,12 +438,6 @@ try{
 								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
 								<!-- <div class='dropdown-divider'></div> -->
 							</div>
 						</div>
@@ -549,18 +538,17 @@ try{
 								<i class='icon-menu9'></i>
 							</a>
 
-							<div class='dropdown-menu dropdown-menu-right'>
-								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
-								<!-- <div class='dropdown-divider'></div> -->
-							</div>
+							<div class='dropdown-menu dropdown-menu-right'> 
+								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>";
+								if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {
+									$acoes .="<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>";
+								}	
+							$acoes .=" </div>
 						</div>
 					</div>";
 		
@@ -601,12 +589,6 @@ try{
 								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
 								<!-- <div class='dropdown-divider'></div> -->
 							</div>
 						</div>
@@ -709,18 +691,17 @@ try{
 								<i class='icon-menu9'></i>
 							</a>
 
-							<div class='dropdown-menu dropdown-menu-right'>
-								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
-								<div class='dropdown-divider'></div>	
-								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
-								<!-- <div class='dropdown-divider'></div> -->
-							</div>
+							<div class='dropdown-menu dropdown-menu-right'> 
+								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>";
+								if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {
+									$acoes .="<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
+									<div class='dropdown-divider'></div>
+									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>";
+								}	
+							$acoes .=" </div>
 						</div>
 					</div>";
 			
@@ -765,12 +746,6 @@ try{
 								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Prontuário'></i> Prontuário</a>
-								<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Declaração de Comparecimento'></i> Declaração de Comparecimento</a>
 								<!-- <div class='dropdown-divider'></div> -->
 							</div>
 						</div>
@@ -911,7 +886,6 @@ try{
 		$sql = "SELECT COUNT(isnull(clienCodigo,0)) as Codigo
 				FROM Cliente
 				Where ClienUnidade = " . $_SESSION['UnidadeId'] . "";
-		//echo $sql;die;
 		$result = $conn->query("$sql");
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);
 
@@ -922,7 +896,9 @@ try{
 			'id' => 'NOVO',
 			'prontuario' => isset($_POST['prontuario'])?$_POST['prontuario']:'null',
 			'nome' => isset($_POST['nome'])?$_POST['nome']:'null',
+			'nomeSocial' => isset($_POST['nomeSocial'])?$_POST['nomeSocial']:'null',
 			'cpf' => isset($_POST['cpf'])?$_POST['cpf']:'null',
+			'cns' => isset($_POST['cns'])?$_POST['cns']:'null',
 			'rg' => isset($_POST['rg'])?$_POST['rg']:'null',
 			'emissor' => isset($_POST['emissor'])?$_POST['emissor']:'null',
 			'uf' => isset($_POST['uf'])?$_POST['uf']:'null',
@@ -930,6 +906,7 @@ try{
 			'nascimento' => isset($_POST['nascimento'])?$_POST['nascimento']:'',
 			'nomePai' => isset($_POST['nomePai'])?$_POST['nomePai']:'null',
 			'nomeMae' => isset($_POST['nomeMae'])?$_POST['nomeMae']:'null',
+			'racaCor' => isset($_POST['racaCor'])?$_POST['racaCor']:'null',
 			'estadoCivil' => isset($_POST['estadoCivil'])?$_POST['estadoCivil']:'null',
 			'naturalidade' => isset($_POST['naturalidade'])?$_POST['naturalidade']:'null',
 			'profissao' => isset($_POST['profissao'])?$_POST['profissao']:'null',
@@ -949,14 +926,14 @@ try{
 			'site' => isset($_POST['site'])?$_POST['site']:'null',
 			'observacao' => isset($_POST['observacao'])?$_POST['observacao']:'null'
 		];
-		$cod = '';
-		$sql = "INSERT INTO Cliente(ClienCodigo,ClienNome,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-			ClienSite,ClienNaturalidade,ClienEstadoCivil,
+		$sql = "INSERT INTO Cliente(ClienCodigo,ClienNome,ClienNomeSocial,ClienCpf,ClienCartaoSus,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+			ClienSite,ClienNaturalidade,ClienRacaCor,ClienEstadoCivil,
 			ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
 			ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 			ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade)
-			VALUES('$cod','$paciente[nome]','$paciente[cpf]','$paciente[rg]',
-			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[site]','$paciente[naturalidade]','$paciente[estadoCivil]',
+			VALUES('$cod','$paciente[nome]','$paciente[nomeSocial]','$paciente[cpf]','$paciente[cns]','$paciente[rg]',
+			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[site]','$paciente[naturalidade]','$paciente[racaCor]',
+			'$paciente[estadoCivil]',
 			'$paciente[nascimento]','$paciente[nomePai]','$paciente[nomeMae]',
 			'$paciente[profissao]','$paciente[cep]','$paciente[endereco]','$paciente[numero]','$paciente[complemento]',
 			'$paciente[bairro]','$paciente[cidade]','$paciente[estado]','$paciente[contato]','$paciente[telefone]',
@@ -1092,9 +1069,21 @@ try{
 			}
 			$sql = substr($sql, 0, -1);
 			$conn->query($sql);
+
+			/* OBS.:
+				essas duas variáveis ($nomeSocial e $racaCor) são provisórias pois no arquivo atendimentoNovo.php
+				e atendimentoEdita.php
+				os campos "nomeSocial" e "racaCor" estão incoerentes, eles existem no modal de novo cliente mas não existem
+				na tela onde mostra os dados do paciente selecionado
+				(essa tela serve para editar os dados do paciente tambem, por isso deve ter) 
+			*/
+
+			$nomeSocial = isset($cliente['nomeSocial'])?$cliente['nomeSocial']:null;
+			$racaCor = isset($cliente['racaCor'])?$cliente['racaCor']:null;
 			
 			$sql = "UPDATE Cliente SET
 				ClienNome= '$cliente[nome]',
+				ClienNomeSocial= '$nomeSocial',
 				ClienCpf= '$cliente[cpf]',
 				ClienCartaoSus= '$cliente[cns]',
 				ClienRg= '$cliente[rg]',
@@ -1104,6 +1093,7 @@ try{
 				ClienDtNascimento= '$cliente[nascimento]',
 				ClienNomePai= '$cliente[nomePai]',
 				ClienNomeMae= '$cliente[nomeMae]',
+				ClienRacaCor= '$racaCor',
 				ClienEstadoCivil= '$cliente[estadoCivil]',
 				ClienNaturalidade= '$cliente[naturalidade]',
 				ClienProfissao= '$cliente[profissao]',
@@ -1242,9 +1232,9 @@ try{
 	} elseif ($tipoRequest == 'PACIENTE'){
 		$iPaciente = $_POST['iPaciente'];
 
-		$sql = "SELECT ClienId,ClienNome,ClienCodigo,
+		$sql = "SELECT ClienId,ClienNome,ClienNomeSocial,ClienCodigo,
 		ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienRacaCor,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienCartaoSus,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 		ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente WHERE ClienId = $iPaciente and ClienUnidade = $iUnidade";
@@ -1257,6 +1247,7 @@ try{
 				'status' => 'success',
 				'prontuario' => $row['ClienCodigo'],
 				'nome' => $row['ClienNome'],
+				'nomeSocial' => $row['ClienNomeSocial'],
 				'cpf' => $row['ClienCpf'],
 				'cns' => $row['ClienCartaoSus'],
 				'rg' => $row['ClienRg'],
@@ -1266,6 +1257,7 @@ try{
 				'nascimento' => $row['ClienDtNascimento'],
 				'nomePai' => $row['ClienNomePai'],
 				'nomeMae' => $row['ClienNomeMae'],
+				'racaCor' => $row['ClienRacaCor'],
 				'estadoCivil' => $row['ClienEstadoCivil'],
 				'naturalidade' => $row['ClienNaturalidade'],
 				'profissao' => $row['ClienProfissao'],
@@ -1318,8 +1310,8 @@ try{
 		$lestIdCliente = $conn->lastInsertId();
 
 		// busca todos os usuários com o novo inserido para adicionalo ja selecionado no select
-		$sql = "SELECT ClienId,ClienCodigo,ClienNome,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
+		$sql = "SELECT ClienId,ClienCodigo,ClienNome,ClienNomeSocial,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
+		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienRacaCor,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
 		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente";
