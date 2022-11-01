@@ -1082,7 +1082,7 @@ try{
 
 			$nomeSocial = isset($cliente['nomeSocial'])?$cliente['nomeSocial']:null;
 			$racaCor = isset($cliente['racaCor'])?$cliente['racaCor']:null;
-			
+
 			$sql = "UPDATE Cliente SET
 				ClienNome= '$cliente[nome]',
 				ClienNomeSocial= '$nomeSocial',
