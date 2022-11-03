@@ -970,6 +970,11 @@ $_SESSION['atendimento'] = [
 									$(item).change()
 								}
 							})
+							$('#racaCor').children("option").each(function(index, item){
+								if($(item).val() == response.racaCor){
+									$(item).change()
+								}
+							})
 							$('#novoPaciente').show()
 							$('#informacoes').show()
 						} else {
@@ -1614,13 +1619,13 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-3">
 											<label>CNS</label>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<label>RG</label>
 										</div>
 										<div class="col-lg-3">
 											<label>Emissor</label>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<label>UF</label>
 										</div>
 
@@ -1628,13 +1633,13 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-3">
 											<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS">
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG">
 										</div>
 										<div class="col-lg-3">
 											<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor">
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<select id="uf" name="uf" class="form-control form-control-select2" placeholder="UF">
 												<option value="">Selecione</option>
 												<option value="AC">AC</option>
@@ -1720,7 +1725,7 @@ $_SESSION['atendimento'] = [
 										<!-- campos -->
 										<div class="col-lg-3">
 											<select id="racaCor" name="racaCor" class="form-control form-control-select2">
-												<option value="#">Selecione a Raça/Cor</option>
+												<option value="#">Selecione</option>
 												<option value="Branca">Branca</option>
 												<option value="Preta">Preta</option>
 												<option value="Parda">Parda</option>
@@ -2206,7 +2211,7 @@ $_SESSION['atendimento'] = [
 										<!-- campos -->
 										<div class="col-lg-3">
 											<select id="racaCorNew" name="racaCorNew" class="form-control form-control-select2">
-												<option value="#">Selecione a Raça/Cor</option>
+												<option value="#">Selecione</option>
 												<option value="Branca">Branca</option>
 												<option value="Preta">Preta</option>
 												<option value="Parda">Parda</option>
