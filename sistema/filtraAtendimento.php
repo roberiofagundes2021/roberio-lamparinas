@@ -1074,7 +1074,7 @@ try{
 
 			$sql = "UPDATE Cliente SET
 				ClienNome= '$cliente[nome]',
-				ClienNomeSocial= '$nomeSocial',
+				ClienNomeSocial= '$cliente[nomeSocial]',
 				ClienCpf= '$cliente[cpf]',
 				ClienCartaoSus= '$cliente[cns]',
 				ClienRg= '$cliente[rg]',
@@ -1084,7 +1084,7 @@ try{
 				ClienDtNascimento= '$cliente[nascimento]',
 				ClienNomePai= '$cliente[nomePai]',
 				ClienNomeMae= '$cliente[nomeMae]',
-				ClienRacaCor= '$racaCor',
+				ClienRacaCor= '$cliente[racaCor]',
 				ClienEstadoCivil= '$cliente[estadoCivil]',
 				ClienNaturalidade= '$cliente[naturalidade]',
 				ClienProfissao= '$cliente[profissao]',
