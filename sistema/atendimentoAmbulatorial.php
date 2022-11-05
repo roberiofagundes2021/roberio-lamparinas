@@ -48,7 +48,7 @@ $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, AtendClassifi
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
 		LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 		LEFT JOIN AtendimentoTriagem ON AtTriAtendimento = AtendId
-		LEFT JOIN AtendimentoProtocoloManchester ON AtPrMId = AtendClassificacaoRisco
+		LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 		JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE  AtendId = $iAtendimentoId 
 		ORDER BY AtendNumRegistro ASC";

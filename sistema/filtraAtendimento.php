@@ -653,7 +653,7 @@ try{
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			LEFT JOIN AtendimentoProtocoloManchester ON AtPrMId = AtendClassificacaoRisco
+			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtXSeId DESC";
@@ -671,7 +671,7 @@ try{
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			LEFT JOIN AtendimentoProtocoloManchester ON AtPrMId = AtendClassificacaoRisco
+			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtXSeId DESC";
