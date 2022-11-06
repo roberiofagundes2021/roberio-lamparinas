@@ -21,7 +21,7 @@ $count = count($row);
 //Se estiver editando
 if(isset($_POST['inputModeloId']) && $_POST['inputModeloId']){
 
-	//Essa consulta é para preencher o campo Nome com o SubGrupo a ser editar
+	//Essa consulta é para preencher o campo Nome com o Modelo a ser editar
 	$sql = "SELECT AtModId, AtModTipoModelo, AtModDescricao, AtModConteudo
 			FROM AtendimentoModelo
 			WHERE AtModId= " . $_POST['inputModeloId'];
@@ -46,7 +46,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			$result->execute(array(
 							':sTipoModelo' => $_POST['cmbModelo'],
 							':sDescricao' => $_POST['inputDescricao'],
-							':sConteudo' => $_POST['inputConteudo'],
+							':sConteudo' => $_POST['txtConteudo'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iModelo' => $_POST['inputModeloId']
 							));
@@ -62,7 +62,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			$result->execute(array(
 							':sTipoModelo' => $_POST['cmbModelo'],
 							':sDescricao' => $_POST['inputDescricao'],
-							':sConteudo' => $_POST['inputConteudo'],
+							':sConteudo' => $_POST['txtConteudo'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId'],
@@ -177,30 +177,42 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				
 				e.preventDefault();
 				
-				var inputNome = $('#inputDescricao').val();
+				var inputNomeNovo = $('#inputDescricao').val();
+				var inputNomeVelho = $('#inputTipoDescricao').val();
+				var inputEstadoAtual = $('#inputEstadoAtual').val();
 				
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "atendimentoModeloValida.php",
-					data: ('nomeNovo='+inputNome+'&estadoAtual='+inputEstadoAtual),
-					success: function(resposta){
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNomeNovo.trim();
 
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
+				//Se o usuário preencheu com espaços em branco ou não preencheu nada
+				if (inputNome == ''){
+					$('#inputDescricao').val('');
+					$("#formModelo").submit();
+				} else {
+				
+					//Esse ajax está sendo usado para verificar no banco se o registro já existe
+					$.ajax({
+						type: "POST",
+						url: "atendimentoModeloValida.php",
+						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
+						success: function(resposta){
+
+							if(resposta == 1){
+								alerta('Atenção','Esse registro já existe!','error');
+								return false;
+							}
+
+							if (resposta == 'EDITA'){
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
+							} else{
+								document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
+							}						
+							
+							$( "#formModelo" ).submit();
 						}
-
-						if (resposta == 'EDITA'){
-							document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
-						} else{
-							document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
-						}						
-						
-						$( "#formModelo" ).submit();
-					}
-				})	
-			})						
+					})
+				}	
+			})							
 		});
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
@@ -266,7 +278,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 									<div class="row">
 										
-										<div class="col-lg-3">
+										<div class="col-lg-6">
 											<label for="cmbModelo">Tipo do Modelo<span class="text-danger"> *</span></label>
 											<select id="cmbModelo" name="cmbModelo" class="form-control select-search" required>
 												<option value="">Selecione</option>
@@ -286,19 +298,22 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 												?>
 											</select>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputDescricao">Descrição <span class="text-danger"> *</span></label>
 												<input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="Descrição" value="<?php if (isset($_POST['inputModeloId'])) echo $rowModelo['AtModDescricao']; ?>" required autofocus>
 											</div>
 										</div>
-										<div class="col-lg-3">
+									</div>
+									<div class="row">
+										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="inputConteudo">Conteúdo do Modelo <span class="text-danger"> *</span></label>
-												<input type="text" id="inputConteudo" name="inputConteudo" class="form-control" placeholder="Contepudo" value="<?php if (isset($_POST['inputModeloId'])) echo $rowModelo['AtModConteudo']; ?>" required autofocus>
+												<label for="txtConteudo">Conteúdo do Modelo<span class="text-danger"> *</span></label>
+												<textarea rows="5" cols="5" class="form-control" id="txtConteudo" name="txtConteudo" placeholder="Determinantes" required ><?php if (isset($_POST['inputModeloId'])) echo $rowModelo['AtModConteudo']; ?></textarea>
 											</div>
 										</div>
-										
+									</div>
+									<div class="row">	
 										<div class="col-lg-3">
 											<div class="form-group" style="padding-top:25px;">
 												<?php

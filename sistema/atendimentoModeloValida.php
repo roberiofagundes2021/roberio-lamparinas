@@ -4,10 +4,15 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-
-$sql = "SELECT AtModId
-		FROM AtendimentoModelo
-		WHERE AtModUnidade = ".$_SESSION['UnidadeId']." and AtModDescricao = '". $_POST['nomeNovo']."'";
+if (isset($_POST['nomeVelho'])){
+	$sql = "SELECT AtModId
+			 FROM AtendimentoModelo
+			 WHERE AtModUnidade = ".$_SESSION['UnidadeId']." and AtModDescricao = '". $_POST['nomeNovo']."' and AtModDescricao <> '". $_POST['nomeVelho']."'";
+} else{
+	$sql = "SELECT AtModId
+			 FROM AtendimentoModelo
+			 WHERE AtModUnidade = ".$_SESSION['UnidadeId']." and AtModDescricao = '". $_POST['nomeNovo']."'";
+}
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
