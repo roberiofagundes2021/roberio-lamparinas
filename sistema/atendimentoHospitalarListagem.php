@@ -565,15 +565,10 @@ $acesso = 'ATENDIMENTO';
 								</div>
 							</div>
 
-							<div class="card-body">
+							<div class="card-body pb-1">
 								<div class="row">
 									<div class="col-md-9">
 										<h3 class="card-title" id="card-title">Pacientes em Espera</h3>
-									</div>
-									<div class="col-md-3">
-										<div class="dropdown p-0" style="float:right; margin-left: 5px;">
-											<div class="text-right col-sm-2 p-0"><a href="#" class="btn bg-secondary" role="button">Imprimir Relação</a></div>
-										</div>
 									</div>
 								</div>
 							</div>
