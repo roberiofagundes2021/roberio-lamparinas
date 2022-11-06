@@ -6,9 +6,9 @@ include('global_assets/php/conexao.php');
 
 if(isset($_POST['historicoId'])){
 
-	$sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExSolicitacaoExame, AtAmbData, AtAmbHoraInicio, AtAmbHoraFim, 
+	$sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExSolicitacaoExame, AtAmbDataInicio, AtAmbHoraInicio, AtAmbHoraFim, 
 				   AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual,AtAmbExameFisico, AtAmbSuspeitaDiagnostico, AtAmbExameSolicitado, AtAmbPrescricao, 
-				   AtAmbOutrasObservacoes, A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleData, AtEleHoraInicio, 
+				   AtAmbOutrasObservacoes, A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleDataInicio, AtEleHoraInicio, 
 				   AtEleHoraFim, AtEleAnamnese, AtClaNome, AtClaChave
 			FROM Atendimento
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
@@ -31,8 +31,8 @@ if(isset($_POST['historicoId'])){
 
 		if($row['AtClaChave'] == "AMBULATORIAL"){
 			print('
-				<p style="margin-right:10px; margin-left: 10px"><b>ENTRADA:</b> '.mostraData($row['AtAmbData']).' - '.mostraHora($row['AtAmbHoraInicio']).'</p>
-				<p style="margin-right:10px; margin-left: 10px"><b>SAÍDA:</b> '.mostraData($row['AtAmbData']).' - '.mostraHora($row['AtAmbHoraFim']).'</p>
+				<p style="margin-right:10px; margin-left: 10px"><b>ENTRADA:</b> '.mostraData($row['AtAmbDataInicio']).' - '.mostraHora($row['AtAmbHoraInicio']).'</p>
+				<p style="margin-right:10px; margin-left: 10px"><b>SAÍDA:</b> '.mostraData($row['AtAmbDataInicio']).' - '.mostraHora($row['AtAmbHoraFim']).'</p>
 				<hr style="margin-right:10px; margin-left: 10px">
 				<p style="margin-right:10px; margin-left: 10px"><b>Modalidade:</b> '.$row['AtModNome'].'</p>
 				<p style="margin-right:10px; margin-left: 10px"><b>Guia:</b> '.$row['AtendNumRegistro'].'</p>
@@ -52,8 +52,8 @@ if(isset($_POST['historicoId'])){
 		}  else if  ($row['AtClaChave'] == "ELETIVO"){
 
 			print('
-				<p style="margin-right:10px; margin-left: 10px"><b>ENTRADA:</b> '.mostraData($row['AtEleData']).' - '.mostraHora($row['AtEleHoraInicio']).'</p>
-				<p style="margin-right:10px; margin-left: 10px"><b>SAÍDA:</b> '.mostraData($row['AtEleData']).' - '.mostraHora($row['AtEleHoraFim']).'</p>
+				<p style="margin-right:10px; margin-left: 10px"><b>ENTRADA:</b> '.mostraData($row['AtEleDataInicio']).' - '.mostraHora($row['AtEleHoraInicio']).'</p>
+				<p style="margin-right:10px; margin-left: 10px"><b>SAÍDA:</b> '.mostraData($row['AtEleDataInicio']).' - '.mostraHora($row['AtEleHoraFim']).'</p>
 				<hr style="margin-right:10px; margin-left: 10px">
 				<p style="margin-right:10px; margin-left: 10px"><b>Modalidade:</b> '.$row['AtModNome'].'</p>
 				<p style="margin-right:10px; margin-left: 10px"><b>Guia:</b> '.$row['AtendNumRegistro'].'</p>

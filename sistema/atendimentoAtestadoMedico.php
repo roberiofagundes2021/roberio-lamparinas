@@ -66,7 +66,7 @@ if ($row['ClienSexo'] == 'F'){
 if(isset($iAtendimentoAtestadoMedicoId ) && $iAtendimentoAtestadoMedicoId ){
 
 	//Essa consulta é para preencher o campo Atestado Médico ao editar
-	$sql = "SELECT AtAMeAtestadoMedico, AtAMeHoraFim, AtAMeHoraInicio, AtAMeData, AtAMeCid10
+	$sql = "SELECT AtAMeAtestadoMedico, AtAMeHoraFim, AtAMeHoraInicio, AtAMeDataInicio, AtAMeCid10
 			FROM AtendimentoAtestadoMedico
 			WHERE AtAMeId = " . $iAtendimentoAtestadoMedicoId ;
 	$result = $conn->query($sql);
@@ -76,7 +76,7 @@ if(isset($iAtendimentoAtestadoMedicoId ) && $iAtendimentoAtestadoMedicoId ){
 
 	// Formatar Hora/Data
 
-	$Data = strtotime($rowAtestadoMedico['AtAMeData']);
+	$Data = strtotime($rowAtestadoMedico['AtAMeDataInicio']);
 	$DataAtendimento = date("d/m/Y", $Data);
 
 	$Inicio = strtotime($rowAtestadoMedico['AtAMeHoraInicio']);
@@ -98,7 +98,7 @@ if (isset($_POST['txtareaConteudo']) ){
 		//Edição
 		if ($iAtendimentoAtestadoMedicoId){
 		
-			$sql = "UPDATE AtendimentoAtestadoMedico SET AtAMeAtendimento = :sAtendimento, AtAMeData = :dData, AtAMeHoraInicio = :sHoraInicio,
+			$sql = "UPDATE AtendimentoAtestadoMedico SET AtAMeAtendimento = :sAtendimento, AtAMeDataInicio = :dData, AtAMeHoraInicio = :sHoraInicio,
 						   AtAMeHoraFim  = :sHoraFim, AtAMeProfissional = :sProfissional, AtAMeCid10 = :iCid10, AtAMeAtestadoMedico = :sAtestadoMedico, AtAMeUnidade = :iUnidade
 					WHERE AtAMeId = :iAtendimentoAtestadoMedico";
 			$result = $conn->prepare($sql);
@@ -120,7 +120,7 @@ if (isset($_POST['txtareaConteudo']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoAtestadoMedico (AtAMeAtendimento, AtAMeData, AtAMeHoraInicio, AtAMeHoraFim, AtAMeProfissional, AtAMeCid10, AtAMeAtestadoMedico, AtAMeUnidade)
+			$sql = "INSERT INTO AtendimentoAtestadoMedico (AtAMeAtendimento, AtAMeDataInicio, AtAMeHoraInicio, AtAMeHoraFim, AtAMeProfissional, AtAMeCid10, AtAMeAtestadoMedico, AtAMeUnidade)
 						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional, :iCid10, :sAtestadoMedico, :iUnidade)";
 			$result = $conn->prepare($sql);
 					

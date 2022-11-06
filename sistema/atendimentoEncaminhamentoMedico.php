@@ -66,7 +66,7 @@ if ($row['ClienSexo'] == 'F'){
 if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMedicoId ){
 
 	//Essa consulta é para preencher o campo Encaminhamento Médico ao editar
-	$sql = "SELECT AtEMeEncaminhamentoMedico, AtEMeHoraFim, AtEMeHoraInicio, AtEMeData, AtEMeCid10
+	$sql = "SELECT AtEMeEncaminhamentoMedico, AtEMeHoraFim, AtEMeHoraInicio, AtEMeDataInicio, AtEMeCid10
 			FROM AtendimentoEncaminhamentoMedico
 			WHERE AtEMeId = " . $iAtendimentoEncaminhamentoMedicoId ;
 	$result = $conn->query($sql);
@@ -76,7 +76,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 
 	// Formatar Hora/Data
 
-	$Data = strtotime($rowEncaminhamentoMedico['AtEMeData']);
+	$Data = strtotime($rowEncaminhamentoMedico['AtEMeDataInicio']);
 	$DataAtendimento = date("d/m/Y", $Data);
 
 	$Inicio = strtotime($rowEncaminhamentoMedico['AtEMeHoraInicio']);
@@ -98,7 +98,7 @@ if (isset($_POST['txtareaConteudo']) ){
 		//Edição
 		if ($iAtendimentoEncaminhamentoMedicoId){
 		
-			$sql = "UPDATE AtendimentoEncaminhamentoMedico SET AtEMeAtendimento = :sAtendimento, AtEMeData = :dData, AtEMeHoraInicio = :sHoraInicio,
+			$sql = "UPDATE AtendimentoEncaminhamentoMedico SET AtEMeAtendimento = :sAtendimento, AtEMeDataInicio = :dData, AtEMeHoraInicio = :sHoraInicio,
 						   AtEMeHoraFim  = :sHoraFim, AtEMeProfissional = :sProfissional, AtEMeCid10 = :iCid10, AtEMeEncaminhamentoMedico = :sEncaminhamentoMedico, AtEMeUnidade = :iUnidade
 					WHERE AtEMeId = :iAtendimentoEncaminhamentoMedico";
 			$result = $conn->prepare($sql);
@@ -120,7 +120,7 @@ if (isset($_POST['txtareaConteudo']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoEncaminhamentoMedico (AtEMeAtendimento, AtEMeData, AtEMeHoraInicio, AtEMeHoraFim, AtEMeProfissional, AtEMeCid10, AtEMeEncaminhamentoMedico, AtEMeUnidade)
+			$sql = "INSERT INTO AtendimentoEncaminhamentoMedico (AtEMeAtendimento, AtEMeDataInicio, AtEMeHoraInicio, AtEMeHoraFim, AtEMeProfissional, AtEMeCid10, AtEMeEncaminhamentoMedico, AtEMeUnidade)
 						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional, :iCid10, :sEncaminhamentoMedico, :iUnidade)";
 			$result = $conn->prepare($sql);
 					

@@ -30,9 +30,9 @@ $sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, ClienId, ClienCo
         $sexo = 'Masculino';
     }
 
-    $sql = "SELECT AtendId, AtendNumRegistro, AtendDataRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExSolicitacaoExame, AtAmbData, AtAmbHoraInicio, AtAmbHoraFim, 
+    $sql = "SELECT AtendId, AtendNumRegistro, AtendDataRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExSolicitacaoExame, AtAmbDataInicio, AtAmbHoraInicio, AtAmbHoraFim, 
                    AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual,AtAmbExameFisico, AtAmbSuspeitaDiagnostico, AtAmbExameSolicitado, AtAmbPrescricao, 
-                   AtAmbOutrasObservacoes, A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleData, AtEleHoraInicio, 
+                   AtAmbOutrasObservacoes, A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleDataInicio, AtEleHoraInicio, 
                    AtEleHoraFim, AtEleAnamnese, AtClaChave, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento, ClienNomeMae, ClienCartaoSus, 
                    ClienCelular, ClResNome
 			FROM Atendimento
@@ -149,7 +149,7 @@ try {
                 <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 10px;">
                     DATA DO ATENDIMENTO AMBULATORIAL
                     <br><br>
-                    <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($item['AtAmbData']).' - '.mostraHora($item['AtAmbHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($item['AtAmbData']).' - '.mostraHora($item['AtAmbHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                    <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($item['AtAmbDataInicio']).' - '.mostraHora($item['AtAmbHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($item['AtAmbDataInicio']).' - '.mostraHora($item['AtAmbHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
                 </div>
                 <div style=" border: #aaa solid 1px; font-weight: bold; position:relative;  background-color:#eee; padding: 10px;">
                     Unidade de Atendimento: <span style="font-weight:normal;">'. $item['UnidaNome'] .'</span> <span style="color:#aaa;"></span><br>Médico Solicitante: <span style="font-weight:normal;">'.$item['ProfissionalNome'].' ('.$item['ProfissaoNome'].')</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Modalidade: <span style="font-weight:normal;">'. $item['AtModNome'] .'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Guia: <span style="font-weight:normal;">'.$item['AtendNumRegistro'].'</span>
@@ -229,7 +229,7 @@ try {
                 <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 10px;">
                 DATA DO ATENDIMENTO ELETIVO
                 <br><br>
-                <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($item['AtEleData']).' - '.mostraHora($item['AtEleHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($item['AtEleData']).' - '.mostraHora($item['AtEleHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($item['AtEleDataInicio']).' - '.mostraHora($item['AtEleHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($item['AtEleDataInicio']).' - '.mostraHora($item['AtEleHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
                 </div>
                 <div style="  border: #aaa solid 1px; font-weight: bold; position:relative; background-color:#eee; padding: 10px;">
                 Unidade de Atendimento: <span style="font-weight:normal;">'. $item['UnidaNome'] .'</span> <span style="color:#aaa;"></span><br>Médico Solicitante: <span style="font-weight:normal;">'.$item['ProfissionalNome'].' ('.$item['ProfissaoNome'].')</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Modalidade: <span style="font-weight:normal;">'. $item['AtModNome'] .'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Guia: <span style="font-weight:normal;">'.$item['AtendNumRegistro'].'</span>

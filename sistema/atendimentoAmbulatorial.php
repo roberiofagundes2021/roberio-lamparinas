@@ -79,7 +79,7 @@ if(isset($iAtendimentoAmbulatorialId ) && $iAtendimentoAmbulatorialId ){
 
 	// Formatar Hora/Data
 
-	$Data = strtotime($rowAmbulatorial['AtAmbData']);
+	$Data = strtotime($rowAmbulatorial['AtAmbDataInicio']);
 	$DataAtendimento = date("d/m/Y", $Data);
 
 	$Inicio = strtotime($rowAmbulatorial['AtAmbHoraInicio']);
@@ -96,7 +96,7 @@ if (isset($_POST['inputInicio']) ){
 		//Edição
 		if ($iAtendimentoAmbulatorialId){
 		
-			$sql = "UPDATE AtendimentoAmbulatorial SET AtAmbAtendimento = :sAtendimento, AtAmbData = :dData, AtAmbHoraInicio = :sHoraInicio,
+			$sql = "UPDATE AtendimentoAmbulatorial SET AtAmbAtendimento = :sAtendimento, AtAmbDataInicio = :dData, AtAmbHoraInicio = :sHoraInicio,
 						   AtAmbHoraFim  = :sHoraFim, AtAmbProfissional = :sProfissional, AtAmbQueixaPrincipal = :sQueixaPrincipal,
 						   AtAmbHistoriaMolestiaAtual = :sHistoriaMolestiaAtual, AtAmbExameFisico = :sExameFisico, 
 						   AtAmbSuspeitaDiagnostico = :sSuspeitaDiagnostico, AtAmbExameSolicitado = :sExameSolicitado, 
@@ -126,7 +126,7 @@ if (isset($_POST['inputInicio']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoAmbulatorial (AtAmbAtendimento, AtAmbData, AtAmbHoraInicio, AtAmbHoraFim, AtAmbProfissional, AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual,
+			$sql = "INSERT INTO AtendimentoAmbulatorial (AtAmbAtendimento, AtAmbDataInicio, AtAmbHoraInicio, AtAmbHoraFim, AtAmbProfissional, AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual,
 			 											AtAmbExameFisico, AtAmbSuspeitaDiagnostico, AtAmbExameSolicitado, AtAmbPrescricao, AtAmbOutrasObservacoes, AtAmbUnidade)
 						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional,:sQueixaPrincipal,:sHistoriaMolestiaAtual, :sExameFisico, 
 						        :sSuspeitaDiagnostico, :sExameSolicitado, :sPrescricao, :sOutrasObservacoes, :iUnidade)";

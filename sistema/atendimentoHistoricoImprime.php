@@ -14,9 +14,9 @@ if (!isset($_POST['AtendimentoId'])){
 
 $iAtendimento = $_POST['AtendimentoId'];
 
-$sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExSolicitacaoExame, AtAmbData, AtAmbHoraInicio, AtAmbHoraFim, AtAmbQueixaPrincipal, 
+$sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExSolicitacaoExame, AtAmbDataInicio, AtAmbHoraInicio, AtAmbHoraFim, AtAmbQueixaPrincipal, 
                 AtAmbHistoriaMolestiaAtual,AtAmbExameFisico, AtAmbSuspeitaDiagnostico, AtAmbExameSolicitado, AtAmbPrescricao, AtAmbOutrasObservacoes, 
-                A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleData, AtEleHoraInicio, AtEleHoraFim, AtEleAnamnese, AtClaChave,
+                A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleDataInicio, AtEleHoraInicio, AtEleHoraFim, AtEleAnamnese, AtClaChave,
                 ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento, ClienNomeMae, ClienCartaoSus, ClienCelular, ClResNome
         FROM Atendimento
         LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
@@ -130,7 +130,7 @@ if($row['AtClaChave'] == "AMBULATORIAL"){
         <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 10px;">
             DATA DO ATENDIMENTO AMBULATORIAL
             <br><br>
-            <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($row['AtAmbData']).' - '.mostraHora($row['AtAmbHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($row['AtAmbData']).' - '.mostraHora($row['AtAmbHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($row['AtAmbDataInicio']).' - '.mostraHora($row['AtAmbHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($row['AtAmbDataInicio']).' - '.mostraHora($row['AtAmbHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
         </div>
         <div style=" border: #aaa solid 1px; font-weight: bold; position:relative;  background-color:#eee; padding: 10px;">
             Unidade de Atendimento: <span style="font-weight:normal;">'. $row['UnidaNome'] .'</span> <span style="color:#aaa;"></span><br>Médico Solicitante: <span style="font-weight:normal;">'.$row['ProfissionalNome'].' ('.$row['ProfissaoNome'].')</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Modalidade: <span style="font-weight:normal;">'. $row['AtModNome'] .'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Guia: <span style="font-weight:normal;">'.$row['AtendNumRegistro'].'</span>
@@ -207,7 +207,7 @@ if($row['AtClaChave'] == "AMBULATORIAL"){
         <div style=" border: #aaa solid 1px; text-align: center; font-weight: bold; position:relative; margin-top: 5px; background-color:#eee; padding: 10px;">
         DATA DO ATENDIMENTO ELETIVO
         <br><br>
-        <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($row['AtEleData']).' - '.mostraHora($row['AtEleHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($row['AtEleData']).' - '.mostraHora($row['AtEleHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+        <span style=" text-align: center; color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Entrada: <span style="font-weight:normal;">' .mostraData($row['AtEleDataInicio']).' - '.mostraHora($row['AtEleHoraInicio']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>Saída: <span style="font-weight:normal;">' .mostraData($row['AtEleDataInicio']).' - '.mostraHora($row['AtEleHoraFim']).'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
         </div>
         <div style="  border: #aaa solid 1px; font-weight: bold; position:relative; background-color:#eee; padding: 10px;">
         Unidade de Atendimento: <span style="font-weight:normal;">'. $row['UnidaNome'] .'</span> <span style="color:#aaa;"></span><br>Médico Solicitante: <span style="font-weight:normal;">'.$row['ProfissionalNome'].' ('.$row['ProfissaoNome'].')</span> <span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Modalidade: <span style="font-weight:normal;">'. $row['AtModNome'] .'</span><span style="color:#aaa;">&nbsp;&nbsp;|&nbsp;&nbsp;</span> Guia: <span style="font-weight:normal;">'.$row['AtendNumRegistro'].'</span>

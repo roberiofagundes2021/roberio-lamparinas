@@ -62,7 +62,7 @@ if ($row['ClienSexo'] == 'F'){
 if(isset($iAtendimentoEletivoId ) && $iAtendimentoEletivoId ){
 
 	//Essa consulta é para preencher o campo Anamnese ao editar
-	$sql = "SELECT AtEleAnamnese, AtEleHoraFim, AtEleHoraInicio, AtEleData
+	$sql = "SELECT AtEleAnamnese, AtEleHoraFim, AtEleHoraInicio, AtEleDataInicio
 			FROM AtendimentoEletivo
 			WHERE AtEleId = " . $iAtendimentoEletivoId ;
 	$result = $conn->query($sql);
@@ -72,7 +72,7 @@ if(isset($iAtendimentoEletivoId ) && $iAtendimentoEletivoId ){
 
 	// Formatar Hora/Data
 
-	$Data = strtotime($rowEletivo['AtEleData']);
+	$Data = strtotime($rowEletivo['AtEleDataInicio']);
 	$DataAtendimento = date("d/m/Y", $Data);
 
 	$Inicio = strtotime($rowEletivo['AtEleHoraInicio']);
@@ -88,7 +88,7 @@ if (isset($_POST['txtareaConteudo']) ){
 		//Edição
 		if ($iAtendimentoEletivoId){
 		
-			$sql = "UPDATE AtendimentoEletivo SET AtEleAtendimento = :sAtendimento, AtEleData = :dData, AtEleHoraInicio = :sHoraInicio,
+			$sql = "UPDATE AtendimentoEletivo SET AtEleAtendimento = :sAtendimento, AtEleDataInicio = :dData, AtEleHoraInicio = :sHoraInicio,
 						   AtEleHoraFim  = :sHoraFim, AtEleProfissional = :sProfissional, AtEleAnamnese = :sAnamnese, AtEleUnidade = :iUnidade
 					WHERE AtEleId = :iAtendimentoEletivo";
 			$result = $conn->prepare($sql);
@@ -109,7 +109,7 @@ if (isset($_POST['txtareaConteudo']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoEletivo(AtEleAtendimento, AtEleData, AtEleHoraInicio, AtEleHoraFim, AtEleProfissional, AtEleAnamnese, AtEleUnidade)
+			$sql = "INSERT INTO AtendimentoEletivo(AtEleAtendimento, AtEleDataInicio, AtEleHoraInicio, AtEleHoraFim, AtEleProfissional, AtEleAnamnese, AtEleUnidade)
 						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional,:sAnamnese, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
