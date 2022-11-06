@@ -47,6 +47,7 @@ if(isset($_POST['inputTipo'])){
 		$sInscricaoMunicipal= $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null;
 		$sInscricaoEstadual= $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoEstadual'] : null;
 		$sCpf= $_POST['inputTipo'] == 'F' ? limpaCPF_CNPJ($_POST['inputCpf']) : null;
+		$sCns= $_POST['inputTipo'] == 'F' ? $_POST['inputCns'] : null;
 		$sRg= $_POST['inputTipo'] == 'F' ? $_POST['inputRg'] : null;
 		$sOrgaoEmissor= $_POST['inputTipo'] == 'F' ? $_POST['inputEmissor'] : null;
 		$sUf= $_POST['inputTipo'] == 'J' || $_POST['cmbUf'] == '#' ? null : $_POST['cmbUf'];
@@ -56,6 +57,7 @@ if(isset($_POST['inputTipo'])){
 		$sConselho= $_POST['inputTipo'] == 'F' ? ($_POST['cmbConselho'] == '#' ? null : $_POST['cmbConselho']) : null;
 		$sNumConselho= $_POST['inputTipo'] == 'F' ? $_POST['inputNumConselho'] : null;
 		$sCnes= $_POST['inputTipo']  == 'J' ? $_POST['inputCnesPJ'] : $_POST['inputCnesPF'];
+		$sCtps= $_POST['inputTipo'] == 'F' ? $_POST['inputCtps'] : null;
 		$sCep= trim($_POST['inputCep']) == "" ? null : $_POST['inputCep'];
 		$sEndereco= $_POST['inputEndereco'];
 		$sNumero= $_POST['inputNumero'];
@@ -79,8 +81,8 @@ if(isset($_POST['inputTipo'])){
 		
 		$sql = "UPDATE Profissional SET ProfiTipo = '$sTipo', ProfiNome = '$sNome', ProfiRazaoSocial = '$sRazaoSocial', ProfiCnpj = '$sCnpj', 
                       ProfiInscricaoMunicipal = '$sInscricaoMunicipal', ProfiInscricaoEstadual = '$sInscricaoEstadual', 
-                      ProfiCpf = '$sCpf', ProfiRg = '$sRg', ProfiOrgaoEmissor = '$sOrgaoEmissor', ProfiUf = '$sUf', ProfiSexo = '$sSexo', ProfiDtNascimento = '$dDtNascimento', 
-                      ProfiProfissao = '$sProfissao', ProfiConselho = '$sConselho', ProfiNumConselho = '$sNumConselho', ProfiCNES =  '$sCnes',
+                      ProfiCpf = '$sCpf', ProfiCNS = '$sCns', ProfiRg = '$sRg', ProfiOrgaoEmissor = '$sOrgaoEmissor', ProfiUf = '$sUf', ProfiSexo = '$sSexo', ProfiDtNascimento = '$dDtNascimento', 
+                      ProfiProfissao = '$sProfissao', ProfiConselho = '$sConselho', ProfiNumConselho = '$sNumConselho', ProfiCNES =  '$sCnes', ProfiCTPS =  '$sCtps',
                       ProfiCep = '$sCep', ProfiEndereco = '$sEndereco', ProfiNumero = '$sNumero', ProfiComplemento = '$sComplemento', ProfiBairro = '$sBairro', 
                       ProfiCidade = '$sCidade', ProfiEstado = '$sEstado', ProfiContato = '$sContato', ProfiTelefone = '$sTelefone', 
                       ProfiCelular = '$sCelular', ProfiEmail = '$sEmail', ProfiSite = '$sSite', ProfiObservacao = '$sObservacao', ProfiBanco = '$sBanco', 
@@ -509,34 +511,40 @@ if(isset($_POST['inputTipo'])){
 												</div>
 											</div>	
 											
-											<div class="col-lg-4" id="CPF">
+											<div class="col-lg-2" id="CPF">
 												<div class="form-group">
 													<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
 													<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php echo formatarCPF_Cnpj($row['ProfiCpf']); ?>" <?php if ($row['ProfiTipo'] == 'F') echo "required"; ?>>
 												</div>	
 											</div>
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputCns">CNS</label>
+													<input type="text" id="inputCns" name="inputCns" class="form-control" placeholder="CNS" value="<?php echo $row['ProfiCNS']; ?>">
+												</div>	
+											</div>	
 										</div>	
 
 										<div class="row">
 											<div class="col-lg-2">
 												<div class="form-group">
-													<label for="inputRg">RG</label>
-													<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG" value="<?php echo $row['ProfiRg']; ?>">
+													<label for="inputRg">RG<span class="text-danger"> *</span></label>
+													<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG" value="<?php echo $row['ProfiRg']; ?>" required>
 												</div>
 											</div>
 
 											<div class="col-lg-2">
 												<div class="form-group">
-													<label for="inputEmissor">Emissor</label>
-													<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor" value="<?php echo $row['ProfiOrgaoEmissor']; ?>">
+													<label for="inputEmissor">Emissor<span class="text-danger"> *</span></label>
+													<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor" value="<?php echo $row['ProfiOrgaoEmissor']; ?>" required>
 												</div>
 											</div>
 
 											<div class="col-lg-3">
 												<div class="form-group">
-													<label for="cmbUf">UF</label>
-													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
-														<option value="#">Selecione um estado</option>
+													<label for="cmbUf">UF<span class="text-danger"> *</span></label>
+													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2" required>
+														<option value="">Selecione um estado</option>
 														<option value="AC" <?php if ($row['ProfiUf'] == 'AC') echo "selected"; ?> >Acre</option>
 														<option value="AL" <?php if ($row['ProfiUf'] == 'AL') echo "selected"; ?> >Alagoas</option>
 														<option value="AP" <?php if ($row['ProfiUf'] == 'AP') echo "selected"; ?> >Amapá</option>
@@ -571,9 +579,9 @@ if(isset($_POST['inputTipo'])){
 											
 											<div class="col-lg-2">
 												<div class="form-group">
-													<label for="cmbSexo">Sexo</label>
-													<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
-														<option value="#">Selecione o sexo</option>
+													<label for="cmbSexo">Sexo<span class="text-danger"> *</span></label>
+													<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2" required>
+														<option value="">Selecione o sexo</option>
 														<option value="F" <?php if ($row['ProfiSexo'] == 'F') echo "selected"; ?> >Feminino</option>
 														<option value="M" <?php if ($row['ProfiSexo'] == 'M') echo "selected"; ?> >Masculino</option>
 													</select>
@@ -582,8 +590,8 @@ if(isset($_POST['inputTipo'])){
 
 											<div class="col-lg-3">
 												<div class="form-group">
-													<label for="inputDtNascimento">Data Nascimento</label>
-													<input type="date" id="inputDtNascimento" name="inputDtNascimento" class="form-control" placeholder="Data Nascimento" value="<?php echo $row['ProfiDtNascimento']; ?>">
+													<label for="inputDtNascimento">Data Nascimento<span class="text-danger"> *</span></label>
+													<input type="date" id="inputDtNascimento" name="inputDtNascimento" class="form-control" placeholder="Data Nascimento" value="<?php echo $row['ProfiDtNascimento']; ?>" required>
 												</div>
 											</div>										
 										</div>
@@ -593,10 +601,10 @@ if(isset($_POST['inputTipo'])){
                                                 <h5 class="mb-0 font-weight-semibold">Dados Profissionais</h5>
                                                 <br>
                                                 <div class="row">								
-                                                    <div class="col-lg-3">
-                                                        <label for="cmbProfissao">Profissão</label>
-                                                        <select id="cmbProfissao" name="cmbProfissao" class="form-control select-search">
-                                                            <option value="#">Selecione uma profissão</option>
+                                                    <div class="col-lg-2">
+                                                        <label for="cmbProfissao">Profissão<span class="text-danger"> *</span></label>
+                                                        <select id="cmbProfissao" name="cmbProfissao" class="form-control select-search" required>
+                                                            <option value="">Selecione uma profissão</option>
                                                             <?php 
                                                                 $sql = "SELECT ProfiId, ProfiNome
                                                                         FROM Profissao
@@ -615,10 +623,10 @@ if(isset($_POST['inputTipo'])){
                                                         </select>
                                                     </div>
 
-													<div class="col-lg-2">
-                                                        <label for="cmbConselho">Conselho</label>
-                                                        <select id="cmbConselho" name="cmbConselho" class="form-control select-search">
-                                                            <option value="#">Selecione </option>
+													<div class="col-lg-1">
+                                                        <label for="cmbConselho">Conselho<span class="text-danger"> *</span></label>
+                                                        <select id="cmbConselho" name="cmbConselho" class="form-control select-search" required>
+                                                            <option value="">Selecione </option>
 															 <?php 
                                                                 $sql = "SELECT PrConId, PrConNome
                                                                         FROM ProfissionalConselho
@@ -640,21 +648,28 @@ if(isset($_POST['inputTipo'])){
                                                     
                                                     <div class="col-lg-2">
                                                         <div class="form-group">
-                                                            <label for="inputNumConselho">Nº do Conselho/UF</label>
-                                                            <input type="text" id="inputNumConselho" name="inputNumConselho" class="form-control" placeholder="CRM/Outros" value="<?php echo $row['ProfiNumConselho']; ?>">
+                                                            <label for="inputNumConselho">Nº do Conselho/UF<span class="text-danger"> *</span></label>
+                                                            <input type="text" id="inputNumConselho" name="inputNumConselho" class="form-control" placeholder="CRM/Outros" value="<?php echo $row['ProfiNumConselho']; ?>" required>
                                                         </div>
                                                     </div>
                                                     
                                                     <div class="col-lg-2">
                                                         <div class="form-group">
-                                                            <label for="inputCnesPF">CNES</label>
-                                                            <input type="text" id="inputCnesPF" name="inputCnesPF" class="form-control" placeholder="CNES" value="<?php echo $row['ProfiCNES']; ?>">
+                                                            <label for="inputCnesPF">CNES<span class="text-danger"> *</span></label>
+                                                            <input type="text" id="inputCnesPF" name="inputCnesPF" class="form-control" placeholder="CNES" value="<?php echo $row['ProfiCNES']; ?>" required>
+                                                        </div>
+                                                    </div>
+
+													<div class="col-lg-2">
+                                                        <div class="form-group">
+                                                            <label for="inputCtps">CTPS</label>
+                                                            <input type="text" id="inputCtps" name="inputCtps" class="form-control" placeholder="CTPS" value="<?php echo $row['ProfiCTPS']; ?>">
                                                         </div>
                                                     </div>
                                                 
                                                     <div class="col-lg-3">
-                                                        <label for="cmbEspecialidade">Especialidades</label>
-                                                        <select id="cmbEspecialidade" name="cmbEspecialidade[]" class="form-control multiselect-filtering" multiple="multiple" data-fouc>
+                                                        <label for="cmbEspecialidade">Especialidades<span class="text-danger"> *</span></label>
+                                                        <select id="cmbEspecialidade" name="cmbEspecialidade[]" class="form-control multiselect-filtering" multiple="multiple" data-fouc required>
                                                             <?php
 																$sql = "SELECT EspecId, EspecNome
 																		FROM Especialidade
@@ -849,8 +864,8 @@ if(isset($_POST['inputTipo'])){
 										
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputCelular">Celular</label>
-												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999" value="<?php echo isset($row['ProfiCelular'])?$row['ProfiCelular']:''; ?>">
+												<label for="inputCelular">Celular<span class="text-danger"> *</span></label>
+												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular"  value="<?php echo isset($row['ProfiCelular'])?$row['ProfiCelular']:''; ?>" required>
 											</div>
 										</div>
 										
