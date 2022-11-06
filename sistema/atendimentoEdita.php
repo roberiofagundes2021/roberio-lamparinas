@@ -469,7 +469,7 @@ if ($tipo == 'ATENDIMENTO') {
 			})
 
 			$('#parentescoCadatrado').on('change', function() {
-				setResponsavelAtribut()
+				setResponsavelAtribut({'visible': true})
 			});
 
 			$('#medicos').on('change', function() {
@@ -622,10 +622,10 @@ if ($tipo == 'ATENDIMENTO') {
 					success: async function(response) {
 						if (response.status == 'success') {
 							alerta(response.titulo, response.menssagem, response.status)
-							await getCmbs({
+							getCmbs({
 								'responsavelID': response.responsavel
 							})
-							setResponsavelAtribut(response.responsavel)
+							setResponsavelAtribut({'id':response.responsavel})
 							$('#page-modal-responsavel').fadeOut(200)
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
@@ -885,7 +885,7 @@ if ($tipo == 'ATENDIMENTO') {
 								`<option value="${item.id}">${item.nome}</option>`
 						$('#parentescoCadatrado').append(opt)
 					})
-					setResponsavelAtribut()
+					setResponsavelAtribut({'visible': false})
 				},
 				error: function(response) {}
 			});
@@ -946,7 +946,6 @@ if ($tipo == 'ATENDIMENTO') {
 						'iPaciente': iPaciente
 					},
 					success: function(response) {
-						console.log(response);
 						if (response.status == 'success') {
 							$('#prontuario').val(response.prontuario)
 							$('#nome').val(response.nome)
@@ -1058,8 +1057,8 @@ if ($tipo == 'ATENDIMENTO') {
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o responsável
-		function setResponsavelAtribut(id) {
-			iResponsavel = id?id:$('#parentescoCadatrado').val()
+		function setResponsavelAtribut(obj) {
+			iResponsavel = obj.id?obj.id:$('#parentescoCadatrado').val()
 			if (iResponsavel) {
 				$.ajax({
 					type: 'POST',
@@ -1092,8 +1091,10 @@ if ($tipo == 'ATENDIMENTO') {
 								}
 							})
 
-							$('#informacoes').show()
-							$('#novoResponsavel').show()
+							if(obj && obj.visible){
+								$('#informacoes').show()
+								$('#novoResponsavel').show()
+							}
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 							$('#novoResponsavel').hide()
