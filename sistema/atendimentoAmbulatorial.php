@@ -90,8 +90,6 @@ if(isset($iAtendimentoAmbulatorialId ) && $iAtendimentoAmbulatorialId ){
 
 } 
 
-
-
 //Se estiver gravando (inclusão ou edição)
 if (isset($_POST['inputInicio']) ){
 	try{
@@ -181,49 +179,20 @@ if (isset($_POST['inputInicio']) ){
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-    <script src="../../../../global_assets/js/demo_pages/components_collapsible.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-
-	<!-- Não permite que o usuário retorne para o EDITAR -->
-	<script src="global_assets/js/lamparinas/stop-back.js"></script>
-
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+    <script src="global_assets/js/demo_pages/components_collapsible.js"></script>
 	
 	<script type="text/javascript">
 
 		$(document).ready(function() {	
+	     
+			$('#enviar').on('click', function(e){
+				
+				e.preventDefault();
+		
+				$( "#formAtendimentoAmbulatorial" ).submit();
+			})
 
-			$('#summernote1').summernote();
-            $('#summernote2').summernote();
-            $('#summernote3').summernote();
-            $('#summernote4').summernote();
-            $('#summernote5').summernote();
-            $('#summernote6').summernote();
-            $('#summernote7').summernote();
-	
-        
-		$('#enviar').on('click', function(e){
-			
-			e.preventDefault();
-	
-
-			$( "#formAtendimentoAmbulatorial" ).submit();
-					
-		})
-
-	}); //document.ready
+		}); //document.ready
 
 	</script>
 
@@ -259,7 +228,7 @@ if (isset($_POST['inputInicio']) ){
 							?>
 						</form>
 						<!-- Basic responsive configuration -->
-						<form name="formAtendimentoAmbulatorial" id="formAtendimentoAmbulatorial" method="post" class="form-validate-jquery">
+						<form name="formAtendimentoAmbulatorial" id="formAtendimentoAmbulatorial" method="post">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
 							?>
