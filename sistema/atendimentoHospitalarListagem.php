@@ -379,6 +379,25 @@ $acesso = 'ATENDIMENTO';
 				})
 			});
 
+			$('.classificacao').each(function(index, element){
+				$(element).on('click', function(e){
+					e.preventDefault()
+					let iAtendimento = $(this).data('atendimento')
+					let iAtendimentoEletivo = $(this).data('eletivo')
+					let AtClaChave = $(this).data('clachave')
+					let AtClaNome = $(this).data('clanome')
+
+					$('#iAtendimentoId').val(iAtendimento)
+					$('#iAtendimentoEletivoId').val(iAtendimentoEletivo)
+					$('#ClaChave').val(AtClaChave)
+					$('#ClaNome').val(AtClaNome)
+
+					$('#dadosPost').attr('action', 'atendimentoClassificacaoRisco.php')
+					$('#dadosPost').attr('method', 'POST')
+					$('#dadosPost').submit()
+				})
+			});
+
 			// btn para editar ou excluir atendimento
 			$('.atualizaAtendimento').each(function() {
 				$(this).on('click',function(e){
