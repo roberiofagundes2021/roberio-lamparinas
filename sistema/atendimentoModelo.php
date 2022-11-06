@@ -56,7 +56,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		} else { //inclusão
 		
 			$sql = "INSERT INTO AtendimentoModelo (AtModTipoModelo, AtModDescricao, AtModConteudo, AtModStatus, AtModUsuarioAtualizador, AtModUnidade)
-					VALUES (:sTipoModelo, :sDescricao, :sDescricao, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+					VALUES (:sTipoModelo, :sDescricao, :sConteudo, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -81,7 +81,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		$_SESSION['msg']['mensagem'] = "Erro reportado com o Modelo!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage(); exit;
 	}
 
 	irpara("atendimentoModelo.php");
@@ -197,7 +197,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
 						}						
 						
-						$( "#formSubGrupo" ).submit();
+						$( "#formModelo" ).submit();
 					}
 				})	
 			})						
@@ -289,13 +289,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputDescricao">Descrição <span class="text-danger"> *</span></label>
-												<input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="SubGrupo" value="<?php if (isset($_POST['inputModeloId'])) echo $rowModelo['AtModDescricao']; ?>" required autofocus>
+												<input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="Descrição" value="<?php if (isset($_POST['inputModeloId'])) echo $rowModelo['AtModDescricao']; ?>" required autofocus>
 											</div>
 										</div>
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputConteudo">Conteúdo do Modelo <span class="text-danger"> *</span></label>
-												<input type="text" id="inputConteudo" name="inputConteudo" class="form-control" placeholder="SubGrupo" value="<?php if (isset($_POST['inputModeloId'])) echo $rowModelo['AtModConteudo']; ?>" required autofocus>
+												<input type="text" id="inputConteudo" name="inputConteudo" class="form-control" placeholder="Contepudo" value="<?php if (isset($_POST['inputModeloId'])) echo $rowModelo['AtModConteudo']; ?>" required autofocus>
 											</div>
 										</div>
 										
