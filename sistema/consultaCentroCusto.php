@@ -13,7 +13,7 @@ $dataFinal3 = $_POST['inputDataFinal3'];
 $data4 = $_POST['inputDataInicial4'];
 $dataFinal4 = $_POST['inputDataFinal4'];
 
-$sql = "SELECT DISTINCT CnCusId, CnCusNome, 
+$sql = "SELECT DISTINCT CnCusId, CnCusNome, CnCusNomePersonalizado 
         dbo.fnCentroCustoPrevisto(".$_SESSION['UnidadeId'].", CnCusId, ".$planoConta.", '".$data1."', '".$dataFinal1."', 'S')  as Previsto,
         dbo.fnCentroCustoRealizado(".$_SESSION['UnidadeId'].", CnCusId, ".$planoConta.", '".$data1."', '".$dataFinal1."', 'S')  as Realizado,
         dbo.fnCentroCustoPrevisto(".$_SESSION['UnidadeId'].", CnCusId, ".$planoConta.", '".$data2."', '".$dataFinal2."', 'S')  as Previsto2,

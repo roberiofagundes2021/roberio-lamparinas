@@ -57,7 +57,7 @@ $MoviLiqui = $resultLiquidacao->fetch(PDO::FETCH_ASSOC);
 if(isset($MoviLiqui['MvLiqId'])){
     // Buacando centros de custos da movimentação
     $sqlMvLiqXCnCus = "SELECT MvLiqXCnCusMovimentacaoLiquidacao, MvLiqXCnCusCentroCusto, CnCusCodigo,
-    MvLiqXCnCusUsuarioAtualizador, MvLiqXCnCusValor,MvLiqXCnCusUnidade, CnCusNome, CnCusId
+    MvLiqXCnCusUsuarioAtualizador, MvLiqXCnCusValor,MvLiqXCnCusUnidade, CnCusNome, CnCusNomePersonalizado, CnCusId
     FROM MovimentacaoLiquidacaoXCentroCusto
     JOIN CentroCusto ON CnCusId = MvLiqXCnCusCentroCusto
     WHERE MvLiqXCnCusMovimentacaoLiquidacao = $MoviLiqui[MvLiqId]
@@ -67,7 +67,7 @@ if(isset($MoviLiqui['MvLiqId'])){
 }
 
 // pesquisa os centros de custos da unidade
-$sqlCentroCusto = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, SituaChave
+$sqlCentroCusto = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusNomePersonalizado CnCusDetalhamento, CnCusStatus, SituaChave
                    FROM  CentroCusto JOIN Situacao on SituaId = CnCusStatus
                    WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
 $resultCentroCusto = $conn->query($sqlCentroCusto);
@@ -192,6 +192,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                 $('#relacaoCentroCusto').show()
                                 for(var x=0; x<response.length; x++){
                                     var centro = response[x]
+                                    var centroCustoDescr = centro.CnCusNomePersonalizado !== null ? centro.CnCusNomePersonalizado : centro.CnCusNome;
 
                                     $('#totalRegistros').val(response.length)
 
@@ -207,7 +208,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                     <input type="text" id="inputCentroCodigo-`+x+`" name="inputCentroCodigo-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusCodigo+`" readOnly>
                                                 </div>
                                                 <div class="col-lg-9">
-                                                    <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusNome+`" readOnly>
+                                                    <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centroCustoDescr+`" readOnly>
                                                 </div>
                                             </div>
                                         </div>
@@ -447,7 +448,8 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
 
                                                         $selectCencust = "<select id='cmbCentroCusto' $disabled name='cmbCentroCusto[]' class='form-control select' multiple='multiple' required autofocus data-fouc>";
                                                         foreach($CenCust as $CentroCusto){
-                                                            $selectCencust .= "<option ".(isset($MoviLiqui['MvLiqPlanoConta'])?' selected ':'')."value='".$CentroCusto['CnCusId']."'>".$CentroCusto['CnCusNome']."</option>";
+                                                            $cnCusDescricao = $CentroCusto["CnCusNomePersonalizado"] === NULL ? $CentroCusto["CnCusNome"] : $CentroCusto["CnCusNomePersonalizado"];
+                                                            $selectCencust .= "<option ".(isset($MoviLiqui['MvLiqPlanoConta'])?' selected ':'')."value='".$CentroCusto['CnCusId']."'>".$cnCusDescricao."</option>";
                                                         }
                                                         $selectCencust .= "</select>";
                                                         echo $selectCencust;
@@ -556,6 +558,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                 $HTMLCenCust = '';
                                                 $HTMLCenCustValueTotal = 0;
                                                 foreach($MvLiqXCnCus as $key => $CnCus){
+                                                    $cnCusDescricao = $CnCus["CnCusNomePersonalizado"] === NULL ? $CnCus["CnCusNome"] : $CnCus["CnCusNomePersonalizado"];
                                                     $valor = $CnCus['MvLiqXCnCusValor'];
                                                     $valor = str_replace('.', ',', $valor);
                                                     $HTMLCenCust .= "
@@ -570,7 +573,7 @@ $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
                                                                     <input type='text' id='inputCentroCodigo-$key' name='inputCentroCodigo-$key' class='form-control-border-off' data-popup='tooltip' value='$CnCus[CnCusCodigo]' readOnly>
                                                                 </div>
                                                                 <div class='col-lg-9'>
-                                                                    <input type='text' id='inputCentroNome-$key' name='inputCentroNome-$key' class='form-control-border-off' data-popup='tooltip' value='$CnCus[CnCusNome]' readOnly>
+                                                                    <input type='text' id='inputCentroNome-$key' name='inputCentroNome-$key' class='form-control-border-off' data-popup='tooltip' value='$cnCusDescricao' readOnly>
                                                                 </div>
                                                             </div>
                                                         </div>

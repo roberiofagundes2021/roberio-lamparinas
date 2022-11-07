@@ -556,7 +556,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                         <select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                            $sql = "SELECT CnCusId, CnCusNome, CnCusCodigo
+                            $sql = "SELECT CnCusId, CnCusNome, CnCusCodigo, CnCusNomePersonalizado
                                       FROM CentroCusto
                                       JOIN Situacao 
                                         ON SituaId = CnCusStatus
@@ -567,14 +567,17 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                             $rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
 
                             foreach ($rowCentroDeCustos as $item) {
+
+                              $cnCusDescricao = $item['CnCusNomePersonalizado'] === NULL ? $item['CnCusNome'] : $item['CnCusNomePersonalizado'];
+
                               if (isset($_SESSION['MovimentacaoFinanceiraConciliacaoCentroDeCustos'])) {
                                 if ($item['CnCusId'] == $_SESSION['MovimentacaoFinanceiraConciliacaoCentroDeCustos']) {
-                                    print('<option value="' . $item['CnCusId'] . '" selected>' . $item['CnCusCodigo'] . ' - ' . $item['CnCusNome'] . '</option>');
+                                    print('<option value="' . $item['CnCusId'] . '" selected>' . $item['CnCusCodigo'] . ' - ' . $cnCusDescricao . '</option>');
                                 } else {
-                                    print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusCodigo'] . ' - ' . $item['CnCusNome'] . '</option>');
+                                    print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusCodigo'] . ' - ' . $cnCusDescricao . '</option>');
                                 }
                               } else {
-                                  print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusCodigo'] . ' - ' . $item['CnCusNome'] . '</option>');
+                                  print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusCodigo'] . ' - ' . $cnCusDescricao . '</option>');
                               }
                             }
                           ?>

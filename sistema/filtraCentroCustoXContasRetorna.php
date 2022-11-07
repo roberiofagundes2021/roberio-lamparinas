@@ -20,7 +20,7 @@ for($x=0; $x < COUNT($centros); $x++){
 $array .= ')';
 
 if($tipo == 'DESPESA') {
-    $sqlCentroCusto =  "SELECT CAPXCValor, CnCusId, CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, SituaChave
+    $sqlCentroCusto =  "SELECT CAPXCValor, CnCusId, CnCusCodigo, CnCusNome, CnCusNomePersonalizado, CnCusDetalhamento, CnCusStatus, SituaChave
                         FROM  ContasAPagarXCentroCusto 
                         JOIN CentroCusto on CnCusId = CAPXCCentroCusto
                         JOIN Situacao on SituaId = CnCusStatus
@@ -33,7 +33,7 @@ if($tipo == 'DESPESA') {
     
     $count = COUNT($CentroCustos);
 }else {
-    $sqlCentroCusto =  "SELECT CARXCValor, CnCusId, CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, SituaChave
+    $sqlCentroCusto =  "SELECT CARXCValor, CnCusId, CnCusCodigo, CnCusNome, CnCusNomePersonalizado, CnCusDetalhamento, CnCusStatus, SituaChave
                         FROM  ContasAReceberXCentroCusto 
                         JOIN CentroCusto on CnCusId = CARXCCentroCusto
                         JOIN Situacao on SituaId = CnCusStatus
