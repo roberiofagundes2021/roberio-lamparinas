@@ -55,7 +55,6 @@ try{
 				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 				JOIN ServicoVenda ON SrVenId = AgendServico
 				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADOVENDA','CONFIRMADO','FILAESPERA')
-				AND AgendData = '$hoje'
 				and AgendAtendimento is null";
 			$result = $conn->query($sql);
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -111,11 +110,9 @@ try{
 					'data' => [
 						mostraData($item['AgendData']) . " - " . mostraHora($item['AgendHorario']), // Data - Hora
 						$difference,  // Espera
-						$item['ClienCodigo'],  // Prontuário
 						$item['ClienNome'],  // Paciente
 						calculaIdadeSimples($item['ClienDtNascimento']), // Idade Paciente
 						$item['ProfissionalNome'],  // Profissional
-						$item['ProfiCbo'] . " - " . $item['ProfissaoNome'], // Cbo Profissional
 						$item['AtModNome'],  // Modalidade
 						$item['SrVenNome'],  // Procedimento
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
@@ -124,7 +121,9 @@ try{
 					'identify' => [
 						'situacao' => $item['SituaChave'],
 						'id' => $item['AgendId'],
-						'sJustificativa' => $item['AgendJustificativa']
+						'sJustificativa' => $item['AgendJustificativa'],
+						'prontuario' => 'Prontuário - '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
+						'cbo' => 'CBO - '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
 					]
 				]);
 			}
@@ -162,11 +161,9 @@ try{
 						mostraData($item['AtXSeData']) . " - " . mostraHora($item['AtXSeHorario']), // Data - Hora
 						$difference,  // Espera
 						$item['AtendNumRegistro'],  // Nº Registro
-						$item['ClienCodigo'],  // Prontuário
 						$item['ClienNome'],  // Paciente
 						calculaIdadeSimples($item['ClienDtNascimento']), // Idade paciente
 						$item['ProfissionalNome'],  // Profissional
-						$item['ProfiCbo'] . " - " . $item['ProfissaoNome'], // Cbo Profissional
 						$item['AtModNome'],  // Modalidade
 						$item['SrVenNome'],  // Procedimento
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
@@ -175,7 +172,9 @@ try{
 					'identify' => [
 						'situacao' => $item['SituaChave'],
 						'id' => $item['AtendId'],
-						'sJustificativa' => $item['AtendJustificativa']
+						'sJustificativa' => $item['AtendJustificativa'],
+						'prontuario' => 'Prontuário - '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
+						'cbo' => 'CBO - '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
 					]
 				]);
 			}

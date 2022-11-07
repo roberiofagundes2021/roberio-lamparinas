@@ -20,7 +20,7 @@ try{
 	if($tipoRequest == 'AGENDAMENTOS'){		
 		$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
 		AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
-		AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,ClienDtNascimento,
+		AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,ClienDtNascimento,ClienCodigo,
 		SituaCor,Profissional.ProfiNome as ProfissionalNome,AtLocNome, SrVenNome, ProfiCbo, Profissao.ProfiNome as ProfissaoNome
 		FROM Agendamento
 		JOIN AtendimentoModalidade ON AtModId = AgendModalidade
@@ -52,7 +52,6 @@ try{
 					$item['ClienNome'],
 					calculaIdadeSimples($item['ClienDtNascimento']),
 					$item['ProfissionalNome'],
-					$item['ProfiCbo'] . " - " . $item['ProfissaoNome'],
 					$item['SrVenNome'],
 					$item['AtModNome'],
 					$contato,
@@ -62,7 +61,9 @@ try{
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAgendamento' => $item['AgendId'],
-					'sObservacao' => $item['AgendObservacao']
+					'sObservacao' => $item['AgendObservacao'],
+					'prontuario' => 'Prontuário - '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
+					'cbo' => 'CBO - '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
 				]
 			]);
 		}
