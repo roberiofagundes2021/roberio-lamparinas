@@ -275,7 +275,7 @@ if (isset($_POST['inputAlergia']) ){
 
 			$('#summernote').summernote();
             $('#summernoteQueixa').summernote();
-            $('#summernoteMotivo').summernote();
+            $('#summernoteMotivo');
 			$('#servicoTable').hide();
 
 			addProcedimentosPadrao();
@@ -336,6 +336,103 @@ if (isset($_POST['inputAlergia']) ){
 					
 			})
 
+			$(".caracteresMotivo").text((400 - $("#summernoteMotivo").val().length) + ' restantes'); //restantes em motivo da consulta
+			$(".caracteresAlergia").text((150 - $("#inputAlergiaDescricao").val().length) + ' restantes'); //restantes em descricao alergia
+			$(".caracteresDiabetes").text((150 - $("#inputDiabetesDescricao").val().length) + ' restantes'); //restantes em descricao diabetes
+			$(".caracteresHipertensao").text((150 - $("#inputHipertensaoDescricao").val().length) + ' restantes'); //restantes em descricao hipertensao
+			$(".caracteresNeoplasia").text((150 - $("#inputNeoplasiaDescricao").val().length) + ' restantes'); //restantes em descricao neoplasia
+			$(".caracteresMedicamento").text((150 - $("#inputUsoMedicamentoDescricao").val().length) + ' restantes'); //restantes em descricao medicamento
+
+			$(document).on("input", "#summernoteMotivo", function() {
+				var limite = 400;
+				var informativo = " restantes.";
+				var caracteresDigitados = $(this).val().length;
+				var caracteresRestantes = limite - caracteresDigitados;
+
+				if (caracteresRestantes <= 0) {
+					var summernoteMotivo = $("textarea[name=summernoteMotivo]").val();
+					$("textarea[name=summernoteMotivo]").val(summernoteMotivo.substr(0, limite));
+					$(".caracteresMotivo").text("0 " + informativo);
+				} else {
+					$(".caracteresMotivo").text(caracteresRestantes + " " + informativo);
+				}
+			});
+
+			$(document).on("input", "#inputAlergiaDescricao", function() {
+				var limite = 150;
+				var informativo = " restantes.";
+				var caracteresDigitados = $(this).val().length;
+				var caracteresRestantes = limite - caracteresDigitados;
+
+				if (caracteresRestantes <= 0) {
+					var inputAlergiaDescricao = $("textarea[name=inputAlergiaDescricao]").val();
+					$("textarea[name=inputAlergiaDescricao]").val(inputAlergiaDescricao.substr(0, limite));
+					$(".caracteresAlergia").text("0 " + informativo);
+				} else {
+					$(".caracteresAlergia").text(caracteresRestantes + " " + informativo);
+				}
+			});
+
+			$(document).on("input", "#inputDiabetesDescricao", function() {
+				var limite = 150;
+				var informativo = " restantes.";
+				var caracteresDigitados = $(this).val().length;
+				var caracteresRestantes = limite - caracteresDigitados;
+
+				if (caracteresRestantes <= 0) {
+					var inputDiabetesDescricao = $("textarea[name=inputDiabetesDescricao]").val();
+					$("textarea[name=inputDiabetesDescricao]").val(inputDiabetesDescricao.substr(0, limite));
+					$(".caracteresDiabetes").text("0 " + informativo);
+				} else {
+					$(".caracteresDiabetes").text(caracteresRestantes + " " + informativo);
+				}
+			});
+
+			$(document).on("input", "#inputHipertensaoDescricao", function() {
+				var limite = 150;
+				var informativo = " restantes.";
+				var caracteresDigitados = $(this).val().length;
+				var caracteresRestantes = limite - caracteresDigitados;
+
+				if (caracteresRestantes <= 0) {
+					var inputHipertensaoDescricao = $("textarea[name=inputHipertensaoDescricao]").val();
+					$("textarea[name=inputHipertensaoDescricao]").val(inputHipertensaoDescricao.substr(0, limite));
+					$(".caracteresHipertensao").text("0 " + informativo);
+				} else {
+					$(".caracteresHipertensao").text(caracteresRestantes + " " + informativo);
+				}
+			});
+
+			$(document).on("input", "#inputNeoplasiaDescricao", function() {
+				var limite = 150;
+				var informativo = " restantes.";
+				var caracteresDigitados = $(this).val().length;
+				var caracteresRestantes = limite - caracteresDigitados;
+
+				if (caracteresRestantes <= 0) {
+					var inputNeoplasiaDescricao = $("textarea[name=inputNeoplasiaDescricao]").val();
+					$("textarea[name=inputNeoplasiaDescricao]").val(inputNeoplasiaDescricao.substr(0, limite));
+					$(".caracteresNeoplasia").text("0 " + informativo);
+				} else {
+					$(".caracteresNeoplasia").text(caracteresRestantes + " " + informativo);
+				}
+			});
+
+			$(document).on("input", "#inputUsoMedicamentoDescricao", function() {
+				var limite = 150;
+				var informativo = " restantes.";
+				var caracteresDigitados = $(this).val().length;
+				var caracteresRestantes = limite - caracteresDigitados;
+
+				if (caracteresRestantes <= 0) {
+					var inputUsoMedicamentoDescricao = $("textarea[name=inputUsoMedicamentoDescricao]").val();
+					$("textarea[name=inputUsoMedicamentoDescricao]").val(inputUsoMedicamentoDescricao.substr(0, limite));
+					$(".caracteresMedicamento").text("0 " + informativo);
+				} else {
+					$(".caracteresMedicamento").text(caracteresRestantes + " " + informativo);
+				}
+			});
+
 		}); //document.ready
 
 
@@ -388,8 +485,9 @@ if (isset($_POST['inputAlergia']) ){
 									</div>`;
 							HTML += `
 							<tr class='servicoItem'>
-								<td class="text-center"> ${item.SrVenCodigo} - ${item.SrVenNome}</td>
-								<td class="text-center">${acoes}</td>
+								<td class="text-left" style="width: 10%"> ${item.SrVenCodigo} </td>
+								<td class="text-left"> ${item.SrVenNome}</td>
+								<td class="text-right">${acoes}</td>
 							</tr>`;
 
 						});
@@ -574,7 +672,8 @@ if (isset($_POST['inputAlergia']) ){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="">Motivo da Consulta (descricao)</label>
-												<textarea rows="5" cols="5"  id="summernoteMotivo" name="summernoteMotivo" class="form-control" placeholder="Descrição (Queixa principal)"><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriMotivoConsulta']; ?></textarea>
+												<textarea rows="4" cols="4"  id="summernoteMotivo" name="summernoteMotivo" class="form-control" placeholder="Descrição (Queixa principal)"><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriMotivoConsulta']; ?></textarea>
+												<span class="text-secondary">Max. 400 caracteres - </span><span class="caracteresMotivo text-secondary"></span>
 											</div>
 										</div>
 									</div>
@@ -633,7 +732,7 @@ if (isset($_POST['inputAlergia']) ){
 												<div class="input-group">
 												<input type="number" id="inputTemperatura" name="inputTemperatura" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriTempAXI']; ?>">
 													<span class="input-group-prepend">
-														<span class="input-group-text"><img src="global_assets/images/lamparinas/termometro.png" width="32" style="margin-top: -13px;" /></span>
+														<span class="input-group-text"><img src="global_assets/images/lamparinas/thermometro.png" width="32" style="margin-top: -13px;" /></span>
 													</span>
 													
 												</div>
@@ -831,40 +930,50 @@ if (isset($_POST['inputAlergia']) ){
 										<div class="col-lg-2"  style="margin-right: 20px;">
 											<div id="dadosAlergia" <?php if (!$iAtendimentoTriagemId) print('style="display:none"'); ?>>
 												<div class="form-group">
-													<label for="inputAlergiaDescricao">Descrição </label>
-													<input type="text" id="inputAlergiaDescricao" name="inputAlergiaDescricao" class="form-control" placeholder="Descrição da Alergia" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriAlergiaDescricao']; ?>">
+													<label for="inputAlergiaDescricao">Descrição (Alergia) </label>
+													<textarea rows="4" id="inputAlergiaDescricao" name="inputAlergiaDescricao" class="form-control" placeholder="Descrição da Alergia" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriAlergiaDescricao']; ?></textarea>
+													<small class="text-secondary">Máx. 150 caracteres</small><br>
+													<small class="caracteresAlergia text-secondary"></small>
 												</div>
 											</div> 
 										</div>
 										<div class="col-lg-2"  style="margin-right: 20px;">
 											<div id="dadosDiabete" <?php if (!$iAtendimentoTriagemId) print('style="display:none"'); ?>>
 												<div class="form-group">
-													<label for="inputDiabetesDescricao">Descrição </label>
-													<input type="text" id="inputDiabetesDescricao" name="inputDiabetesDescricao" class="form-control" placeholder="Descrição da Diabetes" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriDiabetesDescricao']; ?>">
+													<label for="inputDiabetesDescricao">Descrição (Diabetes) </label>
+													<textarea rows="4" id="inputDiabetesDescricao" name="inputDiabetesDescricao" class="form-control" placeholder="Descrição da Diabetes" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriDiabetesDescricao']; ?></textarea>
+													<small class="text-secondary">Máx. 150 caracteres</small><br>
+													<small class="caracteresDiabetes text-secondary"></small>
 												</div>
 											</div> 
 										</div>
 										<div class="col-lg-2"  style="margin-right: 20px;">
 											<div id="dadosHipertencao" <?php if (!$iAtendimentoTriagemId) print('style="display:none"'); ?>>
 												<div class="form-group">
-													<label for="inputHipertensaoDescricao">Descrição </label>
-													<input type="text" id="inputHipertensaoDescricao" name="inputHipertensaoDescricao" class="form-control" placeholder="Descrição da Hipertenção" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriHipertensaoDescricao']; ?>">
+													<label for="inputHipertensaoDescricao">Descrição (Hipertensão) </label>
+													<textarea rows="4" id="inputHipertensaoDescricao" name="inputHipertensaoDescricao" class="form-control" placeholder="Descrição da Hipertensão" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriHipertensaoDescricao']; ?></textarea>
+													<small class="text-secondary">Máx. 150 caracteres</small><br>
+													<small class="caracteresHipertensao text-secondary"></small>
 												</div>
 											</div>
 										</div>
 										<div class="col-lg-2"  style="margin-right: 20px;">
 											<div id="dadosNeoplasia"<?php if (!$iAtendimentoTriagemId) print('style="display:none"'); ?>>
 												<div class="form-group">
-													<label for="inputNeoplasiaDescricao">Descrição </label>
-													<input type="text" id="inputNeoplasiaDescricao" name="inputNeoplasiaDescricao" class="form-control" placeholder="Descrição da Neoplasia" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriNeoplasiaDescricao']; ?>">
+													<label for="inputNeoplasiaDescricao">Descrição (Neoplasia) </label>
+													<textarea rows="4" id="inputNeoplasiaDescricao" name="inputNeoplasiaDescricao" class="form-control" placeholder="Descrição da Neoplasia" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriNeoplasiaDescricao']; ?></textarea>
+													<small class="text-secondary">Máx. 150 caracteres</small><br>
+													<small class="caracteresNeoplasia text-secondary"></small>
 												</div>
 											</div>
 										</div>
 										<div class="col-lg-2">
 											<div id="dadosMedicamento" <?php if (!$iAtendimentoTriagemId) print('style="display:none"'); ?>>
 												<div class="form-group">
-													<label for="inputUsoMedicamentoDescricao">Descrição </label>
-													<input type="text" id="inputUsoMedicamentoDescricao" name="inputUsoMedicamentoDescricao" class="form-control" placeholder="Descrição do Medicamento" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriUsoMedicamentoDescricao']; ?>">
+													<label for="inputUsoMedicamentoDescricao">Descrição (Uso Medicamentos) </label>
+													<textarea rows="3" id="inputUsoMedicamentoDescricao" name="inputUsoMedicamentoDescricao" class="form-control" placeholder="Descrição da Medicamento" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriUsoMedicamentoDescricao']; ?></textarea>
+													<small class="text-secondary">Máx. 150 caracteres</small><br>
+													<small class="caracteresMedicamento text-secondary"></small>
 												</div>
 											</div>
 										</div>
@@ -874,7 +983,7 @@ if (isset($_POST['inputAlergia']) ){
 
 										<div class="col-lg-5">
 											<div class="form-group">
-												<label for="">Procedimentos Realizado </label>
+												<label for="">Procedimentos Adicionais </label>
 
 												<div class="row">
 													
@@ -908,25 +1017,28 @@ if (isset($_POST['inputAlergia']) ){
 
 											</div>
 
-											<div class="row">
-												<div class="col-lg-12">
+										</div>
 
-													<table class="table" id="servicoTable">
-														<thead>
-															<tr class="bg-slate text-center">
-																<th >Procedimento</th>
-																<th></th>
-																
-															</tr>
-														</thead>
-														<tbody id="dataServico">
-	
-														</tbody>
-													</table>
+										<div class="col-lg-12">
+												<div class="row">
 
-												</div>
+												<table class="table" id="servicoTable">
+													<thead>
+														<tr class="bg-slate text-left">
+															<th>Código</th>
+															<th >Procedimento</th>
+															<th></th>
+															
+														</tr>
+													</thead>
+													<tbody id="dataServico">
+
+													</tbody>
+												</table>
+
 											</div>
 										</div>
+										
 										
 									</div>
 
