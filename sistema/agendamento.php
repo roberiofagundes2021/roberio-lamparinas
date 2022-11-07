@@ -86,34 +86,29 @@ include('global_assets/php/conexao.php');
 					targets: [3]
 				},
 				{ 
-					orderable: true,   //Cbo
-					width: "10%",
-					targets: [4]
-				},
-				{ 
 					orderable: true,   //Procedimento
 					width: "15%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Modalidade
 					width: "10%",
-					targets: [6]
+					targets: [5]
 				},
 				{
 					orderable: true,   //Contato
 					width: "10%",
-					targets: [7]
+					targets: [6]
 				},
 				{
 					orderable: true,   //Situacao
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [9]
+					targets: [8]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -243,9 +238,12 @@ include('global_assets/php/conexao.php');
 					response.forEach(item => {
 						rowNode = table.row.add(item.data).draw().node()
 						$(rowNode).attr('class', 'text-left')
-						$(rowNode).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-						$(rowNode).find('td:eq(8)').attr('data-agendamento', `${item.identify.iAgendamento}`)
-						$(rowNode).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
+						$(rowNode).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+						$(rowNode).find('td:eq(7)').attr('data-agendamento', `${item.identify.iAgendamento}`)
+						$(rowNode).find('td:eq(7)').attr('data-observacao', `${item.identify.sObservacao}`)
+						
+						$(rowNode).find('td:eq(1)').attr('title', item.identify.prontuario)
+						$(rowNode).find('td:eq(3)').attr('title', item.identify.cbo)
 					})
 				}
 			});
@@ -363,7 +361,6 @@ include('global_assets/php/conexao.php');
 										<th>Paciente</th>
 										<th>Idade</th>
 										<th>Profissional</th>
-										<th>CBO</th>
 										<th>Procedimento</th>			
 										<th>Modalidade</th>
 										<th>Contato</th>
