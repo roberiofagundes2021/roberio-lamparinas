@@ -105,7 +105,7 @@ try{
 		,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
 		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienCartaoSus,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
-		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
+		ClienCelular,ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente WHERE ClienUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
@@ -236,8 +236,16 @@ try{
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'LOCALATENDIMENTO'){
-		$sql = "SELECT AtLocId,AtLocNome,AtLocStatus,AtLocUsuarioAtualizador,AtLocUnidade
-		FROM AtendimentoLocal WHERE AtLocUnidade = $iUnidade";
+
+		$iMedico = $_POST['iMedico'];
+		$hoje = date('Y-m-d');
+
+		$sql= "SELECT AtLocId,AtLocNome,AtLocStatus,AtLocUsuarioAtualizador,AtLocUnidade
+		FROM AtendimentoLocal 
+		JOIN ProfissionalAgenda ON PrAgeAtendimentoLocal = AtLocId
+		WHERE PrAgeProfissional = $iMedico 
+		AND PrAgeData >= '$hoje'
+		AND AtLocUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];
@@ -524,9 +532,13 @@ try{
 		}
 	} elseif ($tipoRequest == 'SETDATAPROFISSIONAL'){
 		$iMedico = $_POST['iMedico'];
-
+		$localAtend = $_POST['localAtend'];
+		$hoje = date('Y-m-d');
+		
 		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
 		FROM ProfissionalAgenda WHERE PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade
+		AND PrAgeAtendimentoLocal = $localAtend
+		AND PrAgeData >= '$hoje'
 		ORDER BY PrAgeData ASC";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);

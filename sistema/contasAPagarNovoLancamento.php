@@ -832,7 +832,7 @@ if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) 
     }
 
     // pesquisa o Centro de Custo
-    $sqlCentroCusto = "SELECT CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CnCusId, CnCusCodigo, CnCusNome
+    $sqlCentroCusto = "SELECT CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CnCusId, CnCusCodigo, CnCusNome, CnCusNomePersonalizado
                         FROM ContasAPagarXCentroCusto
                         JOIN CentroCusto on CnCusId = CAPXCCentroCusto
                         WHERE CAPXCContasAPagar = " . $_POST['inputContasAPagarId'] . "";
@@ -862,7 +862,7 @@ if (isset($_POST['inputContasAPagarId']) && $_POST['inputContasAPagarId'] != 0) 
         $rowNotaFiscal = $result->fetch(PDO::FETCH_ASSOC);
     }
 
-    $sqlCentroCusto = "SELECT CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CnCusId, CnCusCodigo, CnCusNome
+    $sqlCentroCusto = "SELECT CAPXCContasAPagar, CAPXCCentroCusto, CAPXCValor, CnCusId, CnCusCodigo, CnCusNome, CnCusNomePersonalizado
                         FROM ContasAPagarXCentroCusto
                         JOIN CentroCusto on CnCusId = CAPXCCentroCusto
                         WHERE CAPXCContasAPagar = " . $lancamento['CnAPaId'] . "";
@@ -1612,6 +1612,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                 let totalCentroCusto = 0
                                 for(var x=0; x<response.length; x++){
                                     var centro = response[x]
+                                    var centroCustoDescr = centro.CnCusNomePersonalizado !== null ? centro.CnCusNomePersonalizado : centro.CnCusNome;
                                     totalCentroCusto += centro.CAPXCValor
 
                                     $('#totalRegistros').val(response.length)
@@ -1629,7 +1630,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                         <input type="text" id="inputCentroCodigo-`+x+`" name="inputCentroCodigo-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusCodigo+`" readOnly>
                                                     </div>
                                                     <div class="col-lg-9">
-                                                        <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusNome+`" readOnly>
+                                                        <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centroCustoDescr+`" readOnly>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1655,7 +1656,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                         <input type="text" id="inputCentroCodigo-`+x+`" name="inputCentroCodigo-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusCodigo+`" readOnly>
                                                     </div>
                                                     <div class="col-lg-9">
-                                                        <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusNome+`" readOnly>
+                                                        <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centroCustoDescr+`" readOnly>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1755,6 +1756,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                     </div>`;
                                 for(var x=0; x<response.length; x++){
                                     var centro = response[x]
+                                    var centroCustoDescr = centro.CnCusNomePersonalizado !== null ? centro.CnCusNomePersonalizado : centro.CnCusNome;
 
                                     $('#totalRegistros').val(response.length)
 
@@ -1770,7 +1772,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                     <input type="text" id="inputCentroCodigo-`+x+`" name="inputCentroCodigo-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusCodigo+`" readOnly>
                                                 </div>
                                                 <div class="col-lg-9">
-                                                    <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centro.CnCusNome+`" readOnly>
+                                                    <input type="text" id="inputCentroNome-`+x+`" name="inputCentroNome-`+x+`" class="form-control-border-off" data-popup="tooltip" value="`+centroCustoDescr+`" readOnly>
                                                 </div>
                                             </div>
                                         </div>
@@ -2497,7 +2499,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                             <div class="form-group">
                                                 <label for="cmbCentroCusto" class="ml-1">Centro de Custo <span class="text-danger">*</span></label>
                                                 <?php
-                                                    $sql = "SELECT CnCusId, CnCusNome
+                                                    $sql = "SELECT CnCusId, CnCusNome, CnCusNomePersonalizado
                                                             FROM CentroCusto
                                                             JOIN Situacao on SituaId = CnCusStatus
                                                             WHERE SituaChave = 'ATIVO' AND CnCusUnidade = ".$_SESSION['UnidadeId']."
@@ -2517,11 +2519,15 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                                     $seleciona = "selected";
                                                             }
 
-                                                            $selectCencust .= "<option value='".$CentroCusto['CnCusId']."' $seleciona>".$CentroCusto["CnCusNome"]."</option>";
+                                                            $cnCusDescricao = $CentroCusto["CnCusNomePersonalizado"] === NULL ? $CentroCusto["CnCusNome"] : $CentroCusto["CnCusNomePersonalizado"];
+
+                                                            $selectCencust .= "<option value='".$CentroCusto['CnCusId']."' $seleciona>" . $cnCusDescricao . "</option>";
                                                         }
                                                     }else {
                                                         foreach($listCentroCusto as $CentroCusto){
-                                                            $selectCencust .= "<option value='".$CentroCusto['CnCusId']."'>".$CentroCusto["CnCusNome"]."</option>";
+                                                            
+                                                            $cnCusDescricao = $CentroCusto["CnCusNomePersonalizado"] === NULL ? $CentroCusto["CnCusNome"] : $CentroCusto["CnCusNomePersonalizado"];
+                                                            $selectCencust .= "<option value='".$CentroCusto['CnCusId']."'>" . $cnCusDescricao ."</option>";
                                                         }
                                                     }
                                                     

@@ -1213,7 +1213,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                                     <select id="centroCustoRetirada" name="centroCustoRetirada" class="form-control form-control-select2" aria-hidden="true">
                                         <option value="">Selecionar</option>
                                         <?php
-                                        $sql = "SELECT CnCusId, CnCusNome, SituaChave
+                                        $sql = "SELECT CnCusId, CnCusNome, SituaChave, CnCusNomePersonalizado
                                                 FROM CentroCusto
                                                 JOIN Situacao on SituaId = CnCusStatus
                                                 WHERE CnCusUnidade = $_SESSION[UnidadeId] and SituaChave = 'ATIVO'
@@ -1222,7 +1222,8 @@ if(isset($_POST['inputAtendimentoId'])) {
                                         $rowCentroCusto = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                         foreach ($rowCentroCusto as $item) {
-                                            print('<option value="' . $item['CnCusId'] . '">' . $item['CnCusNome'] . '</option>');
+                                            $cnCusDescricao = $item['CnCusNomePersonalizado'] === NULL ? $item['CnCusNome'] : $item['CnCusNomePersonalizado'];
+                                            print('<option value="' . $item['CnCusId'] . '">' . $cnCusDescricao . '</option>');
                                         }
                                         ?>
                                     </select>

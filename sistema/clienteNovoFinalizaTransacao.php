@@ -25,10 +25,10 @@ try {
 
 	$sql = "INSERT INTO Cliente (clienCodigo, ClienNome, ClienNomeSocial,  ClienCpf, ClienRg, ClienOrgaoEmissor, ClienUf, ClienSexo, ClienDtNascimento, ClienNomePai, ClienNomeMae,
 	 				 	ClienRacaCor, ClienEstadoCivil, ClienNaturalidade, ClienProfissao, ClienCartaoSus, ClienCep, ClienEndereco, ClienNumero, ClienComplemento, ClienBairro, ClienCidade, 
-						ClienEstado, ClienContato, ClienTelefone, ClienCelular, ClienEmail, ClienSite, ClienObservacao, ClienStatus, ClienUsuarioAtualizador, ClienUnidade)
+						ClienEstado, ClienContato, ClienTelefone, ClienCelular, ClienEmail, ClienObservacao, ClienStatus, ClienUsuarioAtualizador, ClienUnidade)
 				VALUES (:sCodigo, :sNome, :sNomeSocial, :sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dDtNascimento, :sNomePai, :sNomeMae, :sRacaCor, :sEstadoCivil, :sNaturalidade,
 				        :sProfissao, :sCartaoSus, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, :sCidade, :sEstado, :sContato, :sTelefone, :sCelular, 
-						:sEmail, :sSite, :sObservacao, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+						:sEmail,:sObservacao, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 
 	$result = $conn->prepare($sql);
 
@@ -62,7 +62,6 @@ try {
 		':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
 		':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
 		':sEmail' => $_POST['inputEmail'],
-		':sSite' => $_POST['inputSite'],
 		':sObservacao' => $_POST['txtareaObservacao'],
 		':bStatus' => 1,
 		':iUsuarioAtualizador' => $_SESSION['UsuarId'],

@@ -506,13 +506,6 @@ else {
 														<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" value="<?php echo $row['ClienEmail']; ?>">
 													</div>
 												</div>
-
-												<div class="col-lg-3">
-													<div class="form-group">
-														<label for="inputSite">Site</label>
-														<input type="url" id="inputSite" name="inputSite" class="form-control" placeholder="URL" value="<?php echo $row['ClienSite']; ?>">
-													</div>
-												</div>
 											</div>
 
 											<div class="row">

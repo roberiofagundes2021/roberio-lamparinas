@@ -394,7 +394,7 @@ try{
 									$acoes .="<div class='dropdown-divider'></div>
 									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
 									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
+									<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 									<div class='dropdown-divider'></div>
 									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>";
 								}	
@@ -545,7 +545,7 @@ try{
 									$acoes .="<div class='dropdown-divider'></div>
 									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
 									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
+									<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 									<div class='dropdown-divider'></div>
 									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>";
 								}	
@@ -698,7 +698,7 @@ try{
 									$acoes .="<div class='dropdown-divider'></div>
 									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
 									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
+									<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 									<div class='dropdown-divider'></div>
 									<a href='#' class='dropdown-item ' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>";
 								}	
@@ -922,18 +922,15 @@ try{
 			'telefone' => isset($_POST['telefone'])?$_POST['telefone']:'null',
 			'celular' => isset($_POST['celular'])?$_POST['celular']:'null',
 			'email' => isset($_POST['email'])?$_POST['email']:'null',
-			'estadoCivil' => isset($_POST['estadoCivil'])?$_POST['estadoCivil']:'null',
-			'naturalidade' => isset($_POST['naturalidade'])?$_POST['naturalidade']:'null',
-			'site' => isset($_POST['site'])?$_POST['site']:'null',
 			'observacao' => isset($_POST['observacao'])?$_POST['observacao']:'null'
 		];
 		$sql = "INSERT INTO Cliente(ClienCodigo,ClienNome,ClienNomeSocial,ClienCpf,ClienCartaoSus,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-			ClienSite,ClienNaturalidade,ClienRacaCor,ClienEstadoCivil,
+			ClienNaturalidade,ClienRacaCor,ClienEstadoCivil,
 			ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
 			ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 			ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade)
 			VALUES('$cod','$paciente[nome]','$paciente[nomeSocial]','$paciente[cpf]','$paciente[cns]','$paciente[rg]',
-			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[site]','$paciente[naturalidade]','$paciente[racaCor]',
+			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[naturalidade]','$paciente[racaCor]',
 			'$paciente[estadoCivil]',
 			'$paciente[nascimento]','$paciente[nomePai]','$paciente[nomeMae]',
 			'$paciente[profissao]','$paciente[cep]','$paciente[endereco]','$paciente[numero]','$paciente[complemento]',
@@ -1303,7 +1300,7 @@ try{
 		$sql = "SELECT ClienId,ClienCodigo,ClienNome,ClienNomeSocial,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
 		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienRacaCor,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
-		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
+		ClienCelular,ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente";
 		$result = $conn->query($sql);
 
@@ -1371,8 +1368,16 @@ try{
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'LOCALATENDIMENTO'){
+
+		$iMedico = $_POST['iMedico'];
+		$hoje = date('Y-m-d');
+
 		$sql = "SELECT AtLocId,AtLocNome,AtLocStatus,AtLocUsuarioAtualizador,AtLocUnidade
-		FROM AtendimentoLocal WHERE AtLocUnidade = $iUnidade";
+		FROM AtendimentoLocal
+		JOIN ProfissionalAgenda ON PrAgeAtendimentoLocal = AtLocId
+		WHERE PrAgeProfissional = $iMedico
+		AND PrAgeData >= '$hoje'
+		AND AtLocUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];
@@ -1606,9 +1611,13 @@ try{
 		}
 	} elseif ($tipoRequest == 'SETDATAPROFISSIONAL'){
 		$iMedico = $_POST['iMedico'];
+		$localAtend = $_POST['localAtend'];
+		$hoje = date('Y-m-d');
 
 		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
 		FROM ProfissionalAgenda WHERE PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade
+		AND PrAgeAtendimentoLocal = $localAtend
+		AND PrAgeData >= '$hoje'
 		ORDER BY PrAgeData ASC";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);

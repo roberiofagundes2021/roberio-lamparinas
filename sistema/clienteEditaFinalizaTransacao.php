@@ -12,7 +12,7 @@ try{
                                 ClienRacaCor = :sRacaCor, ClienEstadoCivil = :sEstadoCivil, ClienNaturalidade = :sNaturalidade, ClienProfissao = :sProfissao, ClienCartaoSus = :sCartaoSus,
                                 ClienCep = :sCep, ClienEndereco = :sEndereco, ClienNumero = :sNumero, ClienComplemento = :sComplemento, ClienBairro = :sBairro, 
                                 ClienCidade = :sCidade, ClienEstado = :sEstado, ClienContato = :sContato, ClienTelefone = :sTelefone, ClienCelular = :sCelular,
-                                ClienEmail = :sEmail, ClienSite = :sSite, ClienObservacao = :sObservacao, ClienUsuarioAtualizador = :iUsuarioAtualizador
+                                ClienEmail = :sEmail, ClienObservacao = :sObservacao, ClienUsuarioAtualizador = :iUsuarioAtualizador
             WHERE ClienId = :iCliente";
     $result = $conn->prepare($sql);						
     $_POST['inputTipo']="F";
@@ -44,7 +44,6 @@ try{
                     ':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
                     ':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
                     ':sEmail' => $_POST['inputEmail'],
-                    ':sSite' => $_POST['inputSite'],
                     ':sObservacao' => $_POST['txtareaObservacao'],					
                     ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
                     ':iCliente'	=> $_POST['inputClienteId']

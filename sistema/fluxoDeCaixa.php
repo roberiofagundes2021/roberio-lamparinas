@@ -278,6 +278,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								let terceiraColuna = resposta[2];
 								let quartaColuna = resposta[3];
 
+								var centroCustoDescr = centroCusto.CnCusNomePersonalizado !== null ? centroCusto.CnCusNomePersonalizado : centroCusto.CnCusNome;
+							
 								/*No momento só há Centros de Custos nas despesas, então estão todos em vermelho*/
 								cor = ' style="color: red;"';
 
@@ -287,7 +289,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 								HTML = HTML + `
 										<div class='row' style='background: #f8f8f8; line-height: 3rem; box-sizing:border-box'>
 											<div class='col-lg-3 planoContaFilho' style='padding-left: 40px; border-right: 1px dotted black;'>
-												<span title=''>`+centroCusto.CnCusNome+`</span>
+												<span title=''>`+centroCustoDescr+`</span>
 											</div>
 									
 											<div class='dataOpeningBalance col-lg-2' style='border-right: 1px dotted black; text-align:center;'>
@@ -687,7 +689,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 												<select id="cmbCentroDeCustos" name="cmbCentroDeCustos" class="form-control multiselect-select-all-filtering" multiple="multiple" data-fouc>
 													<?php
 														$sql = "SELECT CnCusId,
-																	CnCusNome
+																	CnCusNome,
+																	CnCusNomePersonalizado
 																FROM CentroCusto
 																JOIN Situacao 
 																	ON SituaId = CnCusStatus
@@ -698,7 +701,8 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 														$rowCentroDeCustos = $result->fetchAll(PDO::FETCH_ASSOC);
 
 														foreach ($rowCentroDeCustos as $item) {
-															print('<option value="' . $item['CnCusId'] . '" class="centroDeCustosClass" selected>' . $item['CnCusNome'] . '</option>');
+                                                            $cnCusDescricao = $item['CnCusNomePersonalizado'] === NULL ? $item['CnCusNome'] : $item['CnCusNomePersonalizado'];
+															print('<option value="' . $item['CnCusId'] . '" class="centroDeCustosClass" selected>' . $cnCusDescricao . '</option>');
 														}
 													?>
 												</select>

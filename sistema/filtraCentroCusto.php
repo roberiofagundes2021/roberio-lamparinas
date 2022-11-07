@@ -17,7 +17,7 @@ for($x=0; $x < COUNT($centros); $x++){
 
 $array .= ')';
 
-$sqlCentroCusto = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusDetalhamento, CnCusStatus, SituaChave
+$sqlCentroCusto = "SELECT CnCusId, CnCusCodigo, CnCusNome, CnCusNomePersonalizado, CnCusDetalhamento, CnCusStatus, SituaChave
                 FROM  CentroCusto JOIN Situacao on SituaId = CnCusStatus
                 WHERE CnCusUnidade = ".$_SESSION['UnidadeId']." and 
                 SituaChave = 'ATIVO' and CnCusId in ".$array."
