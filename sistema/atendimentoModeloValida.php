@@ -7,11 +7,11 @@ include('global_assets/php/conexao.php');
 if (isset($_POST['nomeVelho'])){
 	$sql = "SELECT AtModId
 			 FROM AtendimentoModelo
-			 WHERE AtModUnidade = ".$_SESSION['UnidadeId']." and AtModDescricao = '". $_POST['nomeNovo']."' and AtModDescricao <> '". $_POST['nomeVelho']."'";
+			 WHERE AtModUnidade = ".$_SESSION['UnidadeId']." and AtModDescricao = '".$_POST['nomeNovo']."' and AtModDescricao <> '".$_POST['nomeVelho']."' and AtModTipoModelo = '". $_POST['cmbModelo']."'";
 } else{
 	$sql = "SELECT AtModId
-			 FROM AtendimentoModelo
-			 WHERE AtModUnidade = ".$_SESSION['UnidadeId']." and AtModDescricao = '". $_POST['nomeNovo']."'";
+	FROM AtendimentoModelo
+	WHERE AtModUnidade = ".$_SESSION['UnidadeId']." and AtModDescricao = '".$_POST['nomeNovo']."' and AtModTipoModelo = '". $_POST['cmbModelo']."'";
 }
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
