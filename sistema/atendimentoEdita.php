@@ -459,11 +459,15 @@ if ($tipo == 'ATENDIMENTO') {
 						setDataProfissional()
 						setHoraProfissional()
 						$('#medicos').empty();
+						$('#localAtendimento').empty();
 						$('#medicos').append(`<option value=''>selecione</option>`)
+						$('#localAtendimento').append(`<option value=''>Selecione</option>`)			
+
 						response.forEach(item => {
 							let opt = `<option value="${item.id}">${item.nome}</option>`
 							$('#medicos').append(opt)
 						})
+						$('#medicos').focus()
 					}
 				});
 			})
@@ -485,8 +489,41 @@ if ($tipo == 'ATENDIMENTO') {
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
 					data: {
+						'tipoRequest' : 'LOCALATENDIMENTO',
+						'iMedico' : iMedico
+					},
+					success: function(response) {
+
+						$('#localAtendimento').empty();
+						if (response.length !== 0 ) {
+							$('#localAtendimento').append(`<option value=''>Selecione</option>`);			
+							response.forEach(item => {
+								let opt = `<option value="${item.id}">${item.nome}</option>`
+								$('#localAtendimento').append(opt)
+							})
+
+							$('#localAtendimento').focus()
+						}else{
+							alerta('Sem Locais Disponíveis', 'Não existe agenda disponível para esse serviço nos próximos dias para o profissional selecionado.','error')
+							$('#localAtendimento').append(`<option value=''>Sem Locais Disponíveis</option>`)	
+						}
+					}
+				})
+			});
+
+			$('#localAtendimento').on('change', function() {
+
+				let localAtend = $(this).val();
+				let iMedico = $('#medicos').val();
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data: {
 						'tipoRequest': 'SETDATAPROFISSIONAL',
 						'iMedico': iMedico,
+						'localAtend' : localAtend
 					},
 					success: function(response) {
 						if (response.status == 'success') {
@@ -849,23 +886,7 @@ if ($tipo == 'ATENDIMENTO') {
 					})
 				}
 			});
-			// vai preencher cmbLocalAtendimento
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data: {
-					'tipoRequest': 'LOCALATENDIMENTO'
-				},
-				success: function(response) {
-					$('#localAtendimento').empty();
-					$('#localAtendimento').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
-						$('#localAtendimento').append(opt)
-					})
-				}
-			});
+
 			// incluir responsáveis cadastrados
 			$.ajax({
 				type: 'POST',
@@ -1525,16 +1546,16 @@ if ($tipo == 'ATENDIMENTO') {
 											<div class="col-lg-2">
 												<label>Médicos</label>
 											</div>
+											<div class="col-lg-2">
+												<label>Local do Atendimento</label>
+											</div>
 											<div class="col-lg-3">
 												<label>Data do Atendimento</label>
 											</div>
 											<div class="col-lg-2">
 												<label>Horário</label>
 											</div>
-											<div class="col-lg-2">
-												<label>Local do Atendimento</label>
-											</div>
-
+											
 											<!-- campos -->
 											<div class="col-lg-2">
 												<select id="servico" name="servico" class="select-search">
@@ -1546,17 +1567,17 @@ if ($tipo == 'ATENDIMENTO') {
 													<option value="" selected>selecione</option>
 												</select>
 											</div>
+											<div class="col-lg-2">
+												<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2">
+													<option value="" selected>Selecione</option>
+												</select>
+											</div>
 											<div id="dataAgenda" class="col-lg-3 input-group">
 												<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">
 											</div>
 											<div id="modalHora" class="col-lg-2">
 												<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
-											</div>
-											<div class="col-lg-2">
-												<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2">
-													<option value="" selected>selecionar</option>
-												</select>
-											</div>
+											</div>											
 											<!-- btnAddServico -->
 											<div class="col-lg-1 text-right">
 												<button id="incluirServico" class="btn btn-lg btn-principal" data-tipo="INCLUIRSERVICO">

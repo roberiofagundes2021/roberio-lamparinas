@@ -127,8 +127,42 @@ $dataHoje = date("Y-m-d");
 					url: 'filtraAgendamento.php',
 					dataType: 'json',
 					data:{
+						'tipoRequest': 'LOCALATENDIMENTO',
+						'iMedico' : iMedico
+					},
+					success: function(response) {
+
+						$('#localAtendimento').empty();
+						if (response.length !== 0 ) {
+							$('#localAtendimento').append(`<option value=''>Selecione</option>`);			
+							response.forEach(item => {
+								let opt = `<option value="${item.id}">${item.nome}</option>`
+								$('#localAtendimento').append(opt)
+							})
+
+							$('#localAtendimento').focus()
+						}else{
+							alerta('Sem Locais Disponíveis', 'Não existe agenda disponível para esse serviço nos próximos dias para o profissional selecionado.','error')
+							$('#localAtendimento').append(`<option value=''>Sem Locais Disponíveis</option>`)	
+						}
+						
+					}
+				});
+			});
+
+			$('#localAtendimento').on('change', function() {
+
+				let localAtend = $(this).val();
+				let iMedico = $('#medico').val();
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAgendamento.php',
+					dataType: 'json',
+					data:{
 						'tipoRequest': 'SETDATAPROFISSIONAL',
-						'iMedico': iMedico,
+						'iMedico' : iMedico,
+						'localAtend': localAtend,
 					},
 					success: function(response) {
 						if(response.status == 'success'){
@@ -139,7 +173,7 @@ $dataHoje = date("Y-m-d");
 						}
 					}
 				});
-			})
+			});
 
 			$('#servico').on('change', function(e){
 				$.ajax({
@@ -154,11 +188,15 @@ $dataHoje = date("Y-m-d");
 						setDataProfissional()
 						setHoraProfissional()
 						$('#medico').empty();
+						$('#localAtendimento').empty();
 						$('#medico').append(`<option value=''>Selecione</option>`)
+						$('#localAtendimento').append(`<option value=''>Selecione</option>`)			
+
 						response.forEach(item => {
 							let opt = `<option value="${item.id}">${item.nome}</option>`
 							$('#medico').append(opt)
 						})
+						$('#medico').focus()
 					}
 				});
 			})
@@ -543,23 +581,6 @@ $dataHoje = date("Y-m-d");
 					})
 				}
 			});
-			// vai preencher cmbLocalAtendimento
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAgendamento.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'LOCALATENDIMENTO'
-				},
-				success: function(response) {
-					$('#localAtendimento').empty();
-					$('#localAtendimento').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
-						$('#localAtendimento').append(opt)
-					})
-				}
-			});
 		}
 
 		function resetServicoCmb(){
@@ -703,15 +724,15 @@ $dataHoje = date("Y-m-d");
 									<div class="col-lg-2">
 										<label>Médicos <span class="text-danger">*</span></label>
 									</div>
+									<div class="col-lg-2">
+										<label>Local do Atendimento <span class="text-danger">*</span></label>
+									</div>
 									<div class="col-lg-3">
 										<label>Data do Atendimento <span class="text-danger">*</span></label>
 									</div>
 									<div class="col-lg-2">
 										<label>Horário <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-2">
-										<label>Local do Atendimento <span class="text-danger">*</span></label>
-									</div>
+									</div>					
 
 									<!-- campos -->
 									<div class="col-lg-2">
@@ -724,17 +745,17 @@ $dataHoje = date("Y-m-d");
 											<option value=''>Selecione</option>
 										</select>
 									</div>
+									<div class="col-lg-2">
+										<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2" required>
+											<option value=''>Selecione</option>
+										</select>
+									</div>
 									<div id="dataAgenda" class="col-lg-3 input-group">
 										<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">
 									</div>
 									<div id="modalHora" class="col-lg-2">										
 										<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
-									</div>
-									<div class="col-lg-2">
-										<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2" required>
-											<!--  -->
-										</select>
-									</div>
+									</div>	
 									<div class="col-lg-1" style="margin-top: -5px;">
 										<a class="btn btn-lg btn-principal" id="inserirServico">Incluir</a>
 									</div>

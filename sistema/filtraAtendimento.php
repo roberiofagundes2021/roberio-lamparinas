@@ -1372,8 +1372,16 @@ try{
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'LOCALATENDIMENTO'){
+
+		$iMedico = $_POST['iMedico'];
+		$hoje = date('Y-m-d');
+
 		$sql = "SELECT AtLocId,AtLocNome,AtLocStatus,AtLocUsuarioAtualizador,AtLocUnidade
-		FROM AtendimentoLocal WHERE AtLocUnidade = $iUnidade";
+		FROM AtendimentoLocal
+		JOIN ProfissionalAgenda ON PrAgeAtendimentoLocal = AtLocId
+		WHERE PrAgeProfissional = $iMedico
+		AND PrAgeData >= '$hoje'
+		AND AtLocUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
 		$array = [];
@@ -1607,9 +1615,13 @@ try{
 		}
 	} elseif ($tipoRequest == 'SETDATAPROFISSIONAL'){
 		$iMedico = $_POST['iMedico'];
+		$localAtend = $_POST['localAtend'];
+		$hoje = date('Y-m-d');
 
 		$sql = "SELECT PrAgeData, PrAgeHoraInicio, PrAgeHoraFim
 		FROM ProfissionalAgenda WHERE PrAgeProfissional = $iMedico and PrAgeUnidade = $iUnidade
+		AND PrAgeAtendimentoLocal = $localAtend
+		AND PrAgeData >= '$hoje'
 		ORDER BY PrAgeData ASC";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
