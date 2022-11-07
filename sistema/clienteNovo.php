@@ -461,7 +461,7 @@ include('global_assets/php/conexao.php');
 									<h5 class="mb-0 font-weight-semibold">Contato</h5>
 									<br>
 									<div class="row">
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputNomeContato">Nome</label>
 												<input type="text" id="inputNomeContato" name="inputNomeContato" class="form-control" placeholder="Contato">
@@ -482,17 +482,10 @@ include('global_assets/php/conexao.php');
 											</div>
 										</div>
 
-										<div class="col-lg-2">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputEmail">E-mail</label>
 												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail">
-											</div>
-										</div>
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputSite">Site</label>
-												<input type="url" id="inputSite" name="inputSite" class="form-control" placeholder="URL">
 											</div>
 										</div>
 									</div>

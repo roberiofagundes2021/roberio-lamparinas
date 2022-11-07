@@ -559,7 +559,6 @@ if ($tipo == 'ATENDIMENTO') {
 						'telefone': $('#telefoneNew').val(),
 						'celular': $('#celularNew').val(),
 						'email': $('#emailNew').val(),
-						'site': $('#siteNew').val(),
 						'observacao': $('#observacaoNew').val()
 					},
 					success: async function(response) {
@@ -2379,11 +2378,8 @@ if ($tipo == 'ATENDIMENTO') {
 										<div class="col-lg-2">
 											<label>Celular</label>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-4">
 											<label>E-mail</label>
-										</div>
-										<div class="col-lg-2">
-											<label>Site</label>
 										</div>
 
 										<!-- campos -->
@@ -2396,11 +2392,8 @@ if ($tipo == 'ATENDIMENTO') {
 										<div class="col-lg-2">
 											<input id="celularNew" name="celularNew" type="text" class="form-control" placeholder="Celular">
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-4">
 											<input id="emailNew" name="emailNew" type="text" class="form-control" placeholder="E-mail">
-										</div>
-										<div class="col-lg-2">
-											<input id="siteNew" name="siteNew" type="text" class="form-control" placeholder="Site">
 										</div>
 									</div>
 
