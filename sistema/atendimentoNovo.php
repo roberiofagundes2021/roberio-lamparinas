@@ -166,7 +166,6 @@ $_SESSION['atendimento'] = [
 						'telefone': $('#telefone').val(),
 						'celular': $('#celular').val(),
 						'email': $('#email').val(),
-						'site': $('#site').val(),
 						'observacao': $('#observacao').val()
 					} : null
 
@@ -590,7 +589,6 @@ $_SESSION['atendimento'] = [
 						'telefone': $('#telefoneNew').val(),
 						'celular': $('#celularNew').val(),
 						'email': $('#emailNew').val(),
-						'site': $('#siteNew').val(),
 						'observacao': $('#observacaoNew').val()
 					},
 					success: async function(response) {
@@ -963,7 +961,6 @@ $_SESSION['atendimento'] = [
 							$('#telefone').val(response.telefone)
 							$('#celular').val(response.celular)
 							$('#email').val(response.email)
-							$('#site').val(response.site)
 							$('#observacao').val(response.observacao)
 
 							$('#uf').val(response.uf)
@@ -1034,7 +1031,6 @@ $_SESSION['atendimento'] = [
 				$('#telefone').val('')
 				$('#celular').val('')
 				$('#email').val('')
-				$('#site').val('')
 				$('#observacao').val('')
 				$('#novoPaciente').hide()
 				$('#informacoes').hide()
@@ -2361,11 +2357,8 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-2">
 											<label>Celular</label>
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-4">
 											<label>E-mail</label>
-										</div>
-										<div class="col-lg-2">
-											<label>Site</label>
 										</div>
 
 										<!-- campos -->
@@ -2378,11 +2371,8 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-2">
 											<input id="celularNew" name="celularNew" type="text" class="form-control" placeholder="Celular">
 										</div>
-										<div class="col-lg-2">
+										<div class="col-lg-4">
 											<input id="emailNew" name="emailNew" type="text" class="form-control" placeholder="E-mail">
-										</div>
-										<div class="col-lg-2">
-											<input id="siteNew" name="siteNew" type="text" class="form-control" placeholder="Site">
 										</div>
 									</div>
 

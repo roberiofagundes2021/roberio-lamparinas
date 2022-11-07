@@ -923,18 +923,15 @@ try{
 			'telefone' => isset($_POST['telefone'])?$_POST['telefone']:'null',
 			'celular' => isset($_POST['celular'])?$_POST['celular']:'null',
 			'email' => isset($_POST['email'])?$_POST['email']:'null',
-			'estadoCivil' => isset($_POST['estadoCivil'])?$_POST['estadoCivil']:'null',
-			'naturalidade' => isset($_POST['naturalidade'])?$_POST['naturalidade']:'null',
-			'site' => isset($_POST['site'])?$_POST['site']:'null',
 			'observacao' => isset($_POST['observacao'])?$_POST['observacao']:'null'
 		];
 		$sql = "INSERT INTO Cliente(ClienCodigo,ClienNome,ClienNomeSocial,ClienCpf,ClienCartaoSus,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
-			ClienSite,ClienNaturalidade,ClienRacaCor,ClienEstadoCivil,
+			ClienNaturalidade,ClienRacaCor,ClienEstadoCivil,
 			ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienProfissao,ClienCep,ClienEndereco,
 			ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,ClienCelular,
 			ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade)
 			VALUES('$cod','$paciente[nome]','$paciente[nomeSocial]','$paciente[cpf]','$paciente[cns]','$paciente[rg]',
-			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[site]','$paciente[naturalidade]','$paciente[racaCor]',
+			'$paciente[emissor]','$paciente[uf]','$paciente[sexo]','$paciente[naturalidade]','$paciente[racaCor]',
 			'$paciente[estadoCivil]',
 			'$paciente[nascimento]','$paciente[nomePai]','$paciente[nomeMae]',
 			'$paciente[profissao]','$paciente[cep]','$paciente[endereco]','$paciente[numero]','$paciente[complemento]',
@@ -1304,7 +1301,7 @@ try{
 		$sql = "SELECT ClienId,ClienCodigo,ClienNome,ClienNomeSocial,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
 		ClienDtNascimento,ClienNomePai,ClienNomeMae,ClienRacaCor,ClienEstadoCivil,ClienNaturalidade,ClienProfissao,ClienCep,ClienEndereco,
 		ClienNumero,ClienComplemento,ClienBairro,ClienCidade,ClienEstado,ClienContato,ClienTelefone,
-		ClienCelular,ClienEmail,ClienSite,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
+		ClienCelular,ClienEmail,ClienObservacao,ClienStatus,ClienUsuarioAtualizador,ClienUnidade
 		FROM Cliente";
 		$result = $conn->query($sql);
 
