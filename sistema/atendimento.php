@@ -86,49 +86,39 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Prontuario
-					width: "5%",
-					targets: [2]
-				},
-				{ 
 					orderable: true,   //Paciente
 					width: "15%",
-					targets: [3]
+					targets: [2]
 				},
 				{ 
 					orderable: true,   //idade
 					width: "10%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Profissional
 					width: "15%",
-					targets: [5]
-				},
-				{ 
-					orderable: true,   //cbo
-					width: "10%",
-					targets: [6]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //modalidade
 					width: "5%",
-					targets: [7]
+					targets: [5]
 				},
 				{ 
 					orderable: true,   // Procedimento
 					width: "5%",
-					targets: [8]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   // Situacao
 					width: "5%",
-					targets: [9]
+					targets: [7]
 				},
 				{ 
 					orderable: true,   // acoes
 					width: "5%",
-					targets: [10]
+					targets: [8]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -162,51 +152,41 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					orderable: true,   // Nº Registro
 					width: "5%",
 					targets: [2]
-				},				
-				{ 
-					orderable: true,   // Prontuario
-					width: "5%",
-					targets: [3]
 				},
 				{ 
 					orderable: true,   // Paciente
 					width: "10%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   // Idade
 					width: "10%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Profissional
 					width: "10%",
-					targets: [6]
-				},
-				{ 
-					orderable: true,   // Cbo
-					width: "10%",
-					targets: [7]
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Modalidade
 					width: "5%",
-					targets: [8]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Procedimento
 					width: "5%",
-					targets: [9]
+					targets: [7]
 				},
 				{ 
 					orderable: true,   // Situação
 					width: "5%",
-					targets: [10]
+					targets: [8]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [10]
+					targets: [9]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -571,19 +551,20 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							$(rowNodeAgendamento).attr('class', 'text-left')
 
 							// esse trecho serve para o link no nome do paciente
-							$(rowNodeAgendamento).find('td:eq(3)').addClass('text-primary')
-							$(rowNodeAgendamento).find('td:eq(3)').attr('style', 'cursor: pointer;')
-							$(rowNodeAgendamento).find('td:eq(3)').attr('title', 'Transformar o agendamento em atendimento')
-							$(rowNodeAgendamento).find('td:eq(3)').attr('data-id', `${item.identify.id}`)
-							$(rowNodeAgendamento).find('td:eq(3)').attr('data-tipo', 'AGENDAMENTO')
-							$(rowNodeAgendamento).find('td:eq(3)').attr('onclick', 'newAtendimento(this)')
+							$(rowNodeAgendamento).find('td:eq(2)').addClass('text-primary')
+							$(rowNodeAgendamento).find('td:eq(2)').attr('style', 'cursor: pointer;')
+							$(rowNodeAgendamento).find('td:eq(2)').attr('title', `Transformar o agendamento em atendimento \n ${item.identify.prontuario}`)
+							$(rowNodeAgendamento).find('td:eq(2)').attr('data-id', `${item.identify.id}`)
+							$(rowNodeAgendamento).find('td:eq(2)').attr('data-tipo', 'AGENDAMENTO')
+							$(rowNodeAgendamento).find('td:eq(2)').attr('onclick', 'newAtendimento(this)')
 							// <end>
+							$(rowNodeAgendamento).find('td:eq(4)').attr('title', `Transformar o agendamento em atendimento \n ${item.identify.cbo}`)
 
 							// esse trecho serve para o atributos no campo situação de cada linha
-							$(rowNodeAgendamento).find('td:eq(9)').attr('data-id', `${item.identify.id}`)
-							$(rowNodeAgendamento).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
-							$(rowNodeAgendamento).find('td:eq(9)').attr('data-tipo', 'AGENDAMENTO')
-							$(rowNodeAgendamento).find('td:eq(9)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+							$(rowNodeAgendamento).find('td:eq(7)').attr('data-id', `${item.identify.id}`)
+							$(rowNodeAgendamento).find('td:eq(7)').attr('data-observacao', `${item.identify.sJustificativa}`)
+							$(rowNodeAgendamento).find('td:eq(7)').attr('data-tipo', 'AGENDAMENTO')
+							$(rowNodeAgendamento).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 							// <end>
 						})
 
@@ -595,15 +576,18 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						await response.dataAtendimento.forEach(item => {
 							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
 
+							$(rowNodeAtendimento).find('td:eq(3)').attr('title', item.identify.prontuario)
+							$(rowNodeAtendimento).find('td:eq(5)').attr('title', item.identify.cbo)
+
 							// esse trecho serve para o atributos no campo situação de cada linha
 							$(rowNodeAtendimento).attr('class', 'text-left')
-							$(rowNodeAtendimento).find('td:eq(10)').attr('data-id', `${item.identify.iAtendimento}`)
-							$(rowNodeAtendimento).find('td:eq(10)').attr('data-observacao', `${item.identify.sJustificativa}`)
-							$(rowNodeAtendimento).find('td:eq(10)').attr('data-tipo', 'ATENDIMENTO')
+							$(rowNodeAtendimento).find('td:eq(8)').attr('data-id', `${item.identify.iAtendimento}`)
+							$(rowNodeAtendimento).find('td:eq(8)').attr('data-observacao', `${item.identify.sJustificativa}`)
+							$(rowNodeAtendimento).find('td:eq(8)').attr('data-tipo', 'ATENDIMENTO')
 
 							// essa opção de alterar situação só vai estar disponível caso o status seja "Em espera" ou "Liberado"
 							if(item.identify.situacao == "EMESPERAVENDA" || item.identify.situacao == "LIBERADOVENDA"){
-								$(rowNodeAtendimento).find('td:eq(10)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+								$(rowNodeAtendimento).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 							}
 							// <end>
 						})
@@ -738,11 +722,9 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 											<tr class="bg-slate text-left">
 												<th>Data / Hora</th>
 												<th>Espera</th>
-												<th>Prontuário</th>			
 												<th>Paciente</th>
 												<th>Idade</th>
 												<th>Profissional</th>
-												<th>CBO</th>
 												<th>Modalidade</th>
 												<th>Procedimento</th>
 												<th>Situação</th>
@@ -765,11 +747,9 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 												<th>Data / Hora</th>
 												<th>Espera</th>
 												<th>Nº Registro</th>
-												<th>Prontuário</th>			
 												<th>Paciente</th>
 												<th>Idade</th>
 												<th>Profissional</th>
-												<th>CBO</th>
 												<th>Modalidade</th>
 												<th>Procedimento</th>
 												<th>Situação</th>
