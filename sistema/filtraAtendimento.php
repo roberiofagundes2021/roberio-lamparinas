@@ -62,7 +62,7 @@ try{
 			$sql = "SELECT AtendId,AtendNumRegistro,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtendClassificacao,
 				AtendObservacao,AtendJustificativa,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto, ClienDtNascimento,
 				ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,Profissional.ProfiNome as ProfissionalNome,SrVenNome, 
-				Profissao.ProfiNome as ProfissaoNome, ProfiCbo
+				Profissao.ProfiNome as ProfissaoNome, ProfiCbo,AtClRNome,AtClRNomePersonalizado,AtClRTempo,AtClRCor,AtClRDeterminantes
 				FROM AtendimentoXServico
 				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -72,6 +72,7 @@ try{
 				LEFT JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
 				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 				LEFT JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
+				LEFT JOIN AtendimentoClassificacaoRisco ON AtendClassificacaoRisco = AtClRId
 				WHERE AtendUnidade = $iUnidade";
 			$result = $conn->query($sql);
 			$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -175,6 +176,10 @@ try{
 						'sJustificativa' => $item['AtendJustificativa'],
 						'prontuario' => 'Prontuário - '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
 						'cbo' => 'CBO - '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
+						'class' => $item['AtClRNomePersonalizado']?'Classificação - '.$item['AtClRNomePersonalizado']:($item['AtClRNome']?'Classificação - '.$item['AtClRNome']:'Sem Classificação!'),
+						'classTemp' => ($item['AtClRTempo']?$item['AtClRTempo']:''),
+						'classCor' => ($item['AtClRCor']?$item['AtClRCor']:'#FFF'),
+						'classDeterminante' => ($item['AtClRDeterminantes']?$item['AtClRDeterminantes']:'')
 					]
 				]);
 			}

@@ -576,6 +576,13 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 						await response.dataAtendimento.forEach(item => {
 							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
 
+							// $(rowNodeAtendimento).attr('style',`border-left: 3px solid ${item.identify.classCor};`)
+
+							if(item.identify.class){
+								$(rowNodeAtendimento).find('td:eq(0)').attr('style',`border-left: 5px solid ${item.identify.classCor};`)
+								$(rowNodeAtendimento).find('td:eq(0)').attr('title',`${item.identify.class}\n${item.identify.classDeterminante}`)
+							}
+
 							$(rowNodeAtendimento).find('td:eq(3)').attr('title', item.identify.prontuario)
 							$(rowNodeAtendimento).find('td:eq(5)').attr('title', item.identify.cbo)
 
@@ -742,7 +749,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 									<div class="card-body" style="padding: 0px"></div>
 									<table class="table" id="AtendimentoTable">
-										<thead>
+										<thead style="border-left: 5px solid #466d96">
 											<tr class="bg-slate text-left">
 												<th>Data / Hora</th>
 												<th>Espera</th>
