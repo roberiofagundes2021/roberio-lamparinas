@@ -176,7 +176,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
-				
+
+				var cmbModelo = $('#cmbModelo').val();
 				var inputNomeNovo = $('#inputDescricao').val();
 				var inputNomeVelho = $('#inputTipoDescricao').val();
 				var inputEstadoAtual = $('#inputEstadoAtual').val();
@@ -194,7 +195,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					$.ajax({
 						type: "POST",
 						url: "atendimentoModeloValida.php",
-						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&estadoAtual='+inputEstadoAtual),
+						data: ('nomeNovo='+inputNome+'&nomeVelho='+inputNomeVelho+'&cmbModelo='+cmbModelo+'&estadoAtual='+inputEstadoAtual),
 						success: function(resposta){
 
 							if(resposta == 1){
