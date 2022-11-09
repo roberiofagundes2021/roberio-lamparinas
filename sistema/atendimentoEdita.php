@@ -21,18 +21,20 @@ $tipo = $_POST['AtendimentoAgendamento'];
 $iUnidade = $_SESSION['UnidadeId'];
 
 if ($tipo == 'ATENDIMENTO') {
-	$sql = "SELECT AtendId as AgAtId,AtendNumRegistro as AgAtNumRegistro,AtendDataRegistro as AgAtdataRegistro,
-	AtendCliente as AgAtCliente,AtendModalidade as AgAtModalidade,AtendResponsavel as AgAtResponsavel,
-	AtendClassificacao as AgAtClassificacao,AtendObservacao as AgAtObservacao,
-	SituaNome,SituaChave
-	FROM Atendimento
-	JOIN Situacao ON SituaId = AtendSituacao
-	WHERE AtendId = $iAtendimento and AtendUnidade = $iUnidade";
+	$sql = "SELECT AtendId as AgAtId,AtendNumRegistro as AgAtNumRegistro,AtendClassificacaoRisco as classRisco,
+		AtendDataRegistro as AgAtdataRegistro,
+		AtendCliente as AgAtCliente,AtendModalidade as AgAtModalidade,AtendResponsavel as AgAtResponsavel,
+		AtendClassificacao as AgAtClassificacao,AtendObservacao as AgAtObservacao,
+		SituaNome,SituaChave
+		FROM Atendimento
+		JOIN Situacao ON SituaId = AtendSituacao
+		WHERE AtendId = $iAtendimento and AtendUnidade = $iUnidade";
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 } else {
-	$sql = "SELECT AgendId as AgAtId,'----' as AgAtNumRegistro,AgendDataRegistro as AgAtdataRegistro,AgendCliente as AgAtCliente,
-		AgendModalidade as AgAtModalidade,AgendClienteResponsavel as AgAtResponsavel,'----' as AgAtClassificacao,
+	$sql = "SELECT AgendId as AgAtId,'' as AgAtNumRegistro,'' as classRisco,
+		AgendDataRegistro as AgAtdataRegistro,AgendCliente as AgAtCliente,
+		AgendModalidade as AgAtModalidade,AgendClienteResponsavel as AgAtResponsavel,'' as AgAtClassificacao,
 		AgendObservacao as AgAtObservacao,SituaNome,SituaChave
 		FROM Agendamento
 		JOIN Situacao ON SituaId = AgendSituacao
@@ -159,6 +161,10 @@ if ($tipo == 'ATENDIMENTO') {
 							menssageError = 'informe a classificação';
 							$('#classificacao').focus();
 							break;
+						case $('#classificacaoRisco').val():
+							menssageError = 'informe a classificação de risco';
+							$('#classificacaoRisco').focus();
+							break;
 						default:
 							menssageError = '';
 							break;
@@ -227,6 +233,9 @@ if ($tipo == 'ATENDIMENTO') {
 							'cliente': paciente,
 							'responsavel': responsavel,
 							'dataRegistro': $('#dataRegistro').val(),
+							'classificacaoRisco': $('#classificacaoRisco').val(),
+							'grupo': $('#grupo').val(),
+							'subgrupo': $('#subgrupo').val(),
 							'modalidade': $('#modalidade').val(),
 							'classificacao': $('#classificacao').val(),
 							'observacao': $('#observacaoAtendimento').val(),
@@ -376,9 +385,8 @@ if ($tipo == 'ATENDIMENTO') {
 						menssageError = 'informe o médico';
 						$('#medicos').focus();
 						break;
-					case dataAtendimento:
-						menssageError = 'informe uma data';
-						$('#dataAtendimento').focus();
+					case $('#dataAtendimento').val():
+						menssageError = 'Sem data disponível para o serviço!!';
 						break;
 					case horaAtendimento:
 						menssageError = 'informe o horário';
@@ -459,7 +467,7 @@ if ($tipo == 'ATENDIMENTO') {
 						'servico': $(this).val()
 					},
 					success: function(response) {
-						setDataProfissional()
+						$('#dataAtendimento').val('');
 						setHoraProfissional()
 						$('#medicos').empty();
 						$('#localAtendimento').empty();
@@ -483,7 +491,7 @@ if ($tipo == 'ATENDIMENTO') {
 				let iMedico = $(this).val()
 
 				if (!iMedico) {
-					setHoraProfissional()
+					$('#dataAtendimento').val('');
 					setDataProfissional()
 					return
 				}
@@ -528,11 +536,38 @@ if ($tipo == 'ATENDIMENTO') {
 						'iMedico': iMedico,
 						'localAtend' : localAtend
 					},
-					success: function(response) {
+					success: async function(response) {
 						if (response.status == 'success') {
-							setDataProfissional(response.arrayData)
-							$('#dataAtendimento').focus()
+							let dataHoje = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
+							dataHoje = dataHoje.split(' ')[0]
 
+							await response.arrayData.forEach(item => {
+								$('#dataAtendimento').val(item == dataHoje?item:$('#dataAtendimento').val())
+							})
+
+							// caso exista algo no campo de data...
+							if($('#dataAtendimento').val()){
+								$.ajax({
+									type: 'POST',
+									url: 'filtraAtendimento.php',
+									dataType: 'json',
+									data: {
+										'tipoRequest': 'SETHORAPROFISSIONAL',
+										'data': $('#dataAtendimento').val(),
+										'iMedico': iMedico
+									},
+									success: function(response) {
+										if (response.status == 'success') {
+											setHoraProfissional(response.arrayHora, response.intervalo)
+											$('#horaAtendimento').focus()
+										} else {
+											alerta(response.titulo, response.menssagem, response.status)
+										}
+									}
+								});
+							}else{
+								alerta('Data do atendimento', 'A data atual não é válida para atendimento do profissional selecionado', 'error')
+							}
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 						}
@@ -686,6 +721,12 @@ if ($tipo == 'ATENDIMENTO') {
 				$('#iAtendimento').val('')
 				$('#page-modal-responsavel').fadeOut(200)
 			})
+			$('#modalDesconto-close-x').on('click', () => {
+				$('#itemDescontoId').val('')
+				$('#itemDescontoValue').val('')
+				$('#inputDesconto').val('')
+				$('#pageModalDescontos').fadeOut(200)
+			})
 
 			$('#cpf').blur(function(element){
 				if(!validaCPF($(this).val())){
@@ -821,10 +862,93 @@ if ($tipo == 'ATENDIMENTO') {
 				e.preventDefault()
 			})
 
+			$('#inputDesconto').on('input', function(item){
+				let valor = $('#itemDescontoValue').val()
+				let desconto = $(this).val()
+				let valorF = 0
+
+				valorF = valor - desconto
+
+				$('#inputModalValorF').val('R$'+float2moeda(valorF))
+
+				$('#pageModalDescontos').fadeIn(200);
+			})
+
+			$('#setDesconto').on('click', function(item){
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'SETDESCONTO',
+						'iServico':$('#itemDescontoId').val(),
+						'desconto':$('#inputDesconto').val(),
+					},
+					success: function(response) {
+						$('#pageModalDescontos').fadeOut(200)
+						checkServicos()
+						alerta(response.titulo,response.menssagem,response.status)
+					}
+				});
+			})
+
 			resetServicoCmb()
 		});
 
 		function getCmbs(obj) {
+			// vai preencher cmbGrupo
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'GRUPO'
+				},
+				success: function(response) {
+					$('#grupo').empty();
+					$('#grupo').append(`<option value=''>selecione</option>`)
+					response.forEach(item => {
+						$('#grupo').append(`<option value="${item.id}">${item.nome}</option>`)
+					})
+				}
+			});
+			// vai preencher cmbSubGrupo
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'SUBGRUPO'
+				},
+				success: function(response) {
+					$('#subgrupo').empty();
+					$('#subgrupo').append(`<option value=''>selecione</option>`)
+
+					response.forEach(item => {
+						$('#subgrupo').append(`<option value="${item.id}">${item.nome}</option>`)
+					})
+				}
+			});
+			// vai preencher cmbClassificacaoRisco
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'CLASSIFICACAORISCOS'
+				},
+				success: function(response) {
+					$('#classificacaoRisco').empty();
+					$('#classificacaoRisco').append(`<option value=''>selecione</option>`)
+
+					let id = obj?obj.classRisco:atendimento.classRisco
+					response.forEach(item => {
+						let opt = item.id == id?`<option selected title="${item.determinante}" value="${item.id}">${item.nome}</option>`
+						:`<option title="${item.determinante}" value="${item.id}">${item.nome}</option>`
+						$('#classificacaoRisco').append(opt)
+					})
+				}
+			});
 			// vai preencher cmbPaciente
 			$.ajax({
 				type: 'POST',
@@ -1159,10 +1283,15 @@ if ($tipo == 'ATENDIMENTO') {
 						let HTML = ''
 						response.array.forEach(item => {
 							if(item.status != 'rem'){
+								let popup = `<i style='color:${(item.desconto && item.desconto>0?'#50b900':'#000')}; cursor:pointer'
+								data-id="${item.id}" data-desconto="${item.desconto}" data-valor="${item.valor}"
+								data-titulo="${item.servico}"
+								class='icon-cash descontoModal' title='Descontos'></i>`
 								let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
 								let acoes = `<div class='list-icons'>
-											${exc}
-										</div>`;
+												${popup}			
+												${exc}
+											</div>`;
 								HTML += `
 								<tr class='servicoItem'>
 									<td class="text-center">${item.servico}</td>
@@ -1175,9 +1304,31 @@ if ($tipo == 'ATENDIMENTO') {
 								</tr>`
 							}
 						})
-						$('#servicoValorTotal').html(`${float2moeda(response.valorTotal)}`).show();
-						$('#dataServico').html(HTML).show();
+						$('#servicoValorTotal').html(`R$${float2moeda(response.valorTotal)}`)
+						$('#servicoValorDescontoTotal').html(`R$${float2moeda(response.valorTotalDesconto)}`)
+						$('#dataServico').html(HTML);
 						$('#servicoTable').show();
+
+						$('.descontoModal').each(function(index, element){
+							$(element).on('click', function(item){
+								let id = $(this).data('id')
+								let valor = $(this).data('valor')
+								let desconto = $(this).data('desconto')
+								let valorF = 0
+
+								$('#inputDesconto').val(desconto)
+								$('#itemDescontoId').val(id)
+								$('#itemDescontoValue').val(valor)
+
+								$('#inputModalValorB').val('R$'+float2moeda(valor))
+
+								valorF = valor - desconto
+
+								$('#inputModalValorF').val('R$'+float2moeda(valorF))
+
+								$('#pageModalDescontos').fadeIn(200);
+							})
+						})
 					} else {
 						$('#servicoTable').hide();
 					}
@@ -1239,97 +1390,6 @@ if ($tipo == 'ATENDIMENTO') {
 			});
 			$('#dataAtendimento').val('')
 			$('#horaAtendimento').val('')
-		}
-
-		function setDataProfissional(array) {
-			$('#dataAgenda').html('').show();
-			$('#dataAgenda').html('<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">').show();
-
-			let arrayData = array ? array : undefined;
-			console.log(array)
-			$('#dataAtendimento').pickadate({
-				weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-				monthsFull: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-				monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-				today: '',
-				close: '',
-				clear: 'Limpar',
-				labelMonthNext: 'Próximo',
-				labelMonthPrev: 'Anterior',
-				labelMonthSelect: 'Escolha um mês na lista suspensa',
-				labelYearSelect: 'Escolha um ano na lista suspensa',
-				selectMonths: false,
-				selectYears: false,
-				showMonthsShort: true,
-				closeOnSelect: true,
-				closeOnClear: true,
-				formatSubmit: 'dd/mm/yyyy',
-				format: 'dd/mm/yyyy',
-				disable: array,
-				min: array && array[1],
-				onStart: function() {
-					// console.log('onStart event')
-				},
-				onRender: function() {
-					$('.picker__day').each(function() {
-						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
-						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
-
-						if (hasClass) {
-							$(this).addClass((hasSelected ?
-								'' :
-								'font-weight-bold text-black border picker__day--highlighted'))
-						}else{
-							$(this).removeClass('picker__day--highlighted');//remover o destaque do dias que n estão disponíves para agendamento
-						}
-					})
-				},
-				onOpen: function() {
-					$('.picker__day').each(function() {
-						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
-						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
-
-						if (hasClass) {
-							$(this).addClass((hasSelected ?
-								'' :
-								'font-weight-bold text-black border picker__day--highlighted'))
-						}else{
-							$(this).removeClass('picker__day--highlighted');//remover o destaque do dias que n estão disponíves para agendamento
-						}
-					})
-				},
-				onClose: function() {
-					// console.log('onClose event')
-				},
-				onStop: function() {
-					// console.log('onStop event')
-				},
-				onSet: function(context) {
-					let data = new Date(context.select).toLocaleString("pt-BR", {
-						timeZone: "America/Bahia"
-					});
-					data = data.split(' ')[0]; // Formatando a string padrão: "dd/mm/yyyy HH:MM:SS" => "dd/mm/yyyy"
-					let iMedico = $('#medicos').val();
-					$.ajax({
-						type: 'POST',
-						url: 'filtraAtendimento.php',
-						dataType: 'json',
-						data: {
-							'tipoRequest': 'SETHORAPROFISSIONAL',
-							'data': data,
-							'iMedico': iMedico
-						},
-						success: function(response) {
-							if (response.status == 'success') {
-								setHoraProfissional(response.arrayHora, response.intervalo, response.horariosIndisp)
-								$('#horaAtendimento').focus()
-							} else {
-								alerta(response.titulo, response.menssagem, response.status)
-							}
-						}
-					});
-				},
-			});
 		}
 
 		function setHoraProfissional(array, interv, horariosIndisp) {
@@ -1481,35 +1541,37 @@ if ($tipo == 'ATENDIMENTO') {
 										<h5 class="text-uppercase font-weight-bold">Cadastro de Atendimento</h5>
 									</div>
 									<div class="card-body">
-										<div class="col-lg-12 mb-4 row mt-4">
+									<div class="col-lg-12 mb-4 row mt-4">
 											<!-- titulos -->
-											<div class='col-lg-2'>
-												<label>Nº Registro</label>
-											</div>
-											<div class='col-lg-4'>
+											<div class='col-lg-3'>
 												<label>Data do Registro</label>
 											</div>
-											<div class='col-lg-2'>
+											<div class='col-lg-3'>
 												<label>Modalidade <span class='text-danger'>*</span></label>
 											</div>
-											<div class='col-lg-4'>
+											<div class='col-lg-3'>
 												<label>Classificação do Atendimento <span class='text-danger'>*</span></label>
+											</div>
+											<div class='col-lg-3'>
+												<label>Classificação de risco <span class='text-danger'>*</span></label>
 											</div>
 
 											<!-- campos -->
-											<div class='col-lg-2'>
-												<input id='numeroRegistro' name='numeroRegistro' type='text' class='form-control' placeholder='Nº Registro' readOnly value='<?php echo $row['AgAtNumRegistro']?>' >
-											</div>
-											<div class='col-lg-4'>
+											<div class='col-lg-3'>
 												<input id='dataRegistro' name='dataRegistro' type='date' class='form-control' placeholder='Nome' readOnly>
 											</div>
-											<div class='col-lg-2'>
+											<div class='col-lg-3'>
 												<select id='modalidade' name='modalidade' class='select-search' required>
 													<option value='' selected>selecionar</option>
 												</select>
 											</div>
-											<div class='col-lg-4'>
+											<div class='col-lg-3'>
 												<select id='classificacao' name='classificacao' class='select-search' required>
+													<option value='' selected>selecionar</option>
+												</select>
+											</div>
+											<div class='col-lg-3'>
+												<select id='classificacaoRisco' name='classificacaoRisco' class='select-search' required>
 													<option value='' selected>selecionar</option>
 												</select>
 											</div>
@@ -1521,10 +1583,37 @@ if ($tipo == 'ATENDIMENTO') {
 
 										<div class="col-lg-12 mb-4 row">
 											<!-- titulos -->
-											<div class="col-lg-2">
-												<label>Serviço</label>
+											<div class="col-lg-4">
+												<label>Grupo</label>
 											</div>
-											<div class="col-lg-2">
+											<div class="col-lg-4">
+												<label>Sub-Grupo</label>
+											</div>
+											<div class="col-lg-4">
+												<label>Serviço</label>
+											</div>											
+
+											<!-- campos -->
+											<div class="col-lg-4">
+												<select id="grupo" name="grupo" class="select-search">
+													<option value="" selected>selecione</option>
+												</select>
+											</div>
+											<div class="col-lg-4">
+												<select id="subgrupo" name="subgrupo" class="form-control form-control-select2">
+													<option value="" selected>Selecione</option>
+												</select>
+											</div>
+											<div class="col-lg-4">
+												<select id="servico" name="servico" class="select-search">
+													<option value="" selected>selecionar</option>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-lg-12 mb-4 row">
+											<!-- titulos -->
+											<div class="col-lg-3">
 												<label>Médicos</label>
 											</div>
 											<div class="col-lg-2">
@@ -1533,17 +1622,12 @@ if ($tipo == 'ATENDIMENTO') {
 											<div class="col-lg-3">
 												<label>Data do Atendimento</label>
 											</div>
-											<div class="col-lg-2">
+											<div class="col-lg-3">
 												<label>Horário</label>
 											</div>
-											
+
 											<!-- campos -->
-											<div class="col-lg-2">
-												<select id="servico" name="servico" class="select-search">
-													<option value="" selected>selecionar</option>
-												</select>
-											</div>
-											<div class="col-lg-2">
+											<div class="col-lg-3">
 												<select id="medicos" name="medicos" class="select-search">
 													<option value="" selected>selecione</option>
 												</select>
@@ -1554,11 +1638,11 @@ if ($tipo == 'ATENDIMENTO') {
 												</select>
 											</div>
 											<div id="dataAgenda" class="col-lg-3 input-group">
-												<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">
+												<input id="dataAtendimento" name="dataAtendimento" type="text" readonly value="" class="form-control">
 											</div>
-											<div id="modalHora" class="col-lg-2">
+											<div id="modalHora" class="col-lg-3">
 												<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
-											</div>											
+											</div>
 											<!-- btnAddServico -->
 											<div class="col-lg-1 text-right">
 												<button id="incluirServico" class="btn btn-lg btn-principal" data-tipo="INCLUIRSERVICO">
@@ -1585,10 +1669,19 @@ if ($tipo == 'ATENDIMENTO') {
 												</tbody>
 												<tfoot>
 													<tr>
-														<th colspan="6" class="font-weight-bold" style="font-size: 16px; width: 72rem;">
+														<th colspan="6" class="font-weight-bold" style="width: 72rem;">
 															<div style="float: right;">
-																<div style="display:table-cell;padding-right:40px;">Valor(R$):</div>
-																<div id="servicoValorTotal" class="font-weight-bold" style="font-size: 15px;display:table-cell;">R$ 0,00</div>
+																<div style="font-size: 13px;">
+																	<div style="display:table-cell;padding-right:55px;">Desconto(R$):</div>
+																	<div id="servicoValorDescontoTotal" class="font-weight-bold" style="display:table-cell;">R$ 0,00</div>
+																</div>
+
+																<br>
+
+																<div style="font-size: 16px;">
+																	<div style="display:table-cell;padding-right:60px;">Valor(R$):</div>
+																	<div id="servicoValorTotal" class="font-weight-bold" style="display:table-cell;">R$ 0,00</div>
+																</div>
 															</div>
 														</th>
 
@@ -2592,6 +2685,66 @@ if ($tipo == 'ATENDIMENTO') {
 						</div>
 					</div>
 					<div class="text-right m-2"><button id="salvarResponsavelModal" class="btn btn-principal" role="button">Confirmar</button></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="pageModalDescontos" class="custon-modal">
+		<div class="custon-modal-container" style="max-width: 500px;">
+			<div class="card custon-modal-content">
+				<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+					<p id='tituloModal' class="h5">Desconto</p>
+					<i id="modalDesconto-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+				</div>
+				<div class="px-0">
+					<div class="d-flex flex-row">
+						<div class="col-lg-12">
+							<form id="editaSituacao" name="alterarSituacao" method="POST" class="form-validate-jquery">
+								<div class="form-group">
+									<div class="custon-modal-title">
+										<i class=""></i>
+										<p class="h3">Descontos</p>
+										<i class=""></i>
+									</div>
+									
+									<div class="p-5">
+										<div class="d-flex flex-row justify-content-between">
+											<div class="col-lg-12" style="text-align:center;">
+												<div class="form-group row">
+													<div class="col-lg-4">
+														<label>Desconto</label>
+													</div>
+													<div class="col-lg-4">
+														<label>Valor</label>
+													</div>
+													<div class="col-lg-4">
+														<label>Valor Final</label>
+													</div>
+
+													<div class="col-lg-4">
+														<input id="inputDesconto" maxLength="12" class="form-control" type="number" name="inputDesconto">
+													</div>
+													<div class="col-lg-4">
+														<input id="inputModalValorB" maxLength="12" class="form-control" type="text" readonly>
+													</div>
+													<div class="col-lg-4">
+														<input id="inputModalValorF" maxLength="12" class="form-control" type="text" readonly>
+													</div>
+
+													<input id="itemDescontoId" name="itemId" type="hidden" value=''>
+													<input id="itemDescontoValue" name="itemId" type="hidden" value=''>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="text-right m-2">
+						<button id="setDesconto" class="btn btn-principal" role="button">Confirmar</button>
+					</div>
 				</div>
 			</div>
 		</div>

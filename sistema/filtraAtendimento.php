@@ -123,8 +123,8 @@ try{
 						'situacao' => $item['SituaChave'],
 						'id' => $item['AgendId'],
 						'sJustificativa' => $item['AgendJustificativa'],
-						'prontuario' => 'Prontuário - '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
-						'cbo' => 'CBO - '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
+						'prontuario' => 'Prontuário: '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
+						'cbo' => 'CBO: '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
 					]
 				]);
 			}
@@ -174,8 +174,8 @@ try{
 						'situacao' => $item['SituaChave'],
 						'id' => $item['AtendId'],
 						'sJustificativa' => $item['AtendJustificativa'],
-						'prontuario' => 'Prontuário - '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
-						'cbo' => 'CBO - '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
+						'prontuario' => 'Prontuário: '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
+						'cbo' => 'CBO: '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
 						'class' => $item['AtClRNomePersonalizado']?'Classificação - '.$item['AtClRNomePersonalizado']:($item['AtClRNome']?'Classificação - '.$item['AtClRNome']:'Sem Classificação!'),
 						'classTemp' => ($item['AtClRTempo']?$item['AtClRTempo']:''),
 						'classCor' => ($item['AtClRCor']?$item['AtClRCor']:'#FFF'),
@@ -411,8 +411,7 @@ try{
 			
 			array_push($espera,[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -454,8 +453,7 @@ try{
 			array_push($atendido,
 			[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -562,8 +560,7 @@ try{
 			
 			array_push($espera,[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -605,8 +602,7 @@ try{
 			array_push($atendido,
 			[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -719,8 +715,7 @@ try{
 			
 			array_push($espera,[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -766,8 +761,7 @@ try{
 			array_push($atendido,
 			[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -999,6 +993,9 @@ try{
 		$atendimento = [
 			'dataRegistro' => isset($_POST['dataRegistro'])?$_POST['dataRegistro']:'',
 			'modalidade' => isset($_POST['modalidade'])?$_POST['modalidade']:'',
+			'classificacaoRisco' => isset($_POST['classificacaoRisco'])?$_POST['classificacaoRisco']:'',
+			'grupo' => isset($_POST['grupo'])?$_POST['grupo']:'',
+			'subgrupo' => isset($_POST['subgrupo'])?$_POST['subgrupo']:'',
 			'classificacao' => isset($_POST['classificacao'])?$_POST['classificacao']:'',
 			'situacao' => isset($_POST['situacao'])?$_POST['situacao']:'',
 			'observacao' => isset($_POST['observacaoAtendimento'])?$_POST['observacaoAtendimento']:''
@@ -1061,12 +1058,12 @@ try{
 				}
 			}
 
-			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
-			AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
+			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeDesconto
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
 			VALUES ";
 	
 			foreach($atendimentoServicos as $atendimentoServico){
-				$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]',
+				$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]','$atendimentoServico[desconto]'
 				'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
 				'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
 			}
@@ -1451,7 +1448,8 @@ try{
 			'data' => $sData,
 			'hora' => mostraHora($sHora),
 			'valor' => $resultServico['SrVenValorVenda'],
-			'status' => 'new'
+			'status' => 'new',
+			'desconto' => 0
 		]);
 		$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
 
@@ -1504,7 +1502,8 @@ try{
 									'data' => $item['AtXSeData'],
 									'hora' => mostraHora($item['AtXSeHorario']),
 									'valor' => $item['SrVenValorVenda'],
-									'status' => 'att'
+									'status' => 'att',
+									'desconto' => $item['AtXSeDesconto']
 								]);
 							}
 						}
@@ -1522,7 +1521,8 @@ try{
 							'data' => $item['AtXSeData'],
 							'hora' => mostraHora($item['AtXSeHorario']),
 							'valor' => $item['SrVenValorVenda'],
-							'status' => 'att'
+							'status' => 'att',
+							'desconto' => $item['AtXSeDesconto']
 						]);
 					}
 				}
@@ -1570,22 +1570,26 @@ try{
 							'data' => $item['AgendData'],
 							'hora' => mostraHora($item['AgendHorario']),
 							'valor' => $item['SrVenValorVenda'],
-							'status' => 'att'
+							'status' => 'att',
+							'desconto' => 0
 						]);
 					}
 				}
 			}
 		}
 		$valorTotal = 0;
+		$valorTotalDesconto = 0;
 
 		foreach($atendimentoSessao as $item){
-			$valorTotal += $item['valor'];
+			$valorTotal += $item['valor'] - $item['desconto'];
+			$valorTotalDesconto += $item['desconto'];
 		}
 		$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
 		
 		echo json_encode([
 			'array' => $atendimentoSessao,
-			'valorTotal' => $valorTotal
+			'valorTotal' => $valorTotal,
+			'valorTotalDesconto' => $valorTotalDesconto
 		]);
 	} elseif ($tipoRequest == 'EXCLUISERVICO'){
 		$oldId = $_POST['id']; // "SrVenId#ProfiId#AtLocId"
@@ -1627,16 +1631,12 @@ try{
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-		$arrayData = [true];
+		$arrayData = [];
 		foreach($row as $item){
 			$data = explode('-', $item['PrAgeData']);
+			$data = $data[2].'/'.$data[1].'/'.$data[0];
 			
-			array_push($arrayData,
-			[
-				intval($data[0]),
-				intval($data[1])-1,
-				intval($data[2])
-			]);
+			array_push($arrayData, $data);
 		}
 
 		echo json_encode([
@@ -1657,7 +1657,7 @@ try{
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-		$arrayHora = [true,];
+		$arrayHora = [true];
 		$intervalo = 30;
 		foreach($row as $item){
 			$horaI = explode(':', $item['PrAgeHoraInicio']);
@@ -1706,7 +1706,78 @@ try{
 			'titulo' => 'Data',
 			'menssagem' => 'Hora do profissional selecionado!!!',
 		]);
-	}
+	} elseif ($tipoRequest == 'CLASSIFICACAORISCOS'){
+		$sql = "SELECT AtClRId,AtClRNome,AtClRNomePersonalizado,AtClRCor,
+		AtClRDeterminantes
+		FROM AtendimentoClassificacaoRisco
+		WHERE AtClRUnidade != $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['AtClRId'],
+				'nome' => $item['AtClRNomePersonalizado']?$item['AtClRNomePersonalizado']:$item['AtClRNome'],
+				'cor' => $item['AtClRCor'],
+				'determinante' => $item['AtClRDeterminantes']
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'GRUPO'){
+		$sql = "SELECT GrupoId,GrupoNome
+		FROM Grupo
+		WHERE GrupoUnidade != $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['GrupoId'],
+				'nome' => $item['GrupoNome']
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'SUBGRUPO'){
+		$sql = "SELECT AtSubId,AtSubNome
+		FROM AtendimentoSubGrupo
+		WHERE AtSubUnidade != $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['AtSubId'],
+				'nome' => $item['AtSubNome']
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif($tipoRequest == 'SETDESCONTO'){
+		$atendimentoSessao = $_SESSION['atendimento']['atendimentoServicos'];
+
+		$id = $_POST['iServico'];
+		$desconto = $_POST['desconto'];
+
+		$valorTotal = 0;
+
+		foreach($atendimentoSessao as $key=>$item){
+			if($item['id'] == $id){
+				$atendimentoSessao[$key]['desconto'] = $desconto;
+			}
+		}
+		$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Desconto',
+			'menssagem' => 'Desconto adicionado!!!',
+		]);
+	} 
 }catch(PDOException $e) {
 	$msg = '';
 	switch($tipoRequest){

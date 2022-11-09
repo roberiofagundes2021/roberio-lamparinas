@@ -111,7 +111,7 @@ if (isset($_POST['txtareaConteudo']) ){
 				':dDataInicio' => gravaData($_POST['inputDataInicio']),
 				':dDataFim' => date('m/d/Y'),
 				':sHoraInicio' => $_POST['inputInicio'],
-				':sHoraFim' => $_POST['inputFim'],
+				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,
 				':iCid10' => $_POST['cmbCid10'],
 				':sAtestadoMedico' => $_POST['txtareaConteudo'],
