@@ -128,6 +128,10 @@ $_SESSION['atendimento'] = [
 							menssageError = 'informe a classificação';
 							$('#classificacao').focus();
 							break;
+						case $('#classificacaoRisco').val():
+							menssageError = 'informe a classificação de risco';
+							$('#classificacaoRisco').focus();
+							break;
 						default:
 							menssageError = '';
 							break;
@@ -195,6 +199,9 @@ $_SESSION['atendimento'] = [
 							'cliente': paciente,
 							'responsavel': responsavel,
 							'dataRegistro': $('#dataRegistro').val(),
+							'classificacaoRisco': $('#classificacaoRisco').val(),
+							'grupo': $('#grupo').val(),
+							'subgrupo': $('#subgrupo').val(),
 							'modalidade': $('#modalidade').val(),
 							'classificacao': $('#classificacao').val(),
 							'observacao': $('#observacaoAtendimento').val(),
@@ -806,6 +813,57 @@ $_SESSION['atendimento'] = [
 		});
 
 		function getCmbs(obj) {
+			// vai preencher cmbGrupo
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'GRUPO'
+				},
+				success: function(response) {
+					$('#grupo').empty();
+					$('#grupo').append(`<option value=''>selecione</option>`)
+
+					response.forEach(item => {
+						$('#grupo').append(`<option value="${item.id}">${item.nome}</option>`)
+					})
+				}
+			});
+			// vai preencher cmbSubGrupo
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'SUBGRUPO'
+				},
+				success: function(response) {
+					$('#subgrupo').empty();
+					$('#subgrupo').append(`<option value=''>selecione</option>`)
+
+					response.forEach(item => {
+						$('#subgrupo').append(`<option value="${item.id}">${item.nome}</option>`)
+					})
+				}
+			});
+			// vai preencher cmbClassificacaoRisco
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'CLASSIFICACAORISCOS'
+				},
+				success: function(response) {
+					$('#classificacaoRisco').empty();
+					$('#classificacaoRisco').append(`<option value=''>selecione</option>`)
+
+					response.forEach(item => {
+						$('#classificacaoRisco').append(`<option title="${item.determinante}" value="${item.id}">${item.nome}</option>`)
+					})
+				}
+			});
 			// vai preencher cmbPaciente
 			$.ajax({
 				type: 'POST',
@@ -1466,27 +1524,35 @@ $_SESSION['atendimento'] = [
 									<div class="card-body">
 										<div class="col-lg-12 mb-4 row mt-4">
 											<!-- titulos -->
-											<div class='col-lg-4'>
+											<div class='col-lg-3'>
 												<label>Data do Registro</label>
 											</div>
-											<div class='col-lg-4'>
+											<div class='col-lg-3'>
 												<label>Modalidade <span class='text-danger'>*</span></label>
 											</div>
-											<div class='col-lg-4'>
+											<div class='col-lg-3'>
 												<label>Classificação do Atendimento <span class='text-danger'>*</span></label>
+											</div>
+											<div class='col-lg-3'>
+												<label>Classificação de risco <span class='text-danger'>*</span></label>
 											</div>
 
 											<!-- campos -->
-											<div class='col-lg-4'>
+											<div class='col-lg-3'>
 												<input id='dataRegistro' name='dataRegistro' type='date' class='form-control' placeholder='Nome' readOnly>
 											</div>
-											<div class='col-lg-4'>
+											<div class='col-lg-3'>
 												<select id='modalidade' name='modalidade' class='select-search' required>
 													<option value='' selected>selecionar</option>
 												</select>
 											</div>
-											<div class='col-lg-4'>
+											<div class='col-lg-3'>
 												<select id='classificacao' name='classificacao' class='select-search' required>
+													<option value='' selected>selecionar</option>
+												</select>
+											</div>
+											<div class='col-lg-3'>
+												<select id='classificacaoRisco' name='classificacaoRisco' class='select-search' required>
 													<option value='' selected>selecionar</option>
 												</select>
 											</div>
@@ -1498,43 +1564,65 @@ $_SESSION['atendimento'] = [
 
 										<div class="col-lg-12 mb-4 row">
 											<!-- titulos -->
-											<div class="col-lg-2">
+											<div class="col-lg-4">
+												<label>Grupo</label>
+											</div>
+											<div class="col-lg-4">
+												<label>Sub-Grupo</label>
+											</div>
+											<div class="col-lg-4">
 												<label>Serviço</label>
-											</div>
-											<div class="col-lg-2">
-												<label>Médicos</label>
-											</div>
-											<div class="col-lg-2">
-												<label>Local do Atendimento</label>
-											</div>
-											<div class="col-lg-3">
-												<label>Data do Atendimento</label>
-											</div>
-											<div class="col-lg-2">
-												<label>Horário</label>
 											</div>											
 
 											<!-- campos -->
-											<div class="col-lg-2">
+											<div class="col-lg-4">
+												<select id="grupo" name="grupo" class="select-search">
+													<option value="" selected>selecione</option>
+												</select>
+											</div>
+											<div class="col-lg-4">
+												<select id="subgrupo" name="subgrupo" class="form-control form-control-select2">
+													<option value="" selected>Selecione</option>
+												</select>
+											</div>
+											<div class="col-lg-4">
 												<select id="servico" name="servico" class="select-search">
 													<option value="" selected>selecionar</option>
 												</select>
 											</div>
-											<div class="col-lg-2">
-												<select id="medicos" name="medicos" class="select-search">
-													<option value="" selected>selecione</option>
-												</select>
+										</div>
+
+										<div class="col-lg-12 mb-4 row">
+											<!-- titulos -->
+											<div class="col-lg-3">
+												<label>Médicos</label>
+											</div>
+											<div class="col-lg-3">
+												<label>Data do Atendimento</label>
+											</div>
+											<div class="col-lg-3">
+												<label>Horário</label>
 											</div>
 											<div class="col-lg-2">
-												<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2">
-													<option value="" selected>Selecione</option>
+												<label>Local do Atendimento</label>
+											</div>
+
+											<!-- campos -->
+											<div class="col-lg-3">
+												<select id="medicos" name="medicos" class="select-search">
+													<option value="" selected>selecione</option>
 												</select>
 											</div>
 											<div id="dataAgenda" class="col-lg-3 input-group">
 												<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">
 											</div>
-											<div id="modalHora" class="col-lg-2">
+											<div id="modalHora" class="col-lg-3">
 												<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
+											</div>
+											<div class="col-lg-2">
+												<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2">
+													<option value="" selected>Selecione</option>
+												</select>
 											</div>
 											<!-- btnAddServico -->
 											<div class="col-lg-1 text-right">

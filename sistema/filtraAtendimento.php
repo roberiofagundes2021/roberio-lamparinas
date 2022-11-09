@@ -999,6 +999,9 @@ try{
 		$atendimento = [
 			'dataRegistro' => isset($_POST['dataRegistro'])?$_POST['dataRegistro']:'',
 			'modalidade' => isset($_POST['modalidade'])?$_POST['modalidade']:'',
+			'classificacaoRisco' => isset($_POST['classificacaoRisco'])?$_POST['classificacaoRisco']:'',
+			'grupo' => isset($_POST['grupo'])?$_POST['grupo']:'',
+			'subgrupo' => isset($_POST['subgrupo'])?$_POST['subgrupo']:'',
 			'classificacao' => isset($_POST['classificacao'])?$_POST['classificacao']:'',
 			'situacao' => isset($_POST['situacao'])?$_POST['situacao']:'',
 			'observacao' => isset($_POST['observacaoAtendimento'])?$_POST['observacaoAtendimento']:''
@@ -1706,6 +1709,57 @@ try{
 			'titulo' => 'Data',
 			'menssagem' => 'Hora do profissional selecionado!!!',
 		]);
+	} elseif ($tipoRequest == 'CLASSIFICACAORISCOS'){
+		$sql = "SELECT AtClRId,AtClRNome,AtClRNomePersonalizado,AtClRCor,
+		AtClRDeterminantes
+		FROM AtendimentoClassificacaoRisco
+		WHERE AtClRUnidade != $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['AtClRId'],
+				'nome' => $item['AtClRNomePersonalizado']?$item['AtClRNomePersonalizado']:$item['AtClRNome'],
+				'cor' => $item['AtClRCor'],
+				'determinante' => $item['AtClRDeterminantes']
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'GRUPO'){
+		$sql = "SELECT GrupoId,GrupoNome
+		FROM Grupo
+		WHERE GrupoUnidade != $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['GrupoId'],
+				'nome' => $item['GrupoNome']
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'SUBGRUPO'){
+		$sql = "SELECT AtSubId,AtSubNome
+		FROM AtendimentoSubGrupo
+		WHERE AtSubUnidade != $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['AtSubId'],
+				'nome' => $item['AtSubNome']
+			]);
+		}
+
+		echo json_encode($array);
 	}
 }catch(PDOException $e) {
 	$msg = '';
