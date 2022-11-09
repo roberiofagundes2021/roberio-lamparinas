@@ -265,6 +265,10 @@ $_SESSION['atendimento'] = [
 			})
 		})
 	</script>
+
+	<!-- funcoes gerais lamparinas -->
+	<script src="global_assets/js/lamparinas/custom.js"></script>	
+
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
@@ -902,26 +906,7 @@ $_SESSION['atendimento'] = [
 			});
 		}
 
-		function validaCPF(strCPF) {
-			var Soma;
-			var Resto;
-			Soma = 0;
-			if (strCPF == "00000000000") return false;
 
-			for (i = 1; i <= 9; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (11 - i);
-			Resto = (Soma * 10) % 11;
-
-			if ((Resto == 10) || (Resto == 11)) Resto = 0;
-			if (Resto != parseInt(strCPF.substring(9, 10))) return false;
-
-			Soma = 0;
-			for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (12 - i);
-			Resto = (Soma * 10) % 11;
-
-			if ((Resto == 10) || (Resto == 11)) Resto = 0;
-			if (Resto != parseInt(strCPF.substring(10, 11))) return false;
-			return true;
-		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o paciente
 		function setPacienteAtribut(id) {
@@ -1627,7 +1612,7 @@ $_SESSION['atendimento'] = [
 											<input id="nomeSocial" name="nomeSocial" type="text" class="form-control" placeholder="Nome	Social">
 										</div>
 										<div class="col-lg-3">
-											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required>
+											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required>
 										</div>
 									</div>
 
@@ -2119,7 +2104,7 @@ $_SESSION['atendimento'] = [
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="cpfNew" name="cpfNew" type="text" class="form-control" placeholder="CPF">
+											<input id="cpfNew" name="cpfNew" type="text" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required>
 										</div>
 										<div class="col-lg-4">
 											<input id="cnsNew" name="cnsNew" type="text" class="form-control" placeholder="Cartão do SUS">
