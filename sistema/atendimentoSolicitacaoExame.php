@@ -67,7 +67,7 @@ if ($row['ClienSexo'] == 'F'){
 if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 	//Essa consulta é para preencher o campo Receituário ao editar
-	$sql = "SELECT AtSExSolicitacaoExame, AtSExHoraFim, AtSExHoraInicio, AtSExDataInicio, AtSExDataFim
+	$sql = "SELECT *
 			FROM AtendimentoSolicitacaoExame
 			WHERE AtSExId = " . $iAtendimentoSolicitacaoExameId ;
 	$result = $conn->query($sql);
@@ -109,7 +109,7 @@ if (isset($_POST['txtareaConteudo']) ){
 				':dDataInicio' => gravaData($_POST['inputDataInicio']),
 				':dDataFim' => date('m/d/Y'),
 				':sHoraInicio' => $_POST['inputInicio'],
-				':sHoraFim' => $_POST['inputFim'],
+				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,
 				':sSolicitacaoExame' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],
