@@ -123,8 +123,8 @@ try{
 						'situacao' => $item['SituaChave'],
 						'id' => $item['AgendId'],
 						'sJustificativa' => $item['AgendJustificativa'],
-						'prontuario' => 'Prontuário - '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
-						'cbo' => 'CBO - '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
+						'prontuario' => 'Prontuário: '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
+						'cbo' => 'CBO: '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
 					]
 				]);
 			}
@@ -174,8 +174,8 @@ try{
 						'situacao' => $item['SituaChave'],
 						'id' => $item['AtendId'],
 						'sJustificativa' => $item['AtendJustificativa'],
-						'prontuario' => 'Prontuário - '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
-						'cbo' => 'CBO - '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
+						'prontuario' => 'Prontuário: '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
+						'cbo' => 'CBO: '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
 						'class' => $item['AtClRNomePersonalizado']?'Classificação - '.$item['AtClRNomePersonalizado']:($item['AtClRNome']?'Classificação - '.$item['AtClRNome']:'Sem Classificação!'),
 						'classTemp' => ($item['AtClRTempo']?$item['AtClRTempo']:''),
 						'classCor' => ($item['AtClRCor']?$item['AtClRCor']:'#FFF'),
