@@ -67,7 +67,7 @@ if ($row['ClienSexo'] == 'F'){
 if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 	//Essa consulta é para preencher o campo Receituário ao editar
-	$sql = "SELECT AtSExSolicitacaoExame, AtSExHoraFim, AtSExHoraInicio, AtSExData
+	$sql = "SELECT AtSExSolicitacaoExame, AtSExHoraFim, AtSExHoraInicio, AtSExDataInicio, AtSExDataFim
 			FROM AtendimentoSolicitacaoExame
 			WHERE AtSExId = " . $iAtendimentoSolicitacaoExameId ;
 	$result = $conn->query($sql);
@@ -77,8 +77,11 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 	// Formatar Hora/Data
 
-	$Data = strtotime($rowSolicitacaoExame['AtSExData']);
-	$DataAtendimento = date("d/m/Y", $Data);
+	$DataInicio = strtotime($rowSolicitacaoExame['AtSExDataInicio']);
+	$DataAtendimentoInicio = date("d/m/Y", $DataInicio);
+
+	$DataFim = strtotime($rowSolicitacaoExame['AtSExDataFim']);
+	$DataAtendimentoFim = date("d/m/Y", $DataFim);
 
 	$Inicio = strtotime($rowSolicitacaoExame['AtSExHoraInicio']);
 	$HoraInicio = date("H:i", $Inicio);
@@ -96,14 +99,15 @@ if (isset($_POST['txtareaConteudo']) ){
 		//Edição
 		if ($iAtendimentoSolicitacaoExameId){
 		
-			$sql = "UPDATE AtendimentoSolicitacaoExame SET AtSExAtendimento = :sAtendimento, AtSExData = :dData, AtSExHoraInicio = :sHoraInicio,
+			$sql = "UPDATE AtendimentoSolicitacaoExame SET AtSExAtendimento = :sAtendimento, AtSExDataInicio = :dDataInicio, AtSExDataFim = :dDataFim, AtSExHoraInicio = :sHoraInicio,
 						   AtSExHoraFim  = :sHoraFim, AtSExProfissional = :sProfissional, AtSExSolicitacaoExame = :sSolicitacaoExame, AtSExUnidade = :iUnidade
 					WHERE AtSExId = :iAtendimentoSolicitacaoExame";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 				':sAtendimento' => $iAtendimentoId,
-				':dData' => gravaData($_POST['inputData']),
+				':dDataInicio' => gravaData($_POST['inputDataInicio']),
+				':dDataFim' => date('m/d/Y'),
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => $_POST['inputFim'],
 				':sProfissional' => $userId,
@@ -117,13 +121,14 @@ if (isset($_POST['txtareaConteudo']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoSolicitacaoExame (AtSExAtendimento, AtSExData, AtSExHoraInicio, AtSExHoraFim, AtSExProfissional, AtSExSolicitacaoExame, AtSExUnidade)
-						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional,:sSolicitacaoExame, :iUnidade)";
+			$sql = "INSERT INTO AtendimentoSolicitacaoExame (AtSExAtendimento, AtSExDataInicio, AtSExDataFim, AtSExHoraInicio, AtSExHoraFim, AtSExProfissional, AtSExSolicitacaoExame, AtSExUnidade)
+						VALUES (:sAtendimento, :dDataInicio, :dDataFim, :sHoraInicio, :sHoraFim, :sProfissional,:sSolicitacaoExame, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 				':sAtendimento' => $iAtendimentoId,
-				':dData' => gravaData($_POST['inputData']),
+				':dDataInicio' => gravaData($_POST['inputDataInicio']),
+				':dDataFim' => gravaData($_POST['inputDataFim']),
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,

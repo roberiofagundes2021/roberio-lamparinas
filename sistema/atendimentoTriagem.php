@@ -76,8 +76,11 @@ if(isset($iAtendimentoTriagemId ) && $iAtendimentoTriagemId ){
 
 	// Formatar Hora/Data
 
-	$Data = strtotime($rowTriagem['AtTriData']);
-	$DataAtendimento = date("d/m/Y", $Data);
+	$DataInicio = strtotime($rowTriagem['AtTriDataInicio']);
+	$DataAtendimentoInicio = date("d/m/Y", $DataInicio);
+
+	$DataFim = strtotime($rowTriagem['AtTriDataFim']);
+	$DataAtendimentoFim = date("d/m/Y", $DataFim);
 
 	$Inicio = strtotime($rowTriagem['AtTriHoraInicio']);
 	$HoraInicio = date("H:i", $Inicio);
@@ -95,7 +98,7 @@ if (isset($_POST['inputAlergia']) ){
 		//Edição
 		if ($iAtendimentoTriagemId){
 		
-			$sql = "UPDATE AtendimentoTriagem SET AtTriAtendimento = :sAtendimento, AtTriData = :dData, AtTriHoraInicio = :sHoraInicio, AtTriHoraFim  = :sHoraFim, AtTriProfissional = :sProfissional, AtTriPressaoSistolica = :sPressaoSistolica, AtTriPressaoDiatolica = :sPressaoDiatolica,
+			$sql = "UPDATE AtendimentoTriagem SET AtTriAtendimento = :sAtendimento, AtTriDataInicio = :dDataInicio, AtTriDataFim = :dDataFim, AtTriHoraInicio = :sHoraInicio, AtTriHoraFim  = :sHoraFim, AtTriProfissional = :sProfissional, AtTriPressaoSistolica = :sPressaoSistolica, AtTriPressaoDiatolica = :sPressaoDiatolica,
 			                                      AtTriFreqCardiaca = :sFreqCardiaca,  AtTriFreqRespiratoria = :sFreqRespiratoria, AtTriTempAXI = :sTempAXI, AtTriSPO = :sSPO, AtTriHGT = :sHGT, AtTriQueixaPrincipal = :sQueixaPrincipal, AtTriPeso = :sPeso, AtTriAltura = :sAltura,  
 												  AtTriAlergia = :sAlergia, AtTriAlergiaDescricao = :sAlergiaDescricao, AtTriDiabetes = :sDiabetes, AtTriDiabetesDescricao = :sDiabetesDescricao, AtTriHipertensao = :sHipertensao, AtTriHipertensaoDescricao = :sHipertensaoDescricao,  
 												  AtTriNeoplasia = :sNeoplasia, AtTriNeoplasiaDescricao = :sNeoplasiaDescricao, AtTriUsoMedicamento = :sUsoMedicamento, AtTriUsoMedicamentoDescricao = :sUsoMedicamentoDescricao, AtTriObservacao = :sObservacao, AtTriUnidade = :iUnidade,
@@ -105,7 +108,8 @@ if (isset($_POST['inputAlergia']) ){
 					
 			$result->execute(array(
 				':sAtendimento' => $iAtendimentoId,
-				':dData' => gravaData($_POST['inputData']),
+				':dDataInicio' => gravaData($_POST['inputDataInicio']),
+				':dDataFim' => date('m/d/Y'),
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => $_POST['inputFim'],
 				':sProfissional' => $userId,
@@ -145,11 +149,11 @@ if (isset($_POST['inputAlergia']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoTriagem (AtTriAtendimento, AtTriData, AtTriHoraInicio, AtTriHoraFim, AtTriProfissional, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca,  AtTriFreqRespiratoria,
+			$sql = "INSERT INTO AtendimentoTriagem (AtTriAtendimento, AtTriDataInicio, AtTriDataFim, AtTriHoraInicio, AtTriHoraFim, AtTriProfissional, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca,  AtTriFreqRespiratoria,
 			                                        AtTriTempAXI, AtTriSPO, AtTriHGT, AtTriQueixaPrincipal, AtTriPeso, AtTriAltura, AtTriAlergia, AtTriAlergiaDescricao, AtTriDiabetes, AtTriDiabetesDescricao, 
 													AtTriHipertensao, AtTriHipertensaoDescricao, AtTriNeoplasia, AtTriNeoplasiaDescricao, AtTriUsoMedicamento, AtTriUsoMedicamentoDescricao, AtTriObservacao, AtTriUnidade,
 													AtTriCiap2, AtTriMotivoConsulta, AtTriMomentoColeta, AtTriImc, AtTriGuicemiaCapilar)
-						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional, :sPressaoSistolica, :sPressaoDiatolica, :sFreqCardiaca, :sFreqRespiratoria,
+						VALUES (:sAtendimento, :dDataInicio, :dDataFim, :sHoraInicio, :sHoraFim, :sProfissional, :sPressaoSistolica, :sPressaoDiatolica, :sFreqCardiaca, :sFreqRespiratoria,
 						        :sTempAXI, :sSPO, :sHGT, :sQueixaPrincipal, :sPeso, :sAltura, :sAlergia, :sAlergiaDescricao, :sDiabetes, :sDiabetesDescricao, 
 								:sHipertensao, :sHipertensaoDescricao, :sNeoplasia, :sNeoplasiaDescricao, :sUsoMedicamento, :sUsoMedicamentoDescricao, :sObservacao, :iUnidade,
 								:sMotivoQueixaSelect, :sMotivoQueixa, :sMomentoColeta, :sImc , :sGlicemiaCapilar )";
@@ -157,7 +161,8 @@ if (isset($_POST['inputAlergia']) ){
 					
 			$result->execute(array(
 				':sAtendimento' => $iAtendimentoId,
-				':dData' => gravaData($_POST['inputData']),
+				':dDataInicio' => gravaData($_POST['inputDataInicio']),
+				':dDataFim' => gravaData($_POST['inputDataFim']),
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,

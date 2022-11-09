@@ -79,8 +79,11 @@ if(isset($iAtendimentoAmbulatorialId ) && $iAtendimentoAmbulatorialId ){
 
 	// Formatar Hora/Data
 
-	$Data = strtotime($rowAmbulatorial['AtAmbDataInicio']);
-	$DataAtendimento = date("d/m/Y", $Data);
+	$DataInicio = strtotime($rowAmbulatorial['AtAmbDataInicio']);
+	$DataAtendimentoInicio = date("d/m/Y", $DataInicio);
+
+	$DataFim = strtotime($rowAmbulatorial['AtAmbDataFim']);
+	$DataAtendimentoFim = date("d/m/Y", $DataFim);
 
 	$Inicio = strtotime($rowAmbulatorial['AtAmbHoraInicio']);
 	$HoraInicio = date("H:i", $Inicio);
@@ -96,7 +99,7 @@ if (isset($_POST['inputInicio']) ){
 		//Edição
 		if ($iAtendimentoAmbulatorialId){
 		
-			$sql = "UPDATE AtendimentoAmbulatorial SET AtAmbAtendimento = :sAtendimento, AtAmbDataInicio = :dData, AtAmbHoraInicio = :sHoraInicio,
+			$sql = "UPDATE AtendimentoAmbulatorial SET AtAmbAtendimento = :sAtendimento, AtAmbDataInicio = :dDataInicio, AtAmbDataFim = :dDataFim, AtAmbHoraInicio = :sHoraInicio,
 						   AtAmbHoraFim  = :sHoraFim, AtAmbProfissional = :sProfissional, AtAmbQueixaPrincipal = :sQueixaPrincipal,
 						   AtAmbHistoriaMolestiaAtual = :sHistoriaMolestiaAtual, AtAmbExameFisico = :sExameFisico, 
 						   AtAmbSuspeitaDiagnostico = :sSuspeitaDiagnostico, AtAmbExameSolicitado = :sExameSolicitado, 
@@ -106,7 +109,8 @@ if (isset($_POST['inputInicio']) ){
 					
 			$result->execute(array(
 				':sAtendimento' => $iAtendimentoId,
-				':dData' => gravaData($_POST['inputData']),
+				':dDataInicio' => gravaData($_POST['inputDataInicio']),
+				':dDataFim' => date('m/d/Y'),
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => $_POST['inputFim'],
 				':sProfissional' => $userId,
@@ -126,15 +130,16 @@ if (isset($_POST['inputInicio']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoAmbulatorial (AtAmbAtendimento, AtAmbDataInicio, AtAmbHoraInicio, AtAmbHoraFim, AtAmbProfissional, AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual,
+			$sql = "INSERT INTO AtendimentoAmbulatorial (AtAmbAtendimento, AtAmbDataInicio, AtAmbDataFim, AtAmbHoraInicio, AtAmbHoraFim, AtAmbProfissional, AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual,
 			 											AtAmbExameFisico, AtAmbSuspeitaDiagnostico, AtAmbExameSolicitado, AtAmbPrescricao, AtAmbOutrasObservacoes, AtAmbUnidade)
-						VALUES (:sAtendimento, :dData, :sHoraInicio, :sHoraFim, :sProfissional,:sQueixaPrincipal,:sHistoriaMolestiaAtual, :sExameFisico, 
+						VALUES (:sAtendimento, :dDataInicio, :dDataFim, :sHoraInicio, :sHoraFim, :sProfissional,:sQueixaPrincipal,:sHistoriaMolestiaAtual, :sExameFisico, 
 						        :sSuspeitaDiagnostico, :sExameSolicitado, :sPrescricao, :sOutrasObservacoes, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 				':sAtendimento' => $iAtendimentoId,
-				':dData' => gravaData($_POST['inputData']),
+				':dDataInicio' => gravaData($_POST['inputDataInicio']),
+				':dDataFim' => gravaData($_POST['inputDataFim']),
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,

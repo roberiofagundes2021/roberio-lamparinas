@@ -72,8 +72,8 @@
         <div class="row">
             <div class="col-lg-2">
                 <div class="form-group">
-                    <label for="inputData">Data</label>
-                    <input type="text" id="inputData" name="inputData" class="form-control" value="<?php if (isset($iAtendimentoEletivoId )){ echo $DataAtendimento;} else { echo date('d/m/Y'); } ?>" readOnly> 
+                    <label for="inputDataInicio">Data Início</label>
+                    <input type="text" id="inputDataInicio" name="inputDataInicio" class="form-control" value="<?php if (isset($iAtendimentoEletivoId )){ echo $DataAtendimentoInicio;} else { echo date('d/m/Y'); } ?>" readOnly> 
                 </div>
             </div>
             <div class="col-lg-2">
@@ -84,11 +84,17 @@
             </div>
             <div class="col-lg-2">
                 <div class="form-group">
+                    <label for="inputDataFim">Data Fim</label>
+                    <input type="text" id="inputDataFim" name="inputDataFim" class="form-control" value="<?php if (isset($iAtendimentoEletivoId )){ echo $DataAtendimentoFim;} else { echo date('d/m/Y'); } ?>" readOnly> 
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <div class="form-group">
                     <label for="inputFim">Témino do Atendimento</label>
                     <input type="text" id="inputFim" name="inputFim" class="form-control" value="<?php if (isset($iAtendimentoEletivoId )) echo $HoraFim; ?>" readOnly>
                 </div>
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-1">
                 <div class="form-group">
                     <label for="inputConselho"> Conselho </label>
                     <input type="text" id="inputConselho" name="inputConselho" class="form-control"  value="<?php echo $rowUser['PrConNome']; ?>" readOnly>
@@ -100,7 +106,7 @@
                     <input type="text" id="inputProfissional" name="inputProfissional" class="form-control"  value="<?php echo $rowUser['ProfissionalNome']; ?>" readOnly>
                 </div>
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-1">
                 <div class="form-group">
                     <label for="inputCbo"> CBO </label>
                     <input type="text" id="inputCbo" name="inputCbo" class="form-control"  value="<?php echo $rowUser['ProfissaoCbo']; ?>" readOnly>
