@@ -411,8 +411,7 @@ try{
 			
 			array_push($espera,[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -454,8 +453,7 @@ try{
 			array_push($atendido,
 			[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -562,8 +560,7 @@ try{
 			
 			array_push($espera,[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -605,8 +602,7 @@ try{
 			array_push($atendido,
 			[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -719,8 +715,7 @@ try{
 			
 			array_push($espera,[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
@@ -766,8 +761,7 @@ try{
 			array_push($atendido,
 			[
 				'data' => [
-					mostraData($item['AtXSeData']),  // Data
-					$item['AtXSeHorario'],  // Horario
+					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtXSeId'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
