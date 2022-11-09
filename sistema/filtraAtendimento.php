@@ -1454,7 +1454,8 @@ try{
 			'data' => $sData,
 			'hora' => mostraHora($sHora),
 			'valor' => $resultServico['SrVenValorVenda'],
-			'status' => 'new'
+			'status' => 'new',
+			'desconto' => 0
 		]);
 		$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
 
@@ -1507,7 +1508,8 @@ try{
 									'data' => $item['AtXSeData'],
 									'hora' => mostraHora($item['AtXSeHorario']),
 									'valor' => $item['SrVenValorVenda'],
-									'status' => 'att'
+									'status' => 'att',
+									'desconto' => $item['AtXSeDesconto']
 								]);
 							}
 						}
@@ -1525,7 +1527,8 @@ try{
 							'data' => $item['AtXSeData'],
 							'hora' => mostraHora($item['AtXSeHorario']),
 							'valor' => $item['SrVenValorVenda'],
-							'status' => 'att'
+							'status' => 'att',
+							'desconto' => $item['AtXSeDesconto']
 						]);
 					}
 				}
@@ -1573,7 +1576,8 @@ try{
 							'data' => $item['AgendData'],
 							'hora' => mostraHora($item['AgendHorario']),
 							'valor' => $item['SrVenValorVenda'],
-							'status' => 'att'
+							'status' => 'att',
+							'desconto' => 0
 						]);
 					}
 				}
@@ -1582,7 +1586,7 @@ try{
 		$valorTotal = 0;
 
 		foreach($atendimentoSessao as $item){
-			$valorTotal += $item['valor'];
+			$valorTotal += $item['valor'] - ($item['valor']*($item['desconto']/100));
 		}
 		$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
 		
@@ -1630,16 +1634,12 @@ try{
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-		$arrayData = [true];
+		$arrayData = [];
 		foreach($row as $item){
 			$data = explode('-', $item['PrAgeData']);
+			$data = $data[2].'/'.$data[1].'/'.$data[0];
 			
-			array_push($arrayData,
-			[
-				intval($data[0]),
-				intval($data[1])-1,
-				intval($data[2])
-			]);
+			array_push($arrayData, $data);
 		}
 
 		echo json_encode([
@@ -1660,7 +1660,7 @@ try{
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-		$arrayHora = [true,];
+		$arrayHora = [true];
 		$intervalo = 30;
 		foreach($row as $item){
 			$horaI = explode(':', $item['PrAgeHoraInicio']);
@@ -1760,7 +1760,29 @@ try{
 		}
 
 		echo json_encode($array);
-	}
+	} elseif($tipoRequest == 'SETDESCONTO'){
+		$atendimentoSessao = $_SESSION['atendimento']['atendimentoServicos'];
+
+		$id = $_POST['iServico'];
+		$desconto = $_POST['desconto'];
+
+		$valorTotal = 0;
+
+		foreach($atendimentoSessao as $key=>$item){
+			if($item['id'] == $id){
+				$atendimentoSessao[$key]['desconto'] = $desconto;
+			}
+		}
+		$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
+
+		echo json_encode([
+			'array' => $atendimentoSessao,
+			'valorTotal' => $valorTotal,
+			'status' => 'success',
+			'titulo' => 'Desconto',
+			'menssagem' => 'Desconto adicionado!!!',
+		]);
+	} 
 }catch(PDOException $e) {
 	$msg = '';
 	switch($tipoRequest){

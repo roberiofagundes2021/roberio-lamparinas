@@ -382,9 +382,8 @@ if ($tipo == 'ATENDIMENTO') {
 						menssageError = 'informe o médico';
 						$('#medicos').focus();
 						break;
-					case dataAtendimento:
-						menssageError = 'informe uma data';
-						$('#dataAtendimento').focus();
+					case $('#dataAtendimento').val():
+						menssageError = 'Sem data disponível para o serviço!!';
 						break;
 					case horaAtendimento:
 						menssageError = 'informe o horário';
@@ -465,7 +464,7 @@ if ($tipo == 'ATENDIMENTO') {
 						'servico': $(this).val()
 					},
 					success: function(response) {
-						setDataProfissional()
+						$('#dataAtendimento').val('');
 						setHoraProfissional()
 						$('#medicos').empty();
 						$('#localAtendimento').empty();
@@ -489,7 +488,7 @@ if ($tipo == 'ATENDIMENTO') {
 				let iMedico = $(this).val()
 
 				if (!iMedico) {
-					setHoraProfissional()
+					$('#dataAtendimento').val('');
 					setDataProfissional()
 					return
 				}
@@ -534,11 +533,38 @@ if ($tipo == 'ATENDIMENTO') {
 						'iMedico': iMedico,
 						'localAtend' : localAtend
 					},
-					success: function(response) {
+					success: async function(response) {
 						if (response.status == 'success') {
-							setDataProfissional(response.arrayData)
-							$('#dataAtendimento').focus()
+							let dataHoje = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
+							dataHoje = dataHoje.split(' ')[0]
 
+							await response.arrayData.forEach(item => {
+								$('#dataAtendimento').val(item == dataHoje?item:$('#dataAtendimento').val())
+							})
+
+							// caso exista algo no campo de data...
+							if($('#dataAtendimento').val()){
+								$.ajax({
+									type: 'POST',
+									url: 'filtraAtendimento.php',
+									dataType: 'json',
+									data: {
+										'tipoRequest': 'SETHORAPROFISSIONAL',
+										'data': $('#dataAtendimento').val(),
+										'iMedico': iMedico
+									},
+									success: function(response) {
+										if (response.status == 'success') {
+											setHoraProfissional(response.arrayHora, response.intervalo)
+											$('#horaAtendimento').focus()
+										} else {
+											alerta(response.titulo, response.menssagem, response.status)
+										}
+									}
+								});
+							}else{
+								alerta('Data do atendimento', 'A data atual não é válida para atendimento do profissional selecionado', 'error')
+							}
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
 						}
@@ -1321,97 +1347,6 @@ if ($tipo == 'ATENDIMENTO') {
 			$('#horaAtendimento').val('')
 		}
 
-		function setDataProfissional(array) {
-			$('#dataAgenda').html('').show();
-			$('#dataAgenda').html('<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">').show();
-
-			let arrayData = array ? array : undefined;
-			console.log(array)
-			$('#dataAtendimento').pickadate({
-				weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-				monthsFull: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-				monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-				today: '',
-				close: '',
-				clear: 'Limpar',
-				labelMonthNext: 'Próximo',
-				labelMonthPrev: 'Anterior',
-				labelMonthSelect: 'Escolha um mês na lista suspensa',
-				labelYearSelect: 'Escolha um ano na lista suspensa',
-				selectMonths: false,
-				selectYears: false,
-				showMonthsShort: true,
-				closeOnSelect: true,
-				closeOnClear: true,
-				formatSubmit: 'dd/mm/yyyy',
-				format: 'dd/mm/yyyy',
-				disable: array,
-				min: array && array[1],
-				onStart: function() {
-					// console.log('onStart event')
-				},
-				onRender: function() {
-					$('.picker__day').each(function() {
-						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
-						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
-
-						if (hasClass) {
-							$(this).addClass((hasSelected ?
-								'' :
-								'font-weight-bold text-black border picker__day--highlighted'))
-						}else{
-							$(this).removeClass('picker__day--highlighted');//remover o destaque do dias que n estão disponíves para agendamento
-						}
-					})
-				},
-				onOpen: function() {
-					$('.picker__day').each(function() {
-						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
-						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
-
-						if (hasClass) {
-							$(this).addClass((hasSelected ?
-								'' :
-								'font-weight-bold text-black border picker__day--highlighted'))
-						}else{
-							$(this).removeClass('picker__day--highlighted');//remover o destaque do dias que n estão disponíves para agendamento
-						}
-					})
-				},
-				onClose: function() {
-					// console.log('onClose event')
-				},
-				onStop: function() {
-					// console.log('onStop event')
-				},
-				onSet: function(context) {
-					let data = new Date(context.select).toLocaleString("pt-BR", {
-						timeZone: "America/Bahia"
-					});
-					data = data.split(' ')[0]; // Formatando a string padrão: "dd/mm/yyyy HH:MM:SS" => "dd/mm/yyyy"
-					let iMedico = $('#medicos').val();
-					$.ajax({
-						type: 'POST',
-						url: 'filtraAtendimento.php',
-						dataType: 'json',
-						data: {
-							'tipoRequest': 'SETHORAPROFISSIONAL',
-							'data': data,
-							'iMedico': iMedico
-						},
-						success: function(response) {
-							if (response.status == 'success') {
-								setHoraProfissional(response.arrayHora, response.intervalo, response.horariosIndisp)
-								$('#horaAtendimento').focus()
-							} else {
-								alerta(response.titulo, response.menssagem, response.status)
-							}
-						}
-					});
-				},
-			});
-		}
-
 		function setHoraProfissional(array, interv, horariosIndisp) {
 			$('#modalHora').html('');
 			$('#modalHora').html('<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">');
@@ -1636,14 +1571,14 @@ if ($tipo == 'ATENDIMENTO') {
 											<div class="col-lg-3">
 												<label>Médicos</label>
 											</div>
+											<div class="col-lg-2">
+												<label>Local do Atendimento</label>
+											</div>
 											<div class="col-lg-3">
 												<label>Data do Atendimento</label>
 											</div>
 											<div class="col-lg-3">
 												<label>Horário</label>
-											</div>
-											<div class="col-lg-2">
-												<label>Local do Atendimento</label>
 											</div>
 
 											<!-- campos -->
@@ -1652,16 +1587,16 @@ if ($tipo == 'ATENDIMENTO') {
 													<option value="" selected>selecione</option>
 												</select>
 											</div>
-											<div id="dataAgenda" class="col-lg-3 input-group">
-												<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">
-											</div>
-											<div id="modalHora" class="col-lg-3">
-												<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
-											</div>
 											<div class="col-lg-2">
 												<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2">
 													<option value="" selected>Selecione</option>
 												</select>
+											</div>
+											<div id="dataAgenda" class="col-lg-3 input-group">
+												<input id="dataAtendimento" name="dataAtendimento" type="text" readonly value="" class="form-control">
+											</div>
+											<div id="modalHora" class="col-lg-3">
+												<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
 											</div>
 											<!-- btnAddServico -->
 											<div class="col-lg-1 text-right">
