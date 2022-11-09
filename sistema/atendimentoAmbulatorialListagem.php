@@ -80,54 +80,49 @@ $acesso = 'ATENDIMENTO';
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Horario
-					width: "10%",
-					targets: [1]
-				},
-				{ 
 					orderable: true,   //Espera
 					width: "5%",
-					targets: [2]
+					targets: [1]
 				},				
 				{ 
 					orderable: true,   //Nº Registro
 					width: "5%",
-					targets: [3]
+					targets: [2]
 				},
 				{ 
 					orderable: true,   //Prontuário
 					width: "5%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Profissional
 					width: "10%",
-					targets: [6]
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Modalidade
 					width: "20%",
-					targets: [7]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Procedimento
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [9]
+					targets: [8]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [10]
+					targets: [9]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -154,49 +149,44 @@ $acesso = 'ATENDIMENTO';
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Horario
-					width: "10%",
-					targets: [1]
-				},
-				{ 
 					orderable: true,   //Espera
 					width: "5%",
-					targets: [2]
+					targets: [1]
 				},				
 				{ 
 					orderable: true,   //Nº Registro
 					width: "5%",
-					targets: [3]
+					targets: [2]
 				},
 				{ 
 					orderable: true,   //Prontuário
 					width: "5%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Procedimento
+					width: "20%",
+					targets: [5]
+				},
+				{ 
+					orderable: true,   //Risco
 					width: "10%",
 					targets: [6]
 				},
 				{ 
-					orderable: true,   //Risco
-					width: "20%",
-					targets: [7]
-				},
-				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [8]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [9]
+					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -229,49 +219,44 @@ $acesso = 'ATENDIMENTO';
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Horario
-					width: "10%",
-					targets: [1]
-				},
-				{ 
 					orderable: true,   //Espera
 					width: "5%",
-					targets: [2]
+					targets: [1]
 				},				
 				{ 
 					orderable: true,   //Nº Registro
 					width: "5%",
-					targets: [3]
+					targets: [2]
 				},
 				{ 
 					orderable: true,   //Prontuário
 					width: "5%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Procedimento
+					width: "20%",
+					targets: [5]
+				},
+				{ 
+					orderable: true,   //Risco
 					width: "10%",
 					targets: [6]
 				},
 				{ 
-					orderable: true,   //Risco
-					width: "20%",
-					targets: [7]
-				},
-				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [9]
+					targets: [8]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -485,17 +470,17 @@ $acesso = 'ATENDIMENTO';
 
 					response.dataEspera.forEach(item => {
 						rowNodeE = tableE.row.add(item.data).draw().node()
-						$(rowNodeE).attr('class', 'text-center')
-						$(rowNodeE).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-						$(rowNodeE).find('td:eq(9)').attr('data-observacao', `${item.identify.sObservacao}`)
+						$(rowNodeE).attr('class', 'text-left')
+						$(rowNodeE).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+						$(rowNodeE).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})
 					response.dataAtendido.forEach(item => {
 						rowNodeA = tableA.row.add(item.data).draw().node()
-						$(rowNodeA).attr('class', 'text-center')
+						$(rowNodeA).attr('class', 'text-left')
+						$(rowNodeA).find('td:eq(7)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+						$(rowNodeA).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						$(rowNodeA).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-						$(rowNodeA).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-						$(rowNodeA).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-						$(rowNodeA).find('td:eq(9)').attr('data-observacao', `${item.identify.sObservacao}`)
+						$(rowNodeA).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})
 					setAttributs()
 				}
@@ -596,9 +581,8 @@ $acesso = 'ATENDIMENTO';
 							<div id="box-pacientes-espera" style="display: block;">
 								<table class="table" id="AtendimentoTableEspera">
 									<thead>
-										<tr class="bg-slate text-center">
-											<th>Data</th>
-											<th>Horario</th>
+										<tr class="bg-slate text-left">
+											<th>Data / Hora</th>
 											<th>Espera</th>
 											<th>Nº Registro</th>
 											<th>Prontuário</th>			
@@ -606,7 +590,7 @@ $acesso = 'ATENDIMENTO';
 											<th>Procedimento</th>
 											<th>Risco</th>
 											<th>Situação</th>
-											<th class="text-center">Ações</th>
+											<th>Ações</th>
 										</tr>
 									</thead>
 									<tbody id="dataAtendimentos">
@@ -621,9 +605,8 @@ $acesso = 'ATENDIMENTO';
 								<div class="card-body" style="padding: 0px"></div>
 								<table class="table" id="AtendimentoTableAtendido">
 									<thead>
-										<tr class="bg-slate text-center">
-											<th>Data</th>
-											<th>Horario</th>
+										<tr class="bg-slate text-left">
+											<th>Data / Hora</th>
 											<th>Espera</th>
 											<th>Nº Registro</th>
 											<th>Prontuário</th>			
@@ -631,7 +614,7 @@ $acesso = 'ATENDIMENTO';
 											<th>Procedimento</th>
 											<th>Risco</th>
 											<th>Situação</th>
-											<th class="text-center">Ações</th>
+											<th>Ações</th>
 										</tr>
 									</thead>
 									<tbody id="dataAtendimentos">
