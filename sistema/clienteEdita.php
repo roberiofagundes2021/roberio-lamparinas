@@ -479,7 +479,7 @@ else {
 											<h5 class="mb-0 font-weight-semibold">Contato</h5>
 											<br>
 											<div class="row">
-												<div class="col-lg-3">
+												<div class="col-lg-4">
 													<div class="form-group">
 														<label for="inputNomeContato">Nome</label>
 														<input type="text" id="inputNomeContato" name="inputNomeContato" class="form-control" placeholder="Contato" value="<?php echo $row['ClienContato']; ?>">
@@ -500,7 +500,7 @@ else {
 													</div>
 												</div>
 
-												<div class="col-lg-2">
+												<div class="col-lg-4">
 													<div class="form-group">
 														<label for="inputEmail">E-mail</label>
 														<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" value="<?php echo $row['ClienEmail']; ?>">
