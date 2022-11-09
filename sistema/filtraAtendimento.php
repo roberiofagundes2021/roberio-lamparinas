@@ -1064,12 +1064,12 @@ try{
 				}
 			}
 
-			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,
-			AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
+			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeDesconto
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
 			VALUES ";
 	
 			foreach($atendimentoServicos as $atendimentoServico){
-				$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]',
+				$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]','$atendimentoServico[desconto]'
 				'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
 				'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
 			}
@@ -1584,15 +1584,18 @@ try{
 			}
 		}
 		$valorTotal = 0;
+		$valorTotalDesconto = 0;
 
 		foreach($atendimentoSessao as $item){
-			$valorTotal += $item['valor'] - ($item['valor']*($item['desconto']/100));
+			$valorTotal += $item['valor'] - $item['desconto'];
+			$valorTotalDesconto += $item['desconto'];
 		}
 		$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
 		
 		echo json_encode([
 			'array' => $atendimentoSessao,
-			'valorTotal' => $valorTotal
+			'valorTotal' => $valorTotal,
+			'valorTotalDesconto' => $valorTotalDesconto
 		]);
 	} elseif ($tipoRequest == 'EXCLUISERVICO'){
 		$oldId = $_POST['id']; // "SrVenId#ProfiId#AtLocId"
@@ -1776,8 +1779,6 @@ try{
 		$_SESSION['atendimento']['atendimentoServicos'] = $atendimentoSessao;
 
 		echo json_encode([
-			'array' => $atendimentoSessao,
-			'valorTotal' => $valorTotal,
 			'status' => 'success',
 			'titulo' => 'Desconto',
 			'menssagem' => 'Desconto adicionado!!!',
