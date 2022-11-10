@@ -195,9 +195,13 @@ $count = count($row);
 											<td>'.$item['CnCusNome'].'</td>
 											<td>'.$item['CnCusDetalhamento'].'</td>
 											');
-										
-										print('<td><a href="#" onclick="atualizaCentroCusto(1,'.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$situacaoChave .', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
-										
+											
+										if ($item['CnCusNome'] != 'Atendimento Eletivo' && $item['CnCusNome'] != 'Atendimento Ambulatorial' && $item['CnCusNome'] != 'Atendimento Internação') {
+											print('<td><a href="#" onclick="atualizaCentroCusto(1,'.$item['CnCusId'].', \''.$item['CnCusNome'].'\','.$situacaoChave .', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										}else{
+											print('<td><a <span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
+										}
+
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
