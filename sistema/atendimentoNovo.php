@@ -588,7 +588,9 @@ $_SESSION['atendimento'] = [
 					alerta('Campo Obrigatório!', menssageError, 'error')
 					return
 				}
-				if(!validaCPF($('#cpfNew').val())){
+
+				var cpfSoNumeros = $('#cpfNew').val().replace(/[^\d]+/g, '');
+				if(!validaCPF(cpfSoNumeros)){
 					alerta('CPF Inválido!', 'Digite um CPF válido!!', 'error')
 					return
 				}
@@ -602,7 +604,7 @@ $_SESSION['atendimento'] = [
 						'prontuario': $('#prontuarioNew').val(),
 						'nome': $('#nomeNew').val(),
 						'nomeSocial': $('#nomeSocialNew').val(),
-						'cpf': $('#cpfNew').val(),
+						'cpf': cpfSoNumeros,
 						'cns': $('#cnsNew').val(),
 						'rg': $('#rgNew').val(),
 						'emissor': $('#emissorNew').val(),
