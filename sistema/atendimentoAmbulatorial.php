@@ -112,7 +112,7 @@ if (isset($_POST['inputInicio']) ){
 				':dDataInicio' => gravaData($_POST['inputDataInicio']),
 				':dDataFim' => date('m/d/Y'),
 				':sHoraInicio' => $_POST['inputInicio'],
-				':sHoraFim' => $_POST['inputFim'],
+				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,
 				':sQueixaPrincipal' => $_POST['txtareaConteudo1'],
 				':sHistoriaMolestiaAtual' => $_POST['txtareaConteudo2'],

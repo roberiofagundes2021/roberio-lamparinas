@@ -109,7 +109,7 @@ if (isset($_POST['txtareaConteudo']) ){
 				':dDataInicio' => gravaData($_POST['inputDataInicio']),
 				':dDataFim' => date('m/d/Y'),
 				':sHoraInicio' => $_POST['inputInicio'],
-				':sHoraFim' => $_POST['inputFim'],
+				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,
 				':sReceituario' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],

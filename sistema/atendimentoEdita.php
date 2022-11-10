@@ -71,7 +71,10 @@ if ($tipo == 'ATENDIMENTO') {
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 
-	<!-- essa função deve ser devlarada aqui pois existem funções que são sobrescrevidas
+	<!-- funcoes gerais lamparinas -->
+	<script src="global_assets/js/lamparinas/custom.js"></script>
+
+	<!-- essa função deve ser declarada aqui pois existem funções que são sobrescrevidas
 	nas importações abaixo -->
 	<script>
 		$(document).ready(function() {
@@ -718,6 +721,12 @@ if ($tipo == 'ATENDIMENTO') {
 				$('#iAtendimento').val('')
 				$('#page-modal-responsavel').fadeOut(200)
 			})
+			$('#modalDesconto-close-x').on('click', () => {
+				$('#itemDescontoId').val('')
+				$('#itemDescontoValue').val('')
+				$('#inputDesconto').val('')
+				$('#pageModalDescontos').fadeOut(200)
+			})
 
 			$('#cpf').blur(function(element){
 				if(!validaCPF($(this).val())){
@@ -851,6 +860,36 @@ if ($tipo == 'ATENDIMENTO') {
 			})
 			$('#dados').submit(function(e) {
 				e.preventDefault()
+			})
+
+			$('#inputDesconto').on('input', function(item){
+				let valor = $('#itemDescontoValue').val()
+				let desconto = $(this).val()
+				let valorF = 0
+
+				valorF = valor - desconto
+
+				$('#inputModalValorF').val('R$'+float2moeda(valorF))
+
+				$('#pageModalDescontos').fadeIn(200);
+			})
+
+			$('#setDesconto').on('click', function(item){
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'SETDESCONTO',
+						'iServico':$('#itemDescontoId').val(),
+						'desconto':$('#inputDesconto').val(),
+					},
+					success: function(response) {
+						$('#pageModalDescontos').fadeOut(200)
+						checkServicos()
+						alerta(response.titulo,response.menssagem,response.status)
+					}
+				});
 			})
 
 			resetServicoCmb()
@@ -1018,27 +1057,6 @@ if ($tipo == 'ATENDIMENTO') {
 					})
 				}
 			});
-		}
-
-		function validaCPF(strCPF) {
-			var Soma;
-			var Resto;
-			Soma = 0;
-			if (strCPF == "00000000000") return false;
-
-			for (i = 1; i <= 9; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (11 - i);
-			Resto = (Soma * 10) % 11;
-
-			if ((Resto == 10) || (Resto == 11)) Resto = 0;
-			if (Resto != parseInt(strCPF.substring(9, 10))) return false;
-
-			Soma = 0;
-			for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (12 - i);
-			Resto = (Soma * 10) % 11;
-
-			if ((Resto == 10) || (Resto == 11)) Resto = 0;
-			if (Resto != parseInt(strCPF.substring(10, 11))) return false;
-			return true;
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o paciente
@@ -1265,10 +1283,15 @@ if ($tipo == 'ATENDIMENTO') {
 						let HTML = ''
 						response.array.forEach(item => {
 							if(item.status != 'rem'){
+								let popup = `<i style='color:${(item.desconto && item.desconto>0?'#50b900':'#000')}; cursor:pointer'
+								data-id="${item.id}" data-desconto="${item.desconto}" data-valor="${item.valor}"
+								data-titulo="${item.servico}"
+								class='icon-cash descontoModal' title='Descontos'></i>`
 								let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
 								let acoes = `<div class='list-icons'>
-											${exc}
-										</div>`;
+												${popup}			
+												${exc}
+											</div>`;
 								HTML += `
 								<tr class='servicoItem'>
 									<td class="text-center">${item.servico}</td>
@@ -1281,9 +1304,31 @@ if ($tipo == 'ATENDIMENTO') {
 								</tr>`
 							}
 						})
-						$('#servicoValorTotal').html(`${float2moeda(response.valorTotal)}`).show();
-						$('#dataServico').html(HTML).show();
+						$('#servicoValorTotal').html(`R$${float2moeda(response.valorTotal)}`)
+						$('#servicoValorDescontoTotal').html(`R$${float2moeda(response.valorTotalDesconto)}`)
+						$('#dataServico').html(HTML);
 						$('#servicoTable').show();
+
+						$('.descontoModal').each(function(index, element){
+							$(element).on('click', function(item){
+								let id = $(this).data('id')
+								let valor = $(this).data('valor')
+								let desconto = $(this).data('desconto')
+								let valorF = 0
+
+								$('#inputDesconto').val(desconto)
+								$('#itemDescontoId').val(id)
+								$('#itemDescontoValue').val(valor)
+
+								$('#inputModalValorB').val('R$'+float2moeda(valor))
+
+								valorF = valor - desconto
+
+								$('#inputModalValorF').val('R$'+float2moeda(valorF))
+
+								$('#pageModalDescontos').fadeIn(200);
+							})
+						})
 					} else {
 						$('#servicoTable').hide();
 					}
@@ -1624,10 +1669,19 @@ if ($tipo == 'ATENDIMENTO') {
 												</tbody>
 												<tfoot>
 													<tr>
-														<th colspan="6" class="font-weight-bold" style="font-size: 16px; width: 72rem;">
+														<th colspan="6" class="font-weight-bold" style="width: 72rem;">
 															<div style="float: right;">
-																<div style="display:table-cell;padding-right:40px;">Valor(R$):</div>
-																<div id="servicoValorTotal" class="font-weight-bold" style="font-size: 15px;display:table-cell;">R$ 0,00</div>
+																<div style="font-size: 13px;">
+																	<div style="display:table-cell;padding-right:55px;">Desconto(R$):</div>
+																	<div id="servicoValorDescontoTotal" class="font-weight-bold" style="display:table-cell;">R$ 0,00</div>
+																</div>
+
+																<br>
+
+																<div style="font-size: 16px;">
+																	<div style="display:table-cell;padding-right:60px;">Valor(R$):</div>
+																	<div id="servicoValorTotal" class="font-weight-bold" style="display:table-cell;">R$ 0,00</div>
+																</div>
 															</div>
 														</th>
 
@@ -1690,7 +1744,7 @@ if ($tipo == 'ATENDIMENTO') {
 											<input id="nomeSocial" name="nomeSocial" type="text" class="form-control" placeholder="Nome Social">
 										</div>
 										<div class="col-lg-3">
-											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" required>
+											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required>
 										</div>
 									</div>
 
@@ -2182,7 +2236,7 @@ if ($tipo == 'ATENDIMENTO') {
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="cpfNew" name="cpfNew" type="text" class="form-control" placeholder="CPF">
+											<input id="cpfNew" name="cpfNew" type="text" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required>
 										</div>
 										<div class="col-lg-4">
 											<input id="cnsNew" name="cnsNew" type="text" class="form-control" placeholder="Cartão do SUS">
@@ -2631,6 +2685,66 @@ if ($tipo == 'ATENDIMENTO') {
 						</div>
 					</div>
 					<div class="text-right m-2"><button id="salvarResponsavelModal" class="btn btn-principal" role="button">Confirmar</button></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="pageModalDescontos" class="custon-modal">
+		<div class="custon-modal-container" style="max-width: 500px;">
+			<div class="card custon-modal-content">
+				<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+					<p id='tituloModal' class="h5">Desconto</p>
+					<i id="modalDesconto-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+				</div>
+				<div class="px-0">
+					<div class="d-flex flex-row">
+						<div class="col-lg-12">
+							<form id="editaSituacao" name="alterarSituacao" method="POST" class="form-validate-jquery">
+								<div class="form-group">
+									<div class="custon-modal-title">
+										<i class=""></i>
+										<p class="h3">Descontos</p>
+										<i class=""></i>
+									</div>
+									
+									<div class="p-5">
+										<div class="d-flex flex-row justify-content-between">
+											<div class="col-lg-12" style="text-align:center;">
+												<div class="form-group row">
+													<div class="col-lg-4">
+														<label>Desconto</label>
+													</div>
+													<div class="col-lg-4">
+														<label>Valor</label>
+													</div>
+													<div class="col-lg-4">
+														<label>Valor Final</label>
+													</div>
+
+													<div class="col-lg-4">
+														<input id="inputDesconto" maxLength="12" class="form-control" type="number" name="inputDesconto">
+													</div>
+													<div class="col-lg-4">
+														<input id="inputModalValorB" maxLength="12" class="form-control" type="text" readonly>
+													</div>
+													<div class="col-lg-4">
+														<input id="inputModalValorF" maxLength="12" class="form-control" type="text" readonly>
+													</div>
+
+													<input id="itemDescontoId" name="itemId" type="hidden" value=''>
+													<input id="itemDescontoValue" name="itemId" type="hidden" value=''>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+					<div class="text-right m-2">
+						<button id="setDesconto" class="btn btn-principal" role="button">Confirmar</button>
+					</div>
 				</div>
 			</div>
 		</div>

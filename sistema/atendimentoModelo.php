@@ -106,7 +106,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
-	
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>	
 	
@@ -117,6 +118,16 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		
 	
 	<script type="text/javascript">
+
+		$(document).ready(function() {
+
+			$('#summernote').summernote();
+
+			$('#enviar').on('click', function(e){
+				e.preventDefault();
+				$( "formModelo" ).submit();
+			})
+		}); //document.ready
 
 		$(document).ready(function (){	
 			$('#tblModelo').DataTable( {
@@ -305,12 +316,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 												<input type="text" id="inputDescricao" name="inputDescricao" class="form-control" placeholder="Descrição" value="<?php if (isset($_POST['inputModeloId'])) echo $rowModelo['AtModDescricao']; ?>" required autofocus>
 											</div>
 										</div>
+										
 									</div>
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtConteudo">Conteúdo do Modelo<span class="text-danger"> *</span></label>
-												<textarea rows="5" cols="5" class="form-control" id="txtConteudo" name="txtConteudo" placeholder="Determinantes" required ><?php if (isset($_POST['inputModeloId'])) echo $rowModelo['AtModConteudo']; ?></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="summernote" name="txtConteudo" placeholder="Conteúdo do Modelo (informe aqui o texto que você queira que apareça no conteúdo do modelo)" required ><?php if (isset($_POST['inputModeloId'])) echo $rowModelo['AtModConteudo']; ?></textarea>
 											</div>
 										</div>
 									</div>

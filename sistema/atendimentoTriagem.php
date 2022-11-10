@@ -111,7 +111,7 @@ if (isset($_POST['inputAlergia']) ){
 				':dDataInicio' => gravaData($_POST['inputDataInicio']),
 				':dDataFim' => date('m/d/Y'),
 				':sHoraInicio' => $_POST['inputInicio'],
-				':sHoraFim' => $_POST['inputFim'],
+				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,
 				':sPressaoSistolica' => $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'],
 				':sPressaoDiatolica' => $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'],
