@@ -504,19 +504,30 @@ $acesso = 'ATENDIMENTO';
 				document.getElementById("card-title").innerText = "Pacientes em Espera";
 				document.getElementById("box-pacientes-espera").style.display = 'block';
 				document.getElementById("box-pacientes-atendidos").style.display = 'none';
-				//document.getElementById("box-pacientes-observacao").style.display = 'none';
-			}
-			if (grid == 'atendidos') {
+				document.getElementById("box-pacientes-observacao").style.display = 'none';
+				document.getElementById("box-pacientes-atendimento").style.display = 'none';
+
+			} else if (grid == 'atendidos') {
 				document.getElementById("card-title").innerText = "Pacientes Atendidos";
 				document.getElementById("box-pacientes-atendidos").style.display = 'block';
 				document.getElementById("box-pacientes-espera").style.display = 'none';
-				//document.getElementById("box-pacientes-observacao").style.display = 'none';			
-			}
-			if (grid == 'observacao') {
+				document.getElementById("box-pacientes-observacao").style.display = 'none';
+				document.getElementById("box-pacientes-atendimento").style.display = 'none';
+
+			} else if (grid == 'observacao') {
 				document.getElementById("card-title").innerText = "Pacientes em Observação";
 				document.getElementById("box-pacientes-observacao").style.display = 'block';
 				document.getElementById("box-pacientes-espera").style.display = 'none';
+				document.getElementById("box-pacientes-atendidos").style.display = 'none';
+				document.getElementById("box-pacientes-atendimento").style.display = 'none';
+
+			}  else if (grid == 'atendimento') {
+				document.getElementById("card-title").innerText = "Pacientes em Atendimento";
+				document.getElementById("box-pacientes-atendimento").style.display = 'block';
+				document.getElementById("box-pacientes-espera").style.display = 'none';
 				document.getElementById("box-pacientes-atendidos").style.display = 'none';				
+				document.getElementById("box-pacientes-observacao").style.display = 'none';
+
 			}
 		}
 
@@ -563,8 +574,9 @@ $acesso = 'ATENDIMENTO';
 
 									<div class="col-lg-12">	
 										<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('espera')" >Pacientes em Espera</button>
+										<button type="button" id="pacientes-atendimento-btn" class="btn-grid btn btn-outline-secondary btn-lg" onclick="mudarGrid('atendimento')" >Pacientes em Atendimento</button>
+										<button type="button" id="pacientes-observacao-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('observacao')" >Pacientes em Observação</button>
 										<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendidos')" >Pacientes Atendidos</button>
-										<button type="button" id="pacientes-observacao-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('observacao')" disabled >Pacientes em Observação</button>
 									</div>
 								</div>
 							</div>
@@ -597,7 +609,17 @@ $acesso = 'ATENDIMENTO';
 
 									</tbody>
 								</table>
-							</div>							
+							</div>
+							
+							<!-- Pacientes Em Atendimento -->
+							<div id="box-pacientes-atendimento" style="display: none;">
+
+							</div>
+
+							<!-- Pacientes Em Observacao -->
+							<div id="box-pacientes-observacao" style="display: none;">
+
+							</div>
 
 							<!-- Pacientes Atendidos -->
 							<div id="box-pacientes-atendidos" style="display: none;">
