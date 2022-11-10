@@ -344,7 +344,7 @@ try{
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iProfissional = $row['ProfiId'];
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
 			FROM AtendimentoXServico
@@ -361,7 +361,7 @@ try{
 		$resultEspera = $conn->query($sql);
 		$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
 			FROM AtendimentoXServico
@@ -413,7 +413,7 @@ try{
 				'data' => [
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
-					$item['AtXSeId'],  // Nº Registro
+					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
@@ -455,7 +455,7 @@ try{
 				'data' => [
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
-					$item['AtXSeId'],  // Nº Registro
+					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
@@ -493,7 +493,7 @@ try{
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iProfissional = $row['ProfiId'];
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
 			FROM AtendimentoXServico
@@ -510,7 +510,7 @@ try{
 		$resultEspera = $conn->query($sql);
 		$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
 			FROM AtendimentoXServico
@@ -562,7 +562,7 @@ try{
 				'data' => [
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
-					$item['AtXSeId'],  // Nº Registro
+					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
@@ -604,7 +604,7 @@ try{
 				'data' => [
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
-					$item['AtXSeId'],  // Nº Registro
+					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
@@ -642,7 +642,7 @@ try{
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iProfissional = $row['ProfiId'];
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
 			FROM AtendimentoXServico
@@ -660,7 +660,7 @@ try{
 		$resultEspera = $conn->query($sql);
 		$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
 			FROM AtendimentoXServico
@@ -717,7 +717,7 @@ try{
 				'data' => [
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
-					$item['AtXSeId'],  // Nº Registro
+					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
@@ -763,7 +763,7 @@ try{
 				'data' => [
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
-					$item['AtXSeId'],  // Nº Registro
+					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
