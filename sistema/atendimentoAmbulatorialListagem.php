@@ -339,7 +339,7 @@ $acesso = 'ATENDIMENTO';
 					$('#ClaChave').val(AtClaChave)
 					$('#ClaNome').val(AtClaNome)
 
-					$('#dadosPost').attr('action', 'atendimentoEletivo.php')
+					$('#dadosPost').attr('action', 'atendimentoAmbulatorial.php')
 					$('#dadosPost').attr('method', 'POST')
 					$('#dadosPost').submit()
 				})
