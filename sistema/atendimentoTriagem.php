@@ -989,7 +989,15 @@ if (isset($_POST['inputAlergia']) ){
 												<button class="btn btn-lg btn-success" id="enviar">Salvar</button>
 												<button class="btn btn-lg btn-secondary" id="imprimir" style="margin-left: 5px;" >Imprimir</button>
 
-												<a href="atendimento.php" class="btn btn-basic" role="button">Cancelar</a>
+												<?php 
+													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
+													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
+													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "ELETINTERNACAOIVO") {
+													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													}					
+												?>
 											</div>
 										</div>
 									</div>    

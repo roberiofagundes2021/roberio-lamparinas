@@ -296,7 +296,15 @@ if (isset($_POST['txtareaConteudo']) ){
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
 												<button class="btn btn-lg btn-principal" id="enviar">Salvar</button>
-												<a href="atendimento.php" class="btn btn-basic" role="button">Cancelar</a>
+												<?php 
+													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
+													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
+													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "ELETINTERNACAOIVO") {
+													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													}					
+												?>
 											</div>
 										</div>
 									</div>    
