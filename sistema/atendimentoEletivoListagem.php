@@ -90,39 +90,34 @@ $acesso = 'ATENDIMENTO';
 					targets: [2]
 				},
 				{ 
-					orderable: true,   //Prontuário
-					width: "5%",
-					targets: [3]
-				},
-				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Profissional
 					width: "10%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Modalidade
 					width: "20%",
-					targets: [6]
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Procedimento
 					width: "5%",
-					targets: [7]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [9]
+					targets: [8]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -159,34 +154,29 @@ $acesso = 'ATENDIMENTO';
 					targets: [2]
 				},
 				{ 
-					orderable: true,   //Prontuário
-					width: "5%",
-					targets: [3]
-				},
-				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Procedimento
 					width: "10%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Risco
-					width: "5%",
-					targets: [6]
+					width: "10%",
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [7]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -229,34 +219,29 @@ $acesso = 'ATENDIMENTO';
 					targets: [2]
 				},
 				{ 
-					orderable: true,   //Prontuário
-					width: "5%",
-					targets: [3]
-				},
-				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Procedimento
 					width: "10%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Risco
-					width: "5%",
-					targets: [6]
+					width: "10%",
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [7]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -293,34 +278,29 @@ $acesso = 'ATENDIMENTO';
 					targets: [2]
 				},
 				{ 
-					orderable: true,   //Prontuário
-					width: "5%",
-					targets: [3]
-				},
-				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Procedimento
 					width: "10%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Risco
-					width: "5%",
-					targets: [6]
+					width: "10%",
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [7]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -358,34 +338,29 @@ $acesso = 'ATENDIMENTO';
 					targets: [2]
 				},
 				{ 
-					orderable: true,   //Prontuário
-					width: "5%",
-					targets: [3]
-				},
-				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Procedimento
 					width: "10%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Risco
-					width: "5%",
-					targets: [6]
+					width: "10%",
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [7]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -607,24 +582,28 @@ $acesso = 'ATENDIMENTO';
 					response.dataEspera.forEach(item => {
 						rowNodeE = tableE.row.add(item.data).draw().node()
 						$(rowNodeE).attr('class', 'text-left')
+						$(rowNodeE).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
 						$(rowNodeE).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeE).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})					
 					response.dataEmAtendimento.forEach(item => {
 						rowNodeEmAtendimento = tableEmAtendimento.row.add(item.data).draw().node()
 						$(rowNodeEmAtendimento).attr('class', 'text-left')
+						$(rowNodeEmAtendimento).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
 						$(rowNodeEmAtendimento).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeEmAtendimento).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})
 					response.dataObservacao.forEach(item => {
 						rowNodeObservacao = tableObservacao.row.add(item.data).draw().node()
 						$(rowNodeObservacao).attr('class', 'text-left')
+						$(rowNodeObservacao).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
 						$(rowNodeObservacao).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeObservacao).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})					
 					response.dataAtendido.forEach(item => {
 						rowNodeA = tableA.row.add(item.data).draw().node()
 						$(rowNodeA).attr('class', 'text-left')
+						$(rowNodeA).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
 						$(rowNodeA).find('td:eq(7)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeA).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						$(rowNodeA).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
@@ -748,11 +727,10 @@ $acesso = 'ATENDIMENTO';
 										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>
 											<th>Espera</th>
-											<th>Nº Registro</th>
-											<th>Prontuário</th>			
+											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Risco</th>
+											<th>Classificação de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>
@@ -771,11 +749,10 @@ $acesso = 'ATENDIMENTO';
 										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>
 											<th>Espera</th>
-											<th>Nº Registro</th>
-											<th>Prontuário</th>			
+											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Risco</th>
+											<th>Classificação de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>
@@ -794,11 +771,10 @@ $acesso = 'ATENDIMENTO';
 										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>
 											<th>Espera</th>
-											<th>Nº Registro</th>
-											<th>Prontuário</th>			
+											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Risco</th>
+											<th>Classificação de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>
@@ -818,11 +794,10 @@ $acesso = 'ATENDIMENTO';
 										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>
 											<th>Espera</th>
-											<th>Nº Registro</th>
-											<th>Prontuário</th>			
+											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Risco</th>
+											<th>Classificação de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>
