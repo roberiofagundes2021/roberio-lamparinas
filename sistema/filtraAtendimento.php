@@ -455,17 +455,17 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					'Risco**',  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sJustificativa' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao'],
+					'prontuario' => $item['ClienCodigo']
 				]]);
 		}
 		foreach($rowEmAtendimento as $item){
@@ -506,17 +506,17 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					'Risco**',  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sJustificativa' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao'],
+					'prontuario' => $item['ClienCodigo']
 				]]);
 		}
 		foreach($rowObservacao as $item){
@@ -557,17 +557,17 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					'Risco**',  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sJustificativa' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao'],
+					'prontuario' => $item['ClienCodigo']
 				]]);
 		}
 		foreach($rowAtendido as $item){
@@ -609,11 +609,10 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					'Risco**',  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
@@ -621,7 +620,8 @@ try{
 					'iAtendimento' => $item['AtendId'],
 					'sJustificativa' => $item['AtendObservacao'],
 					'AtClaChave' => $item['AtClaChave'],
-					'AtClaNome' => $item['AtClaNome']
+					'AtClaNome' => $item['AtClaNome'],
+					'prontuario' => $item['ClienCodigo']
 				]
 			]);
 		}
@@ -759,17 +759,17 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					'Risco**',  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sJustificativa' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao'],
+					'prontuario' => $item['ClienCodigo']
 				]]);
 		}
 		foreach($rowEmAtendimento as $item){
@@ -810,17 +810,17 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					'Risco**',  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sJustificativa' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao'],
+					'prontuario' => $item['ClienCodigo']
 				]]);
 		}
 		foreach($rowObservacao as $item){
@@ -861,17 +861,17 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					'Risco**',  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sJustificativa' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao'],
+					'prontuario' => $item['ClienCodigo']
 				]]);
 		}
 		foreach($rowAtendido as $item){
@@ -909,11 +909,10 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					'Risco**',  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
@@ -921,7 +920,8 @@ try{
 					'iAtendimento' => $item['AtendId'],
 					'sJustificativa' => $item['AtendObservacao'],
 					'AtClaChave' => $item['AtClaChave'],
-					'AtClaNome' => $item['AtClaNome']
+					'AtClaNome' => $item['AtClaNome'],
+					'prontuario' => $item['ClienCodigo']
 				]
 			]);
 		}
@@ -1090,17 +1090,17 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sJustificativa' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao'],
+					'prontuario' => $item['ClienCodigo']
 				]]);
 		}
 
@@ -1146,17 +1146,17 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sJustificativa' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao'],
+					'prontuario' => $item['ClienCodigo']
 				]]);
 		}
 
@@ -1202,17 +1202,17 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
 					'situacao' => $item['SituaChave'],
 					'iAtendimento' => $item['AtendId'],
-					'sJustificativa' => $item['AtendObservacao']
+					'sJustificativa' => $item['AtendObservacao'],
+					'prontuario' => $item['ClienCodigo']
 				]]);
 		}
 
@@ -1259,11 +1259,10 @@ try{
 					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'] ,  // Data - hora
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienCodigo'],  // Prontuário
 					$item['ClienNome'],  // Paciente
 					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
-					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
 				],
 				'identify' => [
@@ -1271,7 +1270,8 @@ try{
 					'iAtendimento' => $item['AtendId'],
 					'sJustificativa' => $item['AtendObservacao'],
 					'AtClaChave' => $item['AtClaChave'],
-					'AtClaNome' => $item['AtClaNome']
+					'AtClaNome' => $item['AtClaNome'],
+					'prontuario' => $item['ClienCodigo']
 				]
 			]);
 		}
