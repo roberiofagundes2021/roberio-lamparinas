@@ -165,7 +165,12 @@ try {
     $msg = '';
 
 	switch($tipoRequest){
-		case 'ADICIONARPROCEDIMENTO': $msg = 'Erro ao adicionar procedimento!!';break;
+		case 'ADICIONAREXAME': $msg = 'Erro ao adicionar procedimento!!';break;
+        case 'CHECKEXAMES': $msg = 'Erro ao checar procedimento!!';break;
+		case 'EXCLUIREXAME': $msg = 'Erro ao excluir procedimento!!';break;
+		case 'GRUPOS': $msg = 'Erro ao buscar grupos!!';break;
+		case 'SUBGRUPOS': $msg = 'Erro ao buscar subgrupos!!';break;
+		case 'PROCEDIMENTOS': $msg = 'Erro ao buscar procedimentos!!';break;
 		default: $msg = 'Erro ao executar ação!!';break;
 	}
 	echo json_encode([
