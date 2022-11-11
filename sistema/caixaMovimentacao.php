@@ -60,9 +60,6 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
     <title>Lamparinas | Movimentação do Caixa</title>
 
     <?php include_once("head.php"); ?>
-
-    <!-- funcoes gerais lamparinas -->
-	<script src="global_assets/js/lamparinas/custom.js"></script>
     
     <!-- Theme JS files -->
     <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>

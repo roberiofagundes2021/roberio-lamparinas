@@ -71,9 +71,6 @@ if ($tipo == 'ATENDIMENTO') {
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 
-	<!-- funcoes gerais lamparinas -->
-	<script src="global_assets/js/lamparinas/custom.js"></script>
-
 	<!-- essa função deve ser declarada aqui pois existem funções que são sobrescrevidas
 	nas importações abaixo -->
 	<script>

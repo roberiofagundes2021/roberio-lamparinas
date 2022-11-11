@@ -29,9 +29,6 @@ else {
 
 	<?php include_once("head.php"); ?>
 
-	<!-- funcoes gerais lamparinas -->
-	<script src="global_assets/js/lamparinas/custom.js"></script>
-
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>

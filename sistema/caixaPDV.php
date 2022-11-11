@@ -202,9 +202,6 @@ if(isset($_POST['inputAtendimentoId'])) {
 
     <?php include_once("head.php"); ?>
 
-    <!-- funcoes gerais lamparinas -->
-	<script src="global_assets/js/lamparinas/custom.js"></script>
-
     <!-- Theme JS files -->
     <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
