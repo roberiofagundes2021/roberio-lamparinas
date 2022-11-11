@@ -181,8 +181,6 @@ if (isset($_POST['inputInicio']) ){
 
 	<?php include_once("head.php"); ?>
 	
-    <script src="global_assets/js/demo_pages/components_collapsible.js"></script>
-	
 	<script type="text/javascript">
 
 		$(document).ready(function() {	

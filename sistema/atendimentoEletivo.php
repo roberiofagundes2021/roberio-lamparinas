@@ -173,18 +173,6 @@ if (isset($_POST['inputInicio']) ){
 	<title>Lamparinas | Anamnese</title>
 
 	<?php include_once("head.php"); ?>
-	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-
-	<!-- Não permite que o usuário retorne para o EDITAR -->
-	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 
 	<script type="text/javascript">
 
