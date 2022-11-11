@@ -486,7 +486,7 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 											<div class="form-group">
 												<label for="justificativa">Justificativa</label>
 												<textarea rows="5" cols="5" maxLength="500" id="justificativa" name="justificativa" onInput="contarCaracteres(this);" class="form-control" placeholder="Corpo da solicitacao de exame (informe aqui o texto que você queira que apareça na solicitacao de exame)" ><?php if (isset($iAtendimentoSolicitacaoExameId )) echo $rowSolicitacaoExame['AtSExSolicitacaoExame']; ?></textarea>
-												<span class="text-secondary">Max. 500 caracteres - </span><span class="caracteresjustificativa text-secondary"></span>
+												<small class="text-muted form-text">Max. 500 caracteres - <span class="caracteresjustificativa"></span></small>
 											</div>
 										</div>
 									</div>

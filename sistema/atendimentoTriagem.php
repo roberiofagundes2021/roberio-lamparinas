@@ -604,7 +604,7 @@ if (isset($_POST['inputAlergia']) ){
 											<div class="form-group">
 												<label for="">Motivo da Consulta (descrição)</label>
 												<textarea rows="4" cols="4" maxLength="400"  id="summernoteMotivo" name="summernoteMotivo" onInput="contarCaracteres(this);" class="form-control" placeholder="Descrição (Queixa principal)"><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriMotivoConsulta']; ?></textarea>
-												<span class="text-secondary">Max. 400 caracteres - </span><span class="caracteressummernoteMotivo text-secondary"></span>
+												<small class="text-muted form-text">Max. 400 caracteres - <span class="caracteressummernoteMotivo"></span></small>
 											</div>
 										</div>
 									</div>
@@ -863,8 +863,10 @@ if (isset($_POST['inputAlergia']) ){
 												<div class="form-group">
 													<label for="inputAlergiaDescricao">Descrição (Alergia) </label>
 													<textarea rows="4" id="inputAlergiaDescricao" name="inputAlergiaDescricao" onInput="contarCaracteres(this)" maxLength="150" class="form-control" placeholder="Descrição da Alergia" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriAlergiaDescricao']; ?></textarea>
-													<small class="text-secondary">Máx. 150 caracteres</small><br>
-													<small class="caracteresinputAlergiaDescricao text-secondary"></small>
+													<small class="text-muted form-text">
+														Máx. 150 caracteres<br>
+														<span class="caracteresinputAlergiaDescricao"></span>
+													</small>
 												</div>
 											</div> 
 										</div>
@@ -873,8 +875,10 @@ if (isset($_POST['inputAlergia']) ){
 												<div class="form-group">
 													<label for="inputDiabetesDescricao">Descrição (Diabetes) </label>
 													<textarea rows="4" id="inputDiabetesDescricao" name="inputDiabetesDescricao" onInput="contarCaracteres(this)" maxLength="150" class="form-control" placeholder="Descrição da Diabetes" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriDiabetesDescricao']; ?></textarea>
-													<small class="text-secondary">Máx. 150 caracteres</small><br>
-													<small class="caracteresinputDiabetesDescricao text-secondary"></small>
+													<small class="text-muted form-text">
+														Máx. 150 caracteres<br>
+														<span class="caracteresinputDiabetesDescricao"></span>
+													</small>
 												</div>
 											</div> 
 										</div>
@@ -883,8 +887,10 @@ if (isset($_POST['inputAlergia']) ){
 												<div class="form-group">
 													<label for="inputHipertensaoDescricao">Descrição (Hipertensão) </label>
 													<textarea rows="4" id="inputHipertensaoDescricao" name="inputHipertensaoDescricao" onInput="contarCaracteres(this)" maxLength="150" class="form-control" placeholder="Descrição da Hipertensão" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriHipertensaoDescricao']; ?></textarea>
-													<small class="text-secondary">Máx. 150 caracteres</small><br>
-													<small class="caracteresinputHipertensaoDescricao text-secondary"></small>
+													<small class="text-muted form-text">
+														Máx. 150 caracteres<br>
+														<span class="caracteresinputHipertensaoDescricao"></span>
+													</small>
 												</div>
 											</div>
 										</div>
@@ -893,8 +899,10 @@ if (isset($_POST['inputAlergia']) ){
 												<div class="form-group">
 													<label for="inputNeoplasiaDescricao">Descrição (Neoplasia) </label>
 													<textarea rows="4" id="inputNeoplasiaDescricao" name="inputNeoplasiaDescricao" onInput="contarCaracteres(this)" maxLength="150" class="form-control" placeholder="Descrição da Neoplasia" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriNeoplasiaDescricao']; ?></textarea>
-													<small class="text-secondary">Máx. 150 caracteres</small><br>
-													<small class="caracteresinputNeoplasiaDescricao text-secondary"></small>
+													<small class="text-muted form-text">
+														Máx. 150 caracteres<br>
+														<span class="caracteresinputNeoplasiaDescricao"></span>
+													</small>
 												</div>
 											</div>
 										</div>
@@ -903,8 +911,10 @@ if (isset($_POST['inputAlergia']) ){
 												<div class="form-group">
 													<label for="inputUsoMedicamentoDescricao">Descrição (Uso Medicamentos) </label>
 													<textarea rows="4" id="inputUsoMedicamentoDescricao" name="inputUsoMedicamentoDescricao" onInput="contarCaracteres(this)" maxLength="150" class="form-control" placeholder="Descrição da Medicamento" ><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriUsoMedicamentoDescricao']; ?></textarea>
-													<small class="text-secondary">Máx. 150 caracteres</small><br>
-													<small class="caracteresinputUsoMedicamentoDescricao text-secondary"></small>
+													<small class="text-muted form-text">
+														Máx. 150 caracteres<br>
+														<span class="caracteresinputUsoMedicamentoDescricao"></span>
+													</small>
 												</div>
 											</div>
 										</div>

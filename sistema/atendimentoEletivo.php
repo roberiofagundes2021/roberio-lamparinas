@@ -275,8 +275,8 @@ if (isset($_POST['inputInicio']) ){
 														<a href="#collapse1-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1. Queixa Principal (QP)</h5></a>   
 														<div class="collapse" id="collapse1-link" style="">
 															<div class="mt-3">
-																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);"  id="summernote1" name="txtareaConteudo1" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na queixa principal)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleQueixaPrincipal']; ?></textarea>
-																<span class="text-secondary">Max. 500 caracteres - </span><span class="caracteressummernote1 text-secondary"></span>
+																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);"  id="summernote1" name="txtareaConteudo1" class="form-control form-text" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na queixa principal)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleQueixaPrincipal']; ?></textarea>
+																<span class="text-muted form-text form-text">Max. 500 caracteres - <span class="caracteressummernote1 "></span></span>
 															</div>
 														</div>
 													</div>
@@ -289,7 +289,7 @@ if (isset($_POST['inputInicio']) ){
 														<div class="collapse" id="collapse2-link" style="">
 															<div class="mt-3">
 																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote2" name="txtareaConteudo2" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça nna história da moléstia atual)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleHistoriaMolestiaAtual']; ?></textarea>
-																<span class="text-secondary">Max. 500 caracteres - </span><span class="caracteressummernote2 text-secondary"></span>
+																<span class="text-muted form-text ">Max. 500 caracteres - <span class="caracteressummernote2 "></span></span>
 															
 															</div>
 														</div>
@@ -303,7 +303,7 @@ if (isset($_POST['inputInicio']) ){
 														<div class="collapse" id="collapse3-link" style="">
 															<div class="mt-3">
 																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote3" name="txtareaConteudo3" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na história patológica pregressa)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleHistoriaPatologicaPregressa']; ?></textarea>
-																<span class="text-secondary">Max. 500 caracteres - </span><span class="caracteressummernote3 text-secondary"></span>
+																<span class="text-muted form-text ">Max. 500 caracteres - <span class="caracteressummernote3 "></span></span>
 															
 															</div>
 														</div>
@@ -317,7 +317,7 @@ if (isset($_POST['inputInicio']) ){
 														<div class="collapse" id="collapse4-link" style="">
 															<div class="mt-3">
 																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote4" name="txtareaConteudo4" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça no exame físico)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleExameFisico']; ?></textarea>
-																<span class="text-secondary">Max. 500 caracteres - </span><span class="caracteressummernote4 text-secondary"></span>
+																<span class="text-muted form-text ">Max. 500 caracteres - <span class="caracteressummernote4 "></span></span>
 															
 															</div>
 														</div>
@@ -331,7 +331,7 @@ if (isset($_POST['inputInicio']) ){
 														<div class="collapse" id="collapse5-link" style="">
 															<div class="mt-3">
 																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote5" name="txtareaConteudo5" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na hipotese diaginóstica)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleHipoteseDiagnostica']; ?></textarea>
-																<span class="text-secondary">Max. 500 caracteres - </span><span class="caracteressummernote5 text-secondary"></span>
+																<span class="text-muted form-text ">Max. 500 caracteres - <span class="caracteressummernote5 "></span></span>
 															
 															</div>
 														</div>
@@ -345,7 +345,7 @@ if (isset($_POST['inputInicio']) ){
 														<div class="collapse" id="collapse6-link" style="">
 															<div class="mt-3">
 																<textarea rows="5" cols="5" maxLength="1000" onInput="contarCaracteres(this);" id="summernote6" name="txtareaConteudo6" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na anamnese)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleDigitacaoLivre']; ?></textarea>
-																<span class="text-secondary">Max. 1000 caracteres - </span><span class="caracteressummernote6 text-secondary"></span>
+																<span class="text-muted form-text ">Max. 1000 caracteres - <span class="caracteressummernote6 "></span></span>
 															
 															</div>
 														</div>
