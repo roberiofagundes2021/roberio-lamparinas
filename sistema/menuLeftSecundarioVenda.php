@@ -31,6 +31,7 @@
 					case 'historicoPaciente': URL = 'atendimentoHistoricoPaciente.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'solicitacaoProcedimento': URL = 'atendimentoSolicitacaoProcedimento.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'triagem': URL = 'atendimentoTriagem.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'atendimentoAmbulatorial': URL = 'atendimentoAmbulatorial.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'exportacaoProntuario': URL = 'atendimentoProntuarioExportacao.php'; $('#dadosPost').attr('target', '_blank'); break;
@@ -112,7 +113,10 @@
 							<a href="#" class="nav-link itemLink" data-tipo='historicoPaciente'><i class="icon-equalizer"></i> Histórico do Paciente</a>
 						</li>
 						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='solicitacaoExame'><i class="icon-copy"></i> Solicitação de Exame</a>
+							<a href="#" class="nav-link itemLink" data-tipo='solicitacaoExame'><i class="icon-copy"></i> Solicitação de Exames</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link itemLink" data-tipo='solicitacaoProcedimento'><i class="icon-copy"></i> Solicitação de Procedimentos</a>
 						</li>
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='encaminhamentoMedico'><i class="icon-folder-plus4"></i> Encaminhamento Médico</a>
@@ -160,7 +164,10 @@
 							<a href="#" class="nav-link itemLink" data-tipo='historicoPaciente'><i class="icon-equalizer"></i> Histórico do Paciente</a>
 						</li>
 						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='solicitacaoExame'><i class="icon-office"></i> Solicitação de Exame</a>
+							<a href="#" class="nav-link itemLink" data-tipo='solicitacaoExame'><i class="icon-office"></i> Solicitação de Exames</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link itemLink" data-tipo='solicitacaoProcedimento'><i class="icon-office"></i> Solicitação de Procedimentos</a>
 						</li>
 						
 						<li class="nav-item-divider"></li>
@@ -232,6 +239,9 @@
 								</li>
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='solicitacaoExame'><i class="icon-certificate"></i> Solicitação de Exames</a>
+								</li>
+								<li class="nav-item">
+									<a href="#" class="nav-link itemLink" data-tipo='solicitacaoProcedimento'><i class="icon-certificate"></i> Solicitação de Procedimentos</a>
 								</li>
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='relatorioAtaHospitalar'><i class="icon-certificate"></i> Relatório de Ata Hospitalar</a>

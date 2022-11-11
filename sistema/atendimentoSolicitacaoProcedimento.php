@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Solicitacao de Exame';
+$_SESSION['PaginaAtual'] = 'Solicitacao de Procedimento';
 
 include('global_assets/php/conexao.php');
 
@@ -12,20 +12,10 @@ if(!$iAtendimentoId){
 	irpara("atendimento.php");
 }
 
-$sql = "SELECT TOP(1) AtSExId
-FROM AtendimentoSolicitacaoExame
-WHERE AtSExAtendimento = $iAtendimentoId
-ORDER BY AtSExId DESC";
-$result = $conn->query($sql);
-$rowSolicitacaoExame= $result->fetch(PDO::FETCH_ASSOC);
-
-$iAtendimentoSolicitacaoExameId = $rowSolicitacaoExame?$rowSolicitacaoExame['AtSExId']:null;
-
 // essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
 
 $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
-
 
 //Essa consulta é para verificar  o profissional
 $sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo
@@ -37,7 +27,6 @@ $sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome
 $result = $conn->query($sql);
 $rowUser = $result->fetch(PDO::FETCH_ASSOC);
 $userId = $rowUser['ProfissionalId'];
-
 
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
@@ -63,34 +52,6 @@ if ($row['ClienSexo'] == 'F'){
     $sexo = 'Masculino';
 }
 
-//Se estiver editando
-if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
-
-	//Essa consulta é para preencher o campo Receituário ao editar
-	$sql = "SELECT *
-			FROM AtendimentoSolicitacaoExame
-			WHERE AtSExId = " . $iAtendimentoSolicitacaoExameId ;
-	$result = $conn->query($sql);
-	$rowSolicitacaoExame = $result->fetch(PDO::FETCH_ASSOC);
-		
-	$_SESSION['msg'] = array();
-
-	// Formatar Hora/Data
-
-	$DataInicio = strtotime($rowSolicitacaoExame['AtSExDataInicio']);
-	$DataAtendimentoInicio = date("d/m/Y", $DataInicio);
-
-	$DataFim = strtotime($rowSolicitacaoExame['AtSExDataFim']);
-	$DataAtendimentoFim = date("d/m/Y", $DataFim);
-
-	$Inicio = strtotime($rowSolicitacaoExame['AtSExHoraInicio']);
-	$HoraInicio = date("H:i", $Inicio);
-
-	$Fim = strtotime($rowSolicitacaoExame['AtSExHoraFim']);
-	$HoraFim = date("H:i", $Fim);
-
-} 
-
 ?>
 
 <!DOCTYPE html>
@@ -99,7 +60,7 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Sol. Exame</title>
+	<title>Lamparinas | Sol. Procedimento</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -116,13 +77,13 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 	<!-- Não permite que o usuário retorne para o EDITAR -->
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
-	
+
 	<script type="text/javascript">
 
 		$(document).ready(function() {
 
 			getCmbs()
-			checkExames()
+			checkProcedimentos()
 			
 			$('#tblTabelaGastos').DataTable( {
 				"order": [[ 0, "asc" ]],
@@ -158,14 +119,19 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 					targets: [4]
 				},
 				{ 
-					orderable: true,   //exame
-					width: "30%",
+					orderable: true,   //procedimentos
+					width: "20%",
 					targets: [5]
+				},
+				{ 
+					orderable: true,   //cid10
+					width: "10%",
+					targets: [6]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [6]
+					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
 				language: {
@@ -175,17 +141,18 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
 				}
                 
-			});
-	
+			});		
 
-			$('#adicionarExame').on('click', function(e) {
+			$('#adicionarProcedimento').on('click', function(e) {
 				e.preventDefault();
+
 
 				let menssageError = '';
 
 				let grupo = $('#grupo').val();
 				let subgrupo = $('#subgrupo').val();
-				let exame = $('#exame').val();
+				let procedimento = $('#procedimento').val();
+				let cid10 = $('#cid10').val();
 				let justificativa = $('#justificativa').val();
 				let urgente = $('#urgente').val();
 				let profissional = <?php echo $userId; ?>
@@ -199,11 +166,15 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 						$('#cmbProcRealizado').focus();
 						break;
 					case subgrupo:
-						menssageError = 'Informe o SubGrupo e Exame';
+						menssageError = 'Informe o SubGrupo e Procedimento';
 						$('#cmbProcRealizado').focus();
 						break;
-					case exame:
-						menssageError = 'Informe o Exame';
+					case procedimento:
+						menssageError = 'Informe o Procedimento';
+						$('#cmbProcRealizado').focus();
+						break;
+					case cid10:
+						menssageError = 'Informe o Cid-10';
 						$('#cmbProcRealizado').focus();
 						break;
 					case justificativa:
@@ -223,13 +194,14 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 				//chamar requisicao
 				$.ajax({
 					type: 'POST',
-					url: 'filtraAtendimentoSolicitacaoExame.php',
+					url: 'filtraAtendimentoSolicitacaoProcedimento.php',
 					dataType: 'json',
 					data: {
-						'tipoRequest': 'ADICIONAREXAME',
+						'tipoRequest': 'ADICIONARPROCEDIMENTO',
 						'grupo' : grupo,
 						'subgrupo' : subgrupo,
-						'exame' : exame,
+						'procedimento' : procedimento,
+						'cid10' : cid10,
 						'justificativa' : justificativa,
 						'urgente' : urgente,
 						'profissional' : profissional,
@@ -237,11 +209,12 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 					},
 					success: function(response) {
 						if (response.status == 'success') {
-							checkExames()
+							checkProcedimentos()
 							alerta(response.titulo, response.menssagem, response.status);
 							$('#grupo').val('').change();
 							$('#subgrupo').val('').change();
-							$('#exame').val('').change();
+							$('#procedimento').val('').change();
+							$('#cid10').val('').change();
 							$('#justificativa').val('');
 
 						} else {
@@ -261,7 +234,7 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 				$.ajax({
 					type: 'POST',
-					url: 'filtraAtendimentoSolicitacaoExame.php',
+					url: 'filtraAtendimentoSolicitacaoProcedimento.php',
 					dataType: 'json',
 					data:{
 						'tipoRequest': 'SUBGRUPOS',
@@ -287,25 +260,28 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 				$.ajax({
 					type: 'POST',
-					url: 'filtraAtendimentoSolicitacaoExame.php',
+					url: 'filtraAtendimentoSolicitacaoProcedimento.php',
 					dataType: 'json',
 					data:{
 						'tipoRequest': 'PROCEDIMENTOS',
 						'idSubGrupo' : idSubGrupo						 
 					},
 					success: function(response) {
-						$('#exame').empty();
-						$('#exame').append(`<option value=''>Selecione</option>`)
+						$('#procedimento').empty();
+						$('#procedimento').append(`<option value=''>Selecione</option>`)
 
 						if (response.length !== 0) {
 							Array.from(response).forEach(item => {
 								let opt = `<option value="${item.id}">${item.nome}</option>`
-								$('#exame').append(opt)	
+								$('#procedimento').append(opt)	
 							})							
 						}	
-						$('#exame').focus();			
+						$('#procedimento').focus();			
 					}	
 				})
+
+
+
 			})
 
 			$(".caracteresjustificativa").text((500 - $("#justificativa").val().length) + ' restantes'); //restantes em motivo da consulta
@@ -328,16 +304,16 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 			}
 		}
 
-		function checkExames() {
+		function checkProcedimentos() {
 
 			let iAtendimentoId = $('#iAtendimentoId').val();
 
 			$.ajax({
 			type: 'POST',
-				url: 'filtraAtendimentoSolicitacaoExame.php',
+				url: 'filtraAtendimentoSolicitacaoProcedimento.php',
 				dataType: 'json',
 				data: {
-					'tipoRequest': 'CHECKEXAMES',
+					'tipoRequest': 'CHECKPROCEDIMENTOS',
 					'iAtendimentoId': iAtendimentoId
 				},
 				success: async function(response) {
@@ -355,18 +331,18 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 		}
 
-		function excluirExame(idExame){
+		function excluirProcedimento(idProcedimento){
 
 			$.ajax({
 				type: 'POST',
-				url: 'filtraAtendimentoSolicitacaoExame.php',
+				url: 'filtraAtendimentoSolicitacaoProcedimento.php',
 				dataType: 'json',
 				data:{
-					'tipoRequest': 'EXCLUIREXAME',
-					'idExame' : idExame
+					'tipoRequest': 'EXCLUIRPROCEDIMENTO',
+					'idProcedimento' : idProcedimento
 				},
 				success: function(response) {
-					checkExames();
+					checkProcedimentos();
 					alerta(response.titulo, response.menssagem, response.status)
 				}
 			});
@@ -377,7 +353,7 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 			// vai preencher GRUPOS
 			$.ajax({
 				type: 'POST',
-				url: 'filtraAtendimentoSolicitacaoExame.php',
+				url: 'filtraAtendimentoSolicitacaoProcedimento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'GRUPOS'
@@ -389,6 +365,26 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 					response.forEach(item => {
 						let opt = `<option value="${item.id}">${item.nome}</option>`
 						$('#grupo').append(opt)
+					})
+					
+				}
+			});
+
+			// vai preencher cid-10
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimentoSolicitacaoProcedimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'CID10'
+				},
+				success: function(response) {
+					$('#cid10').empty();
+					$('#cid10').append(`<option value=''>Selecione</option>`)
+				
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.codigo} - ${item.descricao}</option>`
+						$('#cid10').append(opt)
 					})
 					
 				}
@@ -430,13 +426,13 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 							?>
 						</form>
 						<!-- Basic responsive configuration -->
-						<form name="formAtendimentoSolicitacaoExame" id="formAtendimentoSolicitacaoExame" method="post" class="form-validate-jquery">
+						<form name="formAtendimentoSolicitacaoProcedimento" id="formAtendimentoSolicitacaoProcedimento" method="post" class="form-validate-jquery">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
 							?>
 							<div class="card">
 								<div class="card-header header-elements-inline">
-									<h3 class="card-title"><b>SOLICITAÇÃO DE EXAMES</b></h3>
+									<h3 class="card-title"><b>SOLICITAÇÃO DE PROCEDIMENTOS</b></h3>
 								</div>
 							</div>
 
@@ -450,32 +446,40 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 										<form id="formTabelaGastos" name="formTabelaGastos" method="post" class="form-validate-jquery">
 											<div class="col-lg-12 row">
 												<!-- titulos -->
-												<div class="col-lg-3">
+												<div class="col-lg-2">
 													<label>Grupo <span class="text-danger">*</span></label>
 												</div>
-												<div class="col-lg-4">
+												<div class="col-lg-3">
 													<label>SubGrupo <span class="text-danger">*</span></label>
 												</div>
-												<div class="col-lg-5">
-													<label>Exame <span class="text-danger">*</span></label>
+												<div class="col-lg-4">
+													<label>Procedimento <span class="text-danger">*</span></label>
+												</div>
+												<div class="col-lg-3">
+													<label>Cid-10 <span class="text-danger">*</span></label>
 												</div>
 												
 												<!-- campos -->										
-												<div class="col-lg-3">
+												<div class="col-lg-2">
 													<select id="grupo" name="grupo" class="select-search" required>
 														<option value=''>Selecione</option>
 													</select>
 												</div>
-												<div class="col-lg-4">
+												<div class="col-lg-3">
 													<select id="subgrupo" name="subgrupo" class="select-search" required>
 														<option value=''>Selecione</option>
 													</select>											
 												</div>
-												<div class="col-lg-5">
-													<select id="exame" name="exame" class="select-search" required>
+												<div class="col-lg-4">
+													<select id="procedimento" name="procedimento" class="select-search" required>
 														<option value=''>Selecione</option>
 													</select>
-												</div>											
+												</div>
+												<div class="col-lg-3">
+													<select id="cid10" name="cid10" class="select-search" required>
+														<option value=''>Selecione</option>
+													</select>											
+												</div>										
 										
 											</div>
 										</form>
@@ -485,7 +489,7 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="justificativa">Justificativa</label>
-												<textarea rows="5" cols="5" maxLength="500" id="justificativa" name="justificativa" onInput="contarCaracteres(this);" class="form-control" placeholder="Corpo da solicitacao de exame (informe aqui o texto que você queira que apareça na solicitacao de exame)" ><?php if (isset($iAtendimentoSolicitacaoExameId )) echo $rowSolicitacaoExame['AtSExSolicitacaoExame']; ?></textarea>
+												<textarea rows="5" cols="5" maxLength="500" id="justificativa" name="justificativa" onInput="contarCaracteres(this);" class="form-control" placeholder="Corpo da solicitacao do procedimento (informe aqui o texto que você queira que apareça na solicitacao do procedimento)" ></textarea>
 												<span class="text-secondary">Max. 500 caracteres - </span><span class="caracteresjustificativa text-secondary"></span>
 											</div>
 										</div>
@@ -515,13 +519,13 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:15px;">
-												<button class="btn btn-lg btn-success" id="adicionarExame" data-tipo="ADICIONAREXAME" >Adicionar</button>
+												<button class="btn btn-lg btn-success" id="adicionarProcedimento" data-tipo="ADICIONARPROCEDIMENTO" >Adicionar</button>
 											</div>
 										</div>
 									</div> 
 
 									<div class="card-header header-elements-inline" style="margin-left: -20px">
-										<h4 class="card-title font-weight-bold">Exames Solicitados</h4>
+										<h4 class="card-title font-weight-bold">Procedimentos Solicitados</h4>
 									</div>
 
 									<div class="row">
@@ -534,7 +538,8 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 														<th class="text-left">Grupo</th>
 														<th class="text-left">SubGrupo</th>
 														<th class="text-left">Código</th>
-														<th class="text-left">Exame</th>
+														<th class="text-left">Procedimento</th>
+														<th class="text-left">Cid-10</th>
 														<th class="text-left">Ações</th>
 													</tr>
 												</thead>
