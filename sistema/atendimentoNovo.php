@@ -1710,7 +1710,7 @@ $_SESSION['atendimento'] = [
 											<input id="nome" name="nome" type="text" class="form-control" placeholder="Nome completo" required>
 										</div>
 										<div class="col-lg-3">
-											<input id="nomeSocial" name="nomeSocial" type="text" class="form-control" placeholder="Nome	Social">
+											<input id="nomeSocial" name="nomeSocial" type="text" class="form-control" placeholder="Nome Social">
 										</div>
 										<div class="col-lg-3">
 											<input id="cpf" name="cpf" type="text" class="form-control" placeholder="CPF" data-mask="999.999.999-99" required>

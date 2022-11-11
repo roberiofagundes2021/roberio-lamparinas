@@ -137,6 +137,9 @@ if(isset($_POST['inputTipo'])){
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
+	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
@@ -148,8 +151,6 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
-	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -285,6 +286,7 @@ if(isset($_POST['inputTipo'])){
 
 						if (resposta == 1) {
 							alerta('Atenção', 'Esse usuário já está vinculado a outro profissional!', 'error');
+							$('#formProfissional').submit();
 							return false;
 						} else{
 							//Esse ajax está sendo usado para verificar no banco se o registro já existe
