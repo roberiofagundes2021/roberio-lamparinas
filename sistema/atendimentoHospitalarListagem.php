@@ -604,7 +604,6 @@ $acesso = 'ATENDIMENTO';
 						$(rowNodeA).attr('class', 'text-left')
 						$(rowNodeA).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
 						$(rowNodeA).find('td:eq(7)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-						$(rowNodeA).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						$(rowNodeA).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeA).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})
