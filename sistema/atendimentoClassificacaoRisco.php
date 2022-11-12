@@ -6,19 +6,19 @@ $_SESSION['PaginaAtual'] = 'Atestado Médico';
 
 include('global_assets/php/conexao.php'); 
 
-$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
+	$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
-if(!$iAtendimentoId){
-	irpara("atendimento.php");
-}
+	if(!$iAtendimentoId){
+		irpara("atendimento.php");
+	}
 
-$sql = "SELECT AtendId, AtendClassificacaoRisco, AtClRId, AtClRNome, AtClRTempo, AtClRCor, AtClRDeterminantes
-		FROM Atendimento
-		LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-	    WHERE AtendUnidade = ". $_SESSION['UnidadeId'] ." AND AtendId = ". $iAtendimentoId ." 
-		ORDER BY AtClRNome ASC";
-$result = $conn->query($sql);
-$row = $result->fetchAll(PDO::FETCH_ASSOC);
+	$sql = "SELECT AtendId, AtendClassificacaoRisco, AtClRId, AtClRNome, AtClRTempo, AtClRCor, AtClRDeterminantes
+			FROM Atendimento
+			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
+			WHERE AtendUnidade = ". $_SESSION['UnidadeId'] ." AND AtendId = ". $iAtendimentoId ." 
+			ORDER BY AtClRNome ASC";
+	$result = $conn->query($sql);
+	$row = $result->fetch(PDO::FETCH_ASSOC);
 
 
 	if(isset($_POST['cmbClassificacaoRisco'])){
@@ -81,18 +81,29 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 	
 	<script type="text/javascript">
-		
-        
+
+	$(document).ready(function() {
+
+		//Ao informar a ClassificacaoRisco , trazer os demais dados dele (tempo, cor e determinantes)
+		$('#cmbClassificacaoRisco').on('change', function(e) { 
+
+			var ClassificacaoRisco = $('#cmbClassificacaoRisco').val();
+			var Classif = ClassificacaoRisco.split('#');
+
+			$('#inputTempo').val(Classif[1]);
+			$('#inputCor').val(Classif[3]);
+			$('#txtDeterminantes').val(Classif[4]);
+		});
+			
+	}); //document.ready
+
 	$('#enviar').on('click', function(e){
 		
 		e.preventDefault();
 
-
 		$( "#formClassificacaoRisco" ).submit()	
 		
 	})
-		
-	
 	</script>
 
 </head>
@@ -141,15 +152,19 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															WHERE AtClRUnidade = " . $_SESSION['UnidadeId'] . " AND SituaChave = 'ATIVO'
 														    ORDER BY AtClRNome ASC";
 													$result = $conn->query($sql);
-													$rowGrupo = $result->fetchAll(PDO::FETCH_ASSOC);
+													$rowClassificacao = $result->fetchAll(PDO::FETCH_ASSOC);
 													
-													foreach ($rowGrupo as $item) {
-														if ($item['AtClRId'] == $row['AtendClassificacaoRisco']) {
-														  print('<option value="' . $item['AtClRId'] . '" selected="selected">' . $item['AtClRNome'] . '</option>');
+													foreach ($rowClassificacao as $Classificacao) {
+														if (isset($row['AtendClassificacaoRisco'])) {
+															if ($Classificacao['AtClRId'] == $row['AtendClassificacaoRisco']) {
+																print('<option selected value="' . $Classificacao['AtClRId'] . '#' . $Classificacao['AtClRTempo'] . '#' . $Classificacao['AtClRCor'] . '#' . $Classificacao['AtClRDeterminantes'] . '" selected>' . $Classificacao['AtClRNome'] . '</option>');
+															} else {
+																print('<option value="' . $Classificacao['AtClRId'] . '#' . $Classificacao['AtClRTempo'] . '#' . $Classificacao['AtClRCor'] . '#' . $Classificacao['AtClRDeterminantes'] . '">' . $Classificacao['AtClRNome'] . '</option>');
+															}
 														} else {
-														  print('<option value="' . $item['AtClRId'] . '">' . $item['AtClRNome'] . '</option>');
+															print('<option value="' . $Classificacao['AtClRId'] . '#' . $Classificacao['AtClRTempo'] . '#' . $Classificacao['AtClRCor'] . '#' . $Classificacao['AtClRDeterminantes'] . '" >' . $Classificacao['AtClRNome'] . '</option>');
 														}
-													}
+													};
 
 												?>
 											</select>
@@ -162,11 +177,11 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											</div>
 										</div>
 										<div class="col-lg-2">
-											<label for="inputTempo">Cor<span class="text-danger">*</span></label>
-											<div class="form-group" style="margin-left: 10px; margin-Top: 5px; height: 40px; width: 40px; background-color: ; border-radius: 50px;" >
-                                            </div>
-                                        </div>
-										
+											<div class="form-group">
+												<label for="inputCor">Cor<span class="text-danger">*</span></label>
+												<input type="text" id="inputCor" name="inputCor" class="form-control" placeholder="Cor">
+											</div>	
+										</div>
 									</div>
 									
 									<div class="row">
