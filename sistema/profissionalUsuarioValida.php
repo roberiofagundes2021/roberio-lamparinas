@@ -13,7 +13,7 @@ if(isset($_POST['nomeVelho'])){
 			 FROM Profissional
 			 WHERE ProfiUnidade = ".$_SESSION['UnidadeId']." and ProfiUsuario = '". $_POST['nomeNovo']."'");
 }
-$result = $conn->query("$sql");
+$result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
 
