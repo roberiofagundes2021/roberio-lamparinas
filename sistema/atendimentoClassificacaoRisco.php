@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 	$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
 	if(!$iAtendimentoId){
-		irpara("atendimento.php");
+		irpara("atendimentoEletivoListagem.php");
 	}
 
 	$sql = "SELECT AtendId, AtendClassificacaoRisco, AtClRId, AtClRNome, AtClRTempo, AtClRCor, AtClRDeterminantes
@@ -20,17 +20,19 @@ include('global_assets/php/conexao.php');
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
-
 	if(isset($_POST['cmbClassificacaoRisco'])){
 	
 		try{
+
+			$aClassificacaoRisco = explode("#", $_POST['cmbClassificacaoRisco']);
+			$iClassificacaoRisco = $aClassificacaoRisco[0];
 				
 			$sql = "UPDATE Atendimento SET AtendClassificacaoRisco = :sClassificacaoRisco, AtendUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE AtendId = :iAtendimento";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
-							':sClassificacaoRisco' => $_POST['cmbClassificacaoRisco'],
+							':sClassificacaoRisco' => $iClassificacaoRisco,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iAtendimento' => $iAtendimentoId
 							));
@@ -47,6 +49,8 @@ include('global_assets/php/conexao.php');
 			
 			echo 'Error: ' . $e->getMessage();
 		}
+
+		irpara("atendimentoEletivoListagem.php");
 	}
 	
 ?>
@@ -139,7 +143,7 @@ include('global_assets/php/conexao.php');
 							
 							<div class="media">								
 								
-								<div class="media-body">
+								<div class="media-body"> 
 									<div class="row">	
 										<div class="col-lg-8">
 											<label for="cmbClassificacaoRisco">Classificação de Risco<span class="text-danger"> *</span></label>
@@ -172,15 +176,16 @@ include('global_assets/php/conexao.php');
 										
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputTempo">Tempo (min)<span class="text-danger">*</span></label>
-												<input type="number" id="inputTempo" name="inputTempo" class="form-control" placeholder="Tempo">
+												<label for="inputTempo">Tempo (min)</label>
+												<input type="number" id="inputTempo" name="inputTempo" class="form-control" placeholder="Tempo" readonly>
 											</div>
 										</div>
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputCor">Cor<span class="text-danger">*</span></label>
-												<input type="text" id="inputCor" name="inputCor" class="form-control" placeholder="Cor">
-											</div>	
+										<div class="col-lg-2">									
+											<div class="col-lg-2">
+												<label for="inputCor">Cor</label>
+												<div class="form-group"  id="inputCor" name="inputCor"style="margin-left: 10px; margin-Top: 5px; height: 40px; width: 40px; background-color: #fa0000 ; border-radius: 50px;" >
+                                            </div>
+                                        </div>
 										</div>
 									</div>
 									
@@ -188,7 +193,7 @@ include('global_assets/php/conexao.php');
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtDeterminantes">Determinantes Gerais</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtDeterminantes" name="txtDeterminantes" placeholder="Determinantes"></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtDeterminantes" name="txtDeterminantes" placeholder="Determinantes" readonly></textarea>
 											</div>
 										</div>
 									</div>
@@ -202,7 +207,7 @@ include('global_assets/php/conexao.php');
 								<div class="col-lg-12">								
 									<div class="form-group">
 										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-										<a href="atendimento.php" class="btn btn-lg" role="button">Cancelar</a>
+										<a href="atendimentoEletivoListagem.php" class="btn btn-lg" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>
