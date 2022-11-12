@@ -140,22 +140,22 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				responsive: true,
 			    columnDefs: [{
 					orderable: true,   //Data - hora
-					width: "20%",
+					width: "15%",
 					targets: [0]
 				},
 				{ 
 					orderable: true,   // Espera
-					width: "10%",
+					width: "5%",
 					targets: [1]
 				},
 				{ 
 					orderable: true,   // Nº Registro
-					width: "5%",
+					width: "10%",
 					targets: [2]
 				},
 				{ 
 					orderable: true,   // Paciente
-					width: "10%",
+					width: "15%",
 					targets: [3]
 				},
 				{ 
@@ -579,7 +579,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							// $(rowNodeAtendimento).attr('style',`border-left: 3px solid ${item.identify.classCor};`)
 
 							if(item.identify.class){
-								$(rowNodeAtendimento).find('td:eq(0)').attr('style',`border-left: 5px solid ${item.identify.classCor};`)
+								$(rowNodeAtendimento).find('td:eq(0)').attr('style',`border-left: 10px solid ${item.identify.classCor};`)
 								$(rowNodeAtendimento).find('td:eq(0)').attr('title',`${item.identify.class}\n${item.identify.classDeterminante}`)
 							}
 
@@ -749,7 +749,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 									<div class="card-body" style="padding: 0px"></div>
 									<table class="table" id="AtendimentoTable">
-										<thead style="border-left: 5px solid #466d96">
+										<thead style="border-left: 10px solid #466d96">
 											<tr class="bg-slate text-left">
 												<th>Data / Hora</th>
 												<th>Espera</th>

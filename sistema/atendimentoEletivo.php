@@ -173,18 +173,6 @@ if (isset($_POST['inputInicio']) ){
 	<title>Lamparinas | Anamnese</title>
 
 	<?php include_once("head.php"); ?>
-	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-
-	<!-- Não permite que o usuário retorne para o EDITAR -->
-	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 
 	<script type="text/javascript">
 
@@ -387,7 +375,17 @@ if (isset($_POST['inputInicio']) ){
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
 												<button class="btn btn-lg btn-principal" id="enviar">Salvar</button>
-												<a href="atendimento.php" class="btn btn-basic" role="button">Cancelar</a>
+
+												<?php 
+													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
+													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
+													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "ELETINTERNACAOIVO") {
+													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													}					
+												?>
+												
 											</div>
 										</div>
 									</div>    

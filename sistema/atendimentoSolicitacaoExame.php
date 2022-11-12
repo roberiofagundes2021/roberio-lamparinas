@@ -447,7 +447,7 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 								<div class="card-body">	
 
 									<div class="row"  style="margin-top:25px;">									
-										<form id="formTabelaGastos" name="formTabelaGastos" method="post" class="form-validate-jquery">
+										<form id="formSolicitacaoExames" name="formTabelaformSolicitacaoExames" method="post" class="form-validate-jquery">
 											<div class="col-lg-12 row">
 												<!-- titulos -->
 												<div class="col-lg-3">
@@ -485,7 +485,7 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="justificativa">Justificativa</label>
-												<textarea rows="5" cols="5" maxLength="500" id="justificativa" name="justificativa" onInput="contarCaracteres(this);" class="form-control" placeholder="Corpo da solicitacao de exame (informe aqui o texto que você queira que apareça na solicitacao de exame)" ><?php if (isset($iAtendimentoSolicitacaoExameId )) echo $rowSolicitacaoExame['AtSExSolicitacaoExame']; ?></textarea>
+												<textarea rows="5" cols="5" maxLength="500" id="justificativa" name="justificativa" onInput="contarCaracteres(this);" class="form-control" placeholder="Corpo da solicitacao de exame (informe aqui o texto que você queira que apareça na solicitacao de exame)" ></textarea>
 												<small class="text-muted form-text">Max. 500 caracteres - <span class="caracteresjustificativa"></span></small>
 											</div>
 										</div>
@@ -547,7 +547,15 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-												<a href="atendimentoEletivoListagem.php" class="btn btn-basic" role="button">Cancelar</a>
+												<?php 
+													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
+													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
+													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "ELETINTERNACAOIVO") {
+													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													}					
+												?>
 											</div>
 										</div>
 									</div>    

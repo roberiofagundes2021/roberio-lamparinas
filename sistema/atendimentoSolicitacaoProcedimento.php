@@ -552,7 +552,15 @@ if ($row['ClienSexo'] == 'F'){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-												<a href="atendimentoEletivoListagem.php" class="btn btn-basic" role="button">Cancelar</a>
+												<?php 
+													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
+													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
+													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "ELETINTERNACAOIVO") {
+													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													}					
+												?>
 											</div>
 										</div>
 									</div>    
