@@ -218,7 +218,40 @@ if(isset($_POST['inputProfissionalId'])){
 				})
 				
 			}); // enviar
-            
+
+			$('#cmbUsuario').on('change', function() {
+
+				let iUsuario = $(this).val();
+
+				if (iUsuario) {
+
+					$.ajax({
+						type: 'POST',
+						url: 'filtraProfissional.php',
+						dataType: 'json',
+						data:{
+							'tipoRequest': 'BUSCARDADOSUSUARIO',
+							'iUsuario' : iUsuario						 
+						},
+						success: function(response) {
+
+							if (response.status == 'success') {											
+								
+								$('#inputNomePF').val(response.data.UsuarNome);
+								$('#inputCpf').val((response.data.UsuarCpf).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"));
+								$('#inputNomeContato').val(response.data.UsuarNome);
+								$('#inputTelefone').val((response.data.UsuarTelefone).replace(/^(\d{2})(\d)/g,"($1) $2").replace(/(\d)(\d{4})$/,"$1-$2"));
+								$('#inputCelular').val((response.data.UsuarCelular).replace(/^(\d{2})(\d)/g,"($1) $2").replace(/(\d)(\d{4})$/,"$1-$2"));
+								$('#inputEmail').val(response.data.UsuarEmail);								
+								
+							}
+						
+						}	
+					})
+					
+				}
+
+			})
             
         }); //document.ready
 
