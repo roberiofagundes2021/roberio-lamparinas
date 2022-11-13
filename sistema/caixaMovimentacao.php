@@ -60,7 +60,7 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
     <title>Lamparinas | Movimentação do Caixa</title>
 
     <?php include_once("head.php"); ?>
-
+    
     <!-- Theme JS files -->
     <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
@@ -216,35 +216,6 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
             $("#submitFiltro").on('click', () => {
                 filtrar();
             })
-
-            function validaCPF(strCPF) {
-                var Soma;
-                var Resto;
-                Soma = 0;
-
-                strCPF = strCPF.replace(/[^\d]+/g,'');
-
-                for(let i = 0; i <= 9; i++) {
-                    let digito = i + "";
-                    let cpf = digito + digito + digito + digito + digito + digito + digito + digito + digito + digito + digito;
-
-                    if(strCPF == cpf) return false;
-                }
-                    
-                for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
-                    Resto = (Soma * 10) % 11;
-                    
-                if ((Resto == 10) || (Resto == 11))  Resto = 0;
-                if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
-        
-                Soma = 0;
-                for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
-                    Resto = (Soma * 10) % 11;
-                
-                if ((Resto == 10) || (Resto == 11))  Resto = 0;
-                if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
-                return true;
-            }
 
             //A função $(document).on... trabalha dinâmicamente, neste caso funciona com html colocado posteriormente via javascript
             $(document).on("change", "#pagamentoSangria", function(){

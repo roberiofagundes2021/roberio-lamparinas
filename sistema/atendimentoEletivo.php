@@ -62,7 +62,7 @@ if ($row['ClienSexo'] == 'F'){
 if(isset($iAtendimentoEletivoId ) && $iAtendimentoEletivoId ){
 
 	//Essa consulta é para preencher o campo Anamnese ao editar
-	$sql = "SELECT AtEleAnamnese, AtEleHoraFim, AtEleHoraInicio, AtEleDataInicio, AtEleDataFim
+	$sql = "SELECT *
 			FROM AtendimentoEletivo
 			WHERE AtEleId = " . $iAtendimentoEletivoId ;
 	$result = $conn->query($sql);
@@ -86,13 +86,15 @@ if(isset($iAtendimentoEletivoId ) && $iAtendimentoEletivoId ){
 
 } 
 //Se estiver gravando (inclusão ou edição)
-if (isset($_POST['txtareaConteudo']) ){
+if (isset($_POST['inputInicio']) ){
 	try{
 		//Edição
 		if ($iAtendimentoEletivoId){
 		
 			$sql = "UPDATE AtendimentoEletivo SET AtEleAtendimento = :sAtendimento, AtEleDataInicio = :dDataInicio, AtEleDataFim = :dDataFim, AtEleHoraInicio = :sHoraInicio,
-						   AtEleHoraFim  = :sHoraFim, AtEleProfissional = :sProfissional, AtEleAnamnese = :sAnamnese, AtEleUnidade = :iUnidade
+						   	AtEleHoraFim  = :sHoraFim, AtEleProfissional = :sProfissional,  AtEleQueixaPrincipal = :sQueixaPrincipal,
+						   	AtEleHistoriaMolestiaAtual = :sHistoriaMolestiaAtual, AtEleHistoriaPatologicaPregressa = :sHistoriaPatologicaPregressa,
+							AtEleExameFisico = :sExameFisico, AtEleHipoteseDiagnostica = :sHipoteseDiagnostica, AtEleDigitacaoLivre = :sDigitacaoLivre, AtEleUnidade = :iUnidade
 					WHERE AtEleId = :iAtendimentoEletivo";
 			$result = $conn->prepare($sql);
 					
@@ -103,7 +105,12 @@ if (isset($_POST['txtareaConteudo']) ){
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,
-				':sAnamnese' => $_POST['txtareaConteudo'],
+				':sQueixaPrincipal' => $_POST['txtareaConteudo1'],
+				':sHistoriaMolestiaAtual' => $_POST['txtareaConteudo2'],
+				':sHistoriaPatologicaPregressa' => $_POST['txtareaConteudo3'],
+				':sExameFisico' => $_POST['txtareaConteudo4'],
+				':sHipoteseDiagnostica' => $_POST['txtareaConteudo5'],
+				':sDigitacaoLivre' => $_POST['txtareaConteudo6'],
 				':iUnidade' => $_SESSION['UnidadeId'],
 				':iAtendimentoEletivo' => $iAtendimentoEletivoId 
 				));
@@ -113,8 +120,10 @@ if (isset($_POST['txtareaConteudo']) ){
 
 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoEletivo(AtEleAtendimento, AtEleDataInicio, AtEleDataFim, AtEleHoraInicio, AtEleHoraFim, AtEleProfissional, AtEleAnamnese, AtEleUnidade)
-						VALUES (:sAtendimento, :dDataInicio, :dDataFim, :sHoraInicio, :sHoraFim, :sProfissional,:sAnamnese, :iUnidade)";
+			$sql = "INSERT INTO AtendimentoEletivo(AtEleAtendimento, AtEleDataInicio, AtEleDataFim, AtEleHoraInicio, AtEleHoraFim, AtEleProfissional, AtEleQueixaPrincipal, 
+								AtEleHistoriaMolestiaAtual, AtEleHistoriaPatologicaPregressa,	AtEleExameFisico, AtEleHipoteseDiagnostica, AtEleDigitacaoLivre, AtEleUnidade)
+						VALUES (:sAtendimento, :dDataInicio, :dDataFim, :sHoraInicio, :sHoraFim, :sProfissional, :sQueixaPrincipal, 
+								:sHistoriaMolestiaAtual, :sHistoriaPatologicaPregressa, :sExameFisico, :sHipoteseDiagnostica, :sDigitacaoLivre, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -124,7 +133,12 @@ if (isset($_POST['txtareaConteudo']) ){
 				':sHoraInicio' => $_POST['inputInicio'],
 				':sHoraFim' => date('H:i'),
 				':sProfissional' => $userId,
-				':sAnamnese' => $_POST['txtareaConteudo'],
+				':sQueixaPrincipal' => $_POST['txtareaConteudo1'],
+				':sHistoriaMolestiaAtual' => $_POST['txtareaConteudo2'],
+				':sHistoriaPatologicaPregressa' => $_POST['txtareaConteudo3'],
+				':sExameFisico' => $_POST['txtareaConteudo4'],
+				':sHipoteseDiagnostica' => $_POST['txtareaConteudo5'],
+				':sDigitacaoLivre' => $_POST['txtareaConteudo6'],
 				':iUnidade' => $_SESSION['UnidadeId'],
 			));
 
@@ -159,37 +173,39 @@ if (isset($_POST['txtareaConteudo']) ){
 	<title>Lamparinas | Anamnese</title>
 
 	<?php include_once("head.php"); ?>
-	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 
-	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-
-	<!-- Não permite que o usuário retorne para o EDITAR -->
-	<script src="global_assets/js/lamparinas/stop-back.js"></script>
-
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
-	
 	<script type="text/javascript">
 
 		$(document).ready(function() {
-
-			$('#summernote').summernote();
 			
 			$('#enviar').on('click', function(e){
 				e.preventDefault();
 				$( "#formAtendimentoEletivo" ).submit();
 			})
+
+			$(".caracteressummernote1").text((500 - $("#summernote1").val().length) + ' restantes'); //restantes no input1
+			$(".caracteressummernote2").text((500 - $("#summernote2").val().length) + ' restantes'); //restantes no input2
+			$(".caracteressummernote3").text((500 - $("#summernote3").val().length) + ' restantes'); //restantes no input3
+			$(".caracteressummernote4").text((500 - $("#summernote4").val().length) + ' restantes'); //restantes no input4
+			$(".caracteressummernote5").text((500 - $("#summernote5").val().length) + ' restantes'); //restantes no input5
+			$(".caracteressummernote6").text((1000 - $("#summernote6").val().length) + ' restantes'); //restantes no input6
 		}); //document.ready
+
+		function contarCaracteres(params) {
+
+			var limite = params.maxLength;
+			var informativo = " restantes.";
+			var caracteresDigitados = params.value.length;
+			var caracteresRestantes = limite - caracteresDigitados;
+
+			if (caracteresRestantes <= 0) {
+				var texto = $(`textarea[id=${params.id}]`).val();
+				$(`textarea[id=${params.id}]`).val(texto.substr(0, limite));
+				$(".caracteres" + params.id).text("0 " + informativo);
+			} else {
+				$(".caracteres" + params.id).text(caracteresRestantes + " " + informativo);
+			}
+		}
       
 	</script>
 
@@ -241,9 +257,88 @@ if (isset($_POST['txtareaConteudo']) ){
 								<div class="card-body">
 									<div class="row">
 										<div class="col-lg-9">
-											<div class="form-group" >
-												<label for="inputNome"><h4>Anamnese do Paciente</h4></label>
-												<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Corpo do anamnese (informe aqui o texto que você queira que apareça no anamnese)" > <?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleAnamnese']; ?> </textarea>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group"> 
+														<a href="#collapse1-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1. Queixa Principal (QP)</h5></a>   
+														<div class="collapse" id="collapse1-link" style="">
+															<div class="mt-3">
+																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);"  id="summernote1" name="txtareaConteudo1" class="form-control form-text" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na queixa principal)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleQueixaPrincipal']; ?></textarea>
+																<span class="text-muted form-text form-text">Max. 500 caracteres - <span class="caracteressummernote1 "></span></span>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse2-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.1. História da Moléstia Atual (HMA)</h5></a>   
+														<div class="collapse" id="collapse2-link" style="">
+															<div class="mt-3">
+																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote2" name="txtareaConteudo2" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça nna história da moléstia atual)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleHistoriaMolestiaAtual']; ?></textarea>
+																<span class="text-muted form-text ">Max. 500 caracteres - <span class="caracteressummernote2 "></span></span>
+															
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse3-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.2. História Patológica Pregressa</h5></a>   
+														<div class="collapse" id="collapse3-link" style="">
+															<div class="mt-3">
+																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote3" name="txtareaConteudo3" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na história patológica pregressa)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleHistoriaPatologicaPregressa']; ?></textarea>
+																<span class="text-muted form-text ">Max. 500 caracteres - <span class="caracteressummernote3 "></span></span>
+															
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse4-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.3. Exame Físico</h5></a>   
+														<div class="collapse" id="collapse4-link" style="">
+															<div class="mt-3">
+																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote4" name="txtareaConteudo4" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça no exame físico)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleExameFisico']; ?></textarea>
+																<span class="text-muted form-text ">Max. 500 caracteres - <span class="caracteressummernote4 "></span></span>
+															
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse5-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.4. Hipotese Diagnóstica</h5></a>   
+														<div class="collapse" id="collapse5-link" style="">
+															<div class="mt-3">
+																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote5" name="txtareaConteudo5" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na hipotese diaginóstica)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleHipoteseDiagnostica']; ?></textarea>
+																<span class="text-muted form-text ">Max. 500 caracteres - <span class="caracteressummernote5 "></span></span>
+															
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-lg-12">
+													<div class="form-group">
+														<a href="#collapse6-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 2. Anamnese (Digitação Livre)</h5></a>   
+														<div class="collapse" id="collapse6-link" style="">
+															<div class="mt-3">
+																<textarea rows="5" cols="5" maxLength="1000" onInput="contarCaracteres(this);" id="summernote6" name="txtareaConteudo6" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça na anamnese)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleDigitacaoLivre']; ?></textarea>
+																<span class="text-muted form-text ">Max. 1000 caracteres - <span class="caracteressummernote6 "></span></span>
+															
+															</div>
+														</div>
+													</div>
+												</div>
 											</div>
 										</div>
 										<div class="col-lg-3">
@@ -280,7 +375,17 @@ if (isset($_POST['txtareaConteudo']) ){
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
 												<button class="btn btn-lg btn-principal" id="enviar">Salvar</button>
-												<a href="atendimentoEletivoListagem.php" class="btn btn-basic" role="button">Cancelar</a>
+
+												<?php 
+													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
+													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
+													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "ELETINTERNACAOIVO") {
+													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													}					
+												?>
+												
 											</div>
 										</div>
 									</div>    

@@ -244,3 +244,73 @@ function onlynumber(evt) {
 		if (theEvent.preventDefault) theEvent.preventDefault();
 	}
 }
+
+function validaCPF(strCPF) {
+    var Soma;
+    var Resto;
+    Soma = 0;
+    let numerosUnicos = [...new Set(strCPF)];
+    if(numerosUnicos.length <=1){
+        return false;
+    }
+
+    for (i = 1; i <= 9; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (11 - i);
+    Resto = (Soma * 10) % 11;
+
+    if ((Resto == 10) || (Resto == 11)) Resto = 0;
+    if (Resto != parseInt(strCPF.substring(9, 10))) return false;
+
+    Soma = 0;
+    for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i - 1, i)) * (12 - i);
+    Resto = (Soma * 10) % 11;
+
+    if ((Resto == 10) || (Resto == 11)) Resto = 0;
+    if (Resto != parseInt(strCPF.substring(10, 11))) return false;
+    return true;
+}
+
+function validarCNPJ(cnpj) {
+ 
+	cnpj = cnpj.replace(/[^\d]+/g,'');
+
+	if(cnpj == '') return false;
+	
+	if (cnpj.length != 14)
+		return false;
+
+	let numerosUnicosCnpj = [...new Set(cnpj)];
+    if(numerosUnicosCnpj.length <=1){
+    return false;
+    }
+	
+	// Valida DVs
+	tamanho = cnpj.length - 2
+	numeros = cnpj.substring(0,tamanho);
+	digitos = cnpj.substring(tamanho);
+	soma = 0;
+	pos = tamanho - 7;
+	for (i = tamanho; i >= 1; i--) {
+	soma += numeros.charAt(tamanho - i) * pos--;
+	if (pos < 2)
+			pos = 9;
+	}
+	resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+	if (resultado != digitos.charAt(0))
+		return false;
+		
+	tamanho = tamanho + 1;
+	numeros = cnpj.substring(0,tamanho);
+	soma = 0;
+	pos = tamanho - 7;
+	for (i = tamanho; i >= 1; i--) {
+	soma += numeros.charAt(tamanho - i) * pos--;
+	if (pos < 2)
+			pos = 9;
+	}
+	resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
+	if (resultado != digitos.charAt(1))
+		return false;
+			
+	return true;
+	
+}	

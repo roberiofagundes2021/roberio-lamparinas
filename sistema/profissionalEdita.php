@@ -1,11 +1,7 @@
 <?php 
-
 include_once("sessao.php"); 
-
 $_SESSION['PaginaAtual'] = 'Editar Profissional';
-
 include('global_assets/php/conexao.php');
-
 //Se veio do Profissional.php
 if(isset($_POST['inputProfissionalId'])){
 	 
@@ -37,91 +33,6 @@ if(isset($_POST['inputProfissionalId'])){
 	irpara("profissional.php");
 }
 
-if(isset($_POST['inputTipo'])){	
-		
-	try{
-		$sTipo= $_POST['inputTipo'];
-		$sNome= $_POST['inputTipo'] == 'J' ? $_POST['inputNomePJ'] : $_POST['inputNomePF'];
-		$sRazaoSocial= $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null;
-		$sCnpj= $_POST['inputTipo'] == 'J' ? limpaCPF_CNPJ($_POST['inputCnpj']) : null;
-		$sInscricaoMunicipal= $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null;
-		$sInscricaoEstadual= $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoEstadual'] : null;
-		$sCpf= $_POST['inputTipo'] == 'F' ? limpaCPF_CNPJ($_POST['inputCpf']) : null;
-		$sCns= $_POST['inputTipo'] == 'F' ? $_POST['inputCns'] : null;
-		$sRg= $_POST['inputTipo'] == 'F' ? $_POST['inputRg'] : null;
-		$sOrgaoEmissor= $_POST['inputTipo'] == 'F' ? $_POST['inputEmissor'] : null;
-		$sUf= $_POST['inputTipo'] == 'J' || $_POST['cmbUf'] == '#' ? null : $_POST['cmbUf'];
-		$sSexo= $_POST['inputTipo'] == 'J' || $_POST['cmbSexo'] == '#' ? null : $_POST['cmbSexo'];
-		$dDtNascimento= $_POST['inputTipo'] == 'F' ? ($_POST['inputDtNascimento'] == '' ? null : $_POST['inputDtNascimento']) : null;
-		$sProfissao= $_POST['inputTipo'] == 'F'? ($_POST['cmbProfissao'] == '#' || $_POST['cmbProfissao'] == '' ? null : $_POST['cmbProfissao']) : NULL;
-		$sConselho= $_POST['inputTipo'] == 'F' ? ($_POST['cmbConselho'] == '#' ? null : $_POST['cmbConselho']) : null;
-		$sNumConselho= $_POST['inputTipo'] == 'F' ? $_POST['inputNumConselho'] : null;
-		$sCnes= $_POST['inputTipo']  == 'J' ? $_POST['inputCnesPJ'] : $_POST['inputCnesPF'];
-		$sCtps= $_POST['inputTipo'] == 'F' ? $_POST['inputCtps'] : null;
-		$sCep= trim($_POST['inputCep']) == "" ? null : $_POST['inputCep'];
-		$sEndereco= $_POST['inputEndereco'];
-		$sNumero= $_POST['inputNumero'];
-		$sComplemento= $_POST['inputComplemento'];
-		$sBairro= $_POST['inputBairro'];
-		$sCidade= $_POST['inputCidade'];
-		$sEstado= $_POST['cmbEstado'];
-		$sContato= $_POST['inputNomeContato'];
-		$sTelefone= $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'];
-		$sCelular= $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'];
-		$sEmail= $_POST['inputEmail'];
-		$sSite= $_POST['inputSite'];
-		$sObservacao= $_POST['txtareaObservacao'];
-		$sBanco= $_POST['cmbBanco'];
-		$sAgencia= $_POST['inputAgencia'];
-		$sConta= $_POST['inputConta'];
-		$sInformacaoAdicional= $_POST['inputInformacaoAdicional'];
-		$iUsuario= $_POST['cmbUsuario'];
-		$iUsuarioAtualizador= $_SESSION['UsuarId'];
-		$iProfissional= $_POST['inputProfissionalId'];
-		
-		$sql = "UPDATE Profissional SET ProfiTipo = '$sTipo', ProfiNome = '$sNome', ProfiRazaoSocial = '$sRazaoSocial', ProfiCnpj = '$sCnpj', 
-                      ProfiInscricaoMunicipal = '$sInscricaoMunicipal', ProfiInscricaoEstadual = '$sInscricaoEstadual', 
-                      ProfiCpf = '$sCpf', ProfiCNS = '$sCns', ProfiRg = '$sRg', ProfiOrgaoEmissor = '$sOrgaoEmissor', ProfiUf = '$sUf', ProfiSexo = '$sSexo', ProfiDtNascimento = '$dDtNascimento', 
-                      ProfiProfissao = '$sProfissao', ProfiConselho = '$sConselho', ProfiNumConselho = '$sNumConselho', ProfiCNES =  '$sCnes', ProfiCTPS =  '$sCtps',
-                      ProfiCep = '$sCep', ProfiEndereco = '$sEndereco', ProfiNumero = '$sNumero', ProfiComplemento = '$sComplemento', ProfiBairro = '$sBairro', 
-                      ProfiCidade = '$sCidade', ProfiEstado = '$sEstado', ProfiContato = '$sContato', ProfiTelefone = '$sTelefone', 
-                      ProfiCelular = '$sCelular', ProfiEmail = '$sEmail', ProfiSite = '$sSite', ProfiObservacao = '$sObservacao', ProfiBanco = '$sBanco', 
-                      ProfiAgencia = '$sAgencia', ProfiConta = '$sConta',ProfiInformacaoAdicional = '$sInformacaoAdicional', ProfiUsuario = '$iUsuario', ProfiUsuarioAtualizador = '$iUsuarioAtualizador'
-				WHERE ProfiId = '$iProfissional'";
-		$conn->query($sql);
-
-		if($_POST['inputTipo'] == 'F'){
-			$sql = "DELETE FROM ProfissionalXEspecialidade WHERE PrXEsProfissional = $iProfissional and PrXEsUnidade = $iUnidade";
-			$conn->query($sql);
-
-			$sql = "INSERT INTO ProfissionalXEspecialidade(PrXEsProfissional,PrXEsEspecialidade,PrXEsUnidade)
-			VALUES ";
-
-			if(isset($_POST['cmbEspecialidade'])){
-				foreach($_POST['cmbEspecialidade'] as $item){
-						$sql .= "('$iProfissional', '$item', '$iUnidade'),";
-					}
-					$sql = substr($sql, 0, -1);
-					$conn->query($sql);
-				}
-			}
-		
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Profissional alterado!!!";
-		$_SESSION['msg']['tipo'] = "success";
-		
-	} catch(PDOException $e) {
-		
-		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar profissional!!!";
-		$_SESSION['msg']['tipo'] = "error";	
-		
-		echo 'Error: ' . $e->getMessage();
-		exit;
-	}
-	irpara("profissional.php");
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -133,44 +44,37 @@ if(isset($_POST['inputTipo'])){
 	<title>Lamparinas | Profissional</title>
 
 	<?php include_once("head.php"); ?>
-	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	<script src="global_assets/js/demo_pages/form_select2.js"></script>	
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
+	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
+	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<!-- /theme JS files -->	
 
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
-	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>	
 
 	<!-- Adicionando Javascript -->
-    <script type="text/javascript" >
-
-		window.onload = function(){
-			//Ao carregar a página é verificado se é PF ou PJ para aparecer os campos relacionados e esconder o que não estiver
-			var tipo = $('input[name="inputTipo"]:checked').val();
-
-			selecionaPessoa(tipo);
-		}
+    <script type="text/javascript" >		
 
         $(document).ready(function() {			
-
+			var tipo = $('input[name="inputTipo"]:checked').val();
+			selecionaPessoa(tipo);
             function limpa_formulário_cep() {
                 // Limpa valores do formulário de cep.
                 $("#inputEndereco").val("");
                 $("#inputBairro").val("");
                 $("#inputCidade").val("");
-                $("#cmbEstado").val("");   
+                $("#cmbEstado").val("");
 				$("#inputNumero").val("");
-				$("#inputComplemento").val("");             
+				$("#inputComplemento").val("");
             }
             
             //Quando o campo cep perde o foco.
@@ -225,9 +129,8 @@ if(isset($_POST['inputTipo'])){
                     limpa_formulário_cep();
                 }
             }); //cep
-
 			//Valida Registro Duplicado
-			$("#enviar").on('click', function(e){
+			$('#enviar').on('click', function(e){
 				e.preventDefault();
 
 				// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
@@ -307,115 +210,85 @@ if(isset($_POST['inputTipo'])){
 								}
 							}); //ajax
 						}
+					},
+					error: function(response) {
+						alerta('Erro', 'Erro ao salvar o profissional.', 'error');
+						return false;
 					}
 				})
 				
 			}); // enviar
-            
+
+			$('#cmbUsuario').on('change', function() {
+
+				let iUsuario = $(this).val();
+
+				if (iUsuario) {
+
+					$.ajax({
+						type: 'POST',
+						url: 'filtraProfissional.php',
+						dataType: 'json',
+						data:{
+							'tipoRequest': 'BUSCARDADOSUSUARIO',
+							'iUsuario' : iUsuario						 
+						},
+						success: function(response) {
+
+							if (response.status == 'success') {											
+								
+								$('#inputNomePF').val(response.data.UsuarNome);
+								$('#inputCpf').val((response.data.UsuarCpf).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4"));
+								$('#inputNomeContato').val(response.data.UsuarNome);
+								$('#inputTelefone').val((response.data.UsuarTelefone).replace(/^(\d{2})(\d)/g,"($1) $2").replace(/(\d)(\d{4})$/,"$1-$2"));
+								$('#inputCelular').val((response.data.UsuarCelular).replace(/^(\d{2})(\d)/g,"($1) $2").replace(/(\d)(\d{4})$/,"$1-$2"));
+								$('#inputEmail').val(response.data.UsuarEmail);								
+								
+							}
+						
+						}	
+					})
+					
+				}
+
+			})
             
         }); //document.ready
-                
-        
-        function selecionaPessoa(tipo) {
 
+		function selecionaPessoa(tipo) {
+			var camposPFObrigatorios = [
+					'inputNomePF',
+					'inputCpf',
+					'inputRg',
+					'inputEmissor',
+					'cmbUf',
+					'cmbSexo',
+					'inputDtNascimento',
+					'cmbProfissao',
+					'cmbConselho',
+					'inputNumConselho',
+					'inputCnesPF',
+					'cmbEspecialidade'
+			]
+			var camposPJObrigatorios = [
+				'inputNomePJ',
+				'inputCnpj'
+			]
 			if (tipo == 'F'){
+				camposPFObrigatorios.forEach(element => $("#"+element).attr('required',true));
+				camposPJObrigatorios.forEach(element => $("#"+element).attr('required',false));
 				
 				document.getElementById('dadosPF').style.display = "block";
 				document.getElementById('dadosPJ').style.display = "none";
 
-				document.getElementById('inputNomePF').setAttribute('required', 'required');				
-				document.getElementById('inputCpf').setAttribute('required', 'required');
-				document.getElementById('inputNomePJ').removeAttribute('required', 'required');
-				document.getElementById('inputCnpj').removeAttribute('required', 'required');	
-				
-			} else {
-								
+			} else {			
 				document.getElementById('dadosPF').style.display = "none";
 				document.getElementById('dadosPJ').style.display = "block";
-
-				document.getElementById('inputNomePF').removeAttribute('required', 'required');				
-				document.getElementById('inputCpf').removeAttribute('required', 'required');
-				document.getElementById('inputNomePJ').setAttribute('required', 'required');
-				document.getElementById('inputCnpj').setAttribute('required', 'required');
 				
+				camposPJObrigatorios.forEach(element => $("#"+element).attr('required',true));
+				camposPFObrigatorios.forEach(element => $("#"+element).attr('required',false));
 			}
 		}
-		
-		function validaCPF(strCPF) {
-			var Soma;
-			var Resto;
-			Soma = 0;
-			if (strCPF == "00000000000") return false;
-				
-			for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
-			Resto = (Soma * 10) % 11;
-
-			if ((Resto == 10) || (Resto == 11))  Resto = 0;
-			if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
-
-			Soma = 0;
-			for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
-			Resto = (Soma * 10) % 11;
-
-			if ((Resto == 10) || (Resto == 11))  Resto = 0;
-			if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
-			return true;
-		}
-
-		function validarCNPJ(cnpj) {
- 
-			cnpj = cnpj.replace(/[^\d]+/g,'');
-
-			if(cnpj == '') return false;
-			
-			if (cnpj.length != 14)
-				return false;
-
-			// Elimina CNPJs invalidos conhecidos
-			if (cnpj == "00000000000000" || 
-				cnpj == "11111111111111" || 
-				cnpj == "22222222222222" || 
-				cnpj == "33333333333333" || 
-				cnpj == "44444444444444" || 
-				cnpj == "55555555555555" || 
-				cnpj == "66666666666666" || 
-				cnpj == "77777777777777" || 
-				cnpj == "88888888888888" || 
-				cnpj == "99999999999999")
-				return false;
-				
-			// Valida DVs
-			tamanho = cnpj.length - 2
-			numeros = cnpj.substring(0,tamanho);
-			digitos = cnpj.substring(tamanho);
-			soma = 0;
-			pos = tamanho - 7;
-			for (i = tamanho; i >= 1; i--) {
-			soma += numeros.charAt(tamanho - i) * pos--;
-			if (pos < 2)
-					pos = 9;
-			}
-			resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-			if (resultado != digitos.charAt(0))
-				return false;
-				
-			tamanho = tamanho + 1;
-			numeros = cnpj.substring(0,tamanho);
-			soma = 0;
-			pos = tamanho - 7;
-			for (i = tamanho; i >= 1; i--) {
-			soma += numeros.charAt(tamanho - i) * pos--;
-			if (pos < 2)
-					pos = 9;
-			}
-			resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-			if (resultado != digitos.charAt(1))
-				return false;
-					
-			return true;
-			
-		}		
-
     </script>	
 	
 </head>
@@ -438,7 +311,7 @@ if(isset($_POST['inputTipo'])){
 			<div class="content">
 				<!-- Info blocks -->
 				<div class="card">
-					<form name="formProfissional" id="formProfissional" method="POST" class="form-validate-jquery" action="profissionalEdita.php">
+					<form name="formProfissional" action="profissionalEditaFinalizaTransacao.php" id="formProfissional" method="POST" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Profissional "<?php echo $row['ProfiNome']; ?>"</h5>
 						</div>
@@ -493,7 +366,7 @@ if(isset($_POST['inputTipo'])){
 							</div>
 							
 							<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
-							<br>				
+							<br>
 							<div class="row">				
 								<div class="col-lg-12">
 									<div id="dadosPF">
@@ -523,27 +396,27 @@ if(isset($_POST['inputTipo'])){
 													<input type="text" id="inputCns" name="inputCns" class="form-control" placeholder="CNS" value="<?php echo $row['ProfiCNS']; ?>">
 												</div>	
 											</div>	
-										</div>	
+										</div>
 
 										<div class="row">
 											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputRg">RG<span class="text-danger"> *</span></label>
-													<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG" value="<?php echo $row['ProfiRg']; ?>" required>
+													<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG" value="<?php echo $row['ProfiRg']; ?>">
 												</div>
 											</div>
 
 											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputEmissor">Emissor<span class="text-danger"> *</span></label>
-													<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor" value="<?php echo $row['ProfiOrgaoEmissor']; ?>" required>
+													<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor" value="<?php echo $row['ProfiOrgaoEmissor']; ?>">
 												</div>
 											</div>
 
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="cmbUf">UF<span class="text-danger"> *</span></label>
-													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2" required>
+													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
 														<option value="">Selecione um estado</option>
 														<option value="AC" <?php if ($row['ProfiUf'] == 'AC') echo "selected"; ?> >Acre</option>
 														<option value="AL" <?php if ($row['ProfiUf'] == 'AL') echo "selected"; ?> >Alagoas</option>
@@ -580,7 +453,7 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="cmbSexo">Sexo<span class="text-danger"> *</span></label>
-													<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2" required>
+													<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
 														<option value="">Selecione o sexo</option>
 														<option value="F" <?php if ($row['ProfiSexo'] == 'F') echo "selected"; ?> >Feminino</option>
 														<option value="M" <?php if ($row['ProfiSexo'] == 'M') echo "selected"; ?> >Masculino</option>
@@ -591,7 +464,7 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputDtNascimento">Data Nascimento<span class="text-danger"> *</span></label>
-													<input type="date" id="inputDtNascimento" name="inputDtNascimento" class="form-control" placeholder="Data Nascimento" value="<?php echo $row['ProfiDtNascimento']; ?>" required>
+													<input type="date" id="inputDtNascimento" name="inputDtNascimento" class="form-control" placeholder="Data Nascimento" value="<?php echo $row['ProfiDtNascimento']; ?>">
 												</div>
 											</div>										
 										</div>
@@ -603,7 +476,7 @@ if(isset($_POST['inputTipo'])){
                                                 <div class="row">								
                                                     <div class="col-lg-2">
                                                         <label for="cmbProfissao">Profissão<span class="text-danger"> *</span></label>
-                                                        <select id="cmbProfissao" name="cmbProfissao" class="form-control select-search" required>
+                                                        <select id="cmbProfissao" name="cmbProfissao" class="form-control select-search">
                                                             <option value="">Selecione uma profissão</option>
                                                             <?php 
                                                                 $sql = "SELECT ProfiId, ProfiNome
@@ -618,18 +491,17 @@ if(isset($_POST['inputTipo'])){
                                                                     $seleciona = $item['ProfiId'] == $row['ProfiProfissao'] ? "selected" : "";
                                                                     print("<option value='$item[ProfiId]' $seleciona>$item[ProfiNome]</option>");
                                                                 }
-                                                            
                                                             ?>
                                                         </select>
                                                     </div>
 
 													<div class="col-lg-1">
                                                         <label for="cmbConselho">Conselho<span class="text-danger"> *</span></label>
-                                                        <select id="cmbConselho" name="cmbConselho" class="form-control select-search" required>
+                                                        <select id="cmbConselho" name="cmbConselho" class="form-control select-search">
                                                             <option value="">Selecione </option>
-															 <?php 
-                                                                $sql = "SELECT PrConId, PrConNome
-                                                                        FROM ProfissionalConselho
+															<?php
+																$sql = "SELECT PrConId, PrConNome
+																	FROM ProfissionalConselho
                                                                         JOIN Situacao on SituaId = PrConStatus
                                                                         WHERE SituaChave = 'ATIVO'
                                                                         ORDER BY PrConNome ASC";
@@ -649,14 +521,14 @@ if(isset($_POST['inputTipo'])){
                                                     <div class="col-lg-2">
                                                         <div class="form-group">
                                                             <label for="inputNumConselho">Nº do Conselho/UF<span class="text-danger"> *</span></label>
-                                                            <input type="text" id="inputNumConselho" name="inputNumConselho" class="form-control" placeholder="CRM/Outros" value="<?php echo $row['ProfiNumConselho']; ?>" required>
+                                                            <input type="text" id="inputNumConselho" name="inputNumConselho" class="form-control" placeholder="CRM/Outros" value="<?php echo $row['ProfiNumConselho']; ?>">
                                                         </div>
                                                     </div>
                                                     
                                                     <div class="col-lg-2">
                                                         <div class="form-group">
                                                             <label for="inputCnesPF">CNES<span class="text-danger"> *</span></label>
-                                                            <input type="text" id="inputCnesPF" name="inputCnesPF" class="form-control" placeholder="CNES" value="<?php echo $row['ProfiCNES']; ?>" required>
+                                                            <input type="text" id="inputCnesPF" name="inputCnesPF" class="form-control" placeholder="CNES" value="<?php echo $row['ProfiCNES']; ?>">
                                                         </div>
                                                     </div>
 
@@ -669,7 +541,7 @@ if(isset($_POST['inputTipo'])){
                                                 
                                                     <div class="col-lg-3">
                                                         <label for="cmbEspecialidade">Especialidades<span class="text-danger"> *</span></label>
-                                                        <select id="cmbEspecialidade" name="cmbEspecialidade[]" class="form-control multiselect-filtering" multiple="multiple" data-fouc required>
+                                                        <select id="cmbEspecialidade" name="cmbEspecialidade[]" class="form-control multiselect-filtering" multiple="multiple">
                                                             <?php
 																$sql = "SELECT EspecId, EspecNome
 																		FROM Especialidade
@@ -688,11 +560,10 @@ if(isset($_POST['inputTipo'])){
 																}
                                                             ?>
 														</select>
-                                                    </div>									
+                                                    </div>								
                                                 </div>										
                                             </div>
-                                        </div>	
-										
+                                        </div>
 									</div> <!-- Fim dadosPF -->
 									
 									<div id="dadosPJ">
@@ -706,16 +577,16 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-7">
 												<div class="form-group">
 												    <label for="inputNomePJ">Nome<span class="text-danger"> *</span></label>
-													<input type="text" id="inputNomePJ" name="inputNomePJ" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ProfiNome']; ?>" required autofocus>
+													<input type="text" id="inputNomePJ" name="inputNomePJ" class="form-control" placeholder="Nome Completo" value="<?php echo $row['ProfiNome']; ?>" autofocus>
 												</div>
 											</div>	
 											
 											<div class="col-lg-3" id="CNPJ">
 												<div class="form-group">				
 													<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
-													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" value="<?php echo formatarCPF_Cnpj($row['ProfiCnpj']); ?>" <?php if ($row['ProfiTipo'] == 'J') echo "required"; ?>>
+													<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" value="<?php echo formatarCPF_Cnpj($row['ProfiCnpj']); ?>" <?php if ($row['ProfiTipo'] == 'J'); ?>>
 												</div>	
-											</div>							
+											</div>						
 										</div>
 
 										<div class="row">
@@ -748,8 +619,7 @@ if(isset($_POST['inputTipo'])){
 										</div>	
 									</div> <!-- Fim dadosPJ -->
 								</div>
-							</div>
-							
+							</div>					
 							<br>
 							
 							<div class="row">
@@ -840,7 +710,6 @@ if(isset($_POST['inputTipo'])){
 									</div>
 								</div>
 							</div>
-
 							<br>
 							
 							<div class="row">
@@ -865,7 +734,7 @@ if(isset($_POST['inputTipo'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputCelular">Celular<span class="text-danger"> *</span></label>
-												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular"  value="<?php echo isset($row['ProfiCelular'])?$row['ProfiCelular']:''; ?>" required>
+												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular"  data-mask="(99) 99999-9999" value="<?php echo isset($row['ProfiCelular'])?$row['ProfiCelular']:''; ?>" required>
 											</div>
 										</div>
 										

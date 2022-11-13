@@ -90,39 +90,34 @@ $acesso = 'ATENDIMENTO';
 					targets: [2]
 				},
 				{ 
-					orderable: true,   //Prontuário
-					width: "5%",
-					targets: [3]
-				},
-				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Profissional
 					width: "10%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Modalidade
 					width: "20%",
-					targets: [6]
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Procedimento
 					width: "5%",
-					targets: [7]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [9]
+					targets: [8]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -155,28 +150,23 @@ $acesso = 'ATENDIMENTO';
 				},				
 				{ 
 					orderable: true,   //Nº Registro
-					width: "5%",
+					width: "10%",
 					targets: [2]
-				},
-				{ 
-					orderable: true,   //Prontuário
-					width: "5%",
-					targets: [3]
 				},
 				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Procedimento
-					width: "20%",
-					targets: [5]
+					width: "15%",
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Risco
 					width: "10%",
-					targets: [6]
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Situação
@@ -225,38 +215,33 @@ $acesso = 'ATENDIMENTO';
 				},				
 				{ 
 					orderable: true,   //Nº Registro
-					width: "5%",
+					width: "10%",
 					targets: [2]
-				},
-				{ 
-					orderable: true,   //Prontuário
-					width: "5%",
-					targets: [3]
 				},
 				{ 
 					orderable: true,   //Paciente
 					width: "20%",
-					targets: [4]
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Procedimento
-					width: "20%",
-					targets: [5]
+					width: "15%",
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Risco
 					width: "10%",
-					targets: [6]
+					targets: [5]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [7]
+					targets: [6]
 				},
 				{ 
 					orderable: true,   //Ações
 					width: "5%",
-					targets: [8]
+					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
                 language: {
@@ -271,6 +256,126 @@ $acesso = 'ATENDIMENTO';
                     }
                 }
 			})
+
+			/* Início: Tabela Personalizada dos pacientes em atendimento */
+			$('#AtendimentoTableEmAtendimento').DataTable({
+				"order": [[ 0, "desc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [{
+					orderable: true,   //Data
+					width: "10%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Espera
+					width: "5%",
+					targets: [1]
+				},				
+				{ 
+					orderable: true,   //Nº Registro
+					width: "10%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,   //Paciente
+					width: "20%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //Procedimento
+					width: "15%",
+					targets: [4]
+				},
+				{ 
+					orderable: true,   //Risco
+					width: "10%",
+					targets: [5]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "5%",
+					targets: [6]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "5%",
+					targets: [7]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+                language: {
+                    search: '<span>Filtro:</span> _INPUT_',
+                    searchPlaceholder: 'filtra qualquer coluna...',
+                    lengthMenu: '<span>Mostrar:</span> _MENU_',
+                    paginate: {
+                        'first': 'Primeira',
+                        'last': 'Última',
+                        'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+                        'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+                    }
+                }
+			})
+
+
+			/* Início: Tabela Personalizada dos atendimentos em observacao */
+			$('#AtendimentoTableObservacao').DataTable({
+				"order": [[ 0, "desc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [{
+					orderable: true,   //Data
+					width: "10%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //Espera
+					width: "5%",
+					targets: [1]
+				},				
+				{ 
+					orderable: true,   //Nº Registro
+					width: "10%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,   //Paciente
+					width: "20%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //Procedimento
+					width: "15%",
+					targets: [4]
+				},
+				{ 
+					orderable: true,   //Risco
+					width: "10%",
+					targets: [5]
+				},
+				{ 
+					orderable: true,   //Situação
+					width: "5%",
+					targets: [6]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "5%",
+					targets: [7]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+                language: {
+                    search: '<span>Filtro:</span> _INPUT_',
+                    searchPlaceholder: 'filtra qualquer coluna...',
+                    lengthMenu: '<span>Mostrar:</span> _MENU_',
+                    paginate: {
+                        'first': 'Primeira',
+                        'last': 'Última',
+                        'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+                        'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+                    }
+                }
+			})
+
 
 			$('#cmbSituacao').on('change', ()=>{
 				let cmbSituacao = $('#cmbSituacao').val()
@@ -339,7 +444,7 @@ $acesso = 'ATENDIMENTO';
 					$('#ClaChave').val(AtClaChave)
 					$('#ClaNome').val(AtClaNome)
 
-					$('#dadosPost').attr('action', 'atendimentoEletivo.php')
+					$('#dadosPost').attr('action', 'atendimentoAmbulatorial.php')
 					$('#dadosPost').attr('method', 'POST')
 					$('#dadosPost').submit()
 				})
@@ -462,23 +567,45 @@ $acesso = 'ATENDIMENTO';
 
 					let tableE = $('#AtendimentoTableEspera').DataTable().clear().draw()
 					let tableA = $('#AtendimentoTableAtendido').DataTable().clear().draw()
+					let tableEmAtendimento = $('#AtendimentoTableEmAtendimento').DataTable().clear().draw()
+					let tableObservacao = $('#AtendimentoTableObservacao').DataTable().clear().draw()
 
 					tableE = $('#AtendimentoTableEspera').DataTable()
 					tableA = $('#AtendimentoTableAtendido').DataTable()
+					tableAtendidos = $('#AtendimentoTableEmAtendimento').DataTable()
+					tableObservacao = $('#AtendimentoTableObservacao').DataTable()
+					
 					let rowNodeE
 					let rowNodeA
+					let rowNodeEmAtendimento
+					let rowNodeObservacao
 
 					response.dataEspera.forEach(item => {
 						rowNodeE = tableE.row.add(item.data).draw().node()
 						$(rowNodeE).attr('class', 'text-left')
+						$(rowNodeE).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
 						$(rowNodeE).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeE).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
+					})
+					response.dataEmAtendimento.forEach(item => {
+						rowNodeEmAtendimento = tableEmAtendimento.row.add(item.data).draw().node()
+						$(rowNodeEmAtendimento).attr('class', 'text-left')
+						$(rowNodeEmAtendimento).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
+						$(rowNodeEmAtendimento).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+						$(rowNodeEmAtendimento).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
+					})
+					response.dataObservacao.forEach(item => {
+						rowNodeObservacao = tableObservacao.row.add(item.data).draw().node()
+						$(rowNodeObservacao).attr('class', 'text-left')
+						$(rowNodeObservacao).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
+						$(rowNodeObservacao).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+						$(rowNodeObservacao).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})
 					response.dataAtendido.forEach(item => {
 						rowNodeA = tableA.row.add(item.data).draw().node()
 						$(rowNodeA).attr('class', 'text-left')
+						$(rowNodeA).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
 						$(rowNodeA).find('td:eq(7)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-						$(rowNodeA).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 						$(rowNodeA).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeA).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})
@@ -504,19 +631,30 @@ $acesso = 'ATENDIMENTO';
 				document.getElementById("card-title").innerText = "Pacientes em Espera";
 				document.getElementById("box-pacientes-espera").style.display = 'block';
 				document.getElementById("box-pacientes-atendidos").style.display = 'none';
-				//document.getElementById("box-pacientes-observacao").style.display = 'none';
-			}
-			if (grid == 'atendidos') {
+				document.getElementById("box-pacientes-observacao").style.display = 'none';
+				document.getElementById("box-pacientes-atendimento").style.display = 'none';
+
+			} else if (grid == 'atendidos') {
 				document.getElementById("card-title").innerText = "Pacientes Atendidos";
 				document.getElementById("box-pacientes-atendidos").style.display = 'block';
 				document.getElementById("box-pacientes-espera").style.display = 'none';
-				//document.getElementById("box-pacientes-observacao").style.display = 'none';			
-			}
-			if (grid == 'observacao') {
+				document.getElementById("box-pacientes-observacao").style.display = 'none';
+				document.getElementById("box-pacientes-atendimento").style.display = 'none';
+
+			} else if (grid == 'observacao') {
 				document.getElementById("card-title").innerText = "Pacientes em Observação";
 				document.getElementById("box-pacientes-observacao").style.display = 'block';
 				document.getElementById("box-pacientes-espera").style.display = 'none';
+				document.getElementById("box-pacientes-atendidos").style.display = 'none';
+				document.getElementById("box-pacientes-atendimento").style.display = 'none';
+
+			}  else if (grid == 'atendimento') {
+				document.getElementById("card-title").innerText = "Pacientes em Atendimento";
+				document.getElementById("box-pacientes-atendimento").style.display = 'block';
+				document.getElementById("box-pacientes-espera").style.display = 'none';
 				document.getElementById("box-pacientes-atendidos").style.display = 'none';				
+				document.getElementById("box-pacientes-observacao").style.display = 'none';
+
 			}
 		}
 
@@ -563,8 +701,9 @@ $acesso = 'ATENDIMENTO';
 
 									<div class="col-lg-12">	
 										<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('espera')" >Pacientes em Espera</button>
+										<button type="button" id="pacientes-atendimento-btn" class="btn-grid btn btn-outline-secondary btn-lg" onclick="mudarGrid('atendimento')" >Pacientes em Atendimento</button>
+										<button type="button" id="pacientes-observacao-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('observacao')" >Pacientes em Observação</button>
 										<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendidos')" >Pacientes Atendidos</button>
-										<button type="button" id="pacientes-observacao-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('observacao')" disabled >Pacientes em Observação</button>
 									</div>
 								</div>
 							</div>
@@ -584,11 +723,10 @@ $acesso = 'ATENDIMENTO';
 										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>
 											<th>Espera</th>
-											<th>Nº Registro</th>
-											<th>Prontuário</th>			
+											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Risco</th>
+											<th>Classificação de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>
@@ -597,7 +735,53 @@ $acesso = 'ATENDIMENTO';
 
 									</tbody>
 								</table>
-							</div>							
+							</div>
+							
+							<!-- Pacientes Em Atendimento -->
+							<div id="box-pacientes-atendimento" style="display: none;">
+								<div class="card-body" style="padding: 0px"></div>
+								<table class="table" id="AtendimentoTableEmAtendimento">
+									<thead>
+										<tr class="bg-slate text-left">
+											<th>Data / Hora</th>
+											<th>Espera</th>
+											<th>Nº Registro</th>	
+											<th>Paciente</th>
+											<th>Procedimento</th>
+											<th>Classificação de Risco</th>
+											<th>Situação</th>
+											<th>Ações</th>
+										</tr>
+									</thead>
+									<tbody id="dataAtendimentos">
+
+									</tbody>
+								</table>
+
+							</div>
+
+							<!-- Pacientes Em Observacao -->
+							<div id="box-pacientes-observacao" style="display: none;">
+								<div class="card-body" style="padding: 0px"></div>
+								<table class="table" id="AtendimentoTableObservacao">
+									<thead>
+										<tr class="bg-slate text-left">
+											<th>Data / Hora</th>
+											<th>Espera</th>
+											<th>Nº Registro</th>		
+											<th>Paciente</th>
+											<th>Procedimento</th>
+											<th>Classificação de Risco</th>
+											<th>Situação</th>
+											<th>Ações</th>
+										</tr>
+									</thead>
+									<tbody id="dataAtendimentos">
+
+									</tbody>
+								</table>
+
+							</div>
 
 							<!-- Pacientes Atendidos -->
 							<div id="box-pacientes-atendidos" style="display: none;">
@@ -608,11 +792,10 @@ $acesso = 'ATENDIMENTO';
 										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>
 											<th>Espera</th>
-											<th>Nº Registro</th>
-											<th>Prontuário</th>			
+											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Risco</th>
+											<th>Classificação de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>

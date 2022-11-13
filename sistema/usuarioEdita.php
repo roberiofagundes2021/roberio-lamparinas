@@ -149,6 +149,7 @@ if (isset($_POST['inputCpf'])) {
 
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+    <script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
@@ -310,10 +311,10 @@ include_once("topo.php");
 											<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['UsuarNome']; ?>" required>
 										</div>
 									</div>
-									<div class="col-lg-2">
+									<div class="col-lg-3">
 										<div class="form-group">
 											<label for="cmbPerfil">Perfil<span class="text-danger"> *</span></label>
-											<select id="cmbPerfil" name="cmbPerfil" class="form-control form-control-select2" required>
+											<select id="cmbPerfil" name="cmbPerfil" class="form-control select-search" required>
 												<option value="">Informe um perfil</option>
 												<?php
 												$sql = "SELECT PerfiId, PerfiNome, PerfiChave
@@ -333,7 +334,7 @@ include_once("topo.php");
 										</div>
 									</div>
 									<?php if (!isset($_SESSION['EmpresaId'])){ ?>
-									<div class="col-lg-4" style="margin-top: auto; margin-bottom: auto;">
+									<div class="col-lg-3" style="margin-top: auto; margin-bottom: auto;">
 										<div class="custom-control custom-checkbox">
 											<input type="checkbox" class="custom-control-input" value="1" id="inputVisualisaResumoFinanceiro" name="inputVisualisaResumoFinanceiro" <?php echo isset($row['UsXUnResumoFinanceiro']) && $row['UsXUnResumoFinanceiro'] ? 'checked' : ''; ?>>
 											<label class="custom-control-label" for="inputVisualisaResumoFinanceiro">Resumo Financeiro Visível</label>
@@ -414,7 +415,7 @@ include_once("topo.php");
 									<div class="col-lg-4">
 										<div class="form-group">
 											<label for="cmbSetor">Setor<span class="text-danger"> *</span></label>
-											<select name="cmbSetor" id="cmbSetor" class="form-control form-control-select2" required>
+											<select name="cmbSetor" id="cmbSetor" class="form-control select-search" required>
 												<option value="">Informe um setor</option>
 												<?php
 												$sql = "SELECT SetorId, SetorNome
