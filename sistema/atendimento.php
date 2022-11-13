@@ -558,7 +558,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							$(rowNodeAgendamento).find('td:eq(2)').attr('data-tipo', 'AGENDAMENTO')
 							$(rowNodeAgendamento).find('td:eq(2)').attr('onclick', 'newAtendimento(this)')
 							// <end>
-							$(rowNodeAgendamento).find('td:eq(4)').attr('title', `Transformar o agendamento em atendimento \n ${item.identify.cbo}`)
+							$(rowNodeAgendamento).find('td:eq(4)').attr('title', `${item.identify.cbo}`)
 
 							// esse trecho serve para o atributos no campo situação de cada linha
 							$(rowNodeAgendamento).find('td:eq(7)').attr('data-id', `${item.identify.id}`)
