@@ -642,7 +642,7 @@ try{
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iProfissional = $row['ProfiId'];
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
 			FROM AtendimentoXServico
@@ -660,7 +660,7 @@ try{
 		$resultEspera = $conn->query($sql);
 		$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
 			FROM AtendimentoXServico
@@ -677,6 +677,11 @@ try{
 			ORDER BY AtXSeId DESC";
 		$resultAtendido = $conn->query($sql);
 		$rowAtendido = $resultAtendido->fetchAll(PDO::FETCH_ASSOC);
+
+		$sql = "SELECT AtClRId,AtClRNome,AtClRNomePersonalizado,AtClRCor,AtClRDeterminantes
+		FROM AtendimentoClassificacaoRisco WHERE AtClRUnidade != $iUnidade";
+		$resultRiscos = $conn->query($sql);
+		$rowRiscos = $resultRiscos->fetchAll(PDO::FETCH_ASSOC);
 		
 		$espera = [];
 		$atendido = [];
@@ -707,9 +712,46 @@ try{
 						</div>
 					</div>";
 			
-					$classificacao = "<div class='list-icons'>
-										<div style='height: 25px; width: 25px; background-color: $item[AtClRCor]; border-radius: 13px;' >
-									</div>";
+			$borderColor = "";
+			switch($item['AtClRCor']){
+				case '#ff630f':$borderColor='#cd5819';break;
+				case '#fa0000':$borderColor='#c10000';break;
+				case '#fbff00':$borderColor='#adb003';break;
+				case '#00ff1e':$borderColor='#2db93e';break;
+				case '#0008ff':$borderColor='#010579';break;
+				default: $borderColor = '#FFFF';break;
+			}
+
+			// essa etapa monta o submenu de riscos
+			$riscos = "";
+			foreach($rowRiscos as $risco){
+				// .($risco['AtClRNomePersonalizado']?$risco['AtClRNomePersonalizado']:$risco['AtClRNome'])
+				$nome = $risco['AtClRNomePersonalizado']?$risco['AtClRNomePersonalizado']:$risco['AtClRNome'];
+				$borderColorSubMenu = '';
+				switch($risco['AtClRCor']){
+					case '#ff630f':$borderColorSubMenu='#cd5819';break;
+					case '#fa0000':$borderColorSubMenu='#c10000';break;
+					case '#fbff00':$borderColorSubMenu='#adb003';break;
+					case '#00ff1e':$borderColorSubMenu='#2db93e';break;
+					case '#0008ff':$borderColorSubMenu='#010579';break;
+					default: $borderColorSubMenu = '#FFFF';break;
+				}
+				$indicador = "<div style='height: 20px; width: 20px; background-color: $risco[AtClRCor]; border-radius: 13px;border: 2px solid $borderColorSubMenu;'></div>";
+
+				$riscos .= "<div class='dropdown-item' onclick='mudaRisco($item[AtendId], $risco[AtClRId])' title='$risco[AtClRDeterminantes]'>
+								<div class='col-lg-10'>$nome</div>
+								<div class='col-lg-2'>$indicador</div>
+							</div>";
+			}
+
+			$nome = $item['AtClRNomePersonalizado']?$item['AtClRNomePersonalizado']:$item['AtClRNome'];
+
+			$classificacao = "<div class='btn-group justify-content-center' title='$nome \n $item[AtClRDeterminantes]'>
+								<div class='btn dropdown-toggle' data-toggle='dropdown' style='height: 35px; width: 35px; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
+								<div class='dropdown-menu'>
+									$riscos
+								</div>
+							</div>";
 		
 			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
 			
@@ -751,9 +793,46 @@ try{
 							</div>
 						</div>
 					</div>";
+
+			$borderColor = "";
+			switch($item['AtClRCor']){
+				case '#ff630f':$borderColor='#cd5819';break;
+				case '#fa0000':$borderColor='#c10000';break;
+				case '#fbff00':$borderColor='#adb003';break;
+				case '#00ff1e':$borderColor='#2db93e';break;
+				case '#0008ff':$borderColor='#010579';break;
+				default: $borderColor = '#FFFF';break;
+			}
+
+			// essa etapa monta o submenu de riscos
+			$riscos = "";
+			foreach($rowRiscos as $risco){
+				// .($risco['AtClRNomePersonalizado']?$risco['AtClRNomePersonalizado']:$risco['AtClRNome'])
+				$nome = $risco['AtClRNomePersonalizado']?$risco['AtClRNomePersonalizado']:$risco['AtClRNome'];
+				$borderColorSubMenu = '';
+				switch($risco['AtClRCor']){
+					case '#ff630f':$borderColorSubMenu='#cd5819';break;
+					case '#fa0000':$borderColorSubMenu='#c10000';break;
+					case '#fbff00':$borderColorSubMenu='#adb003';break;
+					case '#00ff1e':$borderColorSubMenu='#2db93e';break;
+					case '#0008ff':$borderColorSubMenu='#010579';break;
+					default: $borderColorSubMenu = '#FFFF';break;
+				}
+				$indicador = "<div style='height: 20px; width: 20px; background-color: $risco[AtClRCor]; border-radius: 13px;border: 2px solid $borderColorSubMenu;'></div>";
+
+				$riscos .= "<div class='dropdown-item' onclick='mudaRisco($item[AtendId], $risco[AtClRId])' title='$risco[AtClRDeterminantes]'>
+								<div class='col-lg-10'>$nome</div>
+								<div class='col-lg-2'>$indicador</div>
+							</div>";
+			}
+
+			$nome = $item['AtClRNomePersonalizado']?$item['AtClRNomePersonalizado']:$item['AtClRNome'];
 					
-			$classificacao = "<div class='list-icons'>
-								<div style='height: 25px; width: 25px; background-color: $item[AtClRCor]; border-radius: 13px;' >
+			$classificacao = "<div class='btn-group justify-content-center' title='$nome \n $item[AtClRDeterminantes]'>
+								<div class='btn dropdown-toggle' data-toggle='dropdown' style='height: 35px; width: 35px; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
+								<div class='dropdown-menu'>
+									$riscos
+								</div>
 							</div>";
 		
 			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
@@ -830,6 +909,16 @@ try{
 		$tipo = $_POST['tipo'];
 		$situacao = $_POST['iSituacao'];
 		$sJustificativa = $_POST['sJustificativa'];
+
+		// em algumas telas esse valor não é o id e sim a SITUACHAVE, dessa forma será necessario
+		// pegar o ID da situação informada
+		if(!is_int($situacao)){
+			$sqlSituacao = "SELECT SituaId FROM Situacao WHERE SituaChave = '$situacao'";
+			$resultSituacao = $conn->query($sqlSituacao);
+			$rowSituacao = $resultSituacao->fetch(PDO::FETCH_ASSOC);
+	
+			$situacao = $rowSituacao['SituaId'];
+		}
 	
 		$sql = $tipo == 'AGENDAMENTO'? "UPDATE Agendamento set AgendSituacao = '$situacao', AgendJustificativa = '$sJustificativa'
 		WHERE AgendId = $iAtendimento":
@@ -1776,6 +1865,19 @@ try{
 			'status' => 'success',
 			'titulo' => 'Desconto',
 			'menssagem' => 'Desconto adicionado!!!',
+		]);
+	}  elseif($tipoRequest == 'SETRISCO'){
+		$id = $_POST['id'];
+		$risco = $_POST['risco'];
+
+		$sql = "UPDATE Atendimento SET AtendClassificacaoRisco = $risco
+		WHERE Atendid = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Risco',
+			'menssagem' => 'Classificação de risco atualizada!!!',
 		]);
 	} 
 }catch(PDOException $e) {

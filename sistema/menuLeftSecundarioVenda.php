@@ -51,11 +51,13 @@
 				data:{
 					'tipoRequest': 'MUDARSITUACAO',
 					'iAtendimento': $('#iAtendimentoId').val(),
-					'sSituacao': 'ATENDIDOVENDA'
+					'sJustificativa': '',
+					'tipo': 'ATENDIMENTO',
+					'iSituacao': 'ATENDIDOVENDA'
 				},
 				success: function(response) {
-					window.location.href = 'atendimento.php';
-					alerta(response.titulo, response.menssagem, response.tipo);
+					window.location.href = 'atendimentoEletivoListagem.php';
+					alerta(response.titulo, response.menssagem, response.status);
 				},
 				error: function(response) {
 					alerta(response.titulo, response.menssagem, response.tipo);
