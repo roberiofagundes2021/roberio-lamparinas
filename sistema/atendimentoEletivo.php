@@ -278,7 +278,6 @@ if (isset($_POST['inputInicio']) ){
 															<div class="mt-3">
 																<textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote2" name="txtareaConteudo2" class="form-control" placeholder="Corpo do ambulatorial (informe aqui o texto que você queira que apareça nna história da moléstia atual)" ><?php if (isset($iAtendimentoEletivoId )) echo $rowEletivo['AtEleHistoriaMolestiaAtual']; ?></textarea>
 																<span class="text-muted form-text ">Max. 500 caracteres - <span class="caracteressummernote2 "></span></span>
-															
 															</div>
 														</div>
 													</div>
