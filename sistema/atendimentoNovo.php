@@ -852,7 +852,7 @@ $_SESSION['atendimento'] = [
 
 				valorF = valor - desconto
 
-				$('#inputModalValorF').val('R$'+float2moeda(valorF))
+				$('#inputModalValorF').val('R$ '+float2moeda(valorF))
 
 				$('#pageModalDescontos').fadeIn(200);
 			})
@@ -1271,8 +1271,8 @@ $_SESSION['atendimento'] = [
 								</tr>`
 							}
 						})
-						$('#servicoValorTotal').html(`R$${float2moeda(response.valorTotal)}`).show();
-						$('#servicoValorDescontoTotal').html(`R$${float2moeda(response.valorTotalDesconto)}`).show();
+						$('#servicoValorTotal').html(`R$ ${float2moeda(response.valorTotal)}`).show();
+						$('#servicoValorDescontoTotal').html(`R$ ${float2moeda(response.valorTotalDesconto)}`).show();
 						$('#dataServico').html(HTML).show();
 						$('#servicoTable').show();
 
@@ -1287,11 +1287,11 @@ $_SESSION['atendimento'] = [
 								$('#itemDescontoId').val(id)
 								$('#itemDescontoValue').val(valor)
 
-								$('#inputModalValorB').val('R$'+float2moeda(valor))
+								$('#inputModalValorB').val('R$ '+float2moeda(valor))
 
 								valorF = valor - desconto
 
-								$('#inputModalValorF').val('R$'+float2moeda(valorF))
+								$('#inputModalValorF').val('R$ '+float2moeda(valorF))
 
 								$('#pageModalDescontos').fadeIn(200);
 							})
@@ -1639,14 +1639,14 @@ $_SESSION['atendimento'] = [
 														<th colspan="6" class="font-weight-bold text-right" style="width: 72rem;">
 															<div style="float: right;">
 																<div class="text-right" style="font-size: 16px;">
-																	<div style="text-align: right; padding-right:55px; float: left">Desconto(R$):</div>
+																	<div style="text-align: right; padding-right:55px; float: left">Desconto (R$):</div>
 																	<div id="servicoValorDescontoTotal" class="font-weight-bold text-right" style="display:table-cell;">R$ 0,00</div>
 																</div>
 
 																<br>
 
 																<div class="text-right" style="font-size: 16px;">
-																	<div style="text-align: right; padding-right:55px; float: left">Valor(R$):</div>
+																	<div style="text-align: right; padding-right:55px; float: left">Valor (R$):</div>
 																	<div id="servicoValorTotal" class="font-weight-bold text-right">R$ 0,00</div>
 																</div>
 															</div>
