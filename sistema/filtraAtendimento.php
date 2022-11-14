@@ -1026,7 +1026,7 @@ try{
 		$observacao = [];
 
 		$sql = "SELECT AtClRId,AtClRNome,AtClRNomePersonalizado,AtClRCor,AtClRDeterminantes
-		FROM AtendimentoClassificacaoRisco WHERE AtClRUnidade != $iUnidade";
+		FROM AtendimentoClassificacaoRisco WHERE AtClRUnidade = $iUnidade";
 		$resultRiscos = $conn->query($sql);
 		$rowRiscos = $resultRiscos->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2370,7 +2370,7 @@ try{
 		$sql = "SELECT AtClRId,AtClRNome,AtClRNomePersonalizado,AtClRCor,
 		AtClRDeterminantes
 		FROM AtendimentoClassificacaoRisco
-		WHERE AtClRUnidade != $iUnidade";
+		WHERE AtClRUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2388,7 +2388,7 @@ try{
 	} elseif ($tipoRequest == 'GRUPO'){
 		$sql = "SELECT GrupoId,GrupoNome
 		FROM Grupo
-		WHERE GrupoUnidade != $iUnidade";
+		WHERE GrupoUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2404,7 +2404,7 @@ try{
 	} elseif ($tipoRequest == 'SUBGRUPO'){
 		$sql = "SELECT AtSubId,AtSubNome
 		FROM AtendimentoSubGrupo
-		WHERE AtSubUnidade != $iUnidade";
+		WHERE AtSubUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 

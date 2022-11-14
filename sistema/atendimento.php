@@ -553,7 +553,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							// esse trecho serve para o link no nome do paciente
 							$(rowNodeAgendamento).find('td:eq(2)').addClass('text-primary')
 							$(rowNodeAgendamento).find('td:eq(2)').attr('style', 'cursor: pointer;')
-							$(rowNodeAgendamento).find('td:eq(2)').attr('title', `Transformar o agendamento em atendimento \n ${item.identify.prontuario}`)
+							$(rowNodeAgendamento).find('td:eq(2)').attr('title', `Transformar o agendamento em atendimento \n${item.identify.prontuario}`)
 							$(rowNodeAgendamento).find('td:eq(2)').attr('data-id', `${item.identify.id}`)
 							$(rowNodeAgendamento).find('td:eq(2)').attr('data-tipo', 'AGENDAMENTO')
 							$(rowNodeAgendamento).find('td:eq(2)').attr('onclick', 'newAtendimento(this)')
