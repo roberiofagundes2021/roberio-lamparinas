@@ -434,7 +434,7 @@ $_SESSION['atendimento'] = [
 						setHoraProfissional()
 						$('#medicos').empty();
 						$('#localAtendimento').empty();
-						$('#medicos').append(`<option value=''>selecione</option>`)
+						$('#medicos').append(`<option value=''>Selecione</option>`)
 						$('#localAtendimento').append(`<option value=''>Selecione</option>`)			
 
 						response.forEach(item => {
@@ -889,7 +889,7 @@ $_SESSION['atendimento'] = [
 				},
 				success: function(response) {
 					$('#grupo').empty();
-					$('#grupo').append(`<option value=''>selecione</option>`)
+					$('#grupo').append(`<option value=''>Selecione</option>`)
 
 					response.forEach(item => {
 						$('#grupo').append(`<option value="${item.id}">${item.nome}</option>`)
@@ -906,7 +906,7 @@ $_SESSION['atendimento'] = [
 				},
 				success: function(response) {
 					$('#subgrupo').empty();
-					$('#subgrupo').append(`<option value=''>selecione</option>`)
+					$('#subgrupo').append(`<option value=''>Selecione</option>`)
 
 					response.forEach(item => {
 						$('#subgrupo').append(`<option value="${item.id}">${item.nome}</option>`)
@@ -923,7 +923,7 @@ $_SESSION['atendimento'] = [
 				},
 				success: function(response) {
 					$('#classificacaoRisco').empty();
-					$('#classificacaoRisco').append(`<option value=''>selecione</option>`)
+					$('#classificacaoRisco').append(`<option value=''>Selecione</option>`)
 
 					response.forEach(item => {
 						$('#classificacaoRisco').append(`<option title="${item.determinante}" value="${item.id}">${item.nome}</option>`)
@@ -940,7 +940,7 @@ $_SESSION['atendimento'] = [
 				},
 				success: function(response) {
 					$('#paciente').empty();
-					$('#paciente').append(`<option value=''>selecione</option>`)
+					$('#paciente').append(`<option value=''>Selecione</option>`)
 					let opt = ''
 					response.forEach(item => {
 						let id = obj && obj.pacienteID? obj.pacienteID:null
@@ -1261,11 +1261,11 @@ $_SESSION['atendimento'] = [
 										</div>`;
 								HTML += `
 								<tr class='servicoItem'>
-									<td class="text-center">${item.servico}</td>
-									<td class="text-center">${item.medico}</td>
-									<td class="text-center">${item.sData}</td>
-									<td class="text-center">${item.hora}</td>
-									<td class="text-center">${item.local}</td>
+									<td class="text-left">${item.servico}</td>
+									<td class="text-left">${item.medico}</td>
+									<td class="text-left">${item.sData}</td>
+									<td class="text-left">${item.hora}</td>
+									<td class="text-left">${item.local}</td>
 									<td class="text-right">R$ ${float2moeda(item.valor)}</td>
 									<td class="text-center">${acoes}</td>
 								</tr>`
@@ -1581,7 +1581,7 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-12 mb-4 row">
 											<!-- titulos -->
 											<div class="col-lg-3">
-												<label>Médicos</label>
+												<label>Profissional</label>
 											</div>
 											<div class="col-lg-2">
 												<label>Local do Atendimento</label>
@@ -1621,13 +1621,13 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-12">
 											<table class="table" id="servicoTable">
 												<thead>
-													<tr class="bg-slate text-center">
+													<tr class="bg-slate text-left">
 														<th style="width: 15rem;">Serviço</th>
-														<th style="width: 15rem;">Médico</th>
+														<th style="width: 15rem;">Profissional</th>
 														<th style="width: 11rem;">Data do Atendimento</th>
 														<th style="width: 6rem;">Horário</th>
 														<th style="width: 18rem;">Local</th>
-														<th style="width: 7rem;">Valor</th>
+														<th class="text-right" style="width: 7rem;">Valor</th>
 														<th class="text-center" style="width: 5rem;">Ações</th>
 													</tr>
 												</thead>
@@ -1636,20 +1636,20 @@ $_SESSION['atendimento'] = [
 												</tbody>
 												<tfoot>
 													<tr>
-														<th colspan="6" class="font-weight-bold" style="width: 72rem;">
+														<th colspan="6" class="font-weight-bold text-right" style="width: 72rem;">
 															<div style="float: right;">
-																<div style="font-size: 13px;">
-																	<div style="display:table-cell;padding-right:55px;">Desconto(R$):</div>
-																	<div id="servicoValorDescontoTotal" class="font-weight-bold" style="display:table-cell;">R$ 0,00</div>
+																<div class="text-right" style="font-size: 16px;">
+																	<div style="text-align: right; padding-right:55px; float: left">Desconto(R$):</div>
+																	<div id="servicoValorDescontoTotal" class="font-weight-bold text-right" style="display:table-cell;">R$ 0,00</div>
 																</div>
 
 																<br>
 
-																<div style="font-size: 16px;">
-																	<div style="display:table-cell;padding-right:60px;">Valor(R$):</div>
-																	<div id="servicoValorTotal" class="font-weight-bold" style="display:table-cell;">R$ 0,00</div>
+																<div class="text-right" style="font-size: 16px;">
+																	<div style="text-align: right; padding-right:55px; float: left">Valor(R$):</div>
+																	<div id="servicoValorTotal" class="font-weight-bold text-right">R$ 0,00</div>
 																</div>
-																</div>
+															</div>
 														</th>
 
 														<th style="width: 5rem;">
@@ -1663,7 +1663,7 @@ $_SESSION['atendimento'] = [
 										<div class="col-lg-12 mb-4 row">
 											<!-- titulos -->
 											<div class="col-lg-12">
-												<label>Observação</label>
+												<label>Observações</label>
 											</div>
 
 											<!-- campos -->
@@ -2660,7 +2660,7 @@ $_SESSION['atendimento'] = [
 		<div class="custon-modal-container" style="max-width: 500px;">
 			<div class="card custon-modal-content">
 				<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
-					<p id='tituloModal' class="h5">Desconto</p>
+					<p id='tituloModal' class="h4">Desconto</p>
 					<i id="modalDesconto-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
 				</div>
 				<div class="px-0">
@@ -2668,15 +2668,15 @@ $_SESSION['atendimento'] = [
 						<div class="col-lg-12">
 							<form id="editaSituacao" name="alterarSituacao" method="POST" class="form-validate-jquery">
 								<div class="form-group">
-									<div class="custon-modal-title">
+									<!--<div class="custon-modal-title">
 										<i class=""></i>
 										<p class="h3">Descontos</p>
 										<i class=""></i>
-									</div>
+									</div> -->
 									
-									<div class="p-5">
+									<div class="p-4">
 										<div class="d-flex flex-row justify-content-between">
-											<div class="col-lg-12" style="text-align:center;">
+											<div class="col-lg-12" style="text-align:left;">
 												<div class="form-group row">
 													<div class="col-lg-4">
 														<label>Desconto</label>
