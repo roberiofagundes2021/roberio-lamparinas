@@ -875,6 +875,67 @@ $_SESSION['atendimento'] = [
 				});
 			})
 
+			$('#grupo').on('change',function(e){
+				// vai preencher cmbSubGrupo
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'SUBGRUPO',
+						'grupo': $(this).val()
+					},
+					success: async function(response) {
+						$('#subgrupo').empty();
+						$('#subgrupo').append(`<option value=''>Selecione</option>`)
+
+						await response.forEach(item => {
+							$('#subgrupo').append(`<option value="${item.id}">${item.nome}</option>`)
+						})
+
+						// vai preencher cmbServicos
+						$.ajax({
+							type: 'POST',
+							url: 'filtraAtendimento.php',
+							dataType: 'json',
+							data: {
+								'tipoRequest': 'SERVICOS',
+								'grupo':$('#grupo').val()
+							},
+							success: function(response) {
+								$('#servico').empty();
+								$('#servico').append(`<option value=''>Selecione</option>`)
+								response.forEach(item => {
+									let opt = `<option value="${item.id}">${item.codigo} - ${item.nome}</option>`
+									$('#servico').append(opt)
+								})
+							}
+						});
+					}
+				});
+			})
+			$('#subgrupo').on('change',function(e){
+				// vai preencher cmbServicos
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'SERVICOS',
+						'grupo':$('#grupo').val(),
+						'subGrupo':$(this).val()
+					},
+					success: function(response) {
+						$('#servico').empty();
+						$('#servico').append(`<option value=''>Selecione</option>`)
+						response.forEach(item => {
+							let opt = `<option value="${item.id}">${item.codigo} - ${item.nome}</option>`
+							$('#servico').append(opt)
+						})
+					}
+				});
+			})
+
 			resetServicoCmb()
 		});
 
@@ -1025,8 +1086,6 @@ $_SESSION['atendimento'] = [
 				}
 			});
 		}
-
-
 
 		// essa função vai setar os atributos nos campos quando for selecionado o paciente
 		function setPacienteAtribut(id) {

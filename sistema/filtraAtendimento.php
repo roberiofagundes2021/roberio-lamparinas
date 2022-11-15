@@ -1996,12 +1996,20 @@ try{
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'SERVICOS'){
+		$grupo = isset($_POST['grupo'])?$_POST['grupo']:false;
+		$subgrupo = isset($_POST['subGrupo'])?$_POST['subGrupo']:false;
+
 		$sql = "SELECT SrVenId,SrVenNome,SrVenCodigo
 		FROM ServicoVenda WHERE SrVenUnidade = $iUnidade";
+
+		$sql .= $grupo?" and SrVenGrupo = $grupo":"";
+		$sql .= $subgrupo?" and SrVenSubGrupo = $subgrupo":"";
+
 		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$array = [];
-		foreach($result as $item){
+		foreach($row as $item){
 			array_push($array,[
 				'id' => $item['SrVenId'],
 				'nome' => $item['SrVenNome'],
@@ -2386,25 +2394,30 @@ try{
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'GRUPO'){
-		$sql = "SELECT GrupoId,GrupoNome
-		FROM Grupo
-		WHERE GrupoUnidade = $iUnidade";
+		$sql = "SELECT AtGruId,AtGruNome
+		FROM AtendimentoGrupo
+		WHERE AtGruUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$array = [];
 		foreach($row as $item){
 			array_push($array,[
-				'id' => $item['GrupoId'],
-				'nome' => $item['GrupoNome']
+				'id' => $item['AtGruId'],
+				'nome' => $item['AtGruNome']
 			]);
 		}
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'SUBGRUPO'){
+		$grupo = isset($_POST['grupo'])?$_POST['grupo']:false;
+
 		$sql = "SELECT AtSubId,AtSubNome
 		FROM AtendimentoSubGrupo
 		WHERE AtSubUnidade = $iUnidade";
+
+		$sql .= $grupo?" and AtSubGrupo = $grupo":"";
+
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2450,7 +2463,7 @@ try{
 			'titulo' => 'Risco',
 			'menssagem' => 'Classificação de risco atualizada!!!',
 		]);
-	} 
+	}
 }catch(PDOException $e) {
 	$msg = '';
 	switch($tipoRequest){
