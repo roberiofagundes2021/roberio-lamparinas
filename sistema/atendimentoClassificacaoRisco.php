@@ -35,7 +35,7 @@ include('global_assets/php/conexao.php');
 	
 		try{
 
-			$aClassificacaoRisco = explode("#", $_POST['cmbClassificacaoRisco']);
+			$aClassificacaoRisco = explode("$", $_POST['cmbClassificacaoRisco']);
 			$iClassificacaoRisco = $aClassificacaoRisco[0];
 				
 			$sql = "UPDATE Atendimento SET AtendClassificacaoRisco = :sClassificacaoRisco, AtendUsuarioAtualizador = :iUsuarioAtualizador
@@ -49,13 +49,13 @@ include('global_assets/php/conexao.php');
 							));
 
 			$_SESSION['msg']['titulo'] = "Sucesso";
-			$_SESSION['msg']['mensagem'] = "ClassificacaoRisco incluído!!!";
+			$_SESSION['msg']['mensagem'] = "Classificacao de Risco incluído!!!";
 			$_SESSION['msg']['tipo'] = "success";
 			
 		} catch(PDOException $e) {
 			
 			$_SESSION['msg']['titulo'] = "Erro";
-			$_SESSION['msg']['mensagem'] = "Erro ao incluir ClassificacaoRisco!!!";
+			$_SESSION['msg']['mensagem'] = "Erro ao incluir Classificacao de Risco!!!";
 			$_SESSION['msg']['tipo'] = "error";		
 			
 			echo 'Error: ' . $e->getMessage();
@@ -147,7 +147,7 @@ include('global_assets/php/conexao.php');
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form id="formClassificacaoRisco" name="formClassificacaoRisco" method="post" class="form-validate-jquery">
+					<form name="formClassificacaoRisco" id="formClassificacaoRisco" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold"> Classificação de Risco</h5>
 						</div>
