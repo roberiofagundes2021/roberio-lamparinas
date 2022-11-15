@@ -32,9 +32,7 @@ include('global_assets/php/conexao.php');
 	}	
 
 	if(isset($_POST['cmbClassificacaoRisco'])){
-	
 		try{
-
 			$aClassificacaoRisco = explode("$", $_POST['cmbClassificacaoRisco']);
 			$iClassificacaoRisco = $aClassificacaoRisco[0];
 				
@@ -111,16 +109,12 @@ include('global_assets/php/conexao.php');
 				});
 				$('#txtDeterminantes').val(Classif[3]);
 			});
+
+			$('#enviar').on('click', function(e){
+				// $( "#formClassificacaoRisco" ).submit()
+			})
 			
 		}); //document.ready
-
-		$('#enviar').on('click', function(e){
-			
-			e.preventDefault();
-
-			$( "#formClassificacaoRisco" ).submit()	
-			
-		})
 	</script>
 
 </head>
@@ -147,9 +141,13 @@ include('global_assets/php/conexao.php');
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formClassificacaoRisco" id="formClassificacaoRisco" method="post" class="form-validate-jquery">
+					<form id="formClassificacaoRisco" method="post" action="atendimentoClassificacaoRisco.php" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold"> Classificação de Risco</h5>
+						</div>
+
+						<div>
+							<input type="hidden" value="<?php echo $iAtendimentoId ?>" name="iAtendimentoId"/>
 						</div>
 						
 						<div class="card-body">								
@@ -162,7 +160,7 @@ include('global_assets/php/conexao.php');
 											<label for="cmbClassificacaoRisco">Classificação de Risco<span class="text-danger"> *</span></label>
 											<select id="cmbClassificacaoRisco" name="cmbClassificacaoRisco" class="form-control select-search" required>
 												<option value="">Selecione</option>
-												<?php 
+												<?php
 													$sql = "SELECT AtClRId, AtClRNome,AtClRTempo, AtClRCor, AtClRDeterminantes
 															FROM AtendimentoClassificacaoRisco
 															JOIN Situacao ON SituaId = AtClRStatus
@@ -213,7 +211,6 @@ include('global_assets/php/conexao.php');
 								</div> <!-- media-body -->
 								
 							</div> <!-- media -->
-
 							<br>
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">								

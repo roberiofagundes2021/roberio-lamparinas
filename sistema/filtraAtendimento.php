@@ -1691,7 +1691,7 @@ try{
 				AtendDataRegistro = '$atendimento[dataRegistro]',
 				AtendCliente = '$cliente[id]',
 				AtendModalidade = '$atendimento[modalidade]',
-				AtendResponsavel = ".($responsavel?$responsavel['id']:'').",
+				AtendResponsavel = '".($responsavel?$responsavel['id']:'')."',
 				AtendClassificacao = '$atendimento[classificacao]',
 				AtendObservacao = '$atendimento[observacao]',
 				AtendSituacao = '$rowSituacao[SituaId]',
