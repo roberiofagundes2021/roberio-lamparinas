@@ -111,7 +111,10 @@ include('global_assets/php/conexao.php');
 			});
 
 			$('#enviar').on('click', function(e){
-				// $( "#formClassificacaoRisco" ).submit()
+				
+				e.preventDefault();
+
+				$( "#formClassificacaoRisco" ).submit()
 			})
 			
 		}); //document.ready
@@ -142,13 +145,9 @@ include('global_assets/php/conexao.php');
 				<div class="card">
 					
 					<form id="formClassificacaoRisco" method="post" action="atendimentoClassificacaoRisco.php" class="form-validate-jquery">
-						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold"> Classificação de Risco</h5>
-						</div>
-
-						<div>
-							<input type="hidden" value="<?php echo $iAtendimentoId ?>" name="iAtendimentoId"/>
-						</div>
+						<div><input type="hidden" id="iAtendimentoId" name="iAtendimentoId" value="<?php echo $iAtendimentoId ?>"/></div>
+		
+						<div class="card-header header-elements-inline"> <h5 class="text-uppercase font-weight-bold"> Classificação de Risco</h5></div>
 						
 						<div class="card-body">								
 							
