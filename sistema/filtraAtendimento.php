@@ -1691,6 +1691,7 @@ try{
 				AtendDataRegistro = '$atendimento[dataRegistro]',
 				AtendCliente = '$cliente[id]',
 				AtendModalidade = '$atendimento[modalidade]',
+				AtendClassificacaoRisco = '$atendimento[classificacaoRisco]',
 				AtendResponsavel = '".($responsavel?$responsavel['id']:'')."',
 				AtendClassificacao = '$atendimento[classificacao]',
 				AtendObservacao = '$atendimento[observacao]',
@@ -1704,10 +1705,10 @@ try{
 				$conn->query($sql);
 			}else{
 				$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,AtendCliente,
-					AtendModalidade,AtendResponsavel,AtendClassificacao,AtendObservacao,AtendSituacao,
+					AtendModalidade,AtendResponsavel,AtendClassificacao,AtendClassificacaoRisco,AtendObservacao,AtendSituacao,
 					AtendUsuarioAtualizador,AtendUnidade)
 					VALUES('$numRegistro','$atendimento[dataRegistro]','$cliente[id]','$atendimento[modalidade]',
-					'".($responsavel?$responsavel['id']:'')."',$atendimento[classificacao],'$atendimento[observacao]',
+					'".($responsavel?$responsavel['id']:'')."',$atendimento[classificacao],'$atendimento[classificacaoRisco]','$atendimento[observacao]',
 				$rowSituacao[SituaId],$usuarioId,$iUnidade)";
 				$conn->query($sql);
 		
@@ -1718,12 +1719,13 @@ try{
 				}
 			}
 
-			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeDesconto
+			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeDesconto,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
 			VALUES ";
 	
 			foreach($atendimentoServicos as $atendimentoServico){
-				$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]','$atendimentoServico[desconto]'
+				$desconto = $atendimentoServico['desconto']?$atendimentoServico['desconto']:0;
+				$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]','$desconto',
 				'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
 				'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
 			}
