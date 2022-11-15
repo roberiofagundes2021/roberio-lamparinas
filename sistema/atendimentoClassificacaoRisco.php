@@ -20,6 +20,17 @@ include('global_assets/php/conexao.php');
 	$result = $conn->query($sql);
 	$row = $result->fetch(PDO::FETCH_ASSOC);
 
+	$borderColor = "";
+	
+	switch($row['AtClRCor']){
+		case '#ff630f':$borderColor='2px solid #cd5819';break;
+		case '#fa0000':$borderColor='2px solid #c10000';break;
+		case '#fbff00':$borderColor='2px solid #adb003';break;
+		case '#00ff1e':$borderColor='2px solid #2db93e';break;
+		case '#0008ff':$borderColor='2px solid #010579';break;
+		default: $borderColor = '2px solid #FFFF';break;
+	}	
+
 	if(isset($_POST['cmbClassificacaoRisco'])){
 	
 		try{
@@ -65,19 +76,8 @@ include('global_assets/php/conexao.php');
 
 	<?php include_once("head.php"); ?>
 	
-	<!-- Theme JS files -->
-	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
-	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
-	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
-
-
-	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
-	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-
-	<!-- Não permite que o usuário retorne para o EDITAR -->
-	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
@@ -86,28 +86,41 @@ include('global_assets/php/conexao.php');
 	
 	<script type="text/javascript">
 
-	$(document).ready(function() {
+		$(document).ready(function() {
 
-		//Ao informar a ClassificacaoRisco , trazer os demais dados dele (tempo, cor e determinantes)
-		$('#cmbClassificacaoRisco').on('change', function(e) { 
+			//Ao informar a ClassificacaoRisco , trazer os demais dados dele (tempo, cor e determinantes)
+			$('#cmbClassificacaoRisco').on('change', function(e) { 
 
-			var ClassificacaoRisco = $('#cmbClassificacaoRisco').val();
-			var Classif = ClassificacaoRisco.split('#');
+				var ClassificacaoRisco = $('#cmbClassificacaoRisco').val();
+				var Classif = ClassificacaoRisco.split('$');
 
-			$('#inputTempo').val(Classif[1]);
-			$('#inputCor').val(Classif[3]);
-			$('#txtDeterminantes').val(Classif[4]);
-		});
+				const cor = Classif[2];
+				switch (cor) {
+					case '#ff630f':borderColor='2px solid #cd5819';break;
+					case '#fa0000':borderColor='2px solid #c10000';break;
+					case '#fbff00':borderColor='2px solid #adb003';break;
+					case '#00ff1e':borderColor='2px solid #2db93e';break;
+					case '#0008ff':borderColor='2px solid #010579';break;
+					default: borderColor = '2px solid #FFFF';break;
+				}
+
+				$('#inputTempo').val(Classif[1]);
+				$('#inputCor').css({
+					"background-color": Classif[2],
+					"border": borderColor
+				});
+				$('#txtDeterminantes').val(Classif[3]);
+			});
 			
-	}); //document.ready
+		}); //document.ready
 
-	$('#enviar').on('click', function(e){
-		
-		e.preventDefault();
+		$('#enviar').on('click', function(e){
+			
+			e.preventDefault();
 
-		$( "#formClassificacaoRisco" ).submit()	
-		
-	})
+			$( "#formClassificacaoRisco" ).submit()	
+			
+		})
 	</script>
 
 </head>
@@ -161,12 +174,12 @@ include('global_assets/php/conexao.php');
 													foreach ($rowClassificacao as $Classificacao) {
 														if (isset($row['AtendClassificacaoRisco'])) {
 															if ($Classificacao['AtClRId'] == $row['AtendClassificacaoRisco']) {
-																print('<option selected value="' . $Classificacao['AtClRId'] . '#' . $Classificacao['AtClRTempo'] . '#' . $Classificacao['AtClRCor'] . '#' . $Classificacao['AtClRDeterminantes'] . '" selected>' . $Classificacao['AtClRNome'] . '</option>');
+																print('<option selected value="' . $Classificacao['AtClRId'] . '$' . $Classificacao['AtClRTempo'] . '$' . $Classificacao['AtClRCor'] . '$' . $Classificacao['AtClRDeterminantes'] . '" selected>' . $Classificacao['AtClRNome'] . '</option>');
 															} else {
-																print('<option value="' . $Classificacao['AtClRId'] . '#' . $Classificacao['AtClRTempo'] . '#' . $Classificacao['AtClRCor'] . '#' . $Classificacao['AtClRDeterminantes'] . '">' . $Classificacao['AtClRNome'] . '</option>');
+																print('<option value="' . $Classificacao['AtClRId'] . '$' . $Classificacao['AtClRTempo'] . '$' . $Classificacao['AtClRCor'] . '$' . $Classificacao['AtClRDeterminantes'] . '">' . $Classificacao['AtClRNome'] . '</option>');
 															}
 														} else {
-															print('<option value="' . $Classificacao['AtClRId'] . '#' . $Classificacao['AtClRTempo'] . '#' . $Classificacao['AtClRCor'] . '#' . $Classificacao['AtClRDeterminantes'] . '" >' . $Classificacao['AtClRNome'] . '</option>');
+															print('<option value="' . $Classificacao['AtClRId'] . '$' . $Classificacao['AtClRTempo'] . '$' . $Classificacao['AtClRCor'] . '$' . $Classificacao['AtClRDeterminantes'] . '" >' . $Classificacao['AtClRNome'] . '</option>');
 														}
 													};
 
@@ -177,13 +190,12 @@ include('global_assets/php/conexao.php');
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputTempo">Tempo (min)</label>
-												<input type="number" id="inputTempo" name="inputTempo" class="form-control" placeholder="Tempo" readonly>
+												<input type="number" id="inputTempo" name="inputTempo" class="form-control" placeholder="Tempo" value="<?php if (isset($row)) echo $row['AtClRTempo']; ?>" readonly>
 											</div>
 										</div>
 										<div class="col-lg-2">									
 											<div class="col-lg-2">
-												<label for="inputCor">Cor</label>
-												<div class="form-group"  id="inputCor" name="inputCor"style="margin-left: 10px; margin-Top: 5px; height: 40px; width: 40px; background-color: #fa0000 ; border-radius: 50px;" >
+												<div class="form-group" id="inputCor" name="inputCor" style="margin-left: 10px; margin-Top: 5px; height: 55px; width: 55px <?php if (isset($row)) echo ";background-color:".$row['AtClRCor']."; border:".$borderColor; ?>;  border-radius: 50px;" >
                                             </div>
                                         </div>
 										</div>
@@ -193,7 +205,7 @@ include('global_assets/php/conexao.php');
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtDeterminantes">Determinantes Gerais</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtDeterminantes" name="txtDeterminantes" placeholder="Determinantes" readonly></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtDeterminantes" name="txtDeterminantes" placeholder="Determinantes" readonly><?php if (isset($row)) echo $row['AtClRDeterminantes']; ?></textarea>
 											</div>
 										</div>
 									</div>

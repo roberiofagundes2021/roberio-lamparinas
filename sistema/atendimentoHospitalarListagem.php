@@ -688,7 +688,7 @@ $acesso = 'ATENDIMENTO';
 						<div class="card">
 
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Atendimento Hospitalar</h3>
+								<h3 class="card-title">ATENDIMENTO HOSPITALAR</h3>
 							</div>
 
 							<div class="card-body">
@@ -724,7 +724,7 @@ $acesso = 'ATENDIMENTO';
 											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Classificação de Risco</th>
+											<th>Classificação<br>de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>
@@ -746,7 +746,7 @@ $acesso = 'ATENDIMENTO';
 											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Classificação de Risco</th>
+											<th>Classificação<br>de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>
@@ -768,7 +768,7 @@ $acesso = 'ATENDIMENTO';
 											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Classificação de Risco</th>
+											<th>Classificação<br>de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>
@@ -790,7 +790,7 @@ $acesso = 'ATENDIMENTO';
 											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Classificação de Risco</th>
+											<th>Classificação<br>de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>

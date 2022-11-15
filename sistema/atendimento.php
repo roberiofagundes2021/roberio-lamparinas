@@ -57,11 +57,6 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 	<!-- Modal -->
 	<script src="global_assets/js/plugins/notifications/bootbox.min.js"></script>
-    
-    <!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 	<script type="text/javascript" >
 		// buscar todos os atendimento ao entrar na pagina
@@ -817,7 +812,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 											<th>Prontuário</th>			
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Risco</th>
+											<th>Classificação de Risco</th>
 											<th>Situação</th>
 											<th class="text-center">Ações</th>
 										</tr>
