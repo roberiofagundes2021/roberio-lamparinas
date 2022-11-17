@@ -61,7 +61,10 @@ $_SESSION['atendimento'] = [
 				autoFocus: true,
 				onStepChanging: function(event, currentIndex, newIndex) {
 					let error = $('#paciente').val() ? true : false
-
+					if(!validaDataNascimento($("#nascimento").val())){
+						alerta('Alerta','A data de Nascimento não pode ser futura', 'error');
+						return false;
+					}
 					// esse switch serve para mostrar ou ocultar os dados da tela
 					// de acordo com a etapa do steppers
 					switch (newIndex) {
@@ -146,7 +149,7 @@ $_SESSION['atendimento'] = [
 						'prontuario': $('#prontuario').val(),
 						'nome': $('#nome').val(),
 						'nomeSocial': $('#nomeSocial').val(),
-						'cpf': $('#cpf').val(),
+						'cpf': $('#cpf').val().replace(/[^\d]+/g, ''),
 						'cns': $('#cns').val(),
 						'rg': $('#rg').val(),
 						'emissor': $('#emissor').val(),
@@ -306,6 +309,19 @@ $_SESSION['atendimento'] = [
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+
+	<script type="text/javascript">
+		function validaDataNascimento(dataASerValidada){			
+			let dataObj = new Date(dataASerValidada);
+			let hoje = new Date();
+			if((hoje-dataObj)<0){
+				return false;				
+			}
+			else{
+				return true;
+			}
+		}
+	</script>
 
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -592,6 +608,14 @@ $_SESSION['atendimento'] = [
 					return
 				}
 
+				let dataPreenchida = $("#nascimentoNew").val();
+				if(!validaDataNascimento(dataPreenchida)){
+					$('#nascimentoNew').val('');
+					alerta('Atenção', 'Data de nascimento não pode ser futura!', 'error');
+					$('#nascimentoNew').focus();
+					return
+				}
+
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAtendimento.php',
@@ -718,7 +742,15 @@ $_SESSION['atendimento'] = [
 				$('#inputDesconto').val('')
 				$('#pageModalDescontos').fadeOut(200)
 			})
-			
+
+			$('#cpf').blur(function(element){
+				let cpfSoNumeros = $(this).val().replace(/[^\d]+/g, '')
+				if(!validaCPF(cpfSoNumeros)){
+					$(this).val('')
+					alerta('CPF Inválido!', 'Digite um CPF válido!!', 'error')
+					return
+				}
+			})			
 
 			//Esta função será executada quando o campo cep perder o foco.
 			$("#cepNew").blur(function() {

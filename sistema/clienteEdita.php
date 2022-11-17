@@ -44,6 +44,29 @@ else {
 	<!-- Validação -->
 
 	<!-- Adicionando Javascript -->
+
+	<script type="text/javascript">
+		function validaDataNascimento(dataASerValidada){			
+			let dataObj = new Date(dataASerValidada);
+			let hoje = new Date();
+			if((hoje-dataObj)<0){
+				return false;				
+			}
+			else{
+				return true;
+			}
+		}
+
+		function formataCampoDataNascimento(){
+			let dataPreenchida = $('#inputDtNascimento').val();
+			if (!validaDataNascimento(dataPreenchida)){
+				let labelErro = $('#inputDtNascimento-error')
+				labelErro.removeClass('validation-valid-label');
+				labelErro[0].innerHTML = "Data não pode ser futura";				
+			}
+		}
+	</script>
+
 	<script type="text/javascript">
 		$(document).ready(function() {
 
@@ -134,6 +157,14 @@ else {
 						$('#inputCpf').focus();
 						return false;
 					}
+				}
+
+				let dataPreenchida = $("#inputDtNascimento").val();
+				if(!validaDataNascimento(dataPreenchida)){
+					$('#inputDtNascimento').val('');
+					alerta('Atenção', 'Data de nascimento não pode ser futura!', 'error');
+					$('#inputDtNascimento').focus();
+					return false;
 				}
 
 				//remove os espaços desnecessários antes e depois
@@ -297,7 +328,7 @@ else {
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputDtNascimento">Data Nascimento</label>
-													<input type="date" id="inputDtNascimento" name="inputDtNascimento" class="form-control" placeholder="Data Nascimento" value="<?php echo $row['ClienDtNascimento']; ?>">
+													<input type="date" id="inputDtNascimento" name="inputDtNascimento" class="form-control" onfocusout="formataCampoDataNascimento()" placeholder="Data Nascimento" value="<?php echo $row['ClienDtNascimento']; ?>">
 												</div>
 											</div>
 										</div>
