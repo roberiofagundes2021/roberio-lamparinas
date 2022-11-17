@@ -230,6 +230,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 					case $('#profissional').val(): menssagem='Informe o profissional!';$('#profissional').focus();break;
 					case $('#especialidade').val(): menssagem='Informe a especialidade!';$('#especialidade').focus();break;
 					case $('#modelo').val(): menssagem='Informe o tipo de encaminhamento!';$('#modelo').focus();break;
+					case $('#summernote').val(): menssagem='Informe o encaminhamento médico!';$('#summernote').focus();break;
 					default: menssagem='';break;
 				}
 				if(menssagem){
@@ -477,7 +478,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 
 									<div class="col-lg-12">
 										<div class="form-group">
-											<label for="inputNome">Encaminhamento Médico </label>
+											<label for="inputNome">Encaminhamento Médico <span class="text-danger">*</span></label>
 											<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Digite aqui..."></textarea>
 										</div>
 									</div>
