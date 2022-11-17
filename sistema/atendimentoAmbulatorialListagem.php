@@ -37,6 +37,9 @@ $acesso = 'ATENDIMENTO';
 		table td{
 			padding: 1rem !important;
 		}
+		.dropdown-toggle::after{
+			content:'';
+		}
 	</style>
 	
 	<!-- Theme JS files -->
@@ -610,6 +613,23 @@ $acesso = 'ATENDIMENTO';
 						$(rowNodeA).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})
 					setAttributs()
+				}
+			});
+		}
+
+		function mudaRisco(idAtendimento, idRisco){
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'SETRISCO',
+					'id': idAtendimento,
+					'risco': idRisco
+				},
+				success: function(response) {
+					getAtendimentos()
+					alerta(response.titulo, response.menssagem, response.status);
 				}
 			});
 		}
