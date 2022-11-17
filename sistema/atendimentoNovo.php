@@ -751,124 +751,50 @@ $_SESSION['atendimento'] = [
 					return
 				}
 			})			
+			
+			//Esta função será executada quando o campo cep do edita paciente perder o foco.
+			$("#cep").blur(function() {
+				ValidaEPreencheCEP(
+					"cep",
+					"endereco",
+					"bairro",
+					"cidade",
+					"estado"
+			    )
+			}); 
 
-			//Esta função será executada quando o campo cep perder o foco.
+			//Esta função será executada quando o campo cep do popup perder o foco.
 			$("#cepNew").blur(function() {
-				//$("#cmbEstado").removeClass("form-control-select2");
+				ValidaEPreencheCEP(
+					"cepNew",
+					"enderecoNew",
+					"bairroNew",
+					"cidadeNew",
+					"estadoNew"
+			    )
+			});
 
-				//Nova variável "cep" somente com dígitos.
-				var cep = $(this).val().replace(/\D/g, '');
+			//Esta função será executada quando o campo cep do responsável edita perder o foco.
+			$("#cepResp").blur(function() {
+				ValidaEPreencheCEP(
+					"cepResp",
+					"enderecoResp",
+					"bairroResp",
+					"cidadeResp",
+					"estadoResp"
+			    )
+			}); 
 
-				//Verifica se campo cep possui valor informado.
-				if (cep != "") {
-
-					//Expressão regular para validar o CEP.
-					var validacep = /^[0-9]{8}$/;
-
-					//Valida o formato do CEP.
-					if (validacep.test(cep)) {
-
-						//Preenche os campos com "..." enquanto consulta webservice.
-						$("#enderecoNew").val("...");
-						$("#bairroNew").val("...");
-						$("#cidadeNew").val("...");
-						$("#estadoNew").val("...");
-
-						//Consulta o webservice viacep.com.br/
-						$.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
-
-							if (!("erro" in dados)) {
-
-								//Atualiza os campos com os valores da consulta.
-								$("#enderecoNew").val(dados.logradouro);
-								$("#bairroNew").val(dados.bairro);
-								$("#cidadeNew").val(dados.localidade);
-								
-								$("#estadoNew").val(dados.uf);
-								$('#estadoNew').children("option").each(function(index, item){									
-									if($(item).val().toUpperCase() == dados.uf.toUpperCase()){
-										$(item).change()
-									}
-								})
-							} //end if.
-							else {
-								//CEP pesquisado não foi encontrado.
-								limpa_formulário_cep();
-								alerta("Erro", "CEP não encontrado.", "erro");
-							}
-						});
-					} //end if.
-					else {
-						//cep é inválido.
-						$("#inputCep").val("");
-						limpa_formulário_cep();
-						alerta("Erro", "Formato de CEP inválido.", "erro");
-					}
-				} //end if.
-				else {
-					//cep sem valor, limpa formulário.
-					limpa_formulário_cep();
-				}
-			}); //cep
-
-			//Esta função será executada quando o campo cep perder o foco.
+			//Esta função será executada quando o campo cep do responsável novo (popup) perder o foco.
 			$("#cepRespNew").blur(function() {
-				//$("#cmbEstado").removeClass("form-control-select2");
-
-				//Nova variável "cep" somente com dígitos.
-				var cep = $(this).val().replace(/\D/g, '');
-
-				//Verifica se campo cep possui valor informado.
-				if (cep != "") {
-
-					//Expressão regular para validar o CEP.
-					var validacep = /^[0-9]{8}$/;
-
-					//Valida o formato do CEP.
-					if (validacep.test(cep)) {
-
-						//Preenche os campos com "..." enquanto consulta webservice.
-						$("#enderecoRespNew").val("...");
-						$("#bairroRespNew").val("...");
-						$("#cidadeRespNew").val("...");
-						$("#estadoRespNew").val("...");
-
-						//Consulta o webservice viacep.com.br/
-						$.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
-
-							if (!("erro" in dados)) {
-
-								//Atualiza os campos com os valores da consulta.
-								$("#enderecoRespNew").val(dados.logradouro);
-								$("#bairroRespNew").val(dados.bairro);
-								$("#cidadeRespNew").val(dados.localidade);
-								
-								$("#estadoRespNew").val(dados.uf);
-								$('#estadoRespNew').children("option").each(function(index, item){									
-									if($(item).val().toUpperCase() == dados.uf.toUpperCase()){
-										$(item).change()
-									}
-								})
-							} //end if.
-							else {
-								//CEP pesquisado não foi encontrado.
-								limpa_formulário_cep();
-								alerta("Erro", "CEP não encontrado.", "erro");
-							}
-						});
-					} //end if.
-					else {
-						//cep é inválido.
-						$("#inputCep").val("");
-						limpa_formulário_cep();
-						alerta("Erro", "Formato de CEP inválido.", "erro");
-					}
-				} //end if.
-				else {
-					//cep sem valor, limpa formulário.
-					limpa_formulário_cep();
-				}
-			}); //cep
+				ValidaEPreencheCEP(
+					"cepRespNew",
+					"enderecoRespNew",
+					"bairroRespNew",
+					"cidadeRespNew",
+					"estadoRespNew"
+			    )
+			}); 
 
 			$('#formServicoAtendimento').submit(function(e) {
 				e.preventDefault()
@@ -1825,7 +1751,7 @@ $_SESSION['atendimento'] = [
 											<input id="cns" name="cns" type="text" class="form-control" placeholder="Cartão do SUS">
 										</div>
 										<div class="col-lg-3">
-											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG">
+											<input id="rg" name="rg" type="text" class="form-control" placeholder="RG" data-mask="99.999.999-99">
 										</div>
 										<div class="col-lg-3">
 											<input id="emissor" name="emissor" type="text" class="form-control" placeholder="Orgão Emissor">
@@ -2054,10 +1980,10 @@ $_SESSION['atendimento'] = [
 											<input id="contato" name="contato" type="text" class="form-control" placeholder="Contato">
 										</div>
 										<div class="col-lg-3">
-											<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Res. / Com.">
+											<input id="telefone" name="telefone" type="text" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999">
 										</div>
 										<div class="col-lg-3">
-											<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular">
+											<input id="celular" name="celular" type="text" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
 										</div>
 										<div class="col-lg-3">
 											<input id="email" name="email" type="text" class="form-control" placeholder="E-mail">
@@ -2212,10 +2138,10 @@ $_SESSION['atendimento'] = [
 
 										<!-- campos -->
 										<div class="col-lg-4">
-											<input id="telefoneResp" name="telefoneResp" type="text" class="form-control" placeholder="Res. / Com.">
+											<input id="telefoneResp" name="telefoneResp" type="text" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999">
 										</div>
 										<div class="col-lg-4">
-											<input id="celularResp" name="celularResp" type="text" class="form-control" placeholder="Celular">
+											<input id="celularResp" name="celularResp" type="text" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
 										</div>
 										<div class="col-lg-4">
 											<input id="emailResp" name="emailResp" type="text" class="form-control" placeholder="E-mail">
@@ -2299,7 +2225,7 @@ $_SESSION['atendimento'] = [
 											<input id="cnsNew" name="cnsNew" type="text" class="form-control" placeholder="Cartão do SUS">
 										</div>
 										<div class="col-lg-4">
-											<input id="rgNew" name="rgNew" type="text" class="form-control" placeholder="RG">
+											<input id="rgNew" name="rgNew" type="text" class="form-control" placeholder="RG" data-mask="99.999.999-99">
 										</div>
 									</div>
 
@@ -2540,10 +2466,10 @@ $_SESSION['atendimento'] = [
 											<input id="contatoNew" name="contatoNew" type="text" class="form-control" placeholder="Contato">
 										</div>
 										<div class="col-lg-2">
-											<input id="telefoneNew" name="telefoneNew" type="text" class="form-control" placeholder="Res. / Com.">
+											<input id="telefoneNew" name="telefoneNew" type="text" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999">
 										</div>
 										<div class="col-lg-2">
-											<input id="celularNew" name="celularNew" type="text" class="form-control" placeholder="Celular">
+											<input id="celularNew" name="celularNew" type="text" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
 										</div>
 										<div class="col-lg-4">
 											<input id="emailNew" name="emailNew" type="text" class="form-control" placeholder="E-mail">
