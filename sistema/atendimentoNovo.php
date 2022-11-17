@@ -334,7 +334,7 @@ $_SESSION['atendimento'] = [
 			$('#novoPaciente').hide()
 			$('#novoResponsavel').hide()
 
-			$('.actions').addClass('col-lg-12 row')
+			$('.actions').addClass('col-lg-12 row pt-2')
 			$('.actions ul').addClass('col-lg-10 actionContent')
 			$('.actions').append(`<a class='col-lg-2 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>`)
 			$('#cancelar').insertBefore('.actionContent')

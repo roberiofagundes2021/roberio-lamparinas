@@ -362,7 +362,7 @@ if ($tipo == 'ATENDIMENTO') {
 			$('#servicoTable').hide()
 			$('#novoResponsavel').hide()
 
-			$('.actions').addClass('col-lg-12 row')
+			$('.actions').addClass('col-lg-12 row pt-2')
 			$('.actions ul').addClass('col-lg-10 actionContent')
 			$('.actions').append(`<a class='col-lg-2 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>`)
 			$('#cancelar').insertBefore('.actionContent')
@@ -484,7 +484,7 @@ if ($tipo == 'ATENDIMENTO') {
 						setHoraProfissional()
 						$('#medicos').empty();
 						$('#localAtendimento').empty();
-						$('#medicos').append(`<option value=''>selecione</option>`)
+						$('#medicos').append(`<option value=''>Selecione</option>`)
 						$('#localAtendimento').append(`<option value=''>Selecione</option>`)			
 
 						response.forEach(item => {
@@ -895,7 +895,7 @@ if ($tipo == 'ATENDIMENTO') {
 
 				valorF = valor - desconto
 
-				$('#inputModalValorF').val('R$'+float2moeda(valorF))
+				$('#inputModalValorF').val('R$ '+float2moeda(valorF))
 
 				$('#pageModalDescontos').fadeIn(200);
 			})
@@ -993,7 +993,7 @@ if ($tipo == 'ATENDIMENTO') {
 				},
 				success: function(response) {
 					$('#grupo').empty();
-					$('#grupo').append(`<option value=''>selecione</option>`)
+					$('#grupo').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
 						$('#grupo').append(`<option value="${item.id}">${item.nome}</option>`)
 					})
@@ -1009,7 +1009,7 @@ if ($tipo == 'ATENDIMENTO') {
 				},
 				success: function(response) {
 					$('#subgrupo').empty();
-					$('#subgrupo').append(`<option value=''>selecione</option>`)
+					$('#subgrupo').append(`<option value=''>Selecione</option>`)
 
 					response.forEach(item => {
 						$('#subgrupo').append(`<option value="${item.id}">${item.nome}</option>`)
@@ -1026,7 +1026,7 @@ if ($tipo == 'ATENDIMENTO') {
 				},
 				success: function(response) {
 					$('#classificacaoRisco').empty();
-					$('#classificacaoRisco').append(`<option value=''>selecione</option>`)
+					$('#classificacaoRisco').append(`<option value=''>Selecione</option>`)
 
 					let id = obj?obj.classRisco:atendimento.classRisco
 					response.forEach(item => {
@@ -1046,7 +1046,7 @@ if ($tipo == 'ATENDIMENTO') {
 				},
 				success: function(response) {
 					$('#paciente').empty();
-					$('#paciente').append(`<option value=''>selecione</option>`)
+					$('#paciente').append(`<option value=''>Selecione</option>`)
 					let opt = ''
 
 					// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
@@ -1381,18 +1381,18 @@ if ($tipo == 'ATENDIMENTO') {
 											</div>`;
 								HTML += `
 								<tr class='servicoItem'>
-									<td class="text-center">${item.servico}</td>
-									<td class="text-center">${item.medico}</td>
-									<td class="text-center">${item.sData}</td>
-									<td class="text-center">${item.hora}</td>
-									<td class="text-center">${item.local}</td>
+									<td class="text-left">${item.servico}</td>
+									<td class="text-left">${item.medico}</td>
+									<td class="text-left">${item.sData}</td>
+									<td class="text-left">${item.hora}</td>
+									<td class="text-left">${item.local}</td>
 									<td class="text-right">R$ ${float2moeda(item.valor)}</td>
-									<td class="text-center">${acoes}</td>
+									<td class="text-left">${acoes}</td>
 								</tr>`
 							}
 						})
-						$('#servicoValorTotal').html(`R$${float2moeda(response.valorTotal)}`)
-						$('#servicoValorDescontoTotal').html(`R$${float2moeda(response.valorTotalDesconto)}`)
+						$('#servicoValorTotal').html(`R$ ${float2moeda(response.valorTotal)}`)
+						$('#servicoValorDescontoTotal').html(`R$ ${float2moeda(response.valorTotalDesconto)}`)
 						$('#dataServico').html(HTML);
 						$('#servicoTable').show();
 
@@ -1407,11 +1407,11 @@ if ($tipo == 'ATENDIMENTO') {
 								$('#itemDescontoId').val(id)
 								$('#itemDescontoValue').val(valor)
 
-								$('#inputModalValorB').val('R$'+float2moeda(valor))
+								$('#inputModalValorB').val('R$ '+float2moeda(valor))
 
 								valorF = valor - desconto
 
-								$('#inputModalValorF').val('R$'+float2moeda(valorF))
+								$('#inputModalValorF').val('R$ '+float2moeda(valorF))
 
 								$('#pageModalDescontos').fadeIn(200);
 							})
@@ -1683,7 +1683,7 @@ if ($tipo == 'ATENDIMENTO') {
 											<!-- campos -->
 											<div class="col-lg-4">
 												<select id="grupo" name="grupo" class="select-search">
-													<option value="" selected>selecione</option>
+													<option value="" selected>Selecione</option>
 												</select>
 											</div>
 											<div class="col-lg-4">
@@ -1701,7 +1701,7 @@ if ($tipo == 'ATENDIMENTO') {
 										<div class="col-lg-12 mb-4 row">
 											<!-- titulos -->
 											<div class="col-lg-3">
-												<label>Médicos</label>
+												<label>Profissional</label>
 											</div>
 											<div class="col-lg-2">
 												<label>Local do Atendimento</label>
@@ -1716,7 +1716,7 @@ if ($tipo == 'ATENDIMENTO') {
 											<!-- campos -->
 											<div class="col-lg-3">
 												<select id="medicos" name="medicos" class="select-search">
-													<option value="" selected>selecione</option>
+													<option value="" selected>Selecione</option>
 												</select>
 											</div>
 											<div class="col-lg-2">
@@ -1741,13 +1741,13 @@ if ($tipo == 'ATENDIMENTO') {
 										<div class="col-lg-12">
 											<table class="table" id="servicoTable">
 												<thead>
-													<tr class="bg-slate text-center">
+													<tr class="bg-slate text-left">
 														<th style="width: 15rem;">Serviço</th>
-														<th style="width: 15rem;">Médico</th>
+														<th style="width: 15rem;">Profissional</th>
 														<th style="width: 11rem;">Data do Atendimento</th>
 														<th style="width: 6rem;">Horário</th>
 														<th style="width: 18rem;">Local</th>
-														<th style="width: 7rem;">Valor</th>
+														<th class="text-right" style="width: 7rem;">Valor</th>
 														<th class="text-center" style="width: 5rem;">Ações</th>
 													</tr>
 												</thead>
@@ -1756,18 +1756,18 @@ if ($tipo == 'ATENDIMENTO') {
 												</tbody>
 												<tfoot>
 													<tr>
-														<th colspan="6" class="font-weight-bold" style="width: 72rem;">
+														<th colspan="6" class="font-weight-bold text-right" style="width: 72rem;">
 															<div style="float: right;">
-																<div style="font-size: 13px;">
-																	<div style="display:table-cell;padding-right:55px;">Desconto(R$):</div>
-																	<div id="servicoValorDescontoTotal" class="font-weight-bold" style="display:table-cell;">R$ 0,00</div>
+																<div class="text-right" style="font-size: 16px;">
+																	<div style="text-align: right; display:table-cell;padding-right:55px; float:left">Desconto (R$):</div>
+																	<div id="servicoValorDescontoTotal" class="font-weight-bold text-right" style="display:table-cell;">R$ 0,00</div>
 																</div>
 
 																<br>
 
-																<div style="font-size: 16px;">
-																	<div style="display:table-cell;padding-right:60px;">Valor(R$):</div>
-																	<div id="servicoValorTotal" class="font-weight-bold" style="display:table-cell;">R$ 0,00</div>
+																<div class="text-right" style="font-size: 16px;">
+																	<div style="text-align: right; display:table-cell;padding-right:60px; float:left">Valor (R$):</div>
+																	<div id="servicoValorTotal" class="font-weight-bold text-right">R$ 0,00</div>
 																</div>
 															</div>
 														</th>
@@ -1783,7 +1783,7 @@ if ($tipo == 'ATENDIMENTO') {
 										<div class="col-lg-12 mb-4 row">
 											<!-- titulos -->
 											<div class="col-lg-12">
-												<label>Observação</label>
+												<label>Observações</label>
 											</div>
 
 											<!-- campos -->
@@ -2781,7 +2781,7 @@ if ($tipo == 'ATENDIMENTO') {
 		<div class="custon-modal-container" style="max-width: 500px;">
 			<div class="card custon-modal-content">
 				<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
-					<p id='tituloModal' class="h5">Desconto</p>
+					<p id='tituloModal' class="h4">Desconto</p>
 					<i id="modalDesconto-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
 				</div>
 				<div class="px-0">
@@ -2789,15 +2789,15 @@ if ($tipo == 'ATENDIMENTO') {
 						<div class="col-lg-12">
 							<form id="editaSituacao" name="alterarSituacao" method="POST" class="form-validate-jquery">
 								<div class="form-group">
-									<div class="custon-modal-title">
+									<!--<div class="custon-modal-title">
 										<i class=""></i>
 										<p class="h3">Descontos</p>
 										<i class=""></i>
-									</div>
+									</div>-->
 									
-									<div class="p-5">
+									<div class="p-4">
 										<div class="d-flex flex-row justify-content-between">
-											<div class="col-lg-12" style="text-align:center;">
+											<div class="col-lg-12" style="text-align:left;">
 												<div class="form-group row">
 													<div class="col-lg-4">
 														<label>Desconto</label>
