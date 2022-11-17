@@ -314,3 +314,64 @@ function validarCNPJ(cnpj) {
 	return true;
 	
 }	
+
+//Esta função será executada quando o campo cep perder o foco.
+function ValidaEPreencheCEP(
+	idCampoCEP,
+	idCampoEndereco,
+	idCampoBairro,
+	idCampoCidade,
+	idCampoEstado
+	) {
+
+	//Nova variável "cep" somente com dígitos.
+	var cep = $(`#${idCampoCEP}`).val().replace(/\D/g, '');
+
+	//Verifica se campo cep possui valor informado.
+	if (cep != "") {
+
+		//Expressão regular para validar o CEP.
+		var validacep = /^[0-9]{8}$/;
+
+		//Valida o formato do CEP.
+		if (validacep.test(cep)) {
+			
+			//Preenche os campos com "..." enquanto consulta webservice.
+			$(`#${idCampoEndereco}`).val("...");
+			$(`#${idCampoBairro}`).val("...");
+			$(`#${idCampoCidade}`).val("...");
+			$(`#${idCampoEstado}`).val("...");
+
+			//Consulta o webservice viacep.com.br/
+			$.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
+				if (!("erro" in dados)) {
+					//Atualiza os campos com os valores da consulta.
+					$(`#${idCampoEndereco}`).val(dados.logradouro);
+					$(`#${idCampoBairro}`).val(dados.bairro);
+					$(`#${idCampoCidade}`).val(dados.localidade);					
+					$(`#${idCampoEstado}`).val(dados.uf);
+					$(`#${idCampoEstado}`).children("option").each(function(index, item){									
+						if($(item).val().toUpperCase() == dados.uf.toUpperCase()){
+							$(item).change()
+						}
+					})
+				}
+				else {
+					//CEP pesquisado não foi encontrado.
+					limpa_formulário_cep();
+					alerta("Erro", "CEP não encontrado.", "erro");
+				}
+			});
+		}
+		else {
+			//cep é inválido.
+			$(`#${idCampoCEP}`).val("");
+			limpa_formulário_cep();
+			alerta("Erro", "Formato de CEP inválido.", "erro");
+		}
+	}
+	else {
+		//cep sem valor, limpa formulário.
+		limpa_formulário_cep();
+	}
+} 
