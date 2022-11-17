@@ -90,74 +90,72 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 
 } 
 
-
-
 //Se estiver gravando (inclusão ou edição)
-if (isset($_POST['txtareaConteudo']) ){
+// if (isset($_POST['txtareaConteudo']) ){
 
-	try{
+// 	try{
 	
 
-		//Edição
-		if ($iAtendimentoEncaminhamentoMedicoId){
+// 		//Edição
+// 		if ($iAtendimentoEncaminhamentoMedicoId){
 		
-			$sql = "UPDATE AtendimentoEncaminhamentoMedico SET AtEMeAtendimento = :sAtendimento, AtEMeDataInicio = :dDataInicio, AtEMeDataFim = :dDataFim, AtEMeHoraInicio = :sHoraInicio,
-						   AtEMeHoraFim  = :sHoraFim, AtEMeProfissional = :sProfissional, AtEMeCid10 = :iCid10, AtEMeEncaminhamentoMedico = :sEncaminhamentoMedico, AtEMeUnidade = :iUnidade
-					WHERE AtEMeId = :iAtendimentoEncaminhamentoMedico";
-			$result = $conn->prepare($sql);
+// 			$sql = "UPDATE AtendimentoEncaminhamentoMedico SET AtEMeAtendimento = :sAtendimento, AtEMeDataInicio = :dDataInicio, AtEMeDataFim = :dDataFim, AtEMeHoraInicio = :sHoraInicio,
+// 						   AtEMeHoraFim  = :sHoraFim, AtEMeProfissional = :sProfissional, AtEMeCid10 = :iCid10, AtEMeEncaminhamentoMedico = :sEncaminhamentoMedico, AtEMeUnidade = :iUnidade
+// 					WHERE AtEMeId = :iAtendimentoEncaminhamentoMedico";
+// 			$result = $conn->prepare($sql);
 					
-			$result->execute(array(
-				':sAtendimento' => $iAtendimentoId,
-				':dDataInicio' => gravaData($_POST['inputDataInicio']),
-				':dDataFim' => date('m/d/Y'),
-				':sHoraInicio' => $_POST['inputInicio'],
-				':sHoraFim' => date('H:i'),
-				':sProfissional' => $userId,
-				':iCid10' => $_POST['cmbCid10'],
-				':sEncaminhamentoMedico' => $_POST['txtareaConteudo'],
-				':iUnidade' => $_SESSION['UnidadeId'],
-				':iAtendimentoEncaminhamentoMedico' => $iAtendimentoEncaminhamentoMedicoId 
-				));
+// 			$result->execute(array(
+// 				':sAtendimento' => $iAtendimentoId,
+// 				':dDataInicio' => gravaData($_POST['inputDataInicio']),
+// 				':dDataFim' => date('m/d/Y'),
+// 				':sHoraInicio' => $_POST['inputInicio'],
+// 				':sHoraFim' => date('H:i'),
+// 				':sProfissional' => $userId,
+// 				':iCid10' => $_POST['cmbCid10'],
+// 				':sEncaminhamentoMedico' => $_POST['txtareaConteudo'],
+// 				':iUnidade' => $_SESSION['UnidadeId'],
+// 				':iAtendimentoEncaminhamentoMedico' => $iAtendimentoEncaminhamentoMedicoId 
+// 				));
 
-			$_SESSION['msg']['mensagem'] = "Encaminhamento Médico alterado!!!";
+// 			$_SESSION['msg']['mensagem'] = "Encaminhamento Médico alterado!!!";
 			
 
-		} else { //inclusão
+// 		} else { //inclusão
 
-			$sql = "INSERT INTO AtendimentoEncaminhamentoMedico (AtEMeAtendimento, AtEMeDataInicio, AtEMeDataFim, AtEMeHoraInicio, AtEMeHoraFim, AtEMeProfissional, AtEMeCid10, AtEMeEncaminhamentoMedico, AtEMeUnidade)
-						VALUES (:sAtendimento, :dDataInicio, :dDataFim, :sHoraInicio, :sHoraFim, :sProfissional, :iCid10, :sEncaminhamentoMedico, :iUnidade)";
-			$result = $conn->prepare($sql);
+// 			$sql = "INSERT INTO AtendimentoEncaminhamentoMedico (AtEMeAtendimento, AtEMeDataInicio, AtEMeDataFim, AtEMeHoraInicio, AtEMeHoraFim, AtEMeProfissional, AtEMeCid10, AtEMeEncaminhamentoMedico, AtEMeUnidade)
+// 						VALUES (:sAtendimento, :dDataInicio, :dDataFim, :sHoraInicio, :sHoraFim, :sProfissional, :iCid10, :sEncaminhamentoMedico, :iUnidade)";
+// 			$result = $conn->prepare($sql);
 					
-			$result->execute(array(
-				':sAtendimento' => $iAtendimentoId,
-				':dDataInicio' => gravaData($_POST['inputDataInicio']),
-				':dDataFim' => gravaData($_POST['inputDataFim']),
-				':sHoraInicio' => $_POST['inputInicio'],
-				':sHoraFim' => date('H:i'),
-				':sProfissional' => $userId,
-				':iCid10' => $_POST['cmbCid10'],
-				':sEncaminhamentoMedico' => $_POST['txtareaConteudo'],
-				':iUnidade' => $_SESSION['UnidadeId'],
-			));
+// 			$result->execute(array(
+// 				':sAtendimento' => $iAtendimentoId,
+// 				':dDataInicio' => gravaData($_POST['inputDataInicio']),
+// 				':dDataFim' => gravaData($_POST['inputDataFim']),
+// 				':sHoraInicio' => $_POST['inputInicio'],
+// 				':sHoraFim' => date('H:i'),
+// 				':sProfissional' => $userId,
+// 				':iCid10' => $_POST['cmbCid10'],
+// 				':sEncaminhamentoMedico' => $_POST['txtareaConteudo'],
+// 				':iUnidade' => $_SESSION['UnidadeId'],
+// 			));
 
-			$_SESSION['msg']['mensagem'] = "Encaminhamento Médico incluído!!!";
+// 			$_SESSION['msg']['mensagem'] = "Encaminhamento Médico incluído!!!";
 
-		}
+// 		}
 	
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['tipo'] = "success";
+// 		$_SESSION['msg']['titulo'] = "Sucesso";
+// 		$_SESSION['msg']['tipo'] = "success";
 					
-	} catch(PDOException $e) {
+// 	} catch(PDOException $e) {
 		
-		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro reportado com o Encaminhamento Médico!!!";
-		$_SESSION['msg']['tipo'] = "error";	
+// 		$_SESSION['msg']['titulo'] = "Erro";
+// 		$_SESSION['msg']['mensagem'] = "Erro reportado com o Encaminhamento Médico!!!";
+// 		$_SESSION['msg']['tipo'] = "error";	
 		
-		echo 'Error: ' . $e->getMessage();
-	}
+// 		echo 'Error: ' . $e->getMessage();
+// 	}
 
-	irpara("atendimentoEncaminhamentoMedico.php");
-}
+// 	// irpara("atendimentoEncaminhamentoMedico.php");
+// }
 
 ?>
 
@@ -176,8 +174,7 @@ if (isset($_POST['txtareaConteudo']) ){
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
@@ -193,22 +190,197 @@ if (isset($_POST['txtareaConteudo']) ){
 	<script type="text/javascript">
 
 		$(document).ready(function() {	
+			getCmbs()
+			checkEncaminhamentos()
 
-			$('#summernote').summernote();
-			
+			$('#encaminhamentoTable').hide()
         
-		$('#enviar').on('click', function(e){
-			
-			e.preventDefault();
-	
+			$('#enviar').on('click', function(e){
+				e.preventDefault();
+				$( "#formAtendimentoEncaminhamentoMedico" ).submit()
+			})
 
-			$( "#formAtendimentoEncaminhamentoMedico" ).submit()	
-			
-		})
-	}); //document.ready	
+			$('#profissional').on('change', function(){
+				// vai preencher cmbProfissionais
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'ESPECIALIDADES',
+						'id': $(this).val()
+					},
+					success: function(response) {
+						$('#especialidade').empty();
+						$('#especialidade').append(`<option value=''>Selecione</option>`)
+						response.forEach(item => {
+							let opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#especialidade').append(opt)
+						})
+					}
+				});
+			})
+
+			$('#enviar').on('click', function(e){
+				e.preventDefault()
+				// vai preencher cmbProfissionais
+				let menssagem = ''
+
+				switch(menssagem){
+					case $('#profissional').val(): menssagem='Informe o profissional!';$('#profissional').focus();break;
+					case $('#especialidade').val(): menssagem='Informe a especialidade!';$('#especialidade').focus();break;
+					case $('#modelo').val(): menssagem='Informe o tipo de encaminhamento!';$('#modelo').focus();break;
+					default: menssagem='';break;
+				}
+				if(menssagem){
+					alerta('Campo obrigatório!!', menssagem, 'error')
+					return
+				}
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'SALVARENCAMINHAMENTO',
+						'id': '<?php echo $iAtendimentoId ?>',
+						'dataI': '<?php if (isset($iAtendimentoEletivoId )){ echo $DataAtendimentoInicio;} else { echo date('d/m/Y'); } ?>',
+						'horaI': '<?php if (isset($iAtendimentoEletivoId )){ echo $HoraInicio;} else { echo date('H:i'); } ?>',
+						'dataF': '<?php if (isset($iAtendimentoEletivoId )){ echo $DataAtendimentoFim;} else { echo date('d/m/Y'); } ?>',
+						'horaF': '<?php if (isset($iAtendimentoEletivoId )) echo $HoraFim; ?>',
+						'profissional': '<?php echo $userId ?>',
+						'profissionalDestino': $('#profissional').val(),
+						'especialidade': $('#especialidade').val(),
+						'modelo': $('#modelo').val(),
+						'cid': $('#cid').val(),
+						'encaminhamentoMedico': $('#summernote').val(),
+					},
+					success: function(response) {
+						getCmbs()
+						checkEncaminhamentos()
+					}
+				});
+			})
+
+			$('#formAtendimentoEncaminhamentoMedico').submit(function(e){
+				e.preventDefault()
+			})
+		}); //document.ready
+
+		function getCmbs(){
+			// limpa o campo text
+			$('#summernote').val('')
+
+			// vai preencher MEDICOS
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'MEDICOS'
+				},
+				success: function(response) {
+					$('#profissional').empty();
+					$('#profissional').append(`<option value=''>Selecione</option>`)
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.nome}</option>`
+						$('#profissional').append(opt)
+					})
+				}
+			});
+			// vai preencher MODELOS
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'MODELOS',
+					'chave': 'EMCAMINHAMENTO'
+				},
+				success: function(response) {
+					$('#modelo').empty();
+					$('#modelo').append(`<option value=''>Selecione</option>`)
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.nome}</option>`
+						$('#modelo').append(opt)
+					})
+				}
+			});
+			// vai preencher CID10
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'CID10'
+				},
+				success: function(response) {
+					$('#cid').empty();
+					$('#cid').append(`<option value=''>Selecione</option>`)
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.capitulo} - ${item.codigo} - ${item.descricao}</option>`
+						$('#cid').append(opt)
+					})
+				}
+			});
+		}
+		function checkEncaminhamentos(){
+			// vai preencher MEDICOS
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'ENCAMINHAMENTOS',
+					'id': <?php echo $iAtendimentoId?>
+				},
+				success: function(response) {
+					if(response.length){
+						$('#encaminhamentoTable').show()
+						$('#dataEncaminhamento').html('')
+						let HTML = ''
+						response.forEach((item,index) => {
+							let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Encaminhamento'></i></a>`;
+							let print = `<a style='color: black; cursor:pointer' onclick='imprimirServico(\"${item.id}\")' class='list-icons-item'><i class='icon-printer2' title='Imprimir Encaminhamento'></i></a>`;
+							let acoes = `<div class='list-icons'>
+										${exc}
+										${print}
+									</div>`;
+							HTML += `
+							<tr class='servicoItem'>
+								<td class="text-left">${index+1}</td>
+								<td class="text-left">${item.data} ${item.hora}</td>
+								<td class="text-left">${item.profissional}</td>
+								<td class="text-left">${item.especialidade}</td>
+								<td class="text-center">${acoes}</td>
+							</tr>`
+						})
+						$('#dataEncaminhamento').html(HTML)
+					}
+				}
+			});
+		}
+
+		function excluiServico(id){
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'EXCLUIRENCAMINHAMENTO',
+					'id': id
+				},
+				success: function(response) {
+					alerta(response.titulo, response.menssagem, response.status)
+					getCmbs()
+					checkEncaminhamentos()
+				}
+			});
+		}
+		function imprimirServico(id){
+			console.log(id)
+		}
 		
 	</script>
-
 </head>
 
 <body class="navbar-top sidebar-xs">
@@ -259,47 +431,82 @@ if (isset($_POST['txtareaConteudo']) ){
 							<div class="card">
 
 								<div class="card-body">
+									<div class="col-lg-12 row">
+										<div class="col-lg-6">
+											<label>Profissional <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-6">
+											<label>Especialidade <span class="text-danger">*</span></label>
+										</div>
 
-									<div class="col-lg-12">
-										<div class="form-group">
-											<label for="cmbCid10">CID-10<span class="text-danger">*</span></label>
-											<select id="cmbCid10" name="cmbCid10" class="form-control select-search" required>
+										<div class="col-lg-6 input-group">
+											<select id="profissional" name="profissional" class="form-control select-search">
 												<option value="">Selecione</option>
-												<?php 
-													$sql = "SELECT Cid10Id,Cid10Capitulo, Cid10Codigo, Cid10Descricao
-															FROM Cid10
-															JOIN Situacao on SituaId = Cid10Status
-															WHERE SituaChave = 'ATIVO'
-															ORDER BY Cid10Codigo ASC";
-													$result = $conn->query($sql);
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-													//foreach ($row as $item){
-													//	print('<option value="'.$item['Cid10Id'].'">'.$item['Cid10Capitulo'] . ' - '.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
-													//}
-
-													foreach ($row as $item){
-														$seleciona = $item['Cid10Id'] == $rowEncaminhamentoMedico['AtEMeCid10'] ? "selected" : "";
-														print('<option value="'.$item['Cid10Id'].'" '. $seleciona .'>'.$item['Cid10Capitulo'] . ' - '.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
-													}
-												
-												?>
+											</select>
+										</div>
+										<div class="col-lg-6 input-group">
+											<select id="especialidade" name="especialidade" class="form-control select-search">
+												<option value="">Selecione</option>
 											</select>
 										</div>
 									</div>
-									<br>
-									<div class="row">
-										<div class="col-lg-12">
-											<div class="form-group">
-												<label for="inputNome">Encaminhamento Médico </label>
-												<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Corpo do anamnese (informe aqui o texto que você queira que apareça no anamnese)" > <?php if (isset($iAtendimentoEncaminhamentoMedicoId )) echo $rowEncaminhamentoMedico['AtEMeEncaminhamentoMedico']; ?> </textarea>
-											</div>
+
+									<br/>
+
+									<div class="col-lg-12 row">
+										<div class="col-lg-6">
+											<label>Tipo de encaminhamento <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-6">
+											<label>CID-10</label>
+										</div>
+
+										<div class="col-lg-6 input-group">
+											<select id="modelo" name="modelo" class="form-control select-search">
+												<option value="">Selecione</option>
+											</select>
+										</div>
+										<div class="col-lg-6 input-group">
+											<select id="cid" name="cid" class="form-control select-search">
+												<option value="">Selecione</option>
+											</select>
 										</div>
 									</div>
+
+									<br/>
+
+									<div class="col-lg-12">
+										<div class="form-group">
+											<label for="inputNome">Encaminhamento Médico </label>
+											<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Digite aqui..."></textarea>
+										</div>
+									</div>
+
+									<div class="col-lg-12 mt-2">
+										<div class="col-lg-12 card-header p-0">
+											<h5 class="card-title"><b>Encaminhamentos</b></h5>
+										</div>
+										<table class="table" id="encaminhamentoTable">
+											<thead>
+												<tr class="bg-slate">
+													<th>item</th>
+													<th>Data/Hora</th>
+													<th>Profissional</th>
+													<th>Especialidade</th>
+													<!-- <th>Local</th> -->
+													<th class="text-center">Ações</th>
+												</tr>
+											</thead>
+											<tbody id="dataEncaminhamento">
+												
+											</tbody>
+										</table>
+									</div>
+
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-												<button class="btn btn-lg btn-principal" id="enviar">Salvar</button>
+												<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
 												<?php 
 													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";

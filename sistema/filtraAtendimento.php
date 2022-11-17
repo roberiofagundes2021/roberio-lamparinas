@@ -2368,12 +2368,18 @@ try{
 
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'MEDICOS'){
-		$servico = $_POST['servico'];
+		$servico = isset($_POST['servico'])?$_POST['servico']:false;
 
-		$sql = "SELECT ProfiId,ProfiNome
-		FROM ProfissionalXServicoVenda
-		JOIN Profissional ON ProfiId = PrXSVProfissional
-		WHERE PrXSVServicoVenda = $servico and ProfiUnidade = $iUnidade";
+		if($servico){
+			$sql = "SELECT ProfiId,ProfiNome
+			FROM ProfissionalXServicoVenda
+			JOIN Profissional ON ProfiId = PrXSVProfissional
+			WHERE PrXSVServicoVenda = $servico and ProfiUnidade = $iUnidade";
+		}else{
+			$sql = "SELECT ProfiId,ProfiNome
+			FROM Profissional
+			WHERE ProfiUnidade = $iUnidade";
+		}
 		$result = $conn->query($sql);
 		$result = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2799,7 +2805,7 @@ try{
 			'titulo' => 'Desconto',
 			'menssagem' => 'Desconto adicionado!!!',
 		]);
-	}  elseif($tipoRequest == 'SETRISCO'){
+	} elseif($tipoRequest == 'SETRISCO'){
 		$id = $_POST['id'];
 		$risco = $_POST['risco'];
 
@@ -2812,7 +2818,135 @@ try{
 			'titulo' => 'Risco',
 			'menssagem' => 'Classificação de risco atualizada!!!',
 		]);
-	}
+	} elseif($tipoRequest == 'ESPECIALIDADES'){
+		$id = $_POST['id'];
+
+		$sql = "SELECT EspecId,EspecNome
+		FROM ProfissionalXEspecialidade
+		JOIN Especialidade ON EspecId = PrXEsEspecialidade
+		WHERE PrXEsProfissional = $id and PrXEsUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['EspecId'],
+				'nome' => $item['EspecNome'],
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif($tipoRequest == 'MODELOS'){
+		$chave = $_POST['chave'];
+
+		$sql = "SELECT AtTMoId,AtTMoNome
+		FROM AtendimentoTipoModelo
+		WHERE AtTMoChave = '$chave'";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['AtTMoId'],
+				'nome' => $item['AtTMoNome'],
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif($tipoRequest == 'CID10'){
+		$sql = "SELECT Cid10Id,Cid10Capitulo,Cid10Codigo,Cid10Descricao
+		FROM Cid10";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['Cid10Id'],
+				'capitulo' => $item['Cid10Capitulo'],
+				'codigo' => $item['Cid10Codigo'],
+				'descricao' => $item['Cid10Descricao'],
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif($tipoRequest == 'SALVARENCAMINHAMENTO'){
+		$id = $_POST['id'];
+		$dataI = $_POST['dataI'];
+		$horaI = $_POST['horaI'];
+		$dataF = $_POST['dataF'];
+		$horaF = $_POST['horaF'];
+		$profissional = $_POST['profissional'];
+		$profissionalDestino = $_POST['profissionalDestino'];
+		$especialidade = $_POST['especialidade'];
+		$modelo = $_POST['modelo'];
+		$cid = $_POST['cid'];
+		$encaminhamentoMedico = $_POST['encaminhamentoMedico'];
+	
+		$dataI = explode('/',$dataI);
+		$dataF = explode('/',$dataF);
+
+		$dataI = $dataI[2].'-'.$dataI[1].'-'.$dataI[0];
+		$dataF = $dataF[2].'-'.$dataF[1].'-'.$dataF[0];
+
+		$sql = "INSERT INTO AtendimentoEncaminhamentoMedico(AtEMeAtendimento,AtEMeDataInicio,
+		AtEMeHoraInicio,AtEMeDataFim,AtEMeHoraFim,AtEMeProfissional,AtEMeProfissionalDestino,
+		AtEMeEspecialidade,AtEMeModelo,AtEMeCid10,AtEMeEncaminhamentoMedico,AtEMeUnidade)
+		VALUES('$id','$dataI','$horaI','$dataF','$horaF','$profissional','$profissionalDestino',
+		'$especialidade','$modelo','$cid','$encaminhamentoMedico','$iUnidade')";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Incluir Encaminhamento',
+			'menssagem' => 'Encaminhamento inserido com sucesso!!!'
+		]);
+	} elseif ($tipoRequest == 'ENCAMINHAMENTOS'){
+		$atendimentoSessao = $_SESSION['atendimento']['atendimentoServicos'];
+
+		$iAtendimento = $_POST['id'];
+	
+		$sql = "SELECT AtEMeId,AtEMeDataInicio,AtEMeHoraInicio,ProfiNome,EspecNome
+			FROM AtendimentoEncaminhamentoMedico
+			JOIN Profissional ON ProfiId = AtEMeProfissionalDestino
+			JOIN Especialidade ON EspecId = AtEMeEspecialidade
+			WHERE AtEMeAtendimento = $iAtendimento";
+		$result = $conn->query($sql);
+		$rowEncaminhamento = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($rowEncaminhamento as $item){
+			$data = explode('-',$item['AtEMeDataInicio']);
+			$data = $data[2].'/'.$data[1].'/'.$data[0];
+
+			$hora = explode(':',$item['AtEMeHoraInicio']);
+			$hora = $hora[0].':'.$hora[1];
+			array_push($array,[
+				'id'=>$item['AtEMeId'],
+				'data'=>$data,
+				'hora'=>$hora,
+				'profissional'=>$item['ProfiNome'],
+				'especialidade'=>$item['EspecNome'],
+			]);
+		}
+		
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'EXCLUIRENCAMINHAMENTO'){
+		$id = $_POST['id'];
+	
+		$sql = "DELETE FROM AtendimentoEncaminhamentoMedico
+		WHERE AtEMeId = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Encaminhamento',
+			'menssagem' => 'Encaminhamento excluído!!!',
+		]);
+	} 
 }catch(PDOException $e) {
 	$msg = '';
 	switch($tipoRequest){
