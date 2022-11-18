@@ -385,7 +385,9 @@ if (isset($_POST['inputInicio']) ){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-												<button class="btn btn-lg btn-principal" id="enviar">Salvar</button>
+												<button class="btn btn-lg btn-success mr-1 " id="enviar">Salvar</button>
+												<button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
+
 												<?php 
 													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
