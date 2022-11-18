@@ -139,7 +139,7 @@ try{
 			VALUES ";
 			if(isset($_POST['cmbEspecialidade'])){
 				foreach($_POST['cmbEspecialidade'] as $item){
-						$sql .= "('$iProfissional', '$item', '$iUnidade'),";
+						$sql .= "($iProfissional, '$item', '$iUnidade'),";
 					}
 					$sql = substr($sql, 0, -1);
 					$conn->query($sql);
