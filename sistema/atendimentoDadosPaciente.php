@@ -1,4 +1,4 @@
-<div class="card">
+<div class="card card-collapsed">
     <div class="card-header header-elements-inline">
         <h3 class="card-title">Dados do Paciente</h3>
         <div class="header-elements">
