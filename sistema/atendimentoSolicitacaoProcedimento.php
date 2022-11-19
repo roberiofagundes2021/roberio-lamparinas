@@ -322,8 +322,9 @@ if ($row['ClienSexo'] == 'F'){
 					table = $('#tblTabelaGastos').DataTable()
 					let rowNode	
 
-					response.forEach(item => {
-						rowNode = table.row.add(item.data).draw()
+					response.dataProcedimentos.forEach(item => {
+						rowNode = table.row.add(item.data).draw().node()
+						$(rowNode).find('td:eq(6)').attr('title', `Descrição: ${item.identify.descricaoCid10}`)
 					})
 
 				}
@@ -488,7 +489,7 @@ if ($row['ClienSexo'] == 'F'){
 									<div class="row" style="margin-top: 20px">
 										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="justificativa">Justificativa</label>
+												<label for="justificativa">Justificativa <span class="text-danger">*</span></label>
 												<textarea rows="5" cols="5" maxLength="500" id="justificativa" name="justificativa" onInput="contarCaracteres(this);" class="form-control" placeholder="Corpo da solicitacao do procedimento (informe aqui o texto que você queira que apareça na solicitacao do procedimento)" ></textarea>
 												<small class="text-muted form-text">Max. 500 caracteres - <span class="caracteresjustificativa"></span></small>
 											</div>

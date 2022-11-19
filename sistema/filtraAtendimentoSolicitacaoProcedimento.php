@@ -42,7 +42,7 @@ try {
        
         $iAtendimentoId = $_POST['iAtendimentoId'];
 
-        $sql = "SELECT AtSPrId, AtSPrDataInicio, AtSPrHoraInicio, AtGruNome, AtSubNome, SrVenCodigo, SrVenNome, Cid10Codigo
+        $sql = "SELECT AtSPrId, AtSPrDataInicio, AtSPrHoraInicio, AtGruNome, AtSubNome, SrVenCodigo, SrVenNome, Cid10Codigo, Cid10Descricao
                 FROM AtendimentoSolicitacaoProcedimento
                 JOIN AtendimentoGrupo ON AtSPrGrupo = AtGruId
                 JOIN AtendimentoSubGrupo ON AtSPrSubGrupo = AtSubId
@@ -53,6 +53,7 @@ try {
         $rowProcedimentos = $result->fetchAll(PDO::FETCH_ASSOC);
 
         $array = [];
+        $dataProcedimentos = [];
         $i = 1;
         foreach ($rowProcedimentos as $item) {
             $print = "<a style='color: blue;' href='#' onclick='imprimirSolProcedimento($item[AtSPrId])' class='list-icons-item'><i class='icon-printer2' title='Imprimir Solicitação'></i></a>";
@@ -62,7 +63,7 @@ try {
 						${exc}
 					</div>";
             
-            array_push($array, [
+            array_push($dataProcedimentos, [
                 'data' => [
                     $i,
                     mostraData($item['AtSPrDataInicio']) . " " . mostraHora($item['AtSPrHoraInicio']),
@@ -72,13 +73,20 @@ try {
                     $item['SrVenNome'],
 					$item['Cid10Codigo'],
                     $acoes
+                ],
+                'identify' => [
+                    'descricaoCid10' => $item['Cid10Descricao']
                 ]
-            ]);
+            ],
+        );
             $i++;
         }
 
-        echo json_encode($array);
+        $array = [
+            'dataProcedimentos' => $dataProcedimentos
+        ];
 
+        echo json_encode($array);
         
     } elseif ($tipoRequest == 'EXCLUIRPROCEDIMENTO') {
 

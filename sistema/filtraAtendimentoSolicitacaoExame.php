@@ -32,8 +32,8 @@ try {
 
         echo json_encode([
 			'status' => 'success',
-			'titulo' => 'Procedimento',
-			'menssagem' => 'Procedimento adicionado!!!',
+			'titulo' => 'Exame',
+			'menssagem' => 'Exame Adicionado!!!',
 		]);      
 
 
@@ -165,12 +165,12 @@ try {
     $msg = '';
 
 	switch($tipoRequest){
-		case 'ADICIONAREXAME': $msg = 'Erro ao adicionar procedimento!!';break;
-        case 'CHECKEXAMES': $msg = 'Erro ao checar procedimento!!';break;
-		case 'EXCLUIREXAME': $msg = 'Erro ao excluir procedimento!!';break;
+		case 'ADICIONAREXAME': $msg = 'Erro ao adicionar exame!!';break;
+        case 'CHECKEXAMES': $msg = 'Erro ao checar exame!!';break;
+		case 'EXCLUIREXAME': $msg = 'Erro ao excluir exame!!';break;
 		case 'GRUPOS': $msg = 'Erro ao buscar grupos!!';break;
 		case 'SUBGRUPOS': $msg = 'Erro ao buscar subgrupos!!';break;
-		case 'PROCEDIMENTOS': $msg = 'Erro ao buscar procedimentos!!';break;
+		case 'PROCEDIMENTOS': $msg = 'Erro ao buscar exames!!';break;
 		default: $msg = 'Erro ao executar ação!!';break;
 	}
 	echo json_encode([
