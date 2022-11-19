@@ -18,6 +18,18 @@ $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
 
 $_SESSION['atendimentoTabelaServicos'] = [];
+$_SESSION['atendimentoTabelaProdutos'] = [];
+
+//Essa consulta é para verificar  o profissional
+$sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo
+		FROM Usuario
+		JOIN Profissional A ON A.ProfiUsuario = UsuarId
+		LEFT JOIN Profissao B ON B.ProfiId = A.ProfiProfissao
+		LEFT JOIN ProfissionalConselho ON PrConId = ProfiConselho
+		WHERE UsuarId =  ". $_SESSION['UsuarId'] . " ";
+$result = $conn->query($sql);
+$rowUser = $result->fetch(PDO::FETCH_ASSOC);
+$userId = $rowUser['ProfissionalId'];
 
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtClaNome, AtendDataRegistro, AtModNome, ClienId,
@@ -37,14 +49,13 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 $iAtendimentoId = $row['AtendId'];
 $iClienteId = $row['ClienId'];
 
-$sql = "SELECT AtTGaId, AtTGaAtendimento, AtTGaDataRegistro, AtTGaServico, AtTGaProfissional, AtTGaHorario, AtTGaAtendimentoLocal, 
-               AtTGaValor, AtTGaDesconto, AtTGaDesconto, AtendCliente, AtendDataRegistro, SrVenNome, ProfiNome, AtLocNome
+$sql = "SELECT AtTGaId, AtTGaAtendimento, AtTGaDataRegistro, AtTGaServico, AtTGaProfissional, AtTGaHorario, 
+               AtTGaValor, AtTGaDesconto, AtTGaDesconto, AtendCliente, AtendDataRegistro, SrVenNome, ProfiNome
 		FROM AtendimentoTabelaGasto
 		JOIN Atendimento ON AtendId = AtTGaAtendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		JOIN ServicoVenda ON SrVenId = AtTGaServico
 		JOIN Profissional ON ProfiId = AtTGaProfissional
-		JOIN AtendimentoLocal ON AtLocId = AtTGaAtendimentoLocal
 		JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE AtendCliente = $iClienteId and AtTGaUnidade = ".$_SESSION['UnidadeId']."
 		ORDER BY AtTGaDataRegistro ASC";
@@ -130,8 +141,7 @@ if ($row['ClienSexo'] == 'F'){
 		$(document).ready(function() {
 			getCmbs()
 			checkServicos()
-			setDataProfissional()
-			setHoraProfissional()
+			checkProdutos()			
 
             /* Início: Tabela Personalizada */
 			$('#tblTabelaGastos').DataTable( {
@@ -139,32 +149,32 @@ if ($row['ClienSexo'] == 'F'){
 			    autoWidth: false,
 				responsive: true,
 				searching: false,
-				ordering: true, 
+				ordering: false, 
 				paging: false,
 			    columnDefs: [
 				{ 
-					orderable: true,   //Serviço
-					width: "15%",
+					orderable: true,   //item
+					width: "5%", //15
 					targets: [0]
 				},
 				{ 
-					orderable: true,   //Profissional
-					width: "20%",
+					orderable: true,   //data-hora
+					width: "15%", //20
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //Horado Atendimento
-					width: "15%",
+					orderable: true,   //grupo
+					width: "10%", //15
 					targets: [2]
 				},				
 				{ 
-					orderable: true,   //Data do Atendimento
-					width: "15%",
+					orderable: true,   //subgrupo
+					width: "10%", //15
 					targets: [3]
 				},
 				{ 
-					orderable: true,   //Local do Atendimento
-					width: "15%",
+					orderable: true,   //procedimento
+					width: "30%", //15
 					targets: [4]
 				},
 				{ 
@@ -187,42 +197,113 @@ if ($row['ClienSexo'] == 'F'){
                 
 			});
 
-			divTotal = `<div class="row">
+			/* Início: Tabela Personalizada */
+			$('#tblTabelaGastosProduto').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+				searching: false,
+				ordering: false, 
+				paging: false,
+			    columnDefs: [
+				{ 
+					orderable: true,   //item
+					width: "5%", //15
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //data-hora
+					width: "10%", //20
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //codigo
+					width: "10%", //15
+					targets: [2]
+				},				
+				{ 
+					orderable: true,   //produto
+					width: "35%", //15
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //valor
+					width: "10%", //15
+					targets: [4]
+				},
+				{ 
+					orderable: true,   //acoes
+					width: "10%",
+					targets: [5]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+                
+			});
+
+			divTotal = `<div class="row " style="padding-right: 13%;">
                             <div class="col-lg-9">
-								<button class="btn btn-lg btn-principal" id="fecharConta">Fechar Conta</button>
+								<button class="btn btn-lg btn-principal fecharConta" id="">Fechar Conta</button>
 								<a href="atendimento.php" class="btn btn-basic" role="button">Voltar</a>
 							</div>
-							<div id="tabelaValores" class="col-lg-3"  style="margin-left:-40px;">	
+							<div id="tabelaValores" class="col-lg-3 text-right " >	
 								<div style='font-weight: bold;'>Desconto: </div> <br> 
 								<div style='font-weight: bold;'>TOTAL A PAGAR: </div>
 							</div>
 						</div> <br>`
-        	$('.datatable-footer').append(divTotal);
+			
+			divTotalP = `<div class="row" style="padding-right: 14%;">
+                            <div class="col-lg-9">
+								<button class="btn btn-lg btn-principal fecharConta" id="">Fechar Conta</button>
+								<a href="atendimento.php" class="btn btn-basic" role="button">Voltar</a>
+							</div>
+							<div id="tabelaValoresProdutos" class="col-lg-3 text-right" >	
+								<div style='font-weight: bold;'>Desconto: </div> <br> 
+								<div style='font-weight: bold;'>TOTAL A PAGAR: </div>
+							</div>
+						</div> <br>`
+
+			$('.footerProcedimento').append(divTotal);
+        	$('.footerProduto').append(divTotalP);
+			
 
 			$('#inserirServico').on('click',function(e){
 				$('#formTabelaGastos').submit()
+			})
+
+			$('#inserirProduto').on('click',function(e){
+				$('#formTabelaGastosProduto').submit()
 			})
 
 			$('#modal-close-x').on('click', function(e){
 				e.preventDefault()
 				$('#pageModalDescontos').fadeOut(200)
 			})
+			$('#modal-close-x-p').on('click', function(e){
+				e.preventDefault()
+				$('#pageModalDescontosProduto').fadeOut(200)
+			})
 
 			$('#formTabelaGastos').submit(function(e){
 				e.preventDefault()
 				let menssageError = ''
+
+				let grupo = $('#grupo').val()
+				let subgrupo = $('#subgrupo').val()
 				let procedimentos  = $('#procedimentos').val()
-				let profissional  = $('#profissional').val()
-				let dataAtendimento  = $('#dataAtendimento').val()
-				let horaAtendimento  = $('#horaAtendimento').val()
-				let localAtendimento  = $('#localAtendimento').val()
+
+				let profissional = <?php echo $userId; ?>
 
 				switch(menssageError){
+					case grupo: menssageError = 'informe o grupo'; $('#grupo').focus();break;
+					case subgrupo: menssageError = 'informe o subgrupo'; $('#subgrupo').focus();break;
 					case procedimentos: menssageError = 'informe o procedimento'; $('#procedimentos').focus();break;
-					case profissional: menssageError = 'informe o profissional'; $('#profissional').focus();break;
-					case dataAtendimento: menssageError = 'informe uma data'; $('#dataAtendimento').focus();break;
-					case horaAtendimento: menssageError = 'informe o horário'; $('#horaAtendimento').focus();break;
-					case localAtendimento: menssageError = 'informe o local de atendimento'; $('#localAtendimento').focus();break;
+					
 					default: menssageError = ''; break;
 				}
 
@@ -237,11 +318,11 @@ if ($row['ClienSexo'] == 'F'){
 					dataType: 'json',
 					data:{
 						'tipoRequest': 'ADICIONARSERVICO',
+
+						'grupo' : grupo,
+						'subgrupo' : subgrupo,
 						'servico': procedimentos,
-						'medicos': profissional,
-						'dataAtendimento': dataAtendimento,
-						'horaAtendimento': horaAtendimento,
-						'localAtendimento': localAtendimento
+						'medicos': profissional
 					},
 					success: function(response) {
 						if(response.status == 'success'){
@@ -258,34 +339,104 @@ if ($row['ClienSexo'] == 'F'){
 				});
 			})
 
-			$('#profissional').on('change', function(){
-				let iMedico = $(this).val()
+			$('#formTabelaGastosProduto').submit(function(e){
+				e.preventDefault()
+				let menssageError = ''
 
-				if(!iMedico){
-					setHoraProfissional()
-					setDataProfissional()
+				let produtos  = $('#produtos').val()
+				let profissional = <?php echo $userId; ?>
+
+				switch(menssageError){
+					case produtos: menssageError = 'informe o Produto'; $('#procedimentos').focus();break;					
+					default: menssageError = ''; break;
+				}
+
+				if(menssageError){
+					alerta('Campo Obrigatório!', menssageError, 'error')
 					return
 				}
+
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAtendimentoTabelaGastos.php',
 					dataType: 'json',
 					data:{
-						'tipoRequest': 'SETDATAPROFISSIONAL',
-						'iMedico': iMedico,
+						'tipoRequest': 'ADICIONARPRODUTO',
+						'servico': produtos,
+						'medicos': profissional
 					},
 					success: function(response) {
 						if(response.status == 'success'){
-							setDataProfissional(response.arrayData)
-							$('#dataAtendimento').focus()
-						} else {
+							getCmbs()
+							checkProdutos()
 							alerta(response.titulo, response.menssagem, response.status)
+						} else {
+							alerta(response.titulo, response.menssagem, response.status);
 						}
+					},
+					error: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
 					}
 				});
-			});
+			})
 
-			$('#fecharConta').on('click', function(e){
+
+
+			$('#grupo').on('change', function() {
+
+				let idGrupo = $(this).val();				
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimentoTabelaGastos.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'SUBGRUPOS',
+						'idGrupo' : idGrupo						 
+					},
+					success: function(response) {
+						$('#subgrupo').empty();
+						$('#subgrupo').append(`<option value=''>Selecione</option>`)
+
+						response.forEach(item => {
+							let opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#subgrupo').append(opt)
+						})
+						$('#subgrupo').focus();
+						
+					}
+					
+				})
+			})
+
+			$('#subgrupo').on('change', function() {
+
+				let idSubGrupo = $(this).val();				
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimentoTabelaGastos.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'PROCEDIMENTOS',
+						'idSubGrupo' : idSubGrupo						 
+					},
+					success: function(response) {
+						$('#procedimentos').empty();
+						$('#procedimentos').append(`<option value=''>Selecione</option>`)
+
+						response.forEach(item => {
+							let opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#procedimentos').append(opt)
+						})
+						$('#procedimentos').focus();
+						
+					}
+					
+				})
+			})
+
+			$('.fecharConta').on('click', function(e){
 				e.preventDefault();
 				$.ajax({
 					type: 'POST',
@@ -300,7 +451,8 @@ if ($row['ClienSexo'] == 'F'){
 						if(response.status == 'success'){
 							getCmbs()
 							checkServicos()
-							window.location.href='atendimento.php'
+							checkProdutos()
+							window.location.href='atendimentoEletivo.php'
 							alerta(response.titulo, response.menssagem, response.status)
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
@@ -327,24 +479,49 @@ if ($row['ClienSexo'] == 'F'){
 				});
 			})
 
-			$('#inputDesconto').on('input', function(e){
-				let novoValor = parseFloat($('#itemModalValue').val()) - ($('#inputDesconto').val()?parseFloat($('#inputDesconto').val()):0)
+			$('#setDescontoProduto').on('click', function(e){
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimentoTabelaGastos.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'SETDESCONTOPRODUTO',
+						'id':$('#itemIdp').val(),
+						'desconto':$('#inputDescontop').val(),
+					},
+					success: async function(response) {
+						checkProdutos()
+						$('#pageModalDescontosProduto').fadeOut(200)
+						alerta(response.titulo, response.menssagem, response.status)
+					}
+				});
+			})
+
+			$('#inputDesconto').on('keyup', function(e){
+				let novoValor = parseFloat($('#itemModalValue').val()) - ($('#inputDesconto').val().replaceAll('.', '').replace(',', '.')?parseFloat($('#inputDesconto').val().replaceAll('.', '').replace(',', '.')):0)
 				$('#inputModalValorF').val(`R$ ${float2moeda(novoValor)}`)
 			})
+
+			$('#inputDescontop').on('keyup', function(e){
+				let novoValor = parseFloat($('#itemModalValuep').val()) - ($('#inputDescontop').val().replaceAll('.', '').replace(',', '.')?parseFloat($('#inputDescontop').val().replaceAll('.', '').replace(',', '.')):0)
+				$('#inputModalValorFp').val(`R$ ${float2moeda(novoValor)}`)
+			})
+
+			
 		}); //document.ready
 
 		function getCmbs(){
-			// vai preencher PROCEDIMENTOS
+			// vai preencher PRODUTOS
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimentoTabelaGastos.php',
 				dataType: 'json',
 				data:{
-					'tipoRequest': 'PROCEDIMENTOS'
+					'tipoRequest': 'PRODUTOS'
 				},
 				success: function(response) {
-					$('#procedimentos').empty();
-					$('#procedimentos').append(`<option value=''>Selecione</option>`)
+					$('#produtos').empty();
+					$('#produtos').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
 						let opt = ''
 						// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
@@ -354,46 +531,29 @@ if ($row['ClienSexo'] == 'F'){
 						} else {
 							opt = `<option value="${item.id}">${item.nome}</option>`
 						}
-						$('#procedimentos').append(opt)
+						$('#produtos').append(opt)
 					})
 				}
 			});
-			// vai preencher PROFISSIONAL
+			// vai preencher GRUPOS
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimentoTabelaGastos.php',
 				dataType: 'json',
 				data:{
-					'tipoRequest': 'PROFISSIONAL'
+					'tipoRequest': 'GRUPOS'
 				},
 				success: function(response) {
-					$('#profissional').empty();
-					$('#profissional').append(`<option value=''>Selecione</option>`)
+					$('#grupo').empty();
+					$('#grupo').append(`<option value=''>Selecione</option>`)
+				
 					response.forEach(item => {
 						let opt = `<option value="${item.id}">${item.nome}</option>`
-						$('#profissional').append(opt)
+						$('#grupo').append(opt)
 					})
+					
 				}
 			});
-			// vai preencher LOCAIS
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoTabelaGastos.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'LOCAIS'
-				},
-				success: function(response) {
-					$('#localAtendimento').empty();
-					$('#localAtendimento').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
-						$('#localAtendimento').append(opt)
-					})
-				}
-			});
-			$('#dataAtendimento').val('')
-			$('#horaAtendimento').val('')
 		}
 
 		function checkServicos(){
@@ -411,9 +571,10 @@ if ($row['ClienSexo'] == 'F'){
 						$('#dataServico').html('');
 
 						let HTML = ''
+						let i = 1;
 						response.array.forEach(item => {
 							if(item.status != 'rem'){
-								let exc = `<a class='list-icons-item removeItem' style='color: black; cursor:pointer' data-id="${item.id}"><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
+								let exc = `<a class='list-icons-item removeItem' style='color: black; cursor:pointer' data-id="${item.id}" data-valor="${item.valor}"><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
 								let popup = `<a class='list-icons-item openPopUp' style="color:${(item.desconto?'#50b900':'#000')}; cursor:pointer" data-value="${float2moeda(item.valor)}" data-titulo="${item.servico}" data-id="${item.id}"><i class='icon-cash' title='Desconto'></i></a>`;
 								
 								let acoes = `<div class='list-icons'>
@@ -422,15 +583,16 @@ if ($row['ClienSexo'] == 'F'){
 										</div>`;
 								HTML += `
 								<tr class='servicoItem'>
-									<td class="text-center">${item.servico}</td>
-									<td class="text-center">${item.medico}</td>
-									<td class="text-center">${item.hora}</td>
-									<td class="text-center">${item.sData}</td>
-									<td class="text-center">${item.local}</td>
+									<td class="text-left">${i}</td>
+									<td class="text-left">${item.sData} - ${item.hora}</td>
+									<td class="text-left">${item.grupo}</td>
+									<td class="text-left">${item.subgrupo}</td>
+									<td class="text-left">${item.servico}</td>
 									<td class="text-right">R$ ${float2moeda(item.valor)}</td>
 									<td class="text-center">${acoes}</td>
 								</tr>`
 							}
+							i++;
 						})
 						$('#tabelaValores').html(`
 							<div style='font-weight: bold;'>Desconto: R$${float2moeda(response.desconto)}</div> <br> 
@@ -458,7 +620,9 @@ if ($row['ClienSexo'] == 'F'){
 									},
 									success: async function(response) {
 										if(response.status == 'success'){
-											$('#inputDesconto').val(response.desconto)
+											if (response.desconto != 0) {
+												$('#inputDesconto').val(response.desconto)
+											}
 											let Val2 = parseFloat(response.desconto)
 											console.log(Val1)
 											console.log(Val2)
@@ -480,7 +644,8 @@ if ($row['ClienSexo'] == 'F'){
 									dataType: 'json',
 									data:{
 										'tipoRequest': 'EXCLUISERVICO',
-										'id': $(this).data('id')
+										'id': $(this).data('id'),
+										'valor': $(this).data('valor')
 									},
 									success: function(response) {
 										alerta(response.titulo, response.menssagem, response.status)
@@ -496,145 +661,138 @@ if ($row['ClienSexo'] == 'F'){
 			});
 		}
 
-		function setDataProfissional(arrayData){
-			$('#dataAgenda').html('')
-			$('#dataAgenda').html('<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate">')
+		//check produtos
+		function checkProdutos(){			
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimentoTabelaGastos.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'CHECKPRODUTO',
+					'iAtendimento': atendimento?atendimento['AtendId']:''
+				},
+				success: async function(response) {
+					statusProdutos = response.array.length?true:false;
+					if(statusProdutos){
+						$('#dataProduto').html('');
 
-			let array = arrayData?arrayData:undefined
-			// Events
-			$('#dataAtendimento').pickadate({
-				weekdaysShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-				monthsFull: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-				monthsShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-				today: '',
-				close: '',
-				clear: 'Limpar',
-				labelMonthNext: 'Próximo',
-				labelMonthPrev: 'Anterior',
-				labelMonthSelect: 'Escolha um mês na lista suspensa',
-				labelYearSelect: 'Escolha um ano na lista suspensa',
-				selectMonths: false,
-				selectYears: false,
-				showMonthsShort: true,
-				closeOnSelect: true,
-				closeOnClear: true,
-				formatSubmit: 'yyyy/mm/dd',
-				format: 'dd/mm/yyyy',
-				disable: array,
-				onStart: function() {
-					// console.log('onStart event')
-				},
-				onRender: function() {
-					$('.picker__day').each(function(){
-						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
-						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
-
-						if(hasClass){
-							$(this).addClass((hasSelected?
-							'':
-							'font-weight-bold text-black border'))
-						}
-					})
-				},
-				onOpen: function() {
-					$('.picker__day').each(function(){
-						let hasClass = !$(this).hasClass('picker__day--disabled') // verifica se NÃO está desabilitado...
-						let hasSelected = $(this).hasClass('picker__day--selected') // verifica se está selecionado...
-
-						if(hasClass){
-							$(this).addClass((hasSelected?
-							'':
-							'font-weight-bold text-black border'))
-						}
-					})
-				},
-				onClose: function() {
-					// console.log('onClose event')
-				},
-				onStop: function() {
-					// console.log('onStop event')
-				},
-				onSet: function(context) {
-					let data = new Date(context.select).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
-					data = data.split(' ')[0]; // Formatando a string padrão: "dd/mm/yyyy HH:MM:SS" => "dd/mm/yyyy"
-					let iMedico = $('#profissional').val();
-
-					$.ajax({
-						type: 'POST',
-						url: 'filtraAtendimentoTabelaGastos.php',
-						dataType: 'json',
-						data:{
-							'tipoRequest': 'SETHORAPROFISSIONAL',
-							'data': data,
-							'iMedico': iMedico
-						},
-						success: function(response) {
-							if(response.status == 'success'){
-								setHoraProfissional(response.arrayHora, response.intervalo)
-								$('#horaAtendimento').focus()
-							} else {
-								alerta(response.titulo, response.menssagem, response.status)
+						let HTML = ''
+						let i = 1;
+						response.array.forEach(item => {
+							if(item.status != 'rem'){
+								let exc = `<a class='list-icons-item removeItemP' style='color: black; cursor:pointer' data-id="${item.id}" data-valor="${item.valor}"><i class='icon-bin' title='Excluir Produto'></i></a>`;
+								let popup = `<a class='list-icons-item openPopUpProduto' style="color:${(item.desconto?'#50b900':'#000')}; cursor:pointer" data-value="${float2moeda(item.valor)}" data-titulo="${item.servico}" data-id="${item.id}"><i class='icon-cash' title='Desconto'></i></a>`;
+								
+								let acoes = `<div class='list-icons'>
+											${popup}
+											${exc}
+										</div>`;
+								HTML += `
+								<tr class='servicoItem'>
+									<td class="text-left">${i}</td>
+									<td class="text-left">${item.sData} - ${item.hora}</td>
+									<td class="text-left">${item.codigo}</td>
+									<td class="text-left">${item.servico}</td>
+									<td class="text-right">R$ ${float2moeda(item.valor)}</td>
+									<td class="text-center">${acoes}</td>
+								</tr>`
 							}
-						}
-					});
+							i++;
+						})
+				
+						$('#tabelaValoresProdutos').html(`
+							<div style='font-weight: bold;'>Desconto: R$${float2moeda(response.desconto)}</div> <br> 
+							<div style='font-weight: bold;'>TOTAL A PAGAR: R$${float2moeda(response.valorTotal)}</div>
+						`)
+						$('#dataProduto').html(HTML).show();
+						$('#produtoTable').show();
+
+						$('.openPopUpProduto').each(function(index,element){
+							$(element).on('click', function(e){
+								e.preventDefault()
+								$('#itemIdp').val($(this).data('id'))
+								$('#inputModalValorBp').val(`R$ ${$(this).data('value')}`)
+								$('#itemModalValuep').val($(this).data('value'))
+								let Val1 = parseFloat($(this).data('value'))
+
+								$('#tituloModalp').html(`Descontos do produto <strong>${$(this).data('titulo')}</strong>`)
+								$.ajax({
+									type: 'POST',
+									url: 'filtraAtendimentoTabelaGastos.php',
+									dataType: 'json',
+									data:{
+										'tipoRequest': 'GETDESCONTOPRODUTO',
+										'id': $(this).data('id')
+									},
+									success: async function(response) {
+										if(response.status == 'success'){
+											if (response.desconto != 0) {
+												$('#inputDescontop').val(response.desconto)
+											}
+											let Val2 = parseFloat(response.desconto)
+											console.log(Val1)
+											console.log(Val2)
+											$('#inputModalValorFp').val(`R$ ${float2moeda(Val1 - Val2)}`)
+											$('#pageModalDescontosProduto').fadeIn(200)
+										}else{
+											alerta(response.titulo, response.menssagem, response.status)
+										}
+									}
+								});
+							})
+						})
+
+						$('.removeItemP').each(function(index,element){
+							$(element).on('click', function(e){
+								$.ajax({
+									type: 'POST',
+									url: 'filtraAtendimentoTabelaGastos.php',
+									dataType: 'json',
+									data:{
+										'tipoRequest': 'EXCLUIPRODUTO',
+										'id': $(this).data('id'),
+									},
+									success: function(response) {
+										alerta(response.titulo, response.menssagem, response.status)
+										checkProdutos()
+									}
+								});
+							})
+						})
+					}else{
+						$('#produtoTable').hide();
+					}
 				}
 			});
 		}
 
-		function setHoraProfissional(array,interv){
-			$('#modalHora').html('').show();
-			$('#modalHora').html('<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">');
-
-			let arrayTime = array?array:undefined
-			let intervalo = interv?interv:30
-			// doc: https://amsul.ca/pickadate.js/time/
-			$('#horaAtendimento').pickatime({
-				// Regras
-				interval: intervalo,
-				disable: arrayTime,
-				// disable: [
-				// 	[1,30],
-				// ],
-
-				// Formats
-				format: 'HH:i',
-				formatLabel: undefined,
-				formatSubmit: undefined,
-				hiddenPrefix: undefined,
-				hiddenSuffix: '_submit',
-				
-				// Time limits
-				min: undefined,
-				max: undefined,
-				
-				// Close on a user action
-				closeOnSelect: true,
-				closeOnClear: true,
-
-				// eventos
-				onSet: function(context) {
-					// let hora = context.select
-					let data = $('#dataAtendimento').val()
-					let hora = $('#horaAtendimento').val()
-
-					// data: DD/MM/YYYY => MM/DD/YYYY
-					data = `${data.split('/')[1]}/${data.split('/')[0]}/${data.split('/')[2]}`
-
-					// dataHora: MM/DD/YYYY HH:MM:SS
-					let dataHora = `${data} ${hora}`
-
-					// somente para atribuir à variável "dataHora" um valor do tipo DataTime
-					dataHora = new Date(dataHora).toLocaleString("pt-BR", {timeZone: "America/Bahia"});
-				},
-				onStart: undefined,
-				onRender: undefined,
-				onOpen: undefined,
-				onClose: undefined,
-				onStop: undefined,
+		$(function() {
+			$('.btn-grid').click(function(){
+				$('.btn-grid').removeClass('active');
+				$(this).addClass('active');     
 			});
+		});
+
+		function mudarGrid(grid){
+			if (grid == 'procedimentos') {				
+				document.getElementById("box-procedimentos").style.display = 'block';
+				document.getElementById("box-produtos").style.display = 'none';
+			} else if (grid == 'produtos') {
+				document.getElementById("box-produtos").style.display = 'block';
+				document.getElementById("box-procedimentos").style.display = 'none';
+			}
 		}
-		
+
 	</script>
+
+	<style>
+		.valorTotalEDesconto {
+            font-size: 1.5rem;
+            border: 1px solid #ccc;
+            float: left;
+            min-width: 100px;
+        }
+	</style>
 
 </head>
 
@@ -678,152 +836,137 @@ if ($row['ClienSexo'] == 'F'){
 							</div>
 						</div>
 
-						<div class="card card-collapsed">
-							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Dados do Paciente</h3>
-								<div class="header-elements">
-									<div class="list-icons">
-										<a class="list-icons-item" data-action="collapse"></a>
-									</div>
-								</div>
-							</div>
-							<div class="card-body">
-								<div class="row">
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label>Prontuário Eletrônico: <?php echo $row['ClienCodigo']; ?></label>
-										</div>
-									</div>
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label>Nº do Registro: <?php echo $row['AtendNumRegistro']; ?></label>
-										</div>
-									</div>
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label>Modalidade: <?php echo $row['AtModNome'] ; ?></label>
-										</div>
-									</div>
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label>CNS: <?php echo $row['ClienCartaoSus']; ?></label>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-lg-6">
-										<h4><b><?php echo strtoupper($row['ClienNome']); ?></b></h4>
-									</div>
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label>Sexo: <?php echo $sexo ; ?></label>
-										</div>
-									</div>
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label>Telefone: <?php echo $row['ClienCelular']; ?></label>
-										</div>
-									</div>
-								</div>
-								<div class="row">
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label>Data Nascimento: <?php echo mostraData($row['ClienDtNascimento']); ?></label>
-										</div>
-									</div>
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label>Idade: <?php echo calculaIdade($row['ClienDtNascimento']); ?></label> 
-										</div>
-									</div>
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label>Mãe: <?php echo $row['ClienNomeMae'] ; ?></label>
-										</div>
-									</div>
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label>Responsável: <?php echo $row['ClResNome']; ?></label>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="card">
-								<div class="card-header header-elements-inline">
-									<h3 class="card-title">Procedimentos</h3>
-								</div>
-							<div class="card-body">
-								<form id="formTabelaGastos" name="formTabelaGastos" method="post" class="form-validate-jquery">
-									<div class="col-lg-12 mb-2 row">
-										<!-- titulos -->
-										<div class="col-lg-2">
-											<label>Procedimentos <span class="text-danger">*</span></label>
-										</div>
-										<div class="col-lg-3">
-											<label>Profissional <span class="text-danger">*</span></label>
-										</div>
-										<div class="col-lg-3">
-											<label>Data <span class="text-danger">*</span></label>
-										</div>
-										<div class="col-lg-1">
-											<label>Horário <span class="text-danger">*</span></label>
-										</div>
-										<div class="col-lg-2">
-											<label>Local do Atendimento <span class="text-danger">*</span></label>
-										</div>
+						<div> <?php include ('atendimentoDadosPaciente.php'); ?> </div>
 
-										<!-- campos -->
-										<div class="col-lg-2">
-											<select id="procedimentos" name="procedimentos" class="select-search" required>
-												<!--  -->
-											</select>
-										</div>
-										<div class="col-lg-3">
-											<select id="profissional" name="profissional" class="select-search" required>
-												<!--  -->
-											</select>
-										</div>
-										<div id="dataAgenda" class="col-lg-3">
-											<input id="dataAtendimento" name="dataAtendimento" type="text" class="form-control pickadate" required>
-										</div>
-										<div id="modalHora" class="col-lg-1">										
-											<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled" required>
-										</div>
-										<div class="col-lg-2">
-											<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2" required>
-												<!--  -->
-											</select>
-										</div>
-										<div class="col-lg-1" style="margin-top: -5px;">
-											<a id="inserirServico" class="btn btn-lg btn-principal">Incluir</a>
-										</div>
-									</div>
-								</form>
+						<div class="card">
+
+							<div class="card-header header-elements-inline">
+								<div class="col-lg-11">	
+									<button type="button" id="procedimentos-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('procedimentos')" style="margin-left: -10px; margin-right: 12px;" >Procedimentos</button>
+									<button type="button" id="produtos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('produtos')" >Produtos</button>
+								</div>
 							</div>
-							<div class="row">
-								<div class="col-lg-12">
-									<table class="table" id="tblTabelaGastos">
-										<thead>
-											<tr class="bg-slate">
-												<th>Serviço</th>
-												<th>Profissional</th>
-												<th>Hora</th>
-												<th>Data</th>
-												<th>Local</th>
-												<th>Valor</th>
-												<th class="text-center">Ações</th>
-											</tr>
-										</thead>
-										<tbody id="dataServico">
-										</tbody>
-									</table>
-								</div>		
+
+							<div id="box-procedimentos" style="display: block;">
+
+								<div class="card-body">
+									<form id="formTabelaGastos" name="formTabelaGastos" method="post" class="form-validate-jquery">
+										<div class="col-lg-10 mb-2 row">
+											<!-- titulos -->
+											<div class="col-lg-3">
+												<label>Grupo <span class="text-danger">*</span></label>
+											</div>
+											<div class="col-lg-3">
+												<label>Subgrupo <span class="text-danger">*</span></label>
+											</div>
+											<div class="col-lg-4">
+												<label>Procedimentos <span class="text-danger">*</span></label>
+											</div>
+											
+											<!-- campos -->										
+											<div class="col-lg-3">
+												<select id="grupo" name="grupo" class="select-search" >
+													<option value=''>Selecione</option>
+												</select>
+											</div>
+											<div class="col-lg-3">
+												<select id="subgrupo" name="subgrupo" class="select-search" >
+													<option value=''>Selecione</option>
+												</select>											
+											</div>
+											<div class="col-lg-4">
+												<select id="procedimentos" name="procedimentos" class="select-search" >
+													<option value=''>Selecione</option>
+												</select>
+											</div>
+											
+											<div class="col-lg-1" style="margin-top: -5px;">
+												<a id="inserirServico" class="btn btn-lg btn-principal">Incluir</a>
+											</div>
+										</div>
+									</form>
+								</div>
+								<div class="row">
+									<div class="col-lg-12">
+										<table class="table" id="tblTabelaGastos">
+											<thead>
+												<tr class="bg-slate">
+													<th class="text-left">Item</th>
+													<th class="text-left">Data Registro</th>
+													<th class="text-left">Grupo</th>
+													<th class="text-left">SubGrupo</th>
+													<th class="text-left">Procedimento</th>
+													<th class="text-right">Valor</th>
+													<th class="text-center">Ações</th>
+												</tr>
+											</thead>
+											<tbody id="dataServico">
+											</tbody>
+										</table>
+										<div class="footerProcedimento" style="margin-left: 25px"></div>
+									</div>		
+								</div>							
+						
 							</div>
+
+
+							<div id="box-produtos" style="display: none;">
+
+								<div class="card-body">
+									<form id="formTabelaGastosProduto" name="formTabelaGastosProduto" method="post" class="form-validate-jquery">
+										<div class="col-lg-10 mb-2" style="margin-top: -20px">
+											<!-- titulos -->
+											<div class="row">
+												<div class="col-lg-10">
+													<label>Produtos em Estoque <span class="text-danger">*</span></label>
+												</div>
+											</div>
+											
+											<!-- campos -->										
+											<br>
+											<div class="row" style="margin-top: -20px">												
+												<div class="col-lg-9">
+													<select id="produtos" name="produtos" class="select-search" >
+														<!--  -->
+													</select>
+												</div>
+												<div class="col-lg-1" style="margin-top: -5px;">
+													<a id="inserirProduto" class="btn btn-lg btn-principal">Incluir</a>
+												</div>
+											</div>
+											
+										</div>
+									</form>
+								</div>
+								<div class="row">
+									<div class="col-lg-12">
+										<table class="table" id="tblTabelaGastosProduto">
+											<thead>
+												<tr class="bg-slate">
+													<th class="text-left">Item</th>
+													<th class="text-left">Data Registro</th>
+													<th class="text-left">Código</th>
+													<th class="text-left">Produto</th>
+													<th class="text-right">Valor</th>
+													<th class="text-center">Ações</th>
+												</tr>
+											</thead>
+											<tbody id="dataProduto">
+											</tbody>
+										</table>
+										<div class="footerProduto" style="margin-left: 25px"></div>
+									</div>		
+								</div>
+
+							
+							</div>
+
+
+							
 						</div>
 							<!-- /basic responsive configuration -->
 
-							<!--Modal Desconto-->
+							<!--Modal Desconto Procedimento-->
 							<div id="pageModalDescontos" class="custon-modal">
 								<div class="custon-modal-container" style="max-width: 500px;">
 									<div class="card custon-modal-content">
@@ -836,35 +979,36 @@ if ($row['ClienSexo'] == 'F'){
 												<div class="col-lg-12">
 													<form id="editaSituacao" name="alterarSituacao" method="POST" class="form-validate-jquery">
 														<div class="form-group">
-															<div class="custon-modal-title">
-																<i class=""></i>
-																<p class="h3">Descontos</p>
-																<i class=""></i>
-															</div>
-															
-															<div class="p-5">
+														
+															<div class="p-3">
 																<div class="d-flex flex-row justify-content-between">
-																	<div class="col-lg-12" style="text-align:center;">
-																		<div class="form-group row">
-																			<div class="col-lg-4">
-																				<label>Desconto</label>
-																			</div>
-																			<div class="col-lg-4">
-																				<label>Valor</label>
-																			</div>
-																			<div class="col-lg-4">
-																				<label>Valor Final</label>
-																			</div>
+																	<div class="col-lg-12 d-flex justify-content-center" >
+																		<div class=" col-lg-8 form-group text-center ">												
 
-																			<div class="col-lg-4">
-																				<input id="inputDesconto" maxLength="12" class="form-control" type="number" name="inputDesconto">
-																			</div>
-																			<div class="col-lg-4">
-																				<input id="inputModalValorB" maxLength="12" class="form-control" type="text" readonly>
-																			</div>
-																			<div class="col-lg-4">
-																				<input id="inputModalValorF" maxLength="12" class="form-control" type="text" readonly>
-																			</div>
+																			<div class="row">
+																				<div class="col-12">
+																					<h2 class="text-left pr-3">Desconto:</h2>
+																					<div class="text-right pl-10" >
+																						<input id="inputDesconto" maxLength="12" onKeyUp="moeda(this)" class="form-control valorTotalEDesconto text-center" style="color: green" type="text" name="inputDesconto">
+																					</div>                                                
+																				</div>
+																			</div>   
+																			<div class="row">
+																				<div class="col-12">
+																					<h2 class="text-left pr-3">Valor:</h2>
+																					<div class="text-right pl-10">
+																						<input id="inputModalValorB" maxLength="12" class="form-control valorTotalEDesconto text-center" type="text" readonly>
+																					</div>                                                
+																				</div>
+																			</div>  
+																			<div class="row">
+																				<div class="col-12">
+																					<h2 class="text-left pr-3">Valor Final:</h2>
+																					<div class="text-right pl-10">
+																						<input id="inputModalValorF" maxLength="12" class="form-control valorTotalEDesconto text-center" type="text" readonly>
+																					</div>                                                
+																				</div>
+																			</div>    
 
 																			<input id="itemId" name="itemId" type="hidden" value=''>
 																			<input id="itemModalValue" name="itemId" type="hidden" value=''>
@@ -878,6 +1022,68 @@ if ($row['ClienSexo'] == 'F'){
 											</div>
 											<div class="text-right m-2">
 												<button id="setDesconto" class="btn btn-principal" role="button">Confirmar</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!--Modal Desconto Produto-->
+							<div id="pageModalDescontosProduto" class="custon-modal">
+								<div class="custon-modal-container" style="max-width: 500px;">
+									<div class="card custon-modal-content">
+										<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+											<p id='tituloModalp' class="h5">Desconto</p>
+											<i id="modal-close-x-p" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+										</div>
+										<div class="px-0">
+											<div class="d-flex flex-row">
+												<div class="col-lg-12">
+													<form id="editaSituacao" name="alterarSituacao" method="POST" class="form-validate-jquery">
+														<div class="form-group">
+																														
+															<div class="p-3">
+																<div class="row d-flex flex-row justify-content-between">
+																	<div class=" col-lg-12 d-flex justify-content-center">
+																		<div class=" col-lg-8 form-group text-center ">												
+
+																			<div class="row">
+																				<div class="col-12">
+																					<h2 class="text-left pr-3">Desconto:</h2>
+																					<div class="text-right pl-10" >
+																						<input id="inputDescontop" maxLength="12" onKeyUp="moeda(this)" class="form-control valorTotalEDesconto text-center" style="color: green" type="text" name="inputDescontoP">
+																					</div>                                                
+																				</div>
+																			</div>   
+																			<div class="row">
+																				<div class="col-12">
+																					<h2 class="text-left pr-3">Valor:</h2>
+																					<div class="text-right pl-10">
+																						<input id="inputModalValorBp" maxLength="12" class="form-control valorTotalEDesconto text-center" type="text" readonly>
+																					</div>                                                
+																				</div>
+																			</div>  
+																			<div class="row">
+																				<div class="col-12">
+																					<h2 class="text-left pr-3">Valor Final:</h2>
+																					<div class="text-right pl-10">
+																						<input id="inputModalValorFp" maxLength="12" class="form-control valorTotalEDesconto text-center" type="text" readonly>
+																					</div>                                                
+																				</div>
+																			</div>    
+
+																			<input id="itemIdp" name="itemId" type="hidden" value=''>
+																			<input id="itemModalValuep" name="itemId" type="hidden" value=''>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</form>
+												</div>
+											</div>
+											<div class="text-right m-2">
+												<button id="setDescontoProduto" class="btn btn-principal" role="button">Confirmar</button>
 											</div>
 										</div>
 									</div>
