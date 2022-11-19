@@ -265,7 +265,27 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 			$('#formAtendimentoEncaminhamentoMedico').submit(function(e){
 				e.preventDefault()
 			})
-		}); //document.ready
+			$('#summernote').on('input', function(){
+				cantaCaracteres("summernote", 2000, "caracteresInputEncaminhamentoMedico")
+			})
+			$('#modelo').on('change', function(){
+				// vai preencher MODELOS
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'CONTEUDOMODELO',
+						'id': $(this).val()
+					},
+					success: function(response) {
+						$('#summernote').val('')
+						$('#summernote').val(response.conteudo)
+						cantaCaracteres("summernote", 2000, "caracteresInputEncaminhamentoMedico")
+					}
+				})
+			})
+		})//document.ready
 
 		function getCmbs(){
 			// limpa o campo text
@@ -380,6 +400,13 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 		function imprimirServico(id){
 			console.log(id)
 		}
+		function cantaCaracteres(htmlId, numCaracteres, htmlIdMostra){
+			if($(`#${htmlId}`).val().length >= numCaracteres){
+				$(`#${htmlId}`).val($(`#${htmlId}`).val().substring(0, numCaracteres));
+			}
+			let numCaracteresRestantes = numCaracteres - $(`#${htmlId}`).val().length
+			$(`#${htmlIdMostra}`).html(numCaracteresRestantes!=numCaracteres? numCaracteresRestantes+' restantes':'')
+		}
 		
 	</script>
 </head>
@@ -478,8 +505,12 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 
 									<div class="col-lg-12">
 										<div class="form-group">
-											<label for="inputNome">Encaminhamento Médico <span class="text-danger">*</span></label>
-											<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Digite aqui..."></textarea>
+											<label>Encaminhamento Médico <span class="text-danger">*</span></label>
+											<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control"></textarea>
+											<small class="text-muted form-text">
+												Máx. 2000 caracteres<br>
+												<span id="caracteresInputEncaminhamentoMedico"></span>
+											</small>
 										</div>
 									</div>
 

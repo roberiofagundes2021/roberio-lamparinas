@@ -2850,11 +2850,24 @@ try{
 		foreach($row as $item){
 			array_push($array,[
 				'id' => $item['AtTMoId'],
-				'nome' => $item['AtTMoNome'],
+				'nome' => $item['AtTMoNome']
 			]);
 		}
 
 		echo json_encode($array);
+	} elseif($tipoRequest == 'CONTEUDOMODELO'){
+		$id = $_POST['id'];
+
+		$sql = "SELECT TOP (1) AtModId,AtModConteudo
+		FROM AtendimentoModelo
+		WHERE AtModTipoModelo = '$id'";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode([
+			'id' => $row['AtModId'],
+			'conteudo' => $row['AtModConteudo']
+		]);
 	} elseif($tipoRequest == 'CID10'){
 		$sql = "SELECT Cid10Id,Cid10Capitulo,Cid10Codigo,Cid10Descricao
 		FROM Cid10";
