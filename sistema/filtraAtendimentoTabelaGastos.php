@@ -189,7 +189,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 			AtGruNome, AtGruId, AtSubNome, AtSubId,
 			Profissional.ProfiId,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
 			SituaCor,ProfiNome,SrVenNome,SrVenValorVenda,SrVenId
-			FROM AtendimentoTabelaGasto
+			FROM AtendimentoTabelaGastoProcedimento
 			JOIN Atendimento ON AtendId = AtTGaAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			JOIN Situacao ON SituaId = AtendSituacao
@@ -334,7 +334,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 	$cliente = isset($_POST['cliente'])?$_POST['cliente']:'';
 
 	if($id && $cliente){
-		$sql = "INSERT INTO AtendimentoTabelaGasto(AtTGaAtendimento,AtTGaDataRegistro,AtTGaServico,
+		$sql = "INSERT INTO AtendimentoTabelaGastoProcedimento(AtTGaAtendimento,AtTGaDataRegistro,AtTGaServico,
 			AtTGaProfissional,AtTGaDataAtendimento,AtTGaHorario,AtTGaValor,AtTGaDesconto,
 			AtTGaUsuarioAtualizador,AtTGaUnidade)
 			VALUES ";
@@ -347,13 +347,13 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 			
 			if($item['status'] == 'new'){
 				
-				$sql = "INSERT INTO AtendimentoTabelaGasto(AtTGaAtendimento,AtTGaDataRegistro,AtTGaServico,
+				$sql = "INSERT INTO AtendimentoTabelaGastoProcedimento(AtTGaAtendimento,AtTGaDataRegistro,AtTGaServico,
 				AtTGaProfissional,AtTGaDataAtendimento,AtTGaHorario,AtTGaValor,AtTGaDesconto,
 				AtTGaUsuarioAtualizador,AtTGaUnidade, AtTGaGrupo ,AtTGaSubGrupo)
 				VALUES ('$id', '$dataAtual','$item[iServico]','$item[iMedico]','$item[data]','$item[hora]',
 				$item[valor],'$item[desconto]','$usuarioId','$iUnidade', '$item[iGrupo]', '$item[iSubGrupo]')";
 			} elseif($item['status'] == 'att'){
-				$sql = "UPDATE AtendimentoTabelaGasto SET
+				$sql = "UPDATE AtendimentoTabelaGastoProcedimento SET
 				AtTGaServico = '$item[iServico]',
 				AtTGaProfissional = '$item[iMedico]',
 				AtTGaDataAtendimento = '$item[data]',
@@ -365,7 +365,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 				AtTGaSubGrupo = '$item[iSubGrupo]'
 				WHERE AtTGaId = '$item[id]'";
 			} elseif($item['status'] == 'rem'){
-				$sql = "DELETE FROM AtendimentoTabelaGasto
+				$sql = "DELETE FROM AtendimentoTabelaGastoProcedimento
 				WHERE AtTGaId = '$item[id]'";
 			}
 			array_push($arraySql,$sql);
