@@ -36,6 +36,7 @@
 					case 'atendimentoAmbulatorial': URL = 'atendimentoAmbulatorial.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'exportacaoProntuario': URL = 'atendimentoProntuarioExportacao.php'; $('#dadosPost').attr('target', '_blank'); break;
 					case 'tabelaGastos': URL = 'atendimentoTabelaGastos.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'documento': URL = 'atendimentoDocumentos.php'; $('#dadosPost').attr('target', '_self'); break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
@@ -106,6 +107,9 @@
 							<a href="#" class="nav-link itemLink" data-tipo='triagem'><i class="icon-home7"></i> Triagem</a>
 						</li>
 						<li class="nav-item">
+							<a href="#" class="nav-link itemLink" data-tipo='documento'><i class="icon-file-text"></i> Documentos</a>
+						</li>
+						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='receituario'><i class="icon-cabinet"></i> Receituário</a>
 						</li>
 						<li class="nav-item">
@@ -155,6 +159,9 @@
 						</li>
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='triagem'><i class="icon-home7"></i> Triagem</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link itemLink" data-tipo='documento'><i class="icon-file-text"></i> Documentos</a>
 						</li>
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='receituario'><i class="icon-cabinet"></i> Receituário</a>

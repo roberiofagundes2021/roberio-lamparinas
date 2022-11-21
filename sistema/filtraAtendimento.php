@@ -2959,7 +2959,110 @@ try{
 			'titulo' => 'Encaminhamento',
 			'menssagem' => 'Encaminhamento excluído!!!',
 		]);
-	} 
+	} elseif ($tipoRequest == 'ATENDMODELOS') {
+
+		$sql = "SELECT AtModId,AtModDescricao
+		FROM AtendimentoModelo
+        JOIN AtendimentoTipoModelo ON AtModTipoModelo = AtTMoId
+        AND AtTMoChave IN ('ATESTADOMEDICO', 'ATESTADOMEDICOCID', 
+                        'DECLARACAOCOMPARECIMENTO', 'DECLARACAOCOMPARECIMENTOACOMPANHANTE', 
+                        'RELATORIOMEDICO', 'DIGITACAOLIVRE')";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($row as $item){
+			array_push($array,[
+				'id' => $item['AtModId'],
+				'nome' => $item['AtModDescricao']
+			]);
+		}
+		echo json_encode($array);
+             
+    } elseif($tipoRequest == 'MODELOCONTEUDO'){
+		$id = $_POST['id'];
+
+		$sql = "SELECT TOP (1) AtModId,AtModConteudo
+		FROM AtendimentoModelo
+		WHERE AtModId = '$id'";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode([
+			'id' => $row['AtModId'],
+			'conteudo' => $row['AtModConteudo']
+		]);
+	} elseif($tipoRequest == 'SALVARDOCUMENTO'){        
+        
+        $idAtendimento = $_POST['idAtendimento'];		
+		$profissional = $_POST['profissional'];
+        $modelo = $_POST['modelo'];		
+		$descricao = $_POST['descricao'];
+        
+        $dataHora = date('Y-m-d H:i:s');
+
+        $sql = "INSERT INTO AtendimentoDocumento(
+            AtDocAtendimento, AtDocModelo, AtDocDescricao, AtDocDataHora, AtDocProfissional, AtDocUnidade)
+            VALUES('$idAtendimento', '$modelo', '$descricao', '$dataHora', '$profissional', '$iUnidade')";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Incluir Documento',
+			'menssagem' => 'Documento inserido com sucesso!!!'
+		]);
+	}
+    elseif ($tipoRequest == 'DOCUMENTOS'){
+		$atendimentoSessao = $_SESSION['atendimento']['atendimentoServicos'];
+
+		$iAtendimento = $_POST['id'];
+
+        $sql = "SELECT AtDocId, AtDocAtendimento, AtDocModelo, AtDocDescricao, AtDocDataHora, 
+            AtDocProfissional,Profissional.ProfiNome, ProfiCbo, AtTMoNome
+			FROM AtendimentoDocumento
+            JOIN AtendimentoModelo ON AtDocModelo = AtModId
+            JOIN AtendimentoTipoModelo ON AtModTipoModelo = AtTMoId
+			JOIN Profissional ON AtDocProfissional = Profissional.ProfiId
+			JOIN Profissao ON ProfiProfissao = Profissao.ProfiId
+			WHERE AtDocAtendimento = $iAtendimento";
+
+		$result = $conn->query($sql);
+		$rowEncaminhamento = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($rowEncaminhamento as $item){
+
+            $dataHr = explode(' ', $item['AtDocDataHora']);
+            $data = $dataHr[0];
+
+            $hora = explode('.', $dataHr[1]);
+            $hora = $hora[0];
+
+			array_push($array,[
+				'id'=>$item['AtDocId'],
+				'dataHora'=> mostraData($data) . ' ' . mostraHora($hora) ,
+                'tipoDocumento' => $item['AtTMoNome'],
+				'profissional'=>$item['ProfiNome'],
+				'cbo'=>$item['ProfiCbo'],
+			]);
+		}
+		
+		echo json_encode($array);
+	}  elseif ($tipoRequest == 'EXCLUIRDOCUMENTO'){
+		$id = $_POST['id'];
+	
+		$sql = "DELETE FROM AtendimentoDocumento
+		WHERE AtDocId = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Documento',
+			'menssagem' => 'Documento excluído com sucesso!!!',
+		]);
+	}
+
 }catch(PDOException $e) {
 	$msg = '';
 	switch($tipoRequest){
