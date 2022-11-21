@@ -2001,8 +2001,6 @@ try{
 			'dataRegistro' => isset($_POST['dataRegistro'])?$_POST['dataRegistro']:'',
 			'modalidade' => isset($_POST['modalidade'])?$_POST['modalidade']:'',
 			'classificacaoRisco' => isset($_POST['classificacaoRisco'])?$_POST['classificacaoRisco']:'',
-			'grupo' => isset($_POST['grupo'])?$_POST['grupo']:'',
-			'subgrupo' => isset($_POST['subgrupo'])?$_POST['subgrupo']:'',
 			'classificacao' => isset($_POST['classificacao'])?$_POST['classificacao']:'',
 			'situacao' => isset($_POST['situacao'])?$_POST['situacao']:'',
 			'observacao' => isset($_POST['observacaoAtendimento'])?$_POST['observacaoAtendimento']:''
@@ -2066,15 +2064,19 @@ try{
 				}
 			}
 
-			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeDesconto,
+			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeGrupo,AtXSeSubGrupo,AtXSeServico,AtXSeProfissional,AtXSeDesconto,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
 			VALUES ";
-	
 			foreach($atendimentoServicos as $atendimentoServico){
-				$desconto = $atendimentoServico['desconto']?$atendimentoServico['desconto']:0;
-				$sql .= "('$iAtendimento','$atendimentoServico[iServico]','$atendimentoServico[iMedico]','$desconto',
-				'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
-				'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
+				if($atendimentoServico['status'] != 'rem'){
+					$desconto = $atendimentoServico['desconto']?$atendimentoServico['desconto']:0;
+					$grupo = $atendimentoServico['iGrupo']?$atendimentoServico['iGrupo']:'null';
+					$subGrupo = $atendimentoServico['iSubGrupo']?$atendimentoServico['iSubGrupo']:'null';
+					$sql .= "('$iAtendimento',$grupo,$subGrupo,
+					'$atendimentoServico[iServico]','$atendimentoServico[iMedico]','$desconto',
+					'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
+					'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
+				}
 			}
 			$sql = substr($sql, 0, -1);
 			$conn->query($sql);
@@ -2417,6 +2419,8 @@ try{
 	} elseif($tipoRequest == 'ADICIONARSERVICO'){
 		$atendimentoSessao = $_SESSION['atendimento']['atendimentoServicos'];
 
+		$iGrupo = isset($_POST['grupo'])?$_POST['grupo']:null;
+		$iSubGrupo = isset($_POST['subGrupo'])?$_POST['subGrupo']:null;
 		$iServico = $_POST['servico'];
 		$iMedico = $_POST['medicos'];
 		$sData = explode('/',$_POST['dataAtendimento']);
@@ -2463,6 +2467,8 @@ try{
 			'iServico' => $resultServico['SrVenId'],
 			'iMedico' => $resultMedico['ProfiId'],
 			'iLocal' => $resultLocal['AtLocId'],
+			'iGrupo' => $iGrupo,
+			'iSubGrupo' => $iSubGrupo,
 
 			'servico' => $resultServico['SrVenNome'],
 			'medico' => $resultMedico['ProfiNome'],
@@ -2493,7 +2499,7 @@ try{
 				$sql = "SELECT AtXSeId,AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,AtXSeHorario,
 					AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,AtXSeUsuarioAtualizador,AtXSeUnidade,
 					ProfiId,AtLocId,AtLocNome,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-					SituaCor,ProfiNome,SrVenNome,SrVenValorVenda,SrVenId
+					SituaCor,ProfiNome,SrVenNome,SrVenValorVenda,SrVenId,AtXSeGrupo,AtXSeSubGrupo
 					FROM AtendimentoXServico
 					JOIN Atendimento ON AtendId = AtXSeAtendimento
 					JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -2510,25 +2516,31 @@ try{
 				// desapareçam
 				foreach($rowAtendimento as $item){
 					if(COUNT($atendimentoSessao)){
+						$duplicate = false;
 						foreach($atendimentoSessao as $item2){
-							if(($item2['id'] != "$item[SrVenId]#$item[ProfiId]#$item[AtLocId]")){
-								array_push($atendimentoSessao, [
-									'id' => "$item[SrVenId]#$item[ProfiId]#$item[AtLocId]",
-									'iServico' => $item['SrVenId'],
-									'iMedico' => $item['ProfiId'],
-									'iLocal' => $item['AtLocId'],
-							
-									'servico' => $item['SrVenNome'],
-									'medico' => $item['ProfiNome'],
-									'local' => $item['AtLocNome'],
-									'sData' => mostraData($item['AtXSeData']),
-									'data' => $item['AtXSeData'],
-									'hora' => mostraHora($item['AtXSeHorario']),
-									'valor' => $item['SrVenValorVenda'],
-									'status' => 'att',
-									'desconto' => $item['AtXSeDesconto']
-								]);
+							if("$item[SrVenId]#$item[ProfiId]#$item[AtLocId]" == $item2['id']){
+								$duplicate = true;
 							}
+						}
+						if(!$duplicate){
+							array_push($atendimentoSessao, [
+								'id' => "$item[SrVenId]#$item[ProfiId]#$item[AtLocId]",
+								'iServico' => $item['SrVenId'],
+								'iMedico' => $item['ProfiId'],
+								'iLocal' => $item['AtLocId'],
+								'iGrupo' => $item['AtXSeGrupo'],
+								'iSubGrupo' => $item['AtXSeSubGrupo'],
+						
+								'servico' => $item['SrVenNome'],
+								'medico' => $item['ProfiNome'],
+								'local' => $item['AtLocNome'],
+								'sData' => mostraData($item['AtXSeData']),
+								'data' => $item['AtXSeData'],
+								'hora' => mostraHora($item['AtXSeHorario']),
+								'valor' => $item['SrVenValorVenda'],
+								'status' => 'att',
+								'desconto' => $item['AtXSeDesconto']
+							]);
 						}
 					}else{
 						array_push($atendimentoSessao, [
@@ -2536,6 +2548,8 @@ try{
 							'iServico' => $item['SrVenId'],
 							'iMedico' => $item['ProfiId'],
 							'iLocal' => $item['AtLocId'],
+							'iGrupo' => $item['AtXSeGrupo'],
+							'iSubGrupo' => $item['AtXSeSubGrupo'],
 					
 							'servico' => $item['SrVenNome'],
 							'medico' => $item['ProfiNome'],

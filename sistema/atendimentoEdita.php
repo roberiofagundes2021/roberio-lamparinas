@@ -99,30 +99,30 @@ if ($tipo == 'ATENDIMENTO') {
 					// de acordo com a etapa do steppers
 					switch (newIndex) {
 						case 0:
-							$('#dadosPaciente').show();
-							($('#paciente').val() ? $('#novoPaciente').show() & $('#informacoes').show() : $('#novoPaciente').hide() & $('#informacoes').hide());
-							$('#dadosResponsavel').hide();
-							$('#novoResponsavel').hide()
-							$('#dadosAtendimento').hide();
+							$('#dadosPaciente').removeClass('d-none');
+							($('#paciente').val() ? $('#novoPaciente').removeClass('d-none') & $('#informacoes').show() : $('#novoPaciente').addClass('d-none') & $('#informacoes').hide());
+							$('#dadosResponsavel').addClass('d-none');
+							$('#novoResponsavel').addClass('d-none')
+							$('#dadosAtendimento').addClass('d-none');
 							break;
 						case 1:
-							$('#dadosResponsavel').show();
-							($('#parentescoCadatrado').val() ? $('#novoResponsavel').show() & $('#informacoes').show() : $('#novoResponsavel').hide() & $('#informacoes').hide());
-							$('#novoPaciente').hide();
-							$('#dadosPaciente').hide();
-							$('#dadosAtendimento').hide();
+							$('#dadosResponsavel').removeClass('d-none');
+							($('#parentescoCadatrado').val() ? $('#novoResponsavel').removeClass('d-none') & $('#informacoes').show() : $('#novoResponsavel').addClass('d-none') & $('#informacoes').hide());
+							$('#novoPaciente').addClass('d-none');
+							$('#dadosPaciente').addClass('d-none');
+							$('#dadosAtendimento').addClass('d-none');
 							break;
 						case 2:
-							$('#dadosAtendimento').show();
-							$('#dadosResponsavel').hide();
-							$('#novoResponsavel').hide()
-							$('#dadosPaciente').hide();
-							$('#novoPaciente').hide();
+							$('#dadosAtendimento').removeClass('d-none');
+							$('#dadosResponsavel').addClass('d-none');
+							$('#novoResponsavel').addClass('d-none')
+							$('#dadosPaciente').addClass('d-none');
+							$('#novoPaciente').addClass('d-none');
 							$('#informacoes').hide();
 							break;
 						default:
-							$('#novoPaciente').hide();
-							$('#novoResponsavel').hide();
+							$('#novoPaciente').addClass('d-none');
+							$('#novoResponsavel').addClass('d-none');
 							$('#informacoes').hide();
 							break;
 					}
@@ -297,6 +297,30 @@ if ($tipo == 'ATENDIMENTO') {
 					}
 				}
 			})
+
+			$('.actions a').each(function(index, element) {
+				if ($(element).attr('href') == '#next') {
+					$(element).attr('href', '#')
+					$(element).attr('id', 'nextBTN')
+					$(element).on('click', function(e) {
+						$('#dadosPaciente').submit()
+
+						if($('#paciente').val()){
+
+							let menssagem=''
+							let noDisable=true
+							if(!validaCPF($('#cpf').val())){
+								noDisable=false
+								menssagem='informe um CPF'
+								$('#cpf').focus()
+							}
+							if(!noDisable){
+								alerta('Campo obrigatório!!',menssagem,'error')
+							}
+						}
+					})
+				}
+			})
 		})
 	</script>
 	<!-- Theme JS files -->
@@ -353,14 +377,7 @@ if ($tipo == 'ATENDIMENTO') {
 
 	<script type="text/javascript">
 		$(document).ready(function() {
-			$('#dadosPaciente').show()
 			$('#informacoes').show()
-			$('#novoPaciente').show()
-
-			$('#dadosResponsavel').hide()
-			$('#dadosAtendimento').hide()
-			$('#servicoTable').hide()
-			$('#novoResponsavel').hide()
 
 			$('.actions').addClass('col-lg-12 row pt-2')
 			$('.actions ul').addClass('col-lg-10 actionContent')
@@ -372,7 +389,6 @@ if ($tipo == 'ATENDIMENTO') {
 			dataAtual = dataAtual.split('/')[2] + '-' + dataAtual.split('/')[1] + '-' + dataAtual.split('/')[0]
 			$('#dataRegistro').val(dataAtual)
 
-			$('#servicoTable').hide()
 			getCmbs()
 			checkServicos()
 
@@ -385,6 +401,8 @@ if ($tipo == 'ATENDIMENTO') {
 				let menssageError = ''
 				let servico = $('#servico').val()
 				let medicos = $('#medicos').val()
+				let grupo = $('#grupo').val()
+				let subGrupo = $('#subgrupo').val()
 				let dataAtendimento = $('#dataAtendimento').val()
 				let horaAtendimento = $('#horaAtendimento').val()
 				let localAtendimento = $('#localAtendimento').val()
@@ -426,6 +444,8 @@ if ($tipo == 'ATENDIMENTO') {
 					data: {
 						'tipoRequest': 'ADICIONARSERVICO',
 						'servico': servico,
+						'grupo':grupo,
+						'subGrupo':subGrupo,
 						'medicos': medicos,
 						'dataAtendimento': dataAtendimento,
 						'horaAtendimento': horaAtendimento,
@@ -453,20 +473,6 @@ if ($tipo == 'ATENDIMENTO') {
 			})
 
 			$('#paciente').on('change', function() {
-				$('.actions a').each(function(index, element) {
-					if ($(element).attr('href') == '#' || $(element).attr('href') == '#next') {
-						let href = $('#paciente').val() ? '#next' : '#'
-						$(element).attr('href', href)
-					}
-					$(element).on('click', function(e){
-						$('#dadosPaciente').submit()
-					})
-				})
-				$('.steps ul li').each(function(index, element) {
-					if (!$('#paciente').val() && index > 0) {
-						$(element).attr('class', 'disabled')
-					}
-				})
 				setPacienteAtribut()
 			});
 
@@ -758,8 +764,14 @@ if ($tipo == 'ATENDIMENTO') {
 				if(!validaCPF(cpfSoNumeros)){
 					$(this).val('')
 					alerta('CPF Inválido!', 'Digite um CPF válido!!', 'error')
+					$('#nextBTN').attr('href','#')
+
+					$('.steps ul li').each(function(index, element) {
+						$(element).attr('class', 'disabled')
+					})
 					return
 				}
+				$('#nextBTN').attr('href','#next')
 			})
 			
 			//Esta função será executada quando o campo cep do edita paciente perder o foco.
@@ -1115,6 +1127,20 @@ if ($tipo == 'ATENDIMENTO') {
 							$('#uf').val(response.uf)
 							$('#estado').val(response.estado)
 							$('#sexo').val(response.sexo)
+							$('#estadoCivil').val(response.estadoCivil)
+
+							let noDisable=true
+							if(!validaCPF(response.cpf)){
+								noDisable=false
+							}
+
+							$('#nextBTN').attr('href', (noDisable? '#next':'#'))
+
+							$('.steps ul li').each(function(index, element) {
+								if (!noDisable) {
+									$(element).attr('class', 'disabled')
+								}
+							})
 
 							$('#racaCor').children("option").each(function(index, item){
 								if($(item).val() == response.racaCor){
@@ -1142,11 +1168,11 @@ if ($tipo == 'ATENDIMENTO') {
 									$(item).change()
 								}
 							})
-							$('#novoPaciente').show()
+							$('#novoPaciente').removeClass('d-none')
 							$('#informacoes').show()
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
-							$('#novoPaciente').hide()
+							$('#novoPaciente').addClass('d-none')
 							$('#informacoes').hide()
 						}
 					},
@@ -1181,7 +1207,7 @@ if ($tipo == 'ATENDIMENTO') {
 				$('#celular').val('')
 				$('#email').val('')
 				$('#observacao').val('')
-				$('#novoPaciente').hide()
+				$('#novoPaciente').addClass('d-none')
 				$('#informacoes').hide()
 			}
 
@@ -1231,12 +1257,12 @@ if ($tipo == 'ATENDIMENTO') {
 							})
 
 							if(obj && obj.visible){
+								$('#novoResponsavel').removeClass('d-none')
 								$('#informacoes').show()
-								$('#novoResponsavel').show()
 							}
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)
-							$('#novoResponsavel').hide()
+							$('#novoResponsavel').addClass('d-none')
 							$('#informacoes').hide()
 						}
 					},
@@ -1258,7 +1284,7 @@ if ($tipo == 'ATENDIMENTO') {
 				$('#emailResp').val('')
 				$('#observacaoResp').val('')
 				$('#informacoes').hide()
-				$('#novoResponsavel').hide()
+				$('#novoResponsavel').addClass('d-none')
 			}
 		}
 
@@ -1320,7 +1346,7 @@ if ($tipo == 'ATENDIMENTO') {
 						$('#servicoValorTotal').html(`R$ ${float2moeda(response.valorTotal)}`)
 						$('#servicoValorDescontoTotal').html(`R$ ${float2moeda(response.valorTotalDesconto)}`)
 						$('#dataServico').html(HTML);
-						$('#servicoTable').show();
+						$('#servicoTable').removeClass('d-none');
 
 						$('.descontoModal').each(function(index, element){
 							$(element).on('click', function(item){
@@ -1343,7 +1369,7 @@ if ($tipo == 'ATENDIMENTO') {
 							})
 						})
 					} else {
-						$('#servicoTable').hide();
+						$('#servicoTable').addClass('d-none');
 					}
 				}
 			});
@@ -1530,7 +1556,7 @@ if ($tipo == 'ATENDIMENTO') {
 										</div>
 									</div>
 								</form>
-								<form id="dadosResponsavel" class="form-validate-jquery" action="#" data-fouc>
+								<form id="dadosResponsavel" class="form-validate-jquery d-none" action="#" data-fouc>
 									<div class="card-header header-elements-inline" style="margin-left:10px;">
 										<h5 class="text-uppercase font-weight-bold">Cadastro de Responsável</h5>
 									</div>
@@ -1549,7 +1575,7 @@ if ($tipo == 'ATENDIMENTO') {
 										</div>
 									</div>
 								</form>
-								<form id="dadosAtendimento" class="form-validate-jquery" action="#" data-fouc>
+								<form id="dadosAtendimento" class="form-validate-jquery d-none" action="#" data-fouc>
 									<div class="card-header header-elements-inline" style="margin-left:10px;">
 										<h5 class="text-uppercase font-weight-bold">Cadastro de Atendimento</h5>
 									</div>
@@ -1665,7 +1691,7 @@ if ($tipo == 'ATENDIMENTO') {
 										</div>
 
 										<div class="col-lg-12">
-											<table class="table" id="servicoTable">
+											<table class="table d-none" id="servicoTable">
 												<thead>
 													<tr class="bg-slate text-left">
 														<th style="width: 15rem;">Serviço</th>
@@ -1723,7 +1749,7 @@ if ($tipo == 'ATENDIMENTO') {
 						</div>
 
 						<div id="informacoes" class="card ">
-							<div id="novoPaciente" class="">
+							<div id="novoPaciente" class="d-none">
 								<div class="card-body">
 
 									<div class="card-header header-elements-inline" style="margin-left: -10px;">
@@ -2033,7 +2059,7 @@ if ($tipo == 'ATENDIMENTO') {
 									</div>
 								</div>
 							</div>
-							<div id="novoResponsavel" class="">
+							<div id="novoResponsavel" class="d-none">
 								<div class="card-header header-elements-inline" style="margin-left:10px;">
 									<h5 class="text-uppercase font-weight-bold">Dados Pessoais do responsável</h5>
 								</div>
