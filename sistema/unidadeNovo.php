@@ -263,6 +263,57 @@ if(isset($_POST['inputNome'])){
       ':iUnidade' => $unidadeIdNovo
     ));
 
+    /* Após criar a Unidade deve se cadastrar as classificação do atendimento Padrão para essa Unidade nova criada */
+
+    $sql = "INSERT INTO AtendimentoClassificacaoRisco (AtClRNome, AtClRTempo, AtClRCor, AtClRDeterminantes, AtClRStatus, AtClRUsuarioAtualizador, AtClRUnidade) 
+            VALUES ( :sNome, :sTempo, :sCor, :sDeterminantes, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+    $result = $conn->prepare($sql);
+
+    $result->execute(array(
+      ':sNome' => 'EMERGENTE',
+      ':sTempo' => 0,
+      ':sCor' => '#fa0000',
+      ':sDeterminantes' => 'Pacientes que necessitam de atendimento imediato, com risco iminente de morte.',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'MUITO URGENTE',
+      ':sTempo' => 10,
+      ':sCor' => '#ff630f',
+      ':sDeterminantes' => 'Paciente grave e atendimento necessário em 10 minutos',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'URGENTE',
+      ':sTempo' => 60,
+      ':sCor' => '#fbff00',
+      ':sDeterminantes' => 'Paciente com gravidade moderada. Deve ser atendido em até 60 minutos.',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'POUCO URGENTE',
+      ':sTempo' => 120,
+      ':sCor' => '#00ff1e',
+      ':sDeterminantes' => 'Pouco-urgente, com atendimento em até 120 minutos.',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'NÃO URGENTE',
+      ':sTempo' => 240,
+      ':sCor' => '#0008ff',
+      ':sDeterminantes' => 'Não-urgente, com atendimento de espera em até 240 minutos, pois não apresenta risco à saúde.',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
 
     /* Após criar a Unidade deve se cadastrar os centros de custo por padrão para essa Unidade nova criada */
     
