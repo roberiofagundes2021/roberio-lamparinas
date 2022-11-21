@@ -2,21 +2,21 @@
 
 include_once("sessao.php");
 
-$_SESSION['PaginaAtual'] = 'Editar Protocolo Manchester';
+$_SESSION['PaginaAtual'] = 'Editar Classificação de Risco';
 
 include('global_assets/php/conexao.php');
 
 
-if(isset($_POST['inputProtocoloManchesterId'])){
+if(isset($_POST['inputClassificacaoRiscoId'])){
 
-	$iProtocoloManchester = $_POST['inputProtocoloManchesterId'];
+	$iClassificacaoRisco = $_POST['inputClassificacaoRiscoId'];
 	
 	try{
 	
-		$sql = "SELECT AtPrMId, AtPrMNome,  AtPrMTempo, AtPrMCor, AtPrMDeterminantes, SituaChave
-				FROM AtendimentoProtocoloManchester
-				JOIN Situacao on SituaId = AtPrMStatus
-				WHERE AtPrMId = $iProtocoloManchester ";
+		$sql = "SELECT AtClRId, AtClRNome, AtClRNomePersonalizado, AtClRTempo, AtClRCor, AtClRDeterminantes, SituaChave
+				FROM AtendimentoClassificacaoRisco
+				JOIN Situacao on SituaId = AtClRStatus
+				WHERE AtClRId = $iClassificacaoRisco ";
 		$result = $conn->query($sql);
 		$row = $result->fetch(PDO::FETCH_ASSOC);		
 
@@ -28,8 +28,8 @@ if(isset($_POST['inputProtocoloManchesterId'])){
 
 } else {  //Esse else foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 	
-	header("Location: protocoloManchester.php");
-	//irpara("protocoloManchester.php");
+	header("Location: classificacaoRisco.php");
+	//irpara("classificacaoRisco.php");
 }
 
 
@@ -39,25 +39,25 @@ if(isset($_POST['inputNome'])){
 
 		$conn->beginTransaction();
 		
-		$sql = "UPDATE AtendimentoProtocoloManchester SET AtPrMNome = :sNome, AtPrMTempo = :sTempo, AtPrMCor = :sCor, 
-		               AtPrMDeterminantes = :sDeterminantes, AtPrMUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE AtPrMId = :iProtocoloManchester ";
+		$sql = "UPDATE AtendimentoClassificacaoRisco SET AtClRNome = :sNome, AtClRNomePersonalizado = :sNomePersonalizado, AtClRTempo = :sTempo, 
+		               AtClRDeterminantes = :sDeterminantes, AtClRUsuarioAtualizador = :iUsuarioAtualizador
+				WHERE AtClRId = :iClassificacaoRisco ";
 
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
+						':sNomePersonalizado' => $_POST['inputNomePersonalizado'],
 						':sTempo' => $_POST['inputTempo'],
-						':sCor' => $_POST['inputCor'],
 						':sDeterminantes' => $_POST['txtDeterminantes'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iProtocoloManchester' => $_POST['inputProtocoloManchesterId']
+						':iClassificacaoRisco' => $_POST['inputClassificacaoRiscoId']
 						));				
 		
 		$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Protocolo Manchester alterado!!!";
+		$_SESSION['msg']['mensagem'] = "Classificação de Risco alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {	
@@ -65,7 +65,7 @@ if(isset($_POST['inputNome'])){
 		$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar protocolo manchester!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar classificação de risco!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		//$result->debugDumpParams();
@@ -74,7 +74,7 @@ if(isset($_POST['inputNome'])){
 		exit;
 	}
 	
-	irpara("protocoloManchester.php");
+	irpara("classificacaoRisco.php");
 }
 
 ?>
@@ -85,7 +85,7 @@ if(isset($_POST['inputNome'])){
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Protocolo Manchester</title>
+	<title>Lamparinas | Classificação de Risco</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -95,6 +95,8 @@ if(isset($_POST['inputNome'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -103,51 +105,28 @@ if(isset($_POST['inputNome'])){
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
+
+		$(document).ready(function() {
+
+			$('#summernote').summernote();
+
+			$('#enviar').on('click', function(e){
+				e.preventDefault();
+				$( "formClassificacaoRisco" ).submit();
+			})
+		}); //document.ready
+
 		
 		
 
-        $(document).ready(function() {
-
-			//Limpa o campo Nome quando for digitado só espaços em branco
-			$("#inputNome").on('blur', function(e){
-
-				var inputNome = $('#inputNome').val();
-			
-				inputNome = inputNome.trim();
-				
-				if (inputNome.length == 0){
-					$('#inputNome').val('');
-				}
-			});			
-		
+        $(document).ready(function() {	
 		
 		
 			$('#alterar').on('click', function(e) {
 
 				e.preventDefault();
 
-				var inputNomeNovo = $('#inputNome').val();
-				var inputNomeVelho = $('#inputProtocoloNome').val();
-				
-
-				//remove os espaços desnecessários antes e depois
-				inputNomeNovo = inputNomeNovo.trim();
-
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "protocoloManchesterValida.php",
-					data: ('nomeNovo=' + inputNomeNovo + '&nomeVelho=' + inputNomeVelho),
-					success: function(resposta) {
-
-					if (resposta == 1) {
-						alerta('Atenção', 'Esse registro já existe!', 'error');
-						return false;
-					}
-
-					$("#formProtocoloManchester").submit();
-					}
-				})
+				$("#formClassificacaoRisco").submit();
 
 			})
 		
@@ -176,14 +155,14 @@ if(isset($_POST['inputNome'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form id="formProtocoloManchester" name="formProtocoloManchester" method="post" class="form-validate-jquery" action="protocoloManchesterEdita.php">
+					<form id="formClassificacaoRisco" name="formClassificacaoRisco" method="post" class="form-validate-jquery" action="classificacaoRiscoEdita.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Protocolo Manchester "<?php echo $row['AtPrMNome']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Classificação de Risco "<?php echo $row['AtClRNome']; ?>"</h5>
 						</div>
 						
-						<input type="hidden" id="inputProtocoloManchesterId" name="inputProtocoloManchesterId" value="<?php echo $row['AtPrMId']; ?>" >
-						<input type="hidden" id="inputProtocoloNome" name="inputProtocoloNome" value="<?php echo $row['AtPrMNome']; ?>">
-						<input type="hidden" id="inputProtocoloManchesterStatus" name="inputProtocoloManchesterStatus" value="<?php echo $row['SituaChave']; ?>" >
+						<input type="hidden" id="inputClassificacaoRiscoId" name="inputClassificacaoRiscoId" value="<?php echo $row['AtClRId']; ?>" >
+						<input type="hidden" id="inputProtocoloNome" name="inputProtocoloNome" value="<?php echo $row['AtClRNome']; ?>">
+						<input type="hidden" id="inputClassificacaoRiscoStatus" name="inputClassificacaoRiscoStatus" value="<?php echo $row['SituaChave']; ?>" >
 						
 						<div class="card-body">
 							
@@ -193,24 +172,32 @@ if(isset($_POST['inputNome'])){
 
                                     <div class="row">
 
-                                        <div class="col-lg-8">
+                                        <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="inputNome">Nome <span class="text-danger">*</span></label>
-                                                <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['AtPrMNome']; ?>" required>
+                                                <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['AtClRNome']; ?>" readonly>
                                             </div>
                                         </div>
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputNomePersonalizado">Classificação de Risco (nome personalizado)</label>
+												<input type="text" id="inputNomePersonalizado" name="inputNomePersonalizado" class="form-control" placeholder="Título personalizado" value="<?php echo $row['AtClRNomePersonalizado']; ?>">
+											</div>
+										</div>
 										<div class="col-lg-2">
                                             <div class="form-group">
                                                 <label for="inputTempo">Tempo (min)<span class="text-danger">*</span></label>
-                                                <input type="number" id="inputTempo" name="inputTempo" class="form-control" placeholder="Tempo" value="<?php echo $row['AtPrMTempo']; ?>" required>
+                                                <input type="number" id="inputTempo" name="inputTempo" class="form-control" placeholder="Tempo" value="<?php echo $row['AtClRTempo']; ?>" required>
                                             </div>
                                         </div>
 										<div class="col-lg-2">
-                                            <div class="form-group">
-                                                <label for="inputCor">Cor <span class="text-danger">*</span></label>
-                                                <input type="color" id="inputCor" name="inputCor" class="container" placeholder="Cor" value="<?php echo $row['AtPrMCor']; ?>" required>
+											<label for="inputCor">Cor<span class="text-danger">*</span></label>
+											<div class="form-group" style="margin-left: 10px; margin-Top: 5px; height: 40px; width: 40px; background-color: <?php echo $row['AtClRCor']; ?>; border-radius: 50px;" >
                                             </div>
                                         </div>
+
+										
+										
                                         
                                        
                                                                                                                                             
@@ -220,7 +207,7 @@ if(isset($_POST['inputNome'])){
                                         <div class="col-lg-12">
                                             <div class="form-group">
                                                 <label for="txtDeterminantes">Determinantes Gerais</label>
-                                                <textarea rows="5" cols="5" class="form-control" id="txtDeterminantes" name="txtDeterminantes" placeholder="Determinantes"><?php echo $row['AtPrMDeterminantes']; ?></textarea>
+                                                <textarea rows="5" cols="5" class="form-control" id="summernote" name="txtDeterminantes" placeholder="Determinantes"><?php echo $row['AtClRDeterminantes']; ?></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -238,7 +225,7 @@ if(isset($_POST['inputNome'])){
 											echo '<button id="alterar" class="btn btn-lg btn-principal" type="submit">Alterar</button>';
 										}
 									?>	
-										<a href="protocoloManchester.php" class="btn btn-basic" role="button">Cancelar</a>
+										<a href="classificacaoRisco.php" class="btn btn-basic" role="button">Cancelar</a>
 									</div>
 								</div>
 							</div>
