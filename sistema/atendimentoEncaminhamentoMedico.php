@@ -182,14 +182,12 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 	<!-- Não permite que o usuário retorne para o EDITAR -->
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 	
 	<script type="text/javascript">
 
 		$(document).ready(function() {	
+			$('#summernote').summernote();
 			getCmbs()
 			checkEncaminhamentos()
 
@@ -265,7 +263,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 			$('#formAtendimentoEncaminhamentoMedico').submit(function(e){
 				e.preventDefault()
 			})
-			$('#summernote').on('input', function(){
+			$('#summernote').on('summernote.change', function(){
 				cantaCaracteres("summernote", 2000, "caracteresInputEncaminhamentoMedico")
 			})
 			$('#modelo').on('change', function(){
@@ -280,7 +278,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 					},
 					success: function(response) {
 						$('#summernote').val('')
-						$('#summernote').val(response.conteudo)
+						$('#summernote').summernote('code', response.conteudo)
 						cantaCaracteres("summernote", 2000, "caracteresInputEncaminhamentoMedico")
 					}
 				})

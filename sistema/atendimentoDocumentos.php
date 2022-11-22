@@ -75,17 +75,17 @@ if ($row['ClienSexo'] == 'F'){
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 	<!-- Não permite que o usuário retorne para o EDITAR -->
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 	
 	<script type="text/javascript">
 
-		$(document).ready(function() {	
+		$(document).ready(function() {
+
+			$('#summernote').summernote();
+			
 			getCmbs()
 			checkDocumentos()
 
@@ -188,11 +188,15 @@ if ($row['ClienSexo'] == 'F'){
 					},
 					success: function(response) {
 						$('#summernote').val('')
-						$('#summernote').val(response.conteudo)
+						$('#summernote').summernote('code', response.conteudo)
                         contarCaracteres($('#summernote').get(0));
 					}
 				})
 			})
+
+			$('#summernote').on('summernote.change', function() {
+				contarCaracteres($('#summernote').get(0));
+			});
 
 			$(".caracteressummernote").text((4000 - $("#summernote").val().length) + ' restantes');
 
@@ -284,14 +288,6 @@ if ($row['ClienSexo'] == 'F'){
 			console.log(id)
 		}
 
-		function cantaCaracteres(htmlId, numCaracteres, htmlIdMostra){
-			if($(`#${htmlId}`).val().length >= numCaracteres){
-				$(`#${htmlId}`).val($(`#${htmlId}`).val().substring(0, numCaracteres));
-			}
-			let numCaracteresRestantes = numCaracteres - $(`#${htmlId}`).val().length
-			$(`#${htmlIdMostra}`).html(numCaracteresRestantes!=numCaracteres? numCaracteresRestantes+' restantes':'')
-		}
-
         function contarCaracteres(params) {
 
             var limite = params.maxLength;
@@ -375,7 +371,7 @@ if ($row['ClienSexo'] == 'F'){
 
 									<div class="col-lg-12">
 										<div class="form-group">
-											<textarea rows="5" cols="5" maxLength="4000" onInput="contarCaracteres(this);"  id="summernote" name="txtareaConteudo" class="form-control"></textarea>
+											<textarea rows="5" cols="5" maxLength="4000" id="summernote" name="txtareaConteudo" class="form-control"></textarea>
 												<small class="text-muted form-text">Max. 4000 caracteres - <span class="caracteressummernote"></span></small>
 										</div>
 									</div>
