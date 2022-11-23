@@ -1349,28 +1349,10 @@ try{
 		$resultEmAtendimento = $conn->query($sql);
 		$rowEmAtendimento = $resultEmAtendimento->fetchAll(PDO::FETCH_ASSOC);
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
-			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
-			FROM AtendimentoXServico
-			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
-			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			LEFT JOIN Situacao ON SituaId = AtendSituacao
-			LEFT JOIN Cliente ON ClienId = AtendCliente
-			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
-			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'EMOBSERVACAO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'ELETIVO'
-			ORDER BY AtXSeId DESC";
-		$resultObservacao = $conn->query($sql);
-		$rowObservacao = $resultObservacao->fetchAll(PDO::FETCH_ASSOC);
 		
 		$espera = [];
 		$atendido = [];
 		$emAtendimento = [];
-		$observacao = [];
 
 		$sql = "SELECT AtClRId,AtClRNome,AtClRNomePersonalizado,AtClRCor,AtClRDeterminantes
 		FROM AtendimentoClassificacaoRisco WHERE AtClRUnidade = $iUnidade";
@@ -1586,99 +1568,6 @@ try{
 				]]);
 		}
 
-		foreach($rowObservacao as $item){
-			$difference = diferencaEmHoras($item['AtXSeData'], date('Y-m-d'));
-
-			$att = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
-			$atender = "<button href='#'  type='button' class='btn btn-success btn-sm atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'>Atender</button>";
-			$acoes = "<div class='list-icons'>";
-
-				if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {					
-					
-					$acoes .= "
-						$att
-						<div class='dropdown'>													
-							<a href='#' class='list-icons-item' data-toggle='dropdown'>
-								<i class='icon-menu9'></i>
-							</a>
-
-							<div class='dropdown-menu dropdown-menu-right'> 
-								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
-							</div>
-						</div>";
-				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
-					$acoes .= "$atender";
-				}	
-			$acoes .= "</div>";
-			
-			$borderColor = "";
-			switch($item['AtClRCor']){
-				case '#ff630f':$borderColor='#cd5819';break;
-				case '#fa0000':$borderColor='#c10000';break;
-				case '#fbff00':$borderColor='#adb003';break;
-				case '#00ff1e':$borderColor='#2db93e';break;
-				case '#0008ff':$borderColor='#010579';break;
-				default: $borderColor = '#FFFF';break;
-			}
-
-			// essa etapa monta o submenu de riscos
-			$riscos = "";
-			foreach($rowRiscos as $risco){
-				// .($risco['AtClRNomePersonalizado']?$risco['AtClRNomePersonalizado']:$risco['AtClRNome'])
-				$nome = $risco['AtClRNomePersonalizado']?$risco['AtClRNomePersonalizado']:$risco['AtClRNome'];
-				$borderColorSubMenu = '';
-				switch($risco['AtClRCor']){
-					case '#ff630f':$borderColorSubMenu='#cd5819';break;
-					case '#fa0000':$borderColorSubMenu='#c10000';break;
-					case '#fbff00':$borderColorSubMenu='#adb003';break;
-					case '#00ff1e':$borderColorSubMenu='#2db93e';break;
-					case '#0008ff':$borderColorSubMenu='#010579';break;
-					default: $borderColorSubMenu = '#FFFF';break;
-				}
-				$indicador = "<div style='height: 20px; width: 20px; background-color: $risco[AtClRCor]; border-radius: 13px;border: 2px solid $borderColorSubMenu;'></div>";
-
-				$riscos .= "<div class='dropdown-item' onclick='mudaRisco($item[AtendId], $risco[AtClRId])' title='$risco[AtClRDeterminantes]'>
-								<div class='col-lg-10'>$nome</div>
-								<div class='col-lg-2'>$indicador</div>
-							</div>";
-			}
-
-			$nome = $item['AtClRNomePersonalizado']?$item['AtClRNomePersonalizado']:$item['AtClRNome'];
-			
-			$classificacao = "<div class='btn-group justify-content-center' title='$nome \n $item[AtClRDeterminantes]'>
-								<div class='btn dropdown-toggle' data-toggle='dropdown' style='height: 35px; width: 35px; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
-								<div class='dropdown-menu'>
-									$riscos
-								</div>
-							</div>";
-		
-			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
-			
-			array_push($observacao,[
-				'data' => [
-					mostraData($item['AtXSeData']) . " - " . $item['AtXSeHorario'],  // Data - hora
-					$difference,  // Espera
-					$item['AtendNumRegistro'],  // Nº Registro
-					$item['ClienNome'],  // Paciente
-					$item['SrVenNome'],  // Procedimento
-					$classificacao,  // Risco
-					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
-					$acoes,  // Ações
-				],
-				'identify' => [
-					'situacao' => $item['SituaChave'],
-					'iAtendimento' => $item['AtendId'],
-					'sJustificativa' => $item['AtendObservacao'],
-					'prontuario' => $item['ClienCodigo']
-				]]);
-		}
-
 		foreach($rowAtendido as $item){
 			$difference = diferencaEmHoras($item['AtXSeData'], date('Y-m-d'));
 
@@ -1779,7 +1668,6 @@ try{
 			'dataEspera' =>$espera,
 			'dataAtendido' =>$atendido,
 			'dataEmAtendimento' => $emAtendimento,
-			'dataObservacao' => $observacao,
 			'acesso' => $acesso,
 			'titulo' => '',
 			'status' => 'success',
