@@ -2334,7 +2334,8 @@ try{
 	} elseif ($tipoRequest == 'MODALIDADES'){
 	
 		$sql = "SELECT AtModId,AtModNome,AtModChave,AtModSituacao,AtModUsuarioAtualizador
-		FROM AtendimentoModalidade";
+		FROM AtendimentoModalidade
+		WHERE AtModUnidade = $iUnidade ";
 		$result = $conn->query($sql);
 
 		$array = [];
