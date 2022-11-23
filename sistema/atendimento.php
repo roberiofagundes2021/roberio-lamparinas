@@ -588,7 +588,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 							$(rowNodeAtendimento).find('td:eq(8)').attr('data-tipo', 'ATENDIMENTO')
 
 							// essa opção de alterar situação só vai estar disponível caso o status seja "Em espera" ou "Liberado"
-							if(item.identify.situacao == "EMESPERA" || item.identify.situacao == "LIBERADOVENDA"){
+							if(item.identify.situacao == "EMESPERA" || item.identify.situacao == "LIBERADO"){
 								$(rowNodeAtendimento).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
 							}
 							// <end>

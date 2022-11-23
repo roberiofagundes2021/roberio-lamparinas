@@ -765,7 +765,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                                                         JOIN AtendimentoModalidade on AtModId = AtendModalidade
                                                         LEFT JOIN CaixaRecebimento on CxRecAtendimento = AtendId
                                                         WHERE AtendUnidade = ".$_SESSION['UnidadeId']." and AtendId not in (SELECT CxRecAtendimento FROM CaixaRecebimento)
-                                                        AND SituaChave = 'LIBERADOVENDA'
+                                                        AND SituaChave = 'LIBERADO'
                                                         AND AtModTipoRecebimento = 'À Vista'                                                      
                                                         ORDER BY ClienNome";
                                                 $result = $conn->query($sql);
