@@ -54,7 +54,7 @@ try{
 				JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
 				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 				JOIN ServicoVenda ON SrVenId = AgendServico
-				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADOVENDA','CONFIRMADO','FILAESPERA')
+				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADO','CONFIRMADO','FILAESPERA')
 				and AgendAtendimento is null";
 			$result = $conn->query($sql);
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -226,7 +226,7 @@ try{
 				LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 				LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-				WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+				WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 				ORDER BY AtXSeId DESC";
 			$resultAtendido = $conn->query($sql);
 			$rowAtendido = $resultAtendido->fetchAll(PDO::FETCH_ASSOC);
@@ -411,7 +411,7 @@ try{
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'AMBULATORIAL'
 			ORDER BY AtXSeId DESC";
 		$resultAtendido = $conn->query($sql);
@@ -888,7 +888,7 @@ try{
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'INTERNACAO'
 			ORDER BY AtXSeId DESC";
 		$resultAtendido = $conn->query($sql);
@@ -1325,7 +1325,7 @@ try{
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'ATENDIDOVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtXSeId DESC";
 		$resultAtendido = $conn->query($sql);
@@ -1789,7 +1789,7 @@ try{
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'SITUACOES'){
 		$tipo = $_POST['tipo'];
-		$list = $tipo == 'AGENDAMENTO'?"'AGENDADOVENDA','CONFIRMADO','CANCELADO','FILAESPERA'":
+		$list = $tipo == 'AGENDAMENTO'?"'AGENDADO','CONFIRMADO','CANCELADO','FILAESPERA'":
 		"'NAOESPEROU'";
 		$sql = "SELECT SituaId,SituaNome,SituaChave
 		FROM Situacao

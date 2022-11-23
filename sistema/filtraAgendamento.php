@@ -72,7 +72,7 @@ try{
 	} elseif ($tipoRequest == 'SITUACOES'){
 		$sql = "SELECT SituaId,SituaNome,SituaChave,SituaStatus,SituaUsuarioAtualizador,SituaCor
 		FROM Situacao
-		WHERE SituaChave in ('AGENDADOVENDA','CONFIRMADO','CANCELADO')";
+		WHERE SituaChave in ('AGENDADO','CONFIRMADO','CANCELADO')";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 

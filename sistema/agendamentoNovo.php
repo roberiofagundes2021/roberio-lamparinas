@@ -58,7 +58,7 @@ $dataHoje = date("Y-m-d");
 		$(document).ready(function() {
 			
 			$('#servicoTable').hide()
-			alteraSituacao('AGENDADOVENDA')
+			alteraSituacao('AGENDADO')
 			getCmbs()
 			
 			$('#data').val('<?php echo $dataHoje ?>')
