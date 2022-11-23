@@ -210,7 +210,7 @@ try{
 				LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 				LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-				WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+				WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 				ORDER BY AtXSeId DESC";
 			$resultEspera = $conn->query($sql);
 			$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
@@ -357,7 +357,7 @@ try{
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'AMBULATORIAL'
 			ORDER BY AtXSeId DESC";
 		$resultEspera = $conn->query($sql);
@@ -834,7 +834,7 @@ try{
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'INTERNACAO'
 			ORDER BY AtXSeId DESC";
 		$resultEspera = $conn->query($sql);
@@ -1307,7 +1307,7 @@ try{
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtXSeId DESC";
 		$resultEspera = $conn->query($sql);
@@ -2027,7 +2027,7 @@ try{
 	
 			$numRegistro = "A$mes-$intaValCodigo";
 	
-			$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'EMESPERAVENDA'";
+			$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'LIBERADO'";
 			$result = $conn->query($sql);
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 			
