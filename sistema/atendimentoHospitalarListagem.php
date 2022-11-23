@@ -3,6 +3,7 @@
 include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Atendimento Hospitalar';
+$_SESSION['UltimaPagina'] = 'INTERNACAO';
 
 include('global_assets/php/conexao.php');
 

@@ -8,8 +8,21 @@ include('global_assets/php/conexao.php');
 
 $iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
+if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
+	$iAtendimentoId = $_SESSION['iAtendimentoId'];
+}
+$_SESSION['iAtendimentoId'] = null;
+
 if(!$iAtendimentoId){
-	irpara("atendimento.php");
+	$uTipoAtendimento = $_SESSION['UltimaPagina'];
+
+	if ($uTipoAtendimento == "ELETIVO") {
+		irpara("atendimentoEletivoListagem.php");
+	} elseif ($uTipoAtendimento == "AMBULATORIAL") {
+		irpara("atendimentoAmbulatorialListagem.php");
+	} elseif ($uTipoAtendimento == "INTERNACAO") {
+		irpara("atendimentoHospitalarListagem.php");
+	}	
 }
 
 // essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
@@ -452,7 +465,7 @@ if ($row['ClienSexo'] == 'F'){
 							getCmbs()
 							checkServicos()
 							checkProdutos()
-							window.location.href='atendimentoEletivo.php'
+							window.location.reload()
 							alerta(response.titulo, response.menssagem, response.status)
 						} else {
 							alerta(response.titulo, response.menssagem, response.status)

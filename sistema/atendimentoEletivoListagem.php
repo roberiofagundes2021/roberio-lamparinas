@@ -3,6 +3,7 @@
 include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Atendimento Eletivo';
+$_SESSION['UltimaPagina'] = 'ELETIVO';
 
 include('global_assets/php/conexao.php');
 
