@@ -253,7 +253,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação dos Tipo de Aprazamento</h3>
+								<h3 class="card-title">Relação dos Tipos de Aprazamento</h3>
 							</div>
 
 							<div class="card-body">
