@@ -28,13 +28,13 @@ if(isset($_POST['inputViaId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação do Via alterado!!!";
+		$_SESSION['msg']['mensagem'] = "Situação da Via alterada!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do Via!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação da Via!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();

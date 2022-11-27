@@ -2,7 +2,12 @@
     <div class="card-header header-elements-inline">
         <h4 class="card-title font-weight-bold">
             <label>PRONTUÁRIO ELETRÔNICO: <?php echo $row['ClienCodigo'] != '' ? $row['ClienCodigo'] : 'XXXXXX'; ?></label>
-            <label> - <?php echo strtoupper($row['ClienNome']); ?></label>
+            <label> - 
+                <?php 
+                    $encoding = mb_internal_encoding(); // ou UTF-8, ISO-8859-1
+                    echo mb_strtoupper($row['ClienNome'], $encoding); 
+                ?>
+            </label>
         </h4>
         <div class="header-elements">
             <div class="list-icons">
@@ -10,38 +15,38 @@
             </div>
         </div>
     </div>
-    <div class="card-body">
+    <div class="card-body" style="padding: 1.25rem 1.25rem 0 1.25rem">
         <div class="row">            
             <div class="col-lg-2">
                 <div class="form-group">
-                    <label>Nº do Registro  : <?php echo $row['AtendNumRegistro']; ?></label>
+                    <label>Nº do Registro: <?php echo $row['AtendNumRegistro']; ?></label>
                 </div>
             </div>
             <div class="col-lg-3">
                 <div class="form-group">
-                    <label>Modalidade : <?php echo $row['AtModNome'] ; ?></label>
+                    <label>Modalidade: <?php echo $row['AtModNome'] ; ?></label>
                 </div>
             </div>
             <div class="col-lg-3">
                 <div class="form-group">
-                    <label>CNS  : <?php echo $row['ClienCartaoSus']; ?></label>
+                    <label>CNS: <?php echo $row['ClienCartaoSus']; ?></label>
                 </div>
             </div>
             <div class="col-lg-2">
                 <div class="form-group">
-                    <label>Telefone  : <?php echo $row['ClienCelular']; ?></label>
+                    <label>Telefone: <?php echo $row['ClienCelular']; ?></label>
                 </div>
             </div>
             <div class="col-lg-2">
                 <div class="form-group">
-                    <label>Sexo : <?php echo $sexo ; ?></label>
+                    <label>Sexo: <?php echo $sexo ; ?></label>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-2">
                 <div class="form-group">
-                    <label>Data Nascimento  : <?php echo mostraData($row['ClienDtNascimento']); ?></label>
+                    <label>Nascimento: <?php echo mostraData($row['ClienDtNascimento']); ?></label>
                 </div>
             </div>
             <div class="col-lg-3">
@@ -51,12 +56,12 @@
             </div>
             <div class="col-lg-3">
                 <div class="form-group">
-                    <label>Mãe : <?php echo $row['ClienNomeMae'] ; ?></label>
+                    <label>Mãe: <?php echo $row['ClienNomeMae'] ; ?></label>
                 </div>
             </div>
             <div class="col-lg-3">
                 <div class="form-group">
-                    <label>Responsável  : <?php echo $row['ClResNome']; ?></label>
+                    <label>Responsável: <?php echo $row['ClResNome']; ?></label>
                 </div>
             </div>
         </div>

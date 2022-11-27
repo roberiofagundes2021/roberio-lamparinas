@@ -48,7 +48,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iVia' => $_POST['inputViaId']
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Via alterado!!!";
+			$_SESSION['msg']['mensagem'] = "Via alterada!!!";
 	
 		} else { //inclusão
 		
@@ -63,7 +63,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iUnidade' => $_SESSION['UnidadeId'],
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Via incluído!!!";
+			$_SESSION['msg']['mensagem'] = "Via incluída!!!";
 					
 		}
 	
@@ -73,7 +73,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro reportado com o Via!!!";
+		$_SESSION['msg']['mensagem'] = "Erro reportado com a Via!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
@@ -215,7 +215,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					document.getElementById('inputEstadoAtual').value = "EDITA";
 					document.formVia.action = "atendimentoVia.php";		
 				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formVia, "Tem certeza que deseja excluir esse Via?", "atendimentoViaExclui.php");
+					confirmaExclusao(document.formVia, "Tem certeza que deseja excluir essa Via?", "atendimentoViaExclui.php");
 				} else if (Tipo == 'mudaStatus'){
 					document.formVia.action = "atendimentoViaMudaSituacao.php";
 				} 
@@ -253,7 +253,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Via</h3>
+								<h3 class="card-title">Relação de Vias</h3>
 							</div>
 
 							<div class="card-body">
@@ -267,7 +267,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNome">Nome do Via <span class="text-danger"> *</span></label>
+												<label for="inputNome">Nome da Via <span class="text-danger"> *</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Via" value="<?php if (isset($_POST['inputViaId'])) echo $rowVia['ViaNome']; ?>" required autofocus>
 											</div>
 										</div>

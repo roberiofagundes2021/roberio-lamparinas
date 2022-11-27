@@ -17,7 +17,7 @@ if(isset($_POST['inputViaId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Via excluído!!!";
+		$_SESSION['msg']['mensagem'] = "Via excluída!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {

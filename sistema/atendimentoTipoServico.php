@@ -237,7 +237,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					document.getElementById('inputEstadoAtual').value = "EDITA";
 					document.formTipoServico.action = "atendimentoTipoServico.php";		
 				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formTipoServico, "Tem certeza que deseja excluir esse tipo de servico?", "atendimentoTipoServicoExclui.php");
+					confirmaExclusao(document.formTipoServico, "Tem certeza que deseja excluir esse tipo de serviço?", "atendimentoTipoServicoExclui.php");
 				} else if (Tipo == 'mudaStatus'){
 					document.formTipoServico.action = "atendimentoTipoServicoMudaSituacao.php";
 				} 
