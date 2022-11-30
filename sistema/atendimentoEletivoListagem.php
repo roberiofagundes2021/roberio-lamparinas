@@ -75,7 +75,7 @@ $acesso = 'ATENDIMENTO';
 			/* Início: Tabela Personalizada do Setor Publico */
 
 			$('#AtendimentoTable').DataTable({
-				"order": [[ 0, "desc" ]],
+				"order": [],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{
@@ -139,7 +139,7 @@ $acesso = 'ATENDIMENTO';
 			
 			/* Início: Tabela Personalizada do Setor Publico */
 			$('#AtendimentoTableEspera').DataTable({
-				"order": [[ 0, "desc" ]],
+				"order": [],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{
@@ -601,6 +601,8 @@ $acesso = 'ATENDIMENTO';
 					let rowNodeA
 					let rowNodeEmAtendimento
 					let rowNodeObservacao
+
+					console.log(response.dataEspera)
 
 					response.dataEspera.forEach(item => {
 						rowNodeE = tableE.row.add(item.data).draw().node()

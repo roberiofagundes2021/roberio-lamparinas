@@ -138,7 +138,7 @@ $acesso = 'ATENDIMENTO';
 			
 			/* Início: Tabela Personalizada do Setor Publico */
 			$('#AtendimentoTableEspera').DataTable({
-				"order": [[ 0, "desc" ]],
+				"order": [],
 			    autoWidth: false,
 				responsive: true,
 			    columnDefs: [{

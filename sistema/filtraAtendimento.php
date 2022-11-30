@@ -345,8 +345,8 @@ try{
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iProfissional = $row['ProfiId'];
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
-			AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtendNumRegistro,
+			AtClRNome,AtClRNomePersonalizado,AtClRTempo,AtClRDeterminantes,AtClRCor,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,
 			SituaNome,SituaChave,SituaCor,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
@@ -359,7 +359,7 @@ try{
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'AMBULATORIAL'
-			ORDER BY AtXSeId DESC";
+			ORDER BY AtClRTempo ASC";
 		$resultEspera = $conn->query($sql);
 		$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
 
@@ -823,7 +823,7 @@ try{
 		$iProfissional = $row['ProfiId'];
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
-			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
+			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtClRTempo,AtClRCor,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
@@ -836,7 +836,7 @@ try{
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'INTERNACAO'
-			ORDER BY AtXSeId DESC";
+			ORDER BY AtClRTempo ASC";
 		$resultEspera = $conn->query($sql);
 		$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1295,7 +1295,8 @@ try{
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iProfissional = $row['ProfiId'];
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
+			AtClRNome,AtClRTempo,AtClRNomePersonalizado,AtClRDeterminantes,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
 			FROM AtendimentoXServico
@@ -1309,7 +1310,7 @@ try{
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERAVENDA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
-			ORDER BY AtXSeId DESC";
+			ORDER BY AtClRTempo ASC";
 		$resultEspera = $conn->query($sql);
 		$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1372,8 +1373,9 @@ try{
 		$emAtendimento = [];
 		$observacao = [];
 
-		$sql = "SELECT AtClRId,AtClRNome,AtClRNomePersonalizado,AtClRCor,AtClRDeterminantes
-		FROM AtendimentoClassificacaoRisco WHERE AtClRUnidade = $iUnidade";
+		$sql = "SELECT AtClRId,AtClRNome,AtClRNomePersonalizado,AtClRCor,AtClRDeterminantes,AtClRTempo
+		FROM AtendimentoClassificacaoRisco WHERE AtClRUnidade = $iUnidade
+		ORDER BY AtClRTempo ASC";
 		$resultRiscos = $conn->query($sql);
 		$rowRiscos = $resultRiscos->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1490,7 +1492,8 @@ try{
 					'iAtendimento' => $item['AtendId'],
 					'sJustificativa' => $item['AtendObservacao'],
 					'prontuario' => $item['ClienCodigo']
-				]]);
+				]
+			]);
 		}
 
 		foreach($rowEmAtendimento as $item){
