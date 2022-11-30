@@ -79,7 +79,7 @@ if (isset($_POST['inputCpf'])) {
 
 			//Passo1: atualizar o dados do usuário na tabela Usuario
 			$sql = "UPDATE Usuario SET UsuarNome = :sNome, usuarLogin = :sLogin, UsuarSenha = :sSenha, UsuarEmail = :sEmail, 
-									UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
+					UsuarTelefone = :sTelefone, UsuarCelular = :sCelular
 					WHERE UsuarId = :iUsuario";
 			$result = $conn->prepare($sql);
 

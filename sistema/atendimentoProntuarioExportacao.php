@@ -30,10 +30,10 @@ $sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, ClienId, ClienCo
         $sexo = 'Masculino';
     }
 
-    $sql = "SELECT AtendId, AtendNumRegistro, AtendDataRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExSolicitacaoExame, AtAmbDataInicio, AtAmbHoraInicio, AtAmbHoraFim, 
-                   AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual,AtAmbExameFisico, AtAmbSuspeitaDiagnostico, AtAmbExameSolicitado, AtAmbPrescricao, 
+    $sql = "SELECT AtendId, AtendNumRegistro, AtendDataRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExJustificativa, AtAmbDataInicio, AtAmbHoraInicio, AtAmbHoraFim, 
+                   AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual,AtAmbExameFisico, AtAmbHistoriaPatologicaPregressa, AtAmbHipoteseDiagnostica, AtAmbDigitacaoLivre, 
                    AtAmbOutrasObservacoes, A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleDataInicio, AtEleHoraInicio, 
-                   AtEleHoraFim, AtEleAnamnese, AtClaChave, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento, ClienNomeMae, ClienCartaoSus, 
+                   AtEleHoraFim, AtClaChave, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento, ClienNomeMae, ClienCartaoSus, 
                    ClienCelular, ClResNome
 			FROM Atendimento
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
@@ -173,6 +173,12 @@ try {
                         <td style="width:80%; font-size:12px;">'.$item['AtAmbHistoriaMolestiaAtual'].'</td>	
                     </tr>
                 </table>
+                <table style="width:100%; border-collapse: collapse;"> 
+                    <tr>
+                        <td style="width:20%; font-weight: bold;">Patologica Pregressa</td>	
+                        <td style="width:80%; font-size:12px;">'.$item['AtAmbHistoriaPatologicaPregressa'].'</td>
+                    </tr>
+                </table>
                 <table style="width:100%; border-collapse: collapse;">
                     <tr >
                         <td style="width:20%; font-weight: bold;">Exame Físico</td>
@@ -181,26 +187,14 @@ try {
                 </table>
                 <table style="width:100%; border-collapse: collapse;"> 
                     <tr>
-                        <td style="width:20%; font-weight: bold;">Suspeita Diagnóstico</td>	
-                        <td style="width:80%; font-size:12px;">'.$item['AtAmbSuspeitaDiagnostico'].'</td>
+                        <td style="width:20%; font-weight: bold;">Hipotese Diagnostica</td>
+                        <td style="width:80%; font-size:12px;">'.$item['AtAmbHipoteseDiagnostica'].'</td>	
                     </tr>
                 </table>
                 <table style="width:100%; border-collapse: collapse;"> 
                     <tr>
-                        <td style="width:20%; font-weight: bold;">Exame Solicitado</td>
-                        <td style="width:80%; font-size:12px;">'.$item['AtAmbExameSolicitado'].'</td>	
-                    </tr>
-                </table>
-                <table style="width:100%; border-collapse: collapse;">
-                    <tr >
-                        <td style="width:20%; font-weight: bold;">Prescrição</td>
-                        <td style="width:80%; font-size:12px;">'.$item['AtAmbPrescricao'].'</td>	   
-                    </tr>
-                </table>
-                <table style="width:100%; border-collapse: collapse;"> 
-                    <tr>
-                        <td style="width:20%; font-weight: bold;">Outras Observações</td>	
-                        <td style="width:80%; font-size:12px;">'.$item['AtAmbOutrasObservacoes'].'</td>
+                        <td style="width:20%; font-weight: bold;">Digitacao Livre</td>	
+                        <td style="width:80%; font-size:12px;">'.$item['AtAmbDigitacaoLivre'].'</td>
                     </tr>
                 </table>
                 <table style="width:100%; border-collapse: collapse;"> 
@@ -212,7 +206,7 @@ try {
                 <table style="width:100%; border-collapse: collapse;">
                     <tr >
                         <td style="width:20%; font-weight: bold;">Solicitação de Procedimento</td>
-                        <td style="width:80%; font-size:12px;">'.$item['AtSExSolicitacaoExame'].'</td>	
+                        <td style="width:80%; font-size:12px;">'.$item['AtSExJustificativa'].'</td>	
                     
                     </tr>
                 </table>
@@ -241,13 +235,7 @@ try {
                 <div style="text-align:center;font-weight: bold; position:relative; margin-top: 10px; background-color:#ccc; padding: 5px;">
                     HISTÓRICO DO ATENDIMENTO
                 </div>
-
-                <table style="width:100%; border-collapse: collapse;"> 
-                    <tr>
-                        <td style="width:20%; font-weight: bold;">Clínica (anamnese)</td>	
-                        <td style="width:80%; font-size:12px;">'.$item['AtEleAnamnese'].'</td>
-                    </tr>
-                </table>
+                
                 <table style="width:100%; border-collapse: collapse;"> 
                     <tr>
                         <td style="width:20%; font-weight: bold;">Receituário</td>
@@ -257,7 +245,7 @@ try {
                 <table style="width:100%; border-collapse: collapse;">
                     <tr >
                         <td style="width:20%; font-weight: bold;">Solicitação de Procedimento</td>
-                        <td style="width:80%; font-size:12px;">'.$item['AtSExSolicitacaoExame'].'</td>	
+                        <td style="width:80%; font-size:12px;">'.$item['AtSExJustificativa'].'</td>	
                     
                     </tr>
                 </table>

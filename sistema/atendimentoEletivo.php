@@ -8,8 +8,13 @@ include('global_assets/php/conexao.php');
 
 $iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
-if(!$iAtendimentoId){
-	irpara("atendimento.php");
+if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
+	$iAtendimentoId = $_SESSION['iAtendimentoId'];
+}
+$_SESSION['iAtendimentoId'] = null;
+
+if(!$iAtendimentoId){	
+	irpara("atendimentoEletivoListagem.php");
 }
 
 $sql = "SELECT TOP(1) AtEleId
@@ -159,6 +164,7 @@ if (isset($_POST['inputInicio']) ){
 		echo 'Error: ' . $e->getMessage();
 	}
 
+	$_SESSION['iAtendimentoId'] = $iAtendimentoId;
 	irpara("atendimentoEletivo.php");
 }
 
@@ -381,7 +387,7 @@ if (isset($_POST['inputInicio']) ){
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
 													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
-													} elseif (isset($ClaChave) && $ClaChave == "ELETINTERNACAOIVO") {
+													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
 													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													}					
 												?>

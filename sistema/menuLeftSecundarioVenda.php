@@ -55,7 +55,7 @@
 					'iAtendimento': $('#iAtendimentoId').val(),
 					'sJustificativa': '',
 					'tipo': 'ATENDIMENTO',
-					'iSituacao': 'ATENDIDOVENDA'
+					'iSituacao': 'ATENDIDO'
 				},
 				success: function(response) {
 					window.location.href = 'atendimentoEletivoListagem.php';

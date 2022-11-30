@@ -92,26 +92,60 @@ if (isset($_POST['inputCpf'])) {
 			$result = $conn->query($sql);
 			$rowPerfilChave = $result->fetch(PDO::FETCH_ASSOC);
 
-			//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
-			$sql = "UPDATE UsuarioXUnidade SET UsXUnSetor = :iSetor, UsXUnLocalEstoque = :iLocalEstoque, UsXUnResumoFinanceiro = :bResumoFinanceiro, UsXUnOperadorCaixa = :bOperadorCaixa, UsXUnUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE UsXUnEmpresaUsuarioPerfil = :iEmpresaUsarioPerfil and UsXUnUnidade = :iUnidade";
-			$result = $conn->prepare($sql);
+			$sql = "SELECT COUNT(UsXUnUnidade) as Unidade
+					FROM UsuarioXUnidade
+					WHERE UsXUnEmpresaUsuarioPerfil = ".$row['EXUXPId']." and UsXUnUnidade = ".$_SESSION['UnidadeId'];
+			$result = $conn->query($sql);
+			$rowUsuarioXUnidade = $result->fetch(PDO::FETCH_ASSOC);			
 
-			if ($rowPerfilChave['PerfiChave'] == 'ALMOXARIFADO'){
-				$localEstoque = $_POST['cmbLocalEstoque'];
+			//Verifica se esse usuário já foi vinculado a unidade do usuário logado que está editando o registro ($rowUsuarioXUnidade['Unidade']==0 não está)
+			//Se ainda não tiver sido vinculado nesse momento deve-se vincular, do contrário apenas atualiza
+			if ($rowUsuarioXUnidade['Unidade'] == 0){
+				
+				//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
+				$sql = "INSERT INTO UsuarioXUnidade (UsXUnEmpresaUsuarioPerfil, UsXUnUnidade, UsXUnSetor, UsXUnLocalEstoque, UsXUnPermissaoPerfil, UsXUnResumoFinanceiro, UsXUnOperadorCaixa, UsXUnUsuarioAtualizador)
+						VALUES (:iEmpresaUsarioPerfil, :iUnidade, :iSetor, :iLocalEstoque, :PermissaoPerfil, :bResumoFinanceiro, :bOperadorCaixa, :iUsuarioAtualizador )";
+				$result = $conn->prepare($sql);
+
+				if ($rowPerfilChave['PerfiChave'] == 'ALMOXARIFADO'){
+					$localEstoque = $_POST['cmbLocalEstoque'];
+				} else {
+					$localEstoque = null;
+				}
+
+				$result->execute(array(
+					':iEmpresaUsarioPerfil' => $row['EXUXPId'],
+					':iUnidade' => $_SESSION['UnidadeId'],
+					':iSetor' => $_POST['cmbSetor'],
+					':iLocalEstoque' => $localEstoque,
+					':PermissaoPerfil' => 1,
+					':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
+					':bOperadorCaixa' => $operadorCaixa,
+					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+					));
 			} else {
-				$localEstoque = null;
-			}
 
-			$result->execute(array(
-				':iSetor' => $_POST['cmbSetor'],
-				':iLocalEstoque' => $localEstoque,
-				':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
-				':bOperadorCaixa' => $operadorCaixa,
-				':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-				':iEmpresaUsarioPerfil' => $row['EXUXPId'],
-				':iUnidade' => $_SESSION['UnidadeId']
-				));
+				//Passo3: inserir na tabela UsuarioXUnidade (vinculando o usuário na Unidade, Setor e Local de Estoque)
+				$sql = "UPDATE UsuarioXUnidade SET UsXUnSetor = :iSetor, UsXUnLocalEstoque = :iLocalEstoque, UsXUnResumoFinanceiro = :bResumoFinanceiro, UsXUnOperadorCaixa = :bOperadorCaixa, UsXUnUsuarioAtualizador = :iUsuarioAtualizador
+						WHERE UsXUnEmpresaUsuarioPerfil = :iEmpresaUsarioPerfil and UsXUnUnidade = :iUnidade";
+				$result = $conn->prepare($sql);
+
+				if ($rowPerfilChave['PerfiChave'] == 'ALMOXARIFADO'){
+					$localEstoque = $_POST['cmbLocalEstoque'];
+				} else {
+					$localEstoque = null;
+				}
+
+				$result->execute(array(
+					':iSetor' => $_POST['cmbSetor'],
+					':iLocalEstoque' => $localEstoque,
+					':bResumoFinanceiro' => $visibilidadeResumoFinanceiro,
+					':bOperadorCaixa' => $operadorCaixa,
+					':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+					':iEmpresaUsarioPerfil' => $row['EXUXPId'],
+					':iUnidade' => $_SESSION['UnidadeId']
+					));
+			}
 		}		
 
 		$conn->commit();

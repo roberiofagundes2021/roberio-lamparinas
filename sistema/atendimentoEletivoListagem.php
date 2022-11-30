@@ -3,6 +3,7 @@
 include_once("sessao.php"); 
 
 $_SESSION['PaginaAtual'] = 'Atendimento Eletivo';
+$_SESSION['UltimaPagina'] = 'ELETIVO';
 
 include('global_assets/php/conexao.php');
 
@@ -321,65 +322,6 @@ $acesso = 'ATENDIMENTO';
 			})
 
 
-			/* Início: Tabela Personalizada dos atendimentos em observacao */
-			$('#AtendimentoTableObservacao').DataTable({
-				"order": [[ 0, "desc" ]],
-			    autoWidth: false,
-				responsive: true,
-			    columnDefs: [{
-					orderable: true,   //Data
-					width: "10%",
-					targets: [0]
-				},
-				{ 
-					orderable: true,   //Espera
-					width: "5%",
-					targets: [1]
-				},				
-				{ 
-					orderable: true,   //Nº Registro
-					width: "10%",
-					targets: [2]
-				},
-				{ 
-					orderable: true,   //Paciente
-					width: "20%",
-					targets: [3]
-				},
-				{ 
-					orderable: true,   //Procedimento
-					width: "10%",
-					targets: [4]
-				},
-				{ 
-					orderable: true,   //Risco
-					width: "10%",
-					targets: [5]
-				},
-				{ 
-					orderable: true,   //Situação
-					width: "5%",
-					targets: [6]
-				},
-				{ 
-					orderable: true,   //Ações
-					width: "5%",
-					targets: [7]
-				}],
-				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
-                language: {
-                    search: '<span>Filtro:</span> _INPUT_',
-                    searchPlaceholder: 'filtra qualquer coluna...',
-                    lengthMenu: '<span>Mostrar:</span> _MENU_',
-                    paginate: {
-                        'first': 'Primeira',
-                        'last': 'Última',
-                        'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-                        'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-                    }
-                }
-			})
-
 			$('#cmbSituacao').on('change', ()=>{
 				let cmbSituacao = $('#cmbSituacao').val()
 				$('iSituacao').val(cmbSituacao)
@@ -617,13 +559,6 @@ $acesso = 'ATENDIMENTO';
 						$(rowNodeEmAtendimento).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
 						$(rowNodeEmAtendimento).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeEmAtendimento).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
-					})
-					response.dataObservacao.forEach(item => {
-						rowNodeObservacao = tableObservacao.row.add(item.data).draw().node()
-						$(rowNodeObservacao).attr('class', 'text-left')
-						$(rowNodeObservacao).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
-						$(rowNodeObservacao).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-						$(rowNodeObservacao).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})					
 					response.dataAtendido.forEach(item => {
 						rowNodeA = tableA.row.add(item.data).draw().node()
@@ -672,21 +607,12 @@ $acesso = 'ATENDIMENTO';
 				document.getElementById("card-title").innerText = "Pacientes em Espera";
 				document.getElementById("box-pacientes-espera").style.display = 'block';
 				document.getElementById("box-pacientes-atendidos").style.display = 'none';
-				document.getElementById("box-pacientes-observacao").style.display = 'none';
 				document.getElementById("box-pacientes-atendimento").style.display = 'none';
 
 			} else if (grid == 'atendidos') {
 				document.getElementById("card-title").innerText = "Pacientes Atendidos";
 				document.getElementById("box-pacientes-atendidos").style.display = 'block';
 				document.getElementById("box-pacientes-espera").style.display = 'none';
-				document.getElementById("box-pacientes-observacao").style.display = 'none';
-				document.getElementById("box-pacientes-atendimento").style.display = 'none';
-
-			} else if (grid == 'observacao') {
-				document.getElementById("card-title").innerText = "Pacientes em Observação";
-				document.getElementById("box-pacientes-observacao").style.display = 'block';
-				document.getElementById("box-pacientes-espera").style.display = 'none';
-				document.getElementById("box-pacientes-atendidos").style.display = 'none';
 				document.getElementById("box-pacientes-atendimento").style.display = 'none';
 
 			} else if (grid == 'atendimento') {
@@ -694,7 +620,6 @@ $acesso = 'ATENDIMENTO';
 				document.getElementById("box-pacientes-atendimento").style.display = 'block';
 				document.getElementById("box-pacientes-espera").style.display = 'none';
 				document.getElementById("box-pacientes-atendidos").style.display = 'none';				
-				document.getElementById("box-pacientes-observacao").style.display = 'none';
 
 			}
 		}
@@ -743,7 +668,6 @@ $acesso = 'ATENDIMENTO';
 									<div class="col-lg-12">	
 										<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('espera')" >Pacientes em Espera</button>
 										<button type="button" id="pacientes-atendimento-btn" class="btn-grid btn btn-outline-secondary btn-lg" onclick="mudarGrid('atendimento')" >Pacientes em Atendimento</button>
-										<button type="button" id="pacientes-observacao-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('observacao')" >Pacientes em Observação</button>
 										<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendidos')" >Pacientes Atendidos</button>
 									</div>
 
@@ -786,28 +710,6 @@ $acesso = 'ATENDIMENTO';
 							<div id="box-pacientes-atendimento" style="display: none;">
 								<div class="card-body" style="padding: 0px"></div>
 								<table class="table" id="AtendimentoTableEmAtendimento">
-									<thead>
-										<tr class="bg-slate text-left">
-											<th>Data / Hora</th>
-											<th>Espera</th>
-											<th>Nº Registro</th>		
-											<th>Paciente</th>
-											<th>Procedimento</th>
-											<th>Classificação<br>de Risco</th>
-											<th>Situação</th>
-											<th>Ações</th>
-										</tr>
-									</thead>
-									<tbody id="dataAtendimentos">
-
-									</tbody>
-								</table>
-							</div>
-
-							<!-- Pacientes Em Observacao -->
-							<div id="box-pacientes-observacao" style="display: none;">
-								<div class="card-body" style="padding: 0px"></div>
-								<table class="table" id="AtendimentoTableObservacao">
 									<thead>
 										<tr class="bg-slate text-left">
 											<th>Data / Hora</th>

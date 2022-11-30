@@ -7,9 +7,22 @@ $_SESSION['PaginaAtual'] = 'Triagem';
 include('global_assets/php/conexao.php');
 
 $iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
+ 
+if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
+	$iAtendimentoId = $_SESSION['iAtendimentoId'];
+}
+$_SESSION['iAtendimentoId'] = null;
 
 if(!$iAtendimentoId){
-	irpara("atendimento.php");
+	$uTipoAtendimento = $_SESSION['UltimaPagina'];
+
+	if ($uTipoAtendimento == "ELETIVO") {
+		irpara("atendimentoEletivoListagem.php");
+	} elseif ($uTipoAtendimento == "AMBULATORIAL") {
+		irpara("atendimentoAmbulatorialListagem.php");
+	} elseif ($uTipoAtendimento == "INTERNACAO") {
+		irpara("atendimentoHospitalarListagem.php");
+	}	
 }
 
 $sql = "SELECT TOP(1) AtTriId
@@ -99,9 +112,9 @@ if (isset($_POST['inputAlergia']) ){
 		if ($iAtendimentoTriagemId){
 		
 			$sql = "UPDATE AtendimentoTriagem SET AtTriAtendimento = :sAtendimento, AtTriDataInicio = :dDataInicio, AtTriDataFim = :dDataFim, AtTriHoraInicio = :sHoraInicio, AtTriHoraFim  = :sHoraFim, AtTriProfissional = :sProfissional, AtTriPressaoSistolica = :sPressaoSistolica, AtTriPressaoDiatolica = :sPressaoDiatolica,
-			                                      AtTriFreqCardiaca = :sFreqCardiaca,  AtTriFreqRespiratoria = :sFreqRespiratoria, AtTriTempAXI = :sTempAXI, AtTriSPO = :sSPO, AtTriHGT = :sHGT, AtTriQueixaPrincipal = :sQueixaPrincipal, AtTriPeso = :sPeso, AtTriAltura = :sAltura,  
+			                                      AtTriFreqCardiaca = :sFreqCardiaca,  AtTriFreqRespiratoria = :sFreqRespiratoria, AtTriTempAXI = :sTempAXI, AtTriSPO = :sSPO, AtTriHGT = :sHGT, AtTriPeso = :sPeso, AtTriAltura = :sAltura,  
 												  AtTriAlergia = :sAlergia, AtTriAlergiaDescricao = :sAlergiaDescricao, AtTriDiabetes = :sDiabetes, AtTriDiabetesDescricao = :sDiabetesDescricao, AtTriHipertensao = :sHipertensao, AtTriHipertensaoDescricao = :sHipertensaoDescricao,  
-												  AtTriNeoplasia = :sNeoplasia, AtTriNeoplasiaDescricao = :sNeoplasiaDescricao, AtTriUsoMedicamento = :sUsoMedicamento, AtTriUsoMedicamentoDescricao = :sUsoMedicamentoDescricao, AtTriObservacao = :sObservacao, AtTriUnidade = :iUnidade,
+												  AtTriNeoplasia = :sNeoplasia, AtTriNeoplasiaDescricao = :sNeoplasiaDescricao, AtTriUsoMedicamento = :sUsoMedicamento, AtTriUsoMedicamentoDescricao = :sUsoMedicamentoDescricao, AtTriUnidade = :iUnidade,
 												  AtTriCiap2 = :sMotivoQueixaSelect , AtTriMotivoConsulta = :sMotivoQueixa, AtTriMomentoColeta = :sMomentoColeta, AtTriImc = :sImc, AtTriGuicemiaCapilar = :sGlicemiaCapilar
 					WHERE AtTriId = :iAtendimentoTriagem";
 			$result = $conn->prepare($sql);
@@ -120,7 +133,6 @@ if (isset($_POST['inputAlergia']) ){
 				':sTempAXI' => $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'],
 				':sSPO' => $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'],
 				':sHGT' => $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'],
-				':sQueixaPrincipal' => $_POST['txtareaQueixaPrincipal'] == "" ? null : $_POST['txtareaQueixaPrincipal'],
 				':sPeso' => $_POST['inputPeso'] == "" ? null : floatval(gravaValor($_POST['inputPeso'])),
 				':sAltura' => $_POST['inputAltura'] == "" ? null : floatval(gravaValor($_POST['inputAltura'])),
 				':sAlergia' => $_POST['inputAlergia'] == "" ? null : $_POST['inputAlergia'],
@@ -133,7 +145,6 @@ if (isset($_POST['inputAlergia']) ){
 				':sNeoplasiaDescricao' => $_POST['inputNeoplasiaDescricao'],
 				':sUsoMedicamento' => $_POST['inputUsoMedicamento'] == "" ? null : $_POST['inputUsoMedicamento'],
 				':sUsoMedicamentoDescricao' => $_POST['inputUsoMedicamentoDescricao'],
-				':sObservacao' => $_POST['txtareaObservacao'] == "" ? null : $_POST['txtareaObservacao'],
 				':iUnidade' => $_SESSION['UnidadeId'],
 				':sMotivoQueixaSelect' => $_POST['cmbMotivo'] == "" ? null : $_POST['cmbMotivo'],
 				':sMotivoQueixa' => $_POST['summernoteMotivo'] == "" ? null : $_POST['summernoteMotivo'],
@@ -150,12 +161,12 @@ if (isset($_POST['inputAlergia']) ){
 		} else { //inclusão
 
 			$sql = "INSERT INTO AtendimentoTriagem (AtTriAtendimento, AtTriDataInicio, AtTriDataFim, AtTriHoraInicio, AtTriHoraFim, AtTriProfissional, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca,  AtTriFreqRespiratoria,
-			                                        AtTriTempAXI, AtTriSPO, AtTriHGT, AtTriQueixaPrincipal, AtTriPeso, AtTriAltura, AtTriAlergia, AtTriAlergiaDescricao, AtTriDiabetes, AtTriDiabetesDescricao, 
-													AtTriHipertensao, AtTriHipertensaoDescricao, AtTriNeoplasia, AtTriNeoplasiaDescricao, AtTriUsoMedicamento, AtTriUsoMedicamentoDescricao, AtTriObservacao, AtTriUnidade,
+			                                        AtTriTempAXI, AtTriSPO, AtTriHGT, AtTriPeso, AtTriAltura, AtTriAlergia, AtTriAlergiaDescricao, AtTriDiabetes, AtTriDiabetesDescricao, 
+													AtTriHipertensao, AtTriHipertensaoDescricao, AtTriNeoplasia, AtTriNeoplasiaDescricao, AtTriUsoMedicamento, AtTriUsoMedicamentoDescricao, AtTriUnidade,
 													AtTriCiap2, AtTriMotivoConsulta, AtTriMomentoColeta, AtTriImc, AtTriGuicemiaCapilar)
 						VALUES (:sAtendimento, :dDataInicio, :dDataFim, :sHoraInicio, :sHoraFim, :sProfissional, :sPressaoSistolica, :sPressaoDiatolica, :sFreqCardiaca, :sFreqRespiratoria,
-						        :sTempAXI, :sSPO, :sHGT, :sQueixaPrincipal, :sPeso, :sAltura, :sAlergia, :sAlergiaDescricao, :sDiabetes, :sDiabetesDescricao, 
-								:sHipertensao, :sHipertensaoDescricao, :sNeoplasia, :sNeoplasiaDescricao, :sUsoMedicamento, :sUsoMedicamentoDescricao, :sObservacao, :iUnidade,
+						        :sTempAXI, :sSPO, :sHGT, :sPeso, :sAltura, :sAlergia, :sAlergiaDescricao, :sDiabetes, :sDiabetesDescricao, 
+								:sHipertensao, :sHipertensaoDescricao, :sNeoplasia, :sNeoplasiaDescricao, :sUsoMedicamento, :sUsoMedicamentoDescricao, :iUnidade,
 								:sMotivoQueixaSelect, :sMotivoQueixa, :sMomentoColeta, :sImc , :sGlicemiaCapilar )";
 			$result = $conn->prepare($sql);
 					
@@ -173,7 +184,6 @@ if (isset($_POST['inputAlergia']) ){
 				':sTempAXI' => $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'],
 				':sSPO' => $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'],
 				':sHGT' => $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'],
-				':sQueixaPrincipal' => $_POST['txtareaQueixaPrincipal'] == "" ? null : $_POST['txtareaQueixaPrincipal'],
 				':sPeso' => $_POST['inputPeso'] == "" ? null : floatval(gravaValor($_POST['inputPeso'])),
 				':sAltura' => $_POST['inputAltura'] == "" ? null : floatval(gravaValor($_POST['inputAltura'])),
 				':sAlergia' => $_POST['inputAlergia'] == "" ? null : $_POST['inputAlergia'],
@@ -186,7 +196,6 @@ if (isset($_POST['inputAlergia']) ){
 				':sNeoplasiaDescricao' => $_POST['inputNeoplasiaDescricao'],
 				':sUsoMedicamento' => $_POST['inputUsoMedicamento'] == "" ? null : $_POST['inputUsoMedicamento'],
 				':sUsoMedicamentoDescricao' => $_POST['inputUsoMedicamentoDescricao'],
-				':sObservacao' => $_POST['txtareaObservacao'] == "" ? null : $_POST['txtareaObservacao'],
 				':iUnidade' => $_SESSION['UnidadeId'],
 				':sMotivoQueixaSelect' => $_POST['cmbMotivo'] == "" ? null : $_POST['cmbMotivo'],
 				':sMotivoQueixa' => $_POST['summernoteMotivo'] == "" ? null : $_POST['summernoteMotivo'],
@@ -212,6 +221,7 @@ if (isset($_POST['inputAlergia']) ){
 		echo 'Error: ' . $e->getMessage();
 	}
 
+	$_SESSION['iAtendimentoId'] = $iAtendimentoId;
 	irpara("atendimentoTriagem.php");
 }
 
@@ -603,7 +613,7 @@ if (isset($_POST['inputAlergia']) ){
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="">Motivo da Consulta (descrição)</label>
-												<textarea rows="4" cols="4" maxLength="400"  id="summernoteMotivo" name="summernoteMotivo" onInput="contarCaracteres(this);" class="form-control" placeholder="Descrição (Queixa principal)"><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriMotivoConsulta']; ?></textarea>
+												<textarea rows="4" cols="4" maxLength="400"  id="summernoteMotivo" name="summernoteMotivo" onInput="contarCaracteres(this);" class="form-control" placeholder="Informe aqui o motivo da consulta"><?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriMotivoConsulta']; ?></textarea>
 												<small class="text-muted form-text">Max. 400 caracteres - <span class="caracteressummernoteMotivo"></span></small>
 											</div>
 										</div>
@@ -994,7 +1004,7 @@ if (isset($_POST['inputAlergia']) ){
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
 													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
-													} elseif (isset($ClaChave) && $ClaChave == "ELETINTERNACAOIVO") {
+													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
 													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													}					
 												?>

@@ -8,8 +8,21 @@ include('global_assets/php/conexao.php');
 
 $iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
+if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
+	$iAtendimentoId = $_SESSION['iAtendimentoId'];
+}
+$_SESSION['iAtendimentoId'] = null;
+
 if(!$iAtendimentoId){
-	irpara("atendimento.php");
+	$uTipoAtendimento = $_SESSION['UltimaPagina'];
+
+	if ($uTipoAtendimento == "ELETIVO") {
+		irpara("atendimentoEletivoListagem.php");
+	} elseif ($uTipoAtendimento == "AMBULATORIAL") {
+		irpara("atendimentoAmbulatorialListagem.php");
+	} elseif ($uTipoAtendimento == "INTERNACAO") {
+		irpara("atendimentoHospitalarListagem.php");
+	}	
 }
 
 $sql = "SELECT TOP(1) AtEMeId
@@ -182,14 +195,12 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 	<!-- Não permite que o usuário retorne para o EDITAR -->
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 	
 	<script type="text/javascript">
 
 		$(document).ready(function() {	
+			$('#summernote').summernote();
 			getCmbs()
 			checkEncaminhamentos()
 
@@ -265,7 +276,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 			$('#formAtendimentoEncaminhamentoMedico').submit(function(e){
 				e.preventDefault()
 			})
-			$('#summernote').on('input', function(){
+			$('#summernote').on('summernote.change', function(){
 				cantaCaracteres("summernote", 2000, "caracteresInputEncaminhamentoMedico")
 			})
 			$('#modelo').on('change', function(){
@@ -280,7 +291,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 					},
 					success: function(response) {
 						$('#summernote').val('')
-						$('#summernote').val(response.conteudo)
+						$('#summernote').summernote('code', response.conteudo)
 						cantaCaracteres("summernote", 2000, "caracteresInputEncaminhamentoMedico")
 					}
 				})
@@ -544,7 +555,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
 													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
-													} elseif (isset($ClaChave) && $ClaChave == "ELETINTERNACAOIVO") {
+													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
 													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													}					
 												?>

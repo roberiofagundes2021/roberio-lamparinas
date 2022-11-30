@@ -6,10 +6,10 @@ include('global_assets/php/conexao.php');
 
 if(isset($_POST['historicoId'])){
 
-	$sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExSolicitacaoExame, AtAmbDataInicio, AtAmbHoraInicio, AtAmbHoraFim, 
-				   AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual,AtAmbExameFisico, AtAmbSuspeitaDiagnostico, AtAmbExameSolicitado, AtAmbPrescricao, 
-				   AtAmbOutrasObservacoes, A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleDataInicio, AtEleHoraInicio, 
-				   AtEleHoraFim, AtEleAnamnese, AtClaNome, AtClaChave
+	$sql = "SELECT AtendId, AtendNumRegistro, UnidaNome, AtModNome, AtRecReceituario, AtSExJustificativa, AtAmbDataInicio, AtAmbHoraInicio, AtAmbHoraFim, 
+				   AtAmbQueixaPrincipal, AtAmbHistoriaMolestiaAtual, AtAmbHistoriaPatologicaPregressa, AtAmbExameFisico, AtAmbHipoteseDiagnostica, AtAmbDigitacaoLivre, 
+				   A.ProfiNome as ProfissionalNome, B.ProfiNome as ProfissaoNome, ProfiProfissao, AtEleDataInicio, AtEleHoraInicio, 
+				   AtEleHoraFim, AtClaNome, AtClaChave
 			FROM Atendimento
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoAmbulatorial ON AtAmbAtendimento = AtendId
@@ -41,13 +41,12 @@ if(isset($_POST['historicoId'])){
 				<hr style="margin-right:10px; margin-left: 10px">
 				<p style="margin-right:10px; margin-left: 10px"><b>Queixa Principal (QP):</b> '.$row['AtAmbQueixaPrincipal'].'</p>
 				<p style="margin-right:10px; margin-left: 10px"><b>História da Moléstia Atual (HMA):</b> '.$row['AtAmbHistoriaMolestiaAtual'].'</p>
+				<p style="margin-right:10px; margin-left: 10px"><b>Patologica Pregressa:</b> '.$row['AtAmbHistoriaPatologicaPregressa'].'</p>
 				<p style="margin-right:10px; margin-left: 10px"><b>Exame Físico:</b> '.$row['AtAmbExameFisico'].'</p>
-				<p style="margin-right:10px; margin-left: 10px"><b>Suspeita Diagnóstico:</b> '.$row['AtAmbSuspeitaDiagnostico'].'</p>
-				<p style="margin-right:10px; margin-left: 10px"><b>Exame Solicitado:</b> '.$row['AtAmbExameSolicitado'].'</p>
-				<p style="margin-right:10px; margin-left: 10px"><b>Prescrição:</b> '.$row['AtAmbPrescricao'].'</p>
-				<p style="margin-right:10px; margin-left: 10px"><b>Outras Observações:</b> '.$row['AtAmbOutrasObservacoes'].'</p>
+				<p style="margin-right:10px; margin-left: 10px"><b>Hipotese Diagnostica:</b> '.$row['AtAmbHipoteseDiagnostica'].'</p>
+				<p style="margin-right:10px; margin-left: 10px"><b>Digitacao Livre:</b> '.$row['AtAmbDigitacaoLivre'].'</p>
 				<p style="margin-right:10px; margin-left: 10px"><b>Receituário:</b> '.$row['AtRecReceituario'].'</p>
-				<p style="margin-right:10px; margin-left: 10px"><b>Solicitação de Procedimento:</b> '.$row['AtSExSolicitacaoExame'].'</p>
+				<p style="margin-right:10px; margin-left: 10px"><b>Solicitação de Procedimento:</b> '.$row['AtSExJustificativa'].'</p>
 			');
 		}  else if  ($row['AtClaChave'] == "ELETIVO"){
 
@@ -60,9 +59,8 @@ if(isset($_POST['historicoId'])){
 				<p style="margin-right:10px; margin-left: 10px"><b>Unidade de Atendimento:</b> '.$row['UnidaNome'].'</p>
 				<p style="margin-right:10px; margin-left: 10px"><b>Médico Solicitante:</b><b> '.$row['ProfissionalNome'].' ('.$row['ProfissaoNome'].')</b></p>
 				<hr style="margin-right:10px; margin-left: 10px">
-				<p style="margin-right:10px; margin-left: 10px"><b>Clínica (anamnese):</b> '.$row['AtEleAnamnese'].'</p>
 				<p style="margin-right:10px; margin-left: 10px"><b>Receituário:</b> '.$row['AtRecReceituario'].'</p>
-				<p style="margin-right:10px; margin-left: 10px"><b>Solicitação de Procedimento:</b> '.$row['AtSExSolicitacaoExame'].'</p>			
+				<p style="margin-right:10px; margin-left: 10px"><b>Solicitação de Procedimento:</b> '.$row['AtSExJustificativa'].'</p>			
 			');
 
 		}  else {

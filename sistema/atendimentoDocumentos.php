@@ -8,8 +8,21 @@ include('global_assets/php/conexao.php');
 
 $iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
+if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
+	$iAtendimentoId = $_SESSION['iAtendimentoId'];
+}
+$_SESSION['iAtendimentoId'] = null;
+
 if(!$iAtendimentoId){
-	irpara("atendimento.php");
+	$uTipoAtendimento = $_SESSION['UltimaPagina'];
+
+	if ($uTipoAtendimento == "ELETIVO") {
+		irpara("atendimentoEletivoListagem.php");
+	} elseif ($uTipoAtendimento == "AMBULATORIAL") {
+		irpara("atendimentoAmbulatorialListagem.php");
+	} elseif ($uTipoAtendimento == "INTERNACAO") {
+		irpara("atendimentoHospitalarListagem.php");
+	}	
 }
 
 // essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
@@ -75,17 +88,17 @@ if ($row['ClienSexo'] == 'F'){
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 
+	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
 	<!-- Não permite que o usuário retorne para o EDITAR -->
 	<script src="global_assets/js/lamparinas/stop-back.js"></script>
 
-	<!-- Validação -->
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
 	
 	<script type="text/javascript">
 
-		$(document).ready(function() {	
+		$(document).ready(function() {
+
+			$('#summernote').summernote();
+			
 			getCmbs()
 			checkDocumentos()
 
@@ -188,11 +201,15 @@ if ($row['ClienSexo'] == 'F'){
 					},
 					success: function(response) {
 						$('#summernote').val('')
-						$('#summernote').val(response.conteudo)
+						$('#summernote').summernote('code', response.conteudo)
                         contarCaracteres($('#summernote').get(0));
 					}
 				})
 			})
+
+			$('#summernote').on('summernote.change', function() {
+				contarCaracteres($('#summernote').get(0));
+			});
 
 			$(".caracteressummernote").text((4000 - $("#summernote").val().length) + ' restantes');
 
@@ -284,14 +301,6 @@ if ($row['ClienSexo'] == 'F'){
 			console.log(id)
 		}
 
-		function cantaCaracteres(htmlId, numCaracteres, htmlIdMostra){
-			if($(`#${htmlId}`).val().length >= numCaracteres){
-				$(`#${htmlId}`).val($(`#${htmlId}`).val().substring(0, numCaracteres));
-			}
-			let numCaracteresRestantes = numCaracteres - $(`#${htmlId}`).val().length
-			$(`#${htmlIdMostra}`).html(numCaracteresRestantes!=numCaracteres? numCaracteresRestantes+' restantes':'')
-		}
-
         function contarCaracteres(params) {
 
             var limite = params.maxLength;
@@ -375,7 +384,7 @@ if ($row['ClienSexo'] == 'F'){
 
 									<div class="col-lg-12">
 										<div class="form-group">
-											<textarea rows="5" cols="5" maxLength="4000" onInput="contarCaracteres(this);"  id="summernote" name="txtareaConteudo" class="form-control"></textarea>
+											<textarea rows="5" cols="5" maxLength="4000" id="summernote" name="txtareaConteudo" class="form-control"></textarea>
 												<small class="text-muted form-text">Max. 4000 caracteres - <span class="caracteressummernote"></span></small>
 										</div>
 									</div>
@@ -419,7 +428,7 @@ if ($row['ClienSexo'] == 'F'){
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
 													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
-													} elseif (isset($ClaChave) && $ClaChave == "ELETINTERNACAOIVO") {
+													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
 													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													}					
 												?>

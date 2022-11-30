@@ -762,9 +762,11 @@ if(isset($_POST['inputAtendimentoId'])) {
                                                         FROM Atendimento
                                                         JOIN Cliente on ClienId = AtendCliente
                                                         JOIN Situacao on SituaId = AtendSituacao
+                                                        JOIN AtendimentoModalidade on AtModId = AtendModalidade
                                                         LEFT JOIN CaixaRecebimento on CxRecAtendimento = AtendId
                                                         WHERE AtendUnidade = ".$_SESSION['UnidadeId']." and AtendId not in (SELECT CxRecAtendimento FROM CaixaRecebimento)
-                                                        AND SituaChave = 'LIBERADOVENDA'
+                                                        AND SituaChave = 'LIBERADO'
+                                                        AND AtModTipoRecebimento = 'À Vista'                                                      
                                                         ORDER BY ClienNome";
                                                 $result = $conn->query($sql);
                                                 $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
