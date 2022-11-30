@@ -346,6 +346,84 @@ if(isset($_POST['inputNome'])){
       ':iUnidade' => $unidadeIdNovo
     ));
 
+    /* Após criar a Unidade deve se cadastrar as modalidades por padrão para essa Unidade nova criada */
+
+    $sql = "INSERT INTO AtendimentoModalidade (AtModNome, AtModChave, AtModTipoRecebimento, AtModSituacao, AtModUsuarioAtualizador, AtModUnidade)
+				  	VALUES (:sNome, :sChave,:sRecebimento, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+		$result = $conn->prepare($sql);
+					
+		$result->execute(array(
+      ':sNome' =>'Particular com desconto',
+      ':sChave' =>'PARTICULARCOMDESCONTO',
+      ':sRecebimento' =>'À Vista',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' =>'Particular Sem Desconto',
+      ':sChave' =>'PARTICULARSEMDESCONTO',
+      ':sRecebimento' =>'À Vista',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' =>'Convênio UNIMED',
+      ':sChave' =>'CONVENIOUNIMED',
+      ':sRecebimento' =>'À Prazo',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' =>'Convênio CAMED',
+      ':sChave' =>'CONVENIOCAMED',
+      ':sRecebimento' =>'À Prazo',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' =>'Convênio SUS',
+      ':sChave' =>'CONVENIOSUS',
+      ':sRecebimento' =>'À Prazo',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' =>'Convênio Bradesco',
+      ':sChave' =>'CONVENIOBRADESCO',
+      ':sRecebimento' =>'À Prazo',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' =>'Convênio Cassi',
+      ':sChave' =>'CONVENIOCASSI',
+      ':sRecebimento' =>'À Prazo',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' =>'Convênio Sul América',
+      ':sChave' =>'CONVENIOSULAMERICA',
+      ':sRecebimento' =>'À Prazo',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
 					
 		$conn->commit();			
 
