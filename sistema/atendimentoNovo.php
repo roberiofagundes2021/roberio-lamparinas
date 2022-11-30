@@ -1151,6 +1151,10 @@ $_SESSION['atendimento'] = [
 
 				$('#novoPaciente').addClass('d-none')
 				$('#informacoes').hide()
+				
+				$('.steps ul li').each(function(index, element) {
+					$(element).attr('class', 'disabled')
+				})
 			}
 
 			$('.actions a').each(function(index, element) {

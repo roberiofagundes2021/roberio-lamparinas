@@ -1207,8 +1207,13 @@ if ($tipo == 'ATENDIMENTO') {
 				$('#celular').val('')
 				$('#email').val('')
 				$('#observacao').val('')
+				
 				$('#novoPaciente').addClass('d-none')
 				$('#informacoes').hide()
+
+				$('.steps ul li').each(function(index, element) {
+					$(element).attr('class', 'disabled')
+				})
 			}
 
 			$('.actions a').each(function(index, element) {
