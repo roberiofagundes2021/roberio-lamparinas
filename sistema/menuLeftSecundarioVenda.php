@@ -26,7 +26,6 @@
 
 				switch(tipo){
 					case 'atendimentoEletivo': URL = 'atendimentoEletivo.php'; $('#dadosPost').attr('target', '_self'); break;
-					case 'receituario': URL = 'atendimentoReceituario.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'atestadoMedico': URL = 'atendimentoAtestadoMedico.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'historicoPaciente': URL = 'atendimentoHistoricoPaciente.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; $('#dadosPost').attr('target', '_self'); break;
@@ -109,8 +108,6 @@
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='documento'><i class="icon-file-text"></i> Documentos</a>
 						</li>
-						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='receituario'><i class="icon-cabinet"></i> Receituário</a>
 						</li>
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='atestadoMedico'><i class="icon-box"></i> Atestado Médico</a>
@@ -163,8 +160,6 @@
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='documento'><i class="icon-file-text"></i> Documentos</a>
 						</li>
-						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='receituario'><i class="icon-cabinet"></i> Receituário</a>
 						</li>
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='atestadoMedico'><i class="icon-box"></i> Atestado Médico</a>
