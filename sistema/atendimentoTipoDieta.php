@@ -48,7 +48,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iTipoDieta' => $_POST['inputTipoDietaId']
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Tipo de Dieta alterado!!!";
+			$_SESSION['msg']['mensagem'] = "Tipo de Dieta alterada!!!";
 	
 		} else { //inclusão
 		
@@ -63,7 +63,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iUnidade' => $_SESSION['UnidadeId'],
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Tipo de Dieta incluído!!!";
+			$_SESSION['msg']['mensagem'] = "Tipo de Dieta incluída!!!";
 					
 		}
 	

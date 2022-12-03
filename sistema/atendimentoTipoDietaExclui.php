@@ -17,7 +17,7 @@ if(isset($_POST['inputTipoDietaId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Tipo de dieta excluído!!!";
+		$_SESSION['msg']['mensagem'] = "Tipo de dieta excluída!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
