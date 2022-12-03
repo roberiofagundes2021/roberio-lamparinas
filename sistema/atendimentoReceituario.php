@@ -8,10 +8,12 @@ include('global_assets/php/conexao.php');
 
 $iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
-if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
+if (isset($_SESSION['iAtendimentoId']) && !$iAtendimentoId) {
 	$iAtendimentoId = $_SESSION['iAtendimentoId'];
+}else if($iAtendimentoId){
+	$_SESSION['iAtendimentoId'] = $iAtendimentoId;
 }
-$_SESSION['iAtendimentoId'] = null;
+// $_SESSION['iAtendimentoId'] = null;
 
 if(!$iAtendimentoId){
 	$uTipoAtendimento = $_SESSION['UltimaPagina'];
@@ -25,14 +27,16 @@ if(!$iAtendimentoId){
 	}	
 }
 
-$sql = "SELECT TOP(1) AtRecId
-FROM AtendimentoReceituario
-WHERE AtRecAtendimento = $iAtendimentoId
-ORDER BY AtRecId DESC";
-$result = $conn->query($sql);
-$rowReceituario= $result->fetch(PDO::FETCH_ASSOC);
-
-$iAtendimentoReceituarioId = $rowReceituario?$rowReceituario['AtRecId']:null;
+if(isset($_POST['iReceituario'])){
+	$iAtendimentoReceituarioId = $_POST['iReceituario'];
+}else{
+	$sql = "SELECT TOP(1) AtRecId
+	FROM AtendimentoReceituario
+	WHERE AtRecAtendimento = $iAtendimentoId AND AtRecDataFim IS NULL";
+	$result = $conn->query($sql);
+	$rowReceituario= $result->fetch(PDO::FETCH_ASSOC);
+	$iAtendimentoReceituarioId = $rowReceituario?$rowReceituario['AtRecId']:null;
+}
 
 // essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
 
@@ -46,7 +50,7 @@ $sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome
 		JOIN Profissional A ON A.ProfiUsuario = UsuarId
 		LEFT JOIN Profissao B ON B.ProfiId = A.ProfiProfissao
 		LEFT JOIN ProfissionalConselho ON PrConId = ProfiConselho
-		WHERE UsuarId =  ". $_SESSION['UsuarId'] . " ";
+		WHERE UsuarId =  $_SESSION[UsuarId]";
 $result = $conn->query($sql);
 $rowUser = $result->fetch(PDO::FETCH_ASSOC);
 $userId = $rowUser['ProfissionalId'];
@@ -75,54 +79,23 @@ if ($row['ClienSexo'] == 'F'){
 } else{
     $sexo = 'Masculino';
 }
-
-//Se estiver editando
-if(isset($iAtendimentoReceituarioId ) && $iAtendimentoReceituarioId ){
-
-	//Essa consulta é para preencher o campo Receituário ao editar
-	$sql = "SELECT AtRecReceituario, AtRecHoraFim, AtRecHoraInicio, AtRecDataInicio, AtRecDataFim
-			FROM AtendimentoReceituario
-			WHERE AtRecId = " . $iAtendimentoReceituarioId ;
-	$result = $conn->query($sql);
-	$rowReceituario = $result->fetch(PDO::FETCH_ASSOC);
-		
-	$_SESSION['msg'] = array();
-
-	// Formatar Hora/Data
-
-	$DataInicio = strtotime($rowReceituario['AtRecDataInicio']);
-	$DataAtendimentoInicio = date("d/m/Y", $DataInicio);
-
-	$DataFim = strtotime($rowReceituario['AtRecDataFim']);
-	$DataAtendimentoFim = date("d/m/Y", $DataFim);
-
-	$Inicio = strtotime($rowReceituario['AtRecHoraInicio']);
-	$HoraInicio = date("H:i", $Inicio);
-
-	$Fim = strtotime($rowReceituario['AtRecHoraFim']);
-	$HoraFim = date("H:i", $Fim);
-
-} 
-
-
-
 //Se estiver gravando (inclusão ou edição)
-if (isset($_POST['txtareaConteudo']) ){
+if (isset($_POST['txtareaConteudo']) && isset($_POST['receituario']) && $_POST['receituario']){
 	try{
 		//Edição
 		if ($iAtendimentoReceituarioId){
-		
 			$sql = "UPDATE AtendimentoReceituario SET AtRecAtendimento = :sAtendimento, AtRecDataInicio = :dDataInicio, AtRecDataFim = :dDataFim, AtRecHoraInicio = :sHoraInicio,
-						   AtRecHoraFim  = :sHoraFim, AtRecProfissional = :sProfissional, AtRecReceituario = :sReceituario, AtRecUnidade = :iUnidade
+					AtRecTipoReceituario = :TipoReceituario, AtRecHoraFim  = :sHoraFim, AtRecProfissional = :sProfissional, AtRecReceituario = :sReceituario, AtRecUnidade = :iUnidade
 					WHERE AtRecId = :iAtendimentoReceituario";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 				':sAtendimento' => $iAtendimentoId,
 				':dDataInicio' => gravaData($_POST['inputDataInicio']),
-				':dDataFim' => date('m/d/Y'),
+				':dDataFim' => $_POST['inputDataFimReceituario']?$_POST['inputDataFimReceituario']:NULL,
+				':TipoReceituario' => $_POST['receituario'],
 				':sHoraInicio' => $_POST['inputInicio'],
-				':sHoraFim' => date('H:i'),
+				':sHoraFim' => $_POST['inputHoraFimReceituario']?$_POST['inputHoraFimReceituario']:NULL,
 				':sProfissional' => $userId,
 				':sReceituario' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],
@@ -130,20 +103,19 @@ if (isset($_POST['txtareaConteudo']) ){
 				));
 
 			$_SESSION['msg']['mensagem'] = "Receituário alterada!!!";
-			
 
 		} else { //inclusão
-
-			$sql = "INSERT INTO AtendimentoReceituario (AtRecAtendimento, AtRecDataInicio, AtRecDataFim, AtRecHoraInicio, AtRecHoraFim, AtRecProfissional, AtRecReceituario, AtRecUnidade)
-						VALUES (:sAtendimento, :dDataInicio, :dDataFim, :sHoraInicio, :sHoraFim, :sProfissional,:sReceituario, :iUnidade)";
+			$sql = "INSERT INTO AtendimentoReceituario (AtRecAtendimento, AtRecDataInicio, AtRecTipoReceituario, AtRecDataFim, AtRecHoraInicio, AtRecHoraFim, AtRecProfissional, AtRecReceituario, AtRecUnidade)
+						VALUES (:sAtendimento, :dDataInicio, :TipoReceituario, :dDataFim, :sHoraInicio, :sHoraFim, :sProfissional,:sReceituario, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 				':sAtendimento' => $iAtendimentoId,
 				':dDataInicio' => gravaData($_POST['inputDataInicio']),
-				':dDataFim' => gravaData($_POST['inputDataFim']),
+				':dDataFim' => $_POST['inputDataFimReceituario']?$_POST['inputDataFimReceituario']:NULL,
+				':TipoReceituario' => $_POST['receituario'],
 				':sHoraInicio' => $_POST['inputInicio'],
-				':sHoraFim' => date('H:i'),
+				':sHoraFim' => $_POST['inputHoraFimReceituario']?$_POST['inputHoraFimReceituario']:NULL,
 				':sProfissional' => $userId,
 				':sReceituario' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],
@@ -168,6 +140,33 @@ if (isset($_POST['txtareaConteudo']) ){
 	irpara("atendimentoReceituario.php");
 }
 
+//Se estiver editando
+if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
+
+	//Essa consulta é para preencher o campo Receituário ao editar
+	$sql = "SELECT AtRecReceituario, AtRecHoraFim, AtRecHoraInicio, AtRecDataInicio, AtRecDataFim, AtRecTipoReceituario
+	FROM AtendimentoReceituario
+	WHERE AtRecId = $iAtendimentoReceituarioId";
+	$result = $conn->query($sql);
+	$rowReceituario = $result->fetch(PDO::FETCH_ASSOC);
+
+	$_SESSION['msg'] = array();
+
+	if($rowReceituario){
+		// Formatar Hora/Data
+		$DataInicio = strtotime($rowReceituario['AtRecDataInicio']);
+		$DataAtendimentoInicio = date("d/m/Y", $DataInicio);
+
+		$DataFim = strtotime($rowReceituario['AtRecDataFim']);
+		$DataAtendimentoFim = date("d/m/Y", $DataFim);
+
+		$Inicio = strtotime($rowReceituario['AtRecHoraInicio']);
+		$HoraInicio = date("H:i", $Inicio);
+
+		$Fim = strtotime($rowReceituario['AtRecHoraFim']);
+		$HoraFim = date("H:i", $Fim);
+	}
+}
 ?>
 
 <!DOCTYPE html>
@@ -185,8 +184,7 @@ if (isset($_POST['txtareaConteudo']) ){
 	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-
-	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
 	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
@@ -202,20 +200,34 @@ if (isset($_POST['txtareaConteudo']) ){
 	<script type="text/javascript">
 
 		$(document).ready(function() {	
+			$('#enviar').on('click', function(e){
+				e.preventDefault()
+				$( "#formAtendimentoReceituario" ).submit()
+			})
 
-			$('#summernote').summernote();
-			
-        
-		$('#enviar').on('click', function(e){
-			
-			e.preventDefault();
-	
+			$('#finalizarBTN').on('click', function(e){
+				e.preventDefault()
+				let data = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
+				let hora = ''
 
-			$( "#formAtendimentoReceituario" ).submit();
-					
-		})
+				hora = data.split(' ')[1]
+				data = data.split(' ')[0] // dd/mm/yyyy
 
-	}); //document.ready
+				data = data.split('/')
+				data = data[2]+'-'+data[1]+'-'+data[0] // yyyy-mm-dd
+
+				$('#inputHoraFimReceituario').val(hora)
+				$('#inputDataFimReceituario').val(data)
+				$( "#formAtendimentoReceituario" ).submit()
+			})
+
+		}); //document.ready
+
+		function selectItem(item){
+			$('#iReceituario').val($(item).data('id'))
+			$('#receituario').prop('required',false);
+			$( "#formAtendimentoReceituario" ).submit()
+		}
 	
 	</script>
 
@@ -245,7 +257,7 @@ if (isset($_POST['txtareaConteudo']) ){
 				<div class="row">
 					
 					<div class="col-lg-12">
-						<form id='dadosPost'>
+						<form id='dadosPost' method="post">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
 							?>
@@ -253,8 +265,12 @@ if (isset($_POST['txtareaConteudo']) ){
 						<!-- Basic responsive configuration -->
 						<form name="formAtendimentoReceituario" id="formAtendimentoReceituario" method="post" class="form-validate-jquery">
 							<?php
+								echo "<input type='hidden' id='inputDataFimReceituario' name='inputDataFimReceituario' value='".($rowReceituario?$rowReceituario['AtRecDataFim']:'')."'/>";
+								echo "<input type='hidden' id='inputHoraFimReceituario' name='inputHoraFimReceituario' value='".($rowReceituario?$rowReceituario['AtRecHoraFim']:'')."'/>";
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+								echo "<input type='hidden' id='iReceituario' name='iReceituario' value='".($iAtendimentoReceituarioId?$iAtendimentoReceituarioId:'')."' />";
 							?>
+
 							<div class="card">
 								<div class="card-header header-elements-inline">
 									<h3 class="card-title"><b>RECEITUÁRIO</b></h3>
@@ -267,11 +283,32 @@ if (isset($_POST['txtareaConteudo']) ){
 
 								<div class="card-body">
 
+									<div class="col-lg-12 row mb-3">
+										<div class="col-lg-12">
+											<label>Tipo de Receituário <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-6">
+											<select id="receituario" name="receituario" class="select-search" required>
+												<option value=''>Selecione</option>
+												<?php
+													$opts = '';
+													if($rowReceituario && $rowReceituario['AtRecTipoReceituario']){
+														$tipo = $rowReceituario['AtRecTipoReceituario'];
+
+														$opts .= $tipo == 'S'?"<option selected value='S'>Simples</option>":"<option value='S'>Simples</option>";
+														$opts .= $tipo == 'E'?"<option selected value='E'>Especial</option>":"<option value='E'>Especial</option>";
+													}
+													echo $opts?$opts:"<option value='S'>Simples</option>
+														<option value='E'>Especial</option>";
+												?>
+											</select>
+										</div>
+									</div>
+
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group">
-												<label for="inputNome">Receituário do Paciente </label>
-												<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Corpo do receituário (informe aqui o texto que você queira que apareça no receituário)" > <?php if (isset($iAtendimentoReceituarioId )) echo $rowReceituario['AtRecReceituario']; ?> </textarea>
+												<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control" placeholder="Corpo do receituário (informe aqui o texto que você queira que apareça no receituário)"><?php if (isset($iAtendimentoReceituarioId )) echo $rowReceituario['AtRecReceituario']; ?></textarea>
 											</div>
 										</div>
 									</div>
@@ -279,18 +316,66 @@ if (isset($_POST['txtareaConteudo']) ){
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
 												<button class="btn btn-lg btn-principal" id="enviar">Salvar</button>
-												<?php 
+												<?php
+													if($rowReceituario && !$rowReceituario['AtRecDataFim']){
+														echo "<a id='imprimirBTN' href='#' class='btn btn-basic' role='button'>Imprimir</a>";
+														echo "<a id='finalizarBTN' href='#' class='btn btn-basic' role='button'>Finalizar Atendimento</a>";
+													}
+
 													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
-													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+														echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
-													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+														echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
-													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
-													}					
+														echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													}
 												?>
 											</div>
 										</div>
-									</div>    
+									</div>
+
+									<div>
+										<div id="box-agendamentos" style="display: block;">
+											<table class="table" id="receituarioTable">
+												<thead>
+													<tr class="bg-slate text-left">
+														<th>Item</th>
+														<th>Data Registro</th>
+														<th>Tipo de Receituário</th>
+														<th>Profissional</th>
+														<th>CBO</th>
+														<th class="text-center">Ações</th>
+													</tr>
+												</thead>
+												<tbody>
+													<?php
+														$sql = "SELECT  AtRecId,AtRecDataFim,AtRecDataInicio,AtRecTipoReceituario, ProfiNome, ProfiCodigo,AtRecReceituario
+																FROM AtendimentoReceituario
+																JOIN Profissional ON ProfiId = AtRecProfissional
+																WHERE AtRecAtendimento = $iAtendimentoId and AtRecDataFim IS NOT NULL";
+														$result = $conn->query($sql);
+														$rowReceituarioHistorico = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach($rowReceituarioHistorico as $key => $item){
+															$acoes = "
+															<a href='#' onclick='selectItem(this)' data-id='$item[AtRecId]' class='list-icons-item'  title='Detalhamento'><i class='icon-file-text2'></i></a>
+															<a href='#' onclick='imprimirReceituario(this)' data-id='$item[AtRecId]' class='list-icons-item'  title='Imprimir'><i class='icon-printer2'></i></a>";
+
+															$tipoReceituario = $item['AtRecTipoReceituario']=='S'?'Simples':'Especial';
+															echo "<tr>
+																	<td>".($key+1)."</td>
+																	<td>$item[AtRecDataInicio]</td>
+																	<td>$tipoReceituario</td>
+																	<td>$item[ProfiNome]</td>
+																	<td>$item[ProfiCodigo]</td>
+																	<td>$acoes</td>
+																</tr>";
+														}
+													?>
+												</tbody>
+											</table>
+										</div>
+									</div>
 									
 								</div>
 							</div>

@@ -1336,9 +1336,9 @@ try{
 		$resultAtendido = $conn->query($sql);
 		$rowAtendido = $resultAtendido->fetchAll(PDO::FETCH_ASSOC);
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
-			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
+		AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
+		AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -1348,9 +1348,9 @@ try{
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
-			ORDER BY AtXSeId DESC";
+			ORDER BY AtXSeId DESC";// OBS.: SituaChave = 'EMATENDIMENTO'
 		$resultEmAtendimento = $conn->query($sql);
 		$rowEmAtendimento = $resultEmAtendimento->fetchAll(PDO::FETCH_ASSOC);
 
@@ -1489,7 +1489,7 @@ try{
 			$atender = "<button href='#'  type='button' class='btn btn-success btn-sm atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'>Atender</button>";
 			$acoes = "<div class='list-icons'>";
 
-				if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {					
+				if (!$rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {					
 					
 					$acoes .= "
 						$att
