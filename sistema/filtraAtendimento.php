@@ -1348,9 +1348,9 @@ try{
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
+			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
-			ORDER BY AtXSeId DESC";// OBS.: SituaChave = 'EMATENDIMENTO'
+			ORDER BY AtXSeId DESC";
 		$resultEmAtendimento = $conn->query($sql);
 		$rowEmAtendimento = $resultEmAtendimento->fetchAll(PDO::FETCH_ASSOC);
 
