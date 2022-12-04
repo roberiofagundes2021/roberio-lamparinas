@@ -1,0 +1,227 @@
+<?php 
+
+include_once("sessao.php"); 
+
+$_SESSION['PaginaAtual'] = 'Receituário';
+
+include('global_assets/php/conexao.php');
+
+$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
+
+if (isset($_SESSION['iAtendimentoId']) && !$iAtendimentoId) {
+	$iAtendimentoId = $_SESSION['iAtendimentoId'];
+}else if($iAtendimentoId){
+	$_SESSION['iAtendimentoId'] = $iAtendimentoId;
+}
+
+if(!$iAtendimentoId){
+	$uTipoAtendimento = $_SESSION['UltimaPagina'];
+
+	if ($uTipoAtendimento == "ELETIVO") {
+		irpara("atendimentoEletivoListagem.php");
+	} elseif ($uTipoAtendimento == "AMBULATORIAL") {
+		irpara("atendimentoAmbulatorialListagem.php");
+	} elseif ($uTipoAtendimento == "INTERNACAO") {
+		irpara("atendimentoHospitalarListagem.php");
+	}	
+}
+
+// essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
+
+$ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
+$ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
+
+
+//Essa consulta é para verificar  o profissional
+$sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo
+		FROM Usuario
+		JOIN Profissional A ON A.ProfiUsuario = UsuarId
+		LEFT JOIN Profissao B ON B.ProfiId = A.ProfiProfissao
+		LEFT JOIN ProfissionalConselho ON PrConId = ProfiConselho
+		WHERE UsuarId =  $_SESSION[UsuarId]";
+$result = $conn->query($sql);
+$rowUser = $result->fetch(PDO::FETCH_ASSOC);
+$userId = $rowUser['ProfissionalId'];
+
+//Essa consulta é para verificar qual é o atendimento e cliente 
+$sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
+               ClienNomeMae, ClienCartaoSus, ClienCelular, ClienStatus, ClienUsuarioAtualizador, ClienUnidade, ClResNome
+		FROM Atendimento
+		JOIN Cliente ON ClienId = AtendCliente
+		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
+		LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+		JOIN Situacao ON SituaId = AtendSituacao
+	    WHERE  AtendId = $iAtendimentoId 
+		ORDER BY AtendNumRegistro ASC";
+$result = $conn->query($sql);
+$row = $result->fetch(PDO::FETCH_ASSOC);
+
+$iAtendimentoCliente = $row['AtendCliente'] ;
+$iAtendimentoId = $row['AtendId'];
+
+//Essa consulta é para preencher o sexo
+if ($row['ClienSexo'] == 'F'){
+    $sexo = 'Feminino';
+} else{
+    $sexo = 'Masculino';
+}
+
+if(isset($_POST['condulta'])){
+	$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'ATENDIDO'";
+	$result = $conn->query($sql);
+	$situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+	$sql = "UPDATE Atendimento SET AtendSituacao = '$situacao[SituaId]' WHERE AtendId = '$iAtendimentoId'";
+	$conn->query($sql);
+	switch($_SESSION['UltimaPagina']){
+		case "ELETIVO":irpara("atendimentoEletivoListagem.php");break;
+		case "AMBULATORIAL":irpara("atendimentoAmbulatorialListagem.php");break;
+		case "INTERNACAO":irpara("atendimentoHospitalarListagem.php");break;
+		default: irpara("atendimentoEletivoListagem.php");break;
+	}
+}
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Lamparinas | Finalizar atendimento</title>
+
+	<?php include_once("head.php"); ?>
+	
+	<!-- Theme JS files -->
+	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
+
+	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
+	<script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
+
+	<!-- Não permite que o usuário retorne para o EDITAR -->
+	<script src="global_assets/js/lamparinas/stop-back.js"></script>
+
+	<!-- Validação -->
+	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
+	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	
+	<script type="text/javascript">
+
+		$(document).ready(function() {	
+			$('#encerrar').on('click', function(e){
+				e.preventDefault()
+				$( "#formAtendimentoFinalizar" ).attr('action', $('#condulta').val())
+				$( "#formAtendimentoFinalizar" ).submit()
+			})
+		}); //document.ready
+	
+	</script>
+</head>
+
+<body class="navbar-top sidebar-xs">
+
+	<?php include_once("topo.php"); ?>	
+
+	<!-- Page content -->
+	<div class="page-content">
+		
+		<?php
+			include_once("menu-left.php");
+			include_once("menuLeftSecundarioVenda.php");
+		?>
+
+		<!-- Main content -->
+		<div class="content-wrapper">
+
+			<?php include_once("cabecalho.php"); ?>	
+
+			<!-- Content area -->
+			<div class="content">
+
+				<!-- Info blocks -->		
+				<div class="row">
+					
+					<div class="col-lg-12">
+						<form id='dadosPost' method="post">
+							<?php
+								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+							?>
+						</form>
+						<!-- Basic responsive configuration -->
+						<form name="formAtendimentoFinalizar" id="formAtendimentoFinalizar" method="post" class="form-validate-jquery">
+							<div class="card">
+								<div class="card-header header-elements-inline">
+									<h3 class="card-title"><b>Finalizar Atendimento</b></h3>
+								</div>
+							</div>
+
+							<div> <?php include ('atendimentoDadosPaciente.php'); ?> </div>
+
+							<div class="card">
+
+								<div class="card-body">
+
+									<div class="col-lg-12 row mb-3">
+										<div class="col-lg-12">
+											<label>Condulta <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-6">
+											<select id="condulta" name="condulta" class="select-search" required>
+												<option value=''>Selecione</option>
+												<option value='atendimentoReceituario.php'>Residência com Receita</option>
+												<option value='atendimentoFinalizar.php'>Residência sem Receita</option>
+												<option value='atendimentoFinalizar.php'>Liberado após exames/procedimentos solicitados</option>
+												<option value=''>Observação Hospitalar</option>
+												<option value=''>Internação Hospitalar</option>
+												<option value=''>Transferência</option>
+											</select>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group" style="padding-top:25px;">
+												<button class="btn btn-lg btn-principal" id="encerrar">ENCERRAR</button>
+												<?php
+													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
+														echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
+														echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
+														echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+													}
+												?>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>	
+
+							<!-- /basic responsive configuration -->
+					</div>
+					
+				</div>				
+				
+				<!-- /info blocks -->
+
+			</div>
+			<!-- /content area -->
+			
+			<?php include_once("footer.php"); ?>
+
+		</div>
+		<!-- /main content -->
+
+	</div>
+	<!-- /page content -->
+
+	<?php include_once("alerta.php"); ?>
+
+</body>
+
+</html>
