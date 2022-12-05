@@ -543,8 +543,6 @@ try{
 								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
@@ -729,6 +727,8 @@ try{
 								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
+								<div class='dropdown-divider'></div>
+								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
@@ -1022,8 +1022,6 @@ try{
 								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
@@ -1204,6 +1202,8 @@ try{
 								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
+								<div class='dropdown-divider'></div>
+								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
@@ -1506,8 +1506,6 @@ try{
 								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
@@ -1601,6 +1599,8 @@ try{
 								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
+								<div class='dropdown-divider'></div>
+								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
