@@ -45,25 +45,9 @@
 		})
 
 		$('#finalizarAtendimento').on('click', function(){
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'MUDARSITUACAO',
-					'iAtendimento': $('#iAtendimentoId').val(),
-					'sJustificativa': '',
-					'tipo': 'ATENDIMENTO',
-					'iSituacao': 'ATENDIDO'
-				},
-				success: function(response) {
-					window.location.href = 'atendimentoEletivoListagem.php';
-					alerta(response.titulo, response.menssagem, response.status);
-				},
-				error: function(response) {
-					alerta(response.titulo, response.menssagem, response.tipo);
-				}
-			});
+			$('#dadosPost').attr('action', 'atendimentoFinalizar.php')
+			$('#dadosPost').attr('method', 'POST')
+			$('#dadosPost').submit()
 		})
 	})
 

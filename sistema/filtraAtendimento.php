@@ -55,6 +55,7 @@ try{
 				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 				JOIN ServicoVenda ON SrVenId = AgendServico
 				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADO','CONFIRMADO','FILAESPERA')
+				AND AgendData = '$hoje'
 				and AgendAtendimento is null";
 			$result = $conn->query($sql);
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -543,8 +544,6 @@ try{
 								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
@@ -729,6 +728,8 @@ try{
 								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
+								<div class='dropdown-divider'></div>
+								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
@@ -1022,8 +1023,6 @@ try{
 								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
@@ -1204,6 +1203,8 @@ try{
 								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
+								<div class='dropdown-divider'></div>
+								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
@@ -1336,9 +1337,9 @@ try{
 		$resultAtendido = $conn->query($sql);
 		$rowAtendido = $resultAtendido->fetchAll(PDO::FETCH_ASSOC);
 
-		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
-			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
+		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
+		AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
+		AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
 			FROM AtendimentoXServico
 			JOIN Atendimento ON AtendId = AtXSeAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -1488,7 +1489,7 @@ try{
 			$atender = "<button href='#'  type='button' class='btn btn-success btn-sm atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'>Atender</button>";
 			$acoes = "<div class='list-icons'>";
 
-				if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {					
+				if (!$rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {					
 					
 					$acoes .= "
 						$att
@@ -1505,8 +1506,6 @@ try{
 								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
-								<div class='dropdown-divider'></div>
-								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
@@ -1600,6 +1599,8 @@ try{
 								<a href='#' class='dropdown-item classificacao' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item historico' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
+								<div class='dropdown-divider'></div>
+								<a href='#' class='dropdown-item receituario' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
