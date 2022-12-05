@@ -1304,14 +1304,14 @@ try{
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
 			FROM AtendimentoXServico
-			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
-			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			LEFT JOIN Situacao ON SituaId = AtendSituacao
-			LEFT JOIN Cliente ON ClienId = AtendCliente
-			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			JOIN Atendimento ON AtendId = AtXSeAtendimento
+			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+			JOIN Situacao ON SituaId = AtendSituacao
+			JOIN Cliente ON ClienId = AtendCliente
+			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+			JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
+			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtClRTempo ASC";
@@ -1322,14 +1322,14 @@ try{
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
 			FROM AtendimentoXServico
-			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
-			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			LEFT JOIN Situacao ON SituaId = AtendSituacao
-			LEFT JOIN Cliente ON ClienId = AtendCliente
-			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
-			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
+			JOIN Atendimento ON AtendId = AtXSeAtendimento
+			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+			JOIN Situacao ON SituaId = AtendSituacao
+			JOIN Cliente ON ClienId = AtendCliente
+			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+			JOIN ServicoVenda ON SrVenId = AtXSeServico
+			JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtXSeId DESC";
@@ -1340,20 +1340,19 @@ try{
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
 			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
 			FROM AtendimentoXServico
-			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
-			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			LEFT JOIN Situacao ON SituaId = AtendSituacao
-			LEFT JOIN Cliente ON ClienId = AtendCliente
-			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			JOIN Atendimento ON AtendId = AtXSeAtendimento
+			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+			JOIN Situacao ON SituaId = AtendSituacao
+			JOIN Cliente ON ClienId = AtendCliente
+			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+			JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
+			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'
 			ORDER BY AtXSeId DESC";
 		$resultEmAtendimento = $conn->query($sql);
 		$rowEmAtendimento = $resultEmAtendimento->fetchAll(PDO::FETCH_ASSOC);
-
 		
 		$espera = [];
 		$atendido = [];
