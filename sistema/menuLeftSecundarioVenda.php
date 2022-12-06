@@ -44,7 +44,8 @@
 			})
 		})
 
-		$('#finalizarAtendimento').on('click', function(){
+		$('#finalizarAtendimento').on('click', function(e){
+			e.preventDefault()
 			$('#dadosPost').attr('action', 'atendimentoFinalizar.php')
 			$('#dadosPost').attr('method', 'POST')
 			$('#dadosPost').submit()
