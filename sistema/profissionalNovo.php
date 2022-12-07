@@ -258,6 +258,27 @@ include('global_assets/php/conexao.php');
 				camposPFObrigatorios.forEach(element => $("#"+element).attr('required',false));
 			}
 		}
+
+		function validaDataNascimento(dataASerValidada){			
+			let dataObj = new Date(dataASerValidada);
+			let hoje = new Date();
+			if((hoje-dataObj)<0){
+				return false;				
+			}
+			else{
+				return true;
+			}
+		}
+
+		function formataCampoDataNascimento(){
+			let dataPreenchida = $('#inputDtNascimento').val();
+			if (!validaDataNascimento(dataPreenchida)){
+				let labelErro = $('#inputDtNascimento-error')
+				labelErro.removeClass('validation-valid-label');
+				labelErro[0].innerHTML = "Data não pode ser futura";
+				$('#inputDtNascimento').val("");					
+			}
+		}
     </script>	
 	
 </head>
@@ -425,7 +446,7 @@ include('global_assets/php/conexao.php');
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputDtNascimento">Data Nascimento<span class="text-danger"> *</span></label>
-													<input type="date" id="inputDtNascimento" name="inputDtNascimento" class="form-control" placeholder="Data Nascimento">
+													<input type="date" id="inputDtNascimento" name="inputDtNascimento" class="form-control" placeholder="Data Nascimento" onblur="formataCampoDataNascimento()">
 												</div>
 											</div>										
 										</div>
