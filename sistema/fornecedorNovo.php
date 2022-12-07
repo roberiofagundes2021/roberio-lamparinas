@@ -131,13 +131,13 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>		
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	<!-- /theme JS files -->	
 
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
-	<script src="global_assets/js/demo_pages/form_validation.js"></script>	
+	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 	<!-- Adicionando Javascript -->
     <script type="text/javascript" >
@@ -308,7 +308,53 @@ if(isset($_POST['inputTipo'])){
 			}
 		}			
 
+
+		function validaEFormataCnpj(){
+			let cnpj = $('#inputCnpj').val();
+			let resultado = validarCNPJ(cnpj);
+			if (!resultado){
+				let labelErro = $('#inputCnpj-error')
+				labelErro.removeClass('validation-valid-label');
+				labelErro[0].innerHTML = "CNPJ Inválido";	
+				$('#inputCnpj').val("");
+			}
+			
+		}
+		
+		function validaEFormataCpf(){
+			let cpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
+			let resultado = validaCPF(cpf);
+			if (!resultado){
+				let labelErro = $('#inputCpf-error')
+				labelErro.removeClass('validation-valid-label');
+				labelErro[0].innerHTML = "CPF Inválido";	
+				$('#inputCpf').val("");
+			}			
+		}
+
+		function validaDataNascimento(dataASerValidada){			
+			let dataObj = new Date(dataASerValidada);
+			let hoje = new Date();
+			if((hoje-dataObj)<0){
+				return false;				
+			}
+			else{
+				return true;
+			}
+		}
+
+		function formataCampoDataNascimento(){
+			let dataPreenchida = $('#inputAniversario').val();
+			if (!validaDataNascimento(dataPreenchida)){
+				let labelErro = $('#inputAniversario-error')
+				labelErro.removeClass('validation-valid-label');
+				labelErro[0].innerHTML = "Data não pode ser futura";
+				$('#inputAniversario').val("");		
+			}
+		}
     </script>	
+
+
 	
 </head>
 
@@ -370,14 +416,14 @@ if(isset($_POST['inputTipo'])){
 								<div class="col-lg-3" id="CPF" style="display:none;">
 									<div class="form-group">
 										<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
-										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99">
+										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" onblur="validaEFormataCpf()">
 									</div>	
 								</div>
 								
 								<div class="col-lg-3" id="CNPJ">
 									<div class="form-group">				
 										<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
-										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" required>
+										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" onblur="validaEFormataCnpj()"required>
 									</div>	
 								</div>							
 							</div>
@@ -451,7 +497,7 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputAniversario">Aniversário</label>
-													<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário">
+													<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" onblur="formataCampoDataNascimento()">
 												</div>
 											</div>										
 										</div>	
