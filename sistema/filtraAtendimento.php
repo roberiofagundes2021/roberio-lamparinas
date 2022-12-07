@@ -1329,7 +1329,7 @@ try{
 			JOIN Cliente ON ClienId = AtendCliente
 			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 			JOIN ServicoVenda ON SrVenId = AtXSeServico
-			JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 			AND AtClaChave = 'ELETIVO'

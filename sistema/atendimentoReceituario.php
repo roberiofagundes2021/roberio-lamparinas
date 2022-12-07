@@ -88,7 +88,7 @@ if (isset($_POST['txtareaConteudo']) && isset($_POST['receituario']) && $_POST['
 					AtRecTipoReceituario = :TipoReceituario, AtRecHoraFim  = :sHoraFim, AtRecProfissional = :sProfissional, AtRecReceituario = :sReceituario, AtRecUnidade = :iUnidade
 					WHERE AtRecId = :iAtendimentoReceituario";
 			$result = $conn->prepare($sql);
-					
+
 			$result->execute(array(
 				':sAtendimento' => $iAtendimentoId,
 				':dDataInicio' => gravaData($_POST['inputDataInicio']),
@@ -99,10 +99,12 @@ if (isset($_POST['txtareaConteudo']) && isset($_POST['receituario']) && $_POST['
 				':sProfissional' => $userId,
 				':sReceituario' => $_POST['txtareaConteudo'],
 				':iUnidade' => $_SESSION['UnidadeId'],
-				':iAtendimentoReceituario' => $iAtendimentoReceituarioId 
+				':iAtendimentoReceituario' => $iAtendimentoReceituarioId
 				));
 
+			$_SESSION['msg']['titulo'] = "Sucesso";
 			$_SESSION['msg']['mensagem'] = "Receituário alterada!!!";
+			$_SESSION['msg']['tipo'] = "success";
 
 		} else { //inclusão
 			$sql = "INSERT INTO AtendimentoReceituario (AtRecAtendimento, AtRecDataInicio, AtRecTipoReceituario, AtRecDataFim, AtRecHoraInicio, AtRecHoraFim, AtRecProfissional, AtRecReceituario, AtRecUnidade)
@@ -123,6 +125,21 @@ if (isset($_POST['txtareaConteudo']) && isset($_POST['receituario']) && $_POST['
 
 			$_SESSION['msg']['mensagem'] = "Receituário incluída!!!";
 
+		}
+
+		if(isset($_POST['inputDataFimReceituario']) && $_POST['inputDataFimReceituario']){
+			$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'ATENDIDO'";
+			$result = $conn->query($sql);
+			$situacao = $result->fetch(PDO::FETCH_ASSOC);
+	
+			$sql = "UPDATE Atendimento SET AtendSituacao = '$situacao[SituaId]' WHERE AtendId = '$iAtendimentoId'";
+			$conn->query($sql);
+			switch($_SESSION['UltimaPagina']){
+				case "ELETIVO":irpara("atendimentoEletivoListagem.php");break;
+				case "AMBULATORIAL":irpara("atendimentoAmbulatorialListagem.php");break;
+				case "INTERNACAO":irpara("atendimentoHospitalarListagem.php");break;
+				default: irpara("atendimentoEletivoListagem.php");break;
+			}
 		}
 	
 		$_SESSION['msg']['titulo'] = "Sucesso";
@@ -323,11 +340,11 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 													}
 
 													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
-														echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+														echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Voltar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
-														echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+														echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Voltar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
-														echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
+														echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>";
 													}
 												?>
 											</div>
@@ -344,7 +361,7 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 														<th>Tipo de Receituário</th>
 														<th>Profissional</th>
 														<th>CBO</th>
-														<th class="text-center">Ações</th>
+														<th>Ações</th>
 													</tr>
 												</thead>
 												<tbody>
@@ -362,9 +379,10 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 															<a href='#' onclick='imprimirReceituario(this)' data-id='$item[AtRecId]' class='list-icons-item'  title='Imprimir'><i class='icon-printer2'></i></a>";
 
 															$tipoReceituario = $item['AtRecTipoReceituario']=='S'?'Simples':'Especial';
+															$data = mostraData($item['AtRecDataInicio']);
 															echo "<tr>
 																	<td>".($key+1)."</td>
-																	<td>$item[AtRecDataInicio]</td>
+																	<td>$data</td>
 																	<td>$tipoReceituario</td>
 																	<td>$item[ProfiNome]</td>
 																	<td>$item[ProfiCodigo]</td>
