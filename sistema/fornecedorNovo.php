@@ -9,7 +9,7 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputTipo'])){
 			
 	try{
-			
+		
 		$sql = "INSERT INTO Fornecedor (ForneTipo, ForneNome, ForneRazaoSocial, ForneCnpj, ForneInscricaoMunicipal, ForneInscricaoEstadual, 
 										ForneCategoria, ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, 
 										ForneAniversario, ForneCep, ForneEndereco, ForneNumero, ForneComplemento, ForneBairro, ForneCidade, 
@@ -108,7 +108,7 @@ if(isset($_POST['inputTipo'])){
 		echo 'Error: ' . $e->getMessage();
 		exit;
 	}
-	
+
 	irpara("fornecedor.php");
 }
 
@@ -130,7 +130,7 @@ if(isset($_POST['inputTipo'])){
 
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	
+
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	<!-- /theme JS files -->	
 
@@ -174,7 +174,7 @@ if(isset($_POST['inputTipo'])){
                         //Preenche os campos com "..." enquanto consulta webservice.
                         $("#inputEndereco").val("...");
                         $("#inputBairro").val("...");
-                        $("#inputCidade").val("...");                        
+                        $("#inputCidade").val("...");
                         $("#cmbEstado").val("...");                        
 
                         //Consulta o webservice viacep.com.br/
@@ -186,11 +186,7 @@ if(isset($_POST['inputTipo'])){
                                 $("#inputEndereco").val(dados.logradouro);
                                 $("#inputBairro").val(dados.bairro);
                                 $("#inputCidade").val(dados.localidade);                                
-                                $("#cmbEstado").val(dados.uf);                                
-								//$("#cmbEstado").find('option[value="MA"]').attr('selected','selected');
-								//$('#cmbEstado :selected').text();
-								//$("#cmbEstado").find('option:selected').text();
-								//document.getElementById("cmbEstado").options[5].selected = true;
+                                $("#cmbEstado").val(dados.uf);        
                             } //end if.
                             else {
                                 //CEP pesquisado não foi encontrado.
@@ -208,8 +204,7 @@ if(isset($_POST['inputTipo'])){
                 else {
                     //cep sem valor, limpa formulário.
                     limpa_formulário_cep();
-                }             
-                
+                }
             });
             
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
@@ -347,7 +342,7 @@ if(isset($_POST['inputTipo'])){
 		function formataCampoDataNascimento(){
 			let dataPreenchida = $('#inputAniversario').val();
 			if (!validaDataNascimento(dataPreenchida)){
-				let labelErro = $('#inputAniversario-error')
+				let labelErro = $('#inputAniversario-error');
 				labelErro.removeClass('validation-valid-label');
 				labelErro[0].innerHTML = "Data não pode ser futura";
 				$('#inputAniversario').val("");		
@@ -416,14 +411,14 @@ if(isset($_POST['inputTipo'])){
 								
 								<div class="col-lg-3" id="CPF" style="display:none;">
 									<div class="form-group">
-										<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
+										<label for="inputCpf">CPF<span class="text-danger">*</span></label>
 										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" onblur="validaEFormataCpf()">
 									</div>	
 								</div>
 								
 								<div class="col-lg-3" id="CNPJ">
 									<div class="form-group">				
-										<label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
+										<label for="inputCnpj">CNPJ<span class="text-danger">*</span></label>
 										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" onblur="validaEFormataCnpj()"required>
 									</div>	
 								</div>							
