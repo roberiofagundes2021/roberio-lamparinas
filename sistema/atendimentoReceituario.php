@@ -37,6 +37,12 @@ if(isset($_POST['iReceituario'])){
 	$rowReceituario= $result->fetch(PDO::FETCH_ASSOC);
 	$iAtendimentoReceituarioId = $rowReceituario?$rowReceituario['AtRecId']:null;
 }
+$sql = "SELECT TOP(1) AtRecId
+	FROM AtendimentoReceituario
+	WHERE AtRecAtendimento = $iAtendimentoId AND AtRecDataFim IS NULL";
+$result = $conn->query($sql);
+$rowReceituario= $result->fetch(PDO::FETCH_ASSOC);
+$iAtendimentoReceituarioId = $rowReceituario?$rowReceituario['AtRecId']:null;
 
 // essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
 

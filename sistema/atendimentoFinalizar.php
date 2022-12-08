@@ -7,6 +7,8 @@ $_SESSION['PaginaAtual'] = 'Receituário';
 include('global_assets/php/conexao.php');
 
 $iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
+$iUnidade = $_SESSION['UnidadeId'];
+$usuarioId = $_SESSION['UsuarId'];
 
 if (isset($_SESSION['iAtendimentoId']) && !$iAtendimentoId) {
 	$iAtendimentoId = $_SESSION['iAtendimentoId'];
@@ -66,13 +68,75 @@ if ($row['ClienSexo'] == 'F'){
     $sexo = 'Masculino';
 }
 
-if(isset($_POST['condulta'])){
+if(isset($_POST['condulta'])){	
+	// essa parte vai pegar os dados do atendimento para criar outro atendimento baseado no antigo
+	$creatNew = false;
+	switch($_POST['condulta']){
+		case "AMBULATORIAL":$creatNew = true;break;
+		case "INTERNACAO":$creatNew = true;break;
+		default: $creatNew = false;
+	}
+
+	if($creatNew){
+		// busca a classificação
+		$sql = "SELECT AtClaId FROM AtendimentoClassificacao WHERE AtClaChave = '$_POST[condulta]'
+		AND AtClaUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$classificacao = $result->fetch(PDO::FETCH_ASSOC);
+	
+		// busca o Atendimento antigo
+		$sql = "SELECT AtendAgendamento, AtendNumRegistro, AtendDataRegistro, AtendCliente, AtendModalidade,
+		AtendResponsavel, AtendClassificacao, AtendClassificacaoRisco, AtendObservacao, AtendJustificativa,
+		AtendSituacao, AtendUsuarioAtualizador, AtendUnidade
+		FROM Atendimento WHERE AtendId = $iAtendimentoId AND AtendUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$atendimento = $result->fetch(PDO::FETCH_ASSOC);
+
+		$mes = date('m');
+
+		$sql = "SELECT AtendNumRegistro FROM Atendimento WHERE AtendNumRegistro LIKE '%A$mes-%'
+				ORDER BY AtendId DESC";
+		$result = $conn->query($sql);
+		$rowCodigo = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$intaValCodigo = COUNT($rowCodigo)?intval(explode('-',$rowCodigo[0]['AtendNumRegistro'])[1])+1:1;
+
+		$numRegistro = "A$mes-$intaValCodigo";
+	
+		// trata os dados para serem inseridos no banco
+		$AtendAgendamento = $atendimento['AtendAgendamento'];
+		$AtendNumRegistro = $numRegistro;
+		$AtendDataRegistro = date('Y-m-d');
+		$AtendCliente = $atendimento['AtendCliente'];
+		$AtendModalidade = $atendimento['AtendModalidade'];
+		$AtendResponsavel = $atendimento['AtendResponsavel'];
+		$AtendClassificacao = $classificacao['AtClaId'];
+		$AtendClassificacaoRisco = $atendimento['AtendClassificacaoRisco'];
+		$AtendObservacao = $atendimento['AtendObservacao'];
+		$AtendJustificativa = $atendimento['AtendJustificativa'];
+		$AtendSituacao = $atendimento['AtendSituacao'];
+		$AtendUsuarioAtualizador = $usuarioId;
+		$AtendUnidade = $iUnidade;
+	
+		// insere no banco os novos dados
+		$sql = "INSERT INTO Atendimento(AtendAgendamento, AtendNumRegistro, AtendDataRegistro, AtendCliente, AtendModalidade,
+				AtendResponsavel, AtendClassificacao, AtendClassificacaoRisco, AtendObservacao, AtendJustificativa,
+				AtendSituacao, AtendUsuarioAtualizador, AtendUnidade)
+				VALUES('$AtendAgendamento','$AtendNumRegistro','$AtendDataRegistro','$AtendCliente','$AtendModalidade',
+				'$AtendResponsavel','$AtendClassificacao','$AtendClassificacaoRisco','$AtendObservacao',
+				'$AtendJustificativa','$AtendSituacao','$AtendUsuarioAtualizador','$AtendUnidade')";
+		$conn->query($sql);
+	}
+
+	// essa parde vai setar a situação do atendimento antigo como "ATENDIDO"
+
 	$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'ATENDIDO'";
 	$result = $conn->query($sql);
 	$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
 	$sql = "UPDATE Atendimento SET AtendSituacao = '$situacao[SituaId]' WHERE AtendId = '$iAtendimentoId'";
 	$conn->query($sql);
+
 	switch($_SESSION['UltimaPagina']){
 		case "ELETIVO":irpara("atendimentoEletivoListagem.php");break;
 		case "AMBULATORIAL":irpara("atendimentoAmbulatorialListagem.php");break;
@@ -115,7 +179,17 @@ if(isset($_POST['condulta'])){
 		$(document).ready(function() {	
 			$('#encerrar').on('click', function(e){
 				e.preventDefault()
-				$( "#formAtendimentoFinalizar" ).attr('action', $('#condulta').val())
+				let URL
+				switch($('#condulta').val()){
+					case 'COMRECEITA': URL = 'atendimentoReceituario.php';break;
+					case 'SEMRECEITA': URL = 'atendimentoFinalizar.php';break;
+					case 'LIBERADO': URL = 'atendimentoFinalizar.php';break;
+					case 'OBSERVACAO': URL = 'atendimentoFinalizar.php';break;
+					case 'INTERNACAO': URL = 'atendimentoFinalizar.php';break;
+					case 'TRANSFERENCIA': URL = 'atendimentoFinalizar.php';break;
+					default: URL = 'atendimentoFinalizar.php';
+				}
+				$( "#formAtendimentoFinalizar" ).attr('action', URL)
 				$( "#formAtendimentoFinalizar" ).submit()
 			})
 		}); //document.ready
@@ -173,12 +247,13 @@ if(isset($_POST['condulta'])){
 										<div class="col-lg-6">
 											<select id="condulta" name="condulta" class="select-search" required>
 												<option value=''>Selecione</option>
-												<option value='atendimentoReceituario.php'>Residência com Receita</option>
-												<option value='atendimentoFinalizar.php'>Residência sem Receita</option>
-												<option value='atendimentoFinalizar.php'>Liberado após exames/procedimentos solicitados</option>
-												<option value=''>Observação Hospitalar</option>
-												<option value=''>Internação Hospitalar</option>
-												<option value=''>Transferência</option>
+												<option value='COMRECEITA'>Residência com Receita</option>
+												<option value='SEMRECEITA'>Residência sem Receita</option>
+												<option value='LIBERADO'>Liberado após exames/procedimentos solicitados</option>
+												
+												<option value='AMBULATORIAL'>Observação Hospitalar</option>
+												<option value='INTERNACAO'>Internação Hospitalar</option>
+												<option value='TRANSFERENCIA'>Transferência</option>
 											</select>
 										</div>
 									</div>
