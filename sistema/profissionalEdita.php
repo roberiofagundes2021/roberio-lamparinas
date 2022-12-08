@@ -291,7 +291,8 @@ if(isset($_POST['inputProfissionalId'])){
 		}
 
 		function validaDataNascimento(dataASerValidada){			
-			let dataObj = new Date(dataASerValidada);
+			//Adicionado um espaço para forçar o fuso horário de brasília		
+			let dataObj = new Date(dataASerValidada+" ");
 			let hoje = new Date();
 			if((hoje-dataObj)<0){
 				return false;				

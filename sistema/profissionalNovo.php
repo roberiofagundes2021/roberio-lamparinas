@@ -259,8 +259,9 @@ include('global_assets/php/conexao.php');
 			}
 		}
 
-		function validaDataNascimento(dataASerValidada){			
-			let dataObj = new Date(dataASerValidada);
+		function validaDataNascimento(dataASerValidada){	
+			//Adicionado um espaço para forçar o fuso horário de brasília		
+			let dataObj = new Date(dataASerValidada+" ");
 			let hoje = new Date();
 			if((hoje-dataObj)<0){
 				return false;				

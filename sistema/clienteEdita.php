@@ -47,7 +47,8 @@ else {
 
 	<script type="text/javascript">
 		function validaDataNascimento(dataASerValidada){			
-			let dataObj = new Date(dataASerValidada);
+			//Adicionado um espaço para forçar o fuso horário de brasília		
+			let dataObj = new Date(dataASerValidada+" ");
 			let hoje = new Date();
 			if((hoje-dataObj)<0){
 				return false;				
@@ -62,7 +63,8 @@ else {
 			if (!validaDataNascimento(dataPreenchida)){
 				let labelErro = $('#inputDtNascimento-error')
 				labelErro.removeClass('validation-valid-label');
-				labelErro[0].innerHTML = "Data não pode ser futura";				
+				labelErro[0].innerHTML = "Data não pode ser futura";
+				$('#inputDtNascimento').val("");				
 			}
 		}
 	</script>
