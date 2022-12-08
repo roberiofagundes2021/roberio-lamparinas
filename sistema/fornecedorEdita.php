@@ -1,9 +1,6 @@
 <?php 
-
 include_once("sessao.php"); 
-
 $_SESSION['PaginaAtual'] = 'Editar Fornecedor';
-
 include('global_assets/php/conexao.php');
 
 //Se veio do fornecedor.php
@@ -54,8 +51,8 @@ if(isset($_POST['inputTipo'])){
 									  ForneIcms = :iIcms, ForneOutros = :iOutros, ForneUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE ForneId = :iFornecedor";
 		$result = $conn->prepare($sql);
-				
-		$conn->beginTransaction();				
+
+		$conn->beginTransaction();
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
@@ -122,15 +119,15 @@ if(isset($_POST['inputTipo'])){
 									':iUnidade' => $_SESSION['UnidadeId']
 									));
 				}
-							
+				
 			} catch(PDOException $e) {
 				$conn->rollback();
 				echo 'Error: ' . $e->getMessage();exit;
 			}
 		}
-				
-		$conn->commit();
 		
+		$conn->commit();
+
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Fornecedor alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
@@ -167,7 +164,7 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<!-- /theme JS files -->	
 
 	<!-- Validação -->
@@ -249,7 +246,7 @@ if(isset($_POST['inputTipo'])){
             }); //cep
             
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-			$("#cmbCategoria").on('change', function(e){
+			$('#cmbCategoria').on('change', function(e){
 				
 				Filtrando();
 				
@@ -273,7 +270,7 @@ if(isset($_POST['inputTipo'])){
 			});
 
 			//Valida Registro Duplicado
-			$("#enviar").on('click', function(e){
+			$('#enviar').on('click', function(e){
 				
 				e.preventDefault();
 
@@ -357,19 +354,22 @@ if(isset($_POST['inputTipo'])){
 		}        
         
         function selecionaPessoa(tipo) {
-
 			if (tipo == 'F'){
 				document.getElementById('CPF').style.display = "block";
 				document.getElementById('CNPJ').style.display = "none";
 				document.getElementById('dadosPF').style.display = "block";
 				document.getElementById('dadosPJ').style.display = "none";
 				document.getElementById('inputNome').placeholder = "Nome Completo";
+				document.getElementById('inputCpf').setAttribute('required', 'required');
+				document.getElementById('inputCnpj').removeAttribute('required', 'required');
 			} else {
 				document.getElementById('CPF').style.display = "none";
 				document.getElementById('CNPJ').style.display = "block";				
 				document.getElementById('dadosPF').style.display = "none";
 				document.getElementById('dadosPJ').style.display = "block";
 				document.getElementById('inputNome').placeholder = "Nome Fantasia";
+				document.getElementById('inputCpf').removeAttribute('required', 'required');
+				document.getElementById('inputCnpj').setAttribute('required', 'required');
 			}
 		}	
 		
@@ -377,10 +377,10 @@ if(isset($_POST['inputTipo'])){
 			let cnpj = $('#inputCnpj').val();
 			let resultado = validarCNPJ(cnpj);
 			if (!resultado){
-				let labelErro = $('#inputCnpj-error')
+				let labelErro = $('#inputCnpj-error');
 				labelErro.removeClass('validation-valid-label');
-				labelErro[0].innerHTML = "CNPJ Inválido";	
-				$('#inputCnpj').val("");
+				labelErro[0].innerHTML = "CNPJ Inválido";
+				$('#inputCnpj').val("");	
 			}
 			
 		}
@@ -389,7 +389,7 @@ if(isset($_POST['inputTipo'])){
 			let cpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
 			let resultado = validaCPF(cpf);
 			if (!resultado){
-				let labelErro = $('#inputCpf-error')
+				let labelErro = $('#inputCpf-error');
 				labelErro.removeClass('validation-valid-label');
 				labelErro[0].innerHTML = "CPF Inválido";	
 				$('#inputCpf').val("");
@@ -397,7 +397,8 @@ if(isset($_POST['inputTipo'])){
 		}
 
 		function validaDataNascimento(dataASerValidada){			
-			let dataObj = new Date(dataASerValidada);
+			//Adicionado um espaço para forçar o fuso horário de brasília		
+			let dataObj = new Date(dataASerValidada+" ");
 			let hoje = new Date();
 			if((hoje-dataObj)<0){
 				return false;				
@@ -410,7 +411,7 @@ if(isset($_POST['inputTipo'])){
 		function formataCampoDataNascimento(){
 			let dataPreenchida = $('#inputAniversario').val();
 			if (!validaDataNascimento(dataPreenchida)){
-				let labelErro = $('#inputAniversario-error')
+				let labelErro = $('#inputAniversario-error');
 				labelErro.removeClass('validation-valid-label');
 				labelErro[0].innerHTML = "Data não pode ser futura";
 				$('#inputAniversario').val("");		
@@ -441,7 +442,7 @@ if(isset($_POST['inputTipo'])){
 				<!-- Info blocks -->
 				<div class="card">
 					
-					<form name="formFornecedor" id="formFornecedor" method="post" class="form-validate" action="fornecedorEdita.php">
+					<form name="formFornecedor" id="formFornecedor" method="post" class="form-validate-jquery" action="fornecedorEdita.php">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Fornecedor "<?php echo $row['ForneNome']; ?>"</h5>
 						</div>
@@ -481,14 +482,14 @@ if(isset($_POST['inputTipo'])){
 								
 								<div class="col-lg-3" id="CPF">
 									<div class="form-group">
-										<label for="inputCpf">CPF</label>
+										<label for="inputCpf">CPF<span class="text-danger">*</span></label>
 										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" onblur="validaEFormataCpf()" value="<?php echo formatarCPF_Cnpj($row['ForneCpf']); ?>">
 									</div>	
 								</div>
 								
 								<div class="col-lg-3" id="CNPJ">
 									<div class="form-group">				
-										<label for="inputCnpj">CNPJ</label>
+										<label for="inputCnpj">CNPJ<span class="text-danger">*</span></label>
 										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" onblur="validaEFormataCnpj()" value="<?php echo formatarCPF_Cnpj($row['ForneCnpj']); ?>">
 									</div>	
 								</div>							
