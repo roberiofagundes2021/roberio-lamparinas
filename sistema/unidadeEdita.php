@@ -32,7 +32,7 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE Unidade SET UnidaNome = :sNome, UnidaCNES = :sCNES, UnidaCep = :sCep, UnidaEndereco = :sEndereco, UnidaNumero = :sNumero, 
+		$sql = "UPDATE Unidade SET UnidaNome = :sNome, UnidaCNES = :sCNES, UnidaCnpj = :sCnpj, UnidaTelefone = :sTelefone, UnidaDiretorAdministrativo = :sDiretorAdministrativo, UnidaDiretorTecnico = :sDiretorTecnico, UnidaDiretorClinico = :sDiretorClinico, UnidaCep = :sCep, UnidaEndereco = :sEndereco, UnidaNumero = :sNumero, 
 								   UnidaComplemento = :sComplemento, UnidaBairro = :sBairro, UnidaCidade = :sCidade, 
 								   UnidaEstado = :sEstado, UnidaUsuarioAtualizador = :iUsuarioAtualizador
 				WHERE UnidaId = :iUnidade";
@@ -41,6 +41,11 @@ if(isset($_POST['inputNome'])){
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
             ':sCNES' => $_POST['inputCNES'] == "" ? null : $_POST['inputCNES'],
+            ':sCnpj' => limpaCPF_CNPJ($_POST['inputCnpj']),
+            ':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
+            ':sDiretorAdministrativo' => $_POST['inputDiretorAdministrativo'],
+            ':sDiretorTecnico' => $_POST['inputDiretorTecnico'],
+            ':sDiretorClinico' => $_POST['inputDiretorClinico'],
 						':sCep' => trim($_POST['inputCep']) == "" ? null : $_POST['inputCep'],
 						':sEndereco' => $_POST['inputEndereco'],
 						':sNumero' => $_POST['inputNumero'],
@@ -80,6 +85,17 @@ if(isset($_POST['inputNome'])){
   <title>Lamparinas | Unidade</title>
 
   <?php include_once("head.php"); ?>
+
+  <!-- Theme JS files -->
+	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_select2.js"></script>
+
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
+	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+	<!-- /theme JS files -->	
+
 
   <!-- Validação -->
   <script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
@@ -161,12 +177,24 @@ if(isset($_POST['inputNome'])){
 
       let inputNomeNovo = $('#inputNome').val();
       let inputNomeVelho = $('#inputUnidadeNome').val();
+      let inputCnpj = $('#inputCnpj').val().replace(/[^\d]+/g,'');
       let inputCep = $('#inputCep').val();
       let inputEndereco = $('#inputEndereco').val();
       let inputNumero = $('#inputNumero').val();
       let inputBairro = $('#inputBairro').val();
       let inputCidade = $('#inputCidade').val();
       let cmbEstado = $('#cmbEstado').val();
+
+      if (inputCnpj.trim() == ''){
+				$('#inputCnpj').val('');
+      } else {
+        if (!validarCNPJ(inputCnpj)){
+          $('#inputCnpj').val('');
+          alerta('Atenção','CNPJ inválido!','error');
+          $('#inputCnpj').focus();
+          return false;
+        }
+      }		
 
       //remove os espaços desnecessários antes e depois
       inputNomeNovo = inputNomeNovo.trim();
@@ -182,7 +210,7 @@ if(isset($_POST['inputNome'])){
       $.ajax({
         type: "POST",
         url: "unidadeValida.php",
-        data: ('nomeNovo=' + inputNomeNovo + '&nomeVelho=' + inputNomeVelho),
+        data: ('nomeNovo=' + inputNomeNovo + '&nomeVelho=' + inputNomeVelho ),
         success: function(resposta) {
 
           if (resposta == 1) {
@@ -196,6 +224,18 @@ if(isset($_POST['inputNome'])){
 
     })
   })
+
+    function validaEFormataCnpj(){
+			let cnpj = $('#inputCnpj').val();
+			let resultado = validarCNPJ(cnpj);
+			if (!resultado){
+				let labelErro = $('#inputCnpj-error')
+				labelErro.removeClass('validation-valid-label');
+				labelErro[0].innerHTML = "CNPJ Inválido";	
+				$('#inputCnpj').val("");
+			}
+			
+		}
   </script>
 
 </head>
@@ -232,16 +272,43 @@ if(isset($_POST['inputNome'])){
 
             <div class="card-body">
               <div class="row">
-                <div class="col-lg-8">
+                <div class="col-lg-5">
                   <div class="form-group">
                     <label for="inputNome">Nome da Unidade <span class='text-danger'>*</span></label>
                     <input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Unidade" value="<?php echo $row['UnidaNome']; ?>" required autofocus>
                   </div>
                 </div>
+                <div class="col-lg-3" id="CNPJ">
+									<div class="form-group">				
+										<label for="inputCnpj">CNPJ <span class='text-danger'>*</span></label>
+										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" onblur="validaEFormataCnpj()" value="<?php echo formatarCPF_Cnpj($row['UnidaCnpj']); ?>" required>
+									</div>	
+								</div>
                 <div class="col-lg-4">
                   <div class="form-group">
                     <label for="inputCNES">CNES</label>
                     <input type="text" id="inputCNES" name="inputCNES" class="form-control" placeholder="CNES" value="<?php echo $row['UnidaCNES']; ?>" >
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="inputDiretorAdministrativo">Diretor Administrativo </label>
+                    <input type="text" id="inputDiretorAdministrativo" name="inputDiretorAdministrativo" class="form-control" placeholder="Diretor Administrativo" value="<?php echo $row['UnidaDiretorAdministrativo']; ?>">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="inputDiretorTecnico">Diretor Técnico</label>
+                    <input type="text" id="inputDiretorTecnico" name="inputDiretorTecnico" class="form-control" placeholder="Diretor Técnico" value="<?php echo $row['UnidaDiretorTecnico']; ?>">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="inputDiretorClinico">Diretor Clínico</label>
+                    <input type="text" id="inputDiretorClinico" name="inputDiretorClinico" class="form-control" placeholder="Diretor Clínico" value="<?php echo $row['UnidaDiretorClinico']; ?>">
                   </div>
                 </div>
               </div>
@@ -272,12 +339,19 @@ if(isset($_POST['inputNome'])){
                       </div>
                     </div>
 
-                    <div class="col-lg-5">
+                    <div class="col-lg-3">
                       <div class="form-group">
                         <label for="inputComplemento">Complemento</label>
                         <input type="text" id="inputComplemento" name="inputComplemento" class="form-control" placeholder="complemento" value="<?php echo $row['UnidaComplemento']; ?>">
                       </div>
                     </div>
+
+                    <div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputTelefone">Telefone <span class='text-danger'>*</span></label>
+												<input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999" value="<?php echo $row['UnidaTelefone']; ?>" required>
+											</div>
+										</div>
                   </div>
 
                   <div class="row">
