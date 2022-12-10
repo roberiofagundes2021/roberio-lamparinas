@@ -225,11 +225,13 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 		$(document).ready(function() {	
 			$('#enviar').on('click', function(e){
 				e.preventDefault()
+				$('#tipo').val('ATT')
 				$( "#formAtendimentoReceituario" ).submit()
 			})
 
 			$('#finalizarBTN').on('click', function(e){
 				e.preventDefault()
+				$('#tipo').val('NEW')
 				let data = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
 				let hora = ''
 
@@ -244,14 +246,37 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 				$( "#formAtendimentoReceituario" ).submit()
 			})
 
-		}); //document.ready
+			$('.selectItem').each(function(){
+				$(this).on('click', function(element){
+					element.preventDefault()
+					$.ajax({
+						type: 'POST',
+						url: 'filtraAtendimentoReceituario.php',
+						dataType: 'json',
+						data: {
+							'tipoRequest': 'GETRECEITUARIO',
+							'iReceituario': $(this).data('id')
+						},
+						success: function(response) {
+							$('#summernote').val(response.receituario)
+							$('#receituario').val(response.tipoReceituario)
 
-		function selectItem(item){
-			$('#iReceituario').val($(item).data('id'))
-			$('#receituario').prop('required',false);
-			$( "#formAtendimentoReceituario" ).submit()
-		}
-	
+							$('#receituario').children("option").each(function(index, item){
+								if($(item).val() == response.tipoReceituario){
+									$(item).change()
+								}
+							})
+						}
+					})
+				})
+			})
+			$('.imprimirReceituario').each(function(){
+				$(this).on('click', function(element){
+					element.preventDefault()
+				})
+			})
+
+		}); //document.ready	
 	</script>
 
 </head>
@@ -288,6 +313,7 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 						<!-- Basic responsive configuration -->
 						<form name="formAtendimentoReceituario" id="formAtendimentoReceituario" method="post" class="form-validate-jquery">
 							<?php
+								$tipo = isset($_POST['tipo'])?$_POST['tipo']:null;
 								echo "<input type='hidden' id='inputDataFimReceituario' name='inputDataFimReceituario' value='".($rowReceituario?$rowReceituario['AtRecDataFim']:'')."'/>";
 								echo "<input type='hidden' id='inputHoraFimReceituario' name='inputHoraFimReceituario' value='".($rowReceituario?$rowReceituario['AtRecHoraFim']:'')."'/>";
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
@@ -381,8 +407,8 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 
 														foreach($rowReceituarioHistorico as $key => $item){
 															$acoes = "
-															<a href='#' onclick='selectItem(this)' data-id='$item[AtRecId]' class='list-icons-item'  title='Detalhamento'><i class='icon-file-text2'></i></a>
-															<a href='#' onclick='imprimirReceituario(this)' data-id='$item[AtRecId]' class='list-icons-item'  title='Imprimir'><i class='icon-printer2'></i></a>";
+															<a href='#' data-id='$item[AtRecId]' class='list-icons-item selectItem' title='Detalhamento'><i class='icon-file-text2'></i></a>
+															<a href='#' data-id='$item[AtRecId]' class='list-icons-item imprimirReceituario' title='Imprimir'><i class='icon-printer2'></i></a>";
 
 															$tipoReceituario = $item['AtRecTipoReceituario']=='S'?'Simples':'Especial';
 															$data = mostraData($item['AtRecDataInicio']);
