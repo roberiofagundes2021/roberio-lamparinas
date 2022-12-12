@@ -2973,6 +2973,182 @@ try{
 			'titulo' => 'Documento',
 			'menssagem' => 'Documento excluído com sucesso!!!',
 		]);
+	}elseif ($tipoRequest == 'SETTIPOBUSCAMEDICAMENTO') {
+
+		if ( $_POST['tipoBusca'] == 'MEDICAMENTO') {
+			$_SESSION['tipoPesquisa'] = 'MEDICAMENTO' ;
+		} elseif ($_POST['tipoBusca'] == 'SOLUCAO') {
+			$_SESSION['tipoPesquisa'] = 'SOLUCAO' ;
+		} elseif ($_POST['tipoBusca'] == 'SOLUCAODILUENTE') {
+			$_SESSION['tipoPesquisa'] = 'SOLUCAODILUENTE' ;
+		}
+		
+		echo json_encode([
+			'status' =>'success'
+		]);
+		
+		} elseif ($tipoRequest == 'PESQUISARPRODUTOS') {
+		
+		$categoria = $_POST['categoria'];
+		$subCategoria = $_POST['subCategoria'];
+		$nomeProduto = $_POST['nomeProduto'];
+		
+		if(!$categoria && $subCategoria){
+			$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, UnMedNome, UnMedId, TpFisNome
+			FROM Produto	
+			JOIN UnidadeMedida ON ProduUnidadeMedida = UnMedId
+			JOIN TipoFiscal ON ProduTipoFiscal = TpFisId
+			JOIN Categoria ON ProduCategoria = CategId
+			JOIN SubCategoria ON ProduSubCategoria = SbCatId
+			WHERE ProduSubCategoria = $subCategoria
+			AND ProduNome like '%$nomeProduto%'
+			AND ProduUnidade = $iUnidade";
+		}elseif(!$subCategoria && $categoria){
+			$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, UnMedNome, UnMedId, TpFisNome 
+			FROM Produto
+			JOIN UnidadeMedida ON ProduUnidadeMedida = UnMedId
+			JOIN TipoFiscal ON ProduTipoFiscal = TpFisId
+			JOIN Categoria ON ProduCategoria = CategId
+			JOIN SubCategoria ON ProduSubCategoria = SbCatId
+			WHERE ProduCategoria = $categoria
+			AND ProduNome like '%$nomeProduto%'
+			AND ProduUnidade = $iUnidade";
+		}elseif ((!$categoria) && (!$subCategoria)) {
+			$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, UnMedNome, UnMedId, TpFisNome 
+			FROM Produto
+			JOIN UnidadeMedida ON ProduUnidadeMedida = UnMedId
+			JOIN TipoFiscal ON ProduTipoFiscal = TpFisId
+			JOIN Categoria ON ProduCategoria = CategId
+			JOIN SubCategoria ON ProduSubCategoria = SbCatId
+			WHERE ProduNome like '%$nomeProduto%'
+			AND ProduUnidade = $iUnidade";
+		}else{
+			$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, UnMedNome, UnMedId,  TpFisNome 
+			FROM Produto
+			JOIN UnidadeMedida ON ProduUnidadeMedida = UnMedId
+			JOIN TipoFiscal ON ProduTipoFiscal = TpFisId
+			JOIN Categoria ON ProduCategoria = CategId
+			JOIN SubCategoria ON ProduSubCategoria = SbCatId
+			WHERE (ProduCategoria = $categoria OR ProduSubCategoria = $subCategoria)
+			AND ProduNome like '%$nomeProduto%'
+			AND ProduUnidade = $iUnidade";			
+		}
+		$result = $conn->query($sql);
+		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+		$array = [];
+		
+		foreach ($rowProdutos as $key => $item ) {
+			
+			array_push($array,[
+				'item' => $key + 1,
+				'id' => $item['ProduId'],
+				'produCodigo'=>$item['ProduCodigo'],
+				'descricao'=> $item['ProduNome'],
+				'categoria' => $item['CategNome'],
+				'subCategoria'=>$item['SbCatNome'],
+				'unidade'=>$item['UnMedNome'],
+				'unidadeId' => $item['UnMedId'],
+				'classificacao'=>$item['TpFisNome'],
+			]);
+		
+		}
+		
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'SALVAROBSERVACAOENTRADA') {
+	
+		$iAtendimentoId = $_POST['iAtendimentoId'];
+		$profissional = $_POST['profissional'];
+		$historiaEntrada = $_POST['historiaEntrada'];
+		$cid10 = $_POST['cid10'];
+		$servico = $_POST['servico'];
+	
+		$dataInicio = date('Y-m-d'); 
+		$horaInicio =date('H:i:s');
+	
+		$sql = "SELECT AtOEnId 
+		FROM AtendimentoObservacaoEntrada
+		WHERE AtOEnAtendimento = $iAtendimentoId
+		AND AtOEnUnidade = $iUnidade";	
+		$result = $conn->query($sql);
+		$resultadoBusca = $result->fetch(PDO::FETCH_ASSOC);
+	
+	
+	
+		if ($resultadoBusca == false) {
+			$sql = "INSERT INTO AtendimentoObservacaoEntrada
+			(AtOEnAtendimento, AtOEnDataInicio, AtOEnHoraInicio, AtOEnProfissional, AtOEnHistoria, AtOEnCid10, AtOEnProcedimento, AtOEnUnidade)
+			VALUES('$iAtendimentoId', '$dataInicio', '$horaInicio', '$profissional', '$historiaEntrada', '$cid10', '$servico', '$iUnidade' )";	
+			
+		} else {
+			$sql = "UPDATE AtendimentoObservacaoEntrada SET
+			AtOEnDataInicio = '$dataInicio', 
+			AtOEnHoraInicio = '$horaInicio', 
+			AtOEnProfissional = '$profissional', 
+			AtOEnHistoria = '$historiaEntrada', 
+			AtOEnCid10 = '$cid10', 
+			AtOEnProcedimento = '$servico', 
+			AtOEnUnidade = '$iUnidade'
+			WHERE AtOEnId = $$resultadoBusca[AtOEnId]";			
+		}
+	
+		$result = $conn->query($sql);
+	
+		echo json_encode([
+			'titulo' => 'Observação Hospitalar',
+			'status' => 'success',
+			'menssagem' => 'Observacão salva com Sucesso!'
+		]);
+		
+	}elseif ($tipoRequest == 'SALVARINTERNACAOENTRADA') {
+	
+		$iAtendimentoId = $_POST['iAtendimentoId'];
+		$profissional = $_POST['profissional'];
+		$sinaisESintomasClinicos = $_POST['sinaisESintomasClinicos'];
+		$justificativaInternacao = $_POST['justificativaInternacao'];
+		$resultProvaDiagnostica = $_POST['resultProvaDiagnostica'];
+		$cid10 = $_POST['cid10'];
+		$servico = $_POST['servico'];
+	
+		$dataInicio = date('Y-m-d'); 
+		$horaInicio =date('H:i:s');
+	
+		$sql = "SELECT AtIEnId 
+		FROM AtendimentoInternacaoEntrada
+		WHERE AtIEnAtendimento = $iAtendimentoId
+		AND AtIEnUnidade = $iUnidade";	
+		$result = $conn->query($sql);
+		$resultadoBusca = $result->fetch(PDO::FETCH_ASSOC);
+	
+	
+	
+		if ($resultadoBusca == false) {
+			$sql = "INSERT INTO AtendimentoInternacaoEntrada
+			(AtIEnAtendimento, AtIEnDataInicio, AtIEnHoraInicio, AtIEnProfissional, AtIEnPrincipaisSinais, AtIEnJustificativa, AtIEnPrincipaisResultados, AtIEnCid10, AtIEnProcedimento, AtIEnUnidade)
+			VALUES('$iAtendimentoId', '$dataInicio', '$horaInicio', '$profissional', '$sinaisESintomasClinicos','$justificativaInternacao','$resultProvaDiagnostica', '$cid10', '$servico', '$iUnidade' )";	
+			
+		} else {
+			$sql = "UPDATE AtendimentoInternacaoEntrada SET
+			AtIEnDataInicio = '$dataInicio', 
+			AtIEnHoraInicio = '$horaInicio', 
+			AtIEnProfissional = '$profissional', 
+			AtIEnPrincipaisSinais = '$sinaisESintomasClinicos', 
+			AtIEnJustificativa = '$justificativaInternacao', 
+			AtIEnPrincipaisResultados = '$resultProvaDiagnostica', 
+			AtIEnCid10 = '$cid10', 
+			AtIEnProcedimento = '$servico', 
+			AtIEnUnidade = '$iUnidade'
+			WHERE AtIEnId = $$resultadoBusca[AtIEnId]";			
+		}
+	
+		$result = $conn->query($sql);
+	
+		echo json_encode([
+			'titulo' => 'Internação Hospitalar',
+			'status' => 'success',
+			'menssagem' => 'Internação salva com Sucesso!'
+		]);
+		
 	}
 
 }catch(PDOException $e) {
