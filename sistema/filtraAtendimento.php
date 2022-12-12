@@ -348,14 +348,14 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtendNumRegistro,
 			AtClRNome,AtClRNomePersonalizado,AtClRTempo,AtClRDeterminantes,AtClRCor,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,
-			SituaNome,SituaChave,SituaCor,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			SituaNome,SituaChave,SituaCor,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -366,14 +366,14 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -384,14 +384,14 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMOBSERVACAO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -402,14 +402,14 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -827,14 +827,14 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtClRTempo,AtClRCor,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -845,14 +845,14 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -863,14 +863,14 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMOBSERVACAO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -881,14 +881,14 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -1303,14 +1303,14 @@ try{
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
 			AtClRNome,AtClRTempo,AtClRNomePersonalizado,AtClRDeterminantes,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda, AtClRCor
 			FROM AtendimentoXServico
 			JOIN Atendimento ON AtendId = AtXSeAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			JOIN Situacao ON SituaId = AtendSituacao
 			JOIN Cliente ON ClienId = AtendCliente
 			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			JOIN ServicoVenda ON SrVenId = AtXSeServico
+			JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -1321,14 +1321,14 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda, AtClRCor
 			FROM AtendimentoXServico
 			JOIN Atendimento ON AtendId = AtXSeAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			JOIN Situacao ON SituaId = AtendSituacao
 			JOIN Cliente ON ClienId = AtendCliente
 			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			JOIN ServicoVenda ON SrVenId = AtXSeServico
+			JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -1339,14 +1339,14 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
 		AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
-		AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda, AtClRCor
+		AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda, AtClRCor
 			FROM AtendimentoXServico
 			JOIN Atendimento ON AtendId = AtXSeAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			JOIN Situacao ON SituaId = AtendSituacao
 			JOIN Cliente ON ClienId = AtendCliente
 			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			JOIN ServicoVenda ON SrVenId = AtXSeServico
+			JOIN Servico ON ServiId = AtXSeServico
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
