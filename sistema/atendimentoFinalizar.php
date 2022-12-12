@@ -77,7 +77,23 @@ if(isset($_POST['condulta'])){
 		default: $creatNew = false;
 	}
 
-	if($creatNew){
+	if(!$creatNew){
+		// essa parde vai setar a situação do atendimento antigo como "ATENDIDO"
+
+		$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'ATENDIDO'";
+		$result = $conn->query($sql);
+		$situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+		$sql = "UPDATE Atendimento SET AtendSituacao = '$situacao[SituaId]' WHERE AtendId = '$iAtendimentoId'";
+		$conn->query($sql);
+
+		switch($_SESSION['UltimaPagina']){
+			case "ELETIVO":irpara("atendimentoEletivoListagem.php");break;
+			case "AMBULATORIAL":irpara("atendimentoAmbulatorialListagem.php");break;
+			case "INTERNACAO":irpara("atendimentoHospitalarListagem.php");break;
+			default: irpara("atendimentoEletivoListagem.php");break;
+		}
+	} else{
 		// busca a classificação
 		$sql = "SELECT AtClaId FROM AtendimentoClassificacao WHERE AtClaChave = '$_POST[condulta]'
 		AND AtClaUnidade = $iUnidade";
@@ -126,22 +142,14 @@ if(isset($_POST['condulta'])){
 				'$AtendResponsavel','$AtendClassificacao','$AtendClassificacaoRisco','$AtendObservacao',
 				'$AtendJustificativa','$AtendSituacao','$AtendUsuarioAtualizador','$AtendUnidade')";
 		$conn->query($sql);
-	}
 
-	// essa parde vai setar a situação do atendimento antigo como "ATENDIDO"
+		$_SESSION['iAtendimentoId'] = $conn->lastInsertId();
 
-	$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'ATENDIDO'";
-	$result = $conn->query($sql);
-	$situacao = $result->fetch(PDO::FETCH_ASSOC);
-
-	$sql = "UPDATE Atendimento SET AtendSituacao = '$situacao[SituaId]' WHERE AtendId = '$iAtendimentoId'";
-	$conn->query($sql);
-
-	switch($_SESSION['UltimaPagina']){
-		case "ELETIVO":irpara("atendimentoEletivoListagem.php");break;
-		case "AMBULATORIAL":irpara("atendimentoAmbulatorialListagem.php");break;
-		case "INTERNACAO":irpara("atendimentoHospitalarListagem.php");break;
-		default: irpara("atendimentoEletivoListagem.php");break;
+		switch($_POST['condulta']){
+			case "AMBULATORIAL":irpara("atendimentoObservacaoEntrada.php");break;
+			case "INTERNACAO":irpara("atendimentoInternacaoEntrada.php");break;
+			default: irpara("atendimentoAmbulatorialListagem.php");break;
+		}
 	}
 }
 ?>
