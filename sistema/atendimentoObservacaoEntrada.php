@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Observação Entrada';
 
 include('global_assets/php/conexao.php');
 
-$iAtendimentoId = 43;
+$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
 if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
 	$iAtendimentoId = $_SESSION['iAtendimentoId'];
