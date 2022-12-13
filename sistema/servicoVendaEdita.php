@@ -53,6 +53,15 @@ if (!isset($_POST['inputServicoId'])) {
 	WHERE s.SituaChave = 'ATIVO' AND am.AtModUnidade = " . $_SESSION['UnidadeId'] . " ORDER BY am.AtModNome asc;";
 	$modalidades = $conn->query($sqlModalidades);
 	$modalidades = $modalidades->fetchAll(PDO::FETCH_ASSOC);
+
+	$queryServicos = "SELECT SVXMoId,SVXMoModalidade,am.AtModNome ,SVXMoValorCusto,SVXMoOutrasDespesas,SVXMoCustoFinal,SVXMoMargemLucro,SVXMoValorVenda
+	FROM ServicoVendaXModalidade svm
+	JOIN AtendimentoModalidade am on svm.SVXMoModalidade = am.AtModId 
+	JOIN Situacao s ON s.SituaId = svm.SVXMoStatus 
+	WHERE s.SituaChave = 'ATIVO' and SVXMoServicoVenda = " . $_POST['inputServicoId'] . "
+	AND SVXMoUnidade = " . $_SESSION['UnidadeId'] . ";";
+	$Servicos = $conn->query($queryServicos);
+	$Servicos = $Servicos->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
 
@@ -76,14 +85,17 @@ if (!isset($_POST['inputServicoId'])) {
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+	<script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		function sleep(ms) {
-			return new Promise(resolve => setTimeout(resolve, ms));
-		}
-
 		$(document).ready(function() {
+
+			//controla se está editando ou criando uma linha nova na tabela de serviços
+			linhaAtual = null;
+			contadorLinhasCriadas = 0;
+
 			let tipoServico = $("#inputServicoTipo").val();
 			$(`#tipoServico option[value=${tipoServico}]`).prop('selected', 'selected').change();
 
@@ -96,7 +108,180 @@ if (!isset($_POST['inputServicoId'])) {
 
 			let planoDeConta = $("#inputPlanoDeConta").val();
 			$(`#cmbPlanoConta option[value=${planoDeConta}]`).prop('selected', 'selected').change();
+
+			//Tabela customizada de preços dos serviços
+			$('#precoServicosTable').DataTable({
+				"order": [
+					[0, "desc"]
+				],
+				autoWidth: false,
+				responsive: true,
+				columnDefs: [{
+						orderable: true, //Modalidade do Serviço
+						width: "70%",
+						targets: [0]
+					},
+					{
+						orderable: true, //Valor de venda
+						width: "20%",
+						targets: [1]
+					},
+					{
+						orderable: true, //Situacao
+						width: "5%",
+						targets: [2]
+					},
+					{
+						orderable: true, //Ações
+						width: "5%",
+						targets: [3]
+					}
+				],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: {
+						'first': 'Primeira',
+						'last': 'Última',
+						'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+						'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+					}
+				}
+			});
+
+			//|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
+			let table = $('#precoServicosTable').DataTable().clear().draw()
+			table = $('#precoServicosTable').DataTable()
+			let rowNode
+
+			var servicos = '<?php echo json_encode($Servicos); ?>';
+			servicos = JSON.parse(servicos);
+			servicosFormatados = []
+
+			servicos.forEach(item => {
+				let situacaoHtml = `
+				<span style='cursor:pointer' class='badge badge-flat border-secondary text-secondary'>
+    				Ativo
+				</span>
+				`;
+				let BotaoEditaHtml = `
+				<div class='list-icons'><a style='color: black' href='#' class='list-icons-item'>
+					<i onclick='editaLinha(event,${item.SVXMoId})' class='icon-pencil7' title='Editar modalidade'></i>
+				</div>
+				`
+				linha = {}
+				linha.data = [item.AtModNome, item.SVXMoValorVenda, situacaoHtml, BotaoEditaHtml]
+				linha.identify = {
+					"situação": "Ativo",
+					"idBanco": item.SVXMoId,
+					"idTabela": "x"
+				}
+				linha.rawData = item;
+				servicosFormatados.push(linha)
+			})
+
+			servicosFormatados.forEach(item => {
+				rowNode = table.row.add(item.data).draw();
+				item.identify.idTabela = rowNode[0];
+			})
+
 		});
+
+		function editaLinha(e, idBanco) {
+			e.preventDefault();
+			var scrollDiv = document.getElementById("rowTabela").offsetTop;
+			window.scrollTo({
+				top: scrollDiv,
+				behavior: 'smooth'
+			});
+			let indexDaLinha = servicosFormatados.findIndex(item => item.identify.idBanco == idBanco);
+			let dadosDaLinha = servicosFormatados[indexDaLinha].rawData;
+			$('#inputValorCusto').val(float2moeda(dadosDaLinha.SVXMoValorCusto));
+			$('#inputOutrasDespesas').val(float2moeda(dadosDaLinha.SVXMoOutrasDespesas));
+			$('#inputCustoFinal').val(float2moeda(dadosDaLinha.SVXMoCustoFinal));
+			$('#inputMargemLucro').val(float2moeda(dadosDaLinha.SVXMoMargemLucro));
+			$('#inputValorVenda').val(float2moeda(dadosDaLinha.SVXMoValorVenda));
+			$(`#modalidades option[value=${dadosDaLinha.SVXMoModalidade}]`).prop('selected', 'selected').change();
+			linhaAtual = {
+				"idBanco": idBanco,
+				"idTabela": servicosFormatados[indexDaLinha].idTabela,
+				"indexDaLinha": indexDaLinha
+			};
+		}
+
+		function AtualizarOuIncluir(e) {
+			e.preventDefault();
+			camposObrigatorios = [
+				"modalidades",
+				"inputValorCusto",
+				"inputOutrasDespesas",
+				"inputCustoFinal",
+				"inputMargemLucro",
+				"inputValorVenda"
+			]
+
+			let campoEmBranco = null;
+			camposObrigatorios.forEach(item=>{
+				eval(`$('#${item}').val()==""?campoEmBranco=${item}:campoEmBranco=null`);
+			})
+			console.log(campoEmBranco);
+			if(campoEmBranco!=null){
+				alert(`${campoEmBranco} não prenchido`);
+				return;
+			}
+			let table = $('#precoServicosTable').DataTable();
+			let idProvisorio = 990000 + contadorLinhasCriadas;
+			let situacaoHtml = `
+				<span style='cursor:pointer' class='badge badge-flat border-secondary text-secondary'>
+    				Ativo
+				</span>
+				`;
+			let BotaoEditaHtml = `
+				<div class='list-icons'><a style='color: black' href='#' class='list-icons-item'>
+					<i onclick='editaLinha(event,${linhaAtual==null?idProvisorio:linhaAtual.idBanco})' class='icon-pencil7' title='Editar modalidade'></i>
+				</div>
+				`
+			linha = {}
+			linha.data = [$('#modalidades option:selected').prop('label'), $('#inputValorVenda').val(), situacaoHtml, BotaoEditaHtml]
+			linha.identify = {
+				"situação": "Ativo",
+				"idBanco": linhaAtual == null ? idProvisorio : linhaAtual.idBanco,
+				"idTabela": "x"
+			}
+			linha.rawData = {
+				SVXMoId: linhaAtual == null ? "X" : linhaAtual.idBanco.toString(),
+				SVXMoModalidade: $('#modalidades option:selected').val(),
+				AtModNome: $('#modalidades option:selected').prop('label'),
+				SVXMoCustoFinal: $('#inputCustoFinal').val().replaceAll('.', '').replace(',', '.'),
+				SVXMoMargemLucro: $('#inputMargemLucro').val().replaceAll('.', '').replace(',', '.'),
+				SVXMoOutrasDespesas: $('#inputOutrasDespesas').val().replaceAll('.', '').replace(',', '.'),
+				SVXMoValorCusto: $('#inputValorCusto').val().replaceAll('.', '').replace(',', '.'),
+				SVXMoValorVenda: $('#inputValorVenda').val().replaceAll('.', '').replace(',', '.'),
+			};
+			if (linhaAtual == null) {
+				rowNode = table.row.add(linha.data).draw();
+				linha.identify.idTabela = rowNode[0];
+				servicosFormatados.push(linha);
+				contadorLinhasCriadas++;
+			} else {
+				table.row(linhaAtual.idTabela).data(linha.data).draw();
+				console.log(linha.rawData);
+				console.log(servicosFormatados[linhaAtual.indexDaLinha].rawData);
+				servicosFormatados[linhaAtual.indexDaLinha] = linha;
+			}
+			linhaAtual = null;
+
+			$('#modalidades').val("");
+			$('#inputValorCusto').val("");
+			$('#inputOutrasDespesas').val("");
+			$('#inputCustoFinal').val("");
+			$('#inputMargemLucro').val("");
+			$('#inputValorVenda').val("");			
+		}
+
+
 
 		function atualizaSubGrupos() {
 			if ($('#grupo').val() == "") {
@@ -119,130 +304,99 @@ if (!isset($_POST['inputServicoId'])) {
 			}
 		}
 
-		//Limpa o campo Nome quando for digitado só espaços em branco
-		$("#inputNome").on('blur', function(e) {
+		function limpaEspacosEmBranco() {
 			var inputNome = $('#inputNome').val();
 			inputNome = inputNome.trim();
 			if (inputNome.length == 0) {
 				$('#inputNome').val('');
 			}
-		});
+		};
 
-		//Ao mudar o Custo, atualiza o CustoFinal
-		$('#inputValorCusto').on('blur', function(e) {
+		function retornaPrecos() {
 
-			var inputValorCusto = $('#inputValorCusto').val().replaceAll('.', '').replace(',', '.');
-			var inputOutrasDespesas = $('#inputOutrasDespesas').val().replaceAll('.', '').replace(',', '.');
-			var inputMargemLucro = $('#inputMargemLucro').val().replaceAll('.', '').replace(',', '.');
+			var camposDigitados = [
+				"inputValorCusto",
+				"inputOutrasDespesas",
+				"inputCustoFinal"
+			]
 
-			if (inputValorCusto == null || inputValorCusto.trim() == '') {
-				inputValorCusto = 0.00;
-			}
+			var camposCalculados = [
+				"inputMargemLucro",
+				"inputValorVenda"
+			]
 
-			if (inputOutrasDespesas == null || inputOutrasDespesas.trim() == '') {
-				inputOutrasDespesas = 0.00;
-			}
+			var inputValorCusto
+			inputOutrasDespesas
+			inputCustoFinal
+			inputMargemLucro
+			inputValorVenda;
 
-			var inputCustoFinal = parseFloat(inputValorCusto) + parseFloat(inputOutrasDespesas);
+			camposDigitados.forEach(campo => {
+				eval(`${campo} = $('#${campo}').val().replaceAll('.', '').replace(',', '.').trim();`);
+				eval(`${campo} = (${campo}==null||${campo}=='')?0.00:parseFloat(${campo});`);
+			});
 
-			inputCustoFinal = float2moeda(inputCustoFinal).toString();
+			camposCalculados.forEach(campo => {
+				eval(`${campo} = $('#${campo}').val().replaceAll('.', '').replace(',', '.').trim();`);
+				eval(`${campo} = (${campo}==null||${campo}=='')?"":parseFloat(${campo});`);
+			});
 
-			$('#inputCustoFinal').val(inputCustoFinal);
-
-			if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
-				atualizaValorVenda();
-			}
-		});
-
-		//Ao mudar o Custo, atualiza o CustoFinal
-		$('#inputOutrasDespesas').on('blur', function(e) {
-
-			var inputValorCusto = $('#inputValorCusto').val().replaceAll('.', '').replace(',', '.');
-			var inputOutrasDespesas = $('#inputOutrasDespesas').val().replaceAll('.', '').replace(',', '.');
-			var inputMargemLucro = $('#inputMargemLucro').val().replaceAll('.', '').replace(',', '.');
-
-			if (inputValorCusto == null || inputValorCusto.trim() == '') {
-				inputValorCusto = 0.00;
-			}
-
-			if (inputOutrasDespesas == null || inputOutrasDespesas.trim() == '') {
-				inputOutrasDespesas = 0.00;
-			}
-
-			var inputCustoFinal = parseFloat(inputValorCusto) + parseFloat(inputOutrasDespesas);
-
-			inputCustoFinal = float2moeda(inputCustoFinal).toString();
-
-			$('#inputCustoFinal').val(inputCustoFinal);
-
-			if (inputMargemLucro != null && inputMargemLucro.trim() != '' && inputMargemLucro.trim() != 0.00) {
-				atualizaValorVenda();
-			}
-		});
-
-		//Ao mudar a Margem de Lucro, atualiza o Valor de Venda
-		$('#inputMargemLucro').on('blur', function(e) {
-
-			atualizaValorVenda();
-		});
-
-		//Ao mudar o Valor de Venda, atualiza a Margem de Lucro
-		$('#inputValorVenda').on('blur', function(e) {
-
-			var inputCustoFinal = $('#inputCustoFinal').val().replaceAll('.', '').replace(',', '.');
-			var inputValorVenda = $('#inputValorVenda').val().replaceAll('.', '').replace(',', '.');
-
-			if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
-				inputCustoFinal = 0.00;
-			}
-
-			if (inputValorVenda == null || inputValorVenda.trim() == '') {
-				inputValorVenda = 0.00;
-			}
-
-			//alert(parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal));
-			var lucro = parseFloat(inputValorVenda) - parseFloat(inputCustoFinal);
-
-			inputMargemLucro = 0;
-
-			if (inputCustoFinal != 0.00 && inputValorVenda != 0.00) {
-				inputMargemLucro = lucro / parseFloat(inputCustoFinal) * 100;
-			}
-
-			inputMargemLucro = float2moeda(inputMargemLucro).toString();
-
-			$('#inputMargemLucro').val(inputMargemLucro);
-
-		});
-
-		function atualizaValorVenda() {
-			var inputCustoFinal = $('#inputCustoFinal').val().replaceAll('.', '').replace(',', '.');
-			var inputMargemLucro = $('#inputMargemLucro').val().replace(',', '.');
-
-			if (inputCustoFinal == null || inputCustoFinal.trim() == '') {
-				inputCustoFinal = 0.00;
-			}
-
-			if (inputMargemLucro == null || inputMargemLucro.trim() == '') {
-				inputMargemLucro = 0.00;
-			}
-
-			var inputValorVenda = inputMargemLucro == 0.00 ? 0.00 : parseFloat(inputCustoFinal) + (parseFloat(inputMargemLucro) * parseFloat(inputCustoFinal)) / 100;
-
-			inputValorVenda = float2moeda(inputValorVenda).toString();
-
-			$('#inputValorVenda').val(inputValorVenda);
+			return ({
+				"inputValorCusto": inputValorCusto,
+				"inputOutrasDespesas": inputOutrasDespesas,
+				"inputCustoFinal": inputCustoFinal,
+				"inputMargemLucro": inputMargemLucro,
+				"inputValorVenda": inputValorVenda
+			})
 		}
 
-		$('#alterar').on('click', (e) => {
+		function AtualizaCustoFinal() {
+			var {
+				inputValorCusto,
+				inputOutrasDespesas
+			} = retornaPrecos();
+			var custoFinalAtualizado;
+			custoFinalAtualizado = inputValorCusto + inputOutrasDespesas;
+			custoFinalAtualizado = float2moeda(custoFinalAtualizado).toString();
+			$('#inputCustoFinal').val(custoFinalAtualizado);
+			AtualizaValorDeVenda();
+		}
+
+		function AtualizaMargemDeLucro() {
+			var {
+				inputMargemLucro,
+				inputValorVenda,
+				inputCustoFinal
+			} = retornaPrecos();
+			var margemLucroAtualizado = inputMargemLucro;
+			if (inputValorVenda != "") {
+				var lucro = inputValorVenda - inputCustoFinal;
+				margemLucroAtualizado = lucro / inputCustoFinal * 100;
+				margemLucroAtualizado = margemLucroAtualizado.toFixed(2);
+
+			}
+			$('#inputMargemLucro').val(margemLucroAtualizado);
+		}
+
+		function AtualizaValorDeVenda() {
+			var {
+				inputMargemLucro,
+				inputValorVenda,
+				inputCustoFinal
+			} = retornaPrecos();
+			var valorVendaAtualizado = inputValorVenda;
+			if (inputMargemLucro != "") {
+				lucro = inputCustoFinal * (inputMargemLucro / 100);
+				valorVendaAtualizado = inputCustoFinal + lucro;
+				valorVendaAtualizado = float2moeda(valorVendaAtualizado).toString();
+			}
+			$('#inputValorVenda').val(valorVendaAtualizado);
+		}
+
+		function submeterFormulario(e) {
 			e.preventDefault();
 			$('#formServico').submit();
-		});
-
-		$('#grupo').on('change', function(e) {
-			// vai preencher subGrupo
-
-		});
+		};
 	</script>
 </head>
 
@@ -266,7 +420,7 @@ if (!isset($_POST['inputServicoId'])) {
 
 					<form id="formServico" name="formServico" method="post" class="form-validate-jquery" action="servicoVendaEdita.php">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Serviço<?php echo $resultDadosFormulario['SrVenNome']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Serviço <?php echo $resultDadosFormulario['SrVenNome']; ?>"</h5>
 						</div>
 
 						<input type="hidden" id="inputServicoId" name="inputServicoId" value="<?php echo $resultDadosFormulario['SrVenId']; ?>">
@@ -300,7 +454,7 @@ if (!isset($_POST['inputServicoId'])) {
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputNome">Nome <span class="text-danger">*</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $resultDadosFormulario['SrVenNome']; ?>" required>
+												<input type="text" id="inputNome" onblur='limpaEspacosEmBranco()' name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $resultDadosFormulario['SrVenNome']; ?>" required>
 											</div>
 										</div>
 
@@ -357,14 +511,6 @@ if (!isset($_POST['inputServicoId'])) {
 												<select id="cmbPlanoConta" name="cmbPlanoConta" class="form-control form-control-select2" required>
 													<option value="">Selecione</option>
 													<?php
-													$sql = "SELECT PlConId, PlConNome
-                                                            FROM PlanoConta
-                                                            JOIN Situacao on SituaId = PlConStatus
-                                                            WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                            ORDER BY PlConNome ASC";
-													$result = $conn->query($sql);
-													$rowPlanoConta = $result->fetchAll(PDO::FETCH_ASSOC);
-
 													foreach ($rowPlanoConta as $item) {
 														$seleciona = $item['PlConId'] == $row['SrVenPlanoConta'] ? "selected" : "";
 														print('<option value="' . $item['PlConId'] . '" ' . $seleciona . '>' . $item['PlConNome'] . '</option>');
@@ -382,7 +528,7 @@ if (!isset($_POST['inputServicoId'])) {
 										</div>
 									</div>
 
-									<div class="row">
+									<div class="row" id="rowTabela">
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="modalidades">Modalidades <span class="text-danger">*</span></label>
@@ -400,14 +546,14 @@ if (!isset($_POST['inputServicoId'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorCusto">Valor de Custo</label>
-												<input type="text" id="inputValorCusto" name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="" onKeyUp="moeda(this)" maxLength="12">
+												<input type="text" id="inputValorCusto" onchange='AtualizaCustoFinal()' name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="" onKeyUp="moeda(this)" maxLength="12" required>
 											</div>
 										</div>
 
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputOutrasDespesas">Outras Despesas</label>
-												<input type="text" id="inputOutrasDespesas" name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" value="" onKeyUp="moeda(this)" maxLength="12">
+												<input type="text" id="inputOutrasDespesas" onchange='AtualizaCustoFinal()' name="inputOutrasDespesas" class="form-control" placeholder="Outras Despesas" value="" onKeyUp="moeda(this)" maxLength="12">
 											</div>
 										</div>
 
@@ -421,17 +567,43 @@ if (!isset($_POST['inputServicoId'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputMargemLucro">Margem de Lucro (%)</label>
-												<input type="text" id="inputMargemLucro" name="inputMargemLucro" class="form-control" placeholder="Margem Lucro" value="" onKeyUp="moeda(this)" maxLength="6">
+												<input type="text" id="inputMargemLucro" onchange='AtualizaValorDeVenda()' name="inputMargemLucro" class="form-control" placeholder="Margem Lucro" value="" onKeyUp="moeda(this)" maxLength="6">
 											</div>
 										</div>
 
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorVenda">Valor de Venda</label>
-												<input type="text" id="inputValorVenda" name="inputValorVenda" class="form-control" placeholder="Valor de Venda" value="" onKeyUp="moeda(this)" maxLength="12">
+												<input type="text" id="inputValorVenda" onchange='AtualizaMargemDeLucro()' name="inputValorVenda" class="form-control" placeholder="Valor de Venda" value="" onKeyUp="moeda(this)" maxLength="12">
 											</div>
 										</div>
 									</div>
+									<div class="row">
+										<div class="col-lg-12">
+											<button id="incluir" onclick="AtualizarOuIncluir(event)" class="btn btn-lg btn-principal">Incluir/Atualizar</button>
+											<br>
+											<br>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-lg-12">
+											<table class="table" id="precoServicosTable">
+												<thead>
+													<tr class="bg-slate text-left">
+														<th>Modalidade do Serviço</th>
+														<th>Valor de venda</th>
+														<th>Situação</th>
+														<th>Ações</th>
+													</tr>
+												</thead>
+												<tbody id="precoServicosBody">
+												</tbody>
+											</table>
+										</div>
+
+									</div>
+
 								</div>
 							</div>
 						</div>
@@ -442,7 +614,7 @@ if (!isset($_POST['inputServicoId'])) {
 								<div class="form-group">
 									<?php
 									if ($_POST['inputPermission']) {
-										echo '<button id="alterar" class="btn btn-lg btn-principal" type="submit">Alterar</button>';
+										echo '<button id="alterar" onclick="submeterFormulario()" class="btn btn-lg btn-principal" type="submit">Alterar</button>';
 									}
 									?>
 									<a href="servicoVenda.php" class="btn btn-basic" role="button">Cancelar</a>
