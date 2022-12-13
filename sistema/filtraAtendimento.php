@@ -45,7 +45,7 @@ try{
 			$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
 				AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
 				AgendObservacao,AgendJustificativa,ClienNome,ClienCodigo,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave, ClienDtNascimento,
-				SituaCor,Profissional.ProfiNome as ProfissionalNome,AtLocNome, ServiNome, ProfiCbo, Profissao.ProfiNome as ProfissaoNome
+				SituaCor,Profissional.ProfiNome as ProfissionalNome,AtLocNome, SrVenNome, ProfiCbo, Profissao.ProfiNome as ProfissaoNome
 				FROM Agendamento
 				JOIN AtendimentoModalidade ON AtModId = AgendModalidade
 				JOIN Situacao ON SituaId = AgendSituacao
@@ -62,7 +62,7 @@ try{
 
 			$sql = "SELECT AtendId,AtendNumRegistro,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtendClassificacao,
 				AtendObservacao,AtendJustificativa,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto, ClienDtNascimento,
-				ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,Profissional.ProfiNome as ProfissionalNome,ServiNome, 
+				ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,Profissional.ProfiNome as ProfissionalNome,SrVenNome, 
 				Profissao.ProfiNome as ProfissaoNome, ProfiCbo,AtClRNome,AtClRNomePersonalizado,AtClRTempo,AtClRCor,AtClRDeterminantes
 				FROM AtendimentoXServico
 				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
@@ -116,7 +116,7 @@ try{
 						calculaIdadeSimples($item['ClienDtNascimento']), // Idade Paciente
 						$item['ProfissionalNome'],  // Profissional
 						$item['AtModNome'],  // Modalidade
-						$item['ServiNome'],  // Procedimento
+						$item['SrVenNome'],  // Procedimento
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 						$acoes,  // Ações
 					],
@@ -167,7 +167,7 @@ try{
 						calculaIdadeSimples($item['ClienDtNascimento']), // Idade paciente
 						$item['ProfissionalNome'],  // Profissional
 						$item['AtModNome'],  // Modalidade
-						$item['ServiNome'],  // Procedimento
+						$item['SrVenNome'],  // Procedimento
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 						$acoes,  // Ações
 					],
@@ -202,7 +202,7 @@ try{
 
 			$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
 				AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,SrVenValorVenda
+				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
 				FROM AtendimentoXServico
 				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -218,7 +218,7 @@ try{
 
 			$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
 				AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,SrVenValorVenda
+				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
 				FROM AtendimentoXServico
 				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -266,7 +266,7 @@ try{
 						$item['AtXSeId'],  // Nº Registro
 						$item['ClienCodigo'],  // Prontuário
 						$item['ClienNome'],  // Paciente
-						$item['ServiNome'],  // Procedimento
+						$item['SrVenNome'],  // Procedimento
 						'Risco**',  // Risco
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 						$acoes,  // Ações
@@ -309,7 +309,7 @@ try{
 						$item['AtXSeId'],  // Nº Registro
 						$item['ClienCodigo'],  // Prontuário
 						$item['ClienNome'],  // Paciente
-						$item['ServiNome'],  // Procedimento
+						$item['SrVenNome'],  // Procedimento
 						'Risco**',  // Risco
 						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 						$acoes,  // Ações
@@ -348,14 +348,15 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtendNumRegistro,
 			AtClRNome,AtClRNomePersonalizado,AtClRTempo,AtClRDeterminantes,AtClRCor,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,
-			SituaNome,SituaChave,SituaCor,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
+			SituaNome,SituaChave,SituaCor,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN Servico ON ServiId = AtXSeServico
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -366,14 +367,15 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN Servico ON ServiId = AtXSeServico
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -384,14 +386,15 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN Servico ON ServiId = AtXSeServico
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMOBSERVACAO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -402,14 +405,15 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN Servico ON ServiId = AtXSeServico
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -508,7 +512,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -600,7 +604,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -692,7 +696,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -787,7 +791,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -827,14 +831,15 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtClRTempo,AtClRCor,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN Servico ON ServiId = AtXSeServico
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -845,14 +850,15 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN Servico ON ServiId = AtXSeServico
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -863,14 +869,15 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN Servico ON ServiId = AtXSeServico
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMOBSERVACAO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -881,14 +888,15 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome, AtendNumRegistro,
 			AtClRNome,AtClRCor,AtClRNomePersonalizado,AtClRDeterminantes,AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			LEFT JOIN Situacao ON SituaId = AtendSituacao
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			LEFT JOIN Servico ON ServiId = AtXSeServico
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -987,7 +995,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -1079,7 +1087,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -1171,7 +1179,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -1262,7 +1270,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -1303,14 +1311,15 @@ try{
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
 			AtClRNome,AtClRTempo,AtClRNomePersonalizado,AtClRDeterminantes,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda, AtClRCor
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda, AtClRCor
 			FROM AtendimentoXServico
 			JOIN Atendimento ON AtendId = AtXSeAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			JOIN Situacao ON SituaId = AtendSituacao
 			JOIN Cliente ON ClienId = AtendCliente
 			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			JOIN Servico ON ServiId = AtXSeServico
+			JOIN ServicoVenda ON SrVenId = AtXSeServico
+			JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -1321,14 +1330,15 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
 			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda, AtClRCor
+			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda, AtClRCor
 			FROM AtendimentoXServico
 			JOIN Atendimento ON AtendId = AtXSeAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			JOIN Situacao ON SituaId = AtendSituacao
 			JOIN Cliente ON ClienId = AtendCliente
 			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			JOIN Servico ON ServiId = AtXSeServico
+			JOIN ServicoVenda ON SrVenId = AtXSeServico
+			JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -1339,14 +1349,15 @@ try{
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
 		AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
-		AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,ServiNome,ServiValorVenda, AtClRCor
+		AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda, AtClRCor
 			FROM AtendimentoXServico
 			JOIN Atendimento ON AtendId = AtXSeAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 			JOIN Situacao ON SituaId = AtendSituacao
 			JOIN Cliente ON ClienId = AtendCliente
 			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			JOIN Servico ON ServiId = AtXSeServico
+			JOIN ServicoVenda ON SrVenId = AtXSeServico
+			JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
@@ -1468,7 +1479,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -1562,7 +1573,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -1658,7 +1669,7 @@ try{
 					$difference,  // Espera
 					$item['AtendNumRegistro'],  // Nº Registro
 					$item['ClienNome'],  // Paciente
-					$item['ServiNome'],  // Procedimento
+					$item['SrVenNome'],  // Procedimento
 					$classificacao,  // Risco
 					"<span class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
 					$acoes,  // Ações
@@ -2248,7 +2259,7 @@ try{
 		$grupo = isset($_POST['grupo'])?$_POST['grupo']:false;
 		$subgrupo = isset($_POST['subGrupo'])?$_POST['subGrupo']:false;
 
-		$sql = "SELECT SrVenId,ServiNome,SrVenCodigo
+		$sql = "SELECT SrVenId,SrVenNome,SrVenCodigo
 		FROM ServicoVenda WHERE SrVenUnidade = $iUnidade";
 
 		$sql .= $grupo?" and SrVenGrupo = $grupo":"";
@@ -2261,7 +2272,7 @@ try{
 		foreach($row as $item){
 			array_push($array,[
 				'id' => $item['SrVenId'],
-				'nome' => $item['ServiNome'],
+				'nome' => $item['SrVenNome'],
 				'codigo' => $item['SrVenCodigo'],
 			]);
 		}
@@ -2326,9 +2337,9 @@ try{
 		$sHora = $_POST['horaAtendimento'];
 		$iLocal = $_POST['localAtendimento'];
 		
-		// $sqlServico = "SELECT SrVenId,ServiNome,SrVenDetalhamento,SrVenValorCusto,SrVenUnidade
+		// $sqlServico = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorCusto,SrVenUnidade
 		// FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
-		$sql = "SELECT SrVenId,ServiNome,SrVenDetalhamento,SrVenValorVenda,SrVenUnidade
+		$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorVenda,SrVenUnidade
 		FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
 		$resultServico = $conn->query($sql);
 		$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
@@ -2368,7 +2379,7 @@ try{
 			'iGrupo' => $iGrupo,
 			'iSubGrupo' => $iSubGrupo,
 
-			'servico' => $resultServico['ServiNome'],
+			'servico' => $resultServico['SrVenNome'],
 			'medico' => $resultMedico['ProfiNome'],
 			'local' => $resultLocal['AtLocNome'],
 			'sData' => mostraData($sData),
@@ -2397,7 +2408,7 @@ try{
 				$sql = "SELECT AtXSeId,AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,AtXSeHorario,
 					AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,AtXSeUsuarioAtualizador,AtXSeUnidade,
 					ProfiId,AtLocId,AtLocNome,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-					SituaCor,ProfiNome,ServiNome,SrVenValorVenda,SrVenId,AtXSeGrupo,AtXSeSubGrupo
+					SituaCor,ProfiNome,SrVenNome,SrVenValorVenda,SrVenId,AtXSeGrupo,AtXSeSubGrupo
 					FROM AtendimentoXServico
 					JOIN Atendimento ON AtendId = AtXSeAtendimento
 					JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -2429,7 +2440,7 @@ try{
 								'iGrupo' => $item['AtXSeGrupo'],
 								'iSubGrupo' => $item['AtXSeSubGrupo'],
 						
-								'servico' => $item['ServiNome'],
+								'servico' => $item['SrVenNome'],
 								'medico' => $item['ProfiNome'],
 								'local' => $item['AtLocNome'],
 								'sData' => mostraData($item['AtXSeData']),
@@ -2449,7 +2460,7 @@ try{
 							'iGrupo' => $item['AtXSeGrupo'],
 							'iSubGrupo' => $item['AtXSeSubGrupo'],
 					
-							'servico' => $item['ServiNome'],
+							'servico' => $item['SrVenNome'],
 							'medico' => $item['ProfiNome'],
 							'local' => $item['AtLocNome'],
 							'sData' => mostraData($item['AtXSeData']),
@@ -2470,7 +2481,7 @@ try{
 				AgendData,AgendHorario,AtModNome,
 				AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
 				AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-				SituaCor,ProfiNome,AtLocNome,ServiNome,SrVenValorVenda,SrVenId
+				SituaCor,ProfiNome,AtLocNome,SrVenNome,SrVenValorVenda,SrVenId
 				FROM Agendamento
 				JOIN AtendimentoModalidade ON AtModId = AgendModalidade
 				JOIN Situacao ON SituaId = AgendSituacao
@@ -2498,7 +2509,7 @@ try{
 							'iMedico' => $item['ProfiId'],
 							'iLocal' => $item['AtLocId'],
 					
-							'servico' => $item['ServiNome'],
+							'servico' => $item['SrVenNome'],
 							'medico' => $item['ProfiNome'],
 							'local' => $item['AtLocNome'],
 							'sData' => mostraData($item['AgendData']),

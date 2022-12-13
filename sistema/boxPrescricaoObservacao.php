@@ -190,10 +190,10 @@
             <div class="col-lg-12 mb-4 row">
                 <!-- titulos -->
                 <div class="col-lg-6">
-                    <label>Medicamentos (Em Estoque) <span class="text-danger">*</span></label>
+                    <label>Medicamentos (Em Estoque) </label>
                 </div>
                 <div class="col-lg-6">
-                    <label>Medicamentos (Digitação Livre) <span class="text-danger">*</span></label>
+                    <label>Medicamentos (Digitação Livre) </label>
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-5">
