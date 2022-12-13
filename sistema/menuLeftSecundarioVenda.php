@@ -29,6 +29,7 @@
 					case 'atestadoMedico': URL = 'atendimentoAtestadoMedico.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'historicoPaciente': URL = 'atendimentoHistoricoPaciente.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'observacaoHospitalar': URL = 'atendimentoObservacaoHospitalar.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'solicitacaoProcedimento': URL = 'atendimentoSolicitacaoProcedimento.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'triagem': URL = 'atendimentoTriagem.php'; $('#dadosPost').attr('target', '_self'); break;
@@ -93,6 +94,9 @@
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='documento'><i class="icon-file-text"></i> Documentos</a>
 						</li>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link itemLink" data-tipo='observacaoHospitalar'><i class="icon-file-eye"></i> Observação Hospitalar</a>
 						</li>
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='atestadoMedico'><i class="icon-box"></i> Atestado Médico</a>
@@ -219,6 +223,9 @@
 								</li>
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='AIH'><i class="icon-certificate"></i> AIH</a>
+								</li>
+								<li class="nav-item">
+									<a href="#" class="nav-link itemLink" data-tipo='observacaoHospitalar'><i class="icon-file-eye"></i> Observação Hospitalar</a>
 								</li>
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='evolucaoDiaria'><i class="icon-certificate"></i> Evolução Diária</a>
