@@ -11,7 +11,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT CategId, CategNome, CategStatus, SituaNome, SituaChave, SituaCor
 		FROM Categoria
 		JOIN Situacao on SituaId = CategStatus
-	    WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave != 'ALTERAR'
+	    WHERE CategEmpresa = ".$_SESSION['EmpreId']." and SituaChave != 'ALTERAR'
 		ORDER BY CategNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -53,15 +53,15 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO Categoria (CategNome, CategStatus, CategUsuarioAtualizador, CategUnidade)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO Categoria (CategNome, CategStatus, CategUsuarioAtualizador, CategEmpresa)
+					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId'],
+							':iEmpresa' => $_SESSION['EmpreId'],
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Categoria incluída!!!";

@@ -24,7 +24,7 @@ $categoriaId = $result->fetch(PDO::FETCH_ASSOC);
 
 $sql = "SELECT CategId, CategNome
 		FROM Categoria															     
-		WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and CategId = " . $categoriaId['TrRefCategoria'] . " and CategStatus = 1";
+		WHERE CategEmpresa = ".$_SESSION['EmpreId']." and CategId = " . $categoriaId['TrRefCategoria'] . " and CategStatus = 1";
 $result = $conn->query($sql);
 $rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
 

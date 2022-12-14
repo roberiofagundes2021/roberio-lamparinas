@@ -306,7 +306,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 													$sql = "SELECT CategId, CategNome
 															FROM Categoria
 															JOIN Situacao on SituaId = CategStatus
-															WHERE SituaChave = 'ATIVO' and CategUnidade = ".$_SESSION['UnidadeId']."
+															WHERE SituaChave = 'ATIVO' and CategEmpresa = ".$_SESSION['EmpreId']." 
 															ORDER BY CategNome ASC";
 													$result = $conn->query($sql);
 													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

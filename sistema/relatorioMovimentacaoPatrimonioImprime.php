@@ -109,7 +109,7 @@ if (isset($_POST['inputCategoria_imp']) && $_POST['inputCategoria_imp'] != '') {
 	try {
 		$sql = "SELECT CategNome
 		        FROM Categoria
-		        WHERE CategId = " . $_POST['inputCategoria_imp'] . " and CategUnidade = " . $_SESSION['UnidadeId'] . "
+		        WHERE CategId = " . $_POST['inputCategoria_imp'] . " and CategEmpresa = ".$_SESSION['EmpreId']." 
 	            ";
 		$result = $conn->query($sql);
 		$Categoria = $result->fetch(PDO::FETCH_ASSOC);

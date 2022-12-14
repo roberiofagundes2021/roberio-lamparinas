@@ -17,7 +17,7 @@ $sqlFluxo = "SELECT FlOpeId, FlOpeTermoReferencia, FlOpeFornecedor, FlOpeCategor
 			FlOpeDataFim, FlOpeNumContrato, FlOpeNumProcesso, FlOpeModalidadeLicitacao, FlOpeValor, FlOpeObservacao,
 			FlOpePrioridade, FlOpeNumAta, FlOpeConteudoInicio, FlOpeConteudoFim, FlOpeStatus, FlOpeUsuarioAtualizador, FlOpeEmpresa,
 			FlOpeUnidade, SituaChave, ForneId, ForneRazaoSocial, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular,
-			CategId, CategNome, CategStatus, CategUsuarioAtualizador, CategUnidade
+			CategId, CategNome, CategStatus, CategUsuarioAtualizador, CategEmpresa
 			FROM FluxoOperacional
 			JOIN Situacao on SituaId = FlOpeStatus
 			JOIN Fornecedor on ForneId = FlOpeFornecedor

@@ -16,7 +16,7 @@ $categoriaId = $result->fetch(PDO::FETCH_ASSOC);
 $sql = "SELECT CategId, CategNome
 		FROM Categoria
 		JOIN Situacao on SituaId = CategStatus
-		WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and CategId = ".$categoriaId['TrRefCategoria']." and SituaChave = 'ATIVO' ";
+		WHERE CategEmpresa = ".$_SESSION['EmpreId']." and CategId = ".$categoriaId['TrRefCategoria']." and SituaChave = 'ATIVO' ";
 $result = $conn->query($sql);
 $rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
 
