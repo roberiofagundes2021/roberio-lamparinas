@@ -348,8 +348,8 @@ if(isset($_POST['inputNome'])){
 
                     <div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputTelefone">Telefone <span class='text-danger'>*</span></label>
-												<input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999" value="<?php echo $row['UnidaTelefone']; ?>" required>
+												<label for="inputTelefone">Telefone </span></label>
+												<input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999" value="<?php echo $row['UnidaTelefone']; ?>">
 											</div>
 										</div>
                   </div>

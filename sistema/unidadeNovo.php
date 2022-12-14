@@ -1056,8 +1056,8 @@ if(isset($_POST['inputNome'])){
                       </div>
                       <div class="col-lg-2">
                         <div class="form-group">
-                          <label for="inputTelefone">Telefone<span class='text-danger'>*</span></label>
-                          <input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999" required>
+                          <label for="inputTelefone">Telefone</span></label>
+                          <input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999">
                         </div>
 										  </div>
                     </div>
