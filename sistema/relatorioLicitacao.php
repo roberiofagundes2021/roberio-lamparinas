@@ -622,7 +622,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                                 $sql = "SELECT CategId, CategNome
                                                         FROM Categoria
                                                         JOIN Situacao on SituaId = CategStatus
-                                                        WHERE CategUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                        WHERE CategEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
                                                         ORDER BY CategNome ASC";
                                                 $result = $conn->query($sql);
                                                 $rowCateg = $result->fetchAll(PDO::FETCH_ASSOC);

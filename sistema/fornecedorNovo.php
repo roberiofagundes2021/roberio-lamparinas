@@ -535,7 +535,7 @@ if(isset($_POST['inputTipo'])){
 											<?php 
 												$sql = "SELECT CategId, CategNome
 														FROM Categoria															     
-														WHERE CategUnidade = ". $_SESSION['UnidadeId'] ." and CategStatus = 1
+														WHERE CategEmpresa = ".$_SESSION['EmpreId']." and CategStatus = 1
 														ORDER BY CategNome ASC";
 												$result = $conn->query($sql);
 												$row = $result->fetchAll(PDO::FETCH_ASSOC);

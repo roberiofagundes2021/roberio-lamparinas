@@ -9,30 +9,30 @@ if (isset($_GET['idOrcamento'])){
 			FROM Categoria
 			JOIN Orcamento on OrcamCategoria = CategId
 			JOIN Situacao on SituaId = CategStatus 
-			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO' and OrcamId = ".$_GET['idOrcamento']."
+			WHERE CategEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO' and OrcamId = ".$_GET['idOrcamento']."
 			ORDER BY CategNome ASC";
 } else if (isset($_GET['idFornecedor']) && $_GET['idFornecedor'] != -1){
 	$sql = "SELECT CategId, CategNome
 			FROM Categoria
 			JOIN Fornecedor on ForneCategoria = CategId
 			JOIN Situacao on SituaId = CategStatus
-			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and ForneId = '". $_GET['idFornecedor']."' and SituaChave = 'ATIVO'
+			WHERE CategEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_GET['idFornecedor']."' and SituaChave = 'ATIVO'
 			ORDER BY CategNome ASC";
 } else if (isset($_GET['idServico']) && $_GET['idServico'] != -1){
 	$sql = "SELECT CategId, CategNome
 			FROM Categoria 
 			JOIN Servico on ServiCategoria = CategId
-			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and ServiId = ". $_GET['idServico'];
+			WHERE CategEmpresa = ".$_SESSION['EmpreId']." and ServiId = ". $_GET['idServico'];
 } else if (isset($_GET['idProduto']) && $_GET['idProduto'] != -1){
 	$sql = "SELECT CategId, CategNome
 			FROM Categoria 
 			JOIN Produto on ProduCategoria = CategId
-			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and ProduId = ". $_GET['idProduto'];
+			WHERE CategEmpresa = ".$_SESSION['EmpreId']." and ProduId = ". $_GET['idProduto'];
 } else{
 	$sql = "SELECT CategId, CategNome
 			FROM Categoria
 			JOIN Situacao on SituaId = CategStatus
-			WHERE CategUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+			WHERE CategEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
 			ORDER BY CategNome ASC";
 }
 
