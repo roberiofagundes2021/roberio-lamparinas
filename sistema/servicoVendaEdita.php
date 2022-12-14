@@ -6,7 +6,8 @@ include('global_assets/php/conexao.php');
 
 //Esse if foi criado para se caso o usuário der um REFRESH na página. Nesse caso não terá POST e campos não reconhecerão o $row da consulta acima (daí ele deve ser redirecionado) e se quiser continuar editando terá que clicar no ícone da Grid novamente
 if (!isset($_POST['inputServicoId'])) {
-	header("Location: servicoVenda.php");
+	echo 1;
+	//header("Location: servicoVenda.php");
 } else {
 	$iUnidade = $_SESSION['UnidadeId'];
 	$sqlDadosFormulario = "SELECT SrVenId,SrVenCodigo,SrVenNome,SrVenDetalhamento,SrVenTipoServico,SrVenGrupo,SrVenSubGrupo,SrVenPlanoConta,s.SituaChave
@@ -62,6 +63,14 @@ if (!isset($_POST['inputServicoId'])) {
 	AND SVXMoUnidade = " . $_SESSION['UnidadeId'] . ";";
 	$Servicos = $conn->query($queryServicos);
 	$Servicos = $Servicos->fetchAll(PDO::FETCH_ASSOC);
+
+	$queryPlanoConta = "SELECT PlConId, PlConNome
+	FROM PlanoConta
+	JOIN Situacao on SituaId = PlConStatus
+	WHERE PlConUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+	ORDER BY PlConNome ASC";
+	$rowPlanoConta = $conn->query($queryPlanoConta);
+	$rowPlanoConta = $rowPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
 
@@ -90,6 +99,7 @@ if (!isset($_POST['inputServicoId'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
+
 		$(document).ready(function() {
 
 			//controla se está editando ou criando uma linha nova na tabela de serviços
@@ -213,23 +223,37 @@ if (!isset($_POST['inputServicoId'])) {
 
 		function AtualizarOuIncluir(e) {
 			e.preventDefault();
-			camposObrigatorios = [
-				"modalidades",
-				"inputValorCusto",
-				"inputOutrasDespesas",
-				"inputCustoFinal",
-				"inputMargemLucro",
-				"inputValorVenda"
-			]
+			let mensagemErro = '';
+			let modalidades = $('#modalidades').val();
+			let inputValorCusto = $('#inputValorCusto').val();
+			let inputMargemLucro = $('#inputMargemLucro').val();
+			let inputValorVenda = $('#inputValorVenda').val();
 
-			let campoEmBranco = null;
-			camposObrigatorios.forEach(item=>{
-				eval(`$('#${item}').val()==""?campoEmBranco=${item}:campoEmBranco=null`);
-			})
-			console.log(campoEmBranco);
-			if(campoEmBranco!=null){
-				alert(`${campoEmBranco} não prenchido`);
-				return;
+			switch (mensagemErro) {
+				case modalidades:
+					mensagemErro = 'informe a modalidade';
+					$('#modalidades').focus();
+					break;
+				case inputValorCusto:
+					mensagemErro = 'informe o valor do custo';
+					$('#inputValorCusto').focus();
+					break;
+				case inputMargemLucro:
+					mensagemErro = 'informe a margem de lucro ou o valor de venda';
+					$('#inputMargemLucro').focus();
+					break;
+				case inputValorVenda:
+					mensagemErro = 'informe a margem de lucro ou o valor de venda';
+					$('#inputValorVenda').focus();
+					break;
+				default:
+					mensagemErro = '';
+					break;
+			}
+
+			if (mensagemErro) {
+				alerta('Campo Obrigatório!', mensagemErro, 'error')
+				return
 			}
 			let table = $('#precoServicosTable').DataTable();
 			let idProvisorio = 990000 + contadorLinhasCriadas;
@@ -267,21 +291,16 @@ if (!isset($_POST['inputServicoId'])) {
 				contadorLinhasCriadas++;
 			} else {
 				table.row(linhaAtual.idTabela).data(linha.data).draw();
-				console.log(linha.rawData);
-				console.log(servicosFormatados[linhaAtual.indexDaLinha].rawData);
 				servicosFormatados[linhaAtual.indexDaLinha] = linha;
 			}
 			linhaAtual = null;
-
 			$('#modalidades').val("");
 			$('#inputValorCusto').val("");
 			$('#inputOutrasDespesas').val("");
 			$('#inputCustoFinal').val("");
 			$('#inputMargemLucro').val("");
-			$('#inputValorVenda').val("");			
+			$('#inputValorVenda').val("");
 		}
-
-
 
 		function atualizaSubGrupos() {
 			if ($('#grupo').val() == "") {
@@ -393,9 +412,35 @@ if (!isset($_POST['inputServicoId'])) {
 			$('#inputValorVenda').val(valorVendaAtualizado);
 		}
 
-		function submeterFormulario(e) {
-			e.preventDefault();
-			$('#formServico').submit();
+		function submeterFormulario() {
+			let unidade = <?php echo $_SESSION['UnidadeId']; ?>;
+		
+			$.ajax({
+				type: 'POST',
+				url: 'servicoVendaSalva.php',
+				dataType: 'json',
+				data: {
+					"SrVenId":$("#inputServicoId").val(),
+					"SrVenCodigo":$("#inputCodigo").val(),
+					"SrVenNome":$("#inputNome").val(),
+					"SrVenTipoServico":$('#tipoServico option:selected').val(),
+					"SrVenDetalhamento":$("#txtDetalhamento").val(),
+					"SrVenGrupo":$('#grupo option:selected').val(),
+					"SrVenSubGrupo":$('#subGrupo option:selected').val(),
+					"SrVenPlanoConta":$('#cmbPlanoConta option:selected').val(),
+					"SrVenUnidade":unidade.toString()
+				},
+				success: function(response) {
+					alerta("Sucesso");
+					console.log(response);
+					//window.location.href = './servicoVenda.php';
+				},
+				error: function(response) {
+					alerta("Falha");
+					console.log(response);
+					//window.location.href = './servicoVenda.php';
+				}
+			});
 		};
 	</script>
 </head>
@@ -418,11 +463,11 @@ if (!isset($_POST['inputServicoId'])) {
 				<!-- Info blocks -->
 				<div class="card">
 
-					<form id="formServico" name="formServico" method="post" class="form-validate-jquery" action="servicoVendaEdita.php">
+					<form id="formServico" name="formServico" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Serviço <?php echo $resultDadosFormulario['SrVenNome']; ?>"</h5>
 						</div>
-
+						
 						<input type="hidden" id="inputServicoId" name="inputServicoId" value="<?php echo $resultDadosFormulario['SrVenId']; ?>">
 						<input type="hidden" id="inputServicoStatus" name="inputServicoStatus" value="<?php echo $resultDadosFormulario['SituaChave']; ?>">
 						<input type="hidden" id="inputServicoTipo" name="inputServicoTipo" value="<?php echo $resultDadosFormulario['SrVenTipoServico']; ?>">
@@ -434,8 +479,6 @@ if (!isset($_POST['inputServicoId'])) {
 							} ?>"
 						</select>
 						<input type="hidden" id="inputPlanoDeConta" name="inputPlanoDeConta" value="<?php echo $resultDadosFormulario['SrVenPlanoConta']; ?>">
-
-
 
 						<div class="card-body">
 
@@ -532,7 +575,7 @@ if (!isset($_POST['inputServicoId'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="modalidades">Modalidades <span class="text-danger">*</span></label>
-												<select id="modalidades" name="modalidades" class="form-control form-control-select2" required>
+												<select id="modalidades" name="modalidades" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php
 													foreach ($modalidades as $item) {
@@ -546,7 +589,7 @@ if (!isset($_POST['inputServicoId'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputValorCusto">Valor de Custo</label>
-												<input type="text" id="inputValorCusto" onchange='AtualizaCustoFinal()' name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="" onKeyUp="moeda(this)" maxLength="12" required>
+												<input type="text" id="inputValorCusto" onchange='AtualizaCustoFinal()' name="inputValorCusto" class="form-control" placeholder="Valor de Custo" value="" onKeyUp="moeda(this)" maxLength="12">
 											</div>
 										</div>
 
@@ -601,23 +644,20 @@ if (!isset($_POST['inputServicoId'])) {
 												</tbody>
 											</table>
 										</div>
-
 									</div>
 
-								</div>
-							</div>
-						</div>
-
-						<br>
-						<div class="row" style="margin-top: 40px;">
-							<div class="col-lg-12">
-								<div class="form-group">
+									<div class="row">
+										<div class="col-lg-12">
+										<div class="form-group">
 									<?php
 									if ($_POST['inputPermission']) {
-										echo '<button id="alterar" onclick="submeterFormulario()" class="btn btn-lg btn-principal" type="submit">Alterar</button>';
+										echo '<button type="button" id="alterar" onclick="submeterFormulario()" class="btn btn-lg ">Alterar</button>';
 									}
 									?>
 									<a href="servicoVenda.php" class="btn btn-basic" role="button">Cancelar</a>
+								</div>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
