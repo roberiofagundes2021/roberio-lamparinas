@@ -229,7 +229,7 @@ $sql = "SELECT ParamEmpresaPublica
 														$sql = "SELECT SbCatId, SbCatNome
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus	
-																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+																WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatId in (".$sSubCategorias.")
 																ORDER BY SbCatNome ASC"; 
 														$result = $conn->query($sql);
 														$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -77,7 +77,7 @@ if (isset($_POST['inputOrcamentoId'])){
 		$sql = "SELECT SbCatId, SbCatNome
 				FROM SubCategoria
 				JOIN TRXOrcamentoXSubcategoria on TXOXSCSubcategoria = SbCatId
-				WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and TXOXSCOrcamento = ".$rowOrcamento['TrXOrId']."";
+				WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and TXOXSCOrcamento = ".$rowOrcamento['TrXOrId']."";
 		$result = $conn->query($sql);
 		$rowSBC = $result->fetchAll(PDO::FETCH_ASSOC);
 

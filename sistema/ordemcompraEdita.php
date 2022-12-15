@@ -652,7 +652,7 @@ if (isset($_POST['inputTipo'])) {
 													$sql = "SELECT SbCatId, SbCatNome
 															FROM SubCategoria
 															JOIN Situacao on SituaId = SbCatStatus															     
-															WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 															ORDER BY SbCatNome ASC";
 													$result = $conn->query($sql);
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

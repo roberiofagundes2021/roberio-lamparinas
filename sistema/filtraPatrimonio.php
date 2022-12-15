@@ -9,7 +9,7 @@ if (isset($_GET['idOrcamento'])){
 			FROM Patrimonio
 			JOIN on OrXSCSubcategoria = SbCatId
 			JOIN Situacao on SituaId = SbCatStatus
-			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and OrXSCOrcamento = '". $_GET['idOrcamento']."' and SituaChave = 'ATIVO' ";
+			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and OrXSCOrcamento = '". $_GET['idOrcamento']."' and SituaChave = 'ATIVO' ";
 
 }
 

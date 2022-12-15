@@ -20,6 +20,7 @@ if (isset($_POST['inputTRId'])) {
 
 	$iTR = $_POST['inputTRId'];
 	$unidade = $_SESSION['UnidadeId'];
+	$empresa = $_SESSION['EmpreId'];
 	$userId = $_SESSION['UsuarId'];
 
 	$sqlUsuarioEquipe = "SELECT TRXEqTermoReferencia, TRXEqUsuario, TRXEqPresidente, TRXEqUnidade
@@ -38,7 +39,7 @@ if (isset($_POST['inputTRId'])) {
 	$sql = "SELECT SbCatId, SbCatNome
 			 FROM SubCategoria
 			 JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-			 WHERE SbCatUnidade = $unidade and TRXSCTermoReferencia = $iTR
+			 WHERE SbCatEmpresa = $empresa and TRXSCTermoReferencia = $iTR
 			 ORDER BY SbCatNome ASC";
 	$result = $conn->query($sql);
 	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -569,7 +570,7 @@ if (isset($_POST['inputTRData'])) {
 													$sql = "SELECT SbCatId, SbCatNome
 													        FROM SubCategoria
 													        JOIN Situacao on SituaId = SbCatStatus
-													        WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SbCatCategoria = " . $row['TrRefCategoria'] . " and SituaChave = 'ATIVO'
+													        WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and SbCatCategoria = " . $row['TrRefCategoria'] . " and SituaChave = 'ATIVO'
 													        ORDER BY SbCatNome ASC";
 													$result = $conn->query($sql);
 													$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

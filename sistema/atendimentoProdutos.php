@@ -6,17 +6,17 @@ $_SESSION['PaginaAtual'] = 'Busca de Produtos';
 
 include('global_assets/php/conexao.php');
 
-$iUnidade = $_SESSION['UnidadeId'];
+$iEmpresa = $_SESSION['EmpreId'];
 
 $sql = "SELECT * FROM Categoria
 	    WHERE  CategStatus = 1
-		AND CategUnidade = $iUnidade";
+		AND CategEmpresa = $iEmpresa";
 $result = $conn->query($sql);
 $rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
 $sql = "SELECT * FROM SubCategoria
 	    WHERE  SbCatStatus = 1
-		AND SbCatUnidade = $iUnidade";
+		AND SbCatEmpresa = $iEmpresa";
 $resultS = $conn->query($sql);
 $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 

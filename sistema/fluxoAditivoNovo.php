@@ -809,7 +809,7 @@ try {
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus
 																JOIN Produto on ProduSubCategoria = SbCatId	
-																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." AND SbCatId IN (".$sSubCategorias.")
+																WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." AND SbCatId IN (".$sSubCategorias.")
 																ORDER BY SbCatNome ASC";
 														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -983,7 +983,7 @@ try {
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus
 																JOIN Servico on ServiSubCategoria = SbCatId	
-																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$sSubCategorias.")
+																WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatId in (".$sSubCategorias.")
 																ORDER BY SbCatNome ASC";
 														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

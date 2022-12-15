@@ -641,7 +641,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 													$sql = "SELECT SbCatId, SbCatNome
 															FROM SubCategoria
 															JOIN Situacao on SituaId = SbCatStatus
-															WHERE SbCatUnidade = $_SESSION[UnidadeId] AND 
+															WHERE SbCatEmpresa = $_SESSION[EmpreId] AND 
 															SbCatId in (SELECT ProduSubCategoria  FROM Produto
 															JOIN FluxoOperacionalXProduto on FOXPrProduto =  ProduId
 															WHERE ProduUnidade  = $_SESSION[UnidadeId] and FOXPrFluxoOperacional = $iFluxoOperacional) ORDER BY SbCatNome ASC"; 

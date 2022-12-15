@@ -123,7 +123,7 @@ if (isset($_POST['inputSubCategoria_imp']) && $_POST['inputSubCategoria_imp'] !=
 	try {
 		$sql = "SELECT SbCatNome
 		        FROM SubCategoria
-		        WHERE SbCatId = " . $_POST['inputSubCategoria_imp'] . " and SbCatUnidade = " . $_SESSION['UnidadeId'] . "
+		        WHERE SbCatId = " . $_POST['inputSubCategoria_imp'] . " and SbCatEmpresa = " . $_SESSION['EmpreId'] . "
 	            ";
 		$result = $conn->query($sql);
 		$SubCategoria = $result->fetch(PDO::FETCH_ASSOC);

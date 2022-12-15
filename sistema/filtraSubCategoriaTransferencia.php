@@ -10,7 +10,7 @@ $sql = "SELECT DISTINCT SbCatId, SbCatNome
 						  ON ProduSubCategoria = SbCatId
 						JOIN Situacao 
 						  ON SituaId = SbCatStatus
-					 WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " 
+					 WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " 
 						 AND SbCatCategoria = '" . $_GET['idCategoria'] . "' 
 						 AND SituaChave = 'ATIVO' ";
 

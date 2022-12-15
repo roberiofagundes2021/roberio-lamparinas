@@ -11,7 +11,7 @@ $sql = "SELECT SbCatId, SbCatNome, SbCatCategoria, SbCatStatus, CategNome, Situa
 		FROM SubCategoria
 		JOIN Categoria on CategId = SbCatCategoria
 		JOIN Situacao on SituaId = SbCatStatus
-	    WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ."
+	    WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY SbCatNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -53,8 +53,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO SubCategoria (SbCatNome, SbCatCategoria, SbCatStatus, SbCatUsuarioAtualizador, SbCatUnidade)
-					VALUES (:sNome, :sCategoria, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO SubCategoria (SbCatNome, SbCatCategoria, SbCatStatus, SbCatUsuarioAtualizador, SbCatEmpresa)
+					VALUES (:sNome, :sCategoria, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -62,7 +62,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':sCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId'],
+							':iEmpresa' => $_SESSION['EmpreId'],
 							));
 	
 			$_SESSION['msg']['mensagem'] = "SubCategoria incluída!!!";

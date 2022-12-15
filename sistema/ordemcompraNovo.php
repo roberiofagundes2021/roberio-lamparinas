@@ -37,7 +37,7 @@ foreach($fluxo as $key=>$flx){
 		$fluxo[$key]['FlOpeTermoReferencia'] = $termo;
 	}
 	if($flx['FlOpeCategoria']){
-		$sqlSubCat = "SELECT SbCatId, SbCatNome, SbCatCategoria, SbCatStatus, SbCatUnidade
+		$sqlSubCat = "SELECT SbCatId, SbCatNome, SbCatCategoria, SbCatStatus, SbCatEmpresa
 								FROM SubCategoria
 								where SbCatCategoria = ".$flx['FlOpeCategoria'];
 		$SubCat = $conn->query($sqlSubCat);

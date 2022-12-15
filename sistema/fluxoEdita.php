@@ -21,7 +21,7 @@ if (isset($_POST['inputFluxoOperacionalId'])) {
 		$sql = "SELECT SbCatId, SbCatNome
 				FROM SubCategoria
 				JOIN FluxoOperacionalXSubCategoria on FOXSCSubCategoria = SbCatId
-				WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and FOXSCFluxo = $iFluxoOperacional
+				WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and FOXSCFluxo = $iFluxoOperacional
 				ORDER BY SbCatNome ASC";
 		$result = $conn->query($sql);
 		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -333,7 +333,7 @@ if (isset($_POST['inputDataInicio'])) {
 													$sql = "SELECT SbCatId, SbCatNome
 															FROM SubCategoria
 															JOIN FornecedorXSubCategoria on FrXSCSubCategoria = SbCatId														 
-															WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatCategoria = ".$row['FlOpeCategoria']."
+															WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatCategoria = ".$row['FlOpeCategoria']."
 															and FrXSCFornecedor = ". $row['FlOpeFornecedor']."
 															ORDER BY SbCatNome ASC";
 													$result = $conn->query($sql);

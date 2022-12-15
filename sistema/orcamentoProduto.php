@@ -76,7 +76,7 @@ try{
 	$sql = "SELECT SbCatId, SbCatNome
 			FROM SubCategoria
 			JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
-			WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and OrXSCOrcamento = $iOrcamento
+			WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and OrXSCOrcamento = $iOrcamento
 			ORDER BY SbCatNome ASC";
 	$result = $conn->query($sql);
 	$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -309,7 +309,7 @@ try{
 														$sql = "SELECT SbCatId, SbCatNome
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus	
-																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$aSubCategorias.")
+																WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatId in (".$aSubCategorias.")
 																ORDER BY SbCatNome ASC";
 														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -25,7 +25,7 @@ if (isset($_POST['inputOrcamentoId'])) {
 		$sql = "SELECT SbCatId, SbCatNome
 				FROM SubCategoria
 				JOIN OrcamentoXSubCategoria on OrXSCSubCategoria = SbCatId
-				WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and OrXSCOrcamento = $iOrcamento
+				WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and OrXSCOrcamento = $iOrcamento
 				ORDER BY SbCatNome ASC";
 		$result = $conn->query($sql);
 		$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -482,7 +482,7 @@ if (isset($_POST['inputTipo'])) {
 														$sql = "SELECT SbCatId, SbCatNome
 																	FROM SubCategoria
 																	JOIN Situacao on SituaId = SbCatStatus
-																	WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SbCatCategoria = " . $row['OrcamCategoria'] . " and SituaChave = 'ATIVO'
+																	WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and SbCatCategoria = " . $row['OrcamCategoria'] . " and SituaChave = 'ATIVO'
 																	ORDER BY SbCatNome ASC";
 														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

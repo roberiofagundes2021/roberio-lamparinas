@@ -7,13 +7,13 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['nomeVelho']) && $_POST['nomeVelho'] != ''){
 	$sql = "SELECT SbCatId
 			FROM SubCategoria
-			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatNome = '". mssql_escape($_POST['nomeNovo'])."' and SbCatCategoria = ". $_POST['categoriaNovo']." and 
-			SbCatId not in (select SbCatId from SubCategoria where SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatNome = '". mssql_escape($_POST['nomeVelho'])."' and 
+			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and SbCatNome = '". mssql_escape($_POST['nomeNovo'])."' and SbCatCategoria = ". $_POST['categoriaNovo']." and 
+			SbCatId not in (select SbCatId from SubCategoria where SbCatEmpresa = ".$_SESSION['EmpreId']." and SbCatNome = '". mssql_escape($_POST['nomeVelho'])."' and 
 			SbCatCategoria = ". $_POST['categoriaVelho'].")";
 } else{
 	$sql = "SELECT SbCatId
 			FROM SubCategoria
-			WHERE SbCatUnidade = ".$_SESSION['UnidadeId']." and SbCatNome = '". mssql_escape($_POST['nomeNovo'])."' and SbCatCategoria = ". $_POST['categoriaNovo'];
+			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and SbCatNome = '". mssql_escape($_POST['nomeNovo'])."' and SbCatCategoria = ". $_POST['categoriaNovo'];
 }
 
 $result = $conn->query($sql);

@@ -80,7 +80,7 @@ if (isset($_POST['inputIdOrcamento'])) {
 $sql = "SELECT SbCatId, SbCatNome
 		FROM SubCategoria
 		JOIN TRXSubcategoria on TRXSCSubcategoria = SbCatId
-		WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
+		WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and TRXSCTermoReferencia = " . $_SESSION['TRId'] . "
 		ORDER BY SbCatNome ASC";
 $result = $conn->query($sql);
 $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -274,7 +274,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 														$sql = "SELECT SbCatId, SbCatNome
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus	
-																WHERE SbCatUnidade = ". $_SESSION['UnidadeId'] ." and SbCatId in (".$aSubCategorias.")
+																WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SbCatId in (".$aSubCategorias.")
 																ORDER BY SbCatNome ASC"; 
 														$result = $conn->query($sql);
 														$rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);

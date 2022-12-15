@@ -626,7 +626,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT SbCatId, SbCatNome
 																	FROM SubCategoria
 																	JOIN Situacao on SituaId = SbCatStatus
-																	WHERE SbCatUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																	WHERE SbCatEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY SbCatNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);
