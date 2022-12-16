@@ -50,7 +50,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iModalidade' => $_POST['inputModalidadeId']
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Modalidade alterado!!!";
+			$_SESSION['msg']['mensagem'] = "Modalidade alterada!!!";
 	
 		} else { //inclusão
 		
@@ -67,7 +67,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iUnidade' => $_SESSION['UnidadeId'],
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Modalidade incluído!!!";
+			$_SESSION['msg']['mensagem'] = "Modalidade incluída!!!";
 					
 		}
 	
