@@ -331,12 +331,9 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 							<div class="card">
 
 								<div class="card-body">
-
-									<div class="col-lg-12 row mb-3">
-										<div class="col-lg-12">
-											<label>Tipo de Receituário <span class="text-danger">*</span></label>
-										</div>
+									<div class="row mb-3">
 										<div class="col-lg-6">
+											<label>Tipo de Receituário <span class="text-danger">*</span></label>
 											<select id="receituario" name="receituario" class="select-search" required>
 												<option value=''>Selecione</option>
 												<?php
@@ -407,7 +404,7 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 
 														foreach($rowReceituarioHistorico as $key => $item){
 															$acoes = "
-															<a href='#' data-id='$item[AtRecId]' class='list-icons-item selectItem' title='Detalhamento'><i class='icon-file-text2'></i></a>
+															<a href='#' data-id='$item[AtRecId]' class='list-icons-item selectItem' title='Copiar Receita'><i class='icon-files-empty'></i></a>
 															<a href='#' data-id='$item[AtRecId]' class='list-icons-item imprimirReceituario' title='Imprimir'><i class='icon-printer2'></i></a>";
 
 															$tipoReceituario = $item['AtRecTipoReceituario']=='S'?'Simples':'Especial';
