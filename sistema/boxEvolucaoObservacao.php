@@ -9,26 +9,25 @@
 
         <form id="formEvolucaoDiaria" name="formEvolucaoDiaria" method="post" class="form-validate-jquery">
             <input type="hidden" name="idEvolucao" id="idEvolucao">
-            <div class="col-lg-3 mb-2 row">
-                <!-- titulos -->
-                <div class="col-lg-12">
-                    <label>Data/Hora <span class="text-danger">*</span></label>
-                </div>											
-                <!-- campos -->										
-                <div class="col-lg-12">
-                    <input type="datatime-local" class="form-control" name="dataHoraEvolucaoDiaria" id="dataHoraEvolucaoDiaria" value="<?php echo date('d/m/Y H:i');?>" readonly>
+            
+            <div class="row mb-2">
+                <div class="col-lg-3 mb-2 row">				
+                    <div class="col-lg-12">
+                        <label>Data/Hora <span class="text-danger">*</span></label>
+                        <input type="datatime-local" class="form-control" name="dataHoraEvolucaoDiaria" id="dataHoraEvolucaoDiaria" value="<?php echo date('d/m/Y H:i');?>" readonly>
+                    </div>
                 </div>
             </div>
             
-            <div class="row" style="margin-top: 20px">
-            <div class="col-lg-12">
-                <div class="form-group">
-                    <label for="evolucaoDiaria">Evolução Diária <span class="text-danger">*</span></label>
-                    <textarea rows="5" cols="5" maxLength="500" id="evolucaoDiaria" name="evolucaoDiaria"  class="form-control" onInput="contarCaracteres(this);" placeholder="Corpo da evolução (informe aqui o texto que você queira que apareça na evolução diária)" ></textarea>
-                    <small class="text-muted form-text">Max. 500 caracteres <span class="caracteresevolucaoDiaria"></span></small>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label for="evolucaoDiaria">Evolução Diária <span class="text-danger">*</span></label>
+                        <textarea rows="5" cols="5" maxLength="500" id="evolucaoDiaria" name="evolucaoDiaria"  class="form-control" onInput="contarCaracteres(this);" placeholder="Corpo da evolução (informe aqui o texto que você queira que apareça na evolução diária)" ></textarea>
+                        <small class="text-muted form-text">Max. 500 caracteres <span class="caracteresevolucaoDiaria"></span></small>
+                    </div>
                 </div>
             </div>
-        </div>
         </form>
 
         <div class="row">

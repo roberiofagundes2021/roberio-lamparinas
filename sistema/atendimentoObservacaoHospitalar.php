@@ -109,18 +109,13 @@ if ($row['ClienSexo'] == 'F'){
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>	
     <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
     <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	
 	<script src="global_assets/js/plugins/ui/moment/moment.min.js"></script>
 	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>
@@ -157,8 +152,6 @@ if ($row['ClienSexo'] == 'F'){
 			getMedicamentosSolucoes()
 			getDietas()
 			getCuidados()
-
-
 
 			getCmbs()			
 
@@ -688,7 +681,6 @@ if ($row['ClienSexo'] == 'F'){
 				});
 	
 			})
-
 			
 			$('#salvarEdEvolucao').on('click', function (e) {
 
@@ -999,7 +991,6 @@ if ($row['ClienSexo'] == 'F'){
 
 				e.preventDefault();
 
-
 				let msg = ''
 				let idCuidado = $('#idCuidado').val()
 				let snCuidado = 0
@@ -1090,9 +1081,6 @@ if ($row['ClienSexo'] == 'F'){
 				
 			})
 
-
-
-
 			$("#snMedicamentos").change(function() {
 				if ($(this).prop("checked") == true) {
 					$('#complementoMedicamentos').attr("disabled", false);	
@@ -1101,6 +1089,7 @@ if ($row['ClienSexo'] == 'F'){
 					$('#complementoMedicamentos').attr("disabled", true);
 				}
 			});
+
 			$("#snSolucoes").change(function() {
 				if ($(this).prop("checked") == true) {
 					$('#complementoSolucoes').attr("disabled", false);	
@@ -1109,6 +1098,7 @@ if ($row['ClienSexo'] == 'F'){
 					$('#complementoSolucoes').attr("disabled", true);
 				}
 			});
+
 			$("#snCuidados").change(function() {
 				if ($(this).prop("checked") == true) {
 					$('#complementoCuidados').attr("disabled", false);	
@@ -1118,7 +1108,6 @@ if ($row['ClienSexo'] == 'F'){
 				}
 			});
 
-		
 		}); //document.ready
 
 		function contarCaracteres(params) {
@@ -1158,7 +1147,7 @@ if ($row['ClienSexo'] == 'F'){
 					
 					response.forEach(item => {
 
-						let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarEvolucao (\"${item.evolucaoCompl}\")'><i class='icon-clipboard2' title='Copiar Evolução'></i></a>`;
+						let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarEvolucao (\"${item.evolucaoCompl}\")'><i class='icon-files-empty' title='Copiar Evolução'></i></a>`;
 						let editar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='editarEvolucao(\"${item.id}\")' class='list-icons-item' ><i class='icon-pencil7' title='Editar Evolução'></i></a>`;
 						let exc = `<a style='color: black; cursor:pointer' onclick='excluirEvolucao(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Evolucao'></i></a>`;
 						let acoes = ``;
@@ -1191,7 +1180,6 @@ if ($row['ClienSexo'] == 'F'){
 			});	
 
 		}
-
 
 		function getMedicamentosSolucoes() {
 
@@ -1541,7 +1529,6 @@ if ($row['ClienSexo'] == 'F'){
 
 		}
 
-
 		function setDescricaoPosologiaMed() {
 
 			let nomeMedicamento = $('#nomeMedicamentoEstoqueMedicamentos').val()
@@ -1574,7 +1561,6 @@ if ($row['ClienSexo'] == 'F'){
 			contarCaracteres($('#descricaoPosologiaMedicamentos')[0])
 			
 		}
-
 
 		function setDescricaoPosologiaSol() {
 
@@ -1780,6 +1766,7 @@ if ($row['ClienSexo'] == 'F'){
 			});
 			
 		}
+
 		function editarCuidado(id) {
 
 			$.ajax({
@@ -1847,6 +1834,7 @@ if ($row['ClienSexo'] == 'F'){
 				}
 			});			
 		}
+
 		function excluirDieta(id) {
 
 			$.ajax({
@@ -1863,6 +1851,7 @@ if ($row['ClienSexo'] == 'F'){
 				}
 			});			
 		}
+
 		function excluirCuidado(id) {
 
 			$.ajax({
@@ -1885,6 +1874,7 @@ if ($row['ClienSexo'] == 'F'){
 			$('#idEvolucao').val("")
 			$('#evolucaoDiaria').val("")
 		}
+
 		function zerarMedicamento() {
 
 			$('#idMedicamentos').val("")
@@ -1905,6 +1895,7 @@ if ($row['ClienSexo'] == 'F'){
 			$('#snMedicamentos').prop('checked', false)	
 			$('#complementoMedicamentos').prop("disabled", true);
 		}
+
 		function zerarSolucao() {
 
 			$('#idSolucoes').val("")
@@ -1932,6 +1923,7 @@ if ($row['ClienSexo'] == 'F'){
 			$('#complementoSolucoes').prop("disabled", true);
 			
 		}
+
 		function zerarDieta() {
 
 			$('#idDieta').val("")
@@ -1945,6 +1937,7 @@ if ($row['ClienSexo'] == 'F'){
 			$('#checkBombaInfusaoDieta').prop('checked', false)
 			
 		}
+
 		function zerarCuidado() {
 
 			$('#idCuidado').val("")					
@@ -1960,10 +1953,6 @@ if ($row['ClienSexo'] == 'F'){
 		}
 
 	</script>
-
-	<style>
-
-	</style>
 
 </head>
 
