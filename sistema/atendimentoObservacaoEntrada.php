@@ -109,18 +109,13 @@ if ($row['ClienSexo'] == 'F'){
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
-	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script src="global_assets/js/demo_pages/form_layouts.js"></script>	
     <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
     <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
 	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	
 	<script src="global_assets/js/plugins/ui/moment/moment.min.js"></script>
 	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>
@@ -465,7 +460,7 @@ if ($row['ClienSexo'] == 'F'){
 				checkInicioAdmMedicamentos = checkInicioAdmMedicamentos == true ? 1 : 0;
 
 				if (medicamentoEstoqueMedicamentos == '' && medicamentoDlMedicamentos == '') {
-					msg = 'informe um Medicamento no campo livre, ou pesquise um medicamento do inventário!';
+					msg = 'Informe um medicamento no campo livre ou pesquise um medicamento do estoque!';
 					alerta('Campo Obrigatório!', msg, 'error')
 					$('#medicamentoDlMedicamentos').focus();return					
 				}
@@ -480,9 +475,9 @@ if ($row['ClienSexo'] == 'F'){
 
 				switch(msg){
 					case selViaMedicamentos: msg = 'Informe a via de administração do medicamento!';$('#selViaMedicamentos').focus();break
-					case doseMedicamentos: msg = 'Informe a dose do medicamento"';$('#doseMedicamentos').focus();break
+					case doseMedicamentos: msg = 'Informe a dose do medicamento';$('#doseMedicamentos').focus();break
 					case selUnidadeMedicamentos: msg = 'Informe a unidade do medicamento!';$('#selUnidadeMedicamentos').focus();break
-					case frequenciaMedicamentos: msg = 'Informe a frequencia de administraçao do medicamento!';$('#frequenciaMedicamentos').focus();break
+					case frequenciaMedicamentos: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaMedicamentos').focus();break
 					case selTipoAprazamentoMedicamentos: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoMedicamentos').focus();break
 					case dataInicioMedicamentos: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioMedicamentos').focus();break
 					case descricaoPosologiaMedicamentos: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaMedicamentos').focus();break
@@ -559,7 +554,7 @@ if ($row['ClienSexo'] == 'F'){
 
 
 				if (medicamentoEstoqueSolucoes == '' && medicamentoDlSolucoes == '') {
-					msg = 'informe uma um Medicamento no campo livre, ou pesquise um medicamento do inventário!';
+					msg = 'Informe um medicamento no campo livre ou pesquise um medicamento do estoque!';
 					alerta('Campo Obrigatório!', msg, 'error')
 					$('#medicamentoDlSolucoes').focus();return					
 				}
@@ -574,9 +569,9 @@ if ($row['ClienSexo'] == 'F'){
 
 				switch(msg){
 					case selViaSolucoes: msg = 'Informe a via de administração do medicamento!';$('#selViaSolucoes').focus();break
-					case doseSolucoes: msg = 'Informe a dose do medicamento"';$('#doseSolucoes').focus();break
+					case doseSolucoes: msg = 'Informe a dose do medicamento';$('#doseSolucoes').focus();break
 					case selUnidadeSolucoes: msg = 'Informe a unidade do medicamento!';$('#selUnidadeSolucoes').focus();break
-					case frequenciaSolucoes: msg = 'Informe a frequencia de administraçao do medicamento!';$('#frequenciaSolucoes').focus();break
+					case frequenciaSolucoes: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaSolucoes').focus();break
 					case selTipoAprazamentoSolucoes: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoSolucoes').focus();break
 					case dataInicioSolucoes: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioSolucoes').focus();break
 					case descricaoPosologiaSolucoes: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaSolucoes').focus();break
@@ -820,7 +815,7 @@ if ($row['ClienSexo'] == 'F'){
 				checkInicioAdmMedicamentos = checkInicioAdmMedicamentos == true ? 1 : 0;
 
 				if (medicamentoEstoqueMedicamentos == '' && medicamentoDlMedicamentos == '') {
-					msg = 'informe um Medicamento no campo livre, ou pesquise um medicamento do inventário!';
+					msg = 'Informe um medicamento no campo livre ou pesquise um medicamento do estoque!';
 					alerta('Campo Obrigatório!', msg, 'error')
 					$('#medicamentoDlMedicamentos').focus();return					
 				}
@@ -835,9 +830,9 @@ if ($row['ClienSexo'] == 'F'){
 
 				switch(msg){
 					case selViaMedicamentos: msg = 'Informe a via de administração do medicamento!';$('#selViaMedicamentos').focus();break
-					case doseMedicamentos: msg = 'Informe a dose do medicamento"';$('#doseMedicamentos').focus();break
+					case doseMedicamentos: msg = 'Informe a dose do medicamento';$('#doseMedicamentos').focus();break
 					case selUnidadeMedicamentos: msg = 'Informe a unidade do medicamento!';$('#selUnidadeMedicamentos').focus();break
-					case frequenciaMedicamentos: msg = 'Informe a frequencia de administraçao do medicamento!';$('#frequenciaMedicamentos').focus();break
+					case frequenciaMedicamentos: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaMedicamentos').focus();break
 					case selTipoAprazamentoMedicamentos: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoMedicamentos').focus();break
 					case dataInicioMedicamentos: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioMedicamentos').focus();break
 					case descricaoPosologiaMedicamentos: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaMedicamentos').focus();break
@@ -918,7 +913,7 @@ if ($row['ClienSexo'] == 'F'){
 
 
 				if (medicamentoEstoqueSolucoes == '' && medicamentoDlSolucoes == '') {
-					msg = 'informe uma um Medicamento no campo livre, ou pesquise um medicamento do inventário!';
+					msg = 'Informe um medicamento no campo livre ou pesquise um medicamento do estoque!';
 					alerta('Campo Obrigatório!', msg, 'error')
 					$('#medicamentoDlSolucoes').focus();return					
 				}
@@ -933,9 +928,9 @@ if ($row['ClienSexo'] == 'F'){
 
 				switch(msg){
 					case selViaSolucoes: msg = 'Informe a via de administração do medicamento!';$('#selViaSolucoes').focus();break
-					case doseSolucoes: msg = 'Informe a dose do medicamento"';$('#doseSolucoes').focus();break
+					case doseSolucoes: msg = 'Informe a dose do medicamento';$('#doseSolucoes').focus();break
 					case selUnidadeSolucoes: msg = 'Informe a unidade do medicamento!';$('#selUnidadeSolucoes').focus();break
-					case frequenciaSolucoes: msg = 'Informe a frequencia de administraçao do medicamento!';$('#frequenciaSolucoes').focus();break
+					case frequenciaSolucoes: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaSolucoes').focus();break
 					case selTipoAprazamentoSolucoes: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoSolucoes').focus();break
 					case dataInicioSolucoes: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioSolucoes').focus();break
 					case descricaoPosologiaSolucoes: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaSolucoes').focus();break
@@ -1226,7 +1221,7 @@ if ($row['ClienSexo'] == 'F'){
 
 						let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarEvolucao (\"${item.evolucaoCompl}\")'><i class='icon-clipboard2' title='Copiar Evolução'></i></a>`;
 						let editar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='editarEvolucao(\"${item.id}\")' class='list-icons-item' ><i class='icon-pencil7' title='Editar Evolução'></i></a>`;
-						let exc = `<a style='color: black; cursor:pointer' onclick='excluirEvolucao(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Evolucao'></i></a>`;
+						let exc = `<a style='color: black; cursor:pointer' onclick='excluirEvolucao(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Evolução'></i></a>`;
 
 						let acoes = `<div class='list-icons'>
 									${copiar}
@@ -2085,7 +2080,7 @@ if ($row['ClienSexo'] == 'F'){
 								<div class="col-lg-11">	
                                     <button type="button" id="entradaPaciente-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg active mr-2" onclick="mudarGrid('entradaPaciente')" style="margin-left: -10px;" >Entrada do Paciente</button>
 									<button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2" onclick="mudarGrid('prescricao')" >Prescrição</button>
-									<button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2" onclick="mudarGrid('evolucao')" >Evolucao</button>
+									<button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2" onclick="mudarGrid('evolucao')" >Evolução</button>
 								</div>
 							</div>
 							

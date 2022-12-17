@@ -392,7 +392,7 @@ if ($row['ClienSexo'] == 'F'){
 				checkInicioAdmMedicamentos = checkInicioAdmMedicamentos == true ? 1 : 0;
 
 				if (medicamentoEstoqueMedicamentos == '' && medicamentoDlMedicamentos == '') {
-					msg = 'informe um Medicamento no campo livre, ou pesquise um medicamento do inventário!';
+					msg = 'Informe um medicamento no campo livre ou pesquise um medicamento do estoque!';
 					alerta('Campo Obrigatório!', msg, 'error')
 					$('#medicamentoDlMedicamentos').focus();return					
 				}
@@ -407,9 +407,9 @@ if ($row['ClienSexo'] == 'F'){
 
 				switch(msg){
 					case selViaMedicamentos: msg = 'Informe a via de administração do medicamento!';$('#selViaMedicamentos').focus();break
-					case doseMedicamentos: msg = 'Informe a dose do medicamento"';$('#doseMedicamentos').focus();break
+					case doseMedicamentos: msg = 'Informe a dose do medicamento';$('#doseMedicamentos').focus();break
 					case selUnidadeMedicamentos: msg = 'Informe a unidade do medicamento!';$('#selUnidadeMedicamentos').focus();break
-					case frequenciaMedicamentos: msg = 'Informe a frequencia de administraçao do medicamento!';$('#frequenciaMedicamentos').focus();break
+					case frequenciaMedicamentos: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaMedicamentos').focus();break
 					case selTipoAprazamentoMedicamentos: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoMedicamentos').focus();break
 					case dataInicioMedicamentos: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioMedicamentos').focus();break
 					case descricaoPosologiaMedicamentos: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaMedicamentos').focus();break
@@ -486,7 +486,7 @@ if ($row['ClienSexo'] == 'F'){
 
 
 				if (medicamentoEstoqueSolucoes == '' && medicamentoDlSolucoes == '') {
-					msg = 'informe uma um Medicamento no campo livre, ou pesquise um medicamento do inventário!';
+					msg = 'Informe um medicamento no campo livre ou pesquise um medicamento do estoque!';
 					alerta('Campo Obrigatório!', msg, 'error')
 					$('#medicamentoDlSolucoes').focus();return					
 				}
@@ -501,9 +501,9 @@ if ($row['ClienSexo'] == 'F'){
 
 				switch(msg){
 					case selViaSolucoes: msg = 'Informe a via de administração do medicamento!';$('#selViaSolucoes').focus();break
-					case doseSolucoes: msg = 'Informe a dose do medicamento"';$('#doseSolucoes').focus();break
+					case doseSolucoes: msg = 'Informe a dose do medicamento';$('#doseSolucoes').focus();break
 					case selUnidadeSolucoes: msg = 'Informe a unidade do medicamento!';$('#selUnidadeSolucoes').focus();break
-					case frequenciaSolucoes: msg = 'Informe a frequencia de administraçao do medicamento!';$('#frequenciaSolucoes').focus();break
+					case frequenciaSolucoes: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaSolucoes').focus();break
 					case selTipoAprazamentoSolucoes: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoSolucoes').focus();break
 					case dataInicioSolucoes: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioSolucoes').focus();break
 					case descricaoPosologiaSolucoes: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaSolucoes').focus();break
@@ -746,7 +746,7 @@ if ($row['ClienSexo'] == 'F'){
 				checkInicioAdmMedicamentos = checkInicioAdmMedicamentos == true ? 1 : 0;
 
 				if (medicamentoEstoqueMedicamentos == '' && medicamentoDlMedicamentos == '') {
-					msg = 'informe um Medicamento no campo livre, ou pesquise um medicamento do inventário!';
+					msg = 'Informe um medicamento no campo livre ou pesquise um medicamento do estoque!';
 					alerta('Campo Obrigatório!', msg, 'error')
 					$('#medicamentoDlMedicamentos').focus();return					
 				}
@@ -761,9 +761,9 @@ if ($row['ClienSexo'] == 'F'){
 
 				switch(msg){
 					case selViaMedicamentos: msg = 'Informe a via de administração do medicamento!';$('#selViaMedicamentos').focus();break
-					case doseMedicamentos: msg = 'Informe a dose do medicamento"';$('#doseMedicamentos').focus();break
+					case doseMedicamentos: msg = 'Informe a dose do medicamento';$('#doseMedicamentos').focus();break
 					case selUnidadeMedicamentos: msg = 'Informe a unidade do medicamento!';$('#selUnidadeMedicamentos').focus();break
-					case frequenciaMedicamentos: msg = 'Informe a frequencia de administraçao do medicamento!';$('#frequenciaMedicamentos').focus();break
+					case frequenciaMedicamentos: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaMedicamentos').focus();break
 					case selTipoAprazamentoMedicamentos: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoMedicamentos').focus();break
 					case dataInicioMedicamentos: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioMedicamentos').focus();break
 					case descricaoPosologiaMedicamentos: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaMedicamentos').focus();break
@@ -844,7 +844,7 @@ if ($row['ClienSexo'] == 'F'){
 
 
 				if (medicamentoEstoqueSolucoes == '' && medicamentoDlSolucoes == '') {
-					msg = 'informe uma um Medicamento no campo livre, ou pesquise um medicamento do inventário!';
+					msg = 'Informe um medicamento no campo livre ou pesquise um medicamento do estoque!';
 					alerta('Campo Obrigatório!', msg, 'error')
 					$('#medicamentoDlSolucoes').focus();return					
 				}
@@ -859,9 +859,9 @@ if ($row['ClienSexo'] == 'F'){
 
 				switch(msg){
 					case selViaSolucoes: msg = 'Informe a via de administração do medicamento!';$('#selViaSolucoes').focus();break
-					case doseSolucoes: msg = 'Informe a dose do medicamento"';$('#doseSolucoes').focus();break
+					case doseSolucoes: msg = 'Informe a dose do medicamento';$('#doseSolucoes').focus();break
 					case selUnidadeSolucoes: msg = 'Informe a unidade do medicamento!';$('#selUnidadeSolucoes').focus();break
-					case frequenciaSolucoes: msg = 'Informe a frequencia de administraçao do medicamento!';$('#frequenciaSolucoes').focus();break
+					case frequenciaSolucoes: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaSolucoes').focus();break
 					case selTipoAprazamentoSolucoes: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoSolucoes').focus();break
 					case dataInicioSolucoes: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioSolucoes').focus();break
 					case descricaoPosologiaSolucoes: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaSolucoes').focus();break
@@ -1149,7 +1149,7 @@ if ($row['ClienSexo'] == 'F'){
 
 						let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarEvolucao (\"${item.evolucaoCompl}\")'><i class='icon-files-empty' title='Copiar Evolução'></i></a>`;
 						let editar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='editarEvolucao(\"${item.id}\")' class='list-icons-item' ><i class='icon-pencil7' title='Editar Evolução'></i></a>`;
-						let exc = `<a style='color: black; cursor:pointer' onclick='excluirEvolucao(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Evolucao'></i></a>`;
+						let exc = `<a style='color: black; cursor:pointer' onclick='excluirEvolucao(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Evolução'></i></a>`;
 						let acoes = ``;
 
 						if (item.editavel == 1) {
@@ -1522,7 +1522,7 @@ if ($row['ClienSexo'] == 'F'){
 				},
 				success: function(response) {
 					if (response.status == 'success') {						
-						window.open('http://localhost/lamparinas/sistema/atendimentoProdutos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1000,height=450,left=25,top=25'); 
+						window.open('http://localhost/lamparinas/sistema/atendimentoProdutos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1200,height=450,left=25,top=25'); 
 					}
 				}
 			});
@@ -1802,71 +1802,19 @@ if ($row['ClienSexo'] == 'F'){
 		}
 
 		function excluirEvolucao(id) {
-
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoObservacaoHospitalar.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'DELETEEVOLUCAO',
-					'id' : id
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.status)
-					getEvolucaoDiaria()				
-				}
-			});
+			confirmaExclusaoAjax('filtraAtendimentoObservacaoHospitalar.php', 'Excluir Evolução?', 'DELETEEVOLUCAO', id, getEvolucaoDiaria)
 		}
 
 		function excluirMedicamento(id, tipo) {
-
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoObservacaoHospitalar.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'DELETEMEDICAMENTO',
-					'id' : id
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.status)
-					getMedicamentosSolucoes()				
-				}
-			});			
+			confirmaExclusaoAjax('filtraAtendimentoObservacaoHospitalar.php', 'Excluir Prescrição de Medicamento?', 'DELETEMEDICAMENTO', id, getMedicamentosSolucoes)	
 		}
 
 		function excluirDieta(id) {
-
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoObservacaoHospitalar.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'DELETEDIETA',
-					'id' : id
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.status)
-					getDietas()				
-				}
-			});			
+			confirmaExclusaoAjax('filtraAtendimentoObservacaoHospitalar.php', 'Excluir Prescrição de Dieta?', 'DELETEDIETA', id, getDietas)	
 		}
 
 		function excluirCuidado(id) {
-
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoObservacaoHospitalar.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'DELETECUIDADO',
-					'id' : id
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.status)
-					getCuidados()				
-				}
-			});			
+			confirmaExclusaoAjax('filtraAtendimentoObservacaoHospitalar.php', 'Excluir Prescrição de Cuidado?', 'DELETECUIDADO', id, getCuidados)	
 		}
 
 		function zerarEvolucao() {
@@ -2002,7 +1950,7 @@ if ($row['ClienSexo'] == 'F'){
 							<div class="card-header header-elements-inline">
 								<div class="col-lg-11">	
 									<button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg active mr-2 " onclick="mudarGrid('prescricao')" style="margin-left: -10px;" >Prescrição</button>
-									<button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg " onclick="mudarGrid('evolucao')" >Evolucao</button>
+									<button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg " onclick="mudarGrid('evolucao')" >Evolução</button>
 								</div>
 							</div>								
 						</div>

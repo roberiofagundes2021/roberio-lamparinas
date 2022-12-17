@@ -75,7 +75,7 @@ try {
 		$iAtendimentoId = $_POST['iAtendimentoId'];
 		$profissional = $_POST['profissional'];
 		$tipo = $_POST['tipo'];
-		$medicamentoEstoqueSolucoes = $_POST['medicamentoEstoqueSolucoes'];
+		$medicamentoEstoqueSolucoes = $_POST['medicamentoEstoqueSolucoes'] != '' ? "'" . $_POST['medicamentoEstoqueSolucoes'] . "'" : 'NULL';
 		$medicamentoDlSolucoes = $_POST['medicamentoDlSolucoes'];
 		$selViaSolucoes = $_POST['selViaSolucoes'];
 		$doseSolucoes = $_POST['doseSolucoes'];
@@ -83,11 +83,13 @@ try {
 		$frequenciaSolucoes = $_POST['frequenciaSolucoes'];
 		$selTipoAprazamentoSolucoes = $_POST['selTipoAprazamentoSolucoes'];
 		$dataInicioSolucoes = $_POST['dataInicioSolucoes'];	
-		$diluenteSolucoes = $_POST['diluenteSolucoes'];
-		$volumeSolucoes = $_POST['volumeSolucoes'];
-		$correrEmSolucoes = $_POST['correrEmSolucoes'];
-		$selUnTempoSolucoes = $_POST['selUnTempoSolucoes'];
-		$velocidadeInfusaoSolucoes = $_POST['velocidadeInfusaoSolucoes'];	
+
+		$diluenteSolucoes = $_POST['diluenteSolucoes'] != '' ? "'" . $_POST['diluenteSolucoes'] . "'" : 'NULL';
+		$volumeSolucoes = $_POST['volumeSolucoes'] != '' ? "'" . $_POST['volumeSolucoes'] . "'" : 'NULL';
+		$correrEmSolucoes = $_POST['correrEmSolucoes'] != '' ? "'" . $_POST['correrEmSolucoes'] . "'": 'NULL';
+		$selUnTempoSolucoes = $_POST['selUnTempoSolucoes'] != '' ? "'" . $_POST['selUnTempoSolucoes'] . "'": 'NULL';
+		$velocidadeInfusaoSolucoes = $_POST['velocidadeInfusaoSolucoes'] != '' ? "'" . $_POST['velocidadeInfusaoSolucoes'] . "'": 'NULL';
+
 		$checkBombaInfusaoSolucoes = $_POST['checkBombaInfusaoSolucoes'];
 		$checkInicioAdmSolucoes = $_POST['checkInicioAdmSolucoes'];
 		$horaInicioAdmSolucoes = $_POST['horaInicioAdmSolucoes'];
@@ -103,10 +105,10 @@ try {
 			AtPMeDiluente, AtPMeVolume, AtPMeCorrerEm, AtPMeUnidadeTempo, AtPMeVelocidadeInfusao,
 			AtPMeBombaInfusao,	AtPMeInicioAdm, AtPMeHoraInicioAdm, AtPMeComplemento, AtPMePosologia, AtPMeUnidade)
 		VALUES 
-			('$iAtendimentoId', '$dataInicio', '$horaInicio', '$profissional', '$tipo', '$medicamentoEstoqueSolucoes', '$medicamentoDlSolucoes',
+			('$iAtendimentoId', '$dataInicio', '$horaInicio', '$profissional', '$tipo', $medicamentoEstoqueSolucoes, '$medicamentoDlSolucoes',
 			'$selViaSolucoes', '$doseSolucoes', '$selUnidadeSolucoes', '$frequenciaSolucoes', '$selTipoAprazamentoSolucoes', '$dataInicioSolucoes', 
-			'$diluenteSolucoes', '$volumeSolucoes', '$correrEmSolucoes', '$selUnTempoSolucoes', '$velocidadeInfusaoSolucoes', 
-			'$checkBombaInfusaoSolucoes', '$checkInicioAdmSolucoes', '$horaInicioAdmSolucoes', '$complementoSolucoes', '$descricaoPosologiaSolucoes', '$iUnidade')";
+			$diluenteSolucoes, $volumeSolucoes, $correrEmSolucoes, $selUnTempoSolucoes, $velocidadeInfusaoSolucoes, 
+			'$checkBombaInfusaoSolucoes', '$checkInicioAdmSolucoes', '$horaInicioAdmSolucoes', '$complementoSolucoes', '$descricaoPosologiaSolucoes', '$iUnidade')";	
 		$conn->query($sql);
 
 		echo json_encode([
@@ -205,9 +207,9 @@ try {
 
 		$iAtendimentoId = $_POST['iAtendimentoId'];
 
-		$sql = "SELECT AtPMeId, AtPMeTipo, AtPMeEditavel, AtPMeDtInicioTratamento, ProduCodigo, ProduNome ,ViaNome, AtPMePosologia 
+		$sql = "SELECT AtPMeId, AtPMeTipo, AtPMeEditavel, AtPMeDtInicioTratamento, AtPMeProdutoEmEstoque, ProduCodigo, ProduNome ,ViaNome, AtPMePosologia, AtPMeProdutoLivre
 		FROM AtendimentoPrescricaoMedicamento
-		JOIN Produto ON AtPMeProdutoEmEstoque = ProduId
+		LEFT JOIN Produto ON AtPMeProdutoEmEstoque = ProduId
 		JOIN Via ON AtPMeVia = ViaId
 		WHERE AtPMeAtendimento = $iAtendimentoId
 		AND AtPMeUnidade = $iUnidade";
@@ -217,6 +219,13 @@ try {
 		$array = [];
 
 		foreach($rows as $key => $item){
+
+			if ($item['AtPMeProdutoEmEstoque'] == '' || $item['AtPMeProdutoEmEstoque'] == NULL) {
+				$dadosMedicamento = $item['AtPMeProdutoLivre'];
+			}else{
+				$dadosMedicamento = $item['ProduCodigo'] . ' - ' . $item['ProduNome'];
+			}
+
 			array_push($array, [
 
 				'item' => ($key + 1),
@@ -224,7 +233,7 @@ try {
 				'tipo' => $item['AtPMeTipo'],
 				'editavel' => $item['AtPMeEditavel'],
 				'dataIniTratamento' => mostraData($item['AtPMeDtInicioTratamento']),
-				'dadosMedicamento' => $item['ProduCodigo'] . ' - ' . $item['ProduNome'],
+				'dadosMedicamento' => $dadosMedicamento,
 				'via' => $item['ViaNome'],
 				'posologia' => $item['AtPMePosologia']
 
@@ -309,8 +318,8 @@ try {
 
 		echo json_encode([
 			'status' => 'success',
-			'titulo' => 'Incluir Evolução Diária',
-			'menssagem' => 'Evolução Diária inserida com sucesso!!!'
+			'titulo' => 'Atualizar Evolução Diária',
+			'menssagem' => 'Evolução Diária alterada com sucesso!!!'
 		]);
 
 	} elseif ($tipoRequest == 'EDITARMEDICAMENTO') {

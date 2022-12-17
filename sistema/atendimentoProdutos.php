@@ -79,17 +79,17 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,
-					width: "10%", 
+					width: "20%", 
 					targets: [2]
 				},				
 				{ 
 					orderable: true,  
-					width: "10%", 
+					width: "15%", 
 					targets: [3]
 				},				
 				{ 
 					orderable: true,  
-					width: "10%", 
+					width: "15%", 
 					targets: [4]
 				},				
 				{ 
@@ -104,7 +104,7 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 				},				
 				{ 
 					orderable: true,  
-					width: "5%", 
+					width: "10%", 
 					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
@@ -325,7 +325,7 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 
                                                 <div class="form-group">
                                                     <button class="btn btn-lg btn-success ml-2" type="button" id="pesquisar">Pesquisar</button>                                           
-                                                    <a href="#" onClick="fecharJanela();" type="button" class='btn btn-basic ml-2' role='button'>Cancelar</a>";                                 
+                                                    <a href="#" onClick="fecharJanela();" type="button" class='btn btn-basic ml-2' role='button'>Cancelar</a>                                 
                                                 </div>
 																						
 											</div>
@@ -339,8 +339,8 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
                                                 <thead>
                                                     <tr class="bg-slate">
                                                         <th class="text-left">Item</th>
-                                                        <th class="text-left">Codigo</th>
-                                                        <th class="text-left">Descricao</th>
+                                                        <th class="text-left">Código</th>
+                                                        <th class="text-left">Descrição</th>
                                                         <th class="text-left">Categoria</th>
                                                         <th class="text-left">SubCategoria</th>
                                                         <th class="text-left">Unidade</th>

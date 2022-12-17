@@ -72,7 +72,7 @@
                     <label>Tipo de Aprazamento <span class="text-danger">*</span></label>
                 </div>
                 <div class="col-lg-2">
-                    <label>Data Inicio Tratamento <span class="text-danger">*</span></label>
+                    <label>Data Início Tratamento <span class="text-danger">*</span></label>
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-2">
@@ -92,7 +92,7 @@
                     </select>											
                 </div>
                 <div class="col-lg-2">
-                    <input type="date" class="form-control" name="dataInicioMedicamentos" id="dataInicioMedicamentos">									
+                    <input type="date" class="form-control" name="dataInicioMedicamentos" id="dataInicioMedicamentos" min="<?php echo date('Y-m-d') ?>">									
                 </div>
             </div>
         
@@ -243,7 +243,7 @@
                     <label>Tipo de Aprazamento <span class="text-danger">*</span></label>
                 </div>
                 <div class="col-lg-2">
-                    <label>Data Inicio Tratamento <span class="text-danger">*</span></label>
+                    <label>Data Início Tratamento <span class="text-danger">*</span></label>
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-2">
@@ -263,26 +263,26 @@
                     </select>											
                 </div>
                 <div class="col-lg-2">
-                    <input type="date" class="form-control" name="dataInicioSolucoes" id="dataInicioSolucoes">										
+                    <input type="date" class="form-control" name="dataInicioSolucoes" id="dataInicioSolucoes" min="<?php echo date('Y-m-d') ?>">										
                 </div>
             </div>
 
             <div class="col-lg-12 mb-3 row">
                 <!-- titulos -->
                 <div class="col-lg-4">
-                    <label>Diluente (Em Estoque) <span class="text-danger">*</span></label>
+                    <label>Diluente (Em Estoque)</label>
                 </div>
                 <div class="col-lg-2">
-                    <label>Volume (ml) <span class="text-danger">*</span></label>
+                    <label>Volume (ml)</label>
                 </div>
                 <div class="col-lg-2">
-                    <label>Correr em <span class="text-danger">*</span></label>
+                    <label>Correr em</label>
                 </div>
                 <div class="col-lg-2">
-                    <label>Unidade de Tempo <span class="text-danger">*</span></label>
+                    <label>Unidade de Tempo</label>
                 </div>
                 <div class="col-lg-2">
-                    <label>Velocidade de Infusão <span class="text-danger">*</span></label>
+                    <label>Velocidade de Infusão</label>
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-3">
@@ -323,12 +323,12 @@
                 <div class="col-lg-2">
                 </div>
                 <div class="col-lg-2">
-                    <label>Hora Início Adm <span class="text-danger">*</span></label>
+                    <label>Hora Início Adm</label>
                 </div>
                 <div class="col-lg-1">
                 </div>
                 <div class="col-lg-5">
-                    <label>Complemento <span class="text-danger">*</span></label>
+                    <label>Complemento</label>
                 </div>
 
                 <!-- campos -->										
@@ -445,10 +445,10 @@
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-3">
-                    <input type="date" class="form-control" name="dataInicialDieta" id="dataInicialDieta">
+                    <input type="date" class="form-control" name="dataInicialDieta" id="dataInicialDieta" min="<?php echo date('Y-m-d') ?>">
                 </div>
                 <div class="col-lg-3">
-                    <input type="date" class="form-control" name="dataFinalDieta" id="dataFinalDieta">
+                    <input type="date" class="form-control" name="dataFinalDieta" id="dataFinalDieta" min="<?php echo date('Y-m-d') ?>">
                 </div>
                 <div class="col-lg-6">
                     <select id="selTipoDeDieta" name="selTipoDeDieta" class="select-search" onChange="setDescricaoDieta()" >
@@ -570,10 +570,10 @@
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-3">
-                    <input type="date" class="form-control" name="dataInicialCuidados" id="dataInicialCuidados">
+                    <input type="date" class="form-control" name="dataInicialCuidados" id="dataInicialCuidados" min="<?php echo date('Y-m-d') ?>">
                 </div>
                 <div class="col-lg-3">
-                    <input type="date" class="form-control" name="dataFinalCuidados" id="dataFinalCuidados">
+                    <input type="date" class="form-control" name="dataFinalCuidados" id="dataFinalCuidados" min="<?php echo date('Y-m-d') ?>">
                 </div>
                 <div class="col-lg-6">
                     <select id="selTipoDeCuidado" name="selTipoDeCuidado" class="select-search" onChange="setDescricaoCuidados()">
