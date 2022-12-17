@@ -10,7 +10,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT MarcaId, MarcaNome, MarcaStatus, SituaNome, SituaCor, SituaChave
 		FROM Marca
 		JOIN Situacao on SituaId = MarcaStatus
-	    WHERE MarcaUnidade = ". $_SESSION['UnidadeId'] ."
+	    WHERE MarcaEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY MarcaNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -51,15 +51,15 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO Marca (MarcaNome, MarcaStatus, MarcaUsuarioAtualizador, MarcaUnidade)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO Marca (MarcaNome, MarcaStatus, MarcaUsuarioAtualizador, MarcaEmpresa)
+					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId'],
+							':iEmpresa' => $_SESSION['EmpreId'],
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Marca incluída!!!";

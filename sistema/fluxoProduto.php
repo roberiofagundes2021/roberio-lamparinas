@@ -747,6 +747,7 @@ try{
 											
 											$cont++;
 											$iUnidade = $_SESSION['UnidadeId'];
+											$iEmpresa = $_SESSION['EmpreId'];
 
 											// vai buscar na tabela ProdutoXFabricante os dados caso esse fluxo ja tenha sido liberado
 											$HTML_MARCA = '';
@@ -762,7 +763,7 @@ try{
 											$sql = "SELECT MarcaId, MarcaNome
 													FROM Marca
 													JOIN Situacao on SituaId = MarcaStatus
-													WHERE MarcaUnidade = $iUnidade and SituaChave = 'ATIVO'
+													WHERE MarcaEmpresa = $iEmpresa  and SituaChave = 'ATIVO'
 													ORDER BY MarcaNome ASC";
 											$resultMarca = $conn->query($sql);
 											$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);

@@ -686,7 +686,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 															$sql = "SELECT MarcaId, MarcaNome
 																	FROM Marca
 																	JOIN Situacao on SituaId = MarcaStatus											     
-																	WHERE MarcaUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																	WHERE MarcaEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY MarcaNome ASC";
 															$result = $conn->query($sql);
 															$rowMarca = $result->fetchAll(PDO::FETCH_ASSOC);

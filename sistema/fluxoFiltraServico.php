@@ -5,6 +5,7 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 $iUnidade = $_SESSION['UnidadeId'];
+$iEmpresa = $_SESSION['EmpreId'];
 $iFluxoOperacional = $_POST['iFluxoOperacional'];
 $Origem = $_POST['Origem'];
 
@@ -90,7 +91,7 @@ foreach ($rowResult as $item){
 	$sql = "SELECT MarcaId, MarcaNome
 			FROM Marca
 			JOIN Situacao on SituaId = MarcaStatus
-			WHERE MarcaUnidade = $iUnidade and SituaChave = 'ATIVO'
+			WHERE MarcaEmpresa = $iEmpresa and SituaChave = 'ATIVO'
 			ORDER BY MarcaNome ASC";
 	$resultMarca = $conn->query($sql);
 	$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);

@@ -718,6 +718,7 @@ try {
 
 											$cont++;
 											$iUnidade = $_SESSION['UnidadeId'];
+											$iEmpresa = $_SESSION['EmpreId'];
 
 											$iQuantidade = isset($item['FOXSrQuantidade']) ? $item['FOXSrQuantidade'] : '';
 											$fValorUnitario = isset($item['FOXSrValorUnitario']) ? mostraValor($item['FOXSrValorUnitario']) : '';
@@ -728,7 +729,7 @@ try {
 											$sql = "SELECT MarcaId, MarcaNome
 													FROM Marca
 													JOIN Situacao on SituaId = MarcaStatus
-													WHERE MarcaUnidade = $iUnidade and SituaChave = 'ATIVO'
+													WHERE MarcaEmpresa = $iEmpresa and SituaChave = 'ATIVO'
 													ORDER BY MarcaNome ASC";
 											$resultMarca = $conn->query($sql);
 											$rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
