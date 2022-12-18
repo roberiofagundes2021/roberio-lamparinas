@@ -10,7 +10,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT ModelId, ModelNome, ModelStatus, SituaNome, SituaCor, SituaChave
 					FROM Modelo
 					JOIN Situacao on SituaId = ModelStatus
-	    	 WHERE ModelUnidade = " . $_SESSION['UnidadeId'] . "
+	    	 WHERE ModelEmpresa = " . $_SESSION['EmpreId'] . "
 			ORDER BY ModelNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -51,15 +51,15 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO Modelo (ModelNome, ModelStatus, ModelUsuarioAtualizador, ModelUnidade)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO Modelo (ModelNome, ModelStatus, ModelUsuarioAtualizador, ModelEmpresa)
+					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId'],
+							':iEmpresa' => $_SESSION['EmpreId'],
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Modelo incluído!!!";

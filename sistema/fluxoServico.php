@@ -737,7 +737,7 @@ try {
 											$sql = "SELECT ModelId, ModelNome
 													FROM Modelo
 													JOIN Situacao on SituaId = ModelStatus
-													WHERE ModelUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+													WHERE ModelEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
 													ORDER BY ModelNome ASC";
 											$resultModelo = $conn->query($sql);
 											$rowModelo = $resultModelo->fetchAll(PDO::FETCH_ASSOC);
