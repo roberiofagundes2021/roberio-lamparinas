@@ -732,7 +732,7 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 															$sql = "SELECT FabriId, FabriNome
 																	FROM Fabricante														     
 																	JOIN Situacao on SituaId = FabriStatus											     
-																	WHERE FabriUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																	WHERE FabriEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY FabriNome ASC";
 															$result = $conn->query($sql);
 															$rowFabri = $result->fetchAll(PDO::FETCH_ASSOC);

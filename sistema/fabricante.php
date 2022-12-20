@@ -11,7 +11,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT FabriId, FabriNome, FabriStatus, SituaNome, SituaCor, SituaChave
 		FROM Fabricante
 		JOIN Situacao on SituaId = FabriStatus
-	    WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ."
+	    WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY FabriNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -52,15 +52,15 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO Fabricante (FabriNome, FabriStatus, FabriUsuarioAtualizador, FabriUnidade)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO Fabricante (FabriNome, FabriStatus, FabriUsuarioAtualizador, FabriEmpresa)
+					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId'],
+							':iEmpresa' => $_SESSION['EmpreId'],
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Fabricante incluído!!!";

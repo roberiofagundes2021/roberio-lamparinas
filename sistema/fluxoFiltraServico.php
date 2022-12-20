@@ -107,7 +107,7 @@ foreach ($rowResult as $item){
 	$sql = "SELECT FabriId, FabriNome
 			FROM Fabricante
 			JOIN Situacao on SituaId = FabriStatus
-			WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+			WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
 			ORDER BY FabriNome ASC";
 	$resultFabricante = $conn->query($sql);
 	$rowFabricante = $resultFabricante->fetchAll(PDO::FETCH_ASSOC);

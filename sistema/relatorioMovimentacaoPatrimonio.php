@@ -1181,7 +1181,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                                     	$sql = "SELECT FabriId, FabriNome
                                                                 FROM Fabricante
                                                                 JOIN Situacao on SituaId = FabriStatus
-                                                                WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                                WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
                                                                 ORDER BY FabriNome ASC";
                                                         $resultMarca = $conn->query($sql);
                                                         $rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
@@ -1311,7 +1311,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                                     	$sql = "SELECT FabriId, FabriNome
                                                                 FROM Fabricante
                                                                 JOIN Situacao on SituaId = FabriStatus
-                                                                WHERE FabriUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                                WHERE FabriEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
                                                                 ORDER BY FabriNome ASC";
                                                         $resultMarca = $conn->query($sql);
                                                         $rowMarca = $resultMarca->fetchAll(PDO::FETCH_ASSOC);
