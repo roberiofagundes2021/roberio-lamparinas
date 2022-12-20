@@ -112,6 +112,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 			$('#excluirContainer').hide();
 
 			$('#salvarAgenda').on('click', ()=>{
+				$("#salvarAgenda").prop('disabled', true);
 				$.ajax({
 					type: 'POST',
 					url: 'filtraProfissionalAgenda.php',
@@ -123,6 +124,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 					success: function(response) {
 						alerta(response.titulo, response.menssagem, response.status)
 						getAgenda()
+						$("#salvarAgenda").prop('disabled', false);		
 					}
 				});
 			})
@@ -750,7 +752,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 							</div>
 						</div>
 						<div class="text-left m-2">
-							<button id="salvarAgenda" class="btn btn-principal" role="button">Salvar</button>
+							<button id="salvarAgenda" class="btn btn-principal" role="button" >Salvar</button>
 							<a href="profissional.php" class="btn btn-lg" id="cancelar">Cancelar</a>
 						</div>
 					</div>
