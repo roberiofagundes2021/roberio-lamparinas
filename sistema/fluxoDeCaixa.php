@@ -202,7 +202,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 							HTML = HTML + `
 									<div class='row' style='background: #eeeeee; line-height: 3rem; box-sizing:border-box'>
 										<div class='col-lg-12 text-center'>
-											<span title=''>Vazio</span>
+											<span title=''>Não há registros</span>
 										</div>
 									</div>`;
 						}
@@ -366,7 +366,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 							HTML = HTML + `
 									<div class='row' style='background: #f8f8f8; line-height: 3rem; box-sizing:border-box'>
 										<div class='col-lg-12 text-center'>
-											<span title=''>Vazio</span>
+											<span title=''>Não há registros</span>
 										</div>
 									</div>`;
 						}
@@ -412,7 +412,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 		
 				}
 			});
-////////////////////////////////////////
+			////////////////////////////////////////
 
 			inputDateInitial.addEventListener('change', (e) => {
 				const monthInitial = (inputDateInitial.value).split('-')[1] ? (inputDateInitial.value).split('-')[1] : "";
@@ -573,7 +573,7 @@ $_SESSION['PaginaAtual'] = 'Fluxo Realizado';
 							}
 						);
 					} catch(err) {
-					console.error('Houve um error: ',err);
+						console.error('Houve um error: ',err);
 					}
 				} 
 
