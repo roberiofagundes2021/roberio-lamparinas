@@ -14,13 +14,14 @@ if(!isset($_POST['inputAtendimento'])) {
 $atendimentoId =  $_POST['inputAtendimento'];
 $recebimentoId =  $_POST['inputReciboId'];
 
-$sql_rrecebimentoServicos= "SELECT AtendNumRegistro, AtendDataRegistro, ClienNome, SrVenNome, ProfiNome, SrVenValorVenda, AtXSeData, 
+$sql_rrecebimentoServicos= "SELECT AtendNumRegistro, AtendDataRegistro, ClienNome, SrVenNome, ProfiNome, SVXMoServicoVenda, AtXSeData, 
                                    AtXSeHorario, AtLocNome, AtXSeValor, AtXSeDesconto, AtModNome, CxRecFormaPagamento, FrPagNome
                             FROM AtendimentoXServico
                             JOIN Atendimento on AtendId = AtXSeAtendimento
                             JOIN Cliente on ClienId = AtendCliente
                             JOIN AtendimentoLocal on AtLocId = AtXSeAtendimentoLocal
                             JOIN ServicoVenda ON SrVenId = AtXSeServico
+                            LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
                             JOIN Profissional ON ProfiId = AtXSeProfissional
                             JOIN CaixaRecebimento ON CxRecAtendimento = AtendId
                             JOIN FormaPagamento ON FrPagId = CxRecFormaPagamento

@@ -4,9 +4,10 @@ include('global_assets/php/conexao.php');
 
 $atendimentoId = $_POST['inputAtendimentoId'];
 
-$sql_atendimento    = "SELECT SrVenNome, ProfiNome, SrVenValorVenda, AtXSeDesconto
+$sql_atendimento    = "SELECT SrVenNome, ProfiNome, SVXMoValorVenda, AtXSeDesconto
                         FROM AtendimentoXServico
                         JOIN ServicoVenda ON SrVenId = AtXSeServico
+                        LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
                         JOIN Profissional ON ProfiId = AtXSeProfissional
                         WHERE AtXSeAtendimento = ".$atendimentoId." AND AtXSeUnidade = ".$_SESSION['UnidadeId']."";
 $resultAtendimento  = $conn->query($sql_atendimento);
@@ -16,7 +17,7 @@ $arrayData = [];
 foreach ($rowSaldoInicial as $item) {
     $procedimento = $item["SrVenNome"];
     $medico = $item["ProfiNome"];
-    $valorTotal = mostraValor($item["SrVenValorVenda"]);
+    $valorTotal = mostraValor($item["SVXMoValorVenda"]);
     $desconto = mostraValor($item["AtXSeDesconto"]);
 
     $array = [

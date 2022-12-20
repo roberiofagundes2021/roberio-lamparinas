@@ -9,9 +9,6 @@ include('global_assets/php/conexao.php');
 
 $abrirPopUpAberturaCaixa = 0;
 if(isset($_SESSION['aberturaCaixa']) && $_SESSION['aberturaCaixa'] == 'Abrir_Novo_Caixaz') {
-    $_SESSION['msg']['titulo'] = "Sucesso";
-    $_SESSION['msg']['mensagem'] = "Você deve abrir um caixa para acessar o PDV!!!";
-    $_SESSION['msg']['tipo'] = "success";
 
     $abrirPopUpAberturaCaixa = 1;
 
@@ -28,7 +25,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 //$count = count($row);
 
 //CONSULTA MOVIDA PARA MESMA PÁGINA PARA VERIFICAÇÃO MAIS RÁPIDA 
-$sql_saldoInicial    = "SELECT CxAbeId, CaixaNome, CxAbeCaixa, CxAbeDataHoraAbertura, CxAbeDataHoraFechamento, SituaChave
+$sql_saldoInicial    = "SELECT CxAbeId, CaixaNome, CxAbeCaixa, CxAbeDataHoraAbertura, CxAbeDataHoraFechamento, SituaChave, CxAbeSaldoFinal
             FROM CaixaAbertura
             JOIN Caixa on CaixaId = CxAbeCaixa
             JOIN Situacao on SituaId = CxAbeStatus
@@ -37,7 +34,7 @@ $sql_saldoInicial    = "SELECT CxAbeId, CaixaNome, CxAbeCaixa, CxAbeDataHoraAber
 $resultSaldoInicial  = $conn->query($sql_saldoInicial);
 
 if ($rowSaldoInicial = $resultSaldoInicial->fetch(PDO::FETCH_ASSOC)) {
-    $rowREsult = $rowSaldoInicial;
+    $rowResult = $rowSaldoInicial;
 } else {
     $rowResult = 'abrirCaixa';
 }
@@ -358,10 +355,12 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                     dataType: "json",
                     success: function(resposta) {
                         if(resposta == 'abrirCaixa') {
+                            alerta('Sucesso', 'Você deve abrir um caixa para acessar o PDV!!!', 'success')
                             $("#aberturaCaixa").trigger("click");
                         }else {
                             //Verifica se o último caixa do operador já foi fechado, se sim irá aparecer uma tela para abrir novamente
                             if(resposta.SituaChave == 'FECHADO') {
+                                alerta('Sucesso', 'Você deve abrir um caixa para acessar o PDV!!!', 'success')
                                 $("#aberturaCaixa").trigger("click");
                             }else {
                                 let arrayDataAbertura = resposta.CxAbeDataHoraAbertura.split(" ")
@@ -983,20 +982,35 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                                     <select id="cmbCaixa" name="cmbCaixa" class="form-control form-control-select2 select2-hidden-accessible" required="" aria-hidden="true">
                                         <option value="">Selecionar</option>
                                         <?php
+
+                                        $sql = "SELECT DISTINCT CaixaId, MAX(CaixaNome) NomeCaixa, MAX(SituaNome) SituacaoCaixa, MAx(UsuarNome) as NomeUsuario
+                                        FROM Caixa
+                                        JOIN Situacao on SituaId = CaixaStatus
+                                        JOIN ( SELECT DISTINCT CxAbeId, CxAbeCaixa, CxAbeOperador , MAX(CxAbeDataHoraAbertura) ultimaData FROM CaixaAbertura
+                                        where CxAbeUnidade = " . $_SESSION['UnidadeId'] . " and CxAbeDataHoraFechamento is NULL 
+                                        GROUP BY CxAbeCaixa, CxAbeId, CxAbeOperador ) lastID 
+                                        ON CaixaId = lastID.CxAbeCaixa
+                                        LEFT JOIN Usuario ON lastID.CxAbeOperador = UsuarId
+                                        WHERE CaixaUnidade = " . $_SESSION['UnidadeId'] . "
+                                        AND CaixaStatus = 1
+                                        AND CaixaId  in (SELECT CxAbeCaixa FROM CaixaAbertura WHERE CxAbeUnidade = " . $_SESSION['UnidadeId'] . " and CxAbeDataHoraFechamento is NULL)
+                                        GROUP BY CaixaId
                                         
-                                        $sql = "SELECT CaixaId, CaixaNome, SituaNome
-                                                FROM Caixa
-                                                JOIN Situacao on SituaId = CaixaStatus
-                                                WHERE CaixaUnidade = " . $_SESSION['UnidadeId'] . " 
-                                                      and CaixaId not in (SELECT CxAbeCaixa 
-                                                                          FROM CaixaAbertura
-                                                                          WHERE CxAbeUnidade = " . $_SESSION['UnidadeId'] . " and CxAbeDataHoraFechamento is NULL)
-                                                ORDER BY CaixaNome ASC";
+                                        UNION All
+                                        
+                                        SELECT CaixaId, CaixaNome NomeCaixa, SituaNome SituacaoCaixa, 'Disponível' as NomeUsuario
+                                        FROM Caixa
+                                        JOIN Situacao on SituaId = CaixaStatus
+                                        WHERE CaixaUnidade = " . $_SESSION['UnidadeId'] . " 
+                                        AND CaixaStatus = 1
+                                        AND CaixaId not in (SELECT CxAbeCaixa FROM CaixaAbertura WHERE CxAbeUnidade = " . $_SESSION['UnidadeId'] . " and CxAbeDataHoraFechamento is NULL)                      
+                                        ORDER BY CaixaId ASC";
+                                        
                                         $result = $conn->query($sql);
                                         $rowCaixa = $result->fetchAll(PDO::FETCH_ASSOC);
     
                                         foreach ($rowCaixa as $item) {
-                                            print('<option value="' . $item['CaixaId'] . '">'. $item['CaixaNome'] . '</option>');
+                                            print('<option value="' . $item['CaixaId'] . '" ' . ($item['NomeUsuario'] == "Disponível" ? "" :"disabled") . ' >'. $item['NomeCaixa'] . ' (' . $item['NomeUsuario'] . ')' . '</option>');
                                         }
                                         ?>
                                     </select>
