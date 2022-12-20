@@ -699,7 +699,7 @@ $acesso = 'ATENDIMENTO';
 				document.getElementById("box-pacientes-atendimento").style.display = 'none';
 						
 			} else if (grid == 'observacao') {
-				document.getElementById("card-title").innerText = "Pacientes em Observação";
+				document.getElementById("card-title").innerText = "Pacientes Internados";
 				document.getElementById("box-pacientes-observacao").style.display = 'block';
 				document.getElementById("box-pacientes-espera").style.display = 'none';
 				document.getElementById("box-pacientes-atendidos").style.display = 'none';	
@@ -759,7 +759,7 @@ $acesso = 'ATENDIMENTO';
 									<div class="col-lg-12">	
 										<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('espera')" >Pacientes em Espera</button>
 										<button type="button" id="pacientes-atendimento-btn" class="btn-grid btn btn-outline-secondary btn-lg" onclick="mudarGrid('atendimento')" >Pacientes em Atendimento</button>
-										<button type="button" id="pacientes-observacao-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('observacao')"  >Pacientes em Observação</button>
+										<button type="button" id="pacientes-observacao-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('observacao')"  >Pacientes Internados</button>
 										<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendidos')" >Pacientes Atendidos</button>
 									</div>
 								</div>
