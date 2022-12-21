@@ -71,12 +71,12 @@ if ($row['ClienSexo'] == 'F'){
     $sexo = 'Masculino';
 }
 
-// $sql = "SELECT AtClaChave
-// 	FROM Atendimento
-// 	JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-// 	WHERE AtendId = $iAtendimentoId and AtClaUnidade = $iUnidade";
-// $result = $conn->query($sql);
-// $rowAtendimentoClassificacao = $result->fetch(PDO::FETCH_ASSOC);
+$sql = "SELECT AtClaChave
+	FROM Atendimento
+	JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+	WHERE AtendId = $iAtendimentoId and AtClaUnidade = $iUnidade";
+$result = $conn->query($sql);
+$rowAtendimentoClassificacao = $result->fetch(PDO::FETCH_ASSOC);
 
 // if($rowAtendimentoClassificacao['AtClaChave'] == 'ELETIVO'){
 // 	$sql = "SELECT TOP(1) AtEleDataInicio as dataInicio, AtEleHoraInicio as horaFim, AtEleDataFim as dataFim, AtEleHoraFim as horaFim
@@ -145,12 +145,12 @@ if (isset($_POST['inputTipoTransferencia']) && isset($_POST['inputCid'])){
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Transferência incluída com sucesso!!!";
 		$_SESSION['msg']['tipo'] = "success";
-		// switch($_SESSION['UltimaPagina']){
-		// 	case "ELETIVO":irpara("atendimentoEletivoListagem.php");break;
-		// 	case "AMBULATORIAL":irpara("atendimentoAmbulatorialListagem.php");break;
-		// 	case "INTERNACAO":irpara("atendimentoHospitalarListagem.php");break;
-		// 	default: irpara("atendimentoEletivoListagem.php");break;
-		// }
+		switch($rowAtendimentoClassificacao['AtClaChave']){
+			case "ELETIVO":irpara("atendimentoEletivoListagem.php");break;
+			case "AMBULATORIAL":irpara("atendimentoAmbulatorialListagem.php");break;
+			case "INTERNACAO":irpara("atendimentoHospitalarListagem.php");break;
+			default: irpara("atendimentoEletivoListagem.php");break;
+		}
 					
 	} catch(PDOException $e) {
 		
