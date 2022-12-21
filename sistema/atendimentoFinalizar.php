@@ -194,7 +194,7 @@ if(isset($_POST['condulta'])){
 					case 'LIBERADO': URL = 'atendimentoFinalizar.php';break;
 					case 'OBSERVACAO': URL = 'atendimentoFinalizar.php';break;
 					case 'INTERNACAO': URL = 'atendimentoFinalizar.php';break;
-					case 'TRANSFERENCIA': URL = 'atendimentoFinalizar.php';break;
+					case 'TRANSFERENCIA': URL = 'atendimentoTransferencia.php';break;
 					default: URL = 'atendimentoFinalizar.php';
 				}
 				$( "#formAtendimentoFinalizar" ).attr('action', URL)
