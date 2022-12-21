@@ -521,9 +521,13 @@ $_SESSION['atendimento'] = [
 							let dataHoje = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
 							dataHoje = dataHoje.split(' ')[0]
 
-							await response.arrayData.forEach(item => {
-								$('#dataAtendimento').val(item == dataHoje?item:$('#dataAtendimento').val())
-							})
+							$('#dataAtendimento').val(
+								await response.arrayData.filter((item, index, array) => {
+									if (item == dataHoje) {
+										return item
+									}
+								})
+							)
 
 							// caso exista algo no campo de data...
 							if($('#dataAtendimento').val()){

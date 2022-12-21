@@ -198,7 +198,7 @@ try{
 
 			$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
 				AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
 				FROM AtendimentoXServico
 				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -206,6 +206,7 @@ try{
 				LEFT JOIN Cliente ON ClienId = AtendCliente
 				LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+				LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
 				LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 				WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 				ORDER BY AtXSeId DESC";
@@ -214,7 +215,7 @@ try{
 
 			$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
 				AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SrVenValorVenda
+				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
 				FROM AtendimentoXServico
 				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
 				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -222,6 +223,7 @@ try{
 				LEFT JOIN Cliente ON ClienId = AtendCliente
 				LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+				LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
 				LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 				WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
 				ORDER BY AtXSeId DESC";
@@ -2285,7 +2287,7 @@ try{
 		FROM AtendimentoLocal
 		JOIN ProfissionalAgenda ON PrAgeAtendimentoLocal = AtLocId
 		WHERE PrAgeProfissional = $iMedico
-		AND PrAgeData >= '$hoje'
+		AND PrAgeData = '$hoje'
 		AND AtLocUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
@@ -2312,8 +2314,10 @@ try{
 		
 		// $sqlServico = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorCusto,SrVenUnidade
 		// FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
-		$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorVenda,SrVenUnidade
-		FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
+		$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SVXMoValorVenda,SrVenUnidade
+		FROM ServicoVenda 
+		LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
+		WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
 		$resultServico = $conn->query($sql);
 		$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
 
@@ -2358,7 +2362,7 @@ try{
 			'sData' => mostraData($sData),
 			'data' => $sData,
 			'hora' => mostraHora($sHora),
-			'valor' => $resultServico['SrVenValorVenda'],
+			'valor' => $resultServico['SVXMoValorVenda'],
 			'status' => 'new',
 			'desconto' => 0
 		]);
@@ -2381,7 +2385,7 @@ try{
 				$sql = "SELECT AtXSeId,AtXSeAtendimento,AtXSeServico,AtXSeProfissional,AtXSeData,AtXSeHorario,
 					AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto,AtXSeUsuarioAtualizador,AtXSeUnidade,
 					ProfiId,AtLocId,AtLocNome,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-					SituaCor,ProfiNome,SrVenNome,SrVenValorVenda,SrVenId,AtXSeGrupo,AtXSeSubGrupo
+					SituaCor,ProfiNome,SrVenNome,SVXMoValorVenda,SrVenId,AtXSeGrupo,AtXSeSubGrupo
 					FROM AtendimentoXServico
 					JOIN Atendimento ON AtendId = AtXSeAtendimento
 					JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -2390,6 +2394,7 @@ try{
 					JOIN Profissional ON ProfiId = AtXSeProfissional
 					JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
 					JOIN ServicoVenda ON SrVenId = AtXSeServico
+					LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
 					WHERE AtXSeUnidade = $iUnidade and AtXSeAtendimento = $iAtendimento";
 				$result = $conn->query($sql);
 				$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -2419,7 +2424,7 @@ try{
 								'sData' => mostraData($item['AtXSeData']),
 								'data' => $item['AtXSeData'],
 								'hora' => mostraHora($item['AtXSeHorario']),
-								'valor' => $item['SrVenValorVenda'],
+								'valor' => $item['SVXMoValorVenda'],
 								'status' => 'att',
 								'desconto' => $item['AtXSeDesconto']
 							]);
@@ -2439,7 +2444,7 @@ try{
 							'sData' => mostraData($item['AtXSeData']),
 							'data' => $item['AtXSeData'],
 							'hora' => mostraHora($item['AtXSeHorario']),
-							'valor' => $item['SrVenValorVenda'],
+							'valor' => $item['SVXMoValorVenda'],
 							'status' => 'att',
 							'desconto' => $item['AtXSeDesconto']
 						]);
@@ -2454,7 +2459,7 @@ try{
 				AgendData,AgendHorario,AtModNome,
 				AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
 				AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-				SituaCor,ProfiNome,AtLocNome,SrVenNome,SrVenValorVenda,SrVenId
+				SituaCor,ProfiNome,AtLocNome,SrVenNome,SVXMoValorVenda,SrVenId
 				FROM Agendamento
 				JOIN AtendimentoModalidade ON AtModId = AgendModalidade
 				JOIN Situacao ON SituaId = AgendSituacao
@@ -2462,6 +2467,7 @@ try{
 				JOIN Profissional ON ProfiId = AgendProfissional
 				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 				JOIN ServicoVenda ON SrVenId = AgendServico
+				LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
 				WHERE AgendId = $iAtendimento and AgendUnidade = $iUnidade";
 				$result = $conn->query($sql);
 				$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -2488,7 +2494,7 @@ try{
 							'sData' => mostraData($item['AgendData']),
 							'data' => $item['AgendData'],
 							'hora' => mostraHora($item['AgendHorario']),
-							'valor' => $item['SrVenValorVenda'],
+							'valor' => $item['SVXMoValorVenda'],
 							'status' => 'att',
 							'desconto' => 0
 						]);

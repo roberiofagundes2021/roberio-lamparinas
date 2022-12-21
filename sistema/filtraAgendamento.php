@@ -242,7 +242,7 @@ try{
 		$iMedico = $_POST['iMedico'];
 		$hoje = date('Y-m-d');
 
-		$sql= "SELECT AtLocId,AtLocNome,AtLocStatus,AtLocUsuarioAtualizador,AtLocUnidade
+		$sql= "SELECT DISTINCT AtLocId,AtLocNome,AtLocStatus,AtLocUsuarioAtualizador,AtLocUnidade
 		FROM AtendimentoLocal 
 		JOIN ProfissionalAgenda ON PrAgeAtendimentoLocal = AtLocId
 		WHERE PrAgeProfissional = $iMedico 
@@ -395,8 +395,10 @@ try{
 
 		// $sqlServico = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorCusto,SrVenUnidade
 		// FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
-		$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorVenda,SrVenUnidade
-		FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
+		$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SVXMoValorVenda,SrVenUnidade
+		FROM ServicoVenda 
+		LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
+		WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
 		$resultServico = $conn->query($sql);
 		$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
 
@@ -439,7 +441,7 @@ try{
 			'sData' => mostraData($sData),
 			'data' => $sData,
 			'hora' => $sHora,
-			'valor' => $resultServico['SrVenValorVenda'],
+			'valor' => $resultServico['SVXMoValorVenda'],
 		]);
 
 		// esse loop serve para ja calcular o valor total da venda
@@ -465,7 +467,7 @@ try{
 			AgendData,AgendHorario,AtModNome,
 			AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
 			AgendObservacao,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-			SituaCor,ProfiNome,AtLocNome,SrVenNome,SrVenValorVenda,SrVenId
+			SituaCor,ProfiNome,AtLocNome,SrVenNome,SVXMoValorVenda,SrVenId
 			FROM Agendamento
 			JOIN AtendimentoModalidade ON AtModId = AgendModalidade
 			JOIN Situacao ON SituaId = AgendSituacao
@@ -473,6 +475,7 @@ try{
 			JOIN Profissional ON ProfiId = AgendProfissional
 			JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
 			JOIN ServicoVenda ON SrVenId = AgendServico
+			LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
 			WHERE AgendId = $iAgendamento and AgendUnidade = $iUnidade";
 			$result = $conn->query($sql);
 			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -490,7 +493,7 @@ try{
 					'sData' => mostraData($item['AgendData']),
 					'data' => $item['AgendData'],
 					'hora' => mostraHora($item['AgendHorario']),
-					'valor' => $item['SrVenValorVenda'],
+					'valor' => $item['SVXMoValorVenda'],
 				]);
 			}
 		}
