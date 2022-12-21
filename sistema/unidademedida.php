@@ -10,7 +10,7 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT UnMedId, UnMedNome, UnMedSigla, UnMedStatus, SituaNome, SituaCor, SituaChave
 		FROM UnidadeMedida
 		JOIN Situacao on SituaId = UnMedStatus
-	    WHERE UnMedUnidade = ". $_SESSION['UnidadeId'] ."
+	    WHERE UnMedEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY UnMedNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -52,8 +52,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO UnidadeMedida (UnMedNome,  UnMedSigla, UnMedStatus, UnMedUsuarioAtualizador, UnMedUnidade)
-					VALUES (:sNome, :sSigla, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO UnidadeMedida (UnMedNome,  UnMedSigla, UnMedStatus, UnMedUsuarioAtualizador, UnMedEmpresa)
+					VALUES (:sNome, :sSigla, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -61,7 +61,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':sSigla' => $_POST['inputSigla'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId'],
+							':iEmpresa' => $_SESSION['EmpreId'],
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Unidade de Medida incluída!!!";
@@ -348,8 +348,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaUnidadeMedida('.$atualizar.','.$item['UnMedId'].', \''.$item['UnMedNome'].'\','.$item['UnMedStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaUnidadeMedida('.$excluir.','.$item['UnMedId'].', \''.$item['UnMedNome'].'\','.$item['UnMedStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
+														<a href="#" onclick="atualizaUnidadeMedida(1,'.$item['UnMedId'].', \''.$item['UnMedNome'].'\','.$item['UnMedStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaUnidadeMedida(1,'.$item['UnMedId'].', \''.$item['UnMedNome'].'\','.$item['UnMedStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 													</div>
 												</div>
 											</td>

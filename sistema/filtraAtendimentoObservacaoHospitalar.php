@@ -9,6 +9,7 @@ $tipoRequest = $_POST['tipoRequest'];
 try {
 
     $iUnidade = $_SESSION['UnidadeId'];
+	$iEmpresa = $_SESSION['EmpreId'];
 	$usuarioId = $_SESSION['UsuarId'];
 
     if ($tipoRequest == 'ADICIONARPROCEDIMENTO') {
@@ -658,7 +659,7 @@ try {
 		$sql = "SELECT UnMedId, UnMedNome
 		FROM UnidadeMedida
 		WHERE UnMedStatus = 1
-		AND UnMedUnidade = $iUnidade";
+		AND UnMedEmpresa = $iEmpresa";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 

@@ -691,7 +691,7 @@ if(isset($_POST['inputNome'])){
 														$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
 																FROM UnidadeMedida
 																JOIN Situacao on SituaId = UnMedStatus
-																WHERE UnMedUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+																WHERE UnMedEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
 																ORDER BY UnMedNome ASC";
 														$result = $conn->query($sql);
 														$rowUnidadeMedida = $result->fetchAll(PDO::FETCH_ASSOC);
