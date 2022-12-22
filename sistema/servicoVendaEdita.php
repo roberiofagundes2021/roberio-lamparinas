@@ -428,17 +428,16 @@ if (!isset($_POST['inputServicoId'])) {
 					"SrVenGrupo":$('#grupo option:selected').val(),
 					"SrVenSubGrupo":$('#subGrupo option:selected').val(),
 					"SrVenPlanoConta":$('#cmbPlanoConta option:selected').val(),
-					"SrVenUnidade":unidade.toString()
+					"SrVenUnidade":unidade.toString(),
+					"modalidades":servicosFormatados
 				},
 				success: function(response) {
-					alerta("Sucesso");
-					console.log(response);
-					//window.location.href = './servicoVenda.php';
+					alerta(response.titulo, response.mensagem, response.status);
+					window.location.href = './servicoVenda.php';
 				},
 				error: function(response) {
-					alerta("Falha");
-					console.log(response);
-					//window.location.href = './servicoVenda.php';
+					alerta(response.titulo, response.mensagem, response.status);
+					window.location.href = './servicoVenda.php';
 				}
 			});
 		};
@@ -465,7 +464,7 @@ if (!isset($_POST['inputServicoId'])) {
 
 					<form id="formServico" name="formServico" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Editar Serviço <?php echo $resultDadosFormulario['SrVenNome']; ?>"</h5>
+							<h5 class="text-uppercase font-weight-bold">Editar Serviço <?php echo $resultDadosFormulario['SrVenNome']; ?></h5>
 						</div>
 						
 						<input type="hidden" id="inputServicoId" name="inputServicoId" value="<?php echo $resultDadosFormulario['SrVenId']; ?>">
