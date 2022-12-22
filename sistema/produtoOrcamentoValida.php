@@ -9,13 +9,13 @@ if (isset($_POST['IdProduto'])){
 	
 	$sql = "SELECT PrOrcId
 			FROM ProdutoOrcamento
-			WHERE PrOrcUnidade = ".$_SESSION['UnidadeId']." and PrOrcProduto = ". $_POST['IdProduto'];
+			WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and PrOrcProduto = ". $_POST['IdProduto'];
 
 } else if (isset($_POST['IdProdutoAntigo'])){
 	
 	$sql = "SELECT PrOrcId
 			FROM ProdutoOrcamento
-			WHERE PrOrcUnidade = ".$_SESSION['UnidadeId']." and PrOrcProduto = ". $_POST['IdProdutoNovo']."
+			WHERE PrOrcEmpresa = ".$_SESSION['EmpreId']." and PrOrcProduto = ". $_POST['IdProdutoNovo']."
 			and PrOrcProduto <> ".$_POST['IdProdutoAntigo'];
 }
 

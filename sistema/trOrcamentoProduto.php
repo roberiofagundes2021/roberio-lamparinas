@@ -312,7 +312,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 											JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 											JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
 											JOIN SubCategoria on SbCatId = PrOrcSubCategoria
-											WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'
+											WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'ProdutoOrcamento'
 											ORDER BY SbCatNome, PrOrcNome ASC";
 									$result = $conn->query($sql);
 									$rowProdutosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);

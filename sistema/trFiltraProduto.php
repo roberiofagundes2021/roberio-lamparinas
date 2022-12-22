@@ -46,7 +46,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 	$sql = "SELECT PrOrcId, PrOrcNome, PrOrcDetalhamento, PrOrcUnidadeMedida, UnMedNome
 			FROM ProdutoOrcamento
 			JOIN UnidadeMedida on UnMedId = PrOrcUnidadeMedida
-			WHERE PrOrcUnidade = " . $_SESSION['UnidadeId'] . " and PrOrcId in (" . $lista . ")
+			WHERE PrOrcEmpresa = " . $_SESSION['EmpreId'] . " and PrOrcId in (" . $lista . ")
 			Order By PrOrcSubCategoria ASC
 			";
 	//echo $sql;
