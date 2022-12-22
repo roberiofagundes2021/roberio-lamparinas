@@ -10,7 +10,7 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT DISTINCT FlOpeId, ForneRazaoSocial, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, 
 		FlOpeNumContrato, FlOpeNumProcesso, FlOpeValor, FlOpeStatus, CategNome, SituaChave, 
-		SituaNome, SituaCor, dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
+		SituaNome, SituaCor, dbo.fnSubCategoriasFluxo(FlOpeEmpresa, FlOpeId) as SubCategorias, 
 		dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado, BandeMotivo,
 		dbo.fnFimContrato(FlOpeId) as FimContrato, TrRefId, TrRefTipo
 		FROM FluxoOperacional
