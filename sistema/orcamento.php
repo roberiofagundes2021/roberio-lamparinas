@@ -9,7 +9,7 @@ $_SESSION['PaginaAtual'] = 'Orçamento';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT OrcamId, OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, ForneNome, CategNome, OrcamStatus, 
-		SituaNome, SituaChave, SituaCor, dbo.fnSubCategoriasOrcamento(OrcamUnidade, OrcamId) as SubCategorias
+		SituaNome, SituaChave, SituaCor, dbo.fnSubCategoriasOrcamento(OrcamEmpresa, OrcamId) as SubCategorias
 		FROM Orcamento
 		LEFT JOIN Fornecedor on ForneId = OrcamFornecedor
 		JOIN Categoria on CategId = OrcamCategoria
