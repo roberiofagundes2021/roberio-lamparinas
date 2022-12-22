@@ -22,7 +22,7 @@ $sql = "SELECT PrOrcId, PrOrcNome, PrOrcProduto, PrOrcDetalhamento, PrOrcCategor
 		FROM ProdutoOrcamento
 		JOIN Categoria on CategId = PrOrcCategoria
 		JOIN SubCategoria on SbCatId = PrOrcSubCategoria
-		WHERE PrOrcId = " . $_POST['inputPrOrcId'] . " and PrOrcUnidade = " . $_SESSION['UnidadeId'];
+		WHERE PrOrcId = " . $_POST['inputPrOrcId'] . " and PrOrcEmpresa = " . $_SESSION['EmpreId'];
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 //$count = count($row);
@@ -36,7 +36,7 @@ if(isset($_POST['inputNome'])){
 		
 		$sql = "UPDATE ProdutoOrcamento SET PrOrcNome = :sNome, PrOrcProduto = :iProduto, 
 		        PrOrcDetalhamento = :sDetalhamento, PrOrcCategoria = :iCategoria, PrOrcSubcategoria = :iSubCategoria, PrOrcUnidadeMedida = :iUnidadeMedida, 
-				PrOrcUsuarioAtualizador = :iUsuarioAtualizador, PrOrcUnidade = :iUnidade 
+				PrOrcUsuarioAtualizador = :iUsuarioAtualizador, PrOrcEmpresa = :iEmpresa 
 				WHERE PrOrcId = :sId ";
 		$result = $conn->prepare($sql);
 
@@ -49,7 +49,7 @@ if(isset($_POST['inputNome'])){
 						':iSubCategoria' => $_POST['inputSubCategoriaId'],
 						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iUnidade' => $_SESSION['UnidadeId']
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
 
 		if (isset($_POST['cmbProduto'])){
