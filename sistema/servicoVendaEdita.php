@@ -99,9 +99,8 @@ if (!isset($_POST['inputServicoId'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-
 		$(document).ready(function() {
-
+			servicosFormatados = [];
 			//controla se está editando ou criando uma linha nova na tabela de serviços
 			linhaAtual = null;
 			contadorLinhasCriadas = 0;
@@ -168,7 +167,6 @@ if (!isset($_POST['inputServicoId'])) {
 
 			var servicos = '<?php echo json_encode($Servicos); ?>';
 			servicos = JSON.parse(servicos);
-			servicosFormatados = []
 
 			servicos.forEach(item => {
 				let situacaoHtml = `
@@ -414,32 +412,79 @@ if (!isset($_POST['inputServicoId'])) {
 
 		function submeterFormulario() {
 			let unidade = <?php echo $_SESSION['UnidadeId']; ?>;
-		
-			$.ajax({
-				type: 'POST',
-				url: 'servicoVendaSalva.php',
-				dataType: 'json',
-				data: {
-					"SrVenId":$("#inputServicoId").val(),
-					"SrVenCodigo":$("#inputCodigo").val(),
-					"SrVenNome":$("#inputNome").val(),
-					"SrVenTipoServico":$('#tipoServico option:selected').val(),
-					"SrVenDetalhamento":$("#txtDetalhamento").val(),
-					"SrVenGrupo":$('#grupo option:selected').val(),
-					"SrVenSubGrupo":$('#subGrupo option:selected').val(),
-					"SrVenPlanoConta":$('#cmbPlanoConta option:selected').val(),
-					"SrVenUnidade":unidade.toString(),
-					"modalidades":servicosFormatados
+			camposObrigatorios = [{
+					"idCampo": "inputNome",
+					"apelidoCampo": "Nome"
+				}, {
+					"idCampo": "tipoServico",
+					"apelidoCampo": "Tipo de serviço"
 				},
-				success: function(response) {
-					alerta(response.titulo, response.mensagem, response.status);
-					window.location.href = './servicoVenda.php';
+				{
+					"idCampo": "grupo",
+					"apelidoCampo": "Grupo"
 				},
-				error: function(response) {
-					alerta(response.titulo, response.mensagem, response.status);
-					window.location.href = './servicoVenda.php';
+				{
+					"idCampo": "subGrupo",
+					"apelidoCampo": "Subgrupo"
+				},
+				{
+					"idCampo": "cmbPlanoConta",
+					"apelidoCampo": "Plano de conta"
+				},
+				{
+					"idCampo": "inputCodigo",
+					"apelidoCampo": "Código"
 				}
-			});
+			];
+			dadosValidos = true;
+			camposObrigatorios.forEach(campo => {
+				if ($(`#${campo.idCampo}`).val() == "" ^ $(`#${campo.idCampo}`).val() == null) {
+					if (dadosValidos) {
+						$(`#${campo.idCampo}`).focus();
+						alerta('Atenção', `Campo ${campo.apelidoCampo} é obrigatório!`, 'error');
+						dadosValidos = false;
+					}
+				}
+			})
+			if (servicosFormatados.length <= 0) {
+				if (dadosValidos) {
+					alerta('Atenção', `Insira pelo menos uma modalidade`, 'error');
+					$(`#modalidades`).focus();
+					var scrollDiv = document.getElementById("rowTabela").offsetTop;
+					window.scrollTo({
+						top: scrollDiv,
+						behavior: 'smooth'
+					});
+					dadosValidos = false;
+				}
+			}
+			if (dadosValidos) {
+				$.ajax({
+					type: 'POST',
+					url: 'servicoVendaSalva.php',
+					dataType: 'json',
+					data: {
+						"SrVenId": $("#inputServicoId").val(),
+						"SrVenCodigo": $("#inputCodigo").val(),
+						"SrVenNome": $("#inputNome").val(),
+						"SrVenTipoServico": $('#tipoServico option:selected').val(),
+						"SrVenDetalhamento": $("#txtDetalhamento").val(),
+						"SrVenGrupo": $('#grupo option:selected').val(),
+						"SrVenSubGrupo": $('#subGrupo option:selected').val(),
+						"SrVenPlanoConta": $('#cmbPlanoConta option:selected').val(),
+						"SrVenUnidade": unidade.toString(),
+						"modalidades": servicosFormatados
+					},
+					success: function(response) {
+						alerta(response.titulo, response.mensagem, response.status);
+						window.location.href = './servicoVenda.php';
+					},
+					error: function(response) {
+						alerta(response.titulo, response.mensagem, response.status);
+						window.location.href = './servicoVenda.php';
+					}
+				});
+			}
 		};
 	</script>
 </head>
@@ -466,7 +511,7 @@ if (!isset($_POST['inputServicoId'])) {
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Editar Serviço <?php echo $resultDadosFormulario['SrVenNome']; ?></h5>
 						</div>
-						
+
 						<input type="hidden" id="inputServicoId" name="inputServicoId" value="<?php echo $resultDadosFormulario['SrVenId']; ?>">
 						<input type="hidden" id="inputServicoStatus" name="inputServicoStatus" value="<?php echo $resultDadosFormulario['SituaChave']; ?>">
 						<input type="hidden" id="inputServicoTipo" name="inputServicoTipo" value="<?php echo $resultDadosFormulario['SrVenTipoServico']; ?>">
@@ -489,14 +534,14 @@ if (!isset($_POST['inputServicoId'])) {
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputCodigo">Código</label>
-												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="<?php echo $resultDadosFormulario['SrVenCodigo']; ?>">
+												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" maxlength="13" value="<?php echo $resultDadosFormulario['SrVenCodigo']; ?>">
 											</div>
 										</div>
 
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputNome">Nome <span class="text-danger">*</span></label>
-												<input type="text" id="inputNome" onblur='limpaEspacosEmBranco()' name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $resultDadosFormulario['SrVenNome']; ?>" required>
+												<input type="text" id="inputNome" onblur='limpaEspacosEmBranco()' name="inputNome" class="form-control" placeholder="Nome" maxlength="254" value="<?php echo $resultDadosFormulario['SrVenNome']; ?>" required>
 											</div>
 										</div>
 
@@ -519,7 +564,7 @@ if (!isset($_POST['inputServicoId'])) {
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtDetalhamento">Detalhamento</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do serviço"><?php echo $resultDadosFormulario['SrVenDetalhamento']; ?></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do serviço" maxlength="1999"><?php echo $resultDadosFormulario['SrVenDetalhamento']; ?></textarea>
 											</div>
 										</div>
 									</div>
@@ -647,14 +692,14 @@ if (!isset($_POST['inputServicoId'])) {
 
 									<div class="row">
 										<div class="col-lg-12">
-										<div class="form-group">
-									<?php
-									if ($_POST['inputPermission']) {
-										echo '<button type="button" id="alterar" onclick="submeterFormulario()" class="btn btn-lg ">Alterar</button>';
-									}
-									?>
-									<a href="servicoVenda.php" class="btn btn-basic" role="button">Cancelar</a>
-								</div>
+											<div class="form-group">
+												<?php
+												if ($_POST['inputPermission']) {
+													echo '<button type="button" id="alterar" onclick="submeterFormulario()" class="btn btn-lg ">Alterar</button>';
+												}
+												?>
+												<a href="servicoVenda.php" class="btn btn-basic" role="button">Cancelar</a>
+											</div>
 										</div>
 									</div>
 								</div>

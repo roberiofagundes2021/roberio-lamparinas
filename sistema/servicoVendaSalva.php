@@ -7,6 +7,7 @@ include('global_assets/php/conexao.php');
 try {
     $iUnidade = $_SESSION['UnidadeId'];
     $usuarioId = $_SESSION['UsuarId'];
+    $tmpSrvId = "X";
 
     $dataArray = array(
         ':sSrVenCodigo' => $_POST['SrVenCodigo'],
@@ -21,7 +22,7 @@ try {
         ':iSrVenUnidade' => $iUnidade
     );
 
-    if (isset($_POST['SrVenId'])) {
+    if (isset($_POST['SrVenId']) and $_POST['SrVenId']!="") {
         $sql = ("UPDATE
                 ServicoVenda
             SET
@@ -49,12 +50,15 @@ try {
             :sSrVenDetalhamento, :iSrVenGrupo, :iSrVenSubGrupo,
             :iSrVenPlanoConta, :iSrVenStatus, :iSrVenUsuarioAtualizador,
             :iSrVenUnidade
-        )";
+        )";        
+        $sqlUltimoRegistroInserido = "SELECT MAX(SrVenId) from ServicoVenda where SrVenStatus = 1 and SrVenUnidade = " . $iUnidade .";";
+        $result = $conn->query($sqlUltimoRegistroInserido);
+        $row = $result->fetch(PDO::FETCH_ASSOC);
+        $tmpSrvId = $row[""];
         $mensagem = "Serviço criado com sucesso!";
     }
     $result = $conn->prepare($sql);
     $result->execute($dataArray);
-
     foreach ($_POST['modalidades'] as &$modalidade) {
         $sql = "";
         $modalidadeArray = array(
@@ -68,6 +72,9 @@ try {
             ':iSVXMoStatus' => "1",
             ':iSVXMoUnidade' => $_SESSION['UnidadeId']
         );
+        if(!$_POST['SrVenId']){
+            $modalidadeArray[':iSVXMoServicoVenda'] = $tmpSrvId;
+        }
         if(
             ($modalidade['rawData']['SVXMoId']) == 'X')
         {
@@ -124,7 +131,8 @@ try {
     echo json_encode([
         'titulo' => 'Serviço Venda',
         'status' => 'error',
-        'mensagem' => $mensagem
-        //'mensagem' => $e->getMessage()
+        //'mensagem' => $mensagem
+        'mensagem' => $e->getMessage()
+        //'mensagem' =>  $sql
     ]);
 }

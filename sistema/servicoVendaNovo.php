@@ -80,23 +80,11 @@ $rowPlanoConta = $rowPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
 		$(document).ready(function() {
-
+			servicosFormatados = [];
 			//controla se está editando ou criando uma linha nova na tabela de serviços
 			linhaAtual = null;
 			contadorLinhasCriadas = 0;
 
-			let tipoServico = $("#inputServicoTipo").val();
-			$(`#tipoServico option[value=${tipoServico}]`).prop('selected', 'selected').change();
-
-			let grupo = $("#inputGrupo").val();
-			$(`#grupo option[value=${grupo}]`).prop('selected', 'selected').change();
-
-			let subgrupo = $("#inputSubgrupo").val();
-			atualizaSubGrupos();
-			$(`#subGrupo option[value=${subgrupo}]`).prop('selected', 'selected').change();
-
-			let planoDeConta = $("#inputPlanoDeConta").val();
-			$(`#cmbPlanoConta option[value=${planoDeConta}]`).prop('selected', 'selected').change();
 
 			//Tabela customizada de preços dos serviços
 			$('#precoServicosTable').DataTable({
@@ -145,7 +133,7 @@ $rowPlanoConta = $rowPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 			table = $('#precoServicosTable').DataTable()
 			let rowNode;
 
-			servicosFormatados = [];
+
 
 		});
 
@@ -364,32 +352,81 @@ $rowPlanoConta = $rowPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 
 		function submeterFormulario() {
 			let unidade = <?php echo $_SESSION['UnidadeId']; ?>;
-
-			$.ajax({
-				type: 'POST',
-				url: 'servicoVendaSalva.php',
-				dataType: 'json',
-				data: {
-					"SrVenId": $("#inputServicoId").val(),
-					"SrVenCodigo": $("#inputCodigo").val(),
-					"SrVenNome": $("#inputNome").val(),
-					"SrVenTipoServico": $('#tipoServico option:selected').val(),
-					"SrVenDetalhamento": $("#txtDetalhamento").val(),
-					"SrVenGrupo": $('#grupo option:selected').val(),
-					"SrVenSubGrupo": $('#subGrupo option:selected').val(),
-					"SrVenPlanoConta": $('#cmbPlanoConta option:selected').val(),
-					"SrVenUnidade": unidade.toString(),
-					"modalidades": servicosFormatados
+			//validação de campos obrigatórios
+			camposObrigatorios = [{
+					"idCampo": "inputNome",
+					"apelidoCampo": "Nome"
+				}, {
+					"idCampo": "tipoServico",
+					"apelidoCampo": "Tipo de serviço"
 				},
-				success: function(response) {
-					alerta(response.titulo, response.mensagem, response.status);
-					window.location.href = './servicoVenda.php';
+				{
+					"idCampo": "grupo",
+					"apelidoCampo": "Grupo"
 				},
-				error: function(response) {
-					alerta(response.titulo, response.mensagem, response.status);
-					window.location.href = './servicoVenda.php';
+				{
+					"idCampo": "subGrupo",
+					"apelidoCampo": "Subgrupo"
+				},
+				{
+					"idCampo": "cmbPlanoConta",
+					"apelidoCampo": "Plano de conta"
+				},
+				{
+					"idCampo": "inputCodigo",
+					"apelidoCampo": "Código"
 				}
-			});
+			];
+			dadosValidos = true;
+			camposObrigatorios.forEach(campo => {
+				if ($(`#${campo.idCampo}`).val() == "" ^ $(`#${campo.idCampo}`).val() == null) {
+					if (dadosValidos) {
+						$(`#${campo.idCampo}`).focus();
+						alerta('Atenção', `Campo ${campo.apelidoCampo} é obrigatório!`, 'error');
+						dadosValidos = false;
+					}
+				}
+			})
+			if (servicosFormatados.length <= 0) {
+				if (dadosValidos) {
+					alerta('Atenção', `Insira pelo menos uma modalidade`, 'error');
+					$(`#modalidades`).focus();
+					var scrollDiv = document.getElementById("rowTabela").offsetTop;
+					window.scrollTo({
+						top: scrollDiv,
+						behavior: 'smooth'
+					});
+					dadosValidos = false;
+				}
+			}
+			if (dadosValidos) {
+				$.ajax({
+					type: 'POST',
+					url: 'servicoVendaSalva.php',
+					dataType: 'json',
+					data: {
+						"SrVenId": $("#inputServicoId").val(),
+						"SrVenCodigo": $("#inputCodigo").val(),
+						"SrVenNome": $("#inputNome").val(),
+						"SrVenTipoServico": $('#tipoServico option:selected').val(),
+						"SrVenDetalhamento": $("#txtDetalhamento").val(),
+						"SrVenGrupo": $('#grupo option:selected').val(),
+						"SrVenSubGrupo": $('#subGrupo option:selected').val(),
+						"SrVenPlanoConta": $('#cmbPlanoConta option:selected').val(),
+						"SrVenUnidade": unidade.toString(),
+						"modalidades": servicosFormatados
+					},
+					success: function(response) {
+						alerta(response.titulo, response.mensagem, response.status);
+						window.location.href = './servicoVenda.php';
+					},
+					error: function(response) {
+						alerta(response.titulo, response.mensagem, response.status);
+						window.location.href = './servicoVenda.php';
+					}
+				});
+			}
+
 		};
 	</script>
 </head>
@@ -438,15 +475,15 @@ $rowPlanoConta = $rowPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 									<div class="row">
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputCodigo">Código</label>
-												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código">
+												<label for="inputCodigo">Código <span class="text-danger">*</span></label>
+												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" maxlength="13" required>
 											</div>
 										</div>
 
 										<div class="col-lg-6">
 											<div class="form-group">
 												<label for="inputNome">Nome <span class="text-danger">*</span></label>
-												<input type="text" id="inputNome" onblur='limpaEspacosEmBranco()' name="inputNome" class="form-control" placeholder="Nome" required>
+												<input type="text" id="inputNome" onblur='limpaEspacosEmBranco()' name="inputNome" class="form-control" placeholder="Nome" maxlength="254" required>
 											</div>
 										</div>
 
@@ -469,7 +506,7 @@ $rowPlanoConta = $rowPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 										<div class="col-lg-12">
 											<div class="form-group">
 												<label for="txtDetalhamento">Detalhamento</label>
-												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do serviço"></textarea>
+												<textarea rows="5" cols="5" class="form-control" id="txtDetalhamento" name="txtDetalhamento" placeholder="Detalhamento do serviço" maxlength="1999"></textarea>
 											</div>
 										</div>
 									</div>
@@ -523,7 +560,7 @@ $rowPlanoConta = $rowPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 									<div class="row" id="rowTabela">
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="modalidades">Modalidades <span class="text-danger">*</span></label>
+												<label for="modalidades">Modalidades</label>
 												<select id="modalidades" name="modalidades" class="form-control form-control-select2">
 													<option value="">Selecione</option>
 													<?php
@@ -597,7 +634,7 @@ $rowPlanoConta = $rowPlanoConta->fetchAll(PDO::FETCH_ASSOC);
 
 									<div class="row">
 										<div class="col-lg-12">
-											<div class="form-group"><button type="button" id="salvar" onclick="submeterFormulario()" class="btn btn-lg ">Salvar</button>';
+											<div class="form-group"><button type="button" id="salvar" onclick="submeterFormulario()" class="btn btn-lg ">Salvar</button>
 												<a href="servicoVenda.php" class="btn btn-basic" role="button">Cancelar</a>
 											</div>
 										</div>
