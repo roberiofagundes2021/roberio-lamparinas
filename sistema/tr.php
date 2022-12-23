@@ -58,13 +58,13 @@ $permissao = isset($menuPermissao['UsXPeVisualizar'])?$menuPermissao['UsXPeVisua
 if($permissao == 1){
 	$sql = "SELECT DISTINCT TrRefId, TrRefNumero, TrRefData,	TrRefCategoria,	TrRefTipo, CategNome, 
 					TrRefStatus, TrRefLiberaParcial, SituaId, SituaCor, SituaChave, SituaNome, 
-					dbo.fnSubCategoriasTR(TrRefUnidade, TrRefId) as SubCategorias, BandeMotivo, TRXEqUsuario
+					dbo.fnSubCategoriasTR(TrRefEmpresa, TrRefId) as SubCategorias, BandeMotivo, TRXEqUsuario
 					FROM TermoReferencia
 					JOIN Categoria ON CategId = TrRefCategoria
 					JOIN Situacao  ON SituaId = TrRefStatus
 					LEFT JOIN Bandeja ON BandeTabelaId = TrRefId AND BandeTabela = 'TermoReferencia' AND BandeUnidade = $_SESSION[UnidadeId]
 					LEFT JOIN TRXEquipe ON TRXEqTermoReferencia = TrRefId AND TRXEqPresidente = 1
-					WHERE TrRefUnidade = $_SESSION[UnidadeId] ORDER BY TrRefData DESC";
+					WHERE TrRefEmpresa = $_SESSION[EmpreId] ORDER BY TrRefData DESC";
 	$result = $conn->query($sql);
 	$row = $result->fetchAll(PDO::FETCH_ASSOC);
 }else{

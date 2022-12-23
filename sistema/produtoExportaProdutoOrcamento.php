@@ -15,8 +15,8 @@ if (isset($_POST['inputProdutoId'])) {
 
     if ($Produto) {
         try {
-            $sql = "INSERT INTO ProdutoOrcamento (PrOrcNome, PrOrcProduto, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubCategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcUsuarioAtualizador, PrOrcUnidade) 
-				VALUES (:sNome, :iProduto, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
+            $sql = "INSERT INTO ProdutoOrcamento (PrOrcNome, PrOrcProduto, PrOrcDetalhamento, PrOrcCategoria, PrOrcSubCategoria, PrOrcUnidadeMedida, PrOrcSituacao, PrOrcUsuarioAtualizador, PrOrcEmpresa) 
+				VALUES (:sNome, :iProduto, :sDetalhamento, :iCategoria, :iSubCategoria, :iUnidadeMedida, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
             $result = $conn->prepare($sql);
 
             $result->execute(array(
@@ -28,7 +28,7 @@ if (isset($_POST['inputProdutoId'])) {
                 ':iUnidadeMedida' => $Produto['ProduUnidadeMedida'],
                 ':iSituacao' => $Produto['ProduStatus'],
                 ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-                ':iUnidade' => $_SESSION['UnidadeId']
+                ':iEmpresa' => $_SESSION['EmpreId']
             ));
 
             $_SESSION['msg']['titulo'] = "Sucesso";

@@ -161,14 +161,14 @@ if(isset($_POST['inputNome'])){
 		if ($count){
 
 			$sql = "UPDATE ProdutoOrcamento SET PrOrcDetalhamento = :sDetalhamento, PrOrcUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE PrOrcProduto = :iProduto and PrOrcUnidade = :iUnidade";
+					WHERE PrOrcProduto = :iProduto and PrOrcEmpresa = :iEmpresa";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iProduto' => $_POST['inputProdutoId'],
-						':iUnidade' => $_SESSION['UnidadeId']
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
 		}				
 

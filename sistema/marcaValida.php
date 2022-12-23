@@ -2,18 +2,17 @@
 
 include_once("sessao.php"); 
 
-include('global_assets/php/conexao.php');
+include('global_assets/php/conexao.php');  
 
-if(isset($_POST['nomeVelho'])){
+if (isset($_POST['nomeVelho'])){
 	$sql = "SELECT MarcaId
-			FROM Marca
-			WHERE MarcaEmpresa = ".$_SESSION['EmpreId']." and MarcaNome = '". mssql_escape($_POST['nomeNovo'])."' and MarcaNome <> '". mssql_escape($_POST['nomeVelho'])."'";
+			 FROM Marca
+			 WHERE MarcaEmpresa = ".$_SESSION['EmpreId']." and MarcaNome = '". $_POST['nomeNovo']."' and MarcaNome <> '". $_POST['nomeVelho']."'";
 } else{
 	$sql = "SELECT MarcaId
-			FROM Marca
-			WHERE MarcaEmpresa = ".$_SESSION['EmpreId']." and MarcaNome = '". mssql_escape($_POST['nomeNovo'])."'";
+			 FROM Marca
+			 WHERE MarcaEmpresa = ".$_SESSION['EmpreId']." and MarcaNome = '". $_POST['nome']."'";
 }
-
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);

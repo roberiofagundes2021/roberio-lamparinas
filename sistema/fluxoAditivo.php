@@ -20,7 +20,7 @@ $iFluxoOperacional = $_SESSION['FluxoId'];
 //Dados do Fluxo
 $sql = "SELECT FlOpeId, FlOpeNumContrato, FlOpeCategoria, ForneId, ForneNome, ForneTelefone, ForneCelular, CategNome, FlOpeCategoria,
 			   FlOpeNumProcesso, FlOpeValor, FlOpeDataInicio, FlOpeDataFim, FlOpeStatus, SituaChave,
-			   dbo.fnSubCategoriasIdFluxo(FlOpeUnidade, FlOpeId) as FlOpeSubCategoria,
+			   dbo.fnSubCategoriasIdFluxo(FlOpeEmpresa, FlOpeId) as FlOpeSubCategoria,
 			   dbo.fnFimContrato(FlOpeId) as FimContrato, dbo.fnValorTotalContrato(FlOpeId) as TotalContrato
 		FROM FluxoOperacional
 		JOIN Fornecedor on ForneId = FlOpeFornecedor
