@@ -1909,8 +1909,16 @@ try{
 			$intaValCodigo = COUNT($rowCodigo)?intval(explode('-',$rowCodigo[0]['AtendNumRegistro'])[1])+1:1;
 	
 			$numRegistro = "A$mes-$intaValCodigo";
-	
-			$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'LIBERADO'";
+
+			$sql="SELECT AtModTipoRecebimento FROM AtendimentoModalidade WHERE AtModId = '$_POST[modalidade]' ";
+			$result = $conn->query($sql);
+			$resultModalidade = $result->fetch(PDO::FETCH_ASSOC);
+
+			if ($resultModalidade['AtModTipoRecebimento'] == "À Vista") {
+				$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'LIBERADO'";
+			} else if ($resultModalidade['AtModTipoRecebimento'] == "À Prazo") {
+				$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'EMESPERA'";
+			}
 			$result = $conn->query($sql);
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 			
