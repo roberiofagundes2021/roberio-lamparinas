@@ -16,8 +16,8 @@ if (isset($_POST['inputServicoId'])) {
     if ($servico) {
         try {
             $sql = "INSERT INTO ServicoOrcamento (SrOrcNome, SrOrcServico, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubCategoria, SrOrcSituacao, 
-                SrOrcUsuarioAtualizador, SrOrcUnidade) 
-				VALUES (:sNome, :iServico, :sDetalhamento, :iCategoria, :iSubCategoria, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
+                SrOrcUsuarioAtualizador, SrOrcEmpresa) 
+				VALUES (:sNome, :iServico, :sDetalhamento, :iCategoria, :iSubCategoria, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
             $result = $conn->prepare($sql);
 
             $result->execute(array(
@@ -28,7 +28,7 @@ if (isset($_POST['inputServicoId'])) {
                 ':iSubCategoria' => $servico['ServiSubCategoria'],
                 ':iSituacao' => $servico['ServiStatus'],
                 ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-                ':iUnidade' => $_SESSION['UnidadeId']
+                ':iEmpresa' => $_SESSION['EmpreId']
             ));
 
             $_SESSION['msg']['titulo'] = "Sucesso";

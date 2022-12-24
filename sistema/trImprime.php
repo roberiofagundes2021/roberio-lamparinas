@@ -209,7 +209,7 @@ try {
 						FROM ServicoOrcamento
 						JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 						JOIN SubCategoria on SbCatId = SrOrcSubCategoria
-						WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcSubCategoria = ".$sbcat['SbCatId']."
+						WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and SrOrcSubCategoria = ".$sbcat['SbCatId']."
 						ORDER BY SbCatNome, SrOrcNome ASC";
 			} else {
 				$sql = "SELECT ServiId as Id, ServiNome as Nome, ServiCategoria as Categoria, ServiSubCategoria as SubCategoria, 

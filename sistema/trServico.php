@@ -418,7 +418,7 @@ if (count($rowServicoUtilizado) >= 1) {
 																	JOIN Situacao ON SituaId = SrOrcSituacao				     
 																	WHERE SrOrcSubCategoria = " . $valueSubCat['TRXSCSubcategoria'] . " 
 																	AND SituaChave = 'ATIVO' 
-																	AND SrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
+																	AND SrOrcEmpresa = " . $_SESSION['EmpreId'] . " 
 																	AND SrOrcCategoria = " . $iCategoria;
 																/*	
 																if (isset($row['TrRefSubCategoria']) and $row['TrRefSubCategoria'] != '' and $row['TrRefSubCategoria'] != null) {
@@ -442,7 +442,7 @@ if (count($rowServicoUtilizado) >= 1) {
 																SELECT SrOrcId, SrOrcNome
 																FROM ServicoOrcamento
 																JOIN Situacao ON SituaId = SrOrcSituacao		
-																WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
+																WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " 
 																AND SituaChave = 'ATIVO' 
 																AND SrOrcCategoria = " . $iCategoria;
 															$sql .= " ORDER BY SrOrcNome ASC";
@@ -542,7 +542,7 @@ if (count($rowServicoUtilizado) >= 1) {
 												FROM ServicoOrcamento
 												JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 												JOIN SubCategoria on SbCatId = SrOrcSubCategoria
-												WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " 
+												WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " 
 												AND TRXSrTermoReferencia = " . $iTR  . " 
 												AND TRXSrTabela = 'ServicoOrcamento' 
 												Order By SbCatNome, SrOrcNome ASC";
