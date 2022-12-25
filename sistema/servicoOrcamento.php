@@ -12,7 +12,7 @@ $sql = "SELECT SrOrcNome, CategNome, SbCatNome, SrOrcSituacao, SrOrcId, SituaNom
 		JOIN Categoria on CategId = SrOrcCategoria
 		LEFT JOIN SubCategoria on SbCatId = SrOrcSubcategoria
 		JOIN Situacao on SituaId = SrOrcSituacao
-	    WHERE SrOrcUnidade = ". $_SESSION['UnidadeId'] ."
+	    WHERE SrOrcEmpresa = ". $_SESSION['EmpreId'] ."
 		ORDER BY SrOrcNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

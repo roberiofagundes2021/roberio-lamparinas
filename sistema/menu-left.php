@@ -69,7 +69,8 @@
     }
     $position = array_search($menuPai, $menu);
     $menuContente = 0;
-    // verifica em cada menuPai se existe algum submenu com visibilidade true, se sim ele o menuPai será visivel
+
+    // verifica em cada menuPai se existe algum submenu com visibilidade true, se sim ele e o menuPai será visivel
     foreach($menu as $subMenu){
       if ($menuPai['MenuId'] == $subMenu['MenuPai']){
         $visualizar = (isset($subMenu['UsXPeVisualizar'])?$subMenu['UsXPeVisualizar']:$subMenu['PrXPeVisualizar']);
@@ -84,8 +85,9 @@
       }
     }
   }
-  // adiciona o arry em uma session para ser acessado em outras páginas
+  // adiciona o array em uma session para ser acessado em outras páginas
   $_SESSION['Permissoes'] = $arrayPermissao;
+
   // Faz uma varredura para identificar quais modulos irão aparecer de
   // acordo com a visibilidade dos menus já atualizadas
   foreach($modulo as $mod){
@@ -204,44 +206,41 @@
           foreach($modulo as $mod){
             if($mod['SituaChave'] == strtoupper("ativo")  && $mod['conteudo'] == 1){
               if($_SESSION['PerfiChave'] != "CONTABILIDADE"){
-                echo '<li class="nav-item-header">
-                  <div class="text-uppercase font-size-xs line-height-xs">'.$mod['ModulNome'].'</div>
-                </li>';
+                echo "<li class='nav-item-header'>
+                  <div class='text-uppercase font-size-xs line-height-xs'>$mod[ModulNome]</div>
+                </li>";
               }
+              // loop para colocar os menus dentro de cada módulo
               foreach($menu as $men){
-                $visualizar = (isset($men['UsXPeVisualizar'])?$men['UsXPeVisualizar']:$men['PrXPeVisualizar']);
                 if ($men["MenuModulo"] == $mod["ModulId"] && $men["MenuPai"]==0 && $men['SituaChave'] == strtoupper("ativo") && $men['MenuPosicao']=='PRINCIPAL'){  
+                  $visualizar = (isset($men['UsXPeVisualizar'])?$men['UsXPeVisualizar']:$men['PrXPeVisualizar']);
                   
                   //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
                   if($visualizar == 1){
-                    echo  (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
-                      '<a href="'.$men['MenuUrl'].'"';
-                      if((basename($_SERVER['PHP_SELF']) == $men['MenuUrl']))
-                        {echo 'class="nav-link active">';}else{echo 'class="nav-link">';}
-                      echo '<i class="'.$men['MenuIco'].'"></i>
-                      <span>'.
-                        $men['MenuNome']
-                      .'</span>
-                    </a>';
+                    $class = basename($_SERVER['PHP_SELF']) == $men['MenuUrl']?"class='nav-link active'":"class='nav-link'";
+                    echo (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
+                    "<a href='$men[MenuUrl]'$class
+                    <i class='$men[MenuIco]'></i>
+                      <span>$men[MenuNome]</span>
+                    </a>";
                   }
 
+                  // caso seja o menu seja um submenu vai colocar tambem os itens desse submenu
                   if($men['MenuSubMenu'] == 1) {
                     echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
 
                     foreach($menu as $men_f){
                       $visualizar_f = (isset($men_f['UsXPeVisualizar'])?$men_f['UsXPeVisualizar']:$men_f['PrXPeVisualizar']);
                   
-                      if($men_f['MenuPai'] == $men['MenuId'] && $visualizar_f == 1 && $men_f['MenuPosicao']=='PRINCIPAL'){
+                      if($men_f['MenuPai'] == $men['MenuId'] && $visualizar_f == 1 && $men_f['MenuPosicao'] == 'PRINCIPAL'){
                         // mostra todos os submenus e caso a rota destino(MenuUrl) seja "estoqueMinimoImprime.php"
                         // ele abrirá em uma nova aba
-                        echo  '<li class="nav-item"><a href="'.$men_f['MenuUrl'].'" class="nav-link"'
-                        .($men_f['MenuUrl']=='estoqueMinimoImprime.php'? ' target="_blank" >':'>').$men_f['MenuNome'].'</a></li>';
+                        echo  "<li class='nav-item'><a href='$men_f[MenuUrl]' class='nav-link'"
+                        .($men_f['MenuUrl'] == 'estoqueMinimoImprime.php' ? " target='_blank' >" : ">")."$men_f[MenuNome]</a></li>";
                       } 
-                    } 
-                    
+                    }
                     echo '</ul>';
                   }
-
                   echo '</li>';
                 }
               }

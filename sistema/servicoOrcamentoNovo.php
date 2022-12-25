@@ -14,8 +14,8 @@ if(isset($_POST['inputNome'])){
 		$conn->beginTransaction();
 
 		$sql = "INSERT INTO ServicoOrcamento (SrOrcNome, SrOrcServico, SrOrcDetalhamento, SrOrcCategoria, SrOrcSubcategoria, SrOrcSituacao, SrOrcUsuarioAtualizador, 
-				SrOrcUnidade) 
-				VALUES (:sNome, :iServico, :sDetalhamento, :iCategoria, :iSubCategoria, :iSituacao, :iUsuarioAtualizador, :iUnidade)";
+				SrOrcEmpresa) 
+				VALUES (:sNome, :iServico, :sDetalhamento, :iCategoria, :iSubCategoria, :iSituacao, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -27,7 +27,7 @@ if(isset($_POST['inputNome'])){
 						':iSubCategoria' => $_POST['inputSubCategoriaId'],
 						':iSituacao' => $_POST['inputSituacao'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iUnidade' => $_SESSION['UnidadeId']
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
 
 		if (isset($_POST['cmbServico'])){

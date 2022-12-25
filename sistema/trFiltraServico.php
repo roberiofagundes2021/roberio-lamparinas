@@ -44,7 +44,7 @@ if (count($rowServicosOrcamento) >= 1) {
 
 	$sql = "SELECT SrOrcId, SrOrcNome, SrOrcDetalhamento
 			FROM ServicoOrcamento
-			WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and SrOrcId in (" . $lista . ")
+			WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and SrOrcId in (" . $lista . ")
 			";
 	//echo $sql;
 
