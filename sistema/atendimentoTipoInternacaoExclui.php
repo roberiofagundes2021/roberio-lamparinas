@@ -17,7 +17,7 @@ if(isset($_POST['inputTpIntId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Tipo de internação excluído!!!";
+		$_SESSION['msg']['mensagem'] = "Tipo de internação excluída!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {

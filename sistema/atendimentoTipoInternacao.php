@@ -56,7 +56,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                 ':iTpIntUnidade' => $_SESSION['UnidadeId'],
             ));
 
-            $_SESSION['msg']['mensagem'] = "Tipo de internação incluído!!!";
+            $_SESSION['msg']['mensagem'] = "Tipo de internação incluída!!!";
         }
 
         $_SESSION['msg']['titulo'] = "Sucesso";
