@@ -55,7 +55,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                 ':iQuartUnidade' => $_SESSION['UnidadeId'],
             ));
 
-            $_SESSION['msg']['mensagem'] = "Quarto incluída!!!";
+            $_SESSION['msg']['mensagem'] = "Quarto incluído!!!";
         }
 
         $_SESSION['msg']['titulo'] = "Sucesso";
