@@ -17,7 +17,7 @@ if(isset($_POST['tipoAcomodacaoId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Tipo de acomodação excluído!!!";
+		$_SESSION['msg']['mensagem'] = "Tipo de acomodação excluída!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
