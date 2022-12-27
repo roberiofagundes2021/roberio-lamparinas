@@ -7,23 +7,23 @@ $_SESSION['PaginaAtual'] = 'Quartos';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT QuartId, QuartNome, QuartTipoInternacao, QuartStatus, ti.TpIntNome, s.SituaNome, s.SituaCor, s.SituaChave
-		FROM Quarto q
-		JOIN Situacao s on s.SituaId = q.QuartStatus
-        LEFT JOIN TipoInternacao ti on ti.TpIntId = q.QuartTipoInternacao
-	    WHERE QuartUnidade = " . $_SESSION['UnidadeId'] . "
-		ORDER BY QuartId ASC";
+$sql = "SELECT EsLeiId, EsLeiNome, EsLeiTipoInternacao, EsLeiStatus, ti.TpIntNome, s.SituaNome, s.SituaCor, s.SituaChave
+		FROM EspecialidadeLeito esl
+		JOIN Situacao s on s.SituaId = esl.EsLeiStatus
+        LEFT JOIN TipoInternacao ti on ti.TpIntId = esl.EsLeiTipoInternacao
+	    WHERE EsLeiUnidade = " . $_SESSION['UnidadeId'] . "
+		ORDER BY EsLeiId ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 //Se estiver editando
 if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'EDITA') {
     //Essa consulta é para preencher os campos a se editar
-    $sql = "SELECT QuartId, QuartNome, QuartTipoInternacao
-			FROM Quarto
-			WHERE QuartId = " . $_POST['inputQuartoId'] . ";";
+    $sql = "SELECT EsLeiId, EsLeiNome, EsLeiTipoInternacao
+			FROM EspecialidadeLeito
+			WHERE EsLeiId = " . $_POST['inputEspecialidadeLeitoId'] . ";";
     $result = $conn->query($sql);
-    $rowQuarto = $result->fetch(PDO::FETCH_ASSOC);
+    $rowEspecialidadeLeito = $result->fetch(PDO::FETCH_ASSOC);
     $_SESSION['msg'] = array();
 }
 
@@ -32,30 +32,30 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
     try {
         //Edição
         if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA') {
-            $sql = "UPDATE Quarto SET QuartNome = :sQuartNome, QuartTipoInternacao = :iQuartTipoInternacao, QuartUsuarioAtualizador = :iQuartUsuarioAtualizador
-					WHERE QuartId = :iQuartId";
+            $sql = "UPDATE EspecialidadeLeito SET EsLeiNome = :sEsLeiNome, EsLeiTipoInternacao = :iEsLeiTipoInternacao, EsLeiUsuarioAtualizador = :iEsLeiUsuarioAtualizador
+					WHERE EsLeiId = :iEsLeiId";
             $result = $conn->prepare($sql);
             $result->execute(array(
-                ':sQuartNome' => $_POST['inputQuartoNome'],
-                ':iQuartTipoInternacao' => $_POST['cmbQuartoTipoInternacao'],
-                ':iQuartUsuarioAtualizador' => $_SESSION['UsuarId'],
-                ':iQuartId' => $_POST['inputQuartoId']
+                ':sEsLeiNome' => $_POST['inputEspecialidadeLeitoNome'],
+                ':iEsLeiTipoInternacao' => $_POST['cmbEspecialidadeTipoInternacao'],
+                ':iEsLeiUsuarioAtualizador' => $_SESSION['UsuarId'],
+                ':iEsLeiId' => $_POST['inputEspecialidadeLeitoId']
             ));
 
-            $_SESSION['msg']['mensagem'] = "Quarto alterada!!!";
+            $_SESSION['msg']['mensagem'] = "Especialidade do Leito alterada!!!";
         } else { //inclusão
-            $sql = "INSERT INTO Quarto (QuartNome, QuartTipoInternacao, QuartStatus, QuartUsuarioAtualizador, QuartUnidade)
-					VALUES (:sQuartNome, :iQuartTipoInternacao, :bQuartStatus, :iQuartUsuarioAtualizador, :iQuartUnidade)";
+            $sql = "INSERT INTO EspecialidadeLeito (EsLeiNome, EsLeiTipoInternacao, EsLeiStatus, EsLeiUsuarioAtualizador, EsLeiUnidade)
+					VALUES (:sEsLeiNome, :iEsLeiTipoInternacao, :bEsLeiStatus, :iEsLeiUsuarioAtualizador, :iEsLeiUnidade)";
             $result = $conn->prepare($sql);
             $result->execute(array(
-                ':sQuartNome' => $_POST['inputQuartoNome'],
-                ':iQuartTipoInternacao' => $_POST['cmbQuartoTipoInternacao'],
-                ':bQuartStatus' => 1,
-                ':iQuartUsuarioAtualizador' => $_SESSION['UsuarId'],
-                ':iQuartUnidade' => $_SESSION['UnidadeId'],
+                ':sEsLeiNome' => $_POST['inputEspecialidadeLeitoNome'],
+                ':iEsLeiTipoInternacao' => $_POST['cmbEspecialidadeTipoInternacao'],
+                ':bEsLeiStatus' => 1,
+                ':iEsLeiUsuarioAtualizador' => $_SESSION['UsuarId'],
+                ':iEsLeiUnidade' => $_SESSION['UnidadeId'],
             ));
 
-            $_SESSION['msg']['mensagem'] = "Quarto incluída!!!";
+            $_SESSION['msg']['mensagem'] = "Especialidade do Leito incluída!!!";
         }
 
         $_SESSION['msg']['titulo'] = "Sucesso";
@@ -63,13 +63,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
     } catch (PDOException $e) {
         //} catch (PDOException $e) {
         $_SESSION['msg']['titulo'] = "Erro";
-        $_SESSION['msg']['mensagem'] = "Erro reportado com o Quarto!!!";
+        $_SESSION['msg']['mensagem'] = "Erro reportado com a Especialidade do Leito!!";
         $_SESSION['msg']['tipo'] = "error";
 
         echo 'Error: ' . $e->getMessage();
     }
 
-    irpara("atendimentoRelacaoQuartos.php");
+    irpara("atendimentoEspecialidadeLeito.php");
 }
 
 ?>
@@ -81,7 +81,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Lamparinas | Quarto</title>
+    <title>Lamparinas | Especialidade do Leito</title>
 
     <?php include_once("head.php"); ?>
 
@@ -104,7 +104,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#tblRelacaoQuarto').DataTable({
+            $('#tblEspecialidadeLeito').DataTable({
                 "order": [
                     [0, "asc"]
                 ],
@@ -168,20 +168,20 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
             $('#enviar').on('click', function(e) {
                 e.preventDefault();
                 dadosValidos = true;
-                var inputNome = $('#inputQuartoNome').val().trim();
-                var tipoInternacao = $('#cmbQuartoTipoInternacao').val();
+                var inputNome = $('#inputEspecialidadeLeitoNome').val().trim();
+                var tipoInternacao = $('#cmbEspecialidadeTipoInternacao').val();
                 var inputEstadoAtual = $('#inputEstadoAtual').val();
 
                 //Se o usuário preencheu com espaços em branco ou não preencheu nada
                 if (inputNome == '') {
-                    alerta('Atenção', 'Nome do quarto é obrigatório!', 'error');
-                    $('#inputQuartoId').focus();
+                    alerta('Atenção', 'Especialidade do Leito é obrigatório!', 'error');
+                    $('#inputEspecialidadeLeitoId').focus();
                     dadosValidos = false;
                     return;
                 }
                 if (tipoInternacao == '') {
                     alerta('Atenção', 'Selecione um tipo de internação!', 'error');
-                    $('#cmbQuartoTipoInternacao').focus();
+                    $('#cmbEspecialidadeTipoInternacao').focus();
                     dadosValidos = false;
                     return;
                 }
@@ -189,7 +189,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                     //Esse ajax está sendo usado para verificar no banco se o registro já existe
                     $.ajax({
                         type: "POST",
-                        url: "atendimentoRelacaoQuartosValida.php",
+                        url: "atendimentoEspecialidadeLeitoValida.php",
                         data: ('nome=' + inputNome + '&tipoInternacao=' + tipoInternacao + '&estadoAtual=' + inputEstadoAtual),
                         success: function(resposta) {
 
@@ -203,7 +203,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                 document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
                             }
 
-                            $("#formRelacaoQuartos").submit();
+                            $("#formEspecialidadeLeito").submit();
                         },
                         error: function(XMLHttpRequest, textStatus, errorThrown) {
                             alerta('Atenção', 'Erro ao salvar o Quarto!', 'error');
@@ -216,22 +216,22 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
         });
 
         //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-        function atualizaRelacaoQuarto(Permission, QuartId, QuartStatus, Tipo) {
+        function atualizaEspecialidadeLeito(Permission, EsLeiId, EsLeiStatus, Tipo) {
 
             if (Permission == 1) {
-                document.getElementById('inputQuartoId').value = QuartId;
-                document.getElementById('inputQuartoStatus').value = QuartStatus;
+                document.getElementById('inputEspecialidadeLeitoId').value = EsLeiId;
+                document.getElementById('inputEspecialidadeLeitoStatus').value = EsLeiStatus;
 
                 if (Tipo == 'edita') {
                     document.getElementById('inputEstadoAtual').value = "EDITA";
-                    document.formRelacaoQuartos.action = "atendimentoRelacaoQuartos.php";
+                    document.formEspecialidadeLeito.action = "atendimentoEspecialidadeLeito.php";
                 } else if (Tipo == 'exclui') {
-                    confirmaExclusao(document.formRelacaoQuartos, "Tem certeza que deseja excluir esse Quarto?", "atendimentoRelacaoQuartosExclui.php");
+                    confirmaExclusao(document.formEspecialidadeLeito, "Tem certeza que deseja excluir essa Especialidade do Leito?", "atendimentoEspecialidadeLeitoExclui.php");
                 } else if (Tipo == 'mudaStatus') {
-                    document.formRelacaoQuartos.action = "atendimentoRelacaoQuartosMudaSituacao.php";
+                    document.formEspecialidadeLeito.action = "atendimentoEspecialidadeLeitoMudaSituacao.php";
                 }
 
-                document.formRelacaoQuartos.submit();
+                document.formEspecialidadeLeito.submit();
             } else {
                 alerta('Permissão Negada!', '');
             }
@@ -263,26 +263,26 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                         <!-- Basic responsive configuration -->
                         <div class="card">
                             <div class="card-header header-elements-inline">
-                                <h3 class="card-title">Quartos</h3>
+                                <h3 class="card-title">Relação de Especialidades do Leito</h3>
                             </div>
 
                             <div class="card-body">
-                                <form name="formRelacaoQuartos" id="formRelacaoQuartos" method="post" class="form-validate-jquery">
+                                <form name="formEspecialidadeLeito" id="formEspecialidadeLeito" method="post" class="form-validate-jquery">
 
-                                    <input type="hidden" id="inputQuartoId" name="inputQuartoId" value="<?php if (isset($_POST['inputQuartoId'])) echo $_POST['inputQuartoId']; ?>">
+                                    <input type="hidden" id="inputEspecialidadeLeitoId" name="inputEspecialidadeLeitoId" value="<?php if (isset($_POST['inputEspecialidadeLeitoId'])) echo $_POST['inputEspecialidadeLeitoId']; ?>">
                                     <input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>">
-                                    <input type="hidden" id="inputQuartoStatus" name="inputQuartoStatus">
+                                    <input type="hidden" id="inputEspecialidadeLeitoStatus" name="inputEspecialidadeLeitoStatus">
 
                                     <div class="row">
                                         <div class="col-lg-5">
                                             <div class="form-group">
-                                                <label for="inputQuartoNome">Quarto<span class="text-danger"> *</span></label>
-                                                <input type="text" id="inputQuartoNome" name="inputQuartoNome" class="form-control" placeholder="Quarto" value="<?php if (isset($_POST['inputQuartoId'])) echo $rowQuarto['QuartNome']; ?>" required autofocus>
+                                                <label for="inputEspecialidadeLeitoNome">Especialidade do Leito<span class="text-danger"> *</span></label>
+                                                <input type="text" id="inputEspecialidadeLeitoNome" name="inputEspecialidadeLeitoNome" class="form-control" placeholder="Especialidade do Leito" value="<?php if (isset($_POST['inputEspecialidadeLeitoId'])) echo $rowEspecialidadeLeito['EsLeiNome']; ?>" required autofocus>
                                             </div>
                                         </div>
                                         <div class="col-lg-4">
-                                            <label for="cmbQuartoTipoInternacao">Tipo da internação<span class="text-danger"> *</span></label>
-                                            <select id="cmbQuartoTipoInternacao" name="cmbQuartoTipoInternacao" class="form-control select-search" required>
+                                            <label for="cmbEspecialidadeTipoInternacao">Tipo da internação<span class="text-danger"> *</span></label>
+                                            <select id="cmbEspecialidadeTipoInternacao" name="cmbEspecialidadeTipoInternacao" class="form-control select-search" required>
                                                 <option value="">Selecione</option>
                                                 <?php
                                                 $sql = "SELECT TpIntId, TpIntNome
@@ -293,7 +293,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                                 $result = $conn->query($sql);
                                                 $rowTipoInternacao = $result->fetchAll(PDO::FETCH_ASSOC);
                                                 foreach ($rowTipoInternacao as $item) {
-                                                    $seleciona = $item['TpIntId'] == $rowQuarto['QuartTipoInternacao'] ? "selected" : "";
+                                                    $seleciona = $item['TpIntId'] == $rowEspecialidadeLeito['EsLeiTipoInternacao'] ? "selected" : "";
                                                     print('<option value="' . $item['TpIntId'] . '" ' . $seleciona . '>' . $item['TpIntNome'] . '</option>');
                                                 }
                                                 ?>
@@ -307,7 +307,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                                 //editando
                                                 if (isset($_POST['TpAcoId'])) {
                                                     print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-                                                    print('<a href="atendimentoRelacaoQuartos.php" class="btn btn-basic" role="button">Cancelar</a>');
+                                                    print('<a href="atendimentoEspecialidadeLeito.php" class="btn btn-basic" role="button">Cancelar</a>');
                                                 } else { //inserindo
                                                     print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
                                                 }
@@ -320,10 +320,10 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                             </div>
 
 
-                            <table id="tblRelacaoQuarto" class="table">
+                            <table id="tblEspecialidadeLeito" class="table">
                                 <thead>
                                     <tr class="bg-slate">
-                                        <th data-filter>Quarto</th>
+                                        <th data-filter>Especialidade do Leito</th>
                                         <th data-filter>Tipo de internação</th>
                                         <th>Situação</th>
                                         <th class="text-center">Ações</th>
@@ -339,13 +339,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
                                         print('
 										<tr>
-											<td>' . $item['QuartNome'] . '</td>
+											<td>' . $item['EsLeiNome'] . '</td>
 											<td>' . $item['TpIntNome'] . '</td>
 											');
 
-                                        print('<td><a href="#" onclick="atualizaRelacaoQuarto(
+                                        print('<td><a href="#" onclick="atualizaEspecialidadeLeito(
                                             1,
-                                            ' . $item['QuartId'] . ',
+                                            ' . $item['EsLeiId'] . ',
                                             ' . $situacaoChave . ',
                                             \'mudaStatus\'
                                         );"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
@@ -355,15 +355,15 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                         print('
 										<div class="list-icons">
 											<div class="list-icons list-icons-extended">
-												<a href="#" onclick="atualizaRelacaoQuarto(
+												<a href="#" onclick="atualizaEspecialidadeLeito(
                                                     1,
-                                                    ' . $item['QuartId'] . ',
-                                                    ' . $item['QuartStatus'] . ',
+                                                    ' . $item['EsLeiId'] . ',
+                                                    ' . $item['EsLeiStatus'] . ',
                                                     \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar" ></i></a>
-												<a href="#" onclick="atualizaRelacaoQuarto(
+												<a href="#" onclick="atualizaEspecialidadeLeito(
                                                     1,
-                                                    ' . $item['QuartId'] . ',
-                                                    ' . $item['QuartStatus'] . ',
+                                                    ' . $item['EsLeiId'] . ',
+                                                    ' . $item['EsLeiStatus'] . ',
                                                     \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 											</div>
 										</div>								

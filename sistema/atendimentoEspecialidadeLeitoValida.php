@@ -5,9 +5,9 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 
-$sql = "SELECT QuartId
-        FROM Quarto
-        WHERE QuartUnidade = ".$_SESSION['UnidadeId']." and QuartNome = '". $_POST['nome']."' and QuartTipoInternacao = '". $_POST['tipoInternacao']."'";
+$sql = "SELECT EsLeiId
+        FROM EspecialidadeLeito
+        WHERE EsLeiUnidade = ".$_SESSION['UnidadeId']." and EsLeiNome = '". $_POST['nome']."' and EsLeiTipoInternacao = '". $_POST['tipoInternacao']."'";
 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
