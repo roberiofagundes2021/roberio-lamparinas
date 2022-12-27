@@ -13,16 +13,6 @@ $iUnidade = $_SESSION['UnidadeId'];
 $usuarioId = $_SESSION['UsuarId'];
 $acesso = 'ATENDIMENTO';
 
-$sql = "SELECT ProfiId, ProfiUsuario
-FROM Profissional
-WHERE ProfiUsuario = $usuarioId and ProfiUnidade = $iUnidade";
-$result = $conn->query($sql);
-$row = $result->fetch(PDO::FETCH_ASSOC);
-
-$acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
-
-// $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'PROFISSIONAL';
-
 // as requisições são feitas ao carregar a página via AJAX no arquivo filtraAtendimento.php
 ?>
 
@@ -419,7 +409,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					let AtClaChave = $(this).data('clachave')
 					let AtClaNome = $(this).data('clanome')
 
-					$('#idAtendimentoAgendamento').val(iAtendimento)
+					$('#iAtendimentoId').val(iAtendimento)
 					$('#iAtendimentoEletivoId').val(iAtendimentoEletivo)
 					$('#ClaChave').val(AtClaChave)
 					$('#ClaNome').val(AtClaNome)
@@ -433,7 +423,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 		function newAtendimento(element){
 			$('#AtendimentoAgendamento').val($(element).data('tipo'))
-			$('#idAtendimentoAgendamento').val($(element).data('id'))
+			$('#iAtendimentoId').val($(element).data('id'))
 			$('#dadosPost').attr('action','atendimentoEdita.php')
 			$('#dadosPost').submit()
 		}
@@ -475,7 +465,7 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 				Id = $(element).data('agendamento')
 				$('#dadosPost').attr('action','agendamentoEdita.php')
 			}
-			$('#idAtendimentoAgendamento').val(Id)
+			$('#iAtendimentoId').val(Id)
 			$('#AtendimentoAgendamento').val($(element).data('tipo'))
 
 			$('#dadosPost').submit()
@@ -523,101 +513,73 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 			
 		//Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
 		function getAtendimentos(){
-			let acessoTipo = $('#sAcesso').val();
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimento.php',
 				dataType: 'json',
 				data: {
-					'tipoRequest': 'ATENDIMENTOS',
-					'acesso': acessoTipo
+					'tipoRequest': 'ATENDIMENTOS'
 				},
 				success: async function(response) {
 					//|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
 
-					if(response.acesso == 'ATENDIMENTO'){
-						$('#AgendamentoTable').DataTable().clear().draw()
-	
-						tableAgendamento = $('#AgendamentoTable').DataTable()
-						let rowNodeAgendamento
-	
-						await response.dataAgendamento.forEach(item => {
-							rowNodeAgendamento = tableAgendamento.row.add(item.data).draw().node()
-							$(rowNodeAgendamento).attr('class', 'text-left')
+					$('#AgendamentoTable').DataTable().clear().draw()
 
-							// esse trecho serve para o link no nome do paciente
-							$(rowNodeAgendamento).find('td:eq(2)').addClass('text-primary')
-							$(rowNodeAgendamento).find('td:eq(2)').attr('style', 'cursor: pointer;')
-							$(rowNodeAgendamento).find('td:eq(2)').attr('title', `Transformar o agendamento em atendimento \n${item.identify.prontuario}`)
-							$(rowNodeAgendamento).find('td:eq(2)').attr('data-id', `${item.identify.id}`)
-							$(rowNodeAgendamento).find('td:eq(2)').attr('data-tipo', 'AGENDAMENTO')
-							$(rowNodeAgendamento).find('td:eq(2)').attr('onclick', 'newAtendimento(this)')
-							// <end>
-							$(rowNodeAgendamento).find('td:eq(4)').attr('title', `${item.identify.cbo}`)
+					tableAgendamento = $('#AgendamentoTable').DataTable()
+					let rowNodeAgendamento
 
-							// esse trecho serve para o atributos no campo situação de cada linha
-							$(rowNodeAgendamento).find('td:eq(7)').attr('data-id', `${item.identify.id}`)
-							$(rowNodeAgendamento).find('td:eq(7)').attr('data-observacao', `${item.identify.sJustificativa}`)
-							$(rowNodeAgendamento).find('td:eq(7)').attr('data-tipo', 'AGENDAMENTO')
-							$(rowNodeAgendamento).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							// <end>
-						})
+					await response.dataAgendamento.forEach(item => {
+						rowNodeAgendamento = tableAgendamento.row.add(item.data).draw().node()
+						$(rowNodeAgendamento).attr('class', 'text-left')
 
-						$('#AtendimentoTable').DataTable().clear().draw()
+						// esse trecho serve para o link no nome do paciente
+						$(rowNodeAgendamento).find('td:eq(2)').addClass('text-primary')
+						$(rowNodeAgendamento).find('td:eq(2)').attr('style', 'cursor: pointer;')
+						$(rowNodeAgendamento).find('td:eq(2)').attr('title', `Transformar o agendamento em atendimento \n${item.identify.prontuario}`)
+						$(rowNodeAgendamento).find('td:eq(2)').attr('data-id', `${item.identify.id}`)
+						$(rowNodeAgendamento).find('td:eq(2)').attr('data-tipo', 'AGENDAMENTO')
+						$(rowNodeAgendamento).find('td:eq(2)').attr('onclick', 'newAtendimento(this)')
+						// <end>
+						$(rowNodeAgendamento).find('td:eq(4)').attr('title', `${item.identify.cbo}`)
 
-						tableAtendimento = $('#AtendimentoTable').DataTable()
-						let rowNodeAtendimento
+						// esse trecho serve para o atributos no campo situação de cada linha
+						$(rowNodeAgendamento).find('td:eq(7)').attr('data-id', `${item.identify.id}`)
+						$(rowNodeAgendamento).find('td:eq(7)').attr('data-observacao', `${item.identify.sJustificativa}`)
+						$(rowNodeAgendamento).find('td:eq(7)').attr('data-tipo', 'AGENDAMENTO')
+						$(rowNodeAgendamento).find('td:eq(7)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+						// <end>
+					})
 
-						await response.dataAtendimento.forEach(item => {
-							rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
+					$('#AtendimentoTable').DataTable().clear().draw()
 
-							// $(rowNodeAtendimento).attr('style',`border-left: 3px solid ${item.identify.classCor};`)
+					tableAtendimento = $('#AtendimentoTable').DataTable()
+					let rowNodeAtendimento
 
-							if(item.identify.class){
-								$(rowNodeAtendimento).find('td:eq(0)').attr('style',`border-left: 10px solid ${item.identify.classCor};`)
-								$(rowNodeAtendimento).find('td:eq(0)').attr('title',`${item.identify.class}\n${item.identify.classDeterminante}`)
-							}
+					await response.dataAtendimento.forEach(item => {
+						rowNodeAtendimento = tableAtendimento.row.add(item.data).draw().node()
 
-							$(rowNodeAtendimento).find('td:eq(3)').attr('title', item.identify.prontuario)
-							$(rowNodeAtendimento).find('td:eq(5)').attr('title', item.identify.cbo)
+						// $(rowNodeAtendimento).attr('style',`border-left: 3px solid ${item.identify.classCor};`)
 
-							// esse trecho serve para o atributos no campo situação de cada linha
-							$(rowNodeAtendimento).attr('class', 'text-left')
-							$(rowNodeAtendimento).find('td:eq(8)').attr('data-id', `${item.identify.iAtendimento}`)
-							$(rowNodeAtendimento).find('td:eq(8)').attr('data-observacao', `${item.identify.sJustificativa}`)
-							$(rowNodeAtendimento).find('td:eq(8)').attr('data-tipo', 'ATENDIMENTO')
+						if(item.identify.class){
+							$(rowNodeAtendimento).find('td:eq(0)').attr('style',`border-left: 10px solid ${item.identify.classCor};`)
+							$(rowNodeAtendimento).find('td:eq(0)').attr('title',`${item.identify.class}\n${item.identify.classDeterminante}`)
+						}
 
-							// essa opção de alterar situação só vai estar disponível caso o status seja "Em espera" ou "Liberado"
-							if(item.identify.situacao == "EMESPERA" || item.identify.situacao == "LIBERADO"){
-								$(rowNodeAtendimento).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							}
-							// <end>
-						})
-					} else if (response.acesso == 'PROFISSIONAL'){
-						let tableE = $('#AtendimentoTableEspera').DataTable().clear().draw()
-						let tableA = $('#AtendimentoTableAtendido').DataTable().clear().draw()
-	
-						tableE = $('#AtendimentoTableEspera').DataTable()
-						tableA = $('#AtendimentoTableAtendido').DataTable()
-						let rowNodeE
-						let rowNodeA
-	
-						response.dataEspera.forEach(item => {
-							rowNodeE = tableE.row.add(item.data).draw().node()
-							$(rowNodeE).attr('class', 'text-left')
-							$(rowNodeE).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeE).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
-						})
-						response.dataAtendido.forEach(item => {
-							rowNodeA = tableA.row.add(item.data).draw().node()
-							$(rowNodeA).attr('class', 'text-left')
-							$(rowNodeA).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeA).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
-							$(rowNodeA).find('td:eq(9)').attr('data-atendimento', `${item.identify.iAtendimento}`)
-							$(rowNodeA).find('td:eq(9)').attr('data-observacao', `${item.identify.sJustificativa}`)
-						})
-	
-					}
+						$(rowNodeAtendimento).find('td:eq(3)').attr('title', item.identify.prontuario)
+						$(rowNodeAtendimento).find('td:eq(5)').attr('title', item.identify.cbo)
+
+						// esse trecho serve para o atributos no campo situação de cada linha
+						$(rowNodeAtendimento).attr('class', 'text-left')
+						$(rowNodeAtendimento).find('td:eq(8)').attr('data-id', `${item.identify.iAtendimento}`)
+						$(rowNodeAtendimento).find('td:eq(8)').attr('data-observacao', `${item.identify.sJustificativa}`)
+						$(rowNodeAtendimento).find('td:eq(8)').attr('data-tipo', 'ATENDIMENTO')
+
+						// essa opção de alterar situação só vai estar disponível caso o status seja "Em espera" ou "Liberado"
+						if(item.identify.situacao == "EMESPERA" || item.identify.situacao == "LIBERADO"){
+							$(rowNodeAtendimento).find('td:eq(8)').attr('onclick', `alteraSituacao('${item.identify.situacao}', this)`)
+						}
+						// <end>
+					})
 					setAttributs()
 				}
 			});
@@ -642,6 +604,12 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 
 		}
 
+		function adimissaoLeito(id){
+			$('#iAtendimentoId').val(id)
+			$('#dadosPost').attr('action', 'atendimentoAdmissaoLeito.php')
+			$('#dadosPost').submit()
+		}
+
 	</script>
 
 </head>
@@ -663,200 +631,109 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 			<!-- Content area -->
 			<div class="content">
 				<form id='dadosPost' method="POST">
-					<input type='hidden' id='idAtendimentoAgendamento' name='idAtendimentoAgendamento' value='' />
+					<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='' />
 					<input type='hidden' id='AtendimentoAgendamento' name='AtendimentoAgendamento' value='' />
 					<input type='hidden' id='iAtendimentoEletivoId' name='iAtendimentoEletivoId' value='' />
 					<input type='hidden' id='ClaChave' name='ClaChave' value='' />
 					<input type='hidden' id='ClaNome' name='ClaNome' value='' />
 				</form>
+				<!-- Visão Atendente -->		
+				<div class="row">
+					<div class="col-lg-12">
+						<!-- Basic responsive configuration -->
+						<div class="card">
+							<div class="card-header header-elements-inline">
+								<h3 class="card-title">Relação de Atendimentos</h3>
+							</div>
 
-				<?php if ($acesso == 'ATENDIMENTO'){ ?>
-					<!-- Visão Atendente -->		
-					<div class="row">
-						<div class="col-lg-12">
-							<!-- Basic responsive configuration -->
-							<div class="card">
-								<div class="card-header header-elements-inline">
-									<h3 class="card-title">Relação de Atendimentos</h3>
-								</div>
-
-								<div class="card-body">
-									<div class="row">
-										<div class="col-lg-8">
-											<p class="font-size-lg">A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-										</div>
-										<div class="col-lg-4 text-right">
-											<div class="text-right">
-												<a href="#" onclick="submeterAgendaMedica()" class="btn" role="button">Agenda médica</a>
-												<?php 
-                                                    echo $inserir?"<a href='atendimentoNovo.php' class='btn btn-principal' role='button'>Novo Atendimento</a>":"";
-												?>
-												
-												<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
-													<i class="icon-printer2"></i>																						
-												</a>
-											</div>
-										</div>
-										
-										<div class="col-lg-12">	
-											<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('agendamentos')" >Agendamentos</button>
-											<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendimentos')" >Atendimentos</button>
-										</div>
-
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-8">
+										<p class="font-size-lg">A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>
-								</div>
-
-								<div class="card-body">
-									<div class="row">
-										<div class="col-md-9">
-											<h3 class="card-title" id="card-title">Agendamentos</h3>
+									<div class="col-lg-4 text-right">
+										<div class="text-right">
+											<a href="#" onclick="submeterAgendaMedica()" class="btn" role="button">Agenda médica</a>
+											<?php 
+												echo $inserir?"<a href='atendimentoNovo.php' class='btn btn-principal' role='button'>Novo Atendimento</a>":"";
+											?>
+											
+											<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
+												<i class="icon-printer2"></i>																						
+											</a>
 										</div>
 									</div>
 									
-								</div>
-
-
-
-								<!-- Agendamentos -->
-								<div id="box-agendamentos" style="display: block;">
-									<table class="table" id="AgendamentoTable">
-										<thead>
-											<tr class="bg-slate text-left">
-												<th>Data / Hora</th>
-												<th>Espera</th>
-												<th>Paciente</th>
-												<th>Idade</th>
-												<th>Profissional</th>
-												<th>Modalidade</th>
-												<th>Procedimento</th>
-												<th>Situação</th>
-												<th class="text-center">Ações</th>
-											</tr>
-										</thead>
-										<tbody>
-
-										</tbody>
-									</table>
-								</div>
-
-								<!-- Atendimentos -->
-								<div id="box-atendimentos" style="display: none;">
-
-									<div class="card-body" style="padding: 0px"></div>
-									<table class="table" id="AtendimentoTable">
-										<thead style="border-left: 10px solid #466d96">
-											<tr class="bg-slate text-left">
-												<th>Data / Hora</th>
-												<th>Espera</th>
-												<th>Nº Registro</th>
-												<th>Paciente</th>
-												<th>Idade</th>
-												<th>Profissional</th>
-												<th>Modalidade</th>
-												<th>Procedimento</th>
-												<th>Situação</th>
-												<th class="text-center">Ações</th>
-											</tr>
-										</thead>
-										<tbody>
-
-										</tbody>
-									</table>
-								</div>
-
-                            <!-- FIM DIV CARD -->
-							</div>														
-						</div>
-					</div>
-				<?php } elseif ($acesso == 'PROFISSIONAL'){ ?>
-					<!-- Visão Atendente -->		
-					<div class="row">
-						<div class="col-lg-12">
-							<!-- Basic responsive configuration -->
-							<div class="card">
-								<div class="card-header header-elements-inline">
-									<h3 class="card-title">Relação de Atendimento</h3>
-								</div>
-								<div class="card-body">
-									<div class="row">
-										<div class="col-lg-9">
-											<p class="font-size-lg">A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
-										</div>
-										<div class="col-lg-3">
-											<div class="dropdown p-0" style="float:right; margin-left: 5px;">
-												<div class="text-right col-sm-2 p-0"><a href="#" class="btn bg-secondary" role="button">Imprimir Relação</a></div>
-											</div>
-										</div>
+									<div class="col-lg-12">	
+										<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('agendamentos')" >Agendamentos</button>
+										<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendimentos')" >Atendimentos</button>
 									</div>
+
 								</div>
 							</div>
+
+							<div class="card-body">
+								<div class="row">
+									<div class="col-md-9">
+										<h3 class="card-title" id="card-title">Agendamentos</h3>
+									</div>
+								</div>
 								
-							<!-- Em espera -->
-							<div class="card">
-								<div class="card-header header-elements-inline">
-									<h3 class="card-title">Pacientes em espera</h3>
-									<div class="header-elements">
-										<div class="list-icons">
-											<a class="list-icons-item" data-action="collapse"></a>
-										</div>
-									</div>
-								</div>
+							</div>
 
-								<table class="table" id="AtendimentoTableEspera">
+
+
+							<!-- Agendamentos -->
+							<div id="box-agendamentos" style="display: block;">
+								<table class="table" id="AgendamentoTable">
 									<thead>
 										<tr class="bg-slate text-left">
-											<th>Data</th>
-											<th>Horario</th>
+											<th>Data / Hora</th>
 											<th>Espera</th>
-											<th>Nº Registro</th>
-											<th>Prontuário</th>			
 											<th>Paciente</th>
+											<th>Idade</th>
+											<th>Profissional</th>
+											<th>Modalidade</th>
 											<th>Procedimento</th>
-											<th>Classificação de Risco</th>
 											<th>Situação</th>
 											<th class="text-center">Ações</th>
 										</tr>
 									</thead>
-									<tbody id="dataAtendimentos">
+									<tbody>
 
 									</tbody>
 								</table>
 							</div>
 
-							<!-- Atendidos -->
-							<div  class="card">
-								<div class="card-header header-elements-inline">
-									<h3 class="card-title">Pacientes Atendidos</h3>
-									<div class="header-elements">
-										<div class="list-icons">
-											<a class="list-icons-item" data-action="collapse"></a>
-										</div>
-									</div>
-								</div>
+							<!-- Atendimentos -->
+							<div id="box-atendimentos" style="display: none;">
 
-								<table class="table" id="AtendimentoTableAtendido">
-									<thead>
+								<div class="card-body" style="padding: 0px"></div>
+								<table class="table" id="AtendimentoTable">
+									<thead style="border-left: 10px solid #466d96">
 										<tr class="bg-slate text-left">
-											<th>Data</th>
-											<th>Horario</th>
+											<th>Data / Hora</th>
 											<th>Espera</th>
 											<th>Nº Registro</th>
-											<th>Prontuário</th>			
 											<th>Paciente</th>
+											<th>Idade</th>
+											<th>Profissional</th>
+											<th>Modalidade</th>
 											<th>Procedimento</th>
-											<th>Risco</th>
 											<th>Situação</th>
 											<th class="text-center">Ações</th>
 										</tr>
 									</thead>
-									<tbody id="dataAtendimentos">
+									<tbody>
 
 									</tbody>
 								</table>
 							</div>
-						</div>
+
+						<!-- FIM DIV CARD -->
+						</div>														
 					</div>
-				<?php }?>
+				</div>
 
 				<!--Modal Editar Situação-->
                 <div id="page-modal-situacao" class="custon-modal">
@@ -934,10 +811,6 @@ $acesso = isset($row['ProfiId'])?'PROFISSIONAL':'ATENDIMENTO';
 					</div>
 				</div>
 				<input id='iAtendimento' name='iAtendimento' type='hidden' value=''/>
-				<?php
-					echo "<input id='sAcesso' name='sAcesso' type='hidden' value='$acesso'/>"
-				?>
-
 				<!-- Agenda Médica -->
 				<form name="formAgendaMedica" id="formAgendaMedica" method="POST" action="agendaMedica.php">
 					<input id="inputOrigem" name="inputOrigem" type="hidden" value="atendimento.php" />

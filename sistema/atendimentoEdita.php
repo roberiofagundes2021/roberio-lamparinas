@@ -13,10 +13,10 @@ $_SESSION['atendimento'] = [
 ];
 
 // a requisição é feita ao carregar a página via AJAX no arquivo filtraAtendimento.php
-if(!isset($_POST['idAtendimentoAgendamento'])){
+if(!isset($_POST['iAtendimentoId'])){
 	irpara('atendimento.php');
 }
-$iAtendimento = $_POST['idAtendimentoAgendamento'];
+$iAtendimento = $_POST['iAtendimentoId'];
 $tipo = $_POST['AtendimentoAgendamento'];
 $iUnidade = $_SESSION['UnidadeId'];
 

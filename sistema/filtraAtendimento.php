@@ -37,300 +37,156 @@ try{
 	// feito consultas para buscar de acordo com a classificação do atendimento
 	// (ATENDIMENTOSAMBULATORIAIS, ATENDIMENTOSHOSPITALARES, ATENDIMENTOSELETIVOS)
 	if($tipoRequest == 'ATENDIMENTOS'){
-		$acesso = $_POST['acesso'];
 		$array = [];
 		$hoje = date('Y-m-d');
 
-		if($acesso == 'ATENDIMENTO'){
-			$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
-				AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
-				AgendObservacao,AgendJustificativa,ClienNome,ClienCodigo,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave, ClienDtNascimento,
-				SituaCor,Profissional.ProfiNome as ProfissionalNome,AtLocNome, SrVenNome, ProfiCbo, Profissao.ProfiNome as ProfissaoNome
-				FROM Agendamento
-				JOIN AtendimentoModalidade ON AtModId = AgendModalidade
-				JOIN Situacao ON SituaId = AgendSituacao
-				JOIN Cliente ON ClienId = AgendCliente
-				JOIN Profissional ON Profissional.ProfiId = AgendProfissional
-				JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
-				JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
-				JOIN ServicoVenda ON SrVenId = AgendServico
-				WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADO','CONFIRMADO','FILAESPERA')
-				AND AgendData = '$hoje'
-				and AgendAtendimento is null";
-			$result = $conn->query($sql);
-			$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
+		$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
+			AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
+			AgendObservacao,AgendJustificativa,ClienNome,ClienCodigo,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave, ClienDtNascimento,
+			SituaCor,Profissional.ProfiNome as ProfissionalNome,AtLocNome, SrVenNome, ProfiCbo, Profissao.ProfiNome as ProfissaoNome
+			FROM Agendamento
+			JOIN AtendimentoModalidade ON AtModId = AgendModalidade
+			JOIN Situacao ON SituaId = AgendSituacao
+			JOIN Cliente ON ClienId = AgendCliente
+			JOIN Profissional ON Profissional.ProfiId = AgendProfissional
+			JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
+			JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
+			JOIN ServicoVenda ON SrVenId = AgendServico
+			WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADO','CONFIRMADO','FILAESPERA')
+			AND AgendData = '$hoje'
+			and AgendAtendimento is null";
+		$result = $conn->query($sql);
+		$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
-			$sql = "SELECT AtendId,AtendNumRegistro,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtendClassificacao,
-				AtendObservacao,AtendJustificativa,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto, ClienDtNascimento,
-				ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,Profissional.ProfiNome as ProfissionalNome,SrVenNome, 
-				Profissao.ProfiNome as ProfissaoNome, ProfiCbo,AtClRNome,AtClRNomePersonalizado,AtClRTempo,AtClRCor,AtClRDeterminantes
-				FROM AtendimentoXServico
-				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
-				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-				LEFT JOIN Situacao ON SituaId = AtendSituacao
-				LEFT JOIN Cliente ON ClienId = AtendCliente
-				LEFT JOIN Profissional ON Profissional.ProfiId = AtXSeProfissional
-				LEFT JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
-				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
-				LEFT JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
-				LEFT JOIN AtendimentoClassificacaoRisco ON AtendClassificacaoRisco = AtClRId
-				WHERE AtendUnidade = $iUnidade";
-			$result = $conn->query($sql);
-			$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
-			
-			$dataAtendimento = [];
-			$dataAgendamento = [];
-			foreach($rowAgendamento as $item){
-				$att = "<a style='color: black' href='#' data-tipo='AGENDAMENTO' onclick='atualizaAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
-				$exc = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='excluiAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
-				$aud = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AgendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
-				$acoes = "<div class='list-icons'>
-							$att
-							$exc
-							$aud
-							<div class='dropdown'>													
-								<a href='#' class='list-icons-item' data-toggle='dropdown'>
-									<i class='icon-menu9'></i>
-								</a>
+		$sql = "SELECT AtendId,AtendNumRegistro,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtendClassificacao,
+			AtendObservacao,AtendJustificativa,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto, ClienDtNascimento,
+			ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,Profissional.ProfiNome as ProfissionalNome,SrVenNome, 
+			Profissao.ProfiNome as ProfissaoNome, ProfiCbo,AtClRNome,AtClRNomePersonalizado,AtClRTempo,AtClRCor,AtClRDeterminantes
+			FROM AtendimentoXServico
+			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
+			LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+			LEFT JOIN Situacao ON SituaId = AtendSituacao
+			LEFT JOIN Cliente ON ClienId = AtendCliente
+			LEFT JOIN Profissional ON Profissional.ProfiId = AtXSeProfissional
+			LEFT JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
+			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
+			LEFT JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
+			LEFT JOIN AtendimentoClassificacaoRisco ON AtendClassificacaoRisco = AtClRId
+			WHERE AtendUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+		$dataAtendimento = [];
+		$dataAgendamento = [];
+		foreach($rowAgendamento as $item){
+			$att = "<a style='color: black' href='#' data-tipo='AGENDAMENTO' onclick='atualizaAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
+			$exc = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='excluiAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
+			$aud = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AgendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
+			$acoes = "<div class='list-icons'>
+						$att
+						$exc
+						$aud
+						<div class='dropdown'>													
+							<a href='#' class='list-icons-item' data-toggle='dropdown'>
+								<i class='icon-menu9'></i>
+							</a>
 
-								<div class='dropdown-menu dropdown-menu-right'>
-									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Prioridade'></i> Prioridade</a>									
-									<div class='dropdown-divider'></div>
-									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Gerar nota fiscal'></i> Gerar nota fiscal</a>
-									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Anexos'></i> Anexos</a>
-								</div>
+							<div class='dropdown-menu dropdown-menu-right'>
+								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Prioridade'></i> Prioridade</a>									
+								<div class='dropdown-divider'></div>
+								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Gerar nota fiscal'></i> Gerar nota fiscal</a>
+								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Anexos'></i> Anexos</a>
 							</div>
-						</div>";
+						</div>
+					</div>";
+		
+			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
 			
-				$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
-				
-				$dataEspera = date('Y-m-d');
-				$difference = diferencaEmHoras($dataEspera, $item['AgendData']);
-				array_push($dataAgendamento, [
-					'data' => [
-						mostraData($item['AgendData']) . " - " . mostraHora($item['AgendHorario']), // Data - Hora
-						$difference,  // Espera
-						$item['ClienNome'],  // Paciente
-						calculaIdadeSimples($item['ClienDtNascimento']), // Idade Paciente
-						$item['ProfissionalNome'],  // Profissional
-						$item['AtModNome'],  // Modalidade
-						$item['SrVenNome'],  // Procedimento
-						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
-						$acoes,  // Ações
-					],
-					'identify' => [
-						'situacao' => $item['SituaChave'],
-						'id' => $item['AgendId'],
-						'sJustificativa' => $item['AgendJustificativa'],
-						'prontuario' => 'Prontuário: '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
-						'cbo' => 'CBO: '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
-					]
-				]);
-			}
-			foreach($rowAtendimento as $item){
-				$att = "<a class='list-icons-item' href='#' data-tipo='ATENDIMENTO' onclick='atualizaAtendimento(this)' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
-				$exc = "<a class='list-icons-item' href='#' data-tipo='ATENDIMENTO' onclick='excluiAtendimento(this)' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
-				$aud = "<a style='color: black' href='#' data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
-				$acoes = "<div class='list-icons'>
-							$att
-							$exc
-							$aud
-							<div class='dropdown'>													
-								<a href='#' class='list-icons-item' data-toggle='dropdown'>
-									<i class='icon-menu9'></i>
-								</a>
-
-								<div class='dropdown-menu dropdown-menu-right'>
-									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Prioridade'></i> Prioridade</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Gerar nota fiscal'></i> Gerar nota fiscal</a>
-									<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Anexos'></i> Anexos</a>
-								</div>
-							</div>
-						</div>";
-			
-				$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
-				
-				$dataEspera = date('Y-m-d');
-				$difference = diferencaEmHoras($dataEspera, $item['AtXSeData']);
-				
-				array_push($dataAtendimento, [
-					'data' => [
-						mostraData($item['AtXSeData']) . " - " . mostraHora($item['AtXSeHorario']), // Data - Hora
-						$difference,  // Espera
-						$item['AtendNumRegistro'],  // Nº Registro
-						$item['ClienNome'],  // Paciente
-						calculaIdadeSimples($item['ClienDtNascimento']), // Idade paciente
-						$item['ProfissionalNome'],  // Profissional
-						$item['AtModNome'],  // Modalidade
-						$item['SrVenNome'],  // Procedimento
-						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
-						$acoes,  // Ações
-					],
-					'identify' => [
-						'situacao' => $item['SituaChave'],
-						'id' => $item['AtendId'],
-						'sJustificativa' => $item['AtendJustificativa'],
-						'prontuario' => 'Prontuário: '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
-						'cbo' => 'CBO: '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
-						'class' => $item['AtClRNomePersonalizado']?'Classificação - '.$item['AtClRNomePersonalizado']:($item['AtClRNome']?'Classificação - '.$item['AtClRNome']:'Sem Classificação!'),
-						'classTemp' => ($item['AtClRTempo']?$item['AtClRTempo']:''),
-						'classCor' => ($item['AtClRCor']?$item['AtClRCor']:'#FFF'),
-						'classDeterminante' => ($item['AtClRDeterminantes']?$item['AtClRDeterminantes']:'')
-					]
-				]);
-			}
-			$array  = [
-				'dataAgendamento' => $dataAgendamento,
-				'dataAtendimento' => $dataAtendimento,
-				'acesso' => $acesso,
-				'titulo' => 'Alterar Situação',
-				'status' => 'success',
-				'menssagem' => 'Situação alterada com sucesso!!!'
-			];
-		} elseif($acesso == 'PROFISSIONAL'){
-			$sql = "SELECT ProfiId, ProfiUsuario
-				FROM Profissional
-				WHERE ProfiUsuario = $usuarioId and ProfiUnidade = $iUnidade";
-			$result = $conn->query($sql);
-			$row = $result->fetch(PDO::FETCH_ASSOC);
-			$iProfissional = $row['ProfiId'];
-
-			$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
-				AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
-				FROM AtendimentoXServico
-				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
-				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-				LEFT JOIN Situacao ON SituaId = AtendSituacao
-				LEFT JOIN Cliente ON ClienId = AtendCliente
-				LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
-				LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
-				LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-				WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-				ORDER BY AtXSeId DESC";
-			$resultEspera = $conn->query($sql);
-			$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
-
-			$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
-				AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,
-				AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda
-				FROM AtendimentoXServico
-				LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
-				LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-				LEFT JOIN Situacao ON SituaId = AtendSituacao
-				LEFT JOIN Cliente ON ClienId = AtendCliente
-				LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-				LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
-				LEFT JOIN ServicoVendaXModalidade ON SrVenId = SVXMoServicoVenda
-				LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-				WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-				ORDER BY AtXSeId DESC";
-			$resultAtendido = $conn->query($sql);
-			$rowAtendido = $resultAtendido->fetchAll(PDO::FETCH_ASSOC);
-			
-			$espera = [];
-			$atendido = [];
-
-			foreach($rowEspera as $item){
-				$difference = diferencaEmHoras($item['AtXSeData'], date('Y-m-d'));
-
-				$att = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
-				// $exc = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
-				$acoes = "<div class='list-icons'>
-							$att
-							<div class='dropdown'>													
-								<a href='#' class='list-icons-item' data-toggle='dropdown'>
-									<i class='icon-menu9'></i>
-								</a>
-
-								<div class='dropdown-menu dropdown-menu-right'>
-									<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-									<!-- <div class='dropdown-divider'></div> -->
-								</div>
-							</div>
-						</div>";
-			
-				$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
-				
-				array_push($espera,[
-					'data' => [
-						mostraData($item['AtXSeData']),  // Data
-						$item['AtXSeHorario'],  // Horario
-						$difference,  // Espera
-						$item['AtXSeId'],  // Nº Registro
-						$item['ClienCodigo'],  // Prontuário
-						$item['ClienNome'],  // Paciente
-						$item['SrVenNome'],  // Procedimento
-						'Risco**',  // Risco
-						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
-						$acoes,  // Ações
-					],
-					'identify' => [
-						'situacao' => $item['SituaChave'],
-						'id' => $item['AtendId'],
-						'sJustificativa' => $item['AtendObservacao']
-					]]);
-			}
-			foreach($rowAtendido as $item){
-				$difference = diferencaEmHoras($item['AtXSeData'], date('Y-m-d'));
-
-				$att = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
-				// $exc = "<a style='color: black' href='#' onclick='atualizaAtendimento(); class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
-				$acoes = "<div class='list-icons'>
-							$att
-							<div class='dropdown'>													
-								<a href='#' class='list-icons-item' data-toggle='dropdown'>
-									<i class='icon-menu9'></i>
-								</a>
-
-								<div class='dropdown-menu dropdown-menu-right'>
-									<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-									<!-- <div class='dropdown-divider'></div> -->
-								</div>
-							</div>
-						</div>";
-			
-				$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
-				
-				array_push($atendido,
-				[
-					'data' => [
-						mostraData($item['AtXSeData']),  // Data
-						$item['AtXSeHorario'],  // Horario
-						$difference,  // Espera
-						$item['AtXSeId'],  // Nº Registro
-						$item['ClienCodigo'],  // Prontuário
-						$item['ClienNome'],  // Paciente
-						$item['SrVenNome'],  // Procedimento
-						'Risco**',  // Risco
-						"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
-						$acoes,  // Ações
-					],
-					'identify' => [
-						'situacao' => $item['SituaChave'],
-						'id' => $item['AtendId'],
-						'sJustificativa' => $item['AtendObservacao'],
-						'AtClaChave' => $item['AtClaChave'],
-						'AtClaNome' => $item['AtClaNome']
-					]
-				]);
-			}
-			$array = [
-				'dataEspera' =>$espera,
-				'dataAtendido' =>$atendido,
-				'acesso' => $acesso,
-				'titulo' => '',
-				'status' => 'success',
-				'menssagem' => ''
-			];
+			$dataEspera = date('Y-m-d');
+			$difference = diferencaEmHoras($dataEspera, $item['AgendData']);
+			array_push($dataAgendamento, [
+				'data' => [
+					mostraData($item['AgendData']) . " - " . mostraHora($item['AgendHorario']), // Data - Hora
+					$difference,  // Espera
+					$item['ClienNome'],  // Paciente
+					calculaIdadeSimples($item['ClienDtNascimento']), // Idade Paciente
+					$item['ProfissionalNome'],  // Profissional
+					$item['AtModNome'],  // Modalidade
+					$item['SrVenNome'],  // Procedimento
+					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					$acoes,  // Ações
+				],
+				'identify' => [
+					'situacao' => $item['SituaChave'],
+					'id' => $item['AgendId'],
+					'sJustificativa' => $item['AgendJustificativa'],
+					'prontuario' => 'Prontuário: '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
+					'cbo' => 'CBO: '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
+				]
+			]);
 		}
-	
+		foreach($rowAtendimento as $item){
+			$id = $item['AtendId'];
+			$att = "<a class='list-icons-item' href='#' data-tipo='ATENDIMENTO' onclick='atualizaAtendimento(this)' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
+			$exc = "<a class='list-icons-item' href='#' data-tipo='ATENDIMENTO' onclick='excluiAtendimento(this)' style='color: black' data-atendimento='$item[AtendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
+			$aud = "<a style='color: black' href='#' data-tipo='ATENDIMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AtendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
+			$acoes = "<div class='list-icons'>
+						$att
+						$exc
+						$aud
+						<div class='dropdown'>													
+							<a href='#' class='list-icons-item' data-toggle='dropdown'>
+								<i class='icon-menu9'></i>
+							</a>
+
+							<div class='dropdown-menu dropdown-menu-right'>
+								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Prioridade'></i> Prioridade</a>
+								<div class='dropdown-divider'></div>
+								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Gerar nota fiscal'></i> Gerar nota fiscal</a>
+								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Anexos'></i> Anexos</a>
+								<a href='#' onclick='adimissaoLeito($id)' class='dropdown-item'><i class='icon-stackoverflow' title='Leito'></i> Adimissão em Leito</a>
+							</div>
+						</div>
+					</div>";
+		
+			$contato = $item['ClienCelular']?$item['ClienCelular']:($item['ClienTelefone']?$item['ClienTelefone']:'não informado');
+			
+			$dataEspera = date('Y-m-d');
+			$difference = diferencaEmHoras($dataEspera, $item['AtXSeData']);
+			
+			array_push($dataAtendimento, [
+				'data' => [
+					mostraData($item['AtXSeData']) . " - " . mostraHora($item['AtXSeHorario']), // Data - Hora
+					$difference,  // Espera
+					$item['AtendNumRegistro'],  // Nº Registro
+					$item['ClienNome'],  // Paciente
+					calculaIdadeSimples($item['ClienDtNascimento']), // Idade paciente
+					$item['ProfissionalNome'],  // Profissional
+					$item['AtModNome'],  // Modalidade
+					$item['SrVenNome'],  // Procedimento
+					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					$acoes,  // Ações
+				],
+				'identify' => [
+					'situacao' => $item['SituaChave'],
+					'id' => $item['AtendId'],
+					'sJustificativa' => $item['AtendJustificativa'],
+					'prontuario' => 'Prontuário: '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
+					'cbo' => 'CBO: '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN'),
+					'class' => $item['AtClRNomePersonalizado']?'Classificação - '.$item['AtClRNomePersonalizado']:($item['AtClRNome']?'Classificação - '.$item['AtClRNome']:'Sem Classificação!'),
+					'classTemp' => ($item['AtClRTempo']?$item['AtClRTempo']:''),
+					'classCor' => ($item['AtClRCor']?$item['AtClRCor']:'#FFF'),
+					'classDeterminante' => ($item['AtClRDeterminantes']?$item['AtClRDeterminantes']:'')
+				]
+			]);
+		}
+		$array  = [
+			'dataAgendamento' => $dataAgendamento,
+			'dataAtendimento' => $dataAtendimento,
+			'titulo' => 'Atendimentos',
+			'status' => 'success',
+			'menssagem' => ''
+		];	
 		echo json_encode($array);
 	} elseif($tipoRequest == 'ATENDIMENTOSAMBULATORIAIS'){
 		$acesso = $_POST['acesso'];
@@ -1900,15 +1756,6 @@ try{
 		if($cliente['id']){
 			$mes = explode('-',$atendimento['dataRegistro']);
 			$mes = $mes[1];
-	
-			$sql = "SELECT AtendNumRegistro FROM Atendimento WHERE AtendNumRegistro LIKE '%A$mes-%'
-				ORDER BY AtendId DESC";
-			$result = $conn->query($sql);
-			$rowCodigo = $result->fetchAll(PDO::FETCH_ASSOC);
-	
-			$intaValCodigo = COUNT($rowCodigo)?intval(explode('-',$rowCodigo[0]['AtendNumRegistro'])[1])+1:1;
-	
-			$numRegistro = "A$mes-$intaValCodigo";
 
 			$sql="SELECT AtModTipoRecebimento FROM AtendimentoModalidade WHERE AtModId = '$_POST[modalidade]' ";
 			$result = $conn->query($sql);
@@ -1921,56 +1768,94 @@ try{
 			}
 			$result = $conn->query($sql);
 			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
-			
+
 			if($tipo == 'ATENDIMENTO' && $status == 'EDITA'){
 				$sql = "UPDATE Atendimento SET
-				AtendDataRegistro = '$atendimento[dataRegistro]',
-				AtendCliente = '$cliente[id]',
-				AtendModalidade = '$atendimento[modalidade]',
-				AtendClassificacaoRisco = '$atendimento[classificacaoRisco]',
-				AtendResponsavel = '".($responsavel?$responsavel['id']:'')."',
-				AtendClassificacao = '$atendimento[classificacao]',
-				AtendObservacao = '$atendimento[observacao]',
-				AtendSituacao = '$rowSituacao[SituaId]',
-				AtendUsuarioAtualizador = '$usuarioId',
-				AtendUnidade = '$iUnidade'
-				WHERE AtendId = $iAtendimento";
+					AtendDataRegistro = '$atendimento[dataRegistro]',
+					AtendCliente = '$cliente[id]',
+					AtendModalidade = '$atendimento[modalidade]',
+					AtendClassificacaoRisco = '$atendimento[classificacaoRisco]',
+					AtendResponsavel = '".($responsavel?$responsavel['id']:'')."',
+					AtendClassificacao = '$atendimento[classificacao]',
+					AtendObservacao = '$atendimento[observacao]',
+					AtendSituacao = '$rowSituacao[SituaId]',
+					AtendUsuarioAtualizador = '$usuarioId',
+					AtendUnidade = '$iUnidade'
+					WHERE AtendId = $iAtendimento";
 				$conn->query($sql);
 
-				$sql = "DELETE FROM AtendimentoXServico WHERE AtXSeAtendimento = $iAtendimento";
-				$conn->query($sql);
+				// caso esteja editando sera criado novos atendimentos a partir dos serviços inseridos
+				foreach($atendimentoServicos as $atendimentoServico){
+					if($atendimentoServico['status'] == 'new'){
+						$sql = "SELECT AtendNumRegistro FROM Atendimento WHERE AtendNumRegistro LIKE '%A$mes-%'
+							ORDER BY AtendId DESC";
+						$result = $conn->query($sql);
+						$rowCodigo = $result->fetchAll(PDO::FETCH_ASSOC);
+				
+						$intaValCodigo = COUNT($rowCodigo)?intval(explode('-',$rowCodigo[0]['AtendNumRegistro'])[1])+1:1;
+				
+						$numRegistro = "A$mes-$intaValCodigo";
+
+						$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,AtendCliente,AtendAgendamento,
+							AtendModalidade,AtendResponsavel,AtendClassificacao,AtendClassificacaoRisco,AtendObservacao,AtendSituacao,
+							AtendUsuarioAtualizador,AtendUnidade)
+							VALUES('$numRegistro','$atendimento[dataRegistro]','$cliente[id]','$iAgendamento','$atendimento[modalidade]',
+							'".($responsavel?$responsavel['id']:'')."',$atendimento[classificacao],'$atendimento[classificacaoRisco]','$atendimento[observacao]',
+							$rowSituacao[SituaId],$usuarioId,$iUnidade)";
+						$conn->query($sql);
+				
+						$iAtendimento = $conn->lastInsertId();
+
+						$desconto = $atendimentoServico['desconto']?$atendimentoServico['desconto']:0;
+						$grupo = $atendimentoServico['iGrupo']?$atendimentoServico['iGrupo']:'null';
+						$subGrupo = $atendimentoServico['iSubGrupo']?$atendimentoServico['iSubGrupo']:'null';
+						
+						$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeGrupo,AtXSeSubGrupo,AtXSeServico,AtXSeProfissional,AtXSeDesconto,
+							AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
+							VALUES('$iAtendimento',$grupo,$subGrupo,
+							'$atendimentoServico[iServico]','$atendimentoServico[iMedico]','$desconto',
+							'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
+							'$atendimentoServico[valor]','$usuarioId','$iUnidade')";
+						$conn->query($sql);
+					}
+				}
 			}else{
-				$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,AtendCliente,
-					AtendModalidade,AtendResponsavel,AtendClassificacao,AtendClassificacaoRisco,AtendObservacao,AtendSituacao,
-					AtendUsuarioAtualizador,AtendUnidade)
-					VALUES('$numRegistro','$atendimento[dataRegistro]','$cliente[id]','$atendimento[modalidade]',
-					'".($responsavel?$responsavel['id']:'')."',$atendimento[classificacao],'$atendimento[classificacaoRisco]','$atendimento[observacao]',
-				$rowSituacao[SituaId],$usuarioId,$iUnidade)";
-				$conn->query($sql);
-		
-				$iAtendimento = $conn->lastInsertId();
-				if($iAgendamento){
-					$sql = "UPDATE Agendamento SET AgendAtendimento=$iAtendimento WHERE AgendId = $iAgendamento";
-					$conn->query($sql);
-				}
-			}
+				foreach($atendimentoServicos as $atendimentoServico){
+					$sql = "SELECT AtendNumRegistro FROM Atendimento WHERE AtendNumRegistro LIKE '%A$mes-%'
+						ORDER BY AtendId DESC";
+					$result = $conn->query($sql);
+					$rowCodigo = $result->fetchAll(PDO::FETCH_ASSOC);
+			
+					$intaValCodigo = COUNT($rowCodigo)?intval(explode('-',$rowCodigo[0]['AtendNumRegistro'])[1])+1:1;
+			
+					$numRegistro = "A$mes-$intaValCodigo";
 
-			$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeGrupo,AtXSeSubGrupo,AtXSeServico,AtXSeProfissional,AtXSeDesconto,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
-			VALUES ";
-			foreach($atendimentoServicos as $atendimentoServico){
-				if($atendimentoServico['status'] != 'rem'){
-					$desconto = $atendimentoServico['desconto']?$atendimentoServico['desconto']:0;
-					$grupo = $atendimentoServico['iGrupo']?$atendimentoServico['iGrupo']:'null';
-					$subGrupo = $atendimentoServico['iSubGrupo']?$atendimentoServico['iSubGrupo']:'null';
-					$sql .= "('$iAtendimento',$grupo,$subGrupo,
-					'$atendimentoServico[iServico]','$atendimentoServico[iMedico]','$desconto',
-					'$atendimentoServico[data]','$atendimentoServico[hora]','$atendimentoServico[iLocal]',
-					'$atendimentoServico[valor]','$usuarioId','$iUnidade'),";
+					$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,AtendCliente,AtendAgendamento,
+						AtendModalidade,AtendResponsavel,AtendClassificacao,AtendClassificacaoRisco,AtendObservacao,AtendSituacao,
+						AtendUsuarioAtualizador,AtendUnidade)
+						VALUES('$numRegistro','$atendimento[dataRegistro]',$cliente[id],'$iAgendamento','$atendimento[modalidade]',
+						'$responsavel','$atendimento[classificacao]','$atendimento[classificacaoRisco]','$atendimento[observacao]',
+					$rowSituacao[SituaId],$usuarioId,$iUnidade)";
+					$conn->query($sql);
+			
+					$iAtendimento = $conn->lastInsertId();
+	
+					if($atendimentoServico['status'] != 'rem'){
+						$desconto = $atendimentoServico['desconto']?$atendimentoServico['desconto']:0;
+						$grupo = $atendimentoServico['iGrupo']?$atendimentoServico['iGrupo']:'null';
+						$subGrupo = $atendimentoServico['iSubGrupo']?$atendimentoServico['iSubGrupo']:'null';
+						$valor = $atendimentoServico['valor']?$atendimentoServico['valor']:0;
+						
+						$sql = "INSERT INTO AtendimentoXServico(AtXSeAtendimento,AtXSeGrupo,AtXSeSubGrupo,AtXSeServico,AtXSeProfissional,AtXSeDesconto,
+							AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeUsuarioAtualizador,AtXSeUnidade)
+							VALUES($iAtendimento,$grupo,$subGrupo,
+							$atendimentoServico[iServico],$atendimentoServico[iMedico],$desconto,
+							'$atendimentoServico[data]','$atendimentoServico[hora]',$atendimentoServico[iLocal],
+							$valor,$usuarioId,$iUnidade)";
+						$conn->query($sql);
+					}
 				}
 			}
-			$sql = substr($sql, 0, -1);
-			$conn->query($sql);
 
 			$sql = "UPDATE Cliente SET
 				ClienNome= '$cliente[nome]',
@@ -2921,8 +2806,7 @@ try{
 			'titulo' => 'Incluir Documento',
 			'menssagem' => 'Documento inserido com sucesso!!!'
 		]);
-	}
-    elseif ($tipoRequest == 'DOCUMENTOS'){
+	} elseif ($tipoRequest == 'DOCUMENTOS'){
 		$atendimentoSessao = $_SESSION['atendimento']['atendimentoServicos'];
 
 		$iAtendimento = $_POST['id'];
@@ -2959,7 +2843,7 @@ try{
 		}
 		
 		echo json_encode($array);
-	}  elseif ($tipoRequest == 'EXCLUIRDOCUMENTO'){
+	} elseif ($tipoRequest == 'EXCLUIRDOCUMENTO'){
 		$id = $_POST['id'];
 	
 		$sql = "DELETE FROM AtendimentoDocumento
@@ -2971,7 +2855,7 @@ try{
 			'titulo' => 'Documento',
 			'menssagem' => 'Documento excluído com sucesso!!!',
 		]);
-	}elseif ($tipoRequest == 'SETTIPOBUSCAMEDICAMENTO') {
+	} elseif ($tipoRequest == 'SETTIPOBUSCAMEDICAMENTO') {
 
 		if ( $_POST['tipoBusca'] == 'MEDICAMENTO') {
 			$_SESSION['tipoPesquisa'] = 'MEDICAMENTO' ;
@@ -3098,7 +2982,7 @@ try{
 			'menssagem' => 'Observacão salva com Sucesso!'
 		]);
 		
-	}elseif ($tipoRequest == 'SALVARINTERNACAOENTRADA') {
+	} elseif ($tipoRequest == 'SALVARINTERNACAOENTRADA') {
 	
 		$iAtendimentoId = $_POST['iAtendimentoId'];
 		$profissional = $_POST['profissional'];
