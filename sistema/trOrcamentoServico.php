@@ -311,7 +311,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 											FROM ServicoOrcamento
 											JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
 											JOIN SubCategoria on SbCatId = SrOrcSubCategoria
-											WHERE SrOrcUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'
+											WHERE SrOrcEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'ServicoOrcamento'
 											ORDER BY SbCatNome, SrOrcNome ASC";
 									$result = $conn->query($sql);
 									$rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);

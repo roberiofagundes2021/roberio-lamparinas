@@ -8,13 +8,13 @@ if (isset($_POST['IdServico'])){
 	
 	$sql = "SELECT SrOrcId
 			FROM ServicoOrcamento
-			WHERE SrOrcUnidade = ".$_SESSION['UnidadeId']." and SrOrcServico = ". $_POST['IdServico'];
+			WHERE SrOrcEmpresa = ".$_SESSION['EmpreId']." and SrOrcServico = ". $_POST['IdServico'];
 
 } else if (isset($_POST['IdServicoAntigo'])){
 	
 	$sql = "SELECT SrOrcId
 			FROM ServicoOrcamento
-			WHERE SrOrcUnidade = ".$_SESSION['UnidadeId']." and SrOrcServico = ". $_POST['IdServicoNovo']."
+			WHERE SrOrcEmpresa = ".$_SESSION['EmpreId']." and SrOrcServico = ". $_POST['IdServicoNovo']."
 			and SrOrcServico <> ".$_POST['IdServicoAntigo'];
 }
 $result = $conn->query($sql);
