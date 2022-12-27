@@ -115,6 +115,7 @@ include('global_assets/php/conexao.php');
         // caso queira inserir mais alguma cois basta coloca-lo aqui e programar a ação na tela "filtraUnidadeNovo.php"
         let itensRequest = {
           'PERFIS': 'Perfis',
+          'PERFILPERMISSAOPADRAO': 'Permissões padrões',
           'PERFILPERMISSAO': 'Permissões',
           'GRUPOCONTAS': 'Grupo Contas',
           'LOCALESTOQUE': 'Locais de estoque',
@@ -126,37 +127,6 @@ include('global_assets/php/conexao.php');
         }
         let increment = 100 / Object.keys(itensRequest).length
         let porcentagem = 0
-
-        if(erros.length){
-          // retira duplicatas
-          erros = erros.filter(function(item, pos) {return erros.indexOf(item) == pos;})
-
-          increment = 100 / erros.length
-          porcentagem = 0
-
-          await erros.forEach(async function(key){
-            await $.ajax({
-                  type: "POST",
-                  url: "filtraUnidadeNovo.php",
-                  dataType: 'json',
-                  data: {
-                    'tipoRequest': key,
-                    'unidadeIdNovo': iUnidadeNovo
-                  },
-                  success: function(response){
-                    porcentagem += increment
-                    $('#textProgress').html(`Incluindo ${itensRequest[key]}`)
-                    $('#progressBar').attr('style',`width: ${porcentagem}%;`)
-                  },
-                  error: function(response){
-                    porcentagem += increment
-                    alerta(response.titulo, response.mensagem, response.status)
-                    erros.push('PERFIS')
-                  }
-                })
-          })
-          return
-        }
 
         // subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
         var cep = $("#inputCep").val()
@@ -208,8 +178,6 @@ include('global_assets/php/conexao.php');
             $('#cardLoading').removeClass('d-none')
 
             //  cria UNIDADE
-            $('#textProgress').html('Incluindo Unidade')
-            $('#progressBar').attr('style',`width: ${porcentagem}%;`)
 
             await $.ajax({
               type: "POST",
@@ -238,8 +206,15 @@ include('global_assets/php/conexao.php');
                 $('#textProgress').html('Incluindo Perfis')
                 
                 for(key in itensRequest){
-                  $('#textProgress').html(`Incluindo ${itensRequest[key]}`)
+                  $('#infoCard').append(`
+                  <div class='row col-lg-10 text-center mt-4'>
+                    <span id='textProgress'>Inclindo ${itensRequest[key]}</span>
+                    <div id="imgLoading-${key}" class="ml-2">
+                      <img src='global_assets/images/lamparinas/loader.gif' style='width: 80px; height: 40px;'>
+                    </div>
+                  </div>`)
                   $('#progressBar').attr('style',`width: ${porcentagem}%;`)
+
                   await $.ajax({
                     type: "POST",
                     url: "filtraUnidadeNovo.php",
@@ -249,15 +224,18 @@ include('global_assets/php/conexao.php');
                       'unidadeIdNovo': iUnidadeNovo
                     },
                     success: function(response) {
+                      $(`#imgLoading-${key}`).html('<i class="icon-checkmark3 text-green" style="font-size:30px;"></i>')
                       porcentagem += increment
                     },
                     error: function(response){
+                      $(`#imgLoading-${key}`).html('<i class="icon-x text-danger" style="font-size:30px;"></i>')
                       porcentagem += increment
-                      alerta(response.titulo, response.mensagem, response.status)
+                      // alerta(response.titulo, response.mensagem, response.status)
                       erros.push(key)
                     }
                   })
                 }
+                window.location.href='empresa.php'
 
                 if(erros.length){
                   // colocar uma menssagem falando que houve erro ao cadastrar alguns itens e apresentar
@@ -663,11 +641,11 @@ include('global_assets/php/conexao.php');
           <div class="progress">
             <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
           </div>
-          <div class="row m-0 mb-4 col-lg-12 align-content-center">
-            <div class="col-lg-10 text-center">
-              <span id="textProgress"></span>
+          <div id="infoCard" class="row m-0 mb-4 col-lg-12 align-content-center">
+            <!-- <div class="col-lg-10 text-center">
+              <span></span>
               <img id="gifLoading" src="global_assets/images/lamparinas/loader.gif" style="width: 80px; height: 40px;">
-            </div>
+            </div> -->
           </div>
         </div>
         <!-- /info blocks -->

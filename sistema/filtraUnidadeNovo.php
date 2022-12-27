@@ -59,21 +59,21 @@ try{
     $result = $conn->query($sqlPerfil);
 
     echo json_encode(true);
-  }elseif($typeRequest == "PERFILPERMISSAO"){
+  }elseif($typeRequest == "PERFILPERMISSAOPADRAO"){
     $unidadeIdNovo = $_POST['unidadeIdNovo'];
     // esse select traz todos os perfis da unidade nova
     $sql = "SELECT PerfiId,PerfiNome,PerfiChave,PerfiStatus,PerfiUsuarioAtualizador,PerfiUnidade,PerfiPadrao
-    FROM Perfil
-    WHERE PerfiUnidade = $unidadeIdNovo";
+      FROM Perfil
+      WHERE PerfiUnidade = $unidadeIdNovo";
     $result = $conn->query($sql);
     $rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
 
     // esse select traz todos os perfis padrões LAMPARINAS com as respectivas PerfiChave
     $sql = "SELECT PaPerPerfil,PaPerMenu,MenuSetorPublico,MenuSetorPrivado,PaPerVisualizar,
-    PaPerAtualizar,PaPerExcluir,PaPerInserir,PaPerSuperAdmin,PerfiChave
-    FROM PadraoPermissao
-    JOIN Perfil ON PerfiId = PaPerPerfil
-    JOIN Menu ON MenuId = PaPerMenu";
+      PaPerAtualizar,PaPerExcluir,PaPerInserir,PaPerSuperAdmin,PerfiChave
+      FROM PadraoPermissao
+      JOIN Perfil ON PerfiId = PaPerPerfil
+      JOIN Menu ON MenuId = PaPerMenu";
     $result = $conn->query($sql);
     $rowPerfilPadrao = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -88,31 +88,218 @@ try{
     $cont = 0;
 
     // inserir em PerfilXPermissao -------------------------------------------------------------------
+      // $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
+      // PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin)
+      // VALUES ";
+
+      // inserir em PadraoPerfilXPermissao -------------------------------------------------------------
+      
+      // $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
+      // PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin)
+      // VALUES ";
+
+      // nesse laço para cada perfil ele procura um perfil padrão que contenha a mesma PerfiChave para
+      // utilizar os campos: PaPerVisualizar, PaPerAtualizar, PaPerExcluir, PaPerSuperAdmin
+      
+      // foreach ($rowPerfil as $itemPerfil){
+      //   foreach($rowPerfilPadrao as $rowPerPad){
+      //     if($itemPerfil['PerfiChave'] == $rowPerPad['PerfiChave']){
+      //       // nessa parte é verificado se a empresa é publica ou privada, assim verifica-se se cada menu
+      //       // possui permissão de aparecer para esses tipos (publica/privada), caso publica, por exemplo, é atribuido o valor predefinido
+      //       // no padrão caso o menu possa ser vispo por empresa publica, caso contrario ira setar como 0
+      //       // permitindo que, caso necessario, o administrador altere essa condição apenas na empresa específica
+      //       $empresaPermissao = $empresa=='Publica'?$rowPerPad['MenuSetorPublico']:$rowPerPad['MenuSetorPrivado'];
+      //       $visualizar = $empresaPermissao?$rowPerPad['PaPerVisualizar']:0;
+
+      //       $sqlPerfilXPermissao .= " ('$itemPerfil[PerfiId]', '$rowPerPad[PaPerMenu]', '$unidadeIdNovo', '$rowPerPad[PaPerInserir]',
+      //       '$visualizar', '$rowPerPad[PaPerAtualizar]', '$rowPerPad[PaPerExcluir]', '$rowPerPad[PaPerSuperAdmin]'),";
+      
+      //       $sqlPadraoPerfilXPermissao .=  "('$itemPerfil[PerfiId]', '$rowPerPad[PaPerMenu]', '$unidadeIdNovo', '$rowPerPad[PaPerInserir]',
+      //       '$visualizar', '$rowPerPad[PaPerAtualizar]', '$rowPerPad[PaPerExcluir]', '$rowPerPad[PaPerSuperAdmin]'),";
+
+      //       $cont++;
+
+      //       $new = $sqlPerfilXPermissao;
+      //       if($old == $new){
+      //         array_push($lista, $new);
+      //       }
+      //       $old = $new;
+
+      //       if ($cont > 990){
+      //         // Insere na base para não atingir o limite de 1000 linhas por INSERT
+      //         $sqlPerfilXPermissao = substr($sqlPerfilXPermissao, 0, -1);
+      //         $sqlPadraoPerfilXPermissao = substr($sqlPadraoPerfilXPermissao, 0, -1);
+      //         $result = $conn->query($sqlPerfilXPermissao);
+      //         $result = $conn->query($sqlPadraoPerfilXPermissao);
+
+      //         // recria o inserir em PerfilXPermissao -------------------------------------------------------------------
+      //         $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
+      //         PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES ";
+
+      //         // recria o inserir em PadraoPerfilXPermissao -------------------------------------------------------------
+      //         $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
+      //         PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";
+
+      //         $cont = 0;
+      //       }
+      //     }
+      //   }
+      // }
+      // if($cont > 0){
+      //   $sqlPerfilXPermissao = substr($sqlPerfilXPermissao, 0, -1);
+      //   $sqlPadraoPerfilXPermissao = substr($sqlPadraoPerfilXPermissao, 0, -1);
+      //   $result = $conn->query($sqlPerfilXPermissao);
+      //   $result = $conn->query($sqlPadraoPerfilXPermissao);
+      // }
+    //
+    $sqlPerfilXPermissao = [];
+    $sqlPadraoPerfilXPermissao = [];
+
+    // está gerando uma lista de itens a ser inserido e depois verifica se existe itens duplicados
+    // para não cadastrar duplicatos no banco
+
+    foreach ($rowPerfil as $itemPerfil){
+      foreach($rowPerfilPadrao as $rowPerPad){
+        if($itemPerfil['PerfiChave'] == $rowPerPad['PerfiChave']){
+          // nessa parte é verificado se a empresa é publica ou privada, assim verifica-se se cada menu
+          // possui permissão de aparecer para esses tipos (publica/privada), caso publica, por exemplo, é atribuido o valor predefinido
+          // no padrão caso o menu possa ser vispo por empresa publica, caso contrario ira setar como 0
+          // permitindo que, caso necessario, o administrador altere essa condição apenas na empresa específica
+          $empresaPermissao = $empresa=='Publica'?$rowPerPad['MenuSetorPublico']:$rowPerPad['MenuSetorPrivado'];
+          $visualizar = $empresaPermissao?$rowPerPad['PaPerVisualizar']:0;
     
-    $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
-    PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin)
-    VALUES ";
+          array_push($sqlPadraoPerfilXPermissao,"('$itemPerfil[PerfiId]', '$rowPerPad[PaPerMenu]', '$unidadeIdNovo', '$rowPerPad[PaPerInserir]',
+          '$visualizar', '$rowPerPad[PaPerAtualizar]', '$rowPerPad[PaPerExcluir]', '$rowPerPad[PaPerSuperAdmin]'),");
+        }
+      }
+    }
 
-    // $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
-    // PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin)
-    // VALUES(:PrXPePerfil,:PrXPeMenu,:PrXPeUnidade,:PrXPeInserir,:PrXPeVisualizar,
-    // :PrXPeAtualizar,:PrXPeExcluir,:PrXPeSuperAdmin)";
-    // $executePerfilPermissao = $conn->prepare($sqlPerfilXPermissao);
+    $sqlPadraoPerfilXPermissao = array_unique($sqlPadraoPerfilXPermissao);
 
-    // inserir em PadraoPerfilXPermissao -------------------------------------------------------------
-    
-    $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
-    PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin)
-    VALUES ";
+    $sqlPerfilPadrao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";
 
-    // $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
-    // PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin)
-    // VALUES(:PaPrXPePerfil,:PaPrXPeMenu,:PaPrXPeUnidade,:PaPrXPeInserir,
-    // :PaPrXPeVisualizar,:PaPrXPeAtualizar,:PaPrXPeExcluir,:PaPrXPeSuperAdmin)";
-    // $executePadraoPerfilPermissao = $conn->prepare($sqlPadraoPerfilXPermissao);
+    $cont = 0;
+    foreach($sqlPadraoPerfilXPermissao as $item){
+      $sqlPerfilPadrao .= $item;
+      $cont++;
 
-    // nesse laço para cada perfil ele procura um perfil padrão que contenha a mesma PerfiChave para
-    // utilizar os campos: PaPerVisualizar, PaPerAtualizar, PaPerExcluir, PaPerSuperAdmin
+      if ($cont > 990){
+        // Insere na base para não atingir o limite de 1000 linhas por INSERT
+        $sqlPerfilPadrao = substr($sqlPerfilPadrao, 0, -1);
+        $result = $conn->query($sqlPerfilPadrao);
+
+        // recria o inserir em PerfilXPermissao -------------------------------------------------------------------
+        $sqlPerfilPadrao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";
+
+        $cont = 0;
+      }
+    }
+
+    if($cont > 0){
+      $sqlPerfilPadrao = substr($sqlPerfilPadrao, 0, -1);
+      $result = $conn->query($sqlPerfilPadrao);
+    }
+
+    echo json_encode(true);
+  }elseif($typeRequest == "PERFILPERMISSAO"){
+    $unidadeIdNovo = $_POST['unidadeIdNovo'];
+    // esse select traz todos os perfis da unidade nova
+    $sql = "SELECT PerfiId,PerfiNome,PerfiChave,PerfiStatus,PerfiUsuarioAtualizador,PerfiUnidade,PerfiPadrao
+      FROM Perfil
+      WHERE PerfiUnidade = $unidadeIdNovo";
+    $result = $conn->query($sql);
+    $rowPerfil = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    // esse select traz todos os perfis padrões LAMPARINAS com as respectivas PerfiChave
+    $sql = "SELECT PaPerPerfil,PaPerMenu,MenuSetorPublico,MenuSetorPrivado,PaPerVisualizar,
+      PaPerAtualizar,PaPerExcluir,PaPerInserir,PaPerSuperAdmin,PerfiChave
+      FROM PadraoPermissao
+      JOIN Perfil ON PerfiId = PaPerPerfil
+      JOIN Menu ON MenuId = PaPerMenu";
+    $result = $conn->query($sql);
+    $rowPerfilPadrao = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    //Recupera o parâmetro pra saber se a empresa é pública ou privada
+    $sqlParametro = "SELECT ParamEmpresaPublica 
+      FROM Parametro
+      WHERE ParamEmpresa = ".$_SESSION['EmpreId'];
+    $resultParametro = $conn->query($sqlParametro);
+    $parametro = $resultParametro->fetch(PDO::FETCH_ASSOC);
+
+    $empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
+    $cont = 0;
+
+    // inserir em PerfilXPermissao -------------------------------------------------------------------
+      // $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
+      // PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin)
+      // VALUES ";
+
+      // inserir em PadraoPerfilXPermissao -------------------------------------------------------------
+      
+      // $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
+      // PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin)
+      // VALUES ";
+
+      // nesse laço para cada perfil ele procura um perfil padrão que contenha a mesma PerfiChave para
+      // utilizar os campos: PaPerVisualizar, PaPerAtualizar, PaPerExcluir, PaPerSuperAdmin
+      
+      // foreach ($rowPerfil as $itemPerfil){
+      //   foreach($rowPerfilPadrao as $rowPerPad){
+      //     if($itemPerfil['PerfiChave'] == $rowPerPad['PerfiChave']){
+      //       // nessa parte é verificado se a empresa é publica ou privada, assim verifica-se se cada menu
+      //       // possui permissão de aparecer para esses tipos (publica/privada), caso publica, por exemplo, é atribuido o valor predefinido
+      //       // no padrão caso o menu possa ser vispo por empresa publica, caso contrario ira setar como 0
+      //       // permitindo que, caso necessario, o administrador altere essa condição apenas na empresa específica
+      //       $empresaPermissao = $empresa=='Publica'?$rowPerPad['MenuSetorPublico']:$rowPerPad['MenuSetorPrivado'];
+      //       $visualizar = $empresaPermissao?$rowPerPad['PaPerVisualizar']:0;
+
+      //       $sqlPerfilXPermissao .= " ('$itemPerfil[PerfiId]', '$rowPerPad[PaPerMenu]', '$unidadeIdNovo', '$rowPerPad[PaPerInserir]',
+      //       '$visualizar', '$rowPerPad[PaPerAtualizar]', '$rowPerPad[PaPerExcluir]', '$rowPerPad[PaPerSuperAdmin]'),";
+      
+      //       $sqlPadraoPerfilXPermissao .=  "('$itemPerfil[PerfiId]', '$rowPerPad[PaPerMenu]', '$unidadeIdNovo', '$rowPerPad[PaPerInserir]',
+      //       '$visualizar', '$rowPerPad[PaPerAtualizar]', '$rowPerPad[PaPerExcluir]', '$rowPerPad[PaPerSuperAdmin]'),";
+
+      //       $cont++;
+
+      //       $new = $sqlPerfilXPermissao;
+      //       if($old == $new){
+      //         array_push($lista, $new);
+      //       }
+      //       $old = $new;
+
+      //       if ($cont > 990){
+      //         // Insere na base para não atingir o limite de 1000 linhas por INSERT
+      //         $sqlPerfilXPermissao = substr($sqlPerfilXPermissao, 0, -1);
+      //         $sqlPadraoPerfilXPermissao = substr($sqlPadraoPerfilXPermissao, 0, -1);
+      //         $result = $conn->query($sqlPerfilXPermissao);
+      //         $result = $conn->query($sqlPadraoPerfilXPermissao);
+
+      //         // recria o inserir em PerfilXPermissao -------------------------------------------------------------------
+      //         $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
+      //         PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES ";
+
+      //         // recria o inserir em PadraoPerfilXPermissao -------------------------------------------------------------
+      //         $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
+      //         PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";
+
+      //         $cont = 0;
+      //       }
+      //     }
+      //   }
+      // }
+      // if($cont > 0){
+      //   $sqlPerfilXPermissao = substr($sqlPerfilXPermissao, 0, -1);
+      //   $sqlPadraoPerfilXPermissao = substr($sqlPadraoPerfilXPermissao, 0, -1);
+      //   $result = $conn->query($sqlPerfilXPermissao);
+      //   $result = $conn->query($sqlPadraoPerfilXPermissao);
+      // }
+    //
+    $sqlPerfilXPermissao = [];
+    $sqlPadraoPerfilXPermissao = [];
+
+    // está gerando uma lista de itens a ser inserido e depois verifica se existe itens duplicados
+    // para não cadastrar duplicatos no banco
+
     foreach ($rowPerfil as $itemPerfil){
       foreach($rowPerfilPadrao as $rowPerPad){
         if($itemPerfil['PerfiChave'] == $rowPerPad['PerfiChave']){
@@ -123,61 +310,37 @@ try{
           $empresaPermissao = $empresa=='Publica'?$rowPerPad['MenuSetorPublico']:$rowPerPad['MenuSetorPrivado'];
           $visualizar = $empresaPermissao?$rowPerPad['PaPerVisualizar']:0;
 
-          $sqlPerfilXPermissao .= " ('$itemPerfil[PerfiId]', '$rowPerPad[PaPerMenu]', '$unidadeIdNovo', '$rowPerPad[PaPerInserir]',
-          '$visualizar', '$rowPerPad[PaPerAtualizar]', '$rowPerPad[PaPerExcluir]', '$rowPerPad[PaPerSuperAdmin]'),";
           
-          // $executePerfilPermissao->execute(array(
-          //   ':PrXPePerfil' => $itemPerfil['PerfiId'],
-          //   ':PrXPeMenu' => $rowPerPad['PaPerMenu'],
-          //   ':PrXPeUnidade' => $unidadeIdNovo,
-          //   ':PrXPeInserir' => $rowPerPad['PaPerInserir'],
-          //   ':PrXPeVisualizar' => $visualizar,
-          //   ':PrXPeAtualizar' => $rowPerPad['PaPerAtualizar'],
-          //   ':PrXPeExcluir' => $rowPerPad['PaPerExcluir'],
-          //   ':PrXPeSuperAdmin' => $rowPerPad['PaPerSuperAdmin']
-          // ));
-    
-          $sqlPadraoPerfilXPermissao .=  "('$itemPerfil[PerfiId]', '$rowPerPad[PaPerMenu]', '$unidadeIdNovo', '$rowPerPad[PaPerInserir]',
-          '$visualizar', '$rowPerPad[PaPerAtualizar]', '$rowPerPad[PaPerExcluir]', '$rowPerPad[PaPerSuperAdmin]'),";
-
-          // $executePadraoPerfilPermissao->execute(array(
-          //   ':PaPrXPePerfil' => $itemPerfil['PerfiId'],
-          //   ':PaPrXPeMenu' => $rowPerPad['PaPerMenu'],
-          //   ':PaPrXPeUnidade' => $unidadeIdNovo,
-          //   ':PaPrXPeInserir' => $rowPerPad['PaPerInserir'],
-          //   ':PaPrXPeVisualizar' => $visualizar,
-          //   ':PaPrXPeAtualizar' => $rowPerPad['PaPerAtualizar'],
-          //   ':PaPrXPeExcluir' => $rowPerPad['PaPerExcluir'],
-          //   ':PaPrXPeSuperAdmin' => $rowPerPad['PaPerSuperAdmin']
-          // ));
-
-          $cont++;
-
-          if ($cont > 990){
-            // Insere na base para não atingir o limite de 1000 linhas por INSERT
-            $sqlPerfilXPermissao = substr($sqlPerfilXPermissao, 0, -1);
-            $sqlPadraoPerfilXPermissao = substr($sqlPadraoPerfilXPermissao, 0, -1);
-            $result = $conn->query($sqlPerfilXPermissao);
-            $result = $conn->query($sqlPadraoPerfilXPermissao);
-
-            // recria o inserir em PerfilXPermissao -------------------------------------------------------------------
-            $sqlPerfilXPermissao = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,
-            PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES ";
-
-            // recria o inserir em PadraoPerfilXPermissao -------------------------------------------------------------
-            $sqlPadraoPerfilXPermissao = "INSERT INTO PadraoPerfilXPermissao (PaPrXPePerfil, PaPrXPeMenu,PaPrXPeUnidade,PaPrXPeInserir,
-            PaPrXPeVisualizar,PaPrXPeAtualizar,PaPrXPeExcluir,PaPrXPeSuperAdmin) VALUES ";
-
-            $cont = 0;
-          }
+          array_push($sqlPerfilXPermissao,"('$itemPerfil[PerfiId]', '$rowPerPad[PaPerMenu]', '$unidadeIdNovo', '$rowPerPad[PaPerInserir]',
+          '$visualizar', '$rowPerPad[PaPerAtualizar]', '$rowPerPad[PaPerExcluir]', '$rowPerPad[PaPerSuperAdmin]'),");
         }
       }
     }
+
+    $sqlPerfilXPermissao = array_unique($sqlPerfilXPermissao);
+
+    $sqlPerfil = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES ";
+    
+    $cont = 0;
+    foreach($sqlPerfilXPermissao as $item){
+      $sqlPerfil .= $item;
+      $cont++;
+
+      if ($cont > 990){
+        // Insere na base para não atingir o limite de 1000 linhas por INSERT
+        $sqlPerfil = substr($sqlPerfil, 0, -1);
+        $result = $conn->query($sqlPerfil);
+
+        // recria o inserir em PerfilXPermissao -------------------------------------------------------------------
+        $sqlPerfil = "INSERT INTO PerfilXPermissao (PrXPePerfil,PrXPeMenu,PrXPeUnidade,PrXPeInserir,PrXPeVisualizar,PrXPeAtualizar,PrXPeExcluir,PrXPeSuperAdmin) VALUES ";
+
+        $cont = 0;
+      }
+    }
+    
     if($cont > 0){
-      $sqlPerfilXPermissao = substr($sqlPerfilXPermissao, 0, -1);
-      $sqlPadraoPerfilXPermissao = substr($sqlPadraoPerfilXPermissao, 0, -1);
-      $result = $conn->query($sqlPerfilXPermissao);
-      $result = $conn->query($sqlPadraoPerfilXPermissao);
+      $sqlPerfil = substr($sqlPerfil, 0, -1);
+      $result = $conn->query($sqlPerfil);
     }
     echo json_encode(true);
   }elseif($typeRequest == "GRUPOCONTAS"){
@@ -195,7 +358,7 @@ try{
     $rowGrupoConta = $result->fetchAll(PDO::FETCH_ASSOC);
 
     if(COUNT($rowGrupoConta)){
-      $sql = "INSERT INTO GrupoConta(GrConCodigo,GrConNome,GrConStatus,
+      $sql = "INSERT INTO GrupoContas(GrConCodigo,GrConNome,GrConStatus,
       GrConUsuarioAtualizador,GrConUnidade) VALUES ";
       $count = 0;
 
