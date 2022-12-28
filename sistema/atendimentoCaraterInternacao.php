@@ -1,29 +1,28 @@
-<?php
+<?php 
 
-include_once("sessao.php");
+include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Especialidade do Leito';
+$_SESSION['PaginaAtual'] = 'Caráter da Internação';
 
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT EsLeiId, EsLeiNome, EsLeiTipoInternacao, EsLeiStatus, ti.TpIntNome, s.SituaNome, s.SituaCor, s.SituaChave
-		FROM EspecialidadeLeito esl
-		JOIN Situacao s on s.SituaId = esl.EsLeiStatus
-        LEFT JOIN TipoInternacao ti on ti.TpIntId = esl.EsLeiTipoInternacao
-	    WHERE EsLeiUnidade = " . $_SESSION['UnidadeId'] . "
-		ORDER BY EsLeiId ASC";
+$sql = "SELECT CrIntId, CrIntNome, CrIntStatus, s.SituaNome, s.SituaCor, s.SituaChave
+		FROM CaraterInternacao cai
+		JOIN Situacao s on s.SituaId = cai.CrIntStatus
+	    WHERE CrIntUnidade = " . $_SESSION['UnidadeId'] . "
+		ORDER BY CrIntId ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 //Se estiver editando
 if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'EDITA') {
     //Essa consulta é para preencher os campos a se editar
-    $sql = "SELECT EsLeiId, EsLeiNome, EsLeiTipoInternacao
-			FROM EspecialidadeLeito
-			WHERE EsLeiId = " . $_POST['inputEspecialidadeLeitoId'] . ";";
+    $sql = "SELECT CrIntId, CrIntNome
+			FROM CaraterInternacao
+			WHERE CrIntId = " . $_POST['inputCaraterInternacaoId'] . ";";
     $result = $conn->query($sql);
-    $rowEspecialidadeLeito = $result->fetch(PDO::FETCH_ASSOC);
+    $rowCaraterInternacao = $result->fetch(PDO::FETCH_ASSOC);
     $_SESSION['msg'] = array();
 }
 
@@ -32,30 +31,28 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
     try {
         //Edição
         if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA') {
-            $sql = "UPDATE EspecialidadeLeito SET EsLeiNome = :sEsLeiNome, EsLeiTipoInternacao = :iEsLeiTipoInternacao, EsLeiUsuarioAtualizador = :iEsLeiUsuarioAtualizador
-					WHERE EsLeiId = :iEsLeiId";
+            $sql = "UPDATE CaraterInternacao SET CrIntNome = :sCrIntNome, CrIntUsuarioAtualizador = :iCrIntUsuarioAtualizador
+					WHERE CrIntId = :iCrIntId";
             $result = $conn->prepare($sql);
             $result->execute(array(
-                ':sEsLeiNome' => $_POST['inputEspecialidadeLeitoNome'],
-                ':iEsLeiTipoInternacao' => $_POST['cmbEspecialidadeTipoInternacao'],
-                ':iEsLeiUsuarioAtualizador' => $_SESSION['UsuarId'],
-                ':iEsLeiId' => $_POST['inputEspecialidadeLeitoId']
+                ':sCrIntNome' => $_POST['inputCaraterInternacaoNome'],
+                ':iCrIntUsuarioAtualizador' => $_SESSION['UsuarId'],
+                ':iCrIntId' => $_POST['inputCaraterInternacaoId']
             ));
 
-            $_SESSION['msg']['mensagem'] = "Especialidade do Leito alterada!!!";
+            $_SESSION['msg']['mensagem'] = "Carater de Internação alterado!!!";
         } else { //inclusão
-            $sql = "INSERT INTO EspecialidadeLeito (EsLeiNome, EsLeiTipoInternacao, EsLeiStatus, EsLeiUsuarioAtualizador, EsLeiUnidade)
-					VALUES (:sEsLeiNome, :iEsLeiTipoInternacao, :bEsLeiStatus, :iEsLeiUsuarioAtualizador, :iEsLeiUnidade)";
+            $sql = "INSERT INTO CaraterInternacao (CrIntNome, CrIntStatus, CrIntUsuarioAtualizador, CrIntUnidade)
+					VALUES (:sCrIntNome, :bCrIntStatus, :iCrIntUsuarioAtualizador, :iCrIntUnidade)";
             $result = $conn->prepare($sql);
             $result->execute(array(
-                ':sEsLeiNome' => $_POST['inputEspecialidadeLeitoNome'],
-                ':iEsLeiTipoInternacao' => $_POST['cmbEspecialidadeTipoInternacao'],
-                ':bEsLeiStatus' => 1,
-                ':iEsLeiUsuarioAtualizador' => $_SESSION['UsuarId'],
-                ':iEsLeiUnidade' => $_SESSION['UnidadeId'],
+                ':sCrIntNome' => $_POST['inputCaraterInternacaoNome'],
+                ':bCrIntStatus' => 1,
+                ':iCrIntUsuarioAtualizador' => $_SESSION['UsuarId'],
+                ':iCrIntUnidade' => $_SESSION['UnidadeId'],
             ));
 
-            $_SESSION['msg']['mensagem'] = "Especialidade do Leito incluída!!!";
+            $_SESSION['msg']['mensagem'] = "Caráter de Internação incluído!!!";
         }
 
         $_SESSION['msg']['titulo'] = "Sucesso";
@@ -63,13 +60,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
     } catch (PDOException $e) {
         //} catch (PDOException $e) {
         $_SESSION['msg']['titulo'] = "Erro";
-        $_SESSION['msg']['mensagem'] = "Erro reportado com a Especialidade do Leito!!";
+        $_SESSION['msg']['mensagem'] = "Erro reportado com o Caráter de Internação!!";
         $_SESSION['msg']['tipo'] = "error";
 
         echo 'Error: ' . $e->getMessage();
     }
 
-    irpara("atendimentoEspecialidadeLeito.php");
+    irpara("atendimentoCaraterInternacao.php");
 }
 
 ?>
@@ -81,7 +78,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Lamparinas | Especialidade do Leito</title>
+    <title>Lamparinas | Caráter de Internação</title>
 
     <?php include_once("head.php"); ?>
 
@@ -104,31 +101,26 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#tblEspecialidadeLeito').DataTable({
+            $('#tblCaraterInternacao').DataTable({
                 "order": [
                     [0, "asc"]
                 ],
                 autoWidth: false,
                 responsive: true,
                 columnDefs: [{
-                        orderable: true, //Especialidade do Leito
-                        width: "50%",
+                        orderable: true, //Carater de Internação
+                        width: "80%",
                         targets: [0]
                     },
                     {
-                        orderable: true, //Tipo de internação
-                        width: "40%",
+                        orderable: true, //Situação
+                        width: "10%",
                         targets: [1]
                     },
                     {
-                        orderable: true, //Situação
-                        width: "5%",
-                        targets: [2]
-                    },
-                    {
                         orderable: false, //Ações
-                        width: "5%",
-                        targets: [3]
+                        width: "10%",
+                        targets: [2]
                     }
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -168,29 +160,23 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
             $('#enviar').on('click', function(e) {
                 e.preventDefault();
                 dadosValidos = true;
-                var inputNome = $('#inputEspecialidadeLeitoNome').val().trim();
-                var tipoInternacao = $('#cmbEspecialidadeTipoInternacao').val();
+                var inputNome = $('#inputCaraterInternacaoNome').val().trim();
                 var inputEstadoAtual = $('#inputEstadoAtual').val();
 
                 //Se o usuário preencheu com espaços em branco ou não preencheu nada
                 if (inputNome == '') {
-                    alerta('Atenção', 'Especialidade do Leito é obrigatório!', 'error');
-                    $('#inputEspecialidadeLeitoId').focus();
+                    alerta('Atenção', 'Caráter de Internação é obrigatório!', 'error');
+                    $('#inputCaraterInternacaoId').focus();
                     dadosValidos = false;
                     return;
                 }
-                if (tipoInternacao == '') {
-                    alerta('Atenção', 'Selecione um tipo de internação!', 'error');
-                    $('#cmbEspecialidadeTipoInternacao').focus();
-                    dadosValidos = false;
-                    return;
-                }
+                
                 if (dadosValidos) {
                     //Esse ajax está sendo usado para verificar no banco se o registro já existe
                     $.ajax({
                         type: "POST",
-                        url: "atendimentoEspecialidadeLeitoValida.php",
-                        data: ('nome=' + inputNome + '&tipoInternacao=' + tipoInternacao + '&estadoAtual=' + inputEstadoAtual),
+                        url: "atendimentoCaraterInternacaoValida.php",
+                        data: ('nome=' + inputNome + '&estadoAtual=' + inputEstadoAtual),
                         success: function(resposta) {
 
                             if (resposta == 1) {
@@ -203,12 +189,10 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                 document.getElementById('inputEstadoAtual').value = 'GRAVA_NOVO';
                             }
 
-                            $("#formEspecialidadeLeito").submit();
+                            $("#formCaraterInternacao").submit();
                         },
                         error: function(XMLHttpRequest, textStatus, errorThrown) {
-                            alerta('Atenção', 'Erro ao salvar a Especialidade do Leito!', 'error');
-                            //console.log("Status: " + textStatus);
-                            //console.log("Error: " + errorThrown);
+                            alerta('Atenção', 'Erro ao salvar o Carater de Internação!', 'error');
                         }
                     })
                 }
@@ -216,22 +200,22 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
         });
 
         //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-        function atualizaEspecialidadeLeito(Permission, EsLeiId, EsLeiStatus, Tipo) {
+        function atualizaCaraterInternacao(Permission, CrIntId, CrIntStatus, Tipo) {
 
             if (Permission == 1) {
-                document.getElementById('inputEspecialidadeLeitoId').value = EsLeiId;
-                document.getElementById('inputEspecialidadeLeitoStatus').value = EsLeiStatus;
+                document.getElementById('inputCaraterInternacaoId').value = CrIntId;
+                document.getElementById('inputCaraterInternacaoStatus').value = CrIntStatus;
 
                 if (Tipo == 'edita') {
                     document.getElementById('inputEstadoAtual').value = "EDITA";
-                    document.formEspecialidadeLeito.action = "atendimentoEspecialidadeLeito.php";
+                    document.formCaraterInternacao.action = "atendimentoCaraterInternacao.php";
                 } else if (Tipo == 'exclui') {
-                    confirmaExclusao(document.formEspecialidadeLeito, "Tem certeza que deseja excluir essa Especialidade do Leito?", "atendimentoEspecialidadeLeitoExclui.php");
+                    confirmaExclusao(document.formCaraterInternacao, "Tem certeza que deseja excluir esse Caráter de Internação?", "atendimentoCaraterInterncaoExclui.php");
                 } else if (Tipo == 'mudaStatus') {
-                    document.formEspecialidadeLeito.action = "atendimentoEspecialidadeLeitoMudaSituacao.php";
+                    document.formCaraterInternacao.action = "atendimentoCaraterInternacaoMudaSituacao.php";
                 }
 
-                document.formEspecialidadeLeito.submit();
+                document.formCaraterInternacao.submit();
             } else {
                 alerta('Permissão Negada!', '');
             }
@@ -263,41 +247,22 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                         <!-- Basic responsive configuration -->
                         <div class="card">
                             <div class="card-header header-elements-inline">
-                                <h3 class="card-title">Relação de Especialidades do Leito</h3>
+                                <h3 class="card-title">Caráter de Internação</h3>
                             </div>
 
                             <div class="card-body">
-                                <form name="formEspecialidadeLeito" id="formEspecialidadeLeito" method="post" class="form-validate-jquery">
+                                <form name="formCaraterInternacao" id="formCaraterInternacao" method="post" class="form-validate-jquery">
 
-                                    <input type="hidden" id="inputEspecialidadeLeitoId" name="inputEspecialidadeLeitoId" value="<?php if (isset($_POST['inputEspecialidadeLeitoId'])) echo $_POST['inputEspecialidadeLeitoId']; ?>">
+                                    <input type="hidden" id="inputCaraterInternacaoId" name="inputCaraterInternacaoId" value="<?php if (isset($_POST['inputCaraterInternacaoId'])) echo $_POST['inputCaraterInternacaoId']; ?>">
                                     <input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>">
-                                    <input type="hidden" id="inputEspecialidadeLeitoStatus" name="inputEspecialidadeLeitoStatus">
+                                    <input type="hidden" id="inputCaraterInternacaoStatus" name="inputCaraterInternacaoStatus">
 
                                     <div class="row">
                                         <div class="col-lg-5">
                                             <div class="form-group">
-                                                <label for="inputEspecialidadeLeitoNome">Especialidade do Leito<span class="text-danger"> *</span></label>
-                                                <input type="text" id="inputEspecialidadeLeitoNome" name="inputEspecialidadeLeitoNome" class="form-control" placeholder="Especialidade do Leito" value="<?php if (isset($_POST['inputEspecialidadeLeitoId'])) echo $rowEspecialidadeLeito['EsLeiNome']; ?>" required autofocus>
+                                                <label for="inputCaraterInternacaoNome">Caráter de Internação<span class="text-danger"> *</span></label>
+                                                <input type="text" id="inputCaraterInternacaoNome" name="inputCaraterInternacaoNome" class="form-control" placeholder="Caráter de Internação" value="<?php if (isset($_POST['inputCaraterInternacaoId'])) echo $rowCaraterInternacao['CrIntNome']; ?>" required autofocus>
                                             </div>
-                                        </div>
-                                        <div class="col-lg-4">
-                                            <label for="cmbEspecialidadeTipoInternacao">Tipo da internação<span class="text-danger"> *</span></label>
-                                            <select id="cmbEspecialidadeTipoInternacao" name="cmbEspecialidadeTipoInternacao" class="form-control select-search" required>
-                                                <option value="">Selecione</option>
-                                                <?php
-                                                $sql = "SELECT TpIntId, TpIntNome
-                                                FROM TipoInternacao
-                                                JOIN Situacao ON SituaId = TpIntStatus
-                                                WHERE TpIntUnidade = " . $_SESSION['UnidadeId'] . " AND SituaChave = 'ATIVO'
-                                                ORDER BY TpIntNome ASC";
-                                                $result = $conn->query($sql);
-                                                $rowTipoInternacao = $result->fetchAll(PDO::FETCH_ASSOC);
-                                                foreach ($rowTipoInternacao as $item) {
-                                                    $seleciona = $item['TpIntId'] == $rowEspecialidadeLeito['EsLeiTipoInternacao'] ? "selected" : "";
-                                                    print('<option value="' . $item['TpIntId'] . '" ' . $seleciona . '>' . $item['TpIntNome'] . '</option>');
-                                                }
-                                                ?>
-                                            </select>
                                         </div>
 
                                         <div class="col-lg-3">
@@ -305,9 +270,9 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                                 <?php
 
                                                 //editando
-                                                if (isset($_POST['TpAcoId'])) {
+                                                if (isset($_POST['CrIntId'])) {
                                                     print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
-                                                    print('<a href="atendimentoEspecialidadeLeito.php" class="btn btn-basic" role="button">Cancelar</a>');
+                                                    print('<a href="atendimentoCaraterInternacao.php" class="btn btn-basic" role="button">Cancelar</a>');
                                                 } else { //inserindo
                                                     print('<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>');
                                                 }
@@ -320,11 +285,10 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                             </div>
 
 
-                            <table id="tblEspecialidadeLeito" class="table">
+                            <table id="tblCaraterInternacao" class="table">
                                 <thead>
                                     <tr class="bg-slate">
-                                        <th data-filter>Especialidade do Leito</th>
-                                        <th data-filter>Tipo de internação</th>
+                                        <th data-filter>Carater de Internação</th>
                                         <th>Situação</th>
                                         <th class="text-center">Ações</th>
                                     </tr>
@@ -339,13 +303,12 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
                                         print('
 										<tr>
-											<td>' . $item['EsLeiNome'] . '</td>
-											<td>' . $item['TpIntNome'] . '</td>
+											<td>' . $item['CrIntNome'] . '</td>
 											');
 
-                                        print('<td><a href="#" onclick="atualizaEspecialidadeLeito(
+                                        print('<td><a href="#" onclick="atualizaCaraterInternacao(
                                             1,
-                                            ' . $item['EsLeiId'] . ',
+                                            ' . $item['CrIntId'] . ',
                                             ' . $situacaoChave . ',
                                             \'mudaStatus\'
                                         );"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
@@ -355,15 +318,15 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                         print('
 										<div class="list-icons">
 											<div class="list-icons list-icons-extended">
-												<a href="#" onclick="atualizaEspecialidadeLeito(
+												<a href="#" onclick="atualizaCaraterInternacao(
                                                     1,
-                                                    ' . $item['EsLeiId'] . ',
-                                                    ' . $item['EsLeiStatus'] . ',
+                                                    ' . $item['CrIntId'] . ',
+                                                    ' . $item['CrIntStatus'] . ',
                                                     \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar" ></i></a>
-												<a href="#" onclick="atualizaEspecialidadeLeito(
+												<a href="#" onclick="atualizaCaraterInternacao(
                                                     1,
-                                                    ' . $item['EsLeiId'] . ',
-                                                    ' . $item['EsLeiStatus'] . ',
+                                                    ' . $item['CrIntId'] . ',
+                                                    ' . $item['CrIntStatus'] . ',
                                                     \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 											</div>
 										</div>								

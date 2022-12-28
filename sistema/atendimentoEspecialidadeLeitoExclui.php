@@ -6,10 +6,9 @@ include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputEspecialidadeLeitoId'])){
 	
-	$iQuartoId = $_POST['inputEspecialidadeLeitoId'];
+	$iEspecialidadeLeitoId = $_POST['inputEspecialidadeLeitoId'];
         	
 	try{
-		
 		$sql = "DELETE FROM EspecialidadeLeito
 				WHERE EsLeiId = :id";
 		$result = $conn->prepare($sql);
