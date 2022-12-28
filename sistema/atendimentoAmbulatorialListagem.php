@@ -42,6 +42,11 @@ $acesso = 'ATENDIMENTO';
 		.dropdown-toggle::after{
 			content:'';
 		}
+
+		.cardLeitos i {
+			font-size: 60px;
+			margin: 20px;
+		}
 	</style>
 	
 	<!-- Theme JS files -->
@@ -683,38 +688,45 @@ $acesso = 'ATENDIMENTO';
 				$(this).addClass('active');     
 			});
 		});
+		$(function() {
+			$('.btn-grid2').click(function(){
+				$('.btn-grid2').removeClass('active');
+				$(this).addClass('active');     
+			});
+		});
 
 		function mudarGrid(grid){
 
 			if (grid == 'espera') {
-				document.getElementById("card-title").innerText = "Pacientes em Espera";
 				document.getElementById("box-pacientes-espera").style.display = 'block';
 				document.getElementById("box-pacientes-atendidos").style.display = 'none';
 				document.getElementById("box-pacientes-observacao").style.display = 'none';
 				document.getElementById("box-pacientes-atendimento").style.display = 'none';
 
 			} else if (grid == 'atendidos') {
-				document.getElementById("card-title").innerText = "Pacientes Atendidos";
 				document.getElementById("box-pacientes-atendidos").style.display = 'block';
 				document.getElementById("box-pacientes-espera").style.display = 'none';
 				document.getElementById("box-pacientes-observacao").style.display = 'none';
 				document.getElementById("box-pacientes-atendimento").style.display = 'none';
 
 			} else if (grid == 'observacao') {
-				document.getElementById("card-title").innerText = "Pacientes em Observação";
 				document.getElementById("box-pacientes-observacao").style.display = 'block';
 				document.getElementById("box-pacientes-espera").style.display = 'none';
 				document.getElementById("box-pacientes-atendidos").style.display = 'none';
 				document.getElementById("box-pacientes-atendimento").style.display = 'none';
 
 			}  else if (grid == 'atendimento') {
-				document.getElementById("card-title").innerText = "Pacientes em Atendimento";
 				document.getElementById("box-pacientes-atendimento").style.display = 'block';
 				document.getElementById("box-pacientes-espera").style.display = 'none';
 				document.getElementById("box-pacientes-atendidos").style.display = 'none';				
 				document.getElementById("box-pacientes-observacao").style.display = 'none';
 
 			}
+		}
+
+		function mudarGridEspecialidade(especialidade){
+			$('.box-especialidade').css('display','none');
+			document.getElementById(especialidade).style.display = 'block';
 		}
 
 	</script>
@@ -767,16 +779,20 @@ $acesso = 'ATENDIMENTO';
 								</div>
 							</div>
 
-							<div class="card-body pb-1">
-								<div class="row">
-									<div class="col-md-9">
-										<h3 class="card-title" id="card-title">Pacientes em Espera</h3>
-									</div>
-								</div>	
-							</div>
+							
 
 							<!-- Pacientes Espera -->
 							<div id="box-pacientes-espera" style="display: block;">
+
+								<div class="card-body" style="padding: 0px"></div>
+								
+								<div class="card-body pb-1">
+									<div class="row">
+										<div class="col-md-9">
+											<h3 class="card-title" id="card-title">Pacientes em Espera</h3>
+										</div>
+									</div>	
+								</div>
 								<table class="table" id="AtendimentoTableEspera">
 									<thead>
 										<tr class="bg-slate text-left">
@@ -798,7 +814,16 @@ $acesso = 'ATENDIMENTO';
 							
 							<!-- Pacientes Em Atendimento -->
 							<div id="box-pacientes-atendimento" style="display: none;">
+
 								<div class="card-body" style="padding: 0px"></div>
+								<div class="card-body pb-1">
+									<div class="row">
+										<div class="col-md-9">
+											<h3 class="card-title" id="card-title">Pacientes em Atendimento</h3>
+										</div>
+									</div>	
+								</div>
+
 								<table class="table" id="AtendimentoTableEmAtendimento">
 									<thead>
 										<tr class="bg-slate text-left">
@@ -821,24 +846,110 @@ $acesso = 'ATENDIMENTO';
 
 							<!-- Pacientes Em Observacao -->
 							<div id="box-pacientes-observacao" style="display: none;">
-								<div class="card-body" style="padding: 0px"></div>
-								<table class="table" id="AtendimentoTableObservacao">
-									<thead>
-										<tr class="bg-slate text-left">
-											<th>Data / Hora</th>
-											<th>Espera</th>
-											<th>Nº Registro</th>		
-											<th>Paciente</th>
-											<th>Procedimento</th>
-											<th>Classificação<br>de Risco</th>
-											<th>Situação</th>
-											<th>Ações</th>
-										</tr>
-									</thead>
-									<tbody id="dataAtendimentos">
 
-									</tbody>
-								</table>
+								<div class="card-body pb-1">
+
+									<div class="" style="">									
+										<div class="row">
+											<div class="col-md-9">
+												<h3 class="card-title" id="card-title">Pacientes em Observação</h3>
+											</div>
+										</div>	
+									</div>
+
+									<div class="" style="float: right; margin-top: -40px">
+										<div >
+											<div class="" style="float: left">
+												Leitos Ocupados:	
+											</div>
+											<div class="form-group text-white text-bold" style="float: left; margin-left: 5px; margin-Top: -10px; height: 30px; width: 30px; background-color:blue; border-radius: 50px; display: flex;justify-content: center;align-items: center;" >
+												10
+											</div>
+
+										</div>
+										<div>
+											<div class="" style="float: left;">
+												Leitos Livres:
+											</div>
+											<div class="form-group text-white text-bold " style="float: right; margin-left: 5px; margin-Top: -10px; height: 30px; width: 30px; background-color:green; border-radius: 50px; display: flex;justify-content: center;align-items: center;" >
+												10
+											</div>
+										</div>
+									</div>
+									
+									<div class="col-lg-12 mb-4">	
+										<?php
+											$sql = "SELECT *
+											FROM EspecialidadeLeito
+											WHERE EsLeiStatus = 1
+											AND EsLeiUnidade = $iUnidade
+											ORDER BY EsLeiNome ASC" ;
+											$result = $conn->query($sql);
+
+											foreach ($result as $key => $item) {
+												$active = $key == 0 ? 'active' : '';
+												echo "<button type='button' id='pacientes-espera-btn' class=' m-1 btn-grid2 btn btn-outline-secondary btn-lg " . $active . " ' onclick='mudarGridEspecialidade(`boxEspecialidade". $item['EsLeiId'] . "`)'  >" . $item['EsLeiNome'] . "</button>";
+											}
+										?>
+									</div>
+
+								</div>
+
+								<?php
+
+									$sql = "SELECT *
+									FROM EspecialidadeLeito
+									WHERE EsLeiStatus = 1
+									AND EsLeiUnidade = $iUnidade
+									ORDER BY EsLeiNome ASC" ;
+									$result = $conn->query($sql);
+									
+									foreach ($result as $key => $item) {
+							
+										$sql = "SELECT *
+										FROM Quarto
+										WHERE QuartStatus = 1
+										AND QuartUnidade = $iUnidade
+										ORDER BY QuartNome ASC" ;
+										$result2 = $conn->query($sql);
+
+										$display = $key == 0 ? 'block' : 'none';
+
+										echo "<div class='box-especialidade' id='boxEspecialidade" . $item['EsLeiId'] . "' style='display: " . $display . ";'>";
+											
+											foreach($result2 as $item2){											
+												if($item['EsLeiTipoInternacao'] == $item2['QuartTipoInternacao']) {
+													echo "<div class='card-header header-elements-inline ' style='margin-bottom: -30px' >
+															<h3 class='card-title' >" . $item2['QuartNome'] . "</h3>
+															<hr />
+														</div >";
+
+													echo "<hr style='border-color:#aaa; box-sizing:border-box; width:97%; '/>";
+
+													echo "
+													<div class='card-body'>							
+														<div class='card cardLeitos text-center ' style='width: 18rem; '>											
+															<div class='card-header' style='color: white; background-color: #466D96; padding: 5px'>
+																<h3 class=' m-0'>Leito X</h3>
+																<p class='m-0'>Previsão de alta: 10/10/2010</p>
+															</div>
+
+															<div class='card-body'>
+																<i class='icon-bed2'></i>
+																<h4 class='card-title'>ALDO DA SILVA BARBOSA</h4>
+																<p class='card-text mb-1'>Nrº do Registro: 4465</p>
+																<p class='card-text'>Data da Internação: 10/10/2010</p>
+																<a href='#' class='btn btn-principal '>Entrar</a>
+															</div>
+														</div>
+													</div>";
+												}	
+											}
+
+										echo "</div>";
+									}
+
+								?>
 
 							</div>
 
@@ -846,6 +957,15 @@ $acesso = 'ATENDIMENTO';
 							<div id="box-pacientes-atendidos" style="display: none;">
 
 								<div class="card-body" style="padding: 0px"></div>
+
+								<div class="card-body pb-1">
+									<div class="row">
+										<div class="col-md-9">
+											<h3 class="card-title" id="card-title">Pacientes Atendidos</h3>
+										</div>
+									</div>	
+								</div>
+
 								<table class="table" id="AtendimentoTableAtendido">
 									<thead>
 										<tr class="bg-slate text-left">
