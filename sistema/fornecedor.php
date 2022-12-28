@@ -10,7 +10,7 @@ $sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelu
 		FROM Fornecedor
 		JOIN Categoria on CategId = ForneCategoria
 		JOIN Situacao on SituaId = ForneStatus
-	    WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." 
+	    WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." 
 		ORDER BY ForneNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
