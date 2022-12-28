@@ -301,7 +301,7 @@ if (isset($_POST['inputDataInicio'])) {
 															  JOIN TRXSubcategoria on TRXSCSubcategoria = FrXSCSubCategoria ";
 												}		
 
-												$sql .=	"WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and 
+												$sql .=	"WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and 
 														 ForneCategoria = " . $row['CategId'] . " and SituaChave = 'ATIVO'
 														 ORDER BY ForneNome ASC";
 												$result = $conn->query($sql);

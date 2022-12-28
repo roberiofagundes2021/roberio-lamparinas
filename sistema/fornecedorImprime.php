@@ -15,7 +15,7 @@ if ($iCategoria == '#'){
 			FROM Fornecedor
 			JOIN Categoria on CategId = ForneCategoria
 			JOIN Situacao on SituaId = ForneStatus
-			WHERE ForneUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'
+			WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
 			Group By ForneCategoria, CategNome, ForneTipo, ForneRazaoSocial, ForneNome, ForneCpf, ForneCnpj, ForneContato, ForneTelefone, ForneEmail";
 } else {
 	
@@ -30,7 +30,7 @@ if ($iCategoria == '#'){
 	$sql = "SELECT *
 			FROM Fornecedor
 			JOIN Situacao on SituaId = ForneStatus
-			WHERE ForneCategoria = ".$iCategoria." and ForneUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
+			WHERE ForneCategoria = ".$iCategoria." and ForneEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'";
 }
 
 $result = $conn->query($sql);

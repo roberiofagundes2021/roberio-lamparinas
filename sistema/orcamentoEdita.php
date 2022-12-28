@@ -528,7 +528,7 @@ if (isset($_POST['inputTipo'])) {
 													$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																FROM Fornecedor
 																JOIN Situacao on SituaId = ForneStatus							     
-																WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ForneCategoria = " . $row['OrcamCategoria'] . "
+																WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and ForneCategoria = " . $row['OrcamCategoria'] . "
 															    ORDER BY ForneNome ASC";
 													$result = $conn->query($sql);
 													$fornecedores = $result->fetchAll(PDO::FETCH_ASSOC);

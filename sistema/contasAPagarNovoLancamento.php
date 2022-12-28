@@ -1994,7 +1994,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                                                     $sql = "SELECT ForneId, ForneNome
 															FROM Fornecedor
 															JOIN Situacao on SituaId = ForneStatus
-															WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+															WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 															ORDER BY ForneNome ASC";
                                                     $result = $conn->query($sql);
                                                     $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
