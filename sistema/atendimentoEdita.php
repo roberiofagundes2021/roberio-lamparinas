@@ -309,7 +309,7 @@ if ($tipo == 'ATENDIMENTO') {
 
 							let menssagem=''
 							let noDisable=true
-							if(!validaCPF($('#cpf').val())){
+							if(!validaCPF($('#cpf').val().replace(/[^\d]+/g, ''))){
 								noDisable=false
 								menssagem='informe um CPF'
 								$('#cpf').focus()
