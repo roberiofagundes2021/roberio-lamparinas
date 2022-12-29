@@ -28,7 +28,7 @@ if(isset($_POST['inputQuartoId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação da Relação de Quarto alterada!!!";
+		$_SESSION['msg']['mensagem'] = "Situação da Relação de Quarto alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {

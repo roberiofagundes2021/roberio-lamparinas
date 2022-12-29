@@ -4,32 +4,31 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-if(isset($_POST['inputQuartoId'])){
+if(isset($_POST['inputEspecialidadeLeitoId'])){
 	
-	$iQuartoId = $_POST['inputQuartoId'];
+	$iEspecialidadeLeitoId = $_POST['inputEspecialidadeLeitoId'];
         	
 	try{
-		
-		$sql = "DELETE FROM Quarto
-				WHERE QuartId = :id";
+		$sql = "DELETE FROM EspecialidadeLeito
+				WHERE EsLeiId = :id";
 		$result = $conn->prepare($sql);
-		$result->bindParam(':id', $iQuartoId); 
+		$result->bindParam(':id', $iEspecialidadeLeitoId); 
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Relação de Quarto excluída!!!";
+		$_SESSION['msg']['mensagem'] = "Especialidade do Leito excluída!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir Relação de Quarto!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir Especialidade do Leito!!!";
 		$_SESSION['msg']['tipo'] = "error";			
 		
 		//echo 'Error: ' . $e->getMessage();die;
 	}
 }
 
-irpara("atendimentoRelacaoQuartos.php");
+irpara("atendimentoEspecialidadeLeito.php");
 
 ?>

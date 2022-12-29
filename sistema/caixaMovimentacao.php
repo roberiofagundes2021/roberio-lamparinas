@@ -18,7 +18,7 @@ if(isset($_SESSION['aberturaCaixa']) && $_SESSION['aberturaCaixa'] == 'Abrir_Nov
 $sql = "SELECT ForneId, ForneNome, ForneCpf, ForneCnpj, ForneTelefone, ForneCelular, ForneStatus, CategNome
 		FROM Fornecedor
 		JOIN Categoria on CategId = ForneCategoria
-	    WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . "
+	    WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . "
 		ORDER BY ForneNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -1177,7 +1177,7 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
                                         $sql = "SELECT ForneId, ForneNome
                                                 FROM Fornecedor
                                                 JOIN Situacao on SituaId = ForneStatus
-                                                WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
                                                 ORDER BY ForneNome ASC";
                                         $result = $conn->query($sql);
                                         $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);

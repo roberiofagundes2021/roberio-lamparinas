@@ -217,9 +217,9 @@
                   
                   //Empresa pública e o menu visível para o Setor Público ou Empresa Privada e o menu visível para o Setor Privado
                   if($visualizar == 1){
-                    $class = basename($_SERVER['PHP_SELF']) == $men['MenuUrl']?"class='nav-link active'":"class='nav-link'";
+                    $class = basename($_SERVER['PHP_SELF']) == $men['MenuUrl']?" class='nav-link active'":" class='nav-link'";
                     echo (($men['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
-                    "<a href='$men[MenuUrl]'$class
+                    "<a href='$men[MenuUrl]' $class >
                     <i class='$men[MenuIco]'></i>
                       <span>$men[MenuNome]</span>
                     </a>";

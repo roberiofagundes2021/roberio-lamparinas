@@ -6,10 +6,10 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['msg'] = array();
 
-if(isset($_POST['tipoAcomodacaoId'])){
+if(isset($_POST['inputCaraterInternacaoId'])){
 	
-	$iTipoAcomodacao = $_POST['tipoAcomodacaoId'];
-	$sStatus = $_POST['tipoAcomodacaoStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
+	$iCaraterInterncao = $_POST['inputCaraterInternacaoId'];
+	$sStatus = $_POST['inputCaraterInternacaoStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
         	
 	try{
 
@@ -20,27 +20,27 @@ if(isset($_POST['tipoAcomodacaoId'])){
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iStatus = $row['SituaId'];
 
-		$sql = "UPDATE TipoAcomodacao SET TpAcoStatus = :bStatus
-				WHERE TpAcoId = :id";
+		$sql = "UPDATE CaraterInternacao SET CrIntStatus = :bStatus
+				WHERE CrIntId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $iStatus); 
-		$result->bindParam(':id', $iTipoAcomodacao); 
+		$result->bindParam(':id', $iCaraterInterncao); 
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação do tipo de acomodação alterada!!!";
+		$_SESSION['msg']['mensagem'] = "Situação do Caráter de Internação alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do tipo de acomodação!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do Caráter de Internação!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();
 	}
 }
 
-irpara("atendimentoTipoAcomodacao.php");
+irpara("atendimentoCaraterInternacao.php");
 
 ?>

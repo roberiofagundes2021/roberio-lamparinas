@@ -47,7 +47,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iTipoAcomodacao' => $_POST['tipoAcomodacaoId']
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Tipo de acomodação alterado!!!";
+			$_SESSION['msg']['mensagem'] = "Tipo de acomodação alterada!!!";
 	
 		} else { //inclusão
 		
@@ -62,7 +62,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iUnidade' => $_SESSION['UnidadeId'],
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Tipo de Acomodação incluído!!!";
+			$_SESSION['msg']['mensagem'] = "Tipo de Acomodação incluída!!!";
 					
 		}
 	

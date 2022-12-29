@@ -17,7 +17,7 @@ if(isset($_POST['inputQuartoId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Relação de Quarto excluída!!!";
+		$_SESSION['msg']['mensagem'] = "Relação de Quarto excluído!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {

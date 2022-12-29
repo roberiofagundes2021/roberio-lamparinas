@@ -42,7 +42,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                 ':iQuartId' => $_POST['inputQuartoId']
             ));
 
-            $_SESSION['msg']['mensagem'] = "Quarto alterada!!!";
+            $_SESSION['msg']['mensagem'] = "Quarto alterado!!!";
         } else { //inclusão
             $sql = "INSERT INTO Quarto (QuartNome, QuartTipoInternacao, QuartStatus, QuartUsuarioAtualizador, QuartUnidade)
 					VALUES (:sQuartNome, :iQuartTipoInternacao, :bQuartStatus, :iQuartUsuarioAtualizador, :iQuartUnidade)";
@@ -55,7 +55,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                 ':iQuartUnidade' => $_SESSION['UnidadeId'],
             ));
 
-            $_SESSION['msg']['mensagem'] = "Quarto incluída!!!";
+            $_SESSION['msg']['mensagem'] = "Quarto incluído!!!";
         }
 
         $_SESSION['msg']['titulo'] = "Sucesso";

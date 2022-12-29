@@ -4,10 +4,9 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-
-$sql = "SELECT EsLeiId
-        FROM EspecialidadeLeito
-        WHERE EsLeiUnidade = ".$_SESSION['UnidadeId']." and EsLeiNome = '". $_POST['nome']."' and EsLeiTipoInternacao = '". $_POST['tipoInternacao']."'";
+$sql = "SELECT EstabId
+	FROM Estabelecimento
+	WHERE EstabUnidade = ".$_SESSION['UnidadeId']." and EstabNome = '". $_POST['nome']."' and EstabCnes = '". $_POST['cnes']."'";
 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -24,3 +23,5 @@ if($count){
 		echo 0;
 	}
 }
+
+?>

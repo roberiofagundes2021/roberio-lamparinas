@@ -394,7 +394,7 @@ if(isset($_POST['inputData'])){
 														$sql = "SELECT ForneId, ForneNome, ForneContato, ForneEmail, ForneTelefone, ForneCelular
 																FROM Fornecedor
 																JOIN Situacao on SituaId = ForneStatus
-																WHERE ForneUnidade = ". $_SESSION['UnidadeId'] ." and ForneCategoria = ".$rowCategoria['CategId']."
+																WHERE ForneEmpresa = ". $_SESSION['EmpreId'] ." and ForneCategoria = ".$rowCategoria['CategId']."
 																and SituaChave = 'ATIVO'
 															    ORDER BY ForneNome ASC";
 														$result = $conn->query($sql);

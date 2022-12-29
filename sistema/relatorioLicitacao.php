@@ -599,7 +599,7 @@ $rowPerfil = $result->fetch(PDO::FETCH_ASSOC);
                                                 $sql = "SELECT ForneId, ForneRazaoSocial
                                                         FROM Fornecedor
                                                         JOIN Situacao on SituaId = ForneStatus
-                                                        WHERE ForneUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                        WHERE ForneEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
                                                         ORDER BY ForneRazaoSocial ASC";
                                                 $result = $conn->query($sql);
                                                 $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
