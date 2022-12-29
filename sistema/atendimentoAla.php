@@ -7,20 +7,20 @@ $_SESSION['PaginaAtual'] = 'Ala';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT CrIntId, CrIntNome, CrIntStatus, s.SituaNome, s.SituaCor, s.SituaChave
-		FROM CaraterInternacao cai
-		JOIN Situacao s on s.SituaId = cai.CrIntStatus
-	    WHERE CrIntUnidade = " . $_SESSION['UnidadeId'] . "
-		ORDER BY CrIntId ASC";
+$sql = "SELECT AlaId, AlaNome, AlaStatus, s.SituaNome, s.SituaCor, s.SituaChave
+		FROM Ala al
+		JOIN Situacao s on s.SituaId = al.AlaStatus
+	    WHERE AlaUnidade = " . $_SESSION['UnidadeId'] . "
+		ORDER BY AlaId ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 //Se estiver editando
 if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'EDITA') {
     //Essa consulta é para preencher os campos a se editar
-    $sql = "SELECT CrIntId, CrIntNome
-			FROM CaraterInternacao
-			WHERE CrIntId = " . $_POST['inputAlaId'] . ";";
+    $sql = "SELECT AlaId, AlaNome
+			FROM Ala
+			WHERE AlaId = " . $_POST['inputAlaId'] . ";";
     $result = $conn->query($sql);
     $rowAla = $result->fetch(PDO::FETCH_ASSOC);
     $_SESSION['msg'] = array();
@@ -31,25 +31,25 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
     try {
         //Edição
         if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA') {
-            $sql = "UPDATE CaraterInternacao SET CrIntNome = :sCrIntNome, CrIntUsuarioAtualizador = :iCrIntUsuarioAtualizador
-					WHERE CrIntId = :iCrIntId";
+            $sql = "UPDATE Ala SET AlaNome = :sAlaNome, AlaUsuarioAtualizador = :iAlaUsuarioAtualizador
+					WHERE AlaId = :iAlaId";
             $result = $conn->prepare($sql);
             $result->execute(array(
-                ':sCrIntNome' => $_POST['inputAlaNome'],
-                ':iCrIntUsuarioAtualizador' => $_SESSION['UsuarId'],
-                ':iCrIntId' => $_POST['inputAlaId']
+                ':sAlaNome' => $_POST['inputAlaNome'],
+                ':iAlaUsuarioAtualizador' => $_SESSION['UsuarId'],
+                ':iAlaId' => $_POST['inputAlaId']
             ));
 
             $_SESSION['msg']['mensagem'] = "Ala alterada!!!";
         } else { //inclusão
-            $sql = "INSERT INTO CaraterInternacao (CrIntNome, CrIntStatus, CrIntUsuarioAtualizador, CrIntUnidade)
-					VALUES (:sCrIntNome, :bCrIntStatus, :iCrIntUsuarioAtualizador, :iCrIntUnidade)";
+            $sql = "INSERT INTO Ala (AlaNome, AlaStatus, AlaUsuarioAtualizador, AlaUnidade)
+					VALUES (:sAlaNome, :bAlaStatus, :iAlaUsuarioAtualizador, :iAlaUnidade)";
             $result = $conn->prepare($sql);
             $result->execute(array(
-                ':sCrIntNome' => $_POST['inputAlaNome'],
-                ':bCrIntStatus' => 1,
-                ':iCrIntUsuarioAtualizador' => $_SESSION['UsuarId'],
-                ':iCrIntUnidade' => $_SESSION['UnidadeId'],
+                ':sAlaNome' => $_POST['inputAlaNome'],
+                ':bAlaStatus' => 1,
+                ':iAlaUsuarioAtualizador' => $_SESSION['UsuarId'],
+                ':iAlaUnidade' => $_SESSION['UnidadeId'],
             ));
 
             $_SESSION['msg']['mensagem'] = "Ala incluída!!!";
@@ -78,7 +78,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Lamparinas | Ala/title>
+    <title>Lamparinas | Ala</title>
 
     <?php include_once("head.php"); ?>
 
@@ -200,11 +200,11 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
         });
 
         //Essa função foi criada para não usar $_GET e ficar mostrando os ids via URL
-        function atualizaAla(Permission, CrIntId, CrIntStatus, Tipo) {
+        function atualizaAla(Permission, AlaId, AlaStatus, Tipo) {
 
             if (Permission == 1) {
-                document.getElementById('inputAlaId').value = CrIntId;
-                document.getElementById('inputAlaStatus').value = CrIntStatus;
+                document.getElementById('inputAlaId').value = AlaId;
+                document.getElementById('inputAlaStatus').value = AlaStatus;
 
                 if (Tipo == 'edita') {
                     document.getElementById('inputEstadoAtual').value = "EDITA";
@@ -260,8 +260,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                     <div class="row">
                                         <div class="col-lg-5">
                                             <div class="form-group">
-                                                <label for="inputAlaNome">Ala<span class="text-danger"> *</span></label>
-                                                <input type="text" id="inputAlaNome" name="inputAlaNome" class="form-control" placeholder="Ala" value="<?php if (isset($_POST['inputAlaId'])) echo $rowAla['CrIntNome']; ?>" required autofocus>
+                                                <label for="inputAlaNome">Ala<span class="text-danger">*</span></label>
+                                                <input type="text" id="inputAlaNome" name="inputAlaNome" class="form-control" placeholder="Ala" value="<?php if (isset($_POST['inputAlaId'])) echo $rowAla['AlaNome']; ?>" required autofocus>
                                             </div>
                                         </div>
 
@@ -270,7 +270,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                                 <?php
 
                                                 //editando
-                                                if (isset($_POST['CrIntId'])) {
+                                                if (isset($_POST['AlaId'])) {
                                                     print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
                                                     print('<a href="atendimentoAla.php" class="btn btn-basic" role="button">Cancelar</a>');
                                                 } else { //inserindo
@@ -303,12 +303,12 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
                                         print('
 										<tr>
-											<td>' . $item['CrIntNome'] . '</td>
+											<td>' . $item['AlaNome'] . '</td>
 											');
 
                                         print('<td><a href="#" onclick="atualizaAla(
                                             1,
-                                            ' . $item['CrIntId'] . ',
+                                            ' . $item['AlaId'] . ',
                                             ' . $situacaoChave . ',
                                             \'mudaStatus\'
                                         );"><span class="badge ' . $situacaoClasse . '">' . $situacao . '</span></a></td>');
@@ -320,13 +320,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											<div class="list-icons list-icons-extended">
 												<a href="#" onclick="atualizaAla(
                                                     1,
-                                                    ' . $item['CrIntId'] . ',
-                                                    ' . $item['CrIntStatus'] . ',
+                                                    ' . $item['AlaId'] . ',
+                                                    ' . $item['AlaStatus'] . ',
                                                     \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar" ></i></a>
 												<a href="#" onclick="atualizaAla(
                                                     1,
-                                                    ' . $item['CrIntId'] . ',
-                                                    ' . $item['CrIntStatus'] . ',
+                                                    ' . $item['AlaId'] . ',
+                                                    ' . $item['AlaStatus'] . ',
                                                     \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>
 											</div>
 										</div>								

@@ -6,14 +6,14 @@ include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputAlaId'])){
 	
-	$iCaraterInternacao = $_POST['inputAlaId'];
+	$iAla = $_POST['inputAlaId'];
         	
 	try{
 		
-		$sql = "DELETE FROM CaraterInternacao
-				WHERE CrIntId = :id";	
+		$sql = "DELETE FROM Ala
+				WHERE AlaId = :id";	
 		$result = $conn->prepare($sql);
-		$result->bindParam(':id', $iCaraterInternacao); 
+		$result->bindParam(':id', $iAla); 
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

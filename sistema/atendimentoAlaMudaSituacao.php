@@ -20,8 +20,8 @@ if(isset($_POST['inputAlaId'])){
 		$row = $result->fetch(PDO::FETCH_ASSOC);
 		$iStatus = $row['SituaId'];
 
-		$sql = "UPDATE CaraterInternacao SET CrIntStatus = :bStatus
-				WHERE CrIntId = :id";
+		$sql = "UPDATE Ala SET AlaStatus = :bStatus
+				WHERE AlaId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':bStatus', $iStatus); 
 		$result->bindParam(':id', $iAla); 
