@@ -223,7 +223,36 @@ function queryPesquisa(){
             $data = mostraData($item['DATA']);
 
             //HISTÓRICO
-            if (intval($item['CODTRANSFREC']) > 0){
+            if ($item['HISTORICO'] == 'Transferência entre contas'){
+
+                if (intval($item['CODTRANSFREC']) > 0){
+                    $historico = $_POST["permissionAtualiza"]?"<a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['CODTRANSFREC'].", \"edita\");'>" . $item['HISTORICO'] . "</a>":"";
+                               
+                } else if (intval($item['CODTRANSFPAG']) > 0) {
+                    $historico = $_POST["permissionAtualiza"]?"<a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['CODTRANSFPAG'].", \"edita\");'>" . $item['HISTORICO'] . "</a>":"";
+    
+                } else if ($item['TIPO'] === 'R'){
+                    $historico = $_POST["permissionAtualiza"]?"<a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['ID'].", \"edita\");'>" . $item['HISTORICO'] . "</a>":"";
+    
+                } else if ($item['TIPO'] === 'P') {
+                    $historico = $_POST["permissionAtualiza"]?"<a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['ID'].", \"edita\");'>" . $item['HISTORICO'] . "</a>":"";
+                }
+
+            }elseif (intval($item['CODTRANSFREC']) > 0){
+                $historico = $_POST["permissionAtualiza"]?"<a href='#'></a>" . $item['HISTORICO'] . "</a>":"";
+                           
+            } else if (intval($item['CODTRANSFPAG']) > 0) {
+                $historico = $_POST["permissionAtualiza"]?"<a href='#'>" . $item['HISTORICO'] . "</a>":"";
+
+            } else if ($item['TIPO'] === 'R'){
+                $historico = $_POST["permissionAtualiza"]?"<a href='#'>" . $item['HISTORICO'] . "</a>":"";
+
+            } else if ($item['TIPO'] === 'P') {
+                $historico = $_POST["permissionAtualiza"]?"<a href='#'>" . $item['HISTORICO'] . "</a>":"";
+            }
+            
+
+            /* elseif (intval($item['CODTRANSFREC']) > 0){
                 $historico = $_POST["permissionAtualiza"]?"<a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['CODTRANSFREC'].", \"edita\");'>" . $item['HISTORICO'] . "</a>":"";
                            
             } else if (intval($item['CODTRANSFPAG']) > 0) {
@@ -234,7 +263,7 @@ function queryPesquisa(){
 
             } else if ($item['TIPO'] === 'P') {
                 $historico = $_POST["permissionAtualiza"]?"<a href='#' onclick='atualizaMovimentacaoFinanceira(".$_POST["permissionAtualiza"].",".$item['ID'].", \"edita\");'>" . $item['HISTORICO'] . "</a>":"";
-            }
+            }*/
 
             $ClienteOuFornecedor = (isset($item['CLIENTE'])) ? $item['CLIENTE'] : $item['FORNECEDOR'];
 
