@@ -45,22 +45,22 @@ try{
 			AgendObservacao,AgendJustificativa,ClienNome,ClienCodigo,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave, ClienDtNascimento,
 			SituaCor,Profissional.ProfiNome as ProfissionalNome,AtLocNome, SrVenNome, ProfiCbo, Profissao.ProfiNome as ProfissaoNome
 			FROM Agendamento
-			JOIN AtendimentoModalidade ON AtModId = AgendModalidade
-			JOIN Situacao ON SituaId = AgendSituacao
-			JOIN Cliente ON ClienId = AgendCliente
-			JOIN Profissional ON Profissional.ProfiId = AgendProfissional
-			JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
-			JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
-			JOIN ServicoVenda ON SrVenId = AgendServico
+			LEFT JOIN AtendimentoModalidade ON AtModId = AgendModalidade
+			LEFT JOIN Situacao ON SituaId = AgendSituacao
+			LEFT JOIN Cliente ON ClienId = AgendCliente
+			LEFT JOIN Profissional ON Profissional.ProfiId = AgendProfissional
+			LEFT JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
+			LEFT JOIN AtendimentoLocal ON AtLocId = AgendAtendimentoLocal
+			LEFT JOIN ServicoVenda ON SrVenId = AgendServico
 			WHERE AgendUnidade = $iUnidade and SituaChave in ('AGENDADO','CONFIRMADO','FILAESPERA')
 			AND AgendData = '$hoje'
 			and AgendAtendimento is null";
 		$result = $conn->query($sql);
 		$rowAgendamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
-		$sql = "SELECT AtendId,AtendNumRegistro,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtendClassificacao,
+		$sql = "SELECT AtendId,AtendNumRegistro,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtendClassificacao,AtClaChave,
 			AtendObservacao,AtendJustificativa,AtendSituacao,AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtXSeValor,AtXSeDesconto, ClienDtNascimento,
-			ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,Profissional.ProfiNome as ProfissionalNome,SrVenNome, 
+			ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,Profissional.ProfiNome as ProfissionalNome,SrVenNome,
 			Profissao.ProfiNome as ProfissaoNome, ProfiCbo,AtClRNome,AtClRNomePersonalizado,AtClRTempo,AtClRCor,AtClRDeterminantes
 			FROM AtendimentoXServico
 			LEFT JOIN Atendimento ON AtendId = AtXSeAtendimento
@@ -72,6 +72,7 @@ try{
 			LEFT JOIN ServicoVenda ON SrVenId = AtXSeServico
 			LEFT JOIN AtendimentoLocal ON AtLocId = AtXSeAtendimentoLocal
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtendClassificacaoRisco = AtClRId
+			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 			WHERE AtendUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -144,7 +145,7 @@ try{
 								<div class='dropdown-divider'></div>
 								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Gerar nota fiscal'></i> Gerar nota fiscal</a>
 								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Anexos'></i> Anexos</a>
-								<a href='#' onclick='adimissaoLeito($id)' class='dropdown-item'><i class='icon-stackoverflow' title='Leito'></i> Adimissão em Leito</a>
+								".($item['AtClaChave']!='ELETIVO'?"<a href='#' onclick='adimissaoLeito($id)' class='dropdown-item'><i class='icon-stackoverflow' title='Leito'></i> Adimissão em Leito</a>":"")."
 							</div>
 						</div>
 					</div>";
