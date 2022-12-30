@@ -207,7 +207,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                     $.ajax({
                         type: "POST",
                         url: "atendimentoLeitoValida.php",
-                        data: ('nome=' + inputNome + '&quarto=' + quarto + '&EspecialidadeLeito=' + especialidadeLeito + '&estadoAtual=' + inputEstadoAtual),
+                        data: ('nome=' + inputNome + '&quarto=' + quarto + '&especialidadeLeito=' + especialidadeLeito + '&estadoAtual=' + inputEstadoAtual),
                         success: function(resposta) {
 
                             if (resposta == 1) {
@@ -309,8 +309,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 															WHERE QuartUnidade = " . $_SESSION['UnidadeId'] . " AND SituaChave = 'ATIVO'
 														    ORDER BY QuartNome ASC";
                                                 $result = $conn->query($sql);
-                                                $rowLeito = $result->fetchAll(PDO::FETCH_ASSOC);
-                                                foreach ($rowLeito as $item) {
+                                                $rowQuarto = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                foreach ($rowQuarto as $item) {
                                                     $seleciona = $item['QuartId'] == $rowLeito['LeitoQuarto'] ? "selected" : "";
                                                     print('<option value="' . $item['QuartId'] . '" ' . $seleciona . '>' . $item['QuartNome'] . '</option>');
                                                 }
@@ -328,9 +328,9 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 															WHERE EsLeiUnidade = " . $_SESSION['UnidadeId'] . " AND SituaChave = 'ATIVO'
 														    ORDER BY EsLeiNome ASC";
                                                 $result = $conn->query($sql);
-                                                $rowLeito = $result->fetchAll(PDO::FETCH_ASSOC);
-                                                foreach ($rowLeito as $item) {
-                                                    $seleciona = $item['EsLeiId'] == $rowLeito['LeitoQuarto'] ? "selected" : "";
+                                                $rowEspecialidade = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                foreach ($rowEspecialidade as $item) {
+                                                    $seleciona = $item['EsLeiId'] == $rowLeito['LeitoEspecialidade'] ? "selected" : "";
                                                     print('<option value="' . $item['EsLeiId'] . '" ' . $seleciona . '>' . $item['EsLeiNome'] . '</option>');
                                                 }
                                                 ?>

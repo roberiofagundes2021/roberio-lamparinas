@@ -7,8 +7,7 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT LeitoId
         FROM Leito
-        WHERE LeitotUnidade = ".$_SESSION['UnidadeId']." and LeitoNome = '". $_POST['nome']."' and LeitoQuarto = '". $_POST['quarto']."' and LeitoEspecialidade = '". $_POST['especialidadeLeito']."'";
-
+        WHERE LeitoUnidade = ".$_SESSION['UnidadeId']." and LeitoNome = '". $_POST['nome']."' and LeitoQuarto = '". $_POST['quarto']."' and LeitoEspecialidade = '". $_POST['especialidadeLeito']."'";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
