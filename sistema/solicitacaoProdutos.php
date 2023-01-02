@@ -24,7 +24,7 @@ if (isset($_POST['solicitacaoId'])) {
             JOIN Servico on ServiId = SlXSrServico
             JOIN Categoria on CategId = ServiCategoria
             JOIN Situacao on SituaId = ServiStatus
-            WHERE SolicId = " . $_POST['solicitacaoId'] . " and ServiUnidade = " . $_SESSION['UnidadeId'] . "
+            WHERE SolicId = " . $_POST['solicitacaoId'] . " and ServiEmpresa = " . $_SESSION['EmpreId'] . "
             ";
     $resultServico = $conn->query($sqlServico);
     $rowServicos = $resultServico->fetchAll(PDO::FETCH_ASSOC);

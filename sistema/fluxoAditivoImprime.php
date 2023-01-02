@@ -159,7 +159,7 @@ try {
 			LEFT JOIN Marca on MarcaId = SrXFaMarca
 			LEFT JOIN Modelo on ModelId = SrXFaModelo
 			LEFT JOIN Fabricante on FabriId = SrXFaFabricante
-			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$_POST['inputAditivoId']." and AdXSrQuantidade > ' 0 ' ";
+			WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and AdXSrAditivo = ".$_POST['inputAditivoId']." and AdXSrQuantidade > ' 0 ' ";
 	$result = $conn->query($sql);
 	$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 	$totalServicos = count($rowServicos);

@@ -46,7 +46,7 @@ $totalProdutos = count($rowProd);
 $sql = "SELECT ServiId
 		FROM Servico
 		JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
-		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+		WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
 $result = $conn->query($sql);
 $rowServ = $result->fetchAll(PDO::FETCH_ASSOC);
 $totalServicos = count($rowServ);
@@ -293,7 +293,7 @@ try {
 					FROM Servico
 					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 					JOIN SubCategoria on SbCatId = ServiSubCategoria
-					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
+					WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
 					ORDER BY SbCatNome, ServiNome ASC";
 			$result = $conn->query($sql);
 			$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -366,7 +366,7 @@ try {
 						FROM Servico
 						JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 						JOIN SubCategoria on SbCatId = ServiSubCategoria
-						WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
+						WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional."
 						and SbCatId = ".$sbcat['SbCatId']."
 						ORDER BY SbCatNome, ServiNome ASC";
 				$result = $conn->query($sql);

@@ -109,7 +109,7 @@ else {
 			
 			$sql = "SELECT ServiId
 					FROM Servico
-					WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and ServiNome = '".$nome."'";
+					WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and ServiNome = '".$nome."'";
 			$result = $conn->query($sql);
 			$row = $result->fetch(PDO::FETCH_ASSOC);
 			//$count = count($row);
@@ -117,14 +117,14 @@ else {
 			if ($row){
 
 				$sql = "UPDATE Servico SET ServiDetalhamento = :sDetalhamento, ServiUsuarioAtualizador = :iUsuarioAtualizador
-						WHERE ServiNome = :sNome and ServiUnidade = :iUnidade";
+						WHERE ServiNome = :sNome and ServiEmpresa = :iEmpresa";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
 								':sNome' => $nome,
 								':sDetalhamento' => $detalhamento,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iUnidade' => $_SESSION['UnidadeId']
+								':iEmpresa' => $_SESSION['EmpreId']
 								));
 
 				$servicosimportados .= $nome.', ';
@@ -141,7 +141,7 @@ else {
 				
 				$sql = "SELECT COUNT(isnull(ServiCodigo,0)) as Codigo
 						FROM Servico
-						Where ServiUnidade = ".$_SESSION['UnidadeId']."";
+						Where ServiEmpresa = ".$_SESSION['EmpreId']."";
 				//echo $sql;die;
 				$result = $conn->query("$sql");
 				$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -151,9 +151,9 @@ else {
 				
 				$sql = "INSERT INTO Servico (ServiCodigo, ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, 
 											 ServiValorCusto, ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, 
-											 ServiStatus, ServiUnidade, ServiUsuarioAtualizador) 
+											 ServiStatus, ServiEmpresa, ServiUsuarioAtualizador) 
 						VALUES (:sCodigo, :sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :fValorCusto, 
-								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :bStatus, :iUnidade, :iUsuarioAtualizador);";
+								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :bStatus, :iEmpresa, :iUsuarioAtualizador);";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
@@ -168,7 +168,7 @@ else {
 								':fMargemLucro' => null,
 								':fValorVenda' => null,
 								':bStatus' => 1,
-								':iUnidade' => $_SESSION['UnidadeId'],								
+								':iEmpresa' => $_SESSION['EmpreId'],								
 								':iUsuarioAtualizador' => $_SESSION['UsuarId']
 								));
 				 	    

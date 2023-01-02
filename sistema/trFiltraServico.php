@@ -33,7 +33,7 @@ $rowServicosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT TRXSrServico
 		FROM TermoReferenciaXServico
 		JOIN Servico on ServiId = TRXSrServico
-		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+		WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
 $result = $conn->query($sql);
 $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 $countServicosTr2 = count($rowServicos);
@@ -97,7 +97,7 @@ if (count($rowServicosOrcamento) >= 1) {
 } else {
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 			FROM Servico
-			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiId in (" . $lista . ")
+			WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and ServiId in (" . $lista . ")
 			";
 
 	//echo $sql;die;

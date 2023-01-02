@@ -50,7 +50,7 @@ if (!empty($_POST['inputId'])) {
                     FROM Servico
                     JOIN Categoria on CategId = ServiCategoria
                     JOIN Situacao on SituaId = ServiStatus
-                    WHERE ServiId = ".$_POST['inputId']." and ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
+                    WHERE ServiId = ".$_POST['inputId']." and ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' ";
                 }
                 $result = $conn->query($sql);
                 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -104,7 +104,7 @@ if (!empty($_POST['inputId'])) {
                     FROM Servico
                     JOIN Categoria on CategId = ServiCategoria
                     JOIN Situacao on SituaId = ServiStatus
-                    WHERE ServiId = ".$_POST['inputId']."and ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
+                    WHERE ServiId = ".$_POST['inputId']."and ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' ";
                 }
                 $result = $conn->query($sql);
                 $row = $result->fetch(PDO::FETCH_ASSOC);
@@ -163,7 +163,7 @@ if (!empty($_POST['inputId'])) {
                 FROM Servico
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
-                WHERE ServiId = ".$_POST['inputId']."and ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' ";
+                WHERE ServiId = ".$_POST['inputId']."and ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' ";
             }
             $result = $conn->query($sql);
             $row = $result->fetch(PDO::FETCH_ASSOC);

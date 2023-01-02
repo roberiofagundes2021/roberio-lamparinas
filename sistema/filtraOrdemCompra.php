@@ -40,7 +40,7 @@ if ($count) {
             SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, ServiValorCusto as valorCusto, ServiCustoFinal as custoFinal, tipo = 'S'
             FROM OrdemCompraXServico
             JOIN Servico on ServiId = OCXSrServico
-            WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and OCXSrOrdemCompra = " . $value['OrComId'] . "
+            WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OCXSrOrdemCompra = " . $value['OrComId'] . "
             ";
             $result = $conn->query($sql);
             $rowProdutoServico = $result->fetchAll(PDO::FETCH_ASSOC);

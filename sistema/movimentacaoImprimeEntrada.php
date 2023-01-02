@@ -106,7 +106,7 @@ try {
             JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
             JOIN ServicoXFabricante on SrXFaFluxoOperacional = FlOpeId
 			LEFT JOIN Marca on MarcaId = SrXFaMarca
-            WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and MvXSrMovimentacao = ".$iMovimentacao." and MvXSrQuantidade <> 0";
+            WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and MvXSrMovimentacao = ".$iMovimentacao." and MvXSrQuantidade <> 0";
     $result = $conn->query($sql);
     $rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
     $totalServicos = count($rowServicos);

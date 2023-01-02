@@ -6,6 +6,7 @@ include('global_assets/php/conexao.php');
 
 $ordemCompra = $_POST['ordemCompra'];
 $iUnidade = $_SESSION['UnidadeId'];
+$iEmpresa = $_SESSION['EmpreId'];
 
 $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, OCXPrDetalhamento as detalhamento,
         OCXPrValorUnitario as valorCusto, ProduCustoFinal as custoFinal, UnMedSigla, MarcaNome, tipo = 'P',
@@ -30,7 +31,7 @@ $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, 
         LEFT JOIN Marca on MarcaId = SrXFaMarca
         LEFT JOIN Modelo on ModelId = SrXFaModelo
         LEFT JOIN Fabricante on FabriId = SrXFaFabricante
-        WHERE ServiUnidade = $iUnidade and OCXSrOrdemCompra = $ordemCompra
+        WHERE ServiEmpresa = $iEmpresa and OCXSrOrdemCompra = $ordemCompra
         ORDER BY nome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

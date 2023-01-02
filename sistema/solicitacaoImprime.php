@@ -129,7 +129,7 @@ try {
 	$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, SlXSrQuantidade
 	FROM Servico
 	JOIN SolicitacaoXServico on SlXSrServico = ServiId
-	WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and SlXSrSolicitacao = ".$iSolicitacao;
+	WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and SlXSrSolicitacao = ".$iSolicitacao;
 
 	$resultServico = $conn->query($sql);
 	$rowServicos = $resultServico->fetchAll(PDO::FETCH_ASSOC);

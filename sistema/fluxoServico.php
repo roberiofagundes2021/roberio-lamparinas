@@ -135,7 +135,7 @@ try {
 	$sql = "SELECT FOXSrServico
 			FROM FluxoOperacionalXServico
 			JOIN Servico on ServiId = FOXSrServico
-			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+			WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
 	$result = $conn->query($sql);
 	$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countServicoUtilizado = count($rowServicoUtilizado);
@@ -560,7 +560,7 @@ try {
 																	FROM Servico
 																	JOIN Situacao on SituaId = ServiStatus
 																	LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-																	WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria;
+																	WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria;
 															if ($sSubCategorias != 0) {
 																$sql .= " and ServiSubCategoria in (".$sSubCategorias.")";
 															}
@@ -611,7 +611,7 @@ try {
 												FROM Servico
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 												LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+												WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
 												if ($sSubCategorias <> ""){
 													$sql .= " and SbCatId in (".$sSubCategorias.")";
 												}
@@ -628,7 +628,7 @@ try {
 														JOIN Situacao on SituaId = ServiStatus
 														LEFT JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = $iFluxoOperacional
 														LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-														WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and SituaChave = 'ATIVO'"; 
+														WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and ServiCategoria = " . $iCategoria . " and SituaChave = 'ATIVO'"; 
 														if ($sSubCategorias <> ""){
 															$sql .= " and SbCatId in (".$sSubCategorias.")";
 														}
@@ -647,7 +647,7 @@ try {
 															FROM Servico
 															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = ServiId
-															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia'];
+															WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia'];
 															if ($sSubCategorias <> ""){
 																$sql .= " and SbCatId in (".$sSubCategorias.")";
 															}
@@ -658,7 +658,7 @@ try {
 															JOIN ServicoOrcamento on SrOrcServico = ServiId
 															LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
 															JOIN TermoReferenciaXServico on TRXSrServico = SrOrcId
-															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia'];
+															WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = ".$row['FlOpeTermoReferencia'];
 															if ($sSubCategorias <> ""){
 																$sql .= " and SbCatId in (".$sSubCategorias.")";
 															}
