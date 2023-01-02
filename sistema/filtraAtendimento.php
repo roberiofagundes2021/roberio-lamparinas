@@ -1993,7 +1993,7 @@ try{
 		]);
 	} elseif ($tipoRequest == 'PACIENTES'){
 
-		$sql = "SELECT ClienId,ClienNome
+		$sql = "SELECT ClienId,ClienNome, ClienCodigo
 		FROM Cliente WHERE ClienUnidade = $iUnidade";
 		$result = $conn->query($sql);
 
@@ -2002,6 +2002,7 @@ try{
 			array_push($array,[
 				'id' => $item['ClienId'],
 				'nome' => $item['ClienNome'],
+				'codigo' => $item['ClienCodigo']
 			]);
 		}
 
@@ -2022,6 +2023,7 @@ try{
 		if($row){
 			$array = [
 				'status' => 'success',
+				'idCliente' => $row['ClienId'],
 				'prontuario' => $row['ClienCodigo'],
 				'nome' => $row['ClienNome'],
 				'nomeSocial' => $row['ClienNomeSocial'],
