@@ -28,7 +28,7 @@ if(isset($_POST['inputLeitoId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação do Leito alterada!!!";
+		$_SESSION['msg']['mensagem'] = "Situação do Leito alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
