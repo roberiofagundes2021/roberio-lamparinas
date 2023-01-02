@@ -272,6 +272,36 @@ try {
 
 		echo json_encode($array);
 		
+	} elseif ($tipoRequest == 'FILTRARSUBCATEGORIA') {
+
+		$categoriaId = $_POST['categoriaId'];
+
+		if ($categoriaId) {
+			$sql = "SELECT * FROM SubCategoria
+			WHERE  SbCatStatus = 1
+			AND SbCatCategoria = $categoriaId
+			AND SbCatEmpresa = $iEmpresa";
+		} else {
+			$sql = "SELECT * FROM SubCategoria
+			WHERE  SbCatStatus = 1
+			AND SbCatEmpresa = $iEmpresa";
+		}
+	
+		$resultS = $conn->query($sql);
+		$rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($rowSubCategoria as $item){
+
+			array_push($array,[
+				'id'=>$item['SbCatId'],
+				'nome' => $item['SbCatNome'],
+			]);
+		}
+		
+		echo json_encode($array);	
+		
 	}elseif ($tipoRequest == 'CUIDADOS') {
 
 		$iAtendimentoId = $_POST['iAtendimentoId'];
