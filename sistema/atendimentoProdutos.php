@@ -185,7 +185,38 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 
 			});
 
-        });
+
+			$('#categoria').on('change', function (e) {
+
+				let categoriaId = $('#categoria').val();
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimentoObservacaoHospitalar.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'FILTRARSUBCATEGORIA',
+						'categoriaId' : categoriaId
+					},
+					success: function(response) {
+
+						$('#subcategoria').empty();
+						$('#subcategoria').append(`<option value=''>Selecione</option>`)
+						let opt = ''
+						response.forEach(item => {
+					
+							opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#subcategoria').append(opt)
+
+						})
+					}
+				});
+
+				$('#subcategoria').focus();
+
+			})
+
+        });//ready
 
 		function selecionarProduto(item) {
 
