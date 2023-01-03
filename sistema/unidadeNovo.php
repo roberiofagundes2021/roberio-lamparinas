@@ -26,6 +26,9 @@ include('global_assets/php/conexao.php');
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
+
+  <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+  <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
 	<!-- /theme JS files -->	
 
   <!-- Validação -->
@@ -42,6 +45,42 @@ include('global_assets/php/conexao.php');
     $(document).ready(function() {
       var iUnidadeNovo
       var erros = []
+      
+
+      $('#cnesTable').DataTable({
+				"order": [[ 0, "desc" ],[ 1, "asc" ]],
+        autoWidth: false,
+				responsive: true,
+        columnDefs: [
+          {
+            orderable: true,   //Estabelecimento
+            width: "80%",
+            targets: [0]
+          },
+          {
+            orderable: true,   //CNES
+            width: "10%",
+            targets: [1]
+          },
+          {
+            orderable: true,   //Tipo
+            width: "10%",
+            targets: [2]
+          }
+        ],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+        language: {
+            search: '<span>Filtro:</span> _INPUT_',
+            searchPlaceholder: 'filtra qualquer coluna...',
+            lengthMenu: '<span>Mostrar:</span> _MENU_',
+            paginate: {
+                'first': 'Primeira',
+                'last': 'Última',
+                'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+                'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+            }
+        }
+			})
 
       function limpa_formulário_cep() {
         // Limpa valores do formulário de cep.
@@ -106,7 +145,7 @@ include('global_assets/php/conexao.php');
           //cep sem valor, limpa formulário.
           limpa_formulário_cep();
         }
-      });    
+      });
 
       //Valida Registro Duplicado
       $('#enviar').on('click', async function(e) {
@@ -235,7 +274,7 @@ include('global_assets/php/conexao.php');
                     }
                   })
                 }
-                window.location.href='empresa.php'
+                // window.location.href='empresa.php'
 
                 if(erros.length){
                   // colocar uma menssagem falando que houve erro ao cadastrar alguns itens e apresentar
@@ -246,11 +285,68 @@ include('global_assets/php/conexao.php');
           }
         })
       })
-      // https://apidadosabertos.saude.gov.br/v1/
-      // https://cnes.datasus.gov.br/
-      // https://cnes.datasus.gov.br/services/estabelecimentos?
-      // https://cnes.datasus.gov.br/services/profissionais?cpf=08112213500
-      // https://cnes.datasus.gov.br/services/profissionais?nome=AS%20ADA
+
+      // btn search do input CNES
+      $('#cnesSearch').on('click', function(e){
+        e.preventDefault()
+        getTipoUnidadeCnes()
+        $('#page-modal-cnes').fadeIn(200)
+      })
+
+      // btn close do modal cnes
+      $('#modal-cnes-close-x').on('click', function(e){
+        e.preventDefault()
+        $('#page-modal-cnes').fadeOut(200)
+      })
+
+      // btn de consulta do modal cnes
+      $('#concultarCnes').on('click',function(e){
+        e.preventDefault()
+
+        let msg = ''
+
+        switch(msg){
+          case $('#cnesNum').val()||$('#cnesTipo').val():msg = 'informe o numero CNES ou tipo de Estabelecimento';break;
+          default: msg = '';break;
+        }
+        
+        if(msg){
+          alerta('Campo Obrigatório!', msg, 'error')
+					return
+        }
+
+        let centroCirurgico = 'estabelecimento_possui_centro_cirurgico=1'
+        let centroObstetrico = 'estabelecimento_possui_centro_obstetrico=1'
+        let tipoUnidade = $('#cnesTipo').val() ? `&codigo_tipo_unidade=${$('#cnesTipo').val()}` : ''
+        let CNES = $('#cnesNum').val() ? `&codigo_tipo_unidade=${$('#cnesTipo').val()}` : ''
+
+        // let URL = `https://apidadosabertos.saude.gov.br/cnes/estabelecimentos?${centroCirurgico}&${centroObstetrico}${tipoUnidade}${tipoUnidade}`
+        let URL = `https://cnes.datasus.gov.br/services/estabelecimentos?gestao=M&natureza=1&municipio=291170`
+
+        $.ajax({
+					type: 'GET',
+					url: URL,
+					dataType: 'json',
+					// data: {
+					// },
+					success: function(response) {
+            console.log(response)
+					}
+				});
+
+
+
+        // let tableAgenda = $('#AgendaTable').DataTable().clear().draw()
+        // tableAgenda = $('#AgendaTable').DataTable()
+
+        // let rowTableAgenda
+
+        // response.data.forEach(item => {
+        //   rowTableAgenda = tableAgenda.row.add(item).draw().node()
+        //   $(rowTableAgenda).attr('class', 'text-center')
+        //   $(rowTableAgenda).find('td:eq(6)').attr('data-atendimento', `${item.identify.iAtendimento}`)
+        // })
+      })
     })
 
     function validaEFormataCnpj(){
@@ -264,6 +360,22 @@ include('global_assets/php/conexao.php');
 			}
 			
 		}
+
+    function getTipoUnidadeCnes(){
+      $.ajax({
+					type: 'GET',
+					url: 'https://apidadosabertos.saude.gov.br/cnes/tipounidades',
+					dataType: 'json',
+					// data: {
+					// },
+					success: function(response) {
+            $('#cnesTipo').html('<option value="">selecione</option>')
+						response.tipos_unidade.foreach(item => {
+              $('#cnesTipo').append(`<option value="${item.codigo_tipo_unidade}">${item.descricao_tipo_unidade}</option>`)
+            })
+					}
+				});
+    }
   </script>
 
   <style>
@@ -495,14 +607,17 @@ include('global_assets/php/conexao.php');
                 </div>
                 <div class="col-lg-3" id="CNPJ">
                   <div class="form-group">				
-                    <label for="inputCnpj">CNPJ<span class="text-danger"> *</span></label>
+                    <label for="inputCnpj">CNPJ <span class="text-danger"> *</span></label>
                     <input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" onblur="validaEFormataCnpj()"required>
                   </div>	
                 </div>	
                 <div class="col-lg-4">
-                  <div class="form-group">
-                    <label for="inputCNES">CNES </label>
-                    <input type="text" id="inputCNES" name="inputCNES" class="form-control" placeholder="CNES">
+                  <label for="inputCNES">CNES </label>
+                  <div class="form-group form-group-feedback form-group-feedback-right">
+                    <input type="text" id="inputCNES" name="inputCNES" class="form-control" placeholder="CNES" readonly>
+                    <div id="cnesSearch" class="form-control-feedback form-control-feedback-lg">
+                      <i class="icon-search4"></i>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -649,6 +764,81 @@ include('global_assets/php/conexao.php');
           </div>
         </div>
         <!-- /info blocks -->
+      </div>
+
+      <!--Modal Auditoria-->
+      <div id="page-modal-cnes" class="custon-modal">
+          <div class="custon-modal-container" style="max-width: 800px;">
+            <div class="card custon-modal-content">
+              <div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+                  <p class="h5">Buscar CNES</p>
+                  <i id="modal-cnes-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+              </div>
+
+              <div class="px-1 m-2">
+                <div class="col-lg-12 row">
+                  <div class="col-lg-6">
+                    <label>Nome do Estabelecimento</label>
+                  </div>
+                  <div class="col-lg-6">
+                    <label>Tipo de Estabelecimento</label>
+                  </div>
+
+                  <div class="col-lg-6">
+                    <input id="cnesNome" name="cnesNome" type="text" class="form-control" placeholder="nome do estabelecimento">
+                  </div>
+                  <div class="col-lg-6">
+                    <select id="cnesTipo" name="cnesTipo" class="select-search">
+                      <option value="">selecione</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-lg-12 row mt-3">
+                  <div class="col-lg-7">
+                    <label>CNES</label>
+                  </div>
+                  <div class="col-lg-2">
+                    <label>Centro Cirúrgico</label>
+                  </div>
+                  <div class="col-lg-2">
+                    <label>Centro Obstétrico</label>
+                  </div>
+                  <div class="col-lg-1">
+                    <label></label>
+                  </div>
+
+                  <div class="col-lg-7">
+                    <input id="cnesNum" name="cnesNum" type="text" class="form-control" placeholder="número CNES">
+                  </div>
+                  <div class="col-lg-2">
+                    <input id="cnesCentroCirurgico" name="cnesCentroCirurgico" type="checkbox" class="form-control">
+                  </div>
+                  <div class="col-lg-2">
+                    <input id="cnesCentroObstetrico" name="cnesCentroObstetrico" type="checkbox" class="form-control">
+                  </div>
+                  <div class="col-lg-1">
+                    <button id="concultarCnes" class="btn btn-principal">Buscar</button>
+                  </div>
+                </div>
+
+                <div class="card mt-4">
+                  <table class="table" id="cnesTable">
+                    <thead>
+                      <tr class="bg-slate text-left">
+                        <th>Estabelecimento</th>
+                        <th>CNES</th>
+                        <th>Tipo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
       </div>
       <!-- /content area -->
 
