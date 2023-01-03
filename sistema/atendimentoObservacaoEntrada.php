@@ -403,6 +403,14 @@ if ($row['ClienSexo'] == 'F'){
 							
 						}else{
 							alerta(response.titulo, response.menssagem, response.status)
+
+							$(".box-entradaPaciente").css('display', 'block');
+							$(".box-evolucao").css('display', 'none');
+							$(".box-prescricao").css('display', 'none');
+							$("#historiaEntrada").focus();
+							$('.btn-grid').removeClass('active');
+							$('#entradaPaciente-btn').addClass('active'); 
+
 						}						
 					}
 				});
