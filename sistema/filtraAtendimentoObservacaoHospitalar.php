@@ -272,6 +272,36 @@ try {
 
 		echo json_encode($array);
 		
+	} elseif ($tipoRequest == 'FILTRARSUBCATEGORIA') {
+
+		$categoriaId = $_POST['categoriaId'];
+
+		if ($categoriaId) {
+			$sql = "SELECT * FROM SubCategoria
+			WHERE  SbCatStatus = 1
+			AND SbCatCategoria = $categoriaId
+			AND SbCatEmpresa = $iEmpresa";
+		} else {
+			$sql = "SELECT * FROM SubCategoria
+			WHERE  SbCatStatus = 1
+			AND SbCatEmpresa = $iEmpresa";
+		}
+	
+		$resultS = $conn->query($sql);
+		$rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($rowSubCategoria as $item){
+
+			array_push($array,[
+				'id'=>$item['SbCatId'],
+				'nome' => $item['SbCatNome'],
+			]);
+		}
+		
+		echo json_encode($array);	
+		
 	}elseif ($tipoRequest == 'CUIDADOS') {
 
 		$iAtendimentoId = $_POST['iAtendimentoId'];
@@ -759,48 +789,98 @@ try {
 
 		$iAtendimentoId = $_POST['iAtendimentoId'];
 
-		$array = [
-			"UPDATE AtendimentoEvolucaoDiaria SET AtEDiEditavel = 0 WHERE AtEDiAtendimento = '$iAtendimentoId'",
-			"UPDATE AtendimentoPrescricaoMedicamento SET AtPMeEditavel = 0 WHERE AtPMeAtendimento = '$iAtendimentoId'",
-			"UPDATE AtendimentoPrescricaoDieta SET AtPDiEditavel = 0 WHERE AtPDiAtendimento = '$iAtendimentoId'",
-			"UPDATE AtendimentoPrescricaoCuidado SET AtPCuEditavel = 0 WHERE AtPCuAtendimento = '$iAtendimentoId'",
-		];
+		$sql = "SELECT AtOEnId 
+		FROM AtendimentoObservacaoEntrada
+		WHERE AtOEnAtendimento = $iAtendimentoId
+		AND AtOEnUnidade = $iUnidade";	
+		$result = $conn->query($sql);
+		$resultadoBusca = $result->fetch(PDO::FETCH_ASSOC);
 
-		foreach ($array as $sql) {
-			$conn->query($sql);
-		}
+		if ($resultadoBusca) {
 
-		$_SESSION['iAtendimentoId'] = $iAtendimentoId;
+			$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'AGUARDANDOLIBERACAOATENDIMENTO'";
+			$result = $conn->query($sql);
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
 
-		echo json_encode([
-			'status' => 'success',
-			'titulo' => 'Observação Hospitalar',
-			'menssagem' => 'Dados Salvos com Sucesso!!!'
-		]);
+			$sql = "UPDATE Atendimento set AtendSituacao = '$rowSituacao[SituaId]' WHERE AtendId = $iAtendimentoId";
+			$result = $conn->query($sql);
+
+			$array = [
+				"UPDATE AtendimentoEvolucaoDiaria SET AtEDiEditavel = 0 WHERE AtEDiAtendimento = '$iAtendimentoId'",
+				"UPDATE AtendimentoPrescricaoMedicamento SET AtPMeEditavel = 0 WHERE AtPMeAtendimento = '$iAtendimentoId'",
+				"UPDATE AtendimentoPrescricaoDieta SET AtPDiEditavel = 0 WHERE AtPDiAtendimento = '$iAtendimentoId'",
+				"UPDATE AtendimentoPrescricaoCuidado SET AtPCuEditavel = 0 WHERE AtPCuAtendimento = '$iAtendimentoId'",
+			];
+	
+			foreach ($array as $sql) {
+				$conn->query($sql);
+			}
+	
+			$_SESSION['iAtendimentoId'] = $iAtendimentoId;
+	
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Observação Hospitalar',
+				'menssagem' => 'Dados Salvos com Sucesso!!!'
+			]);
+			
+		} else {
+			echo json_encode([
+				'titulo' => 'Observação Hospitalar',
+				'status' => 'error',
+				'menssagem' => 'Você deve preencher e salvar a entrada do paciente antes de Finalizar Atendimento!'
+			]);
+			exit;
+		}	
 
 	}elseif ($tipoRequest == 'FINALIZARINTERNACAOENTRADA') {
 
 		$iAtendimentoId = $_POST['iAtendimentoId'];
 
-		$array = [
-			"UPDATE AtendimentoEvolucaoDiaria SET AtEDiEditavel = 0 WHERE AtEDiAtendimento = '$iAtendimentoId'",
-			"UPDATE AtendimentoPrescricaoMedicamento SET AtPMeEditavel = 0 WHERE AtPMeAtendimento = '$iAtendimentoId'",
-			"UPDATE AtendimentoPrescricaoDieta SET AtPDiEditavel = 0 WHERE AtPDiAtendimento = '$iAtendimentoId'",
-			"UPDATE AtendimentoPrescricaoCuidado SET AtPCuEditavel = 0 WHERE AtPCuAtendimento = '$iAtendimentoId'",
-		];
+		$sql = "SELECT AtIEnId 
+		FROM AtendimentoInternacaoEntrada
+		WHERE AtIEnAtendimento = $iAtendimentoId
+		AND AtIEnUnidade = $iUnidade";	
+		$result = $conn->query($sql);
+		$resultadoBusca = $result->fetch(PDO::FETCH_ASSOC);
 
-		foreach ($array as $sql) {
-			$conn->query($sql);
+		if ($resultadoBusca) {
+
+			$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'AGUARDANDOLIBERACAOATENDIMENTO'";
+			$result = $conn->query($sql);
+			$rowSituacao = $result->fetch(PDO::FETCH_ASSOC);
+
+			$sql = "UPDATE Atendimento set AtendSituacao = '$rowSituacao[SituaId]' WHERE AtendId = $iAtendimentoId";
+			$result = $conn->query($sql);
+
+			$array = [
+				"UPDATE AtendimentoEvolucaoDiaria SET AtEDiEditavel = 0 WHERE AtEDiAtendimento = '$iAtendimentoId'",
+				"UPDATE AtendimentoPrescricaoMedicamento SET AtPMeEditavel = 0 WHERE AtPMeAtendimento = '$iAtendimentoId'",
+				"UPDATE AtendimentoPrescricaoDieta SET AtPDiEditavel = 0 WHERE AtPDiAtendimento = '$iAtendimentoId'",
+				"UPDATE AtendimentoPrescricaoCuidado SET AtPCuEditavel = 0 WHERE AtPCuAtendimento = '$iAtendimentoId'",
+			];
+	
+			foreach ($array as $sql) {
+				$conn->query($sql);
+			}
+	
+			$_SESSION['iAtendimentoId'] = $iAtendimentoId;
+	
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Internaçao Hospitalar',
+				'menssagem' => 'Dados Salvos com Sucesso!!!'
+			]);
+
+		} else {
+			echo json_encode([
+				'titulo' => 'Internação Hospitalar',
+				'status' => 'error',
+				'menssagem' => 'Você deve preencher e salvar a entrada do paciente antes de Finalizar Atendimento!'
+			]);
+			exit;
 		}
-
-		$_SESSION['iAtendimentoId'] = $iAtendimentoId;
-
-		echo json_encode([
-			'status' => 'success',
-			'titulo' => 'Internaçao Hospitalar',
-			'menssagem' => 'Dados Salvos com Sucesso!!!'
-		]);
-
+		
 	}
 
 } catch (\Throwable $e) {

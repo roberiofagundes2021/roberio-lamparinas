@@ -21,12 +21,16 @@ if(isset($_POST['inputEstabId'])){
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
-		
+		$mensagemDeErro = "Erro ao excluir Estabelecimento!!!";
+		if(
+			substr($e->getMessage(), 0, 134)==
+			'SQLSTATE[23000]: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The DELETE statement conflicted with the REFERENCE constraint "'
+		){
+			$mensagemDeErro = "Este registro já está sendo utilizado em outro lugar do sistema. Por favor, exclua todas as dependências dele antes de excluí-lo.";
+		}
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir Estabelecimento!!!";
-		$_SESSION['msg']['tipo'] = "error";			
-		
-		echo 'Error: ' . $e->getMessage();
+		$_SESSION['msg']['mensagem'] = $mensagemDeErro;
+		$_SESSION['msg']['tipo'] = "error";		
 	}
 }
 

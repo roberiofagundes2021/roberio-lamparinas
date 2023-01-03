@@ -180,6 +180,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
 
       function Filtrar() {
         let cont = false;
+        let saldoTfoot = 0;
 
         const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
 
@@ -210,6 +211,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
           dataType: "json",
           data: inputsValuesConsulta,
           success: function(resposta) {
+            saldoTfoot = resposta;
             $("#saldoAnterior").html('<span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">Saldo Anterior: R$ '+resposta+'</span>')
           }
         })
@@ -286,6 +288,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
             
             sinalNegativo = (saidaTotal == 0) ? '' : '-'
             corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
+            console.log(saldoTotal);
 
             total = `
             <tr id="total" role="row" class="even">
@@ -296,7 +299,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
               <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
               <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: green;">${float2moeda(entradaTotal)}</td>
               <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
-              <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: ${corSaldoTotal};">${float2moeda(saldoTotal)}</td>
+              <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: ${corSaldoTotal};">${(saldoTfoot)}</td>
               <td></td>
             </tr>`
             

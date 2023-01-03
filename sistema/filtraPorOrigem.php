@@ -31,7 +31,7 @@ if ($_POST['tipoDeFiltro'] == 'Categoria') {
 			} else {
 				$sql = "SELECT ServiCategoria as Categoria
 						FROM Servico
-						WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiId = " . $value['id'];
+						WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and ServiId = " . $value['id'];
 			}
 
 			$result = $conn->query($sql);

@@ -101,7 +101,7 @@ foreach ($rowSubCategoria as $item) {
 $sql = "SELECT TXOXSServico
 		FROM  TRXOrcamentoXServico
 		JOIN Servico on ServiId = TXOXSServico
-		WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento;
+		WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TXOXSOrcamento = " . $iOrcamento;
 $result = $conn->query($sql);
 $rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 $countServicoUtilizado = count($rowServicoUtilizado);
@@ -320,7 +320,7 @@ foreach ($rowServicoUtilizado as $itemServicoUtilizado) {
 											FROM Servico
 											JOIN TermoReferenciaXServico on TRXSrServico = ServiId
 											JOIN SubCategoria on SbCatId = ServiSubCategoria
-											WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'
+											WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'
 											ORDER BY SbCatNome, ServiNome ASC";
 									$result = $conn->query($sql);
 									$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);

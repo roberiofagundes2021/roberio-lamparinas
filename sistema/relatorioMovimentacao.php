@@ -719,7 +719,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT ServiId, ServiNome
 																	FROM Servico
 																	JOIN Situacao on SituaId = ServiStatus
-																	WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																	WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 																	ORDER BY ServiNome ASC";
 													$result = $conn->query($sql);
 													$row = $result->fetchAll(PDO::FETCH_ASSOC);

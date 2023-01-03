@@ -11,7 +11,7 @@ if(isset($_POST['inputNome'])){
 	try{		
 		$sql = "SELECT COUNT(isnull(ServiCodigo,0)) as Codigo
 				FROM Servico
-				Where ServiUnidade = ".$_SESSION['UnidadeId']."";
+				Where ServiEmpresa = ".$_SESSION['EmpreId']."";
 		//echo $sql;die;
 		$result = $conn->query("$sql");
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -26,10 +26,10 @@ if(isset($_POST['inputNome'])){
 		
 		$sql = "INSERT INTO Servico (ServiCodigo, ServiNome, ServiDetalhamento, ServiCategoria, ServiSubCategoria, ServiValorCusto, 
 									 ServiOutrasDespesas, ServiCustoFinal, ServiMargemLucro, ServiValorVenda, 
-									 ServiStatus, ServiUsuarioAtualizador, ServiUnidade) 
+									 ServiStatus, ServiUsuarioAtualizador, ServiEmpresa) 
 				VALUES (:sCodigo, :sNome, :sDetalhamento, :iCategoria, :iSubCategoria, :fValorCusto, 
 						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :bStatus, 
-						:iUsuarioAtualizador, :iUnidade)";
+						:iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -45,7 +45,7 @@ if(isset($_POST['inputNome'])){
 						':fValorVenda' => $_POST['inputValorVenda'] == null ? null : gravaValor($_POST['inputValorVenda']),
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iUnidade' => $_SESSION['UnidadeId']
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

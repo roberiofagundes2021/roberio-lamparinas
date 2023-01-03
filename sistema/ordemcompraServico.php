@@ -150,7 +150,7 @@ if (isset($_POST['inputIdOrdemCompra'])){
 $sql = "SELECT OCXSrServico
 		FROM OrdemCompraXServico
 		JOIN Servico on ServiId = OCXSrServico
-		WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and ServiCategoria = ".$iCategoria." and OCXSrOrdemCompra = ".$row['OrComId']."";
+		WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and ServiCategoria = ".$iCategoria." and OCXSrOrdemCompra = ".$row['OrComId']."";
 
 if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 	$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
@@ -440,7 +440,7 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 																FROM Servico
 																JOIN Situacao on SituaId = ServiStatus
 																JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
-																WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and 
+																WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO' and 
 																ServiCategoria = ".$iCategoria;
 														
 														if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
@@ -498,7 +498,7 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 												JOIN Situacao on SituaId = ServiStatus
 												JOIN OrdemCompraXServico on OCXSrServico = ServiId and OCXSrOrdemCompra = '$iOrdemCompra'
 												JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
-												WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria." and SituaChave='ATIVO'";
+												WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = ".$iCategoria." and SituaChave='ATIVO'";
 										if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 											$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
 										}
@@ -513,7 +513,7 @@ if ($countServicoUtilizado == $rowCompleto['Quant'] && ($countServicoUtilizado !
 													FROM Servico
 													JOIN Situacao on SituaId = ServiStatus
 													JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
-													WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and ServiCategoria = ".$iCategoria." and SituaChave='ATIVO'";
+													WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and ServiCategoria = ".$iCategoria." and SituaChave='ATIVO'";
 											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 												$sql .= " and ServiSubCategoria = ".$row['OrComSubCategoria'];
 											}

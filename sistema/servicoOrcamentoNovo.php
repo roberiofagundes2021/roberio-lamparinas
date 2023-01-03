@@ -33,14 +33,14 @@ if(isset($_POST['inputNome'])){
 		if (isset($_POST['cmbServico'])){
 
 			$sql = "UPDATE Servico SET ServiDetalhamento = :sDetalhamento, ServiUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE ServiId = :iServico and ServiUnidade = :iUnidade";
+					WHERE ServiId = :iServico and ServiEmpresa = :iEmpresa";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iServico' => $_POST['cmbServico'],
-						':iUnidade' => $_SESSION['UnidadeId']
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
 		}						
 
@@ -212,7 +212,7 @@ if(isset($_POST['inputNome'])){
 													$sql = "SELECT ServiId, ServiNome
 															FROM Servico
 															JOIN Situacao on SituaId = ServiStatus
-															WHERE ServiUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+															WHERE ServiEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
 															ORDER BY ServiNome ASC";
 													$result = $conn->query($sql);
 													$rowServico = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -64,7 +64,7 @@ try {
 	$sql = "SELECT OrXSrServico, OrXSrValorUnitario, OrXSrQuantidade
 			FROM OrcamentoXServico
 			JOIN Servico on ServiId = OrXSrServico
-			WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and OrXSrOrcamento = " . $iOrcamento;
+			WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OrXSrOrcamento = " . $iOrcamento;
 	$result = $conn->query($sql);
 	$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countServicoUtilizado = count($rowServicoUtilizado);
@@ -349,7 +349,7 @@ try {
 													$sql = "SELECT ServiId, ServiNome
 															FROM Servico
 															JOIN Situacao on SituaId = ServiStatus
-															WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria;
+															WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO' and ServiCategoria = " . $iCategoria;
 
 													if (isset($row['OrcamSubCategoria']) and $row['OrcamSubCategoria'] != '' and $row['OrcamSubCategoria'] != null) {
 														$sql .= " and ServiSubCategoria = " . $row['OrcamSubCategoria'];
@@ -403,7 +403,7 @@ try {
 									$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OrXSrValorUnitario, OrXSrQuantidade
 											FROM Servico
 											JOIN OrcamentoXServico on OrXSrServico = ServiId
-											WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and OrXSrOrcamento = " . $iOrcamento;
+											WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OrXSrOrcamento = " . $iOrcamento;
 									$result = $conn->query($sql);
 									$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);
 									$count = count($rowServicos);
@@ -412,7 +412,7 @@ try {
 										$sql = "SELECT ServiId, ServiNome, ServiDetalhamento
 												FROM Servico
 												JOIN Situacao on SituaId = ServiStatus
-												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and ServiCategoria = " . $iCategoria . " and SituaChave = 'ATIVO'
+												WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and ServiCategoria = " . $iCategoria . " and SituaChave = 'ATIVO'
 												ORDER BY ServiNome ASC
 												";
 

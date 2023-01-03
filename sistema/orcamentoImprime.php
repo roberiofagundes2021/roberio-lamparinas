@@ -193,7 +193,7 @@ try {
 			$sql = "SELECT ServiId, ServiNome, ServiDetalhamento, OrXSrQuantidade, OrXSrValorUnitario
 					FROM Servico
 					JOIN OrcamentoXServico on OrXSrServico = ServiId
-					WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " and OrXSrOrcamento = " . $iOrcamento;
+					WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and OrXSrOrcamento = " . $iOrcamento;
 
 			$result = $conn->query($sql);
 			$rowServicos = $result->fetchAll(PDO::FETCH_ASSOC);

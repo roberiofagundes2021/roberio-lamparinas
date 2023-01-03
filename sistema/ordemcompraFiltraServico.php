@@ -38,7 +38,7 @@ $sql = "SELECT ServiId, ServiNome, ServiDetalhamento, FOXSrValorUnitario, OCXSrQ
 				JOIN Categoria on CategId = ServiCategoria
 				JOIN OrdemCompraXServico on OCXSrServico = ServiId and OCXSrOrdemCompra = '$iOrdemCompra'
 				JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
-				WHERE ServiUnidade = $_SESSION[UnidadeId] and ServiId in (".$lista.")";
+				WHERE ServiEmpresa = $_SESSION[EmpreId] and ServiId in (".$lista.")";
 if (isset($rowServ['OrComSubCategoria']) and $rowServ['OrComSubCategoria'] != '' and $rowServ['OrComSubCategoria'] != null){
 	$sql .= " and ServiSubCategoria = ".$rowServ['OrComSubCategoria'];
 }
@@ -52,7 +52,7 @@ if(!$count>0){
 					FROM Servico
 					JOIN Categoria on CategId = ServiCategoria
 					JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = '$iFluxo'
-					WHERE ServiUnidade = $_SESSION[UnidadeId] and ServiId in (".$lista.")";
+					WHERE ServiEmpresa = $_SESSION[EmpreId] and ServiId in (".$lista.")";
 	if (isset($rowServ['OrComSubCategoria']) and $rowServ['OrComSubCategoria'] != '' and $rowServ['OrComSubCategoria'] != null){
 		$sql .= " and ServiSubCategoria = ".$rowServ['OrComSubCategoria'];
 	}

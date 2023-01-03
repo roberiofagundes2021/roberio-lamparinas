@@ -13,8 +13,8 @@ if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
 }
 $_SESSION['iAtendimentoId'] = null;
 
+$uTipoAtendimento = $_SESSION['UltimaPagina'];
 if(!$iAtendimentoId){
-	$uTipoAtendimento = $_SESSION['UltimaPagina'];
 
 	if ($uTipoAtendimento == "ELETIVO") {
 		irpara("atendimentoEletivoListagem.php");
@@ -397,10 +397,26 @@ if ($row['ClienSexo'] == 'F'){
 					success: function(response) {
 						if(response.status == 'success'){
 							alerta(response.titulo, response.menssagem, response.status)
-							window.location.href = 'atendimentoHospitalarListagem.php'
+
+							<?php
+								if ($uTipoAtendimento == "ELETIVO") {
+									echo "window.location.href = 'atendimentoEletivoListagem.php'";
+								} elseif ($uTipoAtendimento == "AMBULATORIAL") {
+									echo "window.location.href = 'atendimentoAmbulatorialListagem.php'";
+								} elseif ($uTipoAtendimento == "INTERNACAO") {
+									echo "window.location.href = 'atendimentoHospitalarListagem.php'";
+								}	
+							?>
 							
 						}else{
 							alerta(response.titulo, response.menssagem, response.status)
+
+							$(".box-entradaPaciente").css('display', 'block');
+							$(".box-evolucao").css('display', 'none');
+							$(".box-prescricao").css('display', 'none');
+							$("#sinaisESintomasClinicos").focus();
+							$('.btn-grid').removeClass('active');
+							$('#entradaPaciente-btn').addClass('active'); 
 						}						
 					}
 				});
@@ -1880,69 +1896,19 @@ if ($row['ClienSexo'] == 'F'){
 		}
 
 		function excluirEvolucao(id) {
-
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoObservacaoHospitalar.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'DELETEEVOLUCAO',
-					'id' : id
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.status)
-					getEvolucaoDiaria()				
-				}
-			});
+			confirmaExclusaoAjax('filtraAtendimentoObservacaoHospitalar.php', 'Excluir Evolução?', 'DELETEEVOLUCAO', id, getEvolucaoDiaria)
 		}
 
 		function excluirMedicamento(id, tipo) {
-
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoObservacaoHospitalar.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'DELETEMEDICAMENTO',
-					'id' : id
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.status)
-					getMedicamentosSolucoes()				
-				}
-			});			
+			confirmaExclusaoAjax('filtraAtendimentoObservacaoHospitalar.php', 'Excluir Prescrição de Medicamento?', 'DELETEMEDICAMENTO', id, getMedicamentosSolucoes)	
 		}
+
 		function excluirDieta(id) {
-
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoObservacaoHospitalar.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'DELETEDIETA',
-					'id' : id
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.status)
-					getDietas()				
-				}
-			});			
+			confirmaExclusaoAjax('filtraAtendimentoObservacaoHospitalar.php', 'Excluir Prescrição de Dieta?', 'DELETEDIETA', id, getDietas)	
 		}
-		function excluirCuidado(id) {
 
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoObservacaoHospitalar.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'DELETECUIDADO',
-					'id' : id
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.status)
-					getCuidados()				
-				}
-			});			
+		function excluirCuidado(id) {
+			confirmaExclusaoAjax('filtraAtendimentoObservacaoHospitalar.php', 'Excluir Prescrição de Cuidado?', 'DELETECUIDADO', id, getCuidados)	
 		}
 
 		function zerarEvolucao() {

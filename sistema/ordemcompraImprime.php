@@ -123,7 +123,7 @@ try {
 			JOIN ServicoXFabricante ON SrXFaServico = FOXSrServico and SrXFaFluxoOperacional = FOXSrFluxoOperacional
 			JOIN FluxoOperacional on FlOpeId = SrXFaFluxoOperacional
 			JOIN Marca on MarcaId = SrXFaMarca
-			WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and OCXSrOrdemCompra = ".$iOrdemCompra." and FOXSrFluxoOperacional = " . $iFluxoOperacional."
+			WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and OCXSrOrdemCompra = ".$iOrdemCompra." and FOXSrFluxoOperacional = " . $iFluxoOperacional."
 			ORDER BY ServiNome ASC";
 
 	$result = $conn->query($sql);

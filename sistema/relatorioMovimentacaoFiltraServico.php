@@ -90,7 +90,7 @@ function queryPesquisa()
                 LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
                 LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
                 LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
-                WHERE " . $string . " ServiUnidade = " . $_SESSION['UnidadeId'] . " and 
+                WHERE " . $string . " ServiEmpresa = " . $_SESSION['EmpreId'] . " and 
                 SituaChave in ('LIBERADO', 'LIBERADOCENTRO', 'AGUARDANDOLIBERACAOCONTABILIDADE', 'LIBERADOCONTABILIDADE')
                 ";
         $result = $conn->query($sql);

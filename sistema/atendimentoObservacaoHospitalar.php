@@ -13,8 +13,8 @@ if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
 }
 $_SESSION['iAtendimentoId'] = null;
 
+$uTipoAtendimento = $_SESSION['UltimaPagina'];
 if(!$iAtendimentoId){
-	$uTipoAtendimento = $_SESSION['UltimaPagina'];
 
 	if ($uTipoAtendimento == "ELETIVO") {
 		irpara("atendimentoEletivoListagem.php");

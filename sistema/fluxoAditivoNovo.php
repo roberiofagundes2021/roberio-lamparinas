@@ -786,7 +786,7 @@ try {
 												LEFT JOIN Marca on MarcaId = SrXFaMarca
 												LEFT JOIN Modelo on ModelId = SrXFaModelo
 												LEFT JOIN Fabricante on FabriId = SrXFaFabricante
-												WHERE ServiUnidade = " . $_SESSION['UnidadeId'] . " AND ServiCategoria = $iCategoria 
+												WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " AND ServiCategoria = $iCategoria 
 												AND FOXSrFluxoOperacional = $iFluxoOperacional";
 								if($sSubCategorias){
 									$sqlServico .= " and ServiSubCategoria in (" . $sSubCategorias . ")";

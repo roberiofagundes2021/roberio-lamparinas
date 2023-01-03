@@ -42,7 +42,7 @@ $sql = "SELECT ServiId, ServiNome, FOXSrDetalhamento as Detalhamento, FOXSrQuant
 FROM Servico
 JOIN FluxoOperacionalXServico on FOXSrServico = ServiId
 LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-WHERE ServiUnidade =  $iUnidade and FOXSrFluxoOperacional = $iFluxoOperacional";
+WHERE ServiEmpresa =  $iEmpresa and FOXSrFluxoOperacional = $iFluxoOperacional";
 
 if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){
 	$sql .= " and ServiSubCategoria = '". $_POST['idSubCategoria']."' and ServiId in (".$lista.")";
@@ -61,7 +61,7 @@ if ($Origem == 'fluxo.php'){
 				JOIN Situacao on SituaId = ServiStatus
 				LEFT JOIN FluxoOperacionalXServico on FOXSrServico = ServiId and FOXSrFluxoOperacional = $iFluxoOperacional
 				LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-				WHERE ServiUnidade = $iUnidade";
+				WHERE ServiEmpresa = $iEmpresa";
 
 		if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){
 			$sql .= " and ServiSubCategoria = '". $_POST['idSubCategoria']."' and ServiId in (".$lista.")";

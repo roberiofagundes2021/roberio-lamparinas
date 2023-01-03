@@ -648,15 +648,16 @@ $acesso = 'ATENDIMENTO';
 
 							<div class="card-body">
 								<div class="row">
-									<div class="col-lg-8">
+									<div class="col-lg-7">
 										<p class="font-size-lg">A relação abaixo faz referência aos atendimentos da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b></p>
 									</div>
-									<div class="col-lg-4 text-right">
+									<div class="col-lg-5 text-right">
 										<div class="text-right">
 											<a href="#" onclick="submeterAgendaMedica()" class="btn" role="button">Agenda médica</a>
 											<?php 
 												echo $inserir?"<a href='atendimentoNovo.php' class='btn btn-principal' role='button'>Novo Atendimento</a>":"";
 											?>
+											<a href="gastosAdicionais.php" class="btn btn-primary" role="button">Gastos Adicionais</a>
 											
 											<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
 												<i class="icon-printer2"></i>																						

@@ -133,7 +133,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional
 		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$ID[1];
+		WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and FOXSrFluxoOperacional = ".$ID[1];
 
 		// filtrar de acordo com os produtos marcados
 		if(isset($_POST['cmbFornecedor'])){
@@ -205,7 +205,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional
 		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$ID[1];
+		WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and AdXSrAditivo = ".$ID[1];
 
 		// filtrar de acordo com os produtos marcados
 		if(isset($_POST['cmbFornecedor'])){
@@ -285,7 +285,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional 
 		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$ID[1];
+		WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and FOXSrFluxoOperacional = ".$ID[1];
 
 		// filtrar de acordo com os produtos marcados
 		if(isset($_POST['cmbFornecedor'])){
@@ -358,7 +358,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional 
 		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$ID[1];
+		WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and AdXSrAditivo = ".$ID[1];
 
 		// filtrar de acordo com os produtos marcados
 		if(isset($_POST['cmbFornecedor'])){
@@ -412,7 +412,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional 
 		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and FOXSrFluxoOperacional = ".$ID[1];
+		WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and FOXSrFluxoOperacional = ".$ID[1];
 	} else {
 		$sqlFilter = "SELECT ProduId as Id, ProduNome as Nome, AdXPrDetalhamento as Detalhamento, 
 		UnMedSigla as UnidadeMedida, AdXPrQuantidade as Quantidade, AdXPrValorUnitario as ValorUnitario, 
@@ -432,7 +432,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ServicoXFabricante on SrXFaServico = ServiId and SrXFaUnidade = $iUnidade and SrXFaFluxoOperacional = $iFluxoOperacional 
 		LEFT JOIN Marca on MarcaId = SrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ServiSubCategoria
-		WHERE ServiUnidade = ".$_SESSION['UnidadeId']." and AdXSrAditivo = ".$ID[1];
+		WHERE ServiEmpresa = ".$_SESSION['EmpreId']." and AdXSrAditivo = ".$ID[1];
 	}
 
 	$resultFilter = $conn->query($sqlFilter);
