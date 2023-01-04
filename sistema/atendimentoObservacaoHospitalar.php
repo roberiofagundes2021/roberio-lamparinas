@@ -1522,7 +1522,7 @@ if ($row['ClienSexo'] == 'F'){
 				},
 				success: function(response) {
 					if (response.status == 'success') {						
-						window.open('http://localhost/lamparinas/sistema/atendimentoProdutos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1200,height=450,left=25,top=25'); 
+						window.open('/lamparinas/sistema/atendimentoProdutos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1200,height=450,left=25,top=25'); 
 					}
 				}
 			});
