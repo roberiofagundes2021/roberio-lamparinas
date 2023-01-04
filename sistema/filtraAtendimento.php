@@ -76,9 +76,37 @@ try{
 			WHERE AtendUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$sql = "SELECT AtendId, AtendNumRegistro, AtOEnDataInicio as AtendData, AtOEnHoraInicio as AtendHora, AtOEnId as AtEntrada,SituaNome, SituaCor, SituaChave,
+			Conduta = 'Observação Hospitalar',ClienNome,ClienCodigo, Profissional.ProfiNome as ProfissionalNome, ProfiCbo, ClienDtNascimento
+			FROM Atendimento
+			LEFT JOIN AtendimentoObservacaoEntrada ON AtendId = AtOEnAtendimento
+			LEFT JOIN Situacao ON SituaId = AtendSituacao
+			LEFT JOIN Cliente ON ClienId = AtendCliente
+			LEFT JOIN Profissional ON Profissional.ProfiId = AtendimentoObservacaoEntrada.AtOEnProfissional
+			LEFT JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
+			WHERE SituaChave = 'AGUARDANDOLIBERACAOATENDIMENTO'
+			AND AtendId  in (SELECT AtOEnAtendimento FROM AtendimentoObservacaoEntrada WHERE AtOEnUnidade = $iUnidade)
+			AND AtendUnidade = $iUnidade
+			UNION ALL 
+			SELECT AtendId, AtendNumRegistro, AtIEnDataInicio as AtendData, AtIEnHoraInicio as AtendHora,  AtIEnId as AtEntrada,SituaNome, SituaCor, SituaChave,
+			Conduta = 'Internação Hospitalar', ClienNome,ClienCodigo, Profissional.ProfiNome as ProfissionalNome, ProfiCbo, ClienDtNascimento
+			FROM Atendimento
+			LEFT JOIN AtendimentoInternacaoEntrada ON AtendId = AtIEnAtendimento
+			LEFT JOIN Situacao ON SituaId = AtendSituacao
+			LEFT JOIN Cliente ON ClienId = AtendCliente
+			LEFT JOIN Profissional ON Profissional.ProfiId = AtendimentoInternacaoEntrada.AtIEnProfissional 
+			LEFT JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
+			WHERE SituaChave = 'AGUARDANDOLIBERACAOATENDIMENTO'
+			AND AtendId  in (SELECT AtIEnAtendimento FROM AtendimentoInternacaoEntrada WHERE AtIEnUnidade = $iUnidade)
+			AND AtendUnidade = $iUnidade
+			ORDER BY AtendId";
+		$result = $conn->query($sql);
+		$rowSolicitacao = $result->fetchAll(PDO::FETCH_ASSOC);
 		
 		$dataAtendimento = [];
 		$dataAgendamento = [];
+		$dataSolicitacao = [];
 		foreach($rowAgendamento as $item){
 			$att = "<a style='color: black' href='#' data-tipo='AGENDAMENTO' onclick='atualizaAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 			$exc = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='excluiAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
@@ -181,9 +209,50 @@ try{
 				]
 			]);
 		}
+		foreach ($rowSolicitacao as $item) {
+
+			$id = $item['AtendId'];
+			$acoes = "<div class='list-icons'>
+	
+						<div class='dropdown'>													
+							<a href='#' class='list-icons-item' data-toggle='dropdown'>
+								<i class='icon-menu9'></i>
+							</a>
+
+							<div class='dropdown-menu dropdown-menu-right'>
+								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Gestão de Leitos'></i> Gestão de Leitos</a>
+								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Tabela de Gastos'></i> Tabela de Gastos</a>
+								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Formularios'></i> Formularios</a>
+							</div>
+						</div>
+					</div>";
+
+			array_push($dataSolicitacao, [
+				'data' => [
+					mostraData($item['AtendData']) . " - " . mostraHora($item['AtendHora']), // Data - Hora
+					$item['AtendNumRegistro'],  // Nº Registro
+					$item['ClienNome'],  // Paciente
+					calculaIdadeSimples($item['ClienDtNascimento']), // Idade paciente
+					$item['ProfissionalNome'],  // Profissional
+					$item['Conduta'],  // Conduta
+					"<span style='cursor:pointer' class='badge badge-flat border-$item[SituaCor] text-$item[SituaCor]'>$item[SituaNome]</span>",  // Situação
+					$acoes,  // Ações
+				],
+				'identify' => [
+					'situacao' => $item['SituaChave'],
+					'id' => $item['AtendId'],
+					'prontuario' => 'Prontuário: '.($item['ClienCodigo']?$item['ClienCodigo']:'NaN'),
+					'cbo' => 'CBO: '.($item['ProfiCbo']?$item['ProfiCbo']:'NaN')
+				]
+			]);
+			
+		}
+
 		$array  = [
 			'dataAgendamento' => $dataAgendamento,
 			'dataAtendimento' => $dataAtendimento,
+			'dataSolicitacao' => $dataSolicitacao,
+			'contadorSolicitacoes' => count($rowSolicitacao),
 			'titulo' => 'Atendimentos',
 			'status' => 'success',
 			'menssagem' => ''
@@ -657,6 +726,7 @@ try{
 			'dataAtendido' =>$atendido,
 			'dataEmAtendimento' => $emAtendimento,
 			'dataObservacao' => $observacao,
+			'contadorEmObservacao' => count($observacao),
 			'acesso' => $acesso,
 			'titulo' => '',
 			'status' => 'success',

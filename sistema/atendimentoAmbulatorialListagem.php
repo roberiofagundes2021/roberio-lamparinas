@@ -641,6 +641,7 @@ $acesso = 'ATENDIMENTO';
 						$(rowNodeEmAtendimento).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeEmAtendimento).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})
+					$('#contadorEmObservacao').text(response.contadorEmObservacao)
 					response.dataObservacao.forEach(item => {
 						rowNodeObservacao = tableObservacao.row.add(item.data).draw().node()
 						$(rowNodeObservacao).attr('class', 'text-left')
@@ -773,7 +774,14 @@ $acesso = 'ATENDIMENTO';
 									<div class="col-lg-12">	
 										<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('espera')" >Pacientes em Espera</button>
 										<button type="button" id="pacientes-atendimento-btn" class="btn-grid btn btn-outline-secondary btn-lg" onclick="mudarGrid('atendimento')" >Pacientes em Atendimento</button>
-										<button type="button" id="pacientes-observacao-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('observacao')" >Pacientes em Observação</button>
+										
+										<div class="btn-group btn-group-toggle" data-toggle="buttons">
+											<label class="btn btn-grid btn-lg btn-outline-secondary " onclick="mudarGrid('observacao')">
+												<input type="radio" autocomplete="off"  > Pacientes em Observação 
+											</label>
+											<label id="contadorEmObservacao" class="btn btn-lg btn-success" style="padding-left: 3px; padding-right: 3px"> - </label>
+										</div>									
+										
 										<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendidos')" >Pacientes Atendidos</button>
 									</div>
 								</div>

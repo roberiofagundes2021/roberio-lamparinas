@@ -186,6 +186,64 @@ $acesso = 'ATENDIMENTO';
                     }
                 }
 			})
+
+			$('#SolicitacoesMedicasTable').DataTable({
+				"order": [[ 0, "desc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [{
+					orderable: true,   //Data - hora
+					width: "10%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   // Nº Registro
+					width: "10%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   // Paciente
+					width: "15%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,   // Idade
+					width: "10%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //Profissional
+					width: "15%",
+					targets: [4]
+				},
+				{ 
+					orderable: true,   //Condulta
+					width: "15%",
+					targets: [5]
+				},
+				{ 
+					orderable: true,   // Situação
+					width: "5%",
+					targets: [6]
+				},
+				{ 
+					orderable: true,   //Ações
+					width: "5%",
+					targets: [7]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+                language: {
+                    search: '<span>Filtro:</span> _INPUT_',
+                    searchPlaceholder: 'filtra qualquer coluna...',
+                    lengthMenu: '<span>Mostrar:</span> _MENU_',
+                    paginate: {
+                        'first': 'Primeira',
+                        'last': 'Última',
+                        'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+                        'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+                    }
+                }
+			})
 			
 			/* Início: Tabela Personalizada do Setor Publico */
 			$('#AtendimentoTableEspera').DataTable({
@@ -580,6 +638,29 @@ $acesso = 'ATENDIMENTO';
 						}
 						// <end>
 					})
+
+					$('#contadorSolicitacoes').text(response.contadorSolicitacoes)
+					$('#SolicitacoesMedicasTable').DataTable().clear().draw()
+
+					tableSolicitacao = $('#SolicitacoesMedicasTable').DataTable()
+					let rowNodeSolicitacao
+
+					await response.dataSolicitacao.forEach(item => {
+						rowNodeSolicitacao = tableSolicitacao.row.add(item.data).draw().node()
+
+						$(rowNodeSolicitacao).find('td:eq(2)').attr('title', item.identify.prontuario)
+						$(rowNodeSolicitacao).find('td:eq(4)').attr('title', item.identify.cbo)
+
+						// esse trecho serve para o atributos no campo situação de cada linha
+						$(rowNodeSolicitacao).attr('class', 'text-left')
+						$(rowNodeSolicitacao).find('td:eq(6)').attr('data-id', `${item.identify.id}`)
+						$(rowNodeSolicitacao).find('td:eq(6)').attr('data-tipo', 'SOLICITACAO')
+
+						$(rowNodeSolicitacao).find('td:eq(7)').attr('class', 'text-center')
+
+						// <end>
+					})
+
 					setAttributs()
 				}
 			});
@@ -595,10 +676,19 @@ $acesso = 'ATENDIMENTO';
 				document.getElementById("card-title").innerText = "Atendimentos";
 				document.getElementById("box-atendimentos").style.display = 'block';
 				document.getElementById("box-agendamentos").style.display = 'none';
+				document.getElementById("box-solicitacoes-medicas").style.display = 'none';
 			}
 			if (grid == 'agendamentos') {
 				document.getElementById("card-title").innerText = "Agendamentos";
 				document.getElementById("box-agendamentos").style.display = 'block';
+				document.getElementById("box-atendimentos").style.display = 'none';	
+				document.getElementById("box-solicitacoes-medicas").style.display = 'none';
+
+			}
+			if (grid == 'solicitacoes-medicas') {
+				document.getElementById("card-title").innerText = "Solicitações Médicas";
+				document.getElementById("box-solicitacoes-medicas").style.display = 'block';
+				document.getElementById("box-agendamentos").style.display = 'none';
 				document.getElementById("box-atendimentos").style.display = 'none';			
 			}
 
@@ -668,6 +758,14 @@ $acesso = 'ATENDIMENTO';
 									<div class="col-lg-12">	
 										<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('agendamentos')" >Agendamentos</button>
 										<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendimentos')" >Atendimentos</button>
+
+										<div class="btn-group btn-group-toggle" data-toggle="buttons">
+											<label class="btn btn-grid btn-lg btn-outline-secondary " onclick="mudarGrid('solicitacoes-medicas')">
+												<input type="radio" autocomplete="off"  > Solicitações Médicas 
+											</label>
+											<label id="contadorSolicitacoes" class="btn btn-lg btn-success" style="padding-left: 3px; padding-right: 3px"> - </label>
+										</div>
+										
 									</div>
 
 								</div>
@@ -721,6 +819,29 @@ $acesso = 'ATENDIMENTO';
 											<th>Profissional</th>
 											<th>Modalidade</th>
 											<th>Procedimento</th>
+											<th>Situação</th>
+											<th class="text-center">Ações</th>
+										</tr>
+									</thead>
+									<tbody>
+
+									</tbody>
+								</table>
+							</div>
+
+							<!-- Solicitacoes Medicas -->
+							<div id="box-solicitacoes-medicas" style="display: none;">
+
+								<div class="card-body" style="padding: 0px"></div>
+								<table class="table" id="SolicitacoesMedicasTable">
+									<thead style="border-left: 10px solid #466d96">
+										<tr class="bg-slate text-left">
+											<th>Data / Hora</th>											
+											<th>Nº Registro</th>
+											<th>Paciente</th>
+											<th>Idade</th>
+											<th>Profissional</th>
+											<th>Conduta</th>
 											<th>Situação</th>
 											<th class="text-center">Ações</th>
 										</tr>
