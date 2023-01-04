@@ -101,7 +101,7 @@ foreach ($rowSubCategoria as $item) {
 $sql = "SELECT TXOXSServico
 		FROM  TRXOrcamentoXServico
 		JOIN Servico on ServiId = TXOXSServico
-		WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TXOXSOrcamento = " . $iOrcamento;
+		WHERE TXOXSUnidade = " . $_SESSION['UnidadeId'] . " and TXOXSOrcamento = " . $iOrcamento;
 $result = $conn->query($sql);
 $rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 $countServicoUtilizado = count($rowServicoUtilizado);

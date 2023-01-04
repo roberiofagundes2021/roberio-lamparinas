@@ -135,7 +135,7 @@ try {
 	$sql = "SELECT FOXSrServico
 			FROM FluxoOperacionalXServico
 			JOIN Servico on ServiId = FOXSrServico
-			WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
+			WHERE FOXSrUnidade = " . $_SESSION['UnidadeId'] . " and FOXSrFluxoOperacional = " . $iFluxoOperacional;
 	$result = $conn->query($sql);
 	$rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countServicoUtilizado = count($rowServicoUtilizado);

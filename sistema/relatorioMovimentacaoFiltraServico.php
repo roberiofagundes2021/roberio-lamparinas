@@ -80,7 +80,7 @@ function queryPesquisa()
                     WHEN MovimDestinoLocal IS NULL THEN ISNULL(SetorD.SetorNome, MovimDestinoManual)
                 ELSE LocalD.LcEstNome
                 END as Destino, 
-                MvXSrQuantidade, ServiNome, CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', MovimDestinoLocal) as Saldo
+                MvXSrQuantidade, ServiNome, CategNome, dbo.fnSaldoEstoque(MovimUnidade, ServiId, 'S', MovimDestinoLocal) as Saldo
                 FROM Movimentacao
                 JOIN MovimentacaoXServico on MvXSrMovimentacao = MovimId
                 JOIN Servico on ServiId = MvXSrServico
@@ -90,7 +90,7 @@ function queryPesquisa()
                 LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
                 LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
                 LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
-                WHERE " . $string . " ServiEmpresa = " . $_SESSION['EmpreId'] . " and 
+                WHERE " . $string . " MovimUnidade = " . $_SESSION['UnidadeId'] . " and 
                 SituaChave in ('LIBERADO', 'LIBERADOCENTRO', 'AGUARDANDOLIBERACAOCONTABILIDADE', 'LIBERADOCONTABILIDADE')
                 ";
         $result = $conn->query($sql);

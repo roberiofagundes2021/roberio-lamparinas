@@ -18,13 +18,13 @@ if (isset($_POST['solicitacaoId'])) {
     $rowProdutos = $resultProduto->fetchAll(PDO::FETCH_ASSOC);
 
     $sqlServico = "SELECT SolicId, SlXSrQuantidade as Quantidade, ServiId as Id, ServiCodigo as Codigo,
-    ServiNome as Nome, CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
+    ServiNome as Nome, CategNome, dbo.fnSaldoEstoque(SolicUnidade, ServiId, 'S', NULL) as Estoque
             FROM Solicitacao
             JOIN SolicitacaoXServico on SlXSrSolicitacao = SolicId
             JOIN Servico on ServiId = SlXSrServico
             JOIN Categoria on CategId = ServiCategoria
             JOIN Situacao on SituaId = ServiStatus
-            WHERE SolicId = " . $_POST['solicitacaoId'] . " and ServiEmpresa = " . $_SESSION['EmpreId'] . "
+            WHERE SolicId = " . $_POST['solicitacaoId'] . " and SolicUnidade = " . $_SESSION['UnidadeId'] . "
             ";
     $resultServico = $conn->query($sqlServico);
     $rowServicos = $resultServico->fetchAll(PDO::FETCH_ASSOC);

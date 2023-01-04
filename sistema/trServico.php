@@ -166,7 +166,7 @@ if (count($rowServicoOrcamentoUtilizado) >= 1) {
 $sql = "SELECT TRXSrServico
 		FROM TermoReferenciaXServico
 		JOIN Servico on ServiId = TRXSrServico
-		WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
+		WHERE TRXSrUnidade = " . $_SESSION['UnidadeId'] . " and TRXSrTermoReferencia = " . $iTR . " and TRXSrTabela = 'Servico'";
 $result = $conn->query($sql);
 $rowServicoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 $countServicoUtilizado = count($rowServicoUtilizado);
@@ -626,7 +626,7 @@ if (count($rowServicoUtilizado) >= 1) {
 												FROM TermoReferenciaXServico
 												JOIN Servico ON ServiId = TRXSrServico
 												JOIN SubCategoria on SbCatId = ServiSubCategoria
-												WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " 
+												WHERE TRXSrUnidade = " . $_SESSION['UnidadeId'] . " 
 												AND TRXSrTermoReferencia = " . $iTR . " 
 												AND TRXSrTabela = 'Servico'	
 												Order By SbCatNome, ServiNome ASC";
