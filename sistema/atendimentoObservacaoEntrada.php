@@ -1608,8 +1608,12 @@ if ($row['ClienSexo'] == 'F'){
 					'tipoBusca': tipo,
 				},
 				success: function(response) {
-					if (response.status == 'success') {						
-						window.open('/lamparinas/sistema/atendimentoProdutos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1000,height=450,left=25,top=25'); 
+					if (response.status == 'success') {					
+						if (window.location.host == 'localhost' || window.location.host == '127.0.0.1' ) {							
+							window.open('/lamparinas/sistema/atendimentoProdutos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1000,height=450,left=25,top=25'); 							
+						} else {
+							window.open('/sistema/atendimentoProdutos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1000,height=450,left=25,top=25'); 							
+						}
 					}
 				}
 			});
