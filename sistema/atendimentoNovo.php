@@ -344,9 +344,9 @@ $_SESSION['atendimento'] = [
 		$(document).ready(function() {
 			$('#informacoes').hide()
 			$('.actions').addClass('col-lg-12 row pt-2')
-			$('.actions ul').addClass('col-lg-10 actionContent')
-			$('.actions').append(`<a class='col-lg-2 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>`)
-			$('#cancelar').insertBefore('.actionContent')
+			$('.actions ul').addClass('col-lg-12 actionContent')
+			//$('.actions').append(`<a class='col-lg-12 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>`)
+			//$('#cancelar').insertAfter('.actionContent')
 
 			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
 			dataAtual = dataAtual.split(' ')[0]
@@ -1454,7 +1454,7 @@ $_SESSION['atendimento'] = [
 			<!-- Content area -->
 			<div class="content">
 				<div class="row">
-					<div class="col-lg-12">
+					<div class="col-lg-3">
 						<div class="card">
 							<div class="card-header header-elements-inline" style="margin-left:10px;">
 								<h5 class="text-uppercase font-weight-bold">Cadastro de Atendimento</h5>
@@ -1478,6 +1478,11 @@ $_SESSION['atendimento'] = [
 							</form>
 						</div>
 
+						<div class="card">
+							<a class='col-lg-12 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>
+						</div>
+					</div>
+					<div class="col-lg-9">
 						<!-- 
 							esse card a seguir vai apresentar o conteudo para que o usuário possa selecionar,
 							está fora do  "<fieldset>" para que o componente possa renderizar os botões
@@ -1485,7 +1490,7 @@ $_SESSION['atendimento'] = [
 							todo o efeito de fadeIn e fadeOut dos componentes e páginas são feitos em JavaScript de 
 							acordo com a seleção do usuário
 						-->
-						<div class="card">
+						<div class="card" style="min-height: 270px;">
 							<div id="dados">
 								<form id="dadosPaciente" class="form-validate-jquery" action="#" data-fouc>
 									<div class="card-header header-elements-inline" style="margin-left:10px;">
