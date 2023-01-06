@@ -112,6 +112,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 			$('#excluirContainer').hide();
 
 			$('#salvarAgenda').on('click', ()=>{
+				$('#salvarAgenda').html("<img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px'>");
 				$("#salvarAgenda").prop('disabled', true);
 				$.ajax({
 					type: 'POST',
@@ -123,8 +124,10 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 					},
 					success: function(response) {
 						alerta(response.titulo, response.menssagem, response.status)
+						// window.location.href = "profissional.php"
 						getAgenda()
-						$("#salvarAgenda").prop('disabled', false);		
+						$('#salvarAgenda').html('Salvar');
+						$("#salvarAgenda").prop('disabled', false);
 					}
 				});
 			})

@@ -175,15 +175,12 @@ try{
 				PrAgeHoraFim,PrAgeAtendimentoLocal,PrAgeUsuarioAtualizador,PrAgeUnidade
 				FROM ProfissionalAgenda
 				WHERE PrAgeId != '$item[id]' AND PrAgeProfissional = $iProfissional AND PrAgeData = '$data'
-				AND ('$start[1]' >= PrAgeHoraInicio AND '$start[1]' <= PrAgeHoraFim
+				AND (('$start[1]' >= PrAgeHoraInicio AND '$start[1]' <= PrAgeHoraFim
 				OR '$end[1]' >= PrAgeHoraInicio AND '$end[1]' <= PrAgeHoraFim)OR
 				(PrAgeHoraInicio >= '$start[1]' AND PrAgeHoraFim <= '$start[1]'
-				OR PrAgeHoraInicio >= '$end[1]' AND PrAgeHoraFim <= '$end[1]')";
+				OR PrAgeHoraInicio >= '$end[1]' AND PrAgeHoraFim <= '$end[1]'))";
 				$results = $conn->query($sql);
 				$results = $results->fetchAll(PDO::FETCH_ASSOC);
-
-				// var_dump($sql);
-				// exit();
 
 				switch($item){
 					case !isset($item['tipInsert']):$msg = 'Informe o início e fim do agendamento!!';break;
