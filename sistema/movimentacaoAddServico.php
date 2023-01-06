@@ -4,7 +4,8 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ServiId, ServiNome, ServiValorCusto, ServiCustoFinal, ServiDetalhamento, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
+$sql = "SELECT ServiId, ServiNome, ServiValorCusto, ServiCustoFinal, ServiDetalhamento, 
+		dbo.fnSaldoEstoque(". $_SESSION['UnidadeId'] . ", ServiId, 'S', NULL) as Estoque
 		FROM Servico
 		WHERE ServiEmpresa = " . $_SESSION['EmpreId'] . " and ServiId = " . $_POST['idServico'];
 $result = $conn->query($sql);
