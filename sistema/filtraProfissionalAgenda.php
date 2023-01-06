@@ -42,7 +42,7 @@ try{
 				'id'=> $item['PrAgeId'],
 				'url'=> '',
 				'intervalo'=> $item['PrAgeIntervalo'],
-				'tipInsert'=> 'ATT',
+				'tipInsert'=> '',
 				'localId' => $item['PrAgeAtendimentoLocal'],
 				'title'=> $item['AtLocNome'],
 				'start'=> $inicio,
@@ -95,7 +95,7 @@ try{
 			$horaI = $arrayDataHora[1];
 
 			$data = explode('/',$arrayDataHora[0]);
-			$data = $data[2].'-'.$data[1].'-'.$data[0]; // "yyyy/mm/dd hh:MM:ss"
+			$data = $data[2].'/'.$data[1].'/'.$data[0]; // "yyyy/mm/dd"
 	
 			if(isset($_POST['dataF']) && $_POST['dataF']){
 				$horaF = $_POST['dataF'];
@@ -109,6 +109,7 @@ try{
 				$arrayAgenda[$key]['start'] = ($data.' '.$horaI);
 				$arrayAgenda[$key]['end'] = ($data.' '.$horaF);
 				$arrayAgenda[$key]['intervalo'] = $intervalo;
+				$arrayAgenda[$key]['tipInsert'] = 'ATT';
 				$_SESSION['agendaProfissional'] = $arrayAgenda;
 				echo json_encode($arrayAgenda);
 				exit;
@@ -124,7 +125,7 @@ try{
 			'tipInsert'=> 'NEW',
 			'title'=> $title,
 			'color'=> $cor,
-			'url'=> '',
+			'url'=> ''
 		]);
 		$_SESSION['agendaProfissional'] = $arrayAgenda;
 		echo json_encode($arrayAgenda);
@@ -143,6 +144,7 @@ try{
 				$arrayAgenda[$key]['start'] = $dataI.' '.$horaAgendaInicio;
 				$arrayAgenda[$key]['end'] = $dataF.' '.$horaAgendaFim;
 				$arrayAgenda[$key]['intervalo'] = $intervalo;
+				$arrayAgenda[$key]['tipInsert'] = 'ATT';
 			}
 		}
 		
@@ -159,24 +161,51 @@ try{
 		$msg = '';
 
 		foreach($arrayAgenda as $item){
-			switch($item){
-				case !isset($item['tipInsert']):$msg = 'Informe o início e fim do agendamento!!';break;
-				case !$item['start']:$msg = 'Data de início não informada!!';break;
-				case !explode(' ',$item['start'])[1]:$msg = 'Hora de início não informada!!';break;
-				case !$item['end']:$msg = 'Data de fim não informada!!';break;
-				case !explode(' ',$item['end'])[1]:$msg = 'Hora de fim não informada!!';break;
-				case (!$item['id'] || $item['id'] == 'N/A'):$msg = 'Card de data sem alteração!!';break;
-				default: $msg = '';break;
-			}
-		}
+			// caso seja um item que será atualizado au inserido...
+			// ou seja tipInsert != '' && tipInsert != 'REMOVE' (tipInsert == 'NEW' ou tipInsert == 'ATT')
+			if($item['tipInsert'] && $item['tipInsert'] != 'REMOVE'){
+				$start = explode(' ',$item['start']); //"2022/08/20 09:00:00" => [0]="2022/08/20" [1]="09:00:00"
+				$end = explode(' ',$item['end']); //"2022/08/20 09:00:00" => [0]="2022/08/20" [1]="09:00:00"
+				$intervalo = $item['intervalo']>0?$item['intervalo']:30;
 
-		if($msg){
-			echo json_encode([
-				'status'=> 'ERRO',
-				'titulo'=> 'Dados incompletos!!',
-				'menssagem' => $msg
-			]);
-			exit;
+				$data = explode('/',$start[0]); // [0]="2022" [1]="08" [2]="20"
+				$data = $data[0].'-'.$data[1].'-'.$data[2]; // "2022-08-20"
+
+				$sql = "SELECT PrAgeProfissional,PrAgeIntervalo,PrAgeData,PrAgeHoraInicio,
+				PrAgeHoraFim,PrAgeAtendimentoLocal,PrAgeUsuarioAtualizador,PrAgeUnidade
+				FROM ProfissionalAgenda
+				WHERE PrAgeId != '$item[id]' AND PrAgeProfissional = $iProfissional AND PrAgeData = '$data'
+				AND ('$start[1]' >= PrAgeHoraInicio AND '$start[1]' <= PrAgeHoraFim
+				OR '$end[1]' >= PrAgeHoraInicio AND '$end[1]' <= PrAgeHoraFim)OR
+				(PrAgeHoraInicio >= '$start[1]' AND PrAgeHoraFim <= '$start[1]'
+				OR PrAgeHoraInicio >= '$end[1]' AND PrAgeHoraFim <= '$end[1]')";
+				$results = $conn->query($sql);
+				$results = $results->fetchAll(PDO::FETCH_ASSOC);
+
+				// var_dump($sql);
+				// exit();
+
+				switch($item){
+					case !isset($item['tipInsert']):$msg = 'Informe o início e fim do agendamento!!';break;
+					case !$item['start']:$msg = 'Data de início não informada!!';break;
+					case !explode(' ',$item['start'])[1]:$msg = 'Hora de início não informada!!';break;
+					case !$item['end']:$msg = 'Data de fim não informada!!';break;
+					case !explode(' ',$item['end'])[1]:$msg = 'Hora de fim não informada!!';break;
+					case (!$item['id'] || $item['id'] == 'N/A'):$msg = 'Card de data sem alteração!!';break;
+					default: $msg = '';break;
+				}
+				if(COUNT($results)){
+					$msg = "Existe um registro que entra em conflito com a data selecionada: $data";
+				}
+				if($msg){
+					echo json_encode([
+						'status'=> 'ERRO',
+						'titulo'=> 'Dados incompletos!!',
+						'menssagem' => $msg
+					]);
+					exit;
+				}
+			}
 		}
 
 		$arraySql = [];
@@ -187,7 +216,8 @@ try{
 			$end = explode(' ',$item['end']); //"22-08-2022 09:00:00"
 			$intervalo = $item['intervalo']>0?$item['intervalo']:30;
 
-			$data = $start[0]; // "dd/mm/yyyy"
+			$data = explode('/',$start[0]); // [0]="2022" [1]="08" [2]="20"
+			$data = $data[0].'-'.$data[1].'-'.$data[2]; // "2022-08-20"
 
 			if($item['tipInsert'] == 'NEW'){
 				$sql = "INSERT INTO ProfissionalAgenda(PrAgeProfissional,PrAgeIntervalo,PrAgeData,PrAgeHoraInicio,
@@ -217,7 +247,6 @@ try{
 				array_push($arraySqlUpdate, $sql);
 			} elseif($item['tipInsert'] == 'REMOVE'){
 				$sql = "DELETE FROM ProfissionalAgenda WHERE PrAgeId = $item[id]";
-
 				array_push($arraySql, $sql);
 			}
 		}
