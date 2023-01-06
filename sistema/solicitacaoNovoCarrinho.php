@@ -100,7 +100,7 @@ if (!empty($_POST['inputId'])) {
                     WHERE ProduId = " . $_POST['inputId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
                 } else {
                     $sql = "SELECT ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, CategNome
-                    CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
+                    CategNome, dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ServiId, 'S', NULL) as Estoque
                     FROM Servico
                     JOIN Categoria on CategId = ServiCategoria
                     JOIN Situacao on SituaId = ServiStatus
@@ -159,7 +159,7 @@ if (!empty($_POST['inputId'])) {
                 WHERE ProduId = " . $_POST['inputId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
             } else {
                 $sql = "SELECT ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, CategNome
-                CategNome, dbo.fnSaldoEstoque(ServiUnidade, ServiId, 'S', NULL) as Estoque
+                CategNome, dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ServiId, 'S', NULL) as Estoque
                 FROM Servico
                 JOIN Categoria on CategId = ServiCategoria
                 JOIN Situacao on SituaId = ServiStatus
