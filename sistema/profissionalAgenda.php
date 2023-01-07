@@ -106,7 +106,13 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 		}
 	</style>
 
-	<script type="text/javascript" >
+	<script type="text/javascript">
+		const socket = new WebSocket('wss://lamparinasws.herokuapp.com');
+		socket.addEventListener('message', function (event) {
+			if(event.data == 'AGENDA'){
+				getAgenda()
+			}
+		});
 		$(document).ready(function(){
 			getAgenda()
 			$('#excluirContainer').hide();
@@ -128,6 +134,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 						getAgenda()
 						$('#salvarAgenda').html('Salvar');
 						$("#salvarAgenda").prop('disabled', false);
+						socket.send('AGENDA');
 					}
 				});
 			})
