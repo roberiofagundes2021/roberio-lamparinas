@@ -7,20 +7,21 @@ $_SESSION['PaginaAtual'] = 'Quartos';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT QuartId, QuartNome, QuartTipoInternacao, QuartStatus, ti.TpIntNome, s.SituaNome, s.SituaCor, s.SituaChave
+$sql = "SELECT QuartId, QuartNome, QuartTipoInternacao, QuartAla, QuartStatus, ti.TpIntNome, al.AlaNome, s.SituaNome, s.SituaCor, s.SituaChave
 		FROM Quarto q
 		JOIN Situacao s on s.SituaId = q.QuartStatus
         LEFT JOIN TipoInternacao ti on ti.TpIntId = q.QuartTipoInternacao
-        LEFT JOIN Ala al on al.AlaId = q.QuartTipoInternacao
+        LEFT JOIN Ala al on al.AlaId = q.QuartAla
 	    WHERE QuartUnidade = " . $_SESSION['UnidadeId'] . "
 		ORDER BY QuartId ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
+$count = count($row);
 
 //Se estiver editando
-if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'EDITA') {
-    //Essa consulta é para preencher os campos a se editar
-    $sql = "SELECT QuartId, QuartNome, QuartTipoInternacao
+    if(isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'EDITA'){
+    //Essa consulta é para preencher os campos com o Quarto a se editar
+    $sql = "SELECT QuartId, QuartNome, QuartTipoInternacao, QuartAla
 			FROM Quarto
 			WHERE QuartId = " . $_POST['inputQuartoId'] . ";";
     $result = $conn->query($sql);
@@ -33,42 +34,43 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
     try {
         //Edição
         if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA') {
-            $sql = "UPDATE Quarto SET QuartNome = :sQuartNome, QuartTipoInternacao = :iQuartTipoInternacao, QuartUsuarioAtualizador = :iQuartUsuarioAtualizador
+            $sql = "UPDATE Quarto SET QuartNome = :sQuartNome, QuartTipoInternacao = :iQuartTipoInternacao, QuartAla=:iQuartAla, QuartUsuarioAtualizador = :iQuartUsuarioAtualizador
 					WHERE QuartId = :iQuartId";
             $result = $conn->prepare($sql);
             $result->execute(array(
                 ':sQuartNome' => $_POST['inputQuartoNome'],
                 ':iQuartTipoInternacao' => $_POST['cmbQuartoTipoInternacao'],
+                ':iQuartAla' => $_POST['cmbQuartoAla'],
                 ':iQuartUsuarioAtualizador' => $_SESSION['UsuarId'],
                 ':iQuartId' => $_POST['inputQuartoId']
             ));
 
             $_SESSION['msg']['mensagem'] = "Quarto alterado!!!";
         } else { //inclusão
-            $sql = "INSERT INTO Quarto (QuartNome, QuartTipoInternacao, QuartStatus, QuartUsuarioAtualizador, QuartUnidade)
-					VALUES (:sQuartNome, :iQuartTipoInternacao, :bQuartStatus, :iQuartUsuarioAtualizador, :iQuartUnidade)";
+            $sql = "INSERT INTO Quarto (QuartNome, QuartTipoInternacao, QuartAla, QuartStatus, QuartUsuarioAtualizador, QuartUnidade)
+					VALUES (:sQuartNome, :iQuartTipoInternacao, :iQuartAla, :bQuartStatus, :iQuartUsuarioAtualizador, :iQuartUnidade);";
             $result = $conn->prepare($sql);
             $result->execute(array(
                 ':sQuartNome' => $_POST['inputQuartoNome'],
                 ':iQuartTipoInternacao' => $_POST['cmbQuartoTipoInternacao'],
+                ':iQuartAla' => $_POST['cmbQuartoAla'],
                 ':bQuartStatus' => 1,
                 ':iQuartUsuarioAtualizador' => $_SESSION['UsuarId'],
                 ':iQuartUnidade' => $_SESSION['UnidadeId'],
             ));
-
             $_SESSION['msg']['mensagem'] = "Quarto incluído!!!";
         }
 
         $_SESSION['msg']['titulo'] = "Sucesso";
         $_SESSION['msg']['tipo'] = "success";
-    } catch (PDOException $e) {
-        //} catch (PDOException $e) {
+
+    } catch(PDOException $e) {
         $_SESSION['msg']['titulo'] = "Erro";
         $_SESSION['msg']['mensagem'] = "Erro reportado com o Quarto!!!";
         $_SESSION['msg']['tipo'] = "error";
-
         echo 'Error: ' . $e->getMessage();
     }
+
 
     irpara("atendimentoRelacaoQuartos.php");
 }
@@ -113,23 +115,28 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                 responsive: true,
                 columnDefs: [{
                         orderable: true, //Quarto
-                        width: "50%",
+                        width: "30%",
                         targets: [0]
                     },
                     {
                         orderable: true, //Tipo de internação
-                        width: "40%",
+                        width: "20%",
                         targets: [1]
+                    },
+                    {
+                        orderable: true, //Ala
+                        width: "20%",
+                        targets: [2]
                     },
                     {
                         orderable: true, //Situação
                         width: "5%",
-                        targets: [2]
+                        targets: [3]
                     },
                     {
                         orderable: false, //Ações
                         width: "5%",
-                        targets: [3]
+                        targets: [4]
                     }
                 ],
                 dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
@@ -172,6 +179,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                 var inputNome = $('#inputQuartoNome').val().trim();
                 var tipoInternacao = $('#cmbQuartoTipoInternacao').val();
                 var inputEstadoAtual = $('#inputEstadoAtual').val();
+                var ala = $('#cmbQuartoAla').val();
 
                 //Se o usuário preencheu com espaços em branco ou não preencheu nada
                 if (inputNome == '') {
@@ -186,18 +194,25 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                     dadosValidos = false;
                     return;
                 }
-                if (dadosValidos) {
+                if (ala == '') {
+                    alerta('Atenção', 'Selecione uma ala!', 'error');
+                    $('#cmbQuartoAla').focus();
+                    dadosValidos = false;
+                    return;
+                }
+                if(dadosValidos) {
                     //Esse ajax está sendo usado para verificar no banco se o registro já existe
                     $.ajax({
                         type: "POST",
                         url: "atendimentoRelacaoQuartosValida.php",
-                        data: ('nome=' + inputNome + '&tipoInternacao=' + tipoInternacao + '&estadoAtual=' + inputEstadoAtual),
+                        data: ('nome=' + inputNome + '&tipoInternacao=' + tipoInternacao + '&estadoAtual=' + inputEstadoAtual + '&ala=' + ala),
                         success: function(resposta) {
 
                             if (resposta == 1) {
                                 alerta('Atenção', 'Esse registro já existe!', 'error');
                                 return false;
                             }
+
                             if (resposta == 'EDITA') {
                                 document.getElementById('inputEstadoAtual').value = 'GRAVA_EDITA';
                             } else {
@@ -275,7 +290,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                     <input type="hidden" id="inputQuartoStatus" name="inputQuartoStatus">
 
                                     <div class="row">
-                                        <div class="col-lg-4">
+                                        <div class="col-lg-3">
                                             <div class="form-group">
                                                 <label for="inputQuartoNome">Quarto<span class="text-danger">*</span></label>
                                                 <input type="text" id="inputQuartoNome" name="inputQuartoNome" class="form-control" placeholder="Quarto" value="<?php if (isset($_POST['inputQuartoId'])) echo $rowQuarto['QuartNome']; ?>" required autofocus>
@@ -314,19 +329,19 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                                 $result = $conn->query($sql);
                                                 $rowAla = $result->fetchAll(PDO::FETCH_ASSOC);
                                                 foreach ($rowAla as $item) {
-                                                    $seleciona = $item['AlaId'] == $rowQuarto['QuartTipoInternacao'] ? "selected" : "";
+                                                    $seleciona = $item['AlaId'] == $rowQuarto['QuartAla'] ? "selected" : "";
                                                     print('<option value="' . $item['AlaId'] . '" ' . $seleciona . '>' . $item['AlaNome'] . '</option>');
                                                 }
                                                 ?>
                                             </select>
                                         </div>
 
-                                        <div class="col-lg-2">
+                                        <div class="col-lg-3">
                                             <div class="form-group" style="padding-top:25px;">
                                                 <?php
 
                                                 //editando
-                                                if (isset($_POST['TpAcoId'])) {
+                                                if (isset($_POST['QuartId'])) {
                                                     print('<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>');
                                                     print('<a href="atendimentoRelacaoQuartos.php" class="btn btn-basic" role="button">Cancelar</a>');
                                                 } else { //inserindo
@@ -363,6 +378,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										<tr>
 											<td>' . $item['QuartNome'] . '</td>
 											<td>' . $item['TpIntNome'] . '</td>
+                                            <td>' . $item['AlaNome'] . '</td>
 											');
 
                                         print('<td><a href="#" onclick="atualizaRelacaoQuarto(
