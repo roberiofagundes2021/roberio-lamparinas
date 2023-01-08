@@ -11,6 +11,7 @@ $sql = "SELECT QuartId, QuartNome, QuartTipoInternacao, QuartStatus, ti.TpIntNom
 		FROM Quarto q
 		JOIN Situacao s on s.SituaId = q.QuartStatus
         LEFT JOIN TipoInternacao ti on ti.TpIntId = q.QuartTipoInternacao
+        LEFT JOIN Ala al on al.AlaId = q.QuartTipoInternacao
 	    WHERE QuartUnidade = " . $_SESSION['UnidadeId'] . "
 		ORDER BY QuartId ASC";
 $result = $conn->query($sql);
@@ -274,14 +275,14 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                     <input type="hidden" id="inputQuartoStatus" name="inputQuartoStatus">
 
                                     <div class="row">
-                                        <div class="col-lg-5">
+                                        <div class="col-lg-4">
                                             <div class="form-group">
-                                                <label for="inputQuartoNome">Quarto<span class="text-danger"> *</span></label>
+                                                <label for="inputQuartoNome">Quarto<span class="text-danger">*</span></label>
                                                 <input type="text" id="inputQuartoNome" name="inputQuartoNome" class="form-control" placeholder="Quarto" value="<?php if (isset($_POST['inputQuartoId'])) echo $rowQuarto['QuartNome']; ?>" required autofocus>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4">
-                                            <label for="cmbQuartoTipoInternacao">Tipo da internação<span class="text-danger"> *</span></label>
+                                        <div class="col-lg-3">
+                                            <label for="cmbQuartoTipoInternacao">Tipo da internação<span class="text-danger">*</span></label>
                                             <select id="cmbQuartoTipoInternacao" name="cmbQuartoTipoInternacao" class="form-control select-search" required>
                                                 <option value="">Selecione</option>
                                                 <?php
@@ -301,6 +302,26 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                         </div>
 
                                         <div class="col-lg-3">
+                                            <label for="cmbQuartoAla">Ala<span class="text-danger">*</span></label>
+                                            <select id="cmbQuartoAla" name="cmbQuartoAla" class="form-control select-search" required>
+                                                <option value="">Selecione</option>
+                                                <?php
+                                                $sql = "SELECT AlaId, AlaNome
+                                                FROM Ala
+                                                JOIN Situacao ON SituaId = AlaStatus
+                                                WHERE AlaUnidade = " . $_SESSION['UnidadeId'] . " AND SituaChave = 'ATIVO'
+                                                ORDER BY AlaNome ASC";
+                                                $result = $conn->query($sql);
+                                                $rowAla = $result->fetchAll(PDO::FETCH_ASSOC);
+                                                foreach ($rowAla as $item) {
+                                                    $seleciona = $item['AlaId'] == $rowQuarto['QuartTipoInternacao'] ? "selected" : "";
+                                                    print('<option value="' . $item['AlaId'] . '" ' . $seleciona . '>' . $item['AlaNome'] . '</option>');
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-lg-2">
                                             <div class="form-group" style="padding-top:25px;">
                                                 <?php
 
@@ -325,6 +346,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
                                     <tr class="bg-slate">
                                         <th data-filter>Quarto</th>
                                         <th data-filter>Tipo de internação</th>
+                                        <th data-filter>Ala</th>
                                         <th>Situação</th>
                                         <th class="text-center">Ações</th>
                                     </tr>
