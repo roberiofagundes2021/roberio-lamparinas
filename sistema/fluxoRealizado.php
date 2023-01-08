@@ -97,7 +97,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
 		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$ID[1];
+		WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and FOXPrFluxoOperacional = ".$ID[1];
 
 		// filtrar de acordo com as subCategorias marcados
 		if(isset($_POST['cmbFornecedor'])){
@@ -168,7 +168,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
 		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and AdXPrAditivo = ".$ID[1];
+		WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and AdXPrAditivo = ".$ID[1];
 		// exit;
 
 		// filtrar de acordo com as subCategorias marcados
@@ -249,7 +249,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
 		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$ID[1];
+		WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and FOXPrFluxoOperacional = ".$ID[1];
 
 		// filtrar de acordo com as subCategorias marcados
 		if(isset($_POST['cmbFornecedor'])){
@@ -322,7 +322,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
 		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and AdXPrAditivo = ".$ID[1];
+		WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and AdXPrAditivo = ".$ID[1];
 
 		// filtrar de acordo com as subCategorias marcados
 		if(isset($_POST['cmbFornecedor'])){
@@ -403,7 +403,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
 		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$ID[1].
+		WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and FOXPrFluxoOperacional = ".$ID[1].
 		" UNION
 		SELECT ServiId as Id, ServiNome as Nome, FOXSrDetalhamento as Detalhamento, 
 		'' as UnidadeMedida, FOXSrQuantidade as Quantidade, FOXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
@@ -423,7 +423,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 		LEFT JOIN ProdutoXFabricante on PrXFaProduto = ProduId and PrXFaUnidade = $iUnidade  and PrXFaFluxoOperacional = $iFluxoOperacional
 		LEFT JOIN Marca on MarcaId = PrXFaMarca
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and AdXPrAditivo = ".$ID[1].
+		WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and AdXPrAditivo = ".$ID[1].
 		" UNION
 		SELECT ServiId as Id, ServiNome as Nome, AdXSrDetalhamento as Detalhamento, 
 		'' as UnidadeMedida, AdXSrQuantidade as Quantidade, AdXSrValorUnitario as ValorUnitario, MarcaNome as Marca, SbCatNome as SubCategoria
@@ -644,7 +644,7 @@ if (isset($_POST['inputFluxoOperacionalId'])){
 															WHERE SbCatEmpresa = $_SESSION[EmpreId] AND 
 															SbCatId in (SELECT ProduSubCategoria  FROM Produto
 															JOIN FluxoOperacionalXProduto on FOXPrProduto =  ProduId
-															WHERE ProduUnidade  = $_SESSION[UnidadeId] and FOXPrFluxoOperacional = $iFluxoOperacional) ORDER BY SbCatNome ASC"; 
+															WHERE ProduEmpresa  = $_SESSION[EmpreId] and FOXPrFluxoOperacional = $iFluxoOperacional) ORDER BY SbCatNome ASC"; 
 													$result = $conn->query($sql);
 													$rowBD = $result->fetchAll(PDO::FETCH_ASSOC);
 													$count = count($rowBD);

@@ -18,6 +18,7 @@ que irá indicar qual ação será executada
 try{
 	$iUnidade = $_SESSION['UnidadeId'];
 	$usuarioId = $_SESSION['UsuarId'];
+	$iEmpresa = $_SESSION['EmpreId'];
 	if(!isset($_SESSION['atendimento'])){
 		$_SESSION['atendimento'] = [
 			'paciente' => '',
@@ -2957,7 +2958,7 @@ try{
 			JOIN SubCategoria ON ProduSubCategoria = SbCatId
 			WHERE ProduSubCategoria = $subCategoria
 			AND ProduNome like '%$nomeProduto%'
-			AND ProduUnidade = $iUnidade";
+			AND ProduEmpresa = $iEmpresa";
 		}elseif(!$subCategoria && $categoria){
 			$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, UnMedNome, UnMedId, TpFisNome 
 			FROM Produto
@@ -2967,7 +2968,7 @@ try{
 			JOIN SubCategoria ON ProduSubCategoria = SbCatId
 			WHERE ProduCategoria = $categoria
 			AND ProduNome like '%$nomeProduto%'
-			AND ProduUnidade = $iUnidade";
+			AND ProduEmpresa = $iEmpresa";
 		}elseif ((!$categoria) && (!$subCategoria)) {
 			$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, UnMedNome, UnMedId, TpFisNome 
 			FROM Produto
@@ -2976,7 +2977,7 @@ try{
 			JOIN Categoria ON ProduCategoria = CategId
 			JOIN SubCategoria ON ProduSubCategoria = SbCatId
 			WHERE ProduNome like '%$nomeProduto%'
-			AND ProduUnidade = $iUnidade";
+			AND ProduEmpresa = $iEmpresa";
 		}else{
 			$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, UnMedNome, UnMedId,  TpFisNome 
 			FROM Produto
@@ -2986,7 +2987,7 @@ try{
 			JOIN SubCategoria ON ProduSubCategoria = SbCatId
 			WHERE (ProduCategoria = $categoria OR ProduSubCategoria = $subCategoria)
 			AND ProduNome like '%$nomeProduto%'
-			AND ProduUnidade = $iUnidade";			
+			AND ProduEmpresa = $iEmpresa";			
 		}
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);

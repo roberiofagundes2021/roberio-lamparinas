@@ -770,7 +770,7 @@ try {
 												LEFT JOIN Marca on MarcaId = PrXFaMarca
 												LEFT JOIN Modelo on ModelId = PrXFaModelo
 												LEFT JOIN Fabricante on FabriId = PrXFaFabricante
-												WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " AND ProduCategoria = $iCategoria
+												WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " AND ProduCategoria = $iCategoria
 												AND FOXPrFluxoOperacional = $iFluxoOperacional";
 								if($sSubCategorias){
 									$sqlProduto .= " and ProduSubCategoria in ($sSubCategorias)";

@@ -13,7 +13,7 @@ if (isset($_POST['patrimonioId']) && $_POST['patrimonioId'] !== '') {
 									ProduCustoFinal, 
 									UnMedSigla, 
 									ProduDetalhamento, 
-									dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', '" . $_POST['origem'] . "') as Estoque,
+									dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, 'P', '" . $_POST['origem'] . "') as Estoque,
 									PatriNumero,
 									MvXPrValidade
 						FROM  Produto
@@ -23,7 +23,7 @@ if (isset($_POST['patrimonioId']) && $_POST['patrimonioId'] !== '') {
 							ON  PatriProduto = ProduId
 						JOIN  MovimentacaoXProduto
 						  ON  MvXPrProduto = ProduId
-					 WHERE  ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+					 WHERE  ProduEmpresa = " . $_SESSION['EmpreId'] . " 
 						 AND  ProduId = " . $_POST['idProduto'] . "
 						 AND  PatriId = " . $_POST['patrimonioId'] . "
 				";
@@ -70,14 +70,14 @@ if (isset($_POST['patrimonioId']) && $_POST['patrimonioId'] !== '') {
 							 ProduCustoFinal, 
 							 UnMedSigla, 
 							 ProduDetalhamento, 
-							 dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', '" . $_POST['origem'] . "') as Estoque,
+							 dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, 'P', '" . $_POST['origem'] . "') as Estoque,
 							 MvXPrValidade
 					FROM Produto
 					JOIN UnidadeMedida 
 					  ON UnMedId = ProduUnidadeMedida
 					JOIN MovimentacaoXProduto
 	  			  ON MvXPrProduto = ProduId
-				 WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+				 WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " 
 					 AND ProduId = " . $_POST['idProduto'] . "
 				";
 

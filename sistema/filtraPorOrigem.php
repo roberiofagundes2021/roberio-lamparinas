@@ -27,7 +27,7 @@ if ($_POST['tipoDeFiltro'] == 'Categoria') {
 			if ($value['Tipo'] == 'Produto'){
 				$sql = "SELECT ProduCategoria as Categoria
 						FROM Produto
-						WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId = " . $value['id'];
+						WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduId = " . $value['id'];
 			} else {
 				$sql = "SELECT ServiCategoria as Categoria
 						FROM Servico

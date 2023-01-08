@@ -28,7 +28,7 @@ if(isset($_POST['cmbSubCategoria']) && isset($_POST['inputIdCategoria']) && isse
 			LEFT JOIN Marca on MarcaId = PrXFaMarca
 			LEFT JOIN Modelo on ModelId = PrXFaModelo
 			LEFT JOIN Fabricante on FabriId = PrXFaFabricante
-			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = $iSubCategoria and 
+			WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduCategoria = $iSubCategoria and 
 			ProduSubCategoria in ($subCategoriaList) AND FOXPrFluxoOperacional = $iFluxoOperacional";
 
 	$result = $conn->query($sql);

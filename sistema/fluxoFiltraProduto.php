@@ -38,7 +38,7 @@ $sql = "SELECT ProduId, ProduNome, UnMedSigla, FOXPrDetalhamento as Detalhamento
 	JOIN Categoria on CategId = ProduCategoria
 	JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 	LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-	WHERE ProduUnidade = $iUnidade and FOXPrFluxoOperacional = $iFluxoOperacional";
+	WHERE ProduEmpresa = $iEmpresa and FOXPrFluxoOperacional = $iFluxoOperacional";
 if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){
 	$sql .= " and ProduSubCategoria = '". $_POST['idSubCategoria']."' and ProduId in (".$lista.")";
 } else {
@@ -57,7 +57,7 @@ if($Origem == 'fluxo.php'){
 		JOIN Categoria on CategId = ProduCategoria
 		LEFT JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = $iFluxoOperacional
 		LEFT JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-		WHERE ProduUnidade = $iUnidade";
+		WHERE ProduEmpresa = $iEmpresa";
 		if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#' and $_POST['idSubCategoria'] != ''){
 			$sql .= " and ProduSubCategoria = '". $_POST['idSubCategoria']."' and ProduId in (".$lista.")";
 		} else {
