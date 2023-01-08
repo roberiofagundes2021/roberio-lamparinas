@@ -145,7 +145,7 @@ try {
 			LEFT JOIN Marca on MarcaId = PrXFaMarca
 			LEFT JOIN Modelo on ModelId = PrXFaModelo
 			LEFT JOIN Fabricante on FabriId = PrXFaFabricante
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and AdXPrAditivo = ".$_POST['inputAditivoId']." and AdXPrQuantidade > ' 0 ' ";
+			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and AdXPrAditivo = ".$_POST['inputAditivoId']." and AdXPrQuantidade > ' 0 ' ";
 
 	$result = $conn->query($sql);
 	$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);

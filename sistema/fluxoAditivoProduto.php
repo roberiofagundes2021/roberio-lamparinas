@@ -376,7 +376,7 @@ try {
                                                     /*$sql = "SELECT ProduId, ProduNome
 																FROM Produto
 																JOIN Situacao on SituaId = ProduStatus  
-																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
+																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
 														if ($iSubCategoria){
 															$sql .= " and ProduSubCategoria = ".$iSubCategoria;
 														}
@@ -430,7 +430,7 @@ try {
 												JOIN AditivoXProduto on AdXPrProduto = ProduId
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 												LEFT JOIN Marca on MarcaId = ProduMarca
-												WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and AdXPrAditivo = " . $iAditivo;
+												WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and AdXPrAditivo = " . $iAditivo;
                                     $result = $conn->query($sql);
                                     $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
                                     $countProduto = count($rowProdutos);
@@ -442,7 +442,7 @@ try {
                                                     LEFT JOIN Marca on MarcaId = ProduMarca
                                                     LEFT JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = $iFluxoOperacional
 													JOIN Situacao on SituaId = ProduStatus
-													WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduCategoria = " . $iCategoria . " and 
+													WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduCategoria = " . $iCategoria . " and 
 													ProduSubCategoria = " . $iSubCategoria . " and SituaChave = 'ATIVO' ";
                                         $result = $conn->query($sql);
                                         $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);

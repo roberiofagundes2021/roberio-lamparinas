@@ -19,7 +19,7 @@ $sql = "SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, 
         LEFT JOIN Marca on MarcaId = PrXFaMarca
         LEFT JOIN Modelo on ModelId = PrXFaModelo
         LEFT JOIN Fabricante on FabriId = PrXFaFabricante
-        WHERE ProduUnidade = $iUnidade and OCXPrOrdemCompra = $ordemCompra
+        WHERE OCXPrUnidade = $iUnidade and OCXPrOrdemCompra = $ordemCompra
         UNION
         SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, OCXSrDetalhamento as detalhamento,
         OCXSrValorUnitario as valorCusto, ServiCustoFinal as custoFinal, '', MarcaNome, tipo = 'S',

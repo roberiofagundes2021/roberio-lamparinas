@@ -47,7 +47,7 @@ $rowAditivos = $result->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT ProduId
 		FROM Produto
 		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;	
+		WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;	
 $result = $conn->query($sql);
 $rowProd = $result->fetchAll(PDO::FETCH_ASSOC);
 $totalProdutos = count($rowProd);
@@ -256,7 +256,7 @@ try {
 					LEFT JOIN Marca on MarcaId = PrXFaMarca
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 					JOIN SubCategoria on SbCatId = ProduSubCategoria
-					WHERE FOXPrFluxoOperacional = $iFluxoOperacional and ProduUnidade = " . $_SESSION['UnidadeId'] . " ORDER BY SbCatNome, ProduNome ASC";	
+					WHERE FOXPrFluxoOperacional = $iFluxoOperacional and ProduEmpresa = " . $_SESSION['EmpreId'] . " ORDER BY SbCatNome, ProduNome ASC";	
 			$result = $conn->query($sql);
 			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 			$countProdutos = count($rowProdutos);
@@ -337,7 +337,7 @@ try {
 						LEFT JOIN Fabricante on FabriId = PrXFaFabricante
 						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 						JOIN SubCategoria on SbCatId = ProduSubCategoria
-						WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
+						WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
 						and SbCatId = ".$sbcat['SbCatId']."
 						ORDER BY SbCatNome, ProduNome ASC";	
 				$result = $conn->query($sql);
@@ -644,7 +644,7 @@ try {
 				    JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
 				    JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
 				    JOIN Marca on MarcaId = PrXFaMarca
-					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional." and AdXPrAditivo = " . $aditivo['AditiId']."
+					WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional." and AdXPrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		} else {
 			$sql = "SELECT ProduId, ProduNome, FOXPrDetalhamento as Detalhamento, UnMedSigla, AdXPrQuantidade, AdXPrValorUnitario, MarcaNome, SbCatNome
@@ -656,7 +656,7 @@ try {
 					JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
 					JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
 					JOIN Marca on MarcaId = PrXFaMarca
-					WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional." and AdXPrAditivo = " . $aditivo['AditiId']."
+					WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional." and AdXPrAditivo = " . $aditivo['AditiId']."
 					ORDER BY SbCatNome ASC";
 		}
 		$result = $conn->query($sql);
