@@ -120,20 +120,20 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 		socket.onclose = function (event) {
 			var reason;
 			switch(event.code){
-				case 1000: reason = "Normal closure, meaning that the purpose for which the connection was established has been fulfilled.";break;
-				case 1001: reason = "An endpoint is \"going away\", such as a server going down or a browser having navigated away from a page.";break;
-				case 1002: reason = "An endpoint is terminating the connection due to a protocol error";break;
-				case 1003: reason = "An endpoint is terminating the connection because it has received a type of data it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary message).";break;
-				case 1004: reason = "Reserved. The specific meaning might be defined in the future.";break;
-				case 1005: reason = "No status code was actually present.";break;
-				case 1006: reason = "The connection was closed abnormally, e.g., without sending or receiving a Close control frame";break;
-				case 1007: reason = "An endpoint is terminating the connection because it has received data within a message that was not consistent with the type of the message (e.g., non-UTF-8 [https://www.rfc-editor.org/rfc/rfc3629] data within a text message).";break;
-				case 1008: reason = "An endpoint is terminating the connection because it has received a message that \"violates its policy\". This reason is given either if there is no other sutible reason, or if there is a need to hide specific details about the policy.";break;
-				case 1009: reason = "An endpoint is terminating the connection because it has received a message that is too big for it to process.";break;
-				case 1010: reason = "An endpoint (client) is terminating the connection because it has expected the server to negotiate one or more extension, but the server didn't return them in the response message of the WebSocket handshake. <br /> Specifically, the extensions that are needed are: " + event.reason;break;
-				case 1011: reason = "A server is terminating the connection because it encountered an unexpected condition that prevented it from fulfilling the request.";break;
-				case 1015: reason = "The connection was closed due to a failure to perform a TLS handshake (e.g., the server certificate can't be verified).";break;
-				default: reason = "Unknown reason";break;
+				case 1000: reason = "Encerramento normal, significando que o propósito para o qual a conexão foi estabelecida foi cumprido.";break;
+				case 1001: reason = "Um ponto de extremidade está \"indo embora\", como um servidor que está fora do ar ou um navegador que saiu de uma página.";break;
+				case 1002: reason = "Um endpoint está encerrando a conexão devido a um erro de protocolo";break;
+				case 1003: reason = "Um endpoint está encerrando a conexão porque recebeu um tipo de dados que não pode aceitar (por exemplo, um endpoint que entende apenas dados de texto PODE enviar isso se receber uma mensagem binária).";break;
+				case 1004: reason = "Reservado. O significado específico pode ser definido no futuro.";break;
+				case 1005: reason = "Nenhum código de status estava realmente presente.";break;
+				case 1006: reason = "A conexão foi fechada de forma anormal, por exemplo, sem enviar ou receber um quadro de controle Close";break;
+				case 1007: reason = "Um endpoint está encerrando a conexão porque recebeu dados dentro de uma mensagem que não eram consistentes com o tipo da mensagem (por exemplo, dados não UTF-8 [https://www.rfc-editor.org/rfc/rfc3629] dentro de uma mensagem de texto).";break;
+				case 1008: reason = "Um endpoint está encerrando a conexão porque recebeu uma mensagem que \"viola sua política\". Esse motivo é fornecido se não houver outro motivo susceptível ou se houver necessidade de ocultar detalhes específicos sobre a apólice.";break;
+				case 1009: reason = "Um terminal está encerrando a conexão porque recebeu uma mensagem muito grande para ser processada.";break;
+				case 1010: reason = "Um endpoint (cliente) está encerrando a conexão porque esperava que o servidor negociasse uma ou mais extensões, mas o servidor não as retornou na mensagem de resposta do handshake do WebSocket. <br /> Especificamente, as extensões necessárias são: " + event.reason;break;
+				case 1011: reason = "Um servidor está encerrando a conexão porque encontrou uma condição inesperada que o impediu de atender à solicitação.";break;
+				case 1015: reason = "A conexão foi encerrada devido a uma falha na execução de um handshake TLS (por exemplo, o certificado do servidor não pode ser verificado).";break;
+				default: reason = "Rasão desconhecida";break;
 			}			
 			console.log('WebSocket Close: '+reason)
 		};
