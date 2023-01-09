@@ -35,7 +35,7 @@ if ($count) {
             SELECT OCXPrQuantidade as quantidade, ProduId as id, ProduNome as nome, ProduDetalhamento as detalhamento, ProduValorCusto as valorCusto, ProduCustoFinal as custoFinal, tipo = 'P'
             FROM OrdemCompraXProduto
             JOIN Produto on ProduId = OCXPrProduto
-            WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and OCXPrOrdemCompra = " . $value['OrComId'] . "
+            WHERE OCXPrUnidade = " . $_SESSION['UnidadeId'] . " and OCXPrOrdemCompra = " . $value['OrComId'] . "
             UNION
             SELECT OCXSrQuantidade as quantidade, ServiId as id, ServiNome as nome, ServiDetalhamento as detalhamento, ServiValorCusto as valorCusto, ServiCustoFinal as custoFinal, tipo = 'S'
             FROM OrdemCompraXServico

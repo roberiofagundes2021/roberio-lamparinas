@@ -5,12 +5,12 @@ include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT ProduId, ProduNome, ProduValorCusto, ProduCustoFinal, UnMedSigla, ProduDetalhamento, MarcaNome,
-		dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', '" . $_POST['origem'] . "') as Estoque,
-		dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade
+		dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ProduId, 'P', '" . $_POST['origem'] . "') as Estoque,
+		dbo.fnValidadeProduto(".$_SESSION['UnidadeId'].", ProduId) as Validade
 		FROM Produto
 		JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 		LEFT JOIN Marca on MarcaId = ProduMarca
-		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId = " . $_POST['idProduto'];
+		WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and ProduId = " . $_POST['idProduto'];
 $result = $conn->query($sql);
 $row = $result->fetch(PDO::FETCH_ASSOC);
 $count = count($row);

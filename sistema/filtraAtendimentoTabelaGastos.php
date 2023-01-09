@@ -17,6 +17,7 @@ if(!isset($_SESSION['atendimentoTabelaServicos'])){
 $tipoRequest = $_POST['tipoRequest'];
 $iUnidade = $_SESSION['UnidadeId'];
 $usuarioId = $_SESSION['UsuarId'];
+$iEmpresa = $_SESSION['EmpreId'];
 
 if($tipoRequest == 'PROCEDIMENTOS'){
 	
@@ -46,7 +47,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 			FROM Produto
 			
 			WHERE ProduStatus = 1
-			AND ProduUnidade = $iUnidade
+			AND ProduEmpresa = $iEmpresa
 			AND ProduValorVenda IS NOT NULL
 			ORDER BY ProduNome ASC";
 	$result = $conn->query($sql);
@@ -145,8 +146,8 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 	$sData = date("Y-m-d");
 	$sHora = date("H:i:s");
 	
-	$sql = "SELECT ProduId,ProduNome,ProduDetalhamento,ProduValorVenda,ProduUnidade, ProduCodigo
-	FROM Produto WHERE ProduId = $iServico and ProduUnidade = $iUnidade";
+	$sql = "SELECT ProduId,ProduNome,ProduDetalhamento,ProduValorVenda,ProduEmpresa, ProduCodigo
+	FROM Produto WHERE ProduId = $iServico and ProduEmpresa = $iEmpresa";
 	$resultServico = $conn->query($sql);
 	$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
 

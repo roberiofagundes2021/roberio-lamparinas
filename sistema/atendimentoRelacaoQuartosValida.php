@@ -7,7 +7,10 @@ include('global_assets/php/conexao.php');
 
 $sql = "SELECT QuartId
         FROM Quarto
-        WHERE QuartUnidade = ".$_SESSION['UnidadeId']." and QuartNome = '". $_POST['nome']."' and QuartTipoInternacao = '". $_POST['tipoInternacao']."'";
+        WHERE QuartUnidade = ".$_SESSION['UnidadeId']." 
+		and QuartNome = '". $_POST['nome']."' 
+		and QuartAla = '". $_POST['ala']."' 
+		and QuartTipoInternacao = '". $_POST['tipoInternacao']."'";
 
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -37,7 +37,7 @@ $rowSubCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT ProduId
 		FROM Produto
 		JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
-		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;	
+		WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional;	
 $result = $conn->query($sql);
 $rowProd = $result->fetchAll(PDO::FETCH_ASSOC);
 $totalProdutos = count($rowProd);
@@ -125,7 +125,7 @@ try {
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 					JOIN SubCategoria on SbCatId = ProduSubCategoria
 					JOIN Marca on MarcaId = PrXFaMarca
-					WHERE FOXPrFluxoOperacional = $iFluxoOperacional and ProduUnidade = " . $_SESSION['UnidadeId'] . " ORDER BY SbCatNome, ProduNome ASC";	
+					WHERE FOXPrFluxoOperacional = $iFluxoOperacional and ProduEmpresa = " . $_SESSION['EmpreId'] . " ORDER BY SbCatNome, ProduNome ASC";	
 			$result = $conn->query($sql);
 			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 			$countProdutos = count($rowProdutos);		
@@ -202,7 +202,7 @@ try {
 						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 						JOIN SubCategoria on SbCatId = ProduSubCategoria
 						JOIN Marca on MarcaId = PrXFaMarca
-						WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
+						WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and FOXPrFluxoOperacional = " . $iFluxoOperacional."
 						and SbCatId = ".$sbcat['SbCatId']."
 						ORDER BY SbCatNome, ProduNome ASC";	
 				$result = $conn->query($sql);

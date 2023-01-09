@@ -18,6 +18,7 @@ que irá indicar qual ação será executada
 try{
 	$iUnidade = $_SESSION['UnidadeId'];
 	$usuarioId = $_SESSION['UsuarId'];
+	$iEmpresa = $_SESSION['EmpreId'];
 	if(!isset($_SESSION['atendimento'])){
 		$_SESSION['atendimento'] = [
 			'paciente' => '',
@@ -106,7 +107,7 @@ try{
     }elseif ($tipoRequest == 'PRODUTOS') {
 		$sql = "SELECT ProduId, ProduCodigo, ProduNome
 			FROM Produto		
-			WHERE ProduUnidade = $iUnidade";
+			WHERE ProduEmpresa = $iEmpresa";
 
 		$result = $conn->query($sql);
 		$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -134,10 +135,10 @@ try{
 		$sData = date("Y-m-d");
 		$sHora = date("H:i:s");
 		
-		$sql = "SELECT ProduId,ProduNome,ProduDetalhamento,ProduValorVenda,ProduUnidade, ProduCodigo, MarcaId, MarcaNome
+		$sql = "SELECT ProduId,ProduNome,ProduDetalhamento,ProduValorVenda,ProduEmpresa, ProduCodigo, MarcaId, MarcaNome
 		FROM Produto
 		LEFT JOIN Marca ON ProduMarca = MarcaId 
-		WHERE ProduId = $iServico and ProduUnidade = $iUnidade";
+		WHERE ProduId = $iServico and ProduEmpresa = $iEmpresa";
 		$resultServico = $conn->query($sql);
 		$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
 

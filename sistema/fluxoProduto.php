@@ -130,7 +130,7 @@ try{
 	$sql = "SELECT FOXPrProduto
 			FROM FluxoOperacionalXProduto
 			JOIN Produto on ProduId = FOXPrProduto
-			WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+			WHERE FOXPrUnidade = ". $_SESSION['UnidadeId'] ." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -573,7 +573,7 @@ try{
 																	FROM Produto
 																	JOIN Situacao on SituaId = ProduStatus
 																	LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-																	WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
+																	WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
 															if ($sSubCategorias != 0) {
 																$sql .= " and ProduSubCategoria in (".$sSubCategorias.")";
 															}
@@ -629,7 +629,7 @@ try{
 												JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 												LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
+												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and FOXPrFluxoOperacional = ".$iFluxoOperacional;
 												if ($sSubCategorias <> ""){
 													$sql .= " and SbCatId in (".$sSubCategorias.")";
 												}
@@ -647,7 +647,7 @@ try{
 														JOIN Situacao on SituaId = ProduStatus
 														LEFT  JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = $iFluxoOperacional
 														LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-														WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO'";
+														WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO'";
 														if ($sSubCategorias <> ""){
 															$sql .= " and SbCatId in (".$sSubCategorias.")";
 														}
@@ -667,7 +667,7 @@ try{
 															JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia'];
+															WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia'];
 															if ($sSubCategorias <> ""){
 																$sql .= " and SbCatId in (".$sSubCategorias.")";
 															}
@@ -679,7 +679,7 @@ try{
 															JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
-															WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia'];
+															WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia'];
 															if ($sSubCategorias <> ""){
 																$sql .= " and SbCatId in (".$sSubCategorias.")";
 															}
