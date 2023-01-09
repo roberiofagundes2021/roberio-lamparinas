@@ -37,6 +37,9 @@
 					case 'exportacaoProntuario': URL = 'atendimentoProntuarioExportacao.php'; $('#dadosPost').attr('target', '_blank'); break;
 					case 'tabelaGastos': URL = 'atendimentoTabelaGastos.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'documento': URL = 'atendimentoDocumentos.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'admissaoEnfermagem': URL = 'atendimentoAdmissaoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'evolucaoEnfermagem': URL = 'atendimentoEvolucaoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'anotacaoTecnicoEnfermagem': URL = 'atendimentoAnotacaoTecnicoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
@@ -225,13 +228,13 @@
 							<a href="#" class="nav-link legitRipple">Ato de Enfermagem</a>
 							<ul class="nav nav-group-sub">
 								<li class="nav-item">
-									<a href="#" class="nav-link itemLink" data-tipo='admissao'><i class="icon-certificate"></i> Admissão</a>
+									<a href="#" class="nav-link itemLink" data-tipo='admissaoEnfermagem'><i class="icon-certificate"></i> Admissão</a>
 								</li>
 								<li class="nav-item">
-									<a href="#" class="nav-link itemLink" data-tipo='evolucaoDiaria'><i class="icon-certificate"></i> Prescrição e Evolução</a>
+									<a href="#" class="nav-link itemLink" data-tipo='evolucaoEnfermagem'><i class="icon-certificate"></i> Prescrição e Evolução</a>
 								</li>
 								<li class="nav-item">
-									<a href="#" class="nav-link itemLink" data-tipo='evolucaoDiaria'><i class="icon-certificate"></i> Anotações</a>
+									<a href="#" class="nav-link itemLink" data-tipo='anotacaoTecnicoEnfermagem'><i class="icon-certificate"></i> Anotações</a>
 								</li>								
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='formularios'><i class="icon-certificate"></i> Formulários</a>
