@@ -109,7 +109,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 	<script type="text/javascript" >
 		$(document).ready(function(){
 			getAgenda()
-			$('#excluirContainer').hide();
+			//$('#excluirContainer').hide();
 
 			$('#salvarAgenda').on('click', ()=>{
 				$('#salvarAgenda').html("<img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px'>");
@@ -368,7 +368,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									stack: { dir1: 'down', dir2: 'right', modal: false },
 								})
 							}
-							$('#excluirContainer').hide();
+							//$('#excluirContainer').hide();
 						},
 						isRTL: false
 					});
@@ -529,7 +529,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 							});
 						},
 						eventDragStart: function(event,jsEvent){
-							$('#excluirContainer').show();
+							//$('#excluirContainer').show();
 						},
 						eventDragStop: function(event,jsEvent) {							
 							/* 	basicamente o calculo é feito olhando sempre o tamanho do componente "excluirContainer"
@@ -600,7 +600,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 									stack: { dir1: 'down', dir2: 'right', modal: false },
 								})
 							}
-							$('#excluirContainer').hide();
+							//$('#excluirContainer').hide();
 						},
 						isRTL: false
 					});
@@ -732,7 +732,15 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 					
 					<div class="card-body">
 						<div class="card-header bg-white" style="margin-top: -15px;">
-							<p class="font-size-lg" style="margin-left: -20px;">A relação abaixo faz referência à agenda do profissional <b><?php echo $rowProfissional['ProfiNome']; ?></b></p>
+							<div class="row">
+								<div class="col-lg-9">
+									<p class="font-size-lg" style="margin-left: -18px;">A relação abaixo faz referência à agenda do profissional <b><?php echo $rowProfissional['ProfiNome']; ?></b></p>
+								</div>
+								<div class="col-lg-3 text-right" style="margin-top: -10px;">
+									<a href="profissional.php" class="btn" id="cancelar">Cancelar</a>
+									<button id="salvarAgenda" class="btn btn-principal" role="button" >Salvar</button>									
+								</div>
+							</div>
 						</div>
 						<br>
 						<div class="row">
@@ -753,10 +761,6 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 							<div class="col-md-9">
 								<div id="fullcalendar-external"></div>
 							</div>
-						</div>
-						<div class="text-left m-2">
-							<button id="salvarAgenda" class="btn btn-principal" role="button" >Salvar</button>
-							<a href="profissional.php" class="btn btn-lg" id="cancelar">Cancelar</a>
 						</div>
 					</div>
 				</div>
