@@ -386,8 +386,8 @@ function WebSocketConnect(unidade, empresa){
 	
 	*/
 	if(unidade && empresa){
-		// var socket = new WebSocket('wss://lamparinasws.herokuapp.com');
-		var socket = new WebSocket('ws://localhost:8080');
+		var socket = new WebSocket('wss://lamparinasws.herokuapp.com');
+		// var socket = new WebSocket('ws://localhost:8080');
 	
 		// socket.onmessage = function (event){
 		// 	console.log('implementação padrão')
