@@ -3105,6 +3105,354 @@ try{
 			'menssagem' => 'Internação salva com Sucesso!'
 		]);
 		
+	} elseif ($tipoRequest == 'GETSINAISVITAIS') {
+
+		$iAtendimentoTriagemId = $_POST['id'];
+
+		$sql = "SELECT AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriFreqRespiratoria, AtTriTempAXI,
+		AtTriSPO, AtTriHGT, AtTriAlergia, AtTriDiabetes, AtTriHipertensao, AtTriNeoplasia, AtTriUsoMedicamento, AtTriAlergiaDescricao,
+		AtTriDiabetesDescricao, AtTriHipertensaoDescricao, AtTriNeoplasiaDescricao, AtTriUsoMedicamentoDescricao
+		FROM AtendimentoTriagem
+		WHERE AtTriId = " . $iAtendimentoTriagemId ;
+		$result = $conn->query($sql);
+		$rowTriagem = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode($rowTriagem);
+
+	} elseif ($tipoRequest == 'INCLUIRANOTACAOTECENFERMAGEM') {
+
+		$justificativaAnotacao = $_POST['justificativaAnotacao'] == "" ? null : $_POST['justificativaAnotacao'];
+		$peso = $_POST['peso'] == "" ? 0 : gravaValor($_POST['peso']);
+		$anotacao = $_POST['anotacao'];
+		$inputSistolica = $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'];
+		$inputDiatolica = $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'];
+		$inputCardiaca = $_POST['inputCardiaca'] == "" ? null : $_POST['inputCardiaca'];
+		$inputRespiratoria = $_POST['inputRespiratoria'] == "" ? null : $_POST['inputRespiratoria'];
+		$inputTemperatura = $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'];
+		$inputSPO = $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'];
+		$inputHGT = $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'];
+
+		$inputAlergia = $_POST['inputAlergia'];
+		$inputAlergiaDescricao = $_POST['inputAlergiaDescricao'];
+		$inputDiabetes = $_POST['inputDiabetes'];
+		$inputDiabetesDescricao = $_POST['inputDiabetesDescricao'];
+		$inputHipertensao = $_POST['inputHipertensao'];
+		$inputHipertensaoDescricao = $_POST['inputHipertensaoDescricao'];
+		$inputNeoplasia = $_POST['inputNeoplasia'];
+		$inputNeoplasiaDescricao = $_POST['inputNeoplasiaDescricao'];
+		$inputUsoMedicamento = $_POST['inputUsoMedicamento'];
+		$inputUsoMedicamentoDescricao = $_POST['inputUsoMedicamentoDescricao'];
+
+		$tipo = $_POST['tipo'];
+
+		$dataHoraAtual = date('Y-m-d H:i:s');
+		$dataInicio = date('Y-m-d'); 
+		$horaInicio =date('H:i:s');
+
+		if (isset($tipo) && $tipo == 'INSERT') {
+
+			$iAtendimentoId = $_POST['iAtendimentoId'];
+
+			$sql = "INSERT INTO  EnfermagemAnotacaoTecnico(EnAnTAtendimento,EnAnTDataInicio,EnAnTHoraInicio,EnAnTProfissional,EnAnTPas,EnAnTPad,EnAnTFreqCardiaca,EnAnTFreqRespiratoria,
+														EnAnTTemperatura,EnAnTSPO,EnAnTHGT, EnAnTAlergia, EnAnTAlergiaDescricao, EnAnTDiabetes, EnAnTDiabetesDescricao, EnAnTHipertensao, 
+														EnAnTHipertensaoDescricao, EnAnTNeoplasia, EnAnTNeoplasiaDescricao, EnAnTUsoMedicamento, EnAnTUsoMedicamentoDescricao, 
+														EnAnTDataHora,EnAnTJustificativaLancRetroativo,EnAnTPeso,EnAnTAnotacao,EnAnTEditavel,EnAnTUnidade)
+			VALUES ('$iAtendimentoId', '$dataInicio', '$horaInicio', '$usuarioId', '$inputSistolica', '$inputDiatolica', '$inputCardiaca', '$inputRespiratoria',
+					'$inputTemperatura', '$inputSPO', '$inputHGT', '$inputAlergia', '$inputAlergiaDescricao', '$inputDiabetes', '$inputDiabetesDescricao', '$inputHipertensao', '$inputHipertensaoDescricao', 
+					'$inputNeoplasia', '$inputNeoplasiaDescricao', '$inputUsoMedicamento', '$inputUsoMedicamentoDescricao',  '$dataHoraAtual', '$justificativaAnotacao', '$peso', '$anotacao', 1, '$iUnidade')";
+			$conn->query($sql);
+
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Incluir Anotação',
+				'menssagem' => 'Anotação inserida com sucesso!!!'
+			]);		
+			
+		} else {
+
+			$idAnotacao = $_POST['idAnotacao'];
+
+			$sql = "UPDATE EnfermagemAnotacaoTecnico SET
+			EnAnTProfissional = '$usuarioId',
+			EnAnTPas = '$inputSistolica',
+			EnAnTPad = '$inputDiatolica',
+			EnAnTFreqCardiaca = '$inputCardiaca',
+			EnAnTFreqRespiratoria = '$inputRespiratoria',
+			EnAnTTemperatura = '$inputTemperatura',
+			EnAnTSPO = '$inputSPO',
+			EnAnTHGT = '$inputHGT',
+			EnAnTAlergia = '$inputAlergia', 
+			EnAnTAlergiaDescricao = '$inputAlergiaDescricao', 
+			EnAnTDiabetes = '$inputDiabetes', 
+			EnAnTDiabetesDescricao = '$inputDiabetesDescricao', 
+			EnAnTHipertensao = '$inputHipertensao', 
+			EnAnTHipertensaoDescricao = '$inputHipertensaoDescricao',
+			EnAnTNeoplasia = '$inputNeoplasia', 
+			EnAnTNeoplasiaDescricao = '$inputNeoplasiaDescricao', 
+			EnAnTUsoMedicamento = '$inputUsoMedicamento', 
+			EnAnTUsoMedicamentoDescricao = '$inputUsoMedicamentoDescricao',
+			EnAnTDataHora = '$dataHoraAtual',
+			EnAnTJustificativaLancRetroativo = '$justificativaAnotacao',
+			EnAnTPeso = '$peso',
+			EnAnTAnotacao = '$anotacao'
+			WHERE EnAnTId = '$idAnotacao'";
+
+			$conn->query($sql);
+
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Alterar Anotação',
+				'menssagem' => 'Anotação alterada com sucesso!!!'
+			]);
+
+		}
+
+	} elseif ($tipoRequest == 'SALVARANOTACAOTECENFERMAGEM') {
+
+
+		$iAtendimentoId = $_POST['iAtendimentoId'];
+		$dataFim = date('Y-m-d'); 
+		$horaFim =date('H:i:s');
+
+
+		$sql = "UPDATE EnfermagemAnotacaoTecnico SET
+			EnAnTDataFim = '$dataFim',
+			EnAnTHoraFim = '$horaFim',
+			EnAnTEditavel = 0	
+			WHERE EnAnTAtendimento = '$iAtendimentoId'
+			AND EnAnTProfissional = '$usuarioId'";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Anotação Técnico de Enfermagem',
+			'menssagem' => 'Dados Salvos com Sucesso!!!'
+		]);
+
+		
+	} elseif ($tipoRequest == 'GETANOTACOESTECENFERMAGEM') {
+
+		$iAtendimento = $_POST['id'];
+	
+		$sql = "SELECT *
+			FROM EnfermagemAnotacaoTecnico
+			WHERE EnAnTAtendimento = $iAtendimento";
+
+		$result = $conn->query($sql);
+		$anotacoes = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($anotacoes as $key => $item){
+
+			array_push($array,[
+				'item' => ($key + 1),
+				'id'=>$item['EnAnTId'],
+				'dataHora'=> mostraData($item['EnAnTDataInicio']) . ' ' . mostraHora($item['EnAnTHoraInicio']),
+				'justificativa' => substr($item['EnAnTJustificativaLancRetroativo'], 0, 100) . '...',
+				'anotacao'=> substr($item['EnAnTAnotacao'], 0, 100) . '...',
+				'justificativaCompleta' => $item['EnAnTJustificativaLancRetroativo'],
+				'anotacaoCompleta' => $item['EnAnTAnotacao'],
+				'peso' => $item['EnAnTPeso'],
+				'editavel' => $item['EnAnTEditavel']
+			]);
+		}
+		
+		echo json_encode($array);
+		
+	} elseif ($tipoRequest == 'GETANOTACAOTECENFERMAGEM') {
+
+		$id = $_POST['id'];
+
+		$sql = "SELECT *
+		FROM EnfermagemAnotacaoTecnico
+		WHERE EnAnTId = $id
+		AND EnAnTUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode($row);
+		
+	} elseif ($tipoRequest == 'DELETEANOTACAOTECENFERMAGEM') {
+
+		$id = $_POST['id'];
+	
+		$sql = "DELETE FROM EnfermagemAnotacaoTecnico
+		WHERE EnAnTId = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Anotação Técnico de Enfermagem',
+			'menssagem' => 'Anotação excluída!!!',
+		]);
+		
+	} elseif ($tipoRequest == 'INCLUIREVOLUCAOENFERMAGEM') {
+
+		$justificativaEvolucao = $_POST['justificativaEvolucao'] == "" ? null : $_POST['justificativaEvolucao'];
+		$evolucaoEnfermagem = $_POST['evolucaoEnfermagem'];
+
+		$inputSistolica = $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'];
+		$inputDiatolica = $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'];
+		$inputCardiaca = $_POST['inputCardiaca'] == "" ? null : $_POST['inputCardiaca'];
+		$inputRespiratoria = $_POST['inputRespiratoria'] == "" ? null : $_POST['inputRespiratoria'];
+		$inputTemperatura = $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'];
+		$inputSPO = $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'];
+		$inputHGT = $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'];
+
+		$inputAlergia = $_POST['inputAlergia'];
+		$inputAlergiaDescricao = $_POST['inputAlergiaDescricao'];
+		$inputDiabetes = $_POST['inputDiabetes'];
+		$inputDiabetesDescricao = $_POST['inputDiabetesDescricao'];
+		$inputHipertensao = $_POST['inputHipertensao'];
+		$inputHipertensaoDescricao = $_POST['inputHipertensaoDescricao'];
+		$inputNeoplasia = $_POST['inputNeoplasia'];
+		$inputNeoplasiaDescricao = $_POST['inputNeoplasiaDescricao'];
+		$inputUsoMedicamento = $_POST['inputUsoMedicamento'];
+		$inputUsoMedicamentoDescricao = $_POST['inputUsoMedicamentoDescricao'];
+
+		$tipo = $_POST['tipo'];
+
+		$dataHoraAtual = date('Y-m-d H:i:s');
+		$dataInicio = date('Y-m-d'); 
+		$horaInicio =date('H:i:s');
+
+		if (isset($tipo) && $tipo == 'INSERT') {
+
+			$iAtendimentoId = $_POST['iAtendimentoId'];
+
+			$sql = "INSERT INTO  EnfermagemEvolucao(EnEvoAtendimento,EnEvoDataInicio,EnEvoHoraInicio,EnEvoProfissional,EnEvoPas,EnEvoPad,EnEvoFreqCardiaca,EnEvoFreqRespiratoria,
+														EnEvoTemperatura,EnEvoSPO,EnEvoHGT, EnEvoAlergia, EnEvoAlergiaDescricao, EnEvoDiabetes, EnEvoDiabetesDescricao, EnEvoHipertensao, 
+														EnEvoHipertensaoDescricao, EnEvoNeoplasia, EnEvoNeoplasiaDescricao, EnEvoUsoMedicamento, EnEvoUsoMedicamentoDescricao,
+														EnEvoDataHora,EnEvoJustificativaLancRetroativo,EnEvoEvolucao,EnEvoEditavel,EnEvoUnidade)
+
+			VALUES ('$iAtendimentoId', '$dataInicio', '$horaInicio', '$usuarioId', '$inputSistolica', '$inputDiatolica', '$inputCardiaca', '$inputRespiratoria',
+					'$inputTemperatura', '$inputSPO', '$inputHGT', '$inputAlergia', '$inputAlergiaDescricao', '$inputDiabetes', '$inputDiabetesDescricao', '$inputHipertensao', 
+					'$inputHipertensaoDescricao', '$inputNeoplasia', '$inputNeoplasiaDescricao', '$inputUsoMedicamento', '$inputUsoMedicamentoDescricao',  '$dataHoraAtual', '$justificativaEvolucao', '$evolucaoEnfermagem', 1, '$iUnidade')";
+			$conn->query($sql);
+
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Incluir Evolução',
+				'menssagem' => 'Evolução inserida com sucesso!!!'
+			]);		
+			
+		} else {
+
+			$idEvolucao = $_POST['idEvolucao'];
+
+			$sql = "UPDATE EnfermagemEvolucao SET
+
+			EnEvoProfissional = '$usuarioId',
+			EnEvoPas = '$inputSistolica',
+			EnEvoPad = '$inputDiatolica',
+			EnEvoFreqCardiaca = '$inputCardiaca',
+			EnEvoFreqRespiratoria = '$inputRespiratoria',
+			EnEvoTemperatura = '$inputTemperatura',
+			EnEvoSPO = '$inputSPO',
+			EnEvoHGT = '$inputHGT',
+			EnEvoAlergia = '$inputAlergia', 
+			EnEvoAlergiaDescricao = '$inputAlergiaDescricao', 
+			EnEvoDiabetes = '$inputDiabetes', 
+			EnEvoDiabetesDescricao = '$inputDiabetesDescricao', 
+			EnEvoHipertensao = '$inputHipertensao', 
+			EnEvoHipertensaoDescricao = '$inputHipertensaoDescricao',
+			EnEvoNeoplasia = '$inputNeoplasia', 
+			EnEvoNeoplasiaDescricao = '$inputNeoplasiaDescricao', 
+			EnEvoUsoMedicamento = '$inputUsoMedicamento', 
+			EnEvoUsoMedicamentoDescricao = '$inputUsoMedicamentoDescricao',
+			EnEvoDataHora = '$dataHoraAtual',
+			EnEvoJustificativaLancRetroativo = '$justificativaEvolucao',
+			EnEvoEvolucao = '$evolucaoEnfermagem'
+			WHERE EnEvoId = '$idEvolucao'";
+
+			$conn->query($sql);
+
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Alterar Evolução',
+				'menssagem' => 'Evolução alterada com sucesso!!!'
+			]);
+
+		}
+
+	} elseif ($tipoRequest == 'SALVAREVOLUCAOENFERMAGEM') {
+
+		$iAtendimentoId = $_POST['iAtendimentoId'];
+		$dataFim = date('Y-m-d'); 
+		$horaFim =date('H:i:s');
+
+		$sql = "UPDATE EnfermagemEvolucao SET
+			EnEvoDataFim = '$dataFim',
+			EnEvoHoraFim = '$horaFim',
+			EnEvoEditavel = 0	
+			WHERE EnEvoAtendimento = '$iAtendimentoId'
+			AND EnEvoProfissional = '$usuarioId'";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Anotação Técnico de Enfermagem',
+			'menssagem' => 'Dados Salvos com Sucesso!!!'
+		]);
+
+		
+	} elseif ($tipoRequest == 'GETEVOLUCOESENFERMAGEM') {
+
+		$iAtendimento = $_POST['id'];
+	
+		$sql = "SELECT *
+			FROM EnfermagemEvolucao
+			WHERE EnEvoAtendimento = $iAtendimento";
+
+		$result = $conn->query($sql);
+		$evolucoes = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($evolucoes as $key => $item){
+
+			array_push($array,[
+				'item' => ($key + 1),
+				'id'=>$item['EnEvoId'],
+				'dataHora'=> mostraData($item['EnEvoDataInicio']) . ' ' . mostraHora($item['EnEvoHoraInicio']),
+				'justificativa' => substr($item['EnEvoJustificativaLancRetroativo'], 0, 100) . '...',
+				'evolucao'=> substr($item['EnEvoEvolucao'], 0, 100) . '...',
+				'justificativaCompleta' => $item['EnEvoJustificativaLancRetroativo'],
+				'evolucaoCompleta' => $item['EnEvoEvolucao'],
+				'editavel' => $item['EnEvoEditavel']
+			]);
+		}
+		
+		echo json_encode($array);
+		
+	}elseif ($tipoRequest == 'GETEVOLUCAOENFERMAGEM') {
+
+		$id = $_POST['id'];
+
+		$sql = "SELECT *
+		FROM EnfermagemEvolucao
+		WHERE EnEvoId = $id
+		AND EnEvoUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode($row);
+		
+	} elseif ($tipoRequest == 'DELETEEVOLUCAOENFERMAGEM') {
+
+		$id = $_POST['id'];
+	
+		$sql = "DELETE FROM EnfermagemEvolucao
+		WHERE EnEvoId = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Evolução de Enfermagem',
+			'menssagem' => 'Evolução excluída!!!',
+		]);
+		
 	}
 
 }catch(PDOException $e) {
