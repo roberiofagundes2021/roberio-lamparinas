@@ -11,7 +11,9 @@ include('global_assets/php/conexao.php');
 // que podem ver a tela de atendimento na visão do atendente ou profissional respectivamente
 
 $iUnidade = $_SESSION['UnidadeId'];
+$iEmpresa = $_SESSION['EmpreId'];
 $usuarioId = $_SESSION['UsuarId'];
+
 if(isset($_POST['inputProfissionalId'])){
 	$iProfissional = $_POST['inputProfissionalId'];
 } else {
@@ -105,9 +107,24 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 			border: 1px solid #333;
 		}
 	</style>
+	<?php
+		echo "<script>
+				iUnidade = $iUnidade
+				iEmpresa = $iEmpresa
+			</script>"
+	?>
+
+	<script></script>
 
 	<script type="text/javascript">
-		var socket = null
+		const socket = WebSocketConnect(iUnidade,iEmpresa)
+		socket.onmessage = function (event) {
+			menssage = JSON.parse(event.data)
+			if(menssage.type == 'AGENDA'){
+				getAgenda()
+			}
+		};
+
 		$(document).ready(function(){
 			getAgenda()
 			WebSocketConnect()
@@ -130,7 +147,9 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 						getAgenda()
 						$('#salvarAgenda').html('Salvar');
 						$("#salvarAgenda").prop('disabled', false);
-						socket.send('AGENDA');
+						socket.sendMenssage({
+							'type':'AGENDA'
+						});
 					}
 				});
 			})
@@ -164,41 +183,6 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 				});
 			})
 		})
-
-		function WebSocketConnect(){
-			socket = new WebSocket('wss://lamparinasws.herokuapp.com');
-
-			socket.onmessage = function (event) {
-				if(event.data == 'AGENDA'){
-					getAgenda()
-				}
-			};
-			socket.onerror = function (event) {
-				console.log(event.data)
-				socket.close()
-			};
-			socket.onclose = function (event) {
-				var reason;
-				switch(event.code){
-					case 1000: reason = "Encerramento normal, significando que o propósito para o qual a conexão foi estabelecida foi cumprido.";break;
-					case 1001: reason = "Um ponto de extremidade está \"indo embora\", como um servidor que está fora do ar ou um navegador que saiu de uma página.";break;
-					case 1002: reason = "Um endpoint está encerrando a conexão devido a um erro de protocolo";break;
-					case 1003: reason = "Um endpoint está encerrando a conexão porque recebeu um tipo de dados que não pode aceitar (por exemplo, um endpoint que entende apenas dados de texto PODE enviar isso se receber uma mensagem binária).";break;
-					case 1004: reason = "Reservado. O significado específico pode ser definido no futuro.";break;
-					case 1005: reason = "Nenhum código de status estava realmente presente.";break;
-					case 1006: reason = "A conexão foi fechada de forma anormal, por exemplo, sem enviar ou receber um quadro de controle Close";break;
-					case 1007: reason = "Um endpoint está encerrando a conexão porque recebeu dados dentro de uma mensagem que não eram consistentes com o tipo da mensagem (por exemplo, dados não UTF-8 [https://www.rfc-editor.org/rfc/rfc3629] dentro de uma mensagem de texto).";break;
-					case 1008: reason = "Um endpoint está encerrando a conexão porque recebeu uma mensagem que \"viola sua política\". Esse motivo é fornecido se não houver outro motivo susceptível ou se houver necessidade de ocultar detalhes específicos sobre a apólice.";break;
-					case 1009: reason = "Um terminal está encerrando a conexão porque recebeu uma mensagem muito grande para ser processada.";break;
-					case 1010: reason = "Um endpoint (cliente) está encerrando a conexão porque esperava que o servidor negociasse uma ou mais extensões, mas o servidor não as retornou na mensagem de resposta do handshake do WebSocket. <br /> Especificamente, as extensões necessárias são: " + event.reason;break;
-					case 1011: reason = "Um servidor está encerrando a conexão porque encontrou uma condição inesperada que o impediu de atender à solicitação.";break;
-					case 1015: reason = "A conexão foi encerrada devido a uma falha na execução de um handshake TLS (por exemplo, o certificado do servidor não pode ser verificado).";break;
-					default: reason = "Rasão desconhecida";break;
-				}
-				console.log('WebSocket Close: '+reason)
-				setTimeout(function() {WebSocketConnect()},1000)
-			};
-		}
 
 		function getAgenda(){
 			// iniciar o calendário

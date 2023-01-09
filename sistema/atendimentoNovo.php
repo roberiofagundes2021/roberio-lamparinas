@@ -6,6 +6,9 @@ $_SESSION['PaginaAtual'] = 'Novo Atendimento';
 
 include('global_assets/php/conexao.php');
 
+$iUnidade = $_SESSION['UnidadeId'];
+$iEmpresa = $_SESSION['EmpreId'];
+
 $_SESSION['atendimento'] = [
 	'paciente' => '',
 	'responsavel' => '',
@@ -43,7 +46,19 @@ $_SESSION['atendimento'] = [
 
 	<!-- essa função deve ser devlarada aqui pois existem funções que são sobrescrevidas
 	nas importações abaixo -->
+	<?php
+		echo "<script>
+				iUnidade = $iUnidade
+				iEmpresa = $iEmpresa
+			</script>"
+	?>
 	<script>
+		const socket = WebSocketConnect(iUnidade,iEmpresa)
+		// socket.onmessage = function (event) {
+        //     if(event.data == 'AGENDA'){
+        //         getAgenda()
+        //     }
+        // };
 		$(document).ready(function() {
 			// Show form
 			var form = $('.steps-validation').show();
@@ -213,6 +228,9 @@ $_SESSION['atendimento'] = [
 						success: function(response) {
 							if (response.status == 'success') {
 								alerta(response.titulo, response.menssagem, response.status)
+								socket.sendMenssage({
+									'type':'ATENDIMENTO'
+								});
 								window.location.href = 'atendimento.php'
 							} else {
 								alerta(response.titulo, response.menssagem, response.status);

@@ -7,6 +7,10 @@ $_SESSION['PaginaAtual'] = 'Caixa PDV';
 
 include('global_assets/php/conexao.php');
 
+$iUnidade = $_SESSION['UnidadeId'];
+$iEmpresa = $_SESSION['EmpreId'];
+$usuarioId = $_SESSION['UsuarId'];
+
 $nomeCaixa = '';
 
 if(isset($_POST['inputAbrirCaixa'])) {
@@ -216,11 +220,24 @@ if(isset($_POST['inputAtendimentoId'])) {
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
    
     <!-- /theme JS files -->
+    <?php
+	echo "<script>
+		iUnidade = $iUnidade
+		iEmpresa = $iEmpresa
+		</script>"
+	?>
 
     <script type="text/javascript">
+        const socket = WebSocketConnect(iUnidade,iEmpresa)
+        socket.onmessage = function (event) {
+			menssage = JSON.parse(event.data)
+			if(menssage.type == 'ATENDIMENTO'){
+				getContent()
+			}
+		};
         
         $(document).ready(function () {
-            
+            getContent()
             $('#tblAtendimento').DataTable( {
                 "order": [[ 0, "asc" ]],
                 autoWidth: false,
@@ -690,6 +707,25 @@ if(isset($_POST['inputAtendimentoId'])) {
                 document.formAtendimento.submit();
             })
         });
+
+        function getContent(){
+			// busca os dados para adicionar no select de Atendimentos
+			$.ajax({
+				type: 'POST',
+				url: 'filtraCaixaPDV.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'ATENDIMENTOS'
+				},
+				success: function(response) {
+                    $('#cmbAtendimento').html("<option value=''>Selecionar</option>")
+
+                    response.forEach(item=>{
+                        $('#cmbAtendimento').append(`<option value='${item.id}'>${item.nome}</option>`)
+                    })
+				}
+			});
+		}
     </script>
 
     <style>
@@ -756,25 +792,7 @@ if(isset($_POST['inputAtendimentoId'])) {
                                         <div class="form-group" style="font-size: 1.200rem;">
                                             <label for="cmbAtendimento" class="font-size-lg" style="font-size: 1.200rem; color: #333">Atendimento <span class="text-danger">*</span></label>
                                             <select id="cmbAtendimento" name="cmbAtendimento" class="form-control form-control-select2" required>
-                                                <option value="">Selecionar</option>
-                                                <?php
-                                                $sql = "SELECT AtendId, ClienNome
-                                                        FROM Atendimento
-                                                        JOIN Cliente on ClienId = AtendCliente
-                                                        JOIN Situacao on SituaId = AtendSituacao
-                                                        JOIN AtendimentoModalidade on AtModId = AtendModalidade
-                                                        LEFT JOIN CaixaRecebimento on CxRecAtendimento = AtendId
-                                                        WHERE AtendUnidade = ".$_SESSION['UnidadeId']." and AtendId not in (SELECT CxRecAtendimento FROM CaixaRecebimento)
-                                                        AND SituaChave = 'LIBERADO'
-                                                        AND AtModTipoRecebimento = 'À Vista'                                                      
-                                                        ORDER BY ClienNome";
-                                                $result = $conn->query($sql);
-                                                $rowFornecedor = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                foreach ($rowFornecedor as $item) {
-                                                    print('<option value="' . $item['AtendId'] . '">' . $item['ClienNome'] . '</option>');
-                                                }
-                                                ?>
+                                                <!--  -->
                                             </select>
                                         </div>     
                                     </div>
