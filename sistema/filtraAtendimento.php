@@ -263,7 +263,6 @@ try{
 		$acesso = $_POST['acesso'];
 		$array = [];
 
-
 		$sql = "SELECT ProfiId, ProfiUsuario
 				FROM Profissional
 				WHERE ProfiUsuario = $usuarioId and ProfiUnidade = $iUnidade";
@@ -353,7 +352,7 @@ try{
 		$observacao = [];
 
 		$sql = "SELECT AtClRId,AtClRNome,AtClRNomePersonalizado,AtClRCor,AtClRDeterminantes
-		FROM AtendimentoClassificacaoRisco WHERE AtClRUnidade = $iUnidade";
+			FROM AtendimentoClassificacaoRisco WHERE AtClRUnidade = $iUnidade";
 		$resultRiscos = $conn->query($sql);
 		$rowRiscos = $resultRiscos->fetchAll(PDO::FETCH_ASSOC);
 
@@ -364,16 +363,16 @@ try{
 			$atender = "<button href='#'  type='button' class='btn btn-success btn-sm atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'>Atender</button>";
 			$acoes = "<div class='list-icons'>";
 
-				if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {					
+				if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de Enfermagem') {					
 					
 					$acoes .= "
 						$att
-						<div class='dropdown'>													
+						<div class='dropdown'>
 							<a href='#' class='list-icons-item' data-toggle='dropdown'>
 								<i class='icon-menu9'></i>
 							</a>
 
-							<div class='dropdown-menu dropdown-menu-right'> 
+							<div class='dropdown-menu dropdown-menu-right'>
 								<a href='#' class='dropdown-item atender' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>
 								<div class='dropdown-divider'></div>
 								<a href='#' class='dropdown-item triagem' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
@@ -383,7 +382,7 @@ try{
 						</div>";
 				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
 					$acoes .= "$atender";
-				}	
+				}
 			$acoes .= "</div>";
 
 			$borderColor = "";

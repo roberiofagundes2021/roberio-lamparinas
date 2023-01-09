@@ -438,7 +438,7 @@ $acesso = 'ATENDIMENTO';
 			_componentSelect2();
 			
 			/* Fim: Tabela Personalizada */
-		});
+		})
 
 		function setAttributs(){
 			$('.atender').each(function(index, element){
@@ -688,13 +688,13 @@ $acesso = 'ATENDIMENTO';
 				$('.btn-grid').removeClass('active');
 				$(this).addClass('active');     
 			});
-		});
+		})
 		$(function() {
 			$('.btn-grid2').click(function(){
 				$('.btn-grid2').removeClass('active');
 				$(this).addClass('active');     
 			});
-		});
+		})
 
 		function mudarGrid(grid){
 
@@ -729,7 +729,11 @@ $acesso = 'ATENDIMENTO';
 			$('.box-especialidade').css('display','none');
 			document.getElementById(especialidade).style.display = 'block';
 		}
-
+		function entrar(id){
+			$('#iAtendimentoId').val(id)
+			$('#dadosPost').attr('action', 'atendimentoAmbulatorial.php');
+			$('#dadosPost').submit()
+		}
 	</script>
 
 </head>
@@ -755,7 +759,7 @@ $acesso = 'ATENDIMENTO';
 					<input type='hidden' id='iAtendimentoEletivoId' name='iAtendimentoEletivoId' value='' />
 					<input type='hidden' id='ClaChave' name='ClaChave' value='' />
 					<input type='hidden' id='ClaNome' name='ClaNome' value='' />
-				</form>	
+				</form>
 				<div class="row">
 					<div class="col-lg-12">
 							
@@ -780,7 +784,7 @@ $acesso = 'ATENDIMENTO';
 												<input type="radio" autocomplete="off"  > Pacientes em Observação 
 											</label>
 											<label id="contadorEmObservacao" class="btn btn-lg btn-success" style="padding-left: 3px; padding-right: 3px"> - </label>
-										</div>									
+										</div>
 										
 										<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendidos')" >Pacientes Atendidos</button>
 									</div>
@@ -932,7 +936,7 @@ $acesso = 'ATENDIMENTO';
 															<hr />
 														</div >";
 
-													echo "<hr style='border-color:#aaa; box-sizing:border-box; width:97%; '/>";
+													echo "<hr style='border-color:#aaa;box-sizing:border-box;width:97%;'/>";
 
 													echo "
 													<div class='card-body'>							
@@ -947,7 +951,7 @@ $acesso = 'ATENDIMENTO';
 																<h4 class='card-title'>ALDO DA SILVA BARBOSA</h4>
 																<p class='card-text mb-1'>Nrº do Registro: 4465</p>
 																<p class='card-text'>Data da Internação: 10/10/2010</p>
-																<a href='#' class='btn btn-principal '>Entrar</a>
+																<button onclick='entrar(88)'  type='button' class='btn btn-success btn-sm'>Atender</button>
 															</div>
 														</div>
 													</div>";

@@ -11,10 +11,10 @@ $iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
 	$iAtendimentoId = $_SESSION['iAtendimentoId'];
 }
-$_SESSION['iAtendimentoId'] = null;
+$_SESSION['iAtendimentoId'] = $iAtendimentoId;
 
 if(!$iAtendimentoId){
-	irpara("atendimentoAmbulatorialListagem.php");	
+	irpara("atendimentoAmbulatorialListagem.php");
 }
 
 $sql = "SELECT TOP(1) AtAmbId

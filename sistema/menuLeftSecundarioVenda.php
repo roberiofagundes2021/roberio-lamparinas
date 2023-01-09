@@ -1,10 +1,11 @@
 <?php
 	// essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
 
-	$sql = "SELECT AtClaNome, AtClaChave, AtendCliente, ClienCodigo, ClienNome
+	$sql = "SELECT AtClaNome, AtClaChave, AtendCliente, ClienCodigo, ClienNome, SituaChave
 	FROM Atendimento
 	JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 	JOIN Cliente ON ClienId = AtendCliente
+	JOIN Situacao ON SituaId = AtendSituacao
 	WHERE AtendId = $iAtendimentoId";
 	$result = $conn->query($sql);
 	$rowClassificacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -13,6 +14,7 @@
 	$ClaNome = $rowClassificacao['AtClaNome'] == 'Internação' ? "HOSPITALAR" : $rowClassificacao['AtClaNome'];
 	$prontuario = $rowClassificacao['ClienCodigo'];
 	$Cliente = $rowClassificacao['ClienNome'];
+	$SituaChave = $rowClassificacao['SituaChave'];
 ?>
 
 <script language ="javascript">
@@ -87,6 +89,29 @@
 						<li class="nav-item-header"><?php echo strtoupper($Cliente). "<br>Prontuário: " .$prontuario ; ?></li>
 
 						<li class="nav-item-divider"></li>
+
+						<?php if($SituaChave == 'EMOBSERVACAO'){?>
+							<li class="nav-item nav-item-submenu">
+								<a href="#" class="nav-link legitRipple">Ato de Enfermagem</a>
+								<ul class="nav nav-group-sub">
+									<li class="nav-item">
+										<a href="#" class="nav-link itemLink" data-tipo='admissaoEnfermagem'><i class="icon-certificate"></i> Admissão</a>
+									</li>
+									<li class="nav-item">
+										<a href="#" class="nav-link itemLink" data-tipo='evolucaoEnfermagem'><i class="icon-certificate"></i> Prescrição e Evolução</a>
+									</li>
+									<li class="nav-item">
+										<a href="#" class="nav-link itemLink" data-tipo='anotacaoTecnicoEnfermagem'><i class="icon-certificate"></i> Anotações</a>
+									</li>								
+									<li class="nav-item">
+										<a href="#" class="nav-link itemLink" data-tipo='formularios'><i class="icon-certificate"></i> Formulários</a>
+									</li>
+									<li class="nav-item">
+										<a href="#" class="nav-link itemLink" data-tipo='relatorioAta'><i class="icon-certificate"></i> Relatório de Alta</a>
+									</li>
+								</ul>
+							</li>
+						<?php }?>
 
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='atendimentoAmbulatorial'><i class="icon-certificate"></i> Atendimento Ambulatorial</a>
@@ -217,13 +242,13 @@
 					</ul>
 				<?php }elseif($ClaChave == 'INTERNACAO'){ ?>
 					<ul class="nav nav-sidebar" data-nav-type="accordion">
-					<li style="padding: 20px 0px 0px 20px;"><h2 style="font-weight: 500"><?php echo "".strtoupper($ClaNome); ?></b></li>
+						<li style="padding: 20px 0px 0px 20px;"><h2 style="font-weight: 500"><?php echo "".strtoupper($ClaNome); ?></b></li>
 
-					<li class="nav-item-divider"></li>
+						<li class="nav-item-divider"></li>
 
-					<li class="nav-item-header"><?php echo strtoupper($Cliente). "<br>Prontuário: " .$prontuario ; ?></li>
+						<li class="nav-item-header"><?php echo strtoupper($Cliente). "<br>Prontuário: " .$prontuario ; ?></li>
 
-					<li class="nav-item-divider"></li>
+						<li class="nav-item-divider"></li>
 						<li class="nav-item nav-item-submenu">
 							<a href="#" class="nav-link legitRipple">Ato de Enfermagem</a>
 							<ul class="nav nav-group-sub">
