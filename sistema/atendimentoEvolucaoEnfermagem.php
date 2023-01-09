@@ -457,6 +457,8 @@ if ($row['ClienSexo'] == 'F'){
 
         function anexosEvolucao(idEvolucao) {
             $('#idEvolucaoAnexo').val(idEvolucao);
+            $('#inputClienteEvolucao').val('<?php echo $row['ClienNome']; ?>');
+            $('#inputAtendimento').val('<?php echo $row['AtendNumRegistro']; ?>');
             document.formAnexo.action = "evolucaoAnexo.php";
             document.formAnexo.submit();
         }
@@ -607,6 +609,8 @@ if ($row['ClienSexo'] == 'F'){
 
                             <form method="post" name="formAnexo" target="print_popup">
                                 <input type="hidden" id="idEvolucaoAnexo" name="idEvolucaoAnexo">
+                                <input type="hidden" id="inputClienteEvolucao" name="inputClienteEvolucao">
+                                <input type="hidden" id="inputAtendimento" name="inputAtendimento">
                             </form>                                            
 
                             <div class="card">
