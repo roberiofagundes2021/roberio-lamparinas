@@ -107,8 +107,10 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 	</style>
 
 	<script type="text/javascript">
+		var socket = null
 		$(document).ready(function(){
 			getAgenda()
+			WebSocketConnect()
 			//$('#excluirContainer').hide();
 
 			$('#salvarAgenda').on('click', ()=>{
@@ -164,7 +166,7 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 		})
 
 		function WebSocketConnect(){
-			const socket = new WebSocket('wss://lamparinasws.herokuapp.com');
+			socket = new WebSocket('wss://lamparinasws.herokuapp.com');
 
 			socket.onmessage = function (event) {
 				if(event.data == 'AGENDA'){
