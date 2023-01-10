@@ -131,9 +131,12 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
+	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
+	<script src="../../../../global_assets/js/demo_pages/components_popups.js"></script>
+
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
 	<!-- /theme JS files -->	
-
+	
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
@@ -236,6 +239,18 @@ if(isset($_POST['inputTipo'])){
 				
 				e.preventDefault();
 
+				var inputFoto = $('#inputFoto').val();
+				
+				//Esse ajax está sendo usado para excluir a imagem que nao será mais usada
+				$.ajax({
+					type: "POST",
+					url: "fornecedorExcluiImagem.php",
+					data: ('foto='+inputFoto),
+					success: function(resposta){
+						
+					}
+				})		
+
 				// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
 				var cep = $("#inputCep").val()
 				cep = cep.replace(' ','')
@@ -288,7 +303,9 @@ if(isset($_POST['inputTipo'])){
 				document.getElementById('CPF').style.display = "block";
 				document.getElementById('CNPJ').style.display = "none";
 				document.getElementById('dadosPF').style.display = "block";
+				document.getElementById('pFfoto').style.display = "block";
 				document.getElementById('dadosPJ').style.display = "none";
+				document.getElementById('inputFoto').style.display = "block";
 				document.getElementById('inputNome').placeholder = "Nome Completo";
 				document.getElementById('inputCpf').setAttribute('required', 'required');
 				document.getElementById('inputCnpj').removeAttribute('required', 'required');
@@ -296,7 +313,9 @@ if(isset($_POST['inputTipo'])){
 				document.getElementById('CPF').style.display = "none";
 				document.getElementById('CNPJ').style.display = "block";				
 				document.getElementById('dadosPF').style.display = "none";
+				document.getElementById('pFfoto').style.display = "none";
 				document.getElementById('dadosPJ').style.display = "block";
+				document.getElementById('inputFoto').style.display = "none";
 				document.getElementById('inputNome').placeholder = "Nome Fantasia";
 				document.getElementById('inputCpf').removeAttribute('required', 'required');
 				document.getElementById('inputCnpj').setAttribute('required', 'required');
@@ -401,18 +420,25 @@ if(isset($_POST['inputTipo'])){
 							
 							<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
 							<br>
-							<div class="row">
-								<div class="col-lg-9">
+							<div class="row">									
+								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputNome">Nome<span class="text-danger"> *</span></label>
+										<label for="inputNome">Nome<span class="text-danger">*</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Fantasia" required autofocus>
 									</div>
 								</div>	
 								
-								<div class="col-lg-3" id="CPF" style="display:none;">
+								<div class="col-lg-2" id="CPF" style="display:none;">
 									<div class="form-group">
 										<label for="inputCpf">CPF<span class="text-danger">*</span></label>
 										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" onblur="validaEFormataCpf()">
+									</div>	
+								</div>
+
+								<div class="col-lg-2" id="NIT">
+									<div class="form-group">				
+										<label for="inputNIT">NIT<span class="text-danger">*</span></label>
+										<input type="text" id="inputNIT" name="inputNIT" class="form-control" placeholder="NIT" data-mask="99999999999" onblur="validaEFormataCnpj()"required>
 									</div>	
 								</div>
 								
@@ -423,7 +449,7 @@ if(isset($_POST['inputTipo'])){
 									</div>	
 								</div>							
 							</div>
-								
+
 							<div class="row">				
 								<div class="col-lg-12">
 									<div id="dadosPF" style="display:none">
@@ -442,7 +468,7 @@ if(isset($_POST['inputTipo'])){
 												</div>
 											</div>
 
-											<div class="col-lg-3">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="cmbUf">UF</label>
 													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
@@ -478,7 +504,37 @@ if(isset($_POST['inputTipo'])){
 													</select>
 												</div>
 											</div>
-											
+
+											<div class="col-lg-3">
+												<div class="form-group">
+													<label for="inputNaturalidade">Naturalidade</label>
+													<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+												</div>
+											</div>
+										</div>
+
+										<div class="row">
+											<div class="col-lg-3">
+												<div class="form-group">
+													<label for="inputNacionalidade">Nacionalidade</label>
+													<input type="text" id="inputNacionalidade" name="inputNacionalidade" class="form-control" placeholder="Nacionalidade">
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputAno">Ano</label>
+													<div class="btn btn-primary" title="Entrada no Brasil (se estrangeiro)" data-placement="right"><i class="icon-question4"></i></div>
+													<input type="text" id="inputAno" name="inputAno" class="form-control" placeholder="Ano">
+												</div>
+											</div>
+
+											<div class="col-lg-3">
+												<div class="form-group">
+													<label for="inputCarteiraTrabalho">Carteira de Trabalho</label>
+													<input type="text" id="inputCarteiraTrabalho" name="inputCarteiraTrabalho" class="form-control" placeholder="Carteira de Trabalho">
+												</div>
+											</div>
+
 											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="cmbSexo">Sexo</label>
@@ -495,9 +551,17 @@ if(isset($_POST['inputTipo'])){
 													<label for="inputAniversario">Aniversário</label>
 													<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" onblur="formataCampoDataNascimento()">
 												</div>
-											</div>										
-										</div>	
+											</div>	
+										</div>
 									</div> <!-- Fim dadosPF -->
+
+									<div id="pFfoto" style="display:none" style="text-align:center;">
+										<div id="visualizar">										
+											<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Fornecedor" style="max-height:250px; border:2px solid #ccc;">
+										</div>
+										<br>
+										<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>	
+									</div>
 									
 									<div id="dadosPJ">
 										<div class="row">
@@ -527,7 +591,14 @@ if(isset($_POST['inputTipo'])){
 							</div>
 							
 							<div class="row">
-								<div class="col-lg-6">
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="inputCategoriaCredor">Categoria do Credor</label>
+										<input type="text" id="inputCategoriaCredor" name="inputCategoriaCredor" class="form-control" placeholder="Categoria do Credor">
+									</div>
+								</div>
+
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
 										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
@@ -549,7 +620,7 @@ if(isset($_POST['inputTipo'])){
 									</div>
 								</div>
 
-								<div class="col-lg-6">
+								<div class="col-lg-4">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSubCategoria">SubCategoria</label>
 										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
@@ -655,21 +726,28 @@ if(isset($_POST['inputTipo'])){
 									<h5 class="mb-0 font-weight-semibold">Contato</h5>
 									<br>
 									<div class="row">								
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputNomeContato">Nome</label>
 												<input type="text" id="inputNomeContato" name="inputNomeContato" class="form-control" placeholder="Contato">
 											</div>
 										</div>
-										
+
 										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputTelefone">Telefone</label>
-												<input type="tel" id="inputTelefone" name="inputTelefone" class="form-control" placeholder="Telefone" data-mask="(99) 9999-9999">
+												<label for="inputTelefoneResidencial">Telefone Residencial</label>
+												<input type="tel" id="inputTelefoneResidencial" name="inputTelefoneResidencial" class="form-control" placeholder="Telefone Residencial" data-mask="(99) 9999-9999">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputTelefoneComercial">Telefone Comercial</label>
+												<input type="tel" id="inputTelefoneComercial" name="inputTelefoneComercial" class="form-control" placeholder="Telefone Comercial" data-mask="(99) 9999-9999">
 											</div>
 										</div>
 										
-										<div class="col-lg-2">
+										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputCelular">Celular</label>
 												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
@@ -743,7 +821,7 @@ if(isset($_POST['inputTipo'])){
 											</div>
 										</div>
 
-										<div class="col-lg-2">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputInfoAdicional">Informação Adicional</label>
 												<input type="text" id="inputInfoAdicional" name="inputInfoAdicional" class="form-control">
@@ -800,10 +878,13 @@ if(isset($_POST['inputTipo'])){
 							</div>
 													
 
-					</div>
-					<!-- /card-body -->
-					
+						</div>
+						<!-- /card-body -->
 					</form>
+
+					<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
+						<input type="file" id="imagem" name="imagem" style="display:none;"/>
+					</form>	
 					
 				</div>
 				<!-- /info blocks -->
