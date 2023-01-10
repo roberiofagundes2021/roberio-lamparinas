@@ -152,16 +152,18 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 							<div class="card-body">
 								<div class="row">
-									<div class="col-lg-8">
+									<div class="col-lg-9">
 										A relação abaixo faz referência aos Anexos do cliente <span style="color: #FF0000; font-weight: bold;"> <?php echo $_SESSION['nomeCliente']; ?> </span> da unidade <b><?php echo $_SESSION['UnidadeNome']; ?></b>
 									</div>
-									<div class= " text-right" style="margin-left: 85px;">
-										<a href="cliente.php" role="button"><< Relação de Cliente</a>&nbsp;&nbsp;&nbsp;
-									</div>
-									<div class= " text-right">
-										<a href="clienteAnexoNovo.php" class="btn btn-principal" role="button">Novo Anexo</a></div>
+									<div class="col-lg-3">
+										<div class="text-right" style="margin-top: -10px;">
+											<a href="cliente.php" role="button"><< Relação de Cliente</a>&nbsp;&nbsp;&nbsp;
+											<a href="clienteAnexoNovo.php" class="btn btn-principal" role="button">Novo Anexo</a>
+										</div>
 									</div>
 								</div>
+							</div>
+							
 							<table class="table" id="tblClienteAnexo">
 								<thead>
 									<tr class="bg-slate">
