@@ -55,14 +55,14 @@ if(isset($_POST['inputNome'])){
 		if (isset($_POST['cmbProduto'])){
 
 			$sql = "UPDATE Produto SET ProduDetalhamento = :sDetalhamento, ProduUsuarioAtualizador = :iUsuarioAtualizador
-					WHERE ProduId = :iProduto and ProduUnidade = :iUnidade";
+					WHERE ProduId = :iProduto and ProduEmpresa = :iEmpresa";
 			$result = $conn->prepare($sql);
 
 			$result->execute(array(
 						':sDetalhamento' => $_POST['txtDetalhamento'],
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iProduto' => $_POST['cmbProduto'],
-						':iUnidade' => $_SESSION['UnidadeId']
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
 		}						
 
@@ -260,7 +260,7 @@ if(isset($_POST['inputNome'])){
 													$sql = "SELECT ProduId, ProduNome
 															FROM Produto
 															JOIN Situacao on SituaId = ProduStatus
-															WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+															WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
 															ORDER BY ProduNome ASC";
 													$result = $conn->query($sql);
 													$rowProduto = $result->fetchAll(PDO::FETCH_ASSOC);

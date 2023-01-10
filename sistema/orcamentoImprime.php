@@ -120,14 +120,14 @@ try {
 					FROM Produto
 					JOIN OrcamentoXProduto on OrXPrProduto = ProduId
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-					WHERE ProduUnidade = '$_SESSION[UnidadeId]' and OrXPrOrcamento = '$iOrcamento'
+					WHERE ProduEmpresa = '$_SESSION[EmpreId]' and OrXPrOrcamento = '$iOrcamento'
 					and ProduSubCategoria = '$subCatObj[SbCatId]'";
 
 			// $sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla, OrXPrQuantidade, OrXPrValorUnitario
 			// FROM Produto
 			// JOIN OrcamentoXProduto on OrXPrProduto = ProduId
 			// JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			// WHERE ProduUnidade = '$_SESSION[UnidadeId]' and OrXPrOrcamento = '$iOrcamento'";
+			// WHERE ProduEmpresa = '$_SESSION[EmpreId]' and OrXPrOrcamento = '$iOrcamento'";
 
 			$result = $conn->query($sql);
 			$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);

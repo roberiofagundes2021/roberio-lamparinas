@@ -11,7 +11,7 @@ if(isset($_POST['inputNome'])){
 	try{		
 		$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
 				FROM Produto
-				Where ProduUnidade = ".$_SESSION['UnidadeId']."";
+				Where ProduEmpresa = ".$_SESSION['EmpreId']."";
 		//echo $sql;die;
 		$result = $conn->query("$sql");
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -27,10 +27,10 @@ if(isset($_POST['inputNome'])){
 		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduDetalhamento, ProduFoto, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
 									 ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
 									 ProduEstoqueMinimo, ProduUnidadeMedida, ProduTipoFiscal, ProduNcmFiscal, 
-									 ProduOrigemFiscal, ProduCest, ProduStatus, ProduUsuarioAtualizador, ProduUnidade) 
+									 ProduOrigemFiscal, ProduCest, ProduStatus, ProduUsuarioAtualizador, ProduEmpresa) 
 				VALUES (:sCodigo, :sCodigoBarras, :sNome, :sDetalhamento, :sFoto, :iCategoria, :iSubCategoria, :fValorCusto, 
 						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iUnidadeMedida, 
-						:iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+						:iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
@@ -54,7 +54,7 @@ if(isset($_POST['inputNome'])){
 						':iCest' => $_POST['inputCest'] == '' ? null : $_POST['inputCest'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iUnidade' => $_SESSION['UnidadeId']
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";

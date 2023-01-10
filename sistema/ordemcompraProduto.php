@@ -158,7 +158,7 @@ if (isset($_POST['inputIdOrdemCompra'])){
 $sql = "SELECT OCXPrProduto
 		FROM OrdemCompraXProduto
 		JOIN Produto on ProduId = OCXPrProduto
-		WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and ProduCategoria = ".$iCategoria." and OCXPrOrdemCompra = ".$row['OrComId']."";
+		WHERE OCXPrUnidade = ". $_SESSION['UnidadeId'] ." and ProduCategoria = ".$iCategoria." and OCXPrOrdemCompra = ".$row['OrComId']."";
 
 if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 	$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
@@ -450,7 +450,7 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 																FROM Produto
 																JOIN Situacao on SituaId = ProduStatus
 																JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxo'
-																WHERE ProduUnidade = $_SESSION[UnidadeId] and SituaChave = 'ATIVO' and
+																WHERE ProduEmpresa = $_SESSION[EmpreId] and SituaChave = 'ATIVO' and
 																ProduCategoria = '$iCategoria'";
 														if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 															$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
@@ -505,7 +505,7 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 													JOIN OrdemCompraXProduto on OCXPrProduto = ProduId and OCXPrOrdemCompra = '$iOrdemCompra'
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxo'
-													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
+													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'";
 										if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 											$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
 										}
@@ -520,7 +520,7 @@ if ($countProdutoUtilizado == $rowCompleto['Quant'] && ($countProdutoUtilizado !
 													JOIN Situacao on SituaId = ProduStatus
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxo'
-													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SituaChave = 'ATIVO'";
+													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'";
 											if (isset($row['OrComSubCategoria']) and $row['OrComSubCategoria'] != '' and $row['OrComSubCategoria'] != null){
 												$sql .= " and ProduSubCategoria = ".$row['OrComSubCategoria'];
 											}

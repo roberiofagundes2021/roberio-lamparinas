@@ -111,7 +111,7 @@ else {
 			
 			$sql = "SELECT ProduId
 					FROM Produto
-					WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and ProduCodigoBarras = '".$codigo."'";
+					WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and ProduCodigoBarras = '".$codigo."'";
 			$result = $conn->query($sql);
 			$row = $result->fetch(PDO::FETCH_ASSOC);
 			//$count = count($row);
@@ -119,7 +119,7 @@ else {
 			if ($row){
 
 				$sql = "UPDATE Produto SET ProduNome = :sNome, ProduDetalhamento = :sDetalhamento, ProduUsuarioAtualizador = :iUsuarioAtualizador
-						WHERE ProduCodigoBarras = :sCodigoBarras and ProduUnidade = :iUnidade";
+						WHERE ProduCodigoBarras = :sCodigoBarras and ProduEmpresa = :iEmpresa";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
@@ -127,7 +127,7 @@ else {
 								':sDetalhamento' => $detalhamento,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 								':sCodigoBarras' => $codigo,
-								':iUnidade' => $_SESSION['UnidadeId']
+								':iEmpresa' => $_SESSION['EmpreId']
 								));
 
 				$produtosimportados .= $nome.', ';
@@ -151,7 +151,7 @@ else {
 				
 				$sql = "SELECT COUNT(isnull(ProduCodigo,0)) as Codigo
 						FROM Produto
-						Where ProduUnidade = ".$_SESSION['UnidadeId']."";
+						Where ProduEmpresa = ".$_SESSION['EmpreId']."";
 				//echo $sql;die;
 				$result = $conn->query("$sql");
 				$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
@@ -162,10 +162,10 @@ else {
 				$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduCategoria, ProduSubCategoria, ProduDetalhamento, ProduFoto, 
 											ProduValorCusto, ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
 											ProduEstoqueMinimo, ProduUnidadeMedida, ProduTipoFiscal, ProduNcmFiscal, ProduOrigemFiscal, ProduCest, 
-											ProduStatus, ProduUsuarioAtualizador, ProduUnidade) 
+											ProduStatus, ProduUsuarioAtualizador, ProduEmpresa) 
 						VALUES (:sCodigo, :sCodigoBarras, :sNome, :iCategoria, :iSubCategoria, :sDetalhamento, :sFoto, :fValorCusto, 
 								:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iUnidadeMedida, :iTipoFiscal, 
-								:iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, :iUsuarioAtualizador, :iUnidade);";
+								:iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, :iUsuarioAtualizador, :iEmpresa);";
 				$result = $conn->prepare($sql);
 						
 				$result->execute(array(
@@ -189,7 +189,7 @@ else {
 								':iCest' => null,
 								':bStatus' => 1,
 								':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-								':iUnidade' => $_SESSION['UnidadeId']
+								':iEmpresa' => $_SESSION['EmpreId']
 								));
 						
 				$produtosimportados.= $nome.', ';

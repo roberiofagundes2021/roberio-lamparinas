@@ -17,13 +17,13 @@ if(isset($_POST['inputDataInicio'])) {
 	$iSubCategoria = isset($_POST['cmbSubCategoria']) && $_POST['cmbSubCategoria'] != '' ? $_POST['cmbSubCategoria'] : 'NULL';
 	$iClassificacao = isset($_POST['cmbClassificacao']) && $_POST['cmbClassificacao'] != '' ? $_POST['cmbClassificacao'] : 'NULL';
 
-	$sql = "SELECT ProduId, ProduNome, MvXPrValorUnitario, dbo.fnTotalSaidas(ProduUnidade, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim') as Saidas,
-				   (MvXPrValorUnitario * dbo.fnTotalSaidas(ProduUnidade, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim')) as ValorTotal
+	$sql = "SELECT ProduId, ProduNome, MvXPrValorUnitario, dbo.fnTotalSaidas(".$_SESSION['UnidadeId'].", ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim') as Saidas,
+				   (MvXPrValorUnitario * dbo.fnTotalSaidas(MovimUnidade, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim')) as ValorTotal
 			FROM Produto
 			JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 			JOIN Movimentacao on MovimId = MvXPrMovimentacao
 			JOIN Situacao on SituaId = MovimSituacao
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and MovimTipo = 'S' and SituaChave = 'LIBERADO' and MovimData between '".$dataInicio."' and '".$dataFim."' ";
+			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and MovimTipo = 'S' and SituaChave = 'LIBERADO' and MovimData between '".$dataInicio."' and '".$dataFim."' ";
 
 	if ($iUnidade != 'NULL'){
 		

@@ -92,7 +92,7 @@ try {
             JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
             JOIN ProdutoXFabricante on PrXFaFluxoOperacional = FlOpeId
             LEFT JOIN Marca on MarcaId = PrXFaMarca
-            WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and MvXPrMovimentacao = ".$iMovimentacao." and MvXPrQuantidade <> 0";
+            WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and MvXPrMovimentacao = ".$iMovimentacao." and MvXPrQuantidade <> 0";
     $result = $conn->query($sql);
     $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
     $totalProdutos = count($rowProdutos);

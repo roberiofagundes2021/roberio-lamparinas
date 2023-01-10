@@ -13,7 +13,7 @@ function queryPesquisa()
     $args = [];
 	
     if (!empty($_POST['cmbUnidade'])) {
-		$args[]  = "ProduUnidade = " . $_POST['cmbUnidade'] . " ";
+		$args[]  = "MovimUnidade = " . $_POST['cmbUnidade'] . " ";
 		$iUnidade = $_POST['cmbUnidade'];
 		
 		if (!empty($_POST['cmbSetor'])) {
@@ -66,13 +66,13 @@ function queryPesquisa()
     try {
 		
 		$sql = "SELECT distinct ProduId, ProduCodigo, ProduNome, MvXPrValorUnitario, 
-				dbo.fnTotalSaidas(ProduUnidade, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim') as Saidas,
-			    (MvXPrValorUnitario * dbo.fnTotalSaidas(ProduUnidade, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim')) as ValorTotal
+				dbo.fnTotalSaidas(MovimUnidade, ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim') as Saidas,
+			    (MvXPrValorUnitario * dbo.fnTotalSaidas(". $_SESSION['UnidadeId'] .", ProduId, NULL, $iSetor, $iCategoria, $iSubCategoria, $iClassificacao, '$dataInicio', '$dataFim')) as ValorTotal
 				FROM Produto
 				JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
 				JOIN Movimentacao on MovimId = MvXPrMovimentacao
 				JOIN Situacao on SituaId = MovimSituacao
-				WHERE " . $string . " ProduUnidade = ". $iUnidade ." and MovimTipo = 'S' and SituaChave = 'LIBERADO' and MovimData between '".$dataInicio."' and '".$dataFim."' 
+				WHERE " . $string . " ProduEmpresa = ". $_SESSION['EmpreId'] ." and MovimTipo = 'S' and SituaChave = 'LIBERADO' and MovimData between '".$dataInicio."' and '".$dataFim."' 
 				ORDER BY ValorTotal DESC
 		";			
 

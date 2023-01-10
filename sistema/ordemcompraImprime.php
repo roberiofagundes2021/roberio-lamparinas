@@ -109,7 +109,7 @@ try {
 			JOIN ProdutoXFabricante ON PrXFaProduto = FOXPrProduto and PrXFaFluxoOperacional = FOXPrFluxoOperacional
 			JOIN FluxoOperacional on FlOpeId = PrXFaFluxoOperacional
 			JOIN Marca on MarcaId = PrXFaMarca
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OCXPrOrdemCompra = ".$iOrdemCompra." and FOXPrFluxoOperacional = " . $iFluxoOperacional."
+			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OCXPrOrdemCompra = ".$iOrdemCompra." and FOXPrFluxoOperacional = " . $iFluxoOperacional."
 			ORDER BY ProduNome ASC";
 
 	$result = $conn->query($sql);

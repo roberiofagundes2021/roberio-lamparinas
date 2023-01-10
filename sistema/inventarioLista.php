@@ -70,7 +70,7 @@ try {
 				LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 				LEFT JOIN Setor on SetorId = MovimDestinoSetor
 				JOIN Situacao on SituaId = MovimSituacao
-				WHERE ProduUnidade = " . $item['InvenUnidade'] . " and ProduStatus = 1 and
+				WHERE MovimUnidade = " . $item['InvenUnidade'] . " and ProduStatus = 1 and
 					  MovimDestinoLocal = (" . $iLocal . ") and SituaChave in ('LIBERADO', 'LIBERADOCONTABILIDADE')
 				 ";
 		if ($iCategoria){
@@ -134,7 +134,7 @@ try {
 				LEFT JOIN LocalEstoque on LcEstId = MovimDestinoLocal
 				LEFT JOIN Setor on SetorId = MovimDestinoSetor
 				JOIN Situacao on SituaId = MovimSituacao
-				WHERE ProduUnidade = " . $item['InvenUnidade'] . " and ProduStatus = 1 and
+				WHERE MovimUnidade = " . $item['InvenUnidade'] . " and ProduStatus = 1 and
 					  MovimDestinoSetor = $iSetor and SituaChave = 'LIBERADO'
 				 ";
 		if ($iCategoria){
