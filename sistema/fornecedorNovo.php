@@ -10,16 +10,18 @@ if(isset($_POST['inputTipo'])){
 			
 	try{
 		
-		$sql = "INSERT INTO Fornecedor (ForneTipo, ForneNome, ForneRazaoSocial, ForneCnpj, ForneInscricaoMunicipal, ForneInscricaoEstadual, 
-										ForneCategoria, ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, 
-										ForneAniversario, ForneCep, ForneEndereco, ForneNumero, ForneComplemento, ForneBairro, ForneCidade, 
-										ForneEstado, ForneContato, ForneTelefone, ForneCelular, ForneEmail, ForneSite, ForneObservacao,
-									    ForneBanco, ForneAgencia, ForneConta, ForneInformacaoAdicional, ForneIpi, ForneFrete, ForneIcms, 
-									    ForneOutros, ForneStatus, ForneUsuarioAtualizador, ForneEmpresa)
+		$sql = "INSERT INTO Fornecedor (ForneTipo, ForneNome, ForneRazaoSocial, ForneCnpj, ForneInscricaoMunicipal,	ForneInscricaoEstadual, ForneCategoria,
+										ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, ForneAniversario, ForneNaturalidade, ForneNaturalidadeUf,
+										ForneNacionalidade, ForneAno, ForneCarteiraTrabalho, ForneNit, ForneCategoriaCredor, ForneFoto, ForneCep, ForneEndereco,
+										ForneNumero, ForneComplemento, ForneBairro, ForneCidade, ForneEstado, ForneContato, ForneTelefone, ForneTelefoneComercial,
+										ForneCelular, ForneEmail, ForneSite, ForneObservacao, ForneBanco, ForneAgencia, ForneConta, ForneInformacaoAdicional,
+										ForneIpi, ForneFrete, ForneIcms, ForneOutros, ForneStatus, ForneUsuarioAtualizador, ForneUnidade, ForneEmpresa)
 				VALUES (:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual, :iCategoria,  
-						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sCep, :sEndereco, :sNumero, :sComplemento, :sBairro, 
-						:sCidade, :sEstado, :sContato, :sTelefone, :sCelular, :sEmail, :sSite, :sObservacao, :iBanco, :sAgencia, 
-						:sConta, :sInformacaoAdicional, :iIpi, :iFrete, :iIcms, :iOutros, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sNaturalidade, :sNaturalidadeUF 
+						:sNacionalidade, :sAno, :sCarteiraTrabalho, :sNit, :sCategoriaCredor, :sFoto, :sCep, :sEndereco, 
+						:sNumero, :sComplemento, :sBairro, :sCidade, :sEstado, :sContato, :sTelefone, :sTelefoneComercial 
+						:sCelular, :sEmail, :sSite, :sObservacao, :iBanco, :sAgencia, :sConta, :sInformacaoAdicional, 
+						:iIpi, :iFrete, :iIcms, :iOutros, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
 
 		$conn->beginTransaction();
@@ -32,13 +34,20 @@ if(isset($_POST['inputTipo'])){
 						':sInscricaoMunicipal' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null,
 						':sInscricaoEstadual' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoEstadual'] : null,
 						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sCpf' => $_POST['inputTipo'] == 'F' ? limpaCPF_CNPJ($_POST['inputCpf']) : null,
 						':sRg' => $_POST['inputTipo'] == 'F' ? $_POST['inputRg'] : null,
 						':sOrgaoEmissor' => $_POST['inputTipo'] == 'F' ? $_POST['inputEmissor'] : null,
 						':sUf' => $_POST['inputTipo'] == 'J' || $_POST['cmbUf'] == '#' ? null : $_POST['cmbUf'],
 						':sSexo' => $_POST['inputTipo'] == 'J' || $_POST['cmbSexo'] == '#' ? null : $_POST['cmbSexo'],
 						':dAniversario' => $_POST['inputTipo'] == 'F' ? ($_POST['inputAniversario'] == '' ? null : $_POST['inputAniversario']) : null,
+						':sNaturalidade' => $_POST['inputTipo'] == 'F' ? null : $_POST['inputNaturalidade'],
+						':sNaturalidadeUF' => $_POST['inputTipo'] == 'J' || $_POST['inputNaturalidadeUf'] == '#' ? null : $_POST['inputNaturalidadeUf'],
+						':sNacionalidade' => $_POST['inputTipo'] == 'F' ? null : $_POST['inputNacionalidade'],
+						':sAno' => $_POST['inputTipo'] == 'F' ? null : $_POST['inputAno'],
+						':sCarteiraTrabalho' => $_POST['inputTipo'] == 'F' ? null : $_POST['inputCarteiraTrabalho'],
+						':sNit' => $_POST['inputNit'],
+						':sCategoriaCredor' => $_POST['inputCategoriaCredor'],
+						':sFoto' => $_POST['inputTipo'] == 'F' ? ($_POST['inputFoto']) : null,
 						':sCep' => $_POST['inputCep'],
 						':sEndereco' => $_POST['inputEndereco'],
 						':sNumero' => $_POST['inputNumero'],
@@ -47,7 +56,8 @@ if(isset($_POST['inputTipo'])){
 						':sCidade' => $_POST['inputCidade'],
 						':sEstado' => $_POST['cmbEstado'],
 						':sContato' => $_POST['inputNomeContato'],
-						':sTelefone' => $_POST['inputTelefone'] == '(__) ____-____' ? null : $_POST['inputTelefone'],
+						':sTelefone' => $_POST['inputTelefoneResidencial'] == '(__) ____-____' ? null : $_POST['inputTelefoneResidencial'],
+						':sTelefoneComercial' => $_POST['inputTelefoneComercial'] == '(__) ____-____' ? null : $_POST['inputTelefoneComercial'],
 						':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
 						':sEmail' => $_POST['inputEmail'],
 						':sSite' => $_POST['inputSite'],
@@ -320,8 +330,7 @@ if(isset($_POST['inputTipo'])){
 				document.getElementById('inputCpf').removeAttribute('required', 'required');
 				document.getElementById('inputCnpj').setAttribute('required', 'required');
 			}
-		}			
-
+		}
 
 		function validaEFormataCnpj(){
 			let cnpj = $('#inputCnpj').val();
@@ -367,10 +376,59 @@ if(isset($_POST['inputTipo'])){
 				$('#inputAniversario').val("");		
 			}
 		}
-    </script>	
 
+		//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
+		$('#addFoto').on('click', function(e){	
+			e.preventDefault(); // Isso aqui não deixa o formulário "formFornecedor" ser submetido ao clicar no Incluir Foto, ou seja, ao executar o método ajax
+			
+			$('#imagem').trigger("click");
+		});	
 
-	
+		// #imagem é o id do input, ao alterar o conteudo do input execurará a função abaixo
+		$('#imagem').on('change',function(){
+
+			$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
+				
+			// Get form
+			var form = $('#formFoto')[0];
+			var formData = new FormData(form);
+			//var inputFoto = $('#inputFoto').val();
+			//alert($('#imagem')[0].files[0]);
+
+			formData.append('file', $('#imagem')[0].files[0] );
+			formData.append('tela', 'produto' );
+
+			$.ajax({
+				type: "POST",
+				enctype: 'multipart/form-data',
+				url: "upload.php",
+				processData: false,  // impedir que o jQuery tranforma a "data" em querystring					
+				contentType: false,  // desabilitar o cabeçalho "Content-Type"
+				cache: false, // desabilitar o "cache"
+				data: formData,//{imagem: inputImagem},
+				success: function(resposta){
+					//console.log(resposta);
+		
+				$('#visualizar').html(resposta);
+				$('#addFoto').text("Alterar Foto...");
+		
+				//Aqui sou obrigado a instanciar novamente a utilização do fancybox
+				$(".fancybox").fancybox({
+				// options
+			});	
+		
+				return false;						
+			}
+		}); //ajax
+
+			//$('#formFoto').submit();
+
+			// Efetua o Upload sem dar refresh na pagina
+			$('#formFoto').ajaxForm({
+				target:'#visualizar' // o callback será no elemento com o id #visualizar
+			}).submit();
+		});	
+    </script>		
 </head>
 
 <body class="navbar-top">
@@ -437,8 +495,8 @@ if(isset($_POST['inputTipo'])){
 
 								<div class="col-lg-2" id="NIT">
 									<div class="form-group">				
-										<label for="inputNIT">NIT<span class="text-danger">*</span></label>
-										<input type="text" id="inputNIT" name="inputNIT" class="form-control" placeholder="NIT" data-mask="99999999999" onblur="validaEFormataCnpj()"required>
+										<label for="inputNit">NIT<span class="text-danger">*</span></label>
+										<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT" data-mask="99999999999" onblur="validaEFormataCnpj()"required>
 									</div>	
 								</div>
 								
@@ -452,7 +510,7 @@ if(isset($_POST['inputTipo'])){
 
 							<div class="row">				
 								<div class="col-lg-12">
-									<div id="dadosPF" style="display:none">
+									<div id="dadosPF" style="display:none">										
 										<div class="row">
 											<div class="col-lg-2">
 												<div class="form-group">
@@ -504,13 +562,50 @@ if(isset($_POST['inputTipo'])){
 													</select>
 												</div>
 											</div>
-
+											
 											<div class="col-lg-3">
 												<div class="form-group">
 													<label for="inputNaturalidade">Naturalidade</label>
 													<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
 												</div>
 											</div>
+
+											<div class="col-lg-2">
+												<div class="form-group">
+													<label for="inputNaturalidadeUF">UF de Naturalidade</label>
+													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
+														<option value="#">Selecione um estado</option>
+														<option value="AC">Acre</option>
+														<option value="AL">Alagoas</option>
+														<option value="AP">Amapá</option>
+														<option value="AM">Amazonas</option>
+														<option value="BA">Bahia</option>
+														<option value="CE">Ceará</option>
+														<option value="DF">Distrito Federal</option>
+														<option value="ES">Espírito Santo</option>
+														<option value="GO">Goiás</option>
+														<option value="MA">Maranhão</option>
+														<option value="MT">Mato Grosso</option>
+														<option value="MS">Mato Grosso do Sul</option>
+														<option value="MG">Minas Gerais</option>
+														<option value="PA">Pará</option>
+														<option value="PB">Paraíba</option>
+														<option value="PR">Paraná</option>
+														<option value="PE">Pernambuco</option>
+														<option value="PI">Piauí</option>
+														<option value="RJ">Rio de Janeiro</option>
+														<option value="RN">Rio Grande do Norte</option>
+														<option value="RS">Rio Grande do Sul</option>
+														<option value="RO">Rondônia</option>
+														<option value="RR">Roraima</option>
+														<option value="SC">Santa Catarina</option>
+														<option value="SP">São Paulo</option>
+														<option value="SE">Sergipe</option>
+														<option value="TO">Tocantins</option>
+														<option value="ES">Estrangeiro</option>
+													</select>
+												</div>
+											</div>	
 										</div>
 
 										<div class="row">
@@ -523,7 +618,9 @@ if(isset($_POST['inputTipo'])){
 											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputAno">Ano</label>
-													<div class="btn btn-primary" title="Entrada no Brasil (se estrangeiro)" data-placement="right"><i class="icon-question4"></i></div>
+													<div class="lamparinasTooltip"><button type="button" class="btn btn-light" data-popup="tooltip" title="Entrada no Brasil (se estrangeiro)" data-placement="right" id="right"><i class="icon-question4"></i></button></>
+													</div>
+													<!-- <div class="btn btn-primary" style="background-color: #fff; color: #2196f3;" title="Entrada no Brasil (se estrangeiro)" data-placement="right"><i class="icon-question4"></i></div> -->
 													<input type="text" id="inputAno" name="inputAno" class="form-control" placeholder="Ano">
 												</div>
 											</div>
@@ -546,7 +643,7 @@ if(isset($_POST['inputTipo'])){
 												</div>
 											</div>
 
-											<div class="col-lg-3">
+											<div class="col-lg-2">
 												<div class="form-group">
 													<label for="inputAniversario">Aniversário</label>
 													<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" onblur="formataCampoDataNascimento()">
@@ -554,14 +651,6 @@ if(isset($_POST['inputTipo'])){
 											</div>	
 										</div>
 									</div> <!-- Fim dadosPF -->
-
-									<div id="pFfoto" style="display:none" style="text-align:center;">
-										<div id="visualizar">										
-											<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Fornecedor" style="max-height:250px; border:2px solid #ccc;">
-										</div>
-										<br>
-										<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>	
-									</div>
 									
 									<div id="dadosPJ">
 										<div class="row">
@@ -587,6 +676,14 @@ if(isset($_POST['inputTipo'])){
 											</div>	
 										</div>	
 									</div> <!-- Fim dadosPJ -->
+								</div>
+
+								<div id="pFfoto" style="display:none"  style="text-align:center;">
+									<div id="visualizar">										
+										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Fornecedor" style="max-height:250px; border:2px solid #ccc;">
+									</div>
+									<br>
+									<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>	
 								</div>
 							</div>
 							
