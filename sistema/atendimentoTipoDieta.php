@@ -7,8 +7,9 @@ $_SESSION['PaginaAtual'] = 'Tipo de Dieta';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT TpDieId, TpDieNome, TpDieStatus, SituaNome, SituaCor, SituaChave
+$sql = "SELECT TpDieId, TpDieNome, TpDieVia, TpDieStatus, ViaNome, SituaNome, SituaCor, SituaChave
 		FROM TipoDieta
+		JOIN Via on ViaId = TpDieVia
 		JOIN Situacao on SituaId = TpDieStatus
 	    WHERE TpDieUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY TpDieNome ASC";
@@ -21,7 +22,7 @@ $count = count($row);
 if(isset($_POST['inputTipoDietaId']) && $_POST['inputTipoDietaId']){
 
 	//Essa consulta é para preencher o campo Nome com o TipoDieta a ser editar
-	$sql = "SELECT TpDieId, TpDieNome
+	$sql = "SELECT TpDieId, TpDieNome,TpDieVia
 			FROM TipoDieta
 			WHERE TpDieId = " . $_POST['inputTipoDietaId'];
 	$result = $conn->query($sql);
@@ -38,12 +39,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
-			$sql = "UPDATE TipoDieta SET TpDieNome = :sNome, TpDieUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE TipoDieta SET TpDieNome = :sNome, TpDieVia = :sVia, TpDieUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE TpDieId = :iTipoDieta";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sVia' => $_POST['cmbVia'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iTipoDieta' => $_POST['inputTipoDietaId']
 							));
@@ -52,12 +54,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO TipoDieta (TpDieNome, TpDieStatus, TpDieUsuarioAtualizador, TpDieUnidade)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO TipoDieta (TpDieNome, TpDieVia, TpDieStatus, TpDieUsuarioAtualizador, TpDieUnidade)
+					VALUES (:sNome, :sVia, :bStatus, :iUsuarioAtualizador, :iUnidade)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sVia' => $_POST['cmbVia'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId'],
@@ -122,15 +125,20 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					width: "80%",
 					targets: [0]
 				},
+				{
+					orderable: true,   //via
+					width: "40%",
+					targets: [1]
+				},
 				{ 
 					orderable: true,   //Situação
 					width: "10%",
-					targets: [1]
+					targets: [2]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [2]
+					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -265,13 +273,33 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputNome">Nome do Tipo de Dieta <span class="text-danger"> *</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Tipo de Dieta" value="<?php if (isset($_POST['inputTipoDietaId'])) echo $rowTipoDieta['TpDieNome']; ?>" required autofocus>
 											</div>
 										</div>
-										<div class="col-lg-6">
+										<div class="col-lg-5">
+											<label for="cmbVia">Via<span class="text-danger"> *</span></label>
+											<select id="cmbVia" name="cmbVia" class="form-control select-search" required>
+												<option value="">Selecione</option>
+												<?php 
+													$sql = "SELECT ViaId, ViaNome
+															FROM Via
+															JOIN Situacao ON SituaId = ViaStatus
+															WHERE ViaUnidade = " . $_SESSION['UnidadeId'] . " AND SituaChave = 'ATIVO'
+														    ORDER BY ViaNome ASC";
+													$result = $conn->query($sql);
+													$rowVia = $result->fetchAll(PDO::FETCH_ASSOC);
+													
+													foreach ($rowVia as $item){
+														$seleciona = $item['ViaId'] == $rowTipoDieta['TpDieVia'] ? "selected" : "";
+														print('<option value="'.$item['ViaId'].'" '. $seleciona .'>'.$item['ViaNome'].'</option>');
+													}
+												?>
+											</select>
+										</div>
+										<div class="col-lg-3">
 											<div class="form-group" style="padding-top:25px;">
 												<?php
 
@@ -295,6 +323,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								<thead>
 									<tr class="bg-slate">
 										<th data-filter>Tipo de Dieta</th>
+										<th data-filter>Via</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -310,6 +339,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										print('
 										<tr>
 											<td>'.$item['TpDieNome'].'</td>
+											<td>'.$item['ViaNome'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaTipoDieta(1,'.$item['TpDieId'].', \''.$item['TpDieNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
