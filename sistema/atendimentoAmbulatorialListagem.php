@@ -947,7 +947,7 @@ $acesso = 'ATENDIMENTO';
 															</div>
 
 															<div class='card-body'>
-																<i class='icon-bed2'></i>
+															<img src='global_assets/images/lamparinas/leito-ocupado.png' alt='Leito ocupado' width='100' height='100'>
 																<h4 class='card-title'>ALDO DA SILVA BARBOSA</h4>
 																<p class='card-text mb-1'>Nrº do Registro: 4465</p>
 																<p class='card-text'>Data da Internação: 10/10/2010</p>
