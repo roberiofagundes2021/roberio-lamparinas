@@ -105,11 +105,13 @@ try{
 
 		foreach($arrayAgenda as $key=>$item){
 			if($item['id'] == $id){
+				$type = $arrayAgenda[$key]['tipInsert'];
+
 				$arrayAgenda[$key]['title'] = $title;
 				$arrayAgenda[$key]['start'] = ($data.' '.$horaI);
 				$arrayAgenda[$key]['end'] = ($data.' '.$horaF);
 				$arrayAgenda[$key]['intervalo'] = $intervalo;
-				$arrayAgenda[$key]['tipInsert'] = 'ATT';
+				$arrayAgenda[$key]['tipInsert'] = $type=='NEW'?$type:'ATT';
 				$_SESSION['agendaProfissional'] = $arrayAgenda;
 				echo json_encode($arrayAgenda);
 				exit;
@@ -139,12 +141,13 @@ try{
 
 		foreach($arrayAgenda as $key=>$item){
 			if($item['id'] == $id){
+				$type = $arrayAgenda[$key]['tipInsert'];
 				$dataI = explode(' ',$item['start'])[0];
 				$dataF = explode(' ',$item['start'])[0];
 				$arrayAgenda[$key]['start'] = $dataI.' '.$horaAgendaInicio;
 				$arrayAgenda[$key]['end'] = $dataF.' '.$horaAgendaFim;
 				$arrayAgenda[$key]['intervalo'] = $intervalo;
-				$arrayAgenda[$key]['tipInsert'] = 'ATT';
+				$arrayAgenda[$key]['tipInsert'] = $type=='NEW'?$type:'ATT';
 			}
 		}
 		
@@ -174,7 +177,7 @@ try{
 				$sql = "SELECT PrAgeProfissional,PrAgeIntervalo,PrAgeData,PrAgeHoraInicio,
 				PrAgeHoraFim,PrAgeAtendimentoLocal,PrAgeUsuarioAtualizador,PrAgeUnidade
 				FROM ProfissionalAgenda
-				WHERE PrAgeId != '$item[id]' AND PrAgeProfissional = $iProfissional AND PrAgeData = '$data'
+				WHERE PrAgeProfissional = $iProfissional AND PrAgeData = '$data'
 				AND (('$start[1]' >= PrAgeHoraInicio AND '$start[1]' <= PrAgeHoraFim
 				OR '$end[1]' >= PrAgeHoraInicio AND '$end[1]' <= PrAgeHoraFim)OR
 				(PrAgeHoraInicio >= '$start[1]' AND PrAgeHoraFim <= '$start[1]'
@@ -219,11 +222,10 @@ try{
 			if($item['tipInsert'] == 'NEW'){
 				$sql = "INSERT INTO ProfissionalAgenda(PrAgeProfissional,PrAgeIntervalo,PrAgeData,PrAgeHoraInicio,
 				PrAgeHoraFim,PrAgeAtendimentoLocal,PrAgeUsuarioAtualizador,PrAgeUnidade) VALUES
-				('$iProfissional','$intervalo','$data', '$start[1]','$end[1]','$item[localId]','$usuarioId','$iUnidade')";
+				($iProfissional,'$intervalo','$data', '$start[1]','$end[1]',$item[localId],$usuarioId,$iUnidade)";
 
 				array_push($arraySql, $sql);
 			} elseif($item['tipInsert'] == 'ATT'){
-
 				$sql = "SELECT SituaId  FROM Situacao WHERE (SituaNome = 'Reagendar' OR SituaChave = 'REAGENDAR') AND SituaStatus = 1";
 				$result = $conn->query($sql);
 				$idSituaReag = $result->fetch(PDO::FETCH_ASSOC);			
@@ -238,7 +240,7 @@ try{
 				PrAgeHoraInicio='$start[1]',
 				PrAgeHoraFim='$end[1]',
 				PrAgeAtendimentoLocal='$item[localId]',
-				PrAgeUsuarioAtualizador='$usuarioId'
+				PrAgeUsuarioAtualizador=$usuarioId
 				WHERE PrAgeId = $item[id]";
 
 				array_push($arraySqlUpdate, $sql);
