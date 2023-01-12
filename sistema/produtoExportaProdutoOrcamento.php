@@ -9,7 +9,7 @@ $_SESSION['msg'] = array();
 if (isset($_POST['inputProdutoId'])) {
     $sql = "SELECT ProduNome, ProduDetalhamento, ProduCategoria, ProduSubCategoria, ProduUnidadeMedida, ProduStatus
             FROM Produto
-            WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'];
+            WHERE ProduId = " . $_POST['inputProdutoId'] . " and ProduEmpresa = " . $_SESSION['EmpreId'];
     $result = $conn->query($sql);
     $Produto = $result->fetch(PDO::FETCH_ASSOC);
 

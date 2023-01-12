@@ -11,14 +11,14 @@ if (isset($_POST['idSubCategoria']) && $_POST['idSubCategoria'] != '#'){
 			JOIN Categoria on CategId = ProduCategoria
 			JOIN Fornecedor on ForneCategoria = CategId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ForneId = '". $_POST['idFornecedor']."' and ProduSubCategoria = '". $_POST['idSubCategoria']."'";
+			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_POST['idFornecedor']."' and ProduSubCategoria = '". $_POST['idSubCategoria']."'";
 } else {
 	$sql = "SELECT ProduId, ProduNome, ProduDetalhamento, UnMedSigla
 			FROM Produto
 			JOIN Categoria on CategId = ProduCategoria
 			JOIN Fornecedor on ForneCategoria = CategId
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ForneId = '". $_POST['idFornecedor']."' and ProduCategoria = '". $_POST['idCategoria']."'";
+			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ForneId = '". $_POST['idFornecedor']."' and ProduCategoria = '". $_POST['idCategoria']."'";
 }
 
 $result = $conn->query($sql);

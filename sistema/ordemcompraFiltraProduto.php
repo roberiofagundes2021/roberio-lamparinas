@@ -38,7 +38,7 @@ $sql = "SELECT ProduId, ProduNome, OCXPrDetalhamento as Detalhamento, UnMedSigla
 				JOIN OrdemCompraXProduto on OCXPrProduto = ProduId and OCXPrOrdemCompra = '$iOrdemCompra'
 				JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 				JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxoOp'
-				WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduId in (".$lista.")";
+				WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId in (".$lista.")";
 if (isset($rowProd['OrComSubCategoria']) and $rowProd['OrComSubCategoria'] != '' and $rowProd['OrComSubCategoria'] != null){
 	$sql .= " and ProduSubCategoria = ".$rowProd['OrComSubCategoria'];
 }
@@ -56,7 +56,7 @@ if(!$count>0){
 					JOIN Categoria on CategId = ProduCategoria
 					JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 					JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = '$iFluxoOp'
-					WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduId in (".$lista.")";
+					WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId in (".$lista.")";
 	if (isset($rowProd['OrComSubCategoria']) and $rowProd['OrComSubCategoria'] != '' and $rowProd['OrComSubCategoria'] != null){
 		$sql .= " and ProduSubCategoria = ".$rowProd['OrComSubCategoria'];
 	}

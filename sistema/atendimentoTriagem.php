@@ -470,7 +470,7 @@ if (isset($_POST['inputAlergia']) ){
 
 
 		function selecionaAlergiaDescricao(tipo) {
-			if (tipo == 'S'){
+			if (tipo == 1){
 				document.getElementById('dadosAlergia').style.display = "block";	
 			} else {			
 				document.getElementById('dadosAlergia').style.display = "none";		
@@ -478,7 +478,7 @@ if (isset($_POST['inputAlergia']) ){
 		}
 
 		function selecionaDiabeteDescricao(tipo1) {
-			if (tipo1 == 'S'){	
+			if (tipo1 == 1){	
 				document.getElementById('dadosDiabete').style.display = "block";
 			} else {						
 				document.getElementById('dadosDiabete').style.display = "none";
@@ -486,7 +486,7 @@ if (isset($_POST['inputAlergia']) ){
 		}
 			
 		function selecionaHipertensaoDescricao(tipo2) {
-			if (tipo2 == 'S'){	
+			if (tipo2 == 1){	
 				document.getElementById('dadosHipertencao').style.display = "block";
 			} else {						
 				document.getElementById('dadosHipertencao').style.display = "none";
@@ -494,7 +494,7 @@ if (isset($_POST['inputAlergia']) ){
 		}
 
 		function selecionaNeoplasiaDescricao(tipo3) {
-			if (tipo3 == 'S'){	
+			if (tipo3 == 1){	
 				document.getElementById('dadosNeoplasia').style.display = "block";
 			} else {						
 				document.getElementById('dadosNeoplasia').style.display = "none";
@@ -502,7 +502,7 @@ if (isset($_POST['inputAlergia']) ){
 		}
 
 		function selecionaUsoMedicamentoDescricao(tipo4) {
-			if (tipo4 == 'S'){	
+			if (tipo4 == 1){	
 				document.getElementById('dadosMedicamento').style.display = "block";
 			} else {						
 				document.getElementById('dadosMedicamento').style.display = "none";
@@ -784,14 +784,14 @@ if (isset($_POST['inputAlergia']) ){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputAlergia" name="inputAlergia" value="S" class="form-input-styled" data-fouc onclick="selecionaAlergiaDescricao('S')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriAlergia'] == 'S') echo "checked"; }?>>
+														<input type="radio" id="inputAlergia" name="inputAlergia" value="1" class="form-input-styled" data-fouc onclick="selecionaAlergiaDescricao('1')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriAlergia'] == 1) echo "checked"; }?>>
 														Sim
 													</label>                     
 												</div>                                              
 												
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputAlergia" name="inputAlergia" value="N" class="form-input-styled" data-fouc onclick="selecionaAlergiaDescricao('N')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriAlergia'] == 'N') echo "checked"; }else{ echo "checked"; }?>>
+														<input type="radio" id="inputAlergia" name="inputAlergia" value="0" class="form-input-styled" data-fouc onclick="selecionaAlergiaDescricao('0')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriAlergia'] == 0) echo "checked"; }else{ echo "checked"; }?>>
 														Não
 													</label>
 												</div>										
@@ -802,13 +802,13 @@ if (isset($_POST['inputAlergia']) ){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputDiabetes" name="inputDiabetes" value="S" class="form-input-styled" data-fouc onclick="selecionaDiabeteDescricao('S')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriDiabetes'] == 'S') echo "checked"; }?>>
+														<input type="radio" id="inputDiabetes" name="inputDiabetes" value="1" class="form-input-styled" data-fouc onclick="selecionaDiabeteDescricao('1')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriDiabetes'] == 1) echo "checked"; }?>>
 														Sim
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputDiabetes" name="inputDiabetes" value="N" class="form-input-styled" data-fouc onclick="selecionaDiabeteDescricao('N')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriDiabetes'] == 'N') echo "checked"; }else{ echo "checked"; }?>>
+														<input type="radio" id="inputDiabetes" name="inputDiabetes" value="0" class="form-input-styled" data-fouc onclick="selecionaDiabeteDescricao('0')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriDiabetes'] == 0) echo "checked"; }else{ echo "checked"; }?>>
 														Não
 													</label>
 												</div>										
@@ -819,13 +819,13 @@ if (isset($_POST['inputAlergia']) ){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputHipertensao" name="inputHipertensao" value="S" class="form-input-styled" data-fouc onclick="selecionaHipertensaoDescricao('S')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriHipertensao'] == 'S') echo "checked"; }?>>
+														<input type="radio" id="inputHipertensao" name="inputHipertensao" value="1" class="form-input-styled" data-fouc onclick="selecionaHipertensaoDescricao('1')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriHipertensao'] == 1) echo "checked"; }?>>
 														Sim
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputHipertensao" name="inputHipertensao" value="N" class="form-input-styled" data-fouc  onclick="selecionaHipertensaoDescricao('N')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriHipertensao'] == 'N') echo "checked"; }else{ echo "checked"; }?>>
+														<input type="radio" id="inputHipertensao" name="inputHipertensao" value="0" class="form-input-styled" data-fouc  onclick="selecionaHipertensaoDescricao('0')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriHipertensao'] == 0) echo "checked"; }else{ echo "checked"; }?>>
 														Não
 													</label>
 												</div>										
@@ -836,13 +836,13 @@ if (isset($_POST['inputAlergia']) ){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputNeoplasia" name="inputNeoplasia" value="S" class="form-input-styled" data-fouc onclick="selecionaNeoplasiaDescricao('S')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriNeoplasia'] == 'S') echo "checked"; }?>>
+														<input type="radio" id="inputNeoplasia" name="inputNeoplasia" value="1" class="form-input-styled" data-fouc onclick="selecionaNeoplasiaDescricao('1')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriNeoplasia'] == 1) echo "checked"; }?>>
 														Sim
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputNeoplasia" name="inputNeoplasia" value="N" class="form-input-styled" data-fouc onclick="selecionaNeoplasiaDescricao('N')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriNeoplasia'] == 'N') echo "checked"; }else{ echo "checked"; }?>>
+														<input type="radio" id="inputNeoplasia" name="inputNeoplasia" value="0" class="form-input-styled" data-fouc onclick="selecionaNeoplasiaDescricao('0')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriNeoplasia'] == 0) echo "checked"; }else{ echo "checked"; }?>>
 														Não
 													</label>
 												</div>										
@@ -853,13 +853,13 @@ if (isset($_POST['inputAlergia']) ){
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputUsoMedicamento" name="inputUsoMedicamento" value="S" class="form-input-styled" data-fouc data-fouc onclick="selecionaUsoMedicamentoDescricao('S')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriUsoMedicamento'] == 'S') echo "checked"; }?>>
+														<input type="radio" id="inputUsoMedicamento" name="inputUsoMedicamento" value="1" class="form-input-styled" data-fouc data-fouc onclick="selecionaUsoMedicamentoDescricao('1')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriUsoMedicamento'] == 1) echo "checked"; }?>>
 														Sim
 													</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputUsoMedicamento" name="inputUsoMedicamento" value="N" class="form-input-styled" data-fouc onclick="selecionaUsoMedicamentoDescricao('N')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriUsoMedicamento'] == 'N') echo "checked"; }else{ echo "checked"; }?>>
+														<input type="radio" id="inputUsoMedicamento" name="inputUsoMedicamento" value="0" class="form-input-styled" data-fouc onclick="selecionaUsoMedicamentoDescricao('0')" <?php if (isset($iAtendimentoTriagemId )) { if ($rowTriagem['AtTriUsoMedicamento'] == 0) echo "checked"; }else{ echo "checked"; }?>>
 														Não
 													</label>
 												</div>										

@@ -11,7 +11,7 @@ if (isset($_POST['inputSolicitacaoId'])) {
 	$numProdutosServicos = 0;
 
 	$sql = "SELECT SlXPrQuantidade as Quantidade, ProduId as Id, ProduNome as Nome, ProduValorCusto as Valor, UnMedNome, Tipo = 'P',
-			dbo.fnLoteProduto(ProduUnidade, ProduId) as Lote, dbo.fnValidadeProduto(ProduUnidade, ProduId) as Validade
+			dbo.fnLoteProduto(SlXPrUnidade, ProduId) as Lote, dbo.fnValidadeProduto(".$_SESSION['UnidadeId'].", ProduId) as Validade
 			FROM SolicitacaoXProduto
 			JOIN Solicitacao on SolicId = SlXPrSolicitacao
 			JOIN Produto on ProduId = SlXPrProduto

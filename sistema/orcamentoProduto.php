@@ -64,7 +64,7 @@ try{
 	$sql = "SELECT OrXPrProduto
 			FROM OrcamentoXProduto
 			JOIN Produto on ProduId = OrXPrProduto
-			WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and OrXPrOrcamento = ".$iOrcamento;	
+			WHERE OrXPrUnidade = ". $_SESSION['UnidadeId'] ." and OrXPrOrcamento = ".$iOrcamento;	
 	$result = $conn->query($sql);
 	$rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 	$countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -332,7 +332,7 @@ try{
 														$sql = "SELECT ProduId, ProduNome
 																FROM Produto
 																JOIN Situacao on SituaId = ProduStatus
-																WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
+																WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO' and ProduCategoria = ".$iCategoria;
 														
 														if ($aSubCategorias != ""){
 															$sql .= " and ProduSubCategoria in (".$aSubCategorias.") ";
@@ -385,7 +385,7 @@ try{
 												FROM Produto
 												JOIN OrcamentoXProduto on OrXPrProduto = ProduId
 												JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-												WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and OrXPrOrcamento = ".$iOrcamento;
+												WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and OrXPrOrcamento = ".$iOrcamento;
 										$result = $conn->query($sql);
 										$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 										$count = count($rowProdutos);
@@ -395,7 +395,7 @@ try{
 													FROM Produto
 													JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 													JOIN Situacao on SituaId = ProduStatus
-													WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO' ";
+													WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO' ";
 													
 											if ($aSubCategorias != ""){
 												$sql .= " and ProduSubCategoria in (".$aSubCategorias.") ";
