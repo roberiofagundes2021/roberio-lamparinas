@@ -1,127 +1,7 @@
 <?php 
-
 include_once("sessao.php"); 
-
 $_SESSION['PaginaAtual'] = 'Novo Fornecedor';
-
 include('global_assets/php/conexao.php');
-
-if(isset($_POST['inputTipo'])){
-			
-	try{
-		
-		$sql = "INSERT INTO Fornecedor (ForneTipo, ForneNome, ForneRazaoSocial, ForneCnpj, ForneInscricaoMunicipal,	ForneInscricaoEstadual, ForneCategoria,
-										ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, ForneAniversario, ForneNaturalidade, ForneNaturalidadeUf,
-										ForneNacionalidade, ForneAno, ForneCarteiraTrabalho, ForneNit, ForneCategoriaCredor, ForneFoto, ForneCep, ForneEndereco,
-										ForneNumero, ForneComplemento, ForneBairro, ForneCidade, ForneEstado, ForneContato, ForneTelefone, ForneTelefoneComercial,
-										ForneCelular, ForneEmail, ForneSite, ForneObservacao, ForneBanco, ForneAgencia, ForneConta, ForneInformacaoAdicional,
-										ForneIpi, ForneFrete, ForneIcms, ForneOutros, ForneStatus, ForneUsuarioAtualizador, ForneUnidade, ForneEmpresa)
-				VALUES (:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual, :iCategoria,  
-						:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sNaturalidade, :sNaturalidadeUF 
-						:sNacionalidade, :sAno, :sCarteiraTrabalho, :sNit, :sCategoriaCredor, :sFoto, :sCep, :sEndereco, 
-						:sNumero, :sComplemento, :sBairro, :sCidade, :sEstado, :sContato, :sTelefone, :sTelefoneComercial 
-						:sCelular, :sEmail, :sSite, :sObservacao, :iBanco, :sAgencia, :sConta, :sInformacaoAdicional, 
-						:iIpi, :iFrete, :iIcms, :iOutros, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
-		$result = $conn->prepare($sql);
-
-		$conn->beginTransaction();
-		
-		$result->execute(array(
-						':sTipo' => $_POST['inputTipo'],
-						':sNome' => $_POST['inputNome'],
-						':sRazaoSocial' => $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null,
-						':sCnpj' => $_POST['inputTipo'] == 'J' ? limpaCPF_CNPJ($_POST['inputCnpj']) : null,
-						':sInscricaoMunicipal' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null,
-						':sInscricaoEstadual' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoEstadual'] : null,
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						':sCpf' => $_POST['inputTipo'] == 'F' ? limpaCPF_CNPJ($_POST['inputCpf']) : null,
-						':sRg' => $_POST['inputTipo'] == 'F' ? $_POST['inputRg'] : null,
-						':sOrgaoEmissor' => $_POST['inputTipo'] == 'F' ? $_POST['inputEmissor'] : null,
-						':sUf' => $_POST['inputTipo'] == 'J' || $_POST['cmbUf'] == '#' ? null : $_POST['cmbUf'],
-						':sSexo' => $_POST['inputTipo'] == 'J' || $_POST['cmbSexo'] == '#' ? null : $_POST['cmbSexo'],
-						':dAniversario' => $_POST['inputTipo'] == 'F' ? ($_POST['inputAniversario'] == '' ? null : $_POST['inputAniversario']) : null,
-						':sNaturalidade' => $_POST['inputTipo'] == 'F' ? null : $_POST['inputNaturalidade'],
-						':sNaturalidadeUF' => $_POST['inputTipo'] == 'J' || $_POST['inputNaturalidadeUf'] == '#' ? null : $_POST['inputNaturalidadeUf'],
-						':sNacionalidade' => $_POST['inputTipo'] == 'F' ? null : $_POST['inputNacionalidade'],
-						':sAno' => $_POST['inputTipo'] == 'F' ? null : $_POST['inputAno'],
-						':sCarteiraTrabalho' => $_POST['inputTipo'] == 'F' ? null : $_POST['inputCarteiraTrabalho'],
-						':sNit' => $_POST['inputNit'],
-						':sCategoriaCredor' => $_POST['inputCategoriaCredor'],
-						':sFoto' => $_POST['inputTipo'] == 'F' ? ($_POST['inputFoto']) : null,
-						':sCep' => $_POST['inputCep'],
-						':sEndereco' => $_POST['inputEndereco'],
-						':sNumero' => $_POST['inputNumero'],
-						':sComplemento' => $_POST['inputComplemento'],
-						':sBairro' => $_POST['inputBairro'],
-						':sCidade' => $_POST['inputCidade'],
-						':sEstado' => $_POST['cmbEstado'],
-						':sContato' => $_POST['inputNomeContato'],
-						':sTelefone' => $_POST['inputTelefoneResidencial'] == '(__) ____-____' ? null : $_POST['inputTelefoneResidencial'],
-						':sTelefoneComercial' => $_POST['inputTelefoneComercial'] == '(__) ____-____' ? null : $_POST['inputTelefoneComercial'],
-						':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
-						':sEmail' => $_POST['inputEmail'],
-						':sSite' => $_POST['inputSite'],
-						':sObservacao' => $_POST['txtareaObservacao'],
-						':iBanco' => $_POST['cmbBanco'] == '#' ? null : $_POST['cmbBanco'],
-						':sAgencia' => $_POST['inputAgencia'],
-						':sConta' => $_POST['inputConta'],
-						':sInformacaoAdicional' => $_POST['inputInfoAdicional'],
-						':iIpi' => $_POST['inputIpi'] == null ? 0.00 : gravaValor($_POST['inputIpi']),
-						':iFrete' => $_POST['inputFrete'] == null ? 0.00 : gravaValor($_POST['inputFrete']),
-						':iIcms' => $_POST['inputIcms'] == null ? 0.00 : gravaValor($_POST['inputIcms']),
-						':iOutros' => $_POST['inputOutros'] == null ? 0.00 : gravaValor($_POST['inputOutros']),
-						':bStatus' => 1,
-						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iEmpresa' => $_SESSION['EmpreId']
-						));
-
-		$insertId = $conn->lastInsertId(); 
-
-		if (isset($_POST['cmbSubCategoria'])){
-			
-			try{
-				$sql = "INSERT INTO FornecedorXSubCategoria 
-							(FrXSCFornecedor, FrXSCSubCategoria, FrXSCUnidade)
-						VALUES 
-							(:iFornecedor, :iSubCategoria, :iUnidade)";
-				$result = $conn->prepare($sql);
-
-				foreach ($_POST['cmbSubCategoria'] as $key => $value){
-
-					$result->execute(array(
-									':iFornecedor' => $insertId,
-									':iSubCategoria' => $value,
-									':iUnidade' => $_SESSION['UnidadeId']
-									));
-				}
-				
-			} catch(PDOException $e) {
-				$conn->rollback();
-				echo 'Error: ' . $e->getMessage();exit;
-			}
-		}
-		
-		$conn->commit();
-
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Fornecedor incluído!!!";
-		$_SESSION['msg']['tipo'] = "success";
-		
-	} catch(PDOException $e) {		
-		
-		$conn->rollback();
-		
-		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao incluir fornecedor!!!";
-		$_SESSION['msg']['tipo'] = "error";	
-		
-		echo 'Error: ' . $e->getMessage();
-		exit;
-	}
-
-	irpara("fornecedor.php");
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -153,282 +33,218 @@ if(isset($_POST['inputTipo'])){
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 	<!-- Adicionando Javascript -->
-    <script type="text/javascript" >
+	<script type="text/javascript" >
 	
-        $(document).ready(function() {
+	$(document).ready(function() {
+		
+		//$("#cmbEstado").addClass("form-control-select2");
+						
+		function limpa_formulário_cep() {
+			// Limpa valores do formulário de cep.
+			$("#inputEndereco").val("");
+			$("#inputBairro").val("");
+			$("#inputCidade").val("");
+			$("#cmbEstado").val("");                
+		}
+		
+		//Quando o campo cep perde o foco.
+		$("#inputCep").blur(function() {
+
+			$("#cmbEstado").removeClass("form-control-select2");
 			
-			//$("#cmbEstado").addClass("form-control-select2");
-				            
-            function limpa_formulário_cep() {
-                // Limpa valores do formulário de cep.
-                $("#inputEndereco").val("");
-                $("#inputBairro").val("");
-                $("#inputCidade").val("");
-                $("#cmbEstado").val("");                
-            }
-            
-            //Quando o campo cep perde o foco.
-            $("#inputCep").blur(function() {
+			//Nova variável "cep" somente com dígitos.
+			var cep = $(this).val().replace(/\D/g, '');
 
-				$("#cmbEstado").removeClass("form-control-select2");
-				
-                //Nova variável "cep" somente com dígitos.
-                var cep = $(this).val().replace(/\D/g, '');
+			//Verifica se campo cep possui valor informado.
+			if (cep != "") {
 
-                //Verifica se campo cep possui valor informado.
-                if (cep != "") {
+				//Expressão regular para validar o CEP.
+				var validacep = /^[0-9]{8}$/;
 
-                    //Expressão regular para validar o CEP.
-                    var validacep = /^[0-9]{8}$/;
+				//Valida o formato do CEP.
+				if(validacep.test(cep)) {
 
-                    //Valida o formato do CEP.
-                    if(validacep.test(cep)) {
+					//Preenche os campos com "..." enquanto consulta webservice.
+					$("#inputEndereco").val("...");
+					$("#inputBairro").val("...");
+					$("#inputCidade").val("...");
+					$("#cmbEstado").val("...");                        
 
-                        //Preenche os campos com "..." enquanto consulta webservice.
-                        $("#inputEndereco").val("...");
-                        $("#inputBairro").val("...");
-                        $("#inputCidade").val("...");
-                        $("#cmbEstado").val("...");                        
+					//Consulta o webservice viacep.com.br/
+					$.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
 
-                        //Consulta o webservice viacep.com.br/
-                        $.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
+						if (!("erro" in dados)) {
 
-                            if (!("erro" in dados)) {
-
-                                //Atualiza os campos com os valores da consulta.
-                                $("#inputEndereco").val(dados.logradouro);
-                                $("#inputBairro").val(dados.bairro);
-                                $("#inputCidade").val(dados.localidade);                                
-                                $("#cmbEstado").val(dados.uf);        
-                            } //end if.
-                            else {
-                                //CEP pesquisado não foi encontrado.
-                                limpa_formulário_cep();
-                                alerta("Erro","CEP não encontrado.", "erro");
-                            }
-                        });
-                    } //end if.
-                    else {
-                        //cep é inválido.
-                        limpa_formulário_cep();
-                        alerta("Erro","Formato de CEP inválido.","erro");
-                    }
-                } //end if.
-                else {
-                    //cep sem valor, limpa formulário.
-                    limpa_formulário_cep();
-                }
-            });
-            
-			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-			$('#cmbCategoria').on('change', function(e){
-				
-				Filtrando();
-				
-				var cmbCategoria = $('#cmbCategoria').val();
-
-				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
-					
-					var option = '<option>Selecione a SubCategoria</option>';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-						});
-						
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						Reset();
-					}					
-				});
-			});
-
-			//Valida Registro Duplicado
-			$('#enviar').on('click', function(e){
-				
-				e.preventDefault();
-
-				var inputFoto = $('#inputFoto').val();
-				
-				//Esse ajax está sendo usado para excluir a imagem que nao será mais usada
-				$.ajax({
-					type: "POST",
-					url: "fornecedorExcluiImagem.php",
-					data: ('foto='+inputFoto),
-					success: function(resposta){
-						
-					}
-				})		
-
-				// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
-				var cep = $("#inputCep").val()
-				cep = cep.replace(' ','')
-				$("#inputCep").val(cep)
-				
-				var inputTipo = $('input[name="inputTipo"]:checked').val();				
-				var inputNome = $('#inputNome').val();
-				var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
-				var inputCnpj = $('#inputCnpj').val();
-				var cmbSubCategoria = $('#cmbSubCategoria').val();
-				
-				//remove os espaços desnecessários antes e depois
-				inputNome = inputNome.trim();
-
-				if (cmbSubCategoria[0] == 'Filtrando'){
-					alerta('Atenção','Por algum problema na sua conexão o campo SubCategoria parece não conseguindo ser filtrado! Favor cancelar a edição e tentar novamente.','error');
-					return false;
-				}
-				
-				//Esse ajax está sendo usado para verificar no banco se o registro já existe
-				$.ajax({
-					type: "POST",
-					url: "fornecedorValida.php",
-					data: {tipo: inputTipo, nome: inputNome, cpf: inputCpf, cnpj: inputCnpj},
-					success: function(resposta){
-						
-						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
-							return false;
+							//Atualiza os campos com os valores da consulta.
+							$("#inputEndereco").val(dados.logradouro);
+							$("#inputBairro").val(dados.bairro);
+							$("#inputCidade").val(dados.localidade);                                
+							$("#cmbEstado").val(dados.uf);        
+						} //end if.
+						else {
+							//CEP pesquisado não foi encontrado.
+							limpa_formulário_cep();
+							alerta("Erro","CEP não encontrado.", "erro");
 						}
-						
-						$( "#formFornecedor" ).submit();
-					}
-				}); //ajax
-				
-			}); // enviar
-
-			function Filtrando(){
-				$('#cmbSubCategoria').empty().append('<option value="Filtrando">Filtrando...</option>');
+					});
+				} //end if.
+				else {
+					//cep é inválido.
+					limpa_formulário_cep();
+					alerta("Erro","Formato de CEP inválido.","erro");
+				}
+			} //end if.
+			else {
+				//cep sem valor, limpa formulário.
+				limpa_formulário_cep();
 			}
-			
-			function Reset(){
-				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-			}	
-			
-        }); // document.ready
+		});
 		
-		function selecionaPessoa(tipo) {
-			if (tipo == 'PF'){
-				document.getElementById('CPF').style.display = "block";
-				document.getElementById('CNPJ').style.display = "none";
-				document.getElementById('dadosPF').style.display = "block";
-				document.getElementById('pFfoto').style.display = "block";
-				document.getElementById('dadosPJ').style.display = "none";
-				document.getElementById('inputFoto').style.display = "block";
-				document.getElementById('inputNome').placeholder = "Nome Completo";
-				document.getElementById('inputCpf').setAttribute('required', 'required');
-				document.getElementById('inputCnpj').removeAttribute('required', 'required');
-			} else {
-				document.getElementById('CPF').style.display = "none";
-				document.getElementById('CNPJ').style.display = "block";				
-				document.getElementById('dadosPF').style.display = "none";
-				document.getElementById('pFfoto').style.display = "none";
-				document.getElementById('dadosPJ').style.display = "block";
-				document.getElementById('inputFoto').style.display = "none";
-				document.getElementById('inputNome').placeholder = "Nome Fantasia";
-				document.getElementById('inputCpf').removeAttribute('required', 'required');
-				document.getElementById('inputCnpj').setAttribute('required', 'required');
-			}
-		}
-
-		function validaEFormataCnpj(){
-			let cnpj = $('#inputCnpj').val();
-			let resultado = validarCNPJ(cnpj);
-			if (!resultado){
-				let labelErro = $('#inputCnpj-error')
-				labelErro.removeClass('validation-valid-label');
-				labelErro[0].innerHTML = "CNPJ Inválido";	
-				$('#inputCnpj').val("");
-			}
+		//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+		$('#cmbCategoria').on('change', function(e){
 			
-		}
-		
-		function validaEFormataCpf(){
-			let cpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
-			let resultado = validaCPF(cpf);
-			if (!resultado){
-				let labelErro = $('#inputCpf-error')
-				labelErro.removeClass('validation-valid-label');
-				labelErro[0].innerHTML = "CPF Inválido";	
-				$('#inputCpf').val("");
-			}			
-		}
-
-		function validaDataNascimento(dataASerValidada){			
-			//Adicionado um espaço para forçar o fuso horário de brasília		
-			let dataObj = new Date(dataASerValidada+" ");
-			let hoje = new Date();
-			if((hoje-dataObj)<0){
-				return false;				
-			}
-			else{
-				return true;
-			}
-		}
-
-		function formataCampoDataNascimento(){
-			let dataPreenchida = $('#inputAniversario').val();
-			if (!validaDataNascimento(dataPreenchida)){
-				let labelErro = $('#inputAniversario-error');
-				labelErro.removeClass('validation-valid-label');
-				labelErro[0].innerHTML = "Data não pode ser futura";
-				$('#inputAniversario').val("");		
-			}
-		}
-
-		//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
-		$('#addFoto').on('click', function(e){	
-			e.preventDefault(); // Isso aqui não deixa o formulário "formFornecedor" ser submetido ao clicar no Incluir Foto, ou seja, ao executar o método ajax
+			Filtrando();
 			
-			$('#imagem').trigger("click");
-		});	
+			var cmbCategoria = $('#cmbCategoria').val();
 
-		// #imagem é o id do input, ao alterar o conteudo do input execurará a função abaixo
-		$('#imagem').on('change',function(){
-
-			$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
+			$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 				
-			// Get form
-			var form = $('#formFoto')[0];
-			var formData = new FormData(form);
-			//var inputFoto = $('#inputFoto').val();
-			//alert($('#imagem')[0].files[0]);
+				var option = '<option>Selecione a SubCategoria</option>';
+				
+				if (dados.length){						
+					
+					$.each(dados, function(i, obj){
+						option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+					});
+					
+					$('#cmbSubCategoria').html(option).show();
+				} else {
+					Reset();
+				}					
+			});
+		});
 
-			formData.append('file', $('#imagem')[0].files[0] );
-			formData.append('tela', 'produto' );
+		//Valida Registro Duplicado
+		$('#enviar').on('click', function(e){
+			
+			e.preventDefault();
 
+			// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
+			var cep = $("#inputCep").val()
+			cep = cep.replace(' ','')
+			$("#inputCep").val(cep)
+			
+			var inputTipo = $('input[name="inputTipo"]:checked').val();				
+			var inputNome = $('#inputNome').val();
+			var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
+			var inputCnpj = $('#inputCnpj').val();
+			var cmbSubCategoria = $('#cmbSubCategoria').val();
+			
+			//remove os espaços desnecessários antes e depois
+			inputNome = inputNome.trim();
+
+			if (cmbSubCategoria[0] == 'Filtrando'){
+				alerta('Atenção','Por algum problema na sua conexão o campo SubCategoria parece não conseguindo ser filtrado! Favor cancelar a edição e tentar novamente.','error');
+				return false;
+			}
+			
+			//Esse ajax está sendo usado para verificar no banco se o registro já existe
 			$.ajax({
 				type: "POST",
-				enctype: 'multipart/form-data',
-				url: "upload.php",
-				processData: false,  // impedir que o jQuery tranforma a "data" em querystring					
-				contentType: false,  // desabilitar o cabeçalho "Content-Type"
-				cache: false, // desabilitar o "cache"
-				data: formData,//{imagem: inputImagem},
+				url: "fornecedorValida.php",
+				data: {tipo: inputTipo, nome: inputNome, cpf: inputCpf, cnpj: inputCnpj},
 				success: function(resposta){
-					//console.log(resposta);
-		
-				$('#visualizar').html(resposta);
-				$('#addFoto').text("Alterar Foto...");
-		
-				//Aqui sou obrigado a instanciar novamente a utilização do fancybox
-				$(".fancybox").fancybox({
-				// options
-			});	
-		
-				return false;						
-			}
-		}); //ajax
+					
+					if(resposta == 1){
+						alerta('Atenção','Esse registro já existe!','error');
+						return false;
+					}
+					
+					$( "#formFornecedor" ).submit();
+				}
+			}); //ajax
+			
+		}); // enviar
 
-			//$('#formFoto').submit();
+		function Filtrando(){
+			$('#cmbSubCategoria').empty().append('<option value="Filtrando">Filtrando...</option>');
+		}
+		
+		function Reset(){
+			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+		}	
+		
+	}); // document.ready
+	
+	function selecionaPessoa(tipo) {
+		if (tipo == 'PF'){
+			document.getElementById('CPF').style.display = "block";
+			document.getElementById('CNPJ').style.display = "none";
+			document.getElementById('dadosPF').style.display = "block";
+			document.getElementById('dadosPJ').style.display = "none";
+			document.getElementById('inputNome').placeholder = "Nome Completo";
+			document.getElementById('inputCpf').setAttribute('required', 'required');
+			document.getElementById('inputCnpj').removeAttribute('required', 'required');
+		} else {
+			document.getElementById('CPF').style.display = "none";
+			document.getElementById('CNPJ').style.display = "block";				
+			document.getElementById('dadosPF').style.display = "none";
+			document.getElementById('dadosPJ').style.display = "block";
+			document.getElementById('inputNome').placeholder = "Nome Fantasia";
+			document.getElementById('inputCpf').removeAttribute('required', 'required');
+			document.getElementById('inputCnpj').setAttribute('required', 'required');
+		}
+	}			
 
-			// Efetua o Upload sem dar refresh na pagina
-			$('#formFoto').ajaxForm({
-				target:'#visualizar' // o callback será no elemento com o id #visualizar
-			}).submit();
-		});	
-    </script>		
+
+	function validaEFormataCnpj(){
+		let cnpj = $('#inputCnpj').val();
+		let resultado = validarCNPJ(cnpj);
+		if (!resultado){
+			let labelErro = $('#inputCnpj-error')
+			labelErro.removeClass('validation-valid-label');
+			labelErro[0].innerHTML = "CNPJ Inválido";	
+			$('#inputCnpj').val("");
+		}
+		
+	}
+	
+	function validaEFormataCpf(){
+		let cpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
+		let resultado = validaCPF(cpf);
+		if (!resultado){
+			let labelErro = $('#inputCpf-error')
+			labelErro.removeClass('validation-valid-label');
+			labelErro[0].innerHTML = "CPF Inválido";	
+			$('#inputCpf').val("");
+		}			
+	}
+
+	function validaDataNascimento(dataASerValidada){			
+		//Adicionado um espaço para forçar o fuso horário de brasília		
+		let dataObj = new Date(dataASerValidada+" ");
+		let hoje = new Date();
+		if((hoje-dataObj)<0){
+			return false;				
+		}
+		else{
+			return true;
+		}
+	}
+
+	function formataCampoDataNascimento(){
+		let dataPreenchida = $('#inputAniversario').val();
+		if (!validaDataNascimento(dataPreenchida)){
+			let labelErro = $('#inputAniversario-error');
+			labelErro.removeClass('validation-valid-label');
+			labelErro[0].innerHTML = "Data não pode ser futura";
+			$('#inputAniversario').val("");		
+		}
+	}
+</script>	
+
+</head>
+	
 </head>
 
 <body class="navbar-top">
@@ -479,24 +295,17 @@ if(isset($_POST['inputTipo'])){
 							<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
 							<br>
 							<div class="row">									
-								<div class="col-lg-4">
+								<div class="col-lg-6">
 									<div class="form-group">
 										<label for="inputNome">Nome<span class="text-danger">*</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Fantasia" required autofocus>
 									</div>
 								</div>	
 								
-								<div class="col-lg-2" id="CPF" style="display:none;">
+								<div class="col-lg-3" id="CPF" style="display:none;">
 									<div class="form-group">
 										<label for="inputCpf">CPF<span class="text-danger">*</span></label>
 										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" onblur="validaEFormataCpf()">
-									</div>	
-								</div>
-
-								<div class="col-lg-2" id="NIT">
-									<div class="form-group">				
-										<label for="inputNit">NIT<span class="text-danger">*</span></label>
-										<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT" data-mask="99999999999" onblur="validaEFormataCnpj()"required>
 									</div>	
 								</div>
 								
@@ -505,7 +314,14 @@ if(isset($_POST['inputTipo'])){
 										<label for="inputCnpj">CNPJ<span class="text-danger">*</span></label>
 										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" onblur="validaEFormataCnpj()"required>
 									</div>	
-								</div>							
+								</div>	
+								
+								<div class="col-lg-3">
+									<div class="form-group">				
+										<label for="inputNit">NIT</label>
+										<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT">
+									</div>	
+								</div>
 							</div>
 
 							<div class="row">				
@@ -572,7 +388,7 @@ if(isset($_POST['inputTipo'])){
 
 											<div class="col-lg-2">
 												<div class="form-group">
-													<label for="inputNaturalidadeUF">UF de Naturalidade</label>
+													<label for="inputNaturalidadeUf">UF de Naturalidade</label>
 													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
 														<option value="#">Selecione um estado</option>
 														<option value="AC">Acre</option>
