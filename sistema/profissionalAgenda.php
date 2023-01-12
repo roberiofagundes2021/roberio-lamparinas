@@ -127,7 +127,6 @@ $rowProfissional = $result->fetch(PDO::FETCH_ASSOC);
 
 		$(document).ready(function(){
 			getAgenda()
-			WebSocketConnect()
 			//$('#excluirContainer').hide();
 
 			$('#salvarAgenda').on('click', ()=>{
