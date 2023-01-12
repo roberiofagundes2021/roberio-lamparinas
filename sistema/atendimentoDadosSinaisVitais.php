@@ -120,7 +120,7 @@ if(isset($iAtendimentoTriagemId ) && $iAtendimentoTriagemId ){
     <div class="card-body">
 
         <div class="row" >
-            <div class="col-lg-3">
+            <div class="col-lg-2">
                 <div class="form-group">
                     <label for="inputPressaoArterial">Pressão Arterial</label>
                     <div class="input-group">
@@ -187,6 +187,12 @@ if(isset($iAtendimentoTriagemId ) && $iAtendimentoTriagemId ){
                 <div class="form-group">
                 <label for="inputHGT">HGT </label>
                     <input type="number" id="inputHGT" name="inputHGT" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriHGT']; ?>">
+                </div>
+            </div>
+            <div class="col-lg-1">
+                <div class="form-group">
+                <label for="inputPeso">Peso </label>
+                    <input type="number" id="inputPeso" name="inputPeso" class="form-control" onKeyUp="moeda(this);" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriPeso']; ?>">
                 </div>
             </div>
         </div>
