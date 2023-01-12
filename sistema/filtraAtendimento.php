@@ -78,7 +78,7 @@ try{
 		$result = $conn->query($sql);
 		$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);
 
-		$sql = "SELECT AtendId, AtendNumRegistro, AtOEnDataInicio as AtendData, AtOEnHoraInicio as AtendHora, AtOEnId as AtEntrada,SituaNome, SituaCor, SituaChave,
+		$sql = "SELECT AtendId, AtendNumRegistro, AtOEnDataInicio as AtendData, AtOEnHoraInicio as AtendHora, AtOEnId as AtEntrada,SituaNome, SituaCor,AtClaChave,SituaChave,
 			Conduta = 'Observação Hospitalar',ClienNome,ClienCodigo, Profissional.ProfiNome as ProfissionalNome, ProfiCbo, ClienDtNascimento
 			FROM Atendimento
 			LEFT JOIN AtendimentoObservacaoEntrada ON AtendId = AtOEnAtendimento
@@ -86,11 +86,12 @@ try{
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN Profissional ON Profissional.ProfiId = AtendimentoObservacaoEntrada.AtOEnProfissional
 			LEFT JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
+			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 			WHERE SituaChave = 'AGUARDANDOLIBERACAOATENDIMENTO'
 			AND AtendId  in (SELECT AtOEnAtendimento FROM AtendimentoObservacaoEntrada WHERE AtOEnUnidade = $iUnidade)
 			AND AtendUnidade = $iUnidade
 			UNION ALL 
-			SELECT AtendId, AtendNumRegistro, AtIEnDataInicio as AtendData, AtIEnHoraInicio as AtendHora,  AtIEnId as AtEntrada,SituaNome, SituaCor, SituaChave,
+			SELECT AtendId, AtendNumRegistro, AtIEnDataInicio as AtendData, AtIEnHoraInicio as AtendHora,  AtIEnId as AtEntrada,SituaNome, SituaCor,AtClaChave,SituaChave,
 			Conduta = 'Internação Hospitalar', ClienNome,ClienCodigo, Profissional.ProfiNome as ProfissionalNome, ProfiCbo, ClienDtNascimento
 			FROM Atendimento
 			LEFT JOIN AtendimentoInternacaoEntrada ON AtendId = AtIEnAtendimento
@@ -98,6 +99,7 @@ try{
 			LEFT JOIN Cliente ON ClienId = AtendCliente
 			LEFT JOIN Profissional ON Profissional.ProfiId = AtendimentoInternacaoEntrada.AtIEnProfissional 
 			LEFT JOIN Profissao ON Profissional.ProfiProfissao = Profissao.ProfiId
+			LEFT JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 			WHERE SituaChave = 'AGUARDANDOLIBERACAOATENDIMENTO'
 			AND AtendId  in (SELECT AtIEnAtendimento FROM AtendimentoInternacaoEntrada WHERE AtIEnUnidade = $iUnidade)
 			AND AtendUnidade = $iUnidade
@@ -224,6 +226,7 @@ try{
 								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Gestão de Leitos'></i> Gestão de Leitos</a>
 								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Tabela de Gastos'></i> Tabela de Gastos</a>
 								<a href='#' onclick='' class='dropdown-item'><i class='icon-stackoverflow' title='Formularios'></i> Formularios</a>
+								".($item['AtClaChave']!='ELETIVO'?"<a href='#' onclick='adimissaoLeito($id)' class='dropdown-item'><i class='icon-stackoverflow' title='Leito'></i> Adimissão em Leito</a>":"")."
 							</div>
 						</div>
 					</div>";

@@ -27,17 +27,6 @@ $rowEletivo = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoEletivoId = $rowEletivo?$rowEletivo['AtEleId']:null;
 
-//Essa consulta é para verificar  o profissional
-$sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo
-		FROM Usuario
-		JOIN Profissional A ON A.ProfiUsuario = UsuarId
-		LEFT JOIN Profissao B ON B.ProfiId = A.ProfiProfissao
-		LEFT JOIN ProfissionalConselho ON PrConId = ProfiConselho
-		WHERE UsuarId =  ". $_SESSION['UsuarId'] . " ";
-$result = $conn->query($sql);
-$rowUser = $result->fetch(PDO::FETCH_ASSOC);
-$userId = $rowUser['ProfissionalId'];
-
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, AtendClassificacaoRisco, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
                ClienNomeMae, ClienCartaoSus, ClienCelular, ClienStatus, ClienUsuarioAtualizador, ClienUnidade, ClResNome, AtTriPeso,
