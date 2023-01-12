@@ -143,7 +143,15 @@ if(isset($_POST['condulta'])){
 				'$AtendJustificativa','$AtendSituacao','$AtendUsuarioAtualizador','$AtendUnidade')";
 		$conn->query($sql);
 
-		$_SESSION['iAtendimentoId'] = $conn->lastInsertId();
+		// $_SESSION['iAtendimentoId'] = $conn->lastInsertId();
+
+		// essa parde vai setar a situação do atendimento antigo como "ATENDIDO"
+		$sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'ATENDIDO'";
+		$result = $conn->query($sql);
+		$situacao = $result->fetch(PDO::FETCH_ASSOC);
+
+		$sql = "UPDATE Atendimento SET AtendSituacao = '$situacao[SituaId]' WHERE AtendId = '$iAtendimentoId'";
+		$conn->query($sql);
 
 		switch($_POST['condulta']){
 			case "AMBULATORIAL":irpara("atendimentoObservacaoEntrada.php");break;
