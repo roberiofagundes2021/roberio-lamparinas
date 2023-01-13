@@ -415,7 +415,7 @@ function WebSocketConnect(unidade, empresa){
 				default: reason = "Rasão desconhecida";break;
 			}
 			console.log('WebSocket Close: '+reason)
-			setTimeout(function() {WebSocketConnect()},1000)
+			setTimeout(function() {WebSocketConnect(unidade,empresa)},500)
 		};
 		socket.onopen = function(event){
 			socket.sendMenssage({'type':'SETPARAMETERS','empresa':empresa,

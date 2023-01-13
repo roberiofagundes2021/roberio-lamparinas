@@ -221,10 +221,10 @@ if(isset($_POST['inputAtendimentoId'])) {
    
     <!-- /theme JS files -->
     <?php
-	echo "<script>
-		iUnidade = $iUnidade
-		iEmpresa = $iEmpresa
-		</script>"
+        echo "<script>
+                iUnidade = $iUnidade
+                iEmpresa = $iEmpresa
+            </script>"
 	?>
 
     <script type="text/javascript">
