@@ -684,6 +684,42 @@ try {
 	
 		echo json_encode($array);
 		
+	}elseif ($tipoRequest == 'FILTRAVIADIETA') {
+
+		$tipoDieta = $_POST['tipoDieta'];
+	
+		$sql = "SELECT TOP(1) TpDieVia
+		FROM TipoDieta
+		WHERE TpDieStatus = 1
+		AND TpDieId = $tipoDieta
+		AND TpDieUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$tpDieVia = $result->fetch(PDO::FETCH_ASSOC);
+
+		$tipoDieta = $tpDieVia?$tpDieVia['TpDieVia']:null;
+		$array = [];
+	
+		if ($tipoDieta) {
+			
+			$sql = "SELECT *
+			FROM Via
+			WHERE ViaStatus = 1
+			AND ViaId = $tipoDieta
+			AND ViaUnidade = $iUnidade";			
+			$result = $conn->query($sql);
+			$row = $result->fetchAll(PDO::FETCH_ASSOC);	
+			
+			foreach($row as $item){		
+				array_push($array,[
+					'status' => 'success',
+					'id' => $item['ViaId'],
+					'nome' => $item['ViaNome']
+				]);
+			}
+		}
+	
+		echo json_encode($array);
+		
 	}elseif ($tipoRequest == 'UNIDADEMEDIDA') {
 
 		$sql = "SELECT AtUMeId, AtUMeNome

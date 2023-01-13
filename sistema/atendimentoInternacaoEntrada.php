@@ -1197,6 +1197,34 @@ if ($row['ClienSexo'] == 'F'){
 				}
 			});
 
+			$('#selTipoDeDieta').on('change', function(e){
+				
+				let selTipoDeDieta = $('#selTipoDeDieta').val()
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimentoObservacaoHospitalar.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'FILTRAVIADIETA',
+						'tipoDieta' : selTipoDeDieta
+					},
+					success: function(response) {
+
+						if (response.length !== 0) {
+							$('#selViaDieta').empty();
+							$('#selViaDieta').append(`<option value=''>Selecione</option>`)
+							response.forEach(item => {
+
+								let opt = `<option value="${item.id}">${item.nome}</option>`
+								$('#selViaDieta').append(opt)
+							})			
+						}				
+					}
+				});
+
+			})
+
 		
 		}); //document.ready
 
