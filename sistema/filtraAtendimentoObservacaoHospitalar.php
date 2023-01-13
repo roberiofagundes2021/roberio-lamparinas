@@ -686,10 +686,10 @@ try {
 		
 	}elseif ($tipoRequest == 'UNIDADEMEDIDA') {
 
-		$sql = "SELECT UnMedId, UnMedNome
-		FROM UnidadeMedida
-		WHERE UnMedStatus = 1
-		AND UnMedEmpresa = $iEmpresa";
+		$sql = "SELECT AtUMeId, AtUMeNome
+		FROM AtendimentoUnidadeMedida
+		WHERE AtUMeStatus = 1
+		AND AtUMeUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -697,8 +697,8 @@ try {
 		foreach($row as $item){
 
 			array_push($array,[
-				'id' => $item['UnMedId'],
-				'nome' => $item['UnMedNome']
+				'id' => $item['AtUMeId'],
+				'nome' => $item['AtUMeNome']
 			]);
 		}
 	
