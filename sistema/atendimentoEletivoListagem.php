@@ -210,7 +210,7 @@ $acesso = 'ATENDIMENTO';
 				responsive: true,
 			    columnDefs: [{
 					orderable: true,   //Data
-					width: "10%",
+					width: "12%",
 					targets: [0]
 				},
 				{ 
@@ -225,17 +225,17 @@ $acesso = 'ATENDIMENTO';
 				},
 				{ 
 					orderable: true,   //Paciente
-					width: "20%",
+					width: "24%",
 					targets: [3]
 				},
 				{ 
 					orderable: true,   //Procedimento
-					width: "10%",
+					width: "24%",
 					targets: [4]
 				},
 				{ 
 					orderable: true,   //Risco
-					width: "10%",
+					width: "13%",
 					targets: [5]
 				},
 				{ 
@@ -759,7 +759,7 @@ $acesso = 'ATENDIMENTO';
 											<th>Nº Registro</th>		
 											<th>Paciente</th>
 											<th>Procedimento</th>
-											<th>Classificação<br>de Risco</th>
+											<th>Classif. de Risco</th>
 											<th>Situação</th>
 											<th>Ações</th>
 										</tr>
