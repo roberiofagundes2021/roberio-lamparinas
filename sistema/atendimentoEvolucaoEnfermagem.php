@@ -160,6 +160,7 @@ if ($row['ClienSexo'] == 'F'){
                 let inputTemperatura = $('#inputTemperatura').val()
                 let inputSPO = $('#inputSPO').val()
                 let inputHGT = $('#inputHGT').val()
+                let inputPeso = $('#inputPeso').val()
 
                 let inputAlergia = $('#inputAlergia').val()
                 let inputDiabetes = $('#inputDiabetes').val()
@@ -199,6 +200,7 @@ if ($row['ClienSexo'] == 'F'){
                         'inputTemperatura' : inputTemperatura,		
                         'inputSPO' : inputSPO,		
                         'inputHGT' : inputHGT,
+                        'inputPeso' : inputPeso,
                         'inputAlergia' : inputAlergia,
 						'inputDiabetes' : inputDiabetes,
 						'inputHipertensao' : inputHipertensao,

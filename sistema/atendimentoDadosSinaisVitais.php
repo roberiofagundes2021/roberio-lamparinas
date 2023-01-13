@@ -122,47 +122,37 @@ if(isset($iAtendimentoTriagemId ) && $iAtendimentoTriagemId ){
         <div class="row" >
             <div class="col-lg-2">
                 <div class="form-group">
-                    <label for="inputPressaoArterial">Pressão Arterial</label>
+                    <label for="inputPressaoArterial">PAS <span class="">(mmHg)</span>&nbsp;&nbsp;&nbsp; PAD<span class="">(mmHg)</span></label>
                     <div class="input-group">
-                    <input type="number" id="inputSistolica" name="inputSistolica" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriPressaoSistolica']; ?>">
+                        <input type="number" id="inputSistolica" name="inputSistolica" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriPressaoSistolica']; ?>">
                         <span class="input-group-prepend">
                             <span class="input-group-text">X</span>	
                         </span>
                         <input type="number" id="inputDiatolica" name="inputDiatolica" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriPressaoDiatolica']; ?>">
-                        <span class="input-group-prepend">
-                            <span class="input-group-text">mmHg</span>	
-                        </span>
                     </div>
                 </div>
             </div>
             
             <div class="col-lg-2" style="margin-right: 10px;">
                 <div class="form-group">
-                    <label for="inputCardiaca">Frequência Cardíaca </label>
+                    <label for="inputCardiaca">FC <span class="">(bpm)</span></label>
                     <div class="input-group">
-                    <input type="number" id="inputCardiaca" name="inputCardiaca" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqCardiaca']; ?>">
-                        <span class="input-group-prepend">
-                            <span class="input-group-text">Bpm</span>	
-                        </span>
-                        
+                        <input type="number" id="inputCardiaca" name="inputCardiaca" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqCardiaca']; ?>">
                     </div>
                 </div>
             </div>
             <div class="col-lg-2" style="margin-right: 20px;">
                 <div class="form-group">
-                    <label for="inputRespiratoria">Frequência Respiratória </label>
+                    <label for="inputRespiratoria">FR <span class="">(rpm)</span></label>
                     <div class="input-group">												
                         <input type="number" onKeyUp="" id="inputRespiratoria" name="inputRespiratoria" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqRespiratoria']; ?>">
-                        <span class="input-group-prepend">
-                            <span class="input-group-text">mpm</span>	
-                        </span>
                     </div>
                 </div>
             </div>
             
             <div class="col-lg-2" style="margin-right: 10px;">
                 <div class="form-group">
-                    <label for="inputTemperatura">Temperatura AXI </label>
+                    <label for="inputTemperatura">Temperatura <span class="">(ºC)</span></label>
                     <div class="input-group">
                     <input type="number" id="inputTemperatura" name="inputTemperatura" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriTempAXI']; ?>">
                         <span class="input-group-prepend">
@@ -174,24 +164,21 @@ if(isset($iAtendimentoTriagemId ) && $iAtendimentoTriagemId ){
             </div>
             <div class="col-lg-1" style="margin-right: 20px;">
                 <div class="form-group">
-                    <label for="inputSPO">SPO<sub>2</sub> </label>
+                    <label for="inputSPO">SPO<sub>2</sub> <span class="">(%)</span></label>
                     <div class="input-group">
                         <input type="number" onKeyUp="" id="inputSPO" name="inputSPO" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriSPO']; ?>">
-                        <span class="input-group-prepend">
-                            <span class="input-group-text">%</span>	
-                        </span>
                     </div>
                 </div>
             </div>
             <div class="col-lg-1">
                 <div class="form-group">
-                <label for="inputHGT">HGT </label>
+                <label for="inputHGT">HGT <span class="">(mg/dl)</span></label>
                     <input type="number" id="inputHGT" name="inputHGT" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriHGT']; ?>">
                 </div>
             </div>
             <div class="col-lg-1">
                 <div class="form-group">
-                <label for="inputPeso">Peso </label>
+                <label for="inputPeso">Peso <span class="">(Kg)</span></label>
                     <input type="number" id="inputPeso" name="inputPeso" class="form-control" onKeyUp="moeda(this);" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriPeso']; ?>">
                 </div>
             </div>
