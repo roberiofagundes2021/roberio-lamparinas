@@ -1,3 +1,128 @@
+<!-- Dieta -->
+<div class="card card-collapsed">
+    
+    <div class="card-header header-elements-inline">
+        <h3 class="card-title">DIETA</h3>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <form id="formDieta" name="formDieta" method="post" class="form-validate-jquery">
+
+            <input type="hidden" name="idDieta" id="idDieta">
+
+            <div class="col-lg-12 mb-3 row">
+                <!-- titulos -->
+                <div class="col-lg-3">
+                    <label>Data Inicial <span class="text-danger">*</span></label>
+                </div>
+                <div class="col-lg-3">
+                    <label>Data Final <span class="text-danger">*</span></label>
+                </div>
+                <div class="col-lg-6">
+                    <label>Tipo de Dieta <span class="text-danger">*</span></label>
+                </div>
+                <!-- campos -->										
+                <div class="col-lg-3">
+                    <input type="date" class="form-control" name="dataInicialDieta" id="dataInicialDieta" min="<?php echo date('Y-m-d') ?>">
+                </div>
+                <div class="col-lg-3">
+                    <input type="date" class="form-control" name="dataFinalDieta" id="dataFinalDieta" min="<?php echo date('Y-m-d') ?>">
+                </div>
+                <div class="col-lg-6">
+                    <select id="selTipoDeDieta" name="selTipoDeDieta" class="select-search" onChange="setDescricaoDieta()" >
+                        <option value=''>Selecione</option>
+                    </select>											
+                </div>
+            </div>
+
+            <div class="col-lg-12 mb-3 row">
+                <!-- titulos -->
+                <div class="col-lg-3">
+                    <label>Via <span class="text-danger">*</span></label>
+                </div>
+                <div class="col-lg-3">
+                    <label>Frequência <span class="text-danger">*</span></label>
+                </div>
+                <div class="col-lg-3">
+                    <label>Tipo de Aprazamento <span class="text-danger">*</span></label>
+                </div>
+                <div class="col-lg-3">											
+                </div>
+                <!-- campos -->										
+                <div class="col-lg-3">
+                    <select id="selViaDieta" name="selViaDieta" class="select-search" onChange="setDescricaoDieta()">
+                        <option value=''>Selecione</option>
+                    </select>
+                </div>
+                <div class="col-lg-3">											
+                    <input type="text" id="freqDieta" name="freqDieta" class="form-control" onChange="setDescricaoDieta()">
+                </div>
+                <div class="col-lg-3">
+                    <select id="selTipoAprazamentoDieta" name="selTipoAprazamentoDieta" class="select-search" onChange="setDescricaoDieta()">
+                        <option value=''>Selecione</option>
+                    </select>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-check form-check-inline" style="margin-top: 10px;">
+                        <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" id="checkBombaInfusaoDieta" name="checkBombaInfusaoDieta" onclick="setDescricaoDieta()" >
+                            Bomba de Infusão
+                        </label>
+                    </div>																						
+                </div>
+            </div>
+
+            
+            <div class="row" style="margin-top: 20px">
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label for="justificativa">Descrição da Dieta <span class="text-danger">*</span></label>
+                        <textarea rows="5" cols="5" maxLength="350" id="descricaoDieta" name="descricaoDieta" onInput="contarCaracteres(this);" class="form-control" placeholder="Digite aqui o texto da Posologia." ></textarea>
+                        <small class="text-muted form-text">Max. 350 caracteres <span class="caracteresdescricaoDieta"></span></small>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-group" style="padding-top:15px;">
+                    <button class="btn btn-lg btn-success" id="adicionarDieta"  >Adicionar</button>
+                    <button class="btn btn-lg btn-success" id="salvarEdDieta" style="display: none;"  >Salvar Alterações</button>
+                </div>
+            </div>
+        </div> 
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table" id="tblDieta">
+                <thead>
+                    <tr class="bg-slate">
+                        <th class="text-left">Item</th>
+                        <th class="text-left">Data Inicial</th>
+                        <th class="text-left">Tipo da Dieta</th>
+                        <th class="text-left">Descrição da Dieta</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="dataDieta">
+                </tbody>
+            </table>
+        </div>		
+    </div>
+
+</div>
+
 <!-- medicamentos -->
 <div class=" card card-collapsed " >
 
@@ -414,136 +539,11 @@
 
 </div>
 
-<!-- Dieta -->
-<div class="card card-collapsed">
-    
-    <div class="card-header header-elements-inline">
-        <h3 class="card-title">DIETA</h3>
-        <div class="header-elements">
-            <div class="list-icons">
-                <a class="list-icons-item" data-action="collapse"></a>
-            </div>
-        </div>
-    </div>
-
-    <div class="card-body">
-
-        <form id="formDieta" name="formDieta" method="post" class="form-validate-jquery">
-
-            <input type="hidden" name="idDieta" id="idDieta">
-
-            <div class="col-lg-12 mb-3 row">
-                <!-- titulos -->
-                <div class="col-lg-3">
-                    <label>Data Inicial <span class="text-danger">*</span></label>
-                </div>
-                <div class="col-lg-3">
-                    <label>Data Final <span class="text-danger">*</span></label>
-                </div>
-                <div class="col-lg-6">
-                    <label>Tipo de Dieta <span class="text-danger">*</span></label>
-                </div>
-                <!-- campos -->										
-                <div class="col-lg-3">
-                    <input type="date" class="form-control" name="dataInicialDieta" id="dataInicialDieta" min="<?php echo date('Y-m-d') ?>">
-                </div>
-                <div class="col-lg-3">
-                    <input type="date" class="form-control" name="dataFinalDieta" id="dataFinalDieta" min="<?php echo date('Y-m-d') ?>">
-                </div>
-                <div class="col-lg-6">
-                    <select id="selTipoDeDieta" name="selTipoDeDieta" class="select-search" onChange="setDescricaoDieta()" >
-                        <option value=''>Selecione</option>
-                    </select>											
-                </div>
-            </div>
-
-            <div class="col-lg-12 mb-3 row">
-                <!-- titulos -->
-                <div class="col-lg-3">
-                    <label>Via <span class="text-danger">*</span></label>
-                </div>
-                <div class="col-lg-3">
-                    <label>Frequência <span class="text-danger">*</span></label>
-                </div>
-                <div class="col-lg-3">
-                    <label>Tipo de Aprazamento <span class="text-danger">*</span></label>
-                </div>
-                <div class="col-lg-3">											
-                </div>
-                <!-- campos -->										
-                <div class="col-lg-3">
-                    <select id="selViaDieta" name="selViaDieta" class="select-search" onChange="setDescricaoDieta()">
-                        <option value=''>Selecione</option>
-                    </select>
-                </div>
-                <div class="col-lg-3">											
-                    <input type="text" id="freqDieta" name="freqDieta" class="form-control" onChange="setDescricaoDieta()">
-                </div>
-                <div class="col-lg-3">
-                    <select id="selTipoAprazamentoDieta" name="selTipoAprazamentoDieta" class="select-search" onChange="setDescricaoDieta()">
-                        <option value=''>Selecione</option>
-                    </select>
-                </div>
-                <div class="col-lg-3">
-                    <div class="form-check form-check-inline" style="margin-top: 10px;">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" id="checkBombaInfusaoDieta" name="checkBombaInfusaoDieta" onclick="setDescricaoDieta()" >
-                            Bomba de Infusão
-                        </label>
-                    </div>																						
-                </div>
-            </div>
-
-            
-            <div class="row" style="margin-top: 20px">
-                <div class="col-lg-12">
-                    <div class="form-group">
-                        <label for="justificativa">Descrição da Dieta <span class="text-danger">*</span></label>
-                        <textarea rows="5" cols="5" maxLength="350" id="descricaoDieta" name="descricaoDieta" onInput="contarCaracteres(this);" class="form-control" placeholder="Digite aqui o texto da Posologia." ></textarea>
-                        <small class="text-muted form-text">Max. 350 caracteres <span class="caracteresdescricaoDieta"></span></small>
-                    </div>
-                </div>
-            </div>
-
-        </form>
-
-
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="form-group" style="padding-top:15px;">
-                    <button class="btn btn-lg btn-success" id="adicionarDieta"  >Adicionar</button>
-                    <button class="btn btn-lg btn-success" id="salvarEdDieta" style="display: none;"  >Salvar Alterações</button>
-                </div>
-            </div>
-        </div> 
-
-    </div>
-
-    <div class="row">
-        <div class="col-lg-12">
-            <table class="table" id="tblDieta">
-                <thead>
-                    <tr class="bg-slate">
-                        <th class="text-left">Item</th>
-                        <th class="text-left">Data Inicial</th>
-                        <th class="text-left">Tipo da Dieta</th>
-                        <th class="text-left">Descrição da Dieta</th>
-                        <th class="text-center">Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="dataDieta">
-                </tbody>
-            </table>
-        </div>		
-    </div>
-
-</div>
-
-<!-- Cuidados -->
+<!-- Cuidados/Procedimentos -->
 <div class="card card-collapsed ">
     
     <div class="card-header header-elements-inline">
-        <h3 class="card-title">CUIDADOS</h3>
+        <h3 class="card-title">CUIDADOS/PROCEDIMENTOS</h3>
         <div class="header-elements">
             <div class="list-icons">
                 <a class="list-icons-item" data-action="collapse"></a>
@@ -566,7 +566,7 @@
                     <label>Data Final</label>
                 </div>
                 <div class="col-lg-6">
-                    <label>Tipo do Cuidado <span class="text-danger">*</span></label>
+                    <label>Tipo do Cuidado/Procedimento <span class="text-danger">*</span></label>
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-3">
@@ -621,7 +621,7 @@
             <div class="row" style="margin-top: 20px">
                 <div class="col-lg-12">
                     <div class="form-group">
-                        <label for="justificativa">Descrição dos Cuidados <span class="text-danger">*</span></label>
+                        <label for="justificativa">Descrição dos Cuidados/Procedimentos <span class="text-danger">*</span></label>
                         <textarea rows="5" cols="5" maxLength="350" id="descricaoCuidados" name="descricaoCuidados" onInput="contarCaracteres(this);" onChange="contarCaracteres(this);" class="form-control" placeholder="Digite aqui o texto da Posologia." ></textarea>
                         <small class="text-muted form-text">Max. 350 caracteres <span class="caracteresdescricaoCuidados"></span></small>
                     </div>
