@@ -1647,7 +1647,6 @@ if ($row['ClienSexo'] == 'F'){
 
 			let nomeMedicamento = $('#nomeMedicamentoEstoqueMedicamentos').val()
 			let medicamentoDl = $('#medicamentoDlMedicamentos').val()			
-			let viaMed = $('#selViaMedicamentos option:selected').text()			
 			let doseMed = $('#doseMedicamentos').val()
 			let unidadeMed = $('#selUnidadeMedicamentos option:selected').text()
 			let frequenciaMed = $('#frequenciaMedicamentos').val()
@@ -1663,7 +1662,6 @@ if ($row['ClienSexo'] == 'F'){
 
 				(nomeMedicamento != '' ? nomeMedicamento : '') + 
 				(medicamentoDl != '' ? ' - ' + medicamentoDl : '') + 
-				(viaMed != 'Selecione' ? ' - ' + viaMed : '') + 
 				(doseMed != '' ? ' - ' + doseMed : '') + 
 				(unidadeMed != 'Selecione' ? ' - ' + unidadeMed : '') +
 				(frequenciaMed != '' ? ' - ' + frequenciaMed : '') +
@@ -1681,7 +1679,6 @@ if ($row['ClienSexo'] == 'F'){
 
 			let nomeSolucao = $('#nomeMedicamentoEstoqueSolucoes').val()
 			let solucaoDl = $('#medicamentoDlSolucoes').val()			
-			let viaSol = $('#selViaSolucoes option:selected').text()			
 			let doseSol = $('#doseSolucoes').val()
 			let unidadeSol = $('#selUnidadeSolucoes option:selected').text()
 			let frequenciaSol = $('#frequenciaSolucoes').val()
@@ -1702,7 +1699,6 @@ if ($row['ClienSexo'] == 'F'){
 
 				(nomeSolucao != '' ? nomeSolucao : '') + 
 				(solucaoDl != '' ? ' - ' + solucaoDl : '') + 
-				(viaSol != 'Selecione' ? ' - ' + viaSol : '') + 
 				(doseSol != '' ? ' - ' + doseSol : '') + 
 				(unidadeSol != 'Selecione' ? ' - ' + unidadeSol : '') +
 				(frequenciaSol != '' ? ' - ' + frequenciaSol : '') +
@@ -1723,7 +1719,6 @@ if ($row['ClienSexo'] == 'F'){
 		function setDescricaoDieta() {
 
 			let tipoDieta = $('#selTipoDeDieta option:selected').text();
-			let viaDieta = $('#selViaDieta option:selected').text();
 			let frequenciaDieta = $('#freqDieta').val();
 			let aprazamentoDieta = $('#selTipoAprazamentoDieta option:selected').text();		
 			let bombaInfusaoDieta = '';
@@ -1734,7 +1729,6 @@ if ($row['ClienSexo'] == 'F'){
 
 			$('#descricaoDieta').val(
 				(tipoDieta != 'Selecione' ? tipoDieta : '') + 
-				(viaDieta != 'Selecione' ? ' - ' + viaDieta : '') + 
 				(frequenciaDieta != '' ? ' - ' + frequenciaDieta : '') + 
 				(aprazamentoDieta != 'Selecione' ?  ' - ' + aprazamentoDieta : '') +
 				(bombaInfusaoDieta != '' ? ' - ' + bombaInfusaoDieta : '')

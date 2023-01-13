@@ -56,7 +56,7 @@
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-3">
-                    <select id="selViaDieta" name="selViaDieta" class="select-search" onChange="setDescricaoDieta()">
+                    <select id="selViaDieta" name="selViaDieta" class="select-search" >
                         <option value=''>Selecione</option>
                     </select>
                 </div>
@@ -171,7 +171,7 @@
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-11">
-                    <select id="selViaMedicamentos" name="selViaMedicamentos" class="select-search" onChange="setDescricaoPosologiaMed()" >
+                    <select id="selViaMedicamentos" name="selViaMedicamentos" class="select-search" >
                         <option value=''>Selecione</option>
                     </select>
                 </div>
@@ -342,7 +342,7 @@
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-11">
-                    <select id="selViaSolucoes" name="selViaSolucoes" class="select-search" onChange="setDescricaoPosologiaSol()">
+                    <select id="selViaSolucoes" name="selViaSolucoes" class="select-search" >
                         <option value=''>Selecione</option>
                     </select>
                 </div>
