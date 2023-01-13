@@ -45,7 +45,7 @@ try {
 		$selUnidadeMedicamentos = $_POST['selUnidadeMedicamentos'];
 		$frequenciaMedicamentos = $_POST['frequenciaMedicamentos'];
 		$selTipoAprazamentoMedicamentos = $_POST['selTipoAprazamentoMedicamentos'];
-		$dataInicioMedicamentos = $_POST['dataInicioMedicamentos'];
+		$dataInicioMedicamentos = $_POST['dataInicioMedicamentos'] == "" ? null : $_POST['dataInicioMedicamentos'];
 		$checkBombaInfusaoMedicamentos = $_POST['checkBombaInfusaoMedicamentos'];
 		$checkInicioAdmMedicamentos = $_POST['checkInicioAdmMedicamentos'];
 		$horaInicioAdmMedicamentos = $_POST['horaInicioAdmMedicamentos'];
@@ -83,7 +83,7 @@ try {
 		$selUnidadeSolucoes = $_POST['selUnidadeSolucoes'];
 		$frequenciaSolucoes = $_POST['frequenciaSolucoes'];
 		$selTipoAprazamentoSolucoes = $_POST['selTipoAprazamentoSolucoes'];
-		$dataInicioSolucoes = $_POST['dataInicioSolucoes'];	
+		$dataInicioSolucoes = $_POST['dataInicioSolucoes'] == "" ? null : $_POST['dataInicioSolucoes'];	
 
 		$diluenteSolucoes = $_POST['diluenteSolucoes'] != '' ? "'" . $_POST['diluenteSolucoes'] . "'" : 'NULL';
 		$volumeSolucoes = $_POST['volumeSolucoes'] != '' ? "'" . $_POST['volumeSolucoes'] . "'" : 'NULL';
@@ -365,7 +365,7 @@ try {
 		$selUnidadeMedicamentos = $_POST['selUnidadeMedicamentos'];
 		$frequenciaMedicamentos = $_POST['frequenciaMedicamentos'];
 		$selTipoAprazamentoMedicamentos = $_POST['selTipoAprazamentoMedicamentos'];
-		$dataInicioMedicamentos = $_POST['dataInicioMedicamentos'];
+		$dataInicioMedicamentos = $_POST['dataInicioMedicamentos'] == "" ? null : $_POST['dataInicioMedicamentos'];
 		$checkBombaInfusaoMedicamentos = $_POST['checkBombaInfusaoMedicamentos'];
 		$checkInicioAdmMedicamentos = $_POST['checkInicioAdmMedicamentos'];
 		$horaInicioAdmMedicamentos = $_POST['horaInicioAdmMedicamentos'];
@@ -414,7 +414,7 @@ try {
 		$selUnidadeSolucoes = $_POST['selUnidadeSolucoes'];
 		$frequenciaSolucoes = $_POST['frequenciaSolucoes'];
 		$selTipoAprazamentoSolucoes = $_POST['selTipoAprazamentoSolucoes'];
-		$dataInicioSolucoes = $_POST['dataInicioSolucoes'];	
+		$dataInicioSolucoes = $_POST['dataInicioSolucoes'] == "" ? null : $_POST['dataInicioSolucoes'];	
 		$diluenteSolucoes = $_POST['diluenteSolucoes'];
 		$volumeSolucoes = $_POST['volumeSolucoes'];
 		$correrEmSolucoes = $_POST['correrEmSolucoes'];

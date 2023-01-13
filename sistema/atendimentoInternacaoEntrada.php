@@ -501,7 +501,6 @@ if ($row['ClienSexo'] == 'F'){
 					case selUnidadeMedicamentos: msg = 'Informe a unidade do medicamento!';$('#selUnidadeMedicamentos').focus();break
 					case frequenciaMedicamentos: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaMedicamentos').focus();break
 					case selTipoAprazamentoMedicamentos: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoMedicamentos').focus();break
-					case dataInicioMedicamentos: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioMedicamentos').focus();break
 					case descricaoPosologiaMedicamentos: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaMedicamentos').focus();break
 				}
 
@@ -595,7 +594,6 @@ if ($row['ClienSexo'] == 'F'){
 					case selUnidadeSolucoes: msg = 'Informe a unidade do medicamento!';$('#selUnidadeSolucoes').focus();break
 					case frequenciaSolucoes: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaSolucoes').focus();break
 					case selTipoAprazamentoSolucoes: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoSolucoes').focus();break
-					case dataInicioSolucoes: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioSolucoes').focus();break
 					case descricaoPosologiaSolucoes: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaSolucoes').focus();break
 				}
 
@@ -856,7 +854,6 @@ if ($row['ClienSexo'] == 'F'){
 					case selUnidadeMedicamentos: msg = 'Informe a unidade do medicamento!';$('#selUnidadeMedicamentos').focus();break
 					case frequenciaMedicamentos: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaMedicamentos').focus();break
 					case selTipoAprazamentoMedicamentos: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoMedicamentos').focus();break
-					case dataInicioMedicamentos: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioMedicamentos').focus();break
 					case descricaoPosologiaMedicamentos: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaMedicamentos').focus();break
 				}
 
@@ -954,7 +951,6 @@ if ($row['ClienSexo'] == 'F'){
 					case selUnidadeSolucoes: msg = 'Informe a unidade do medicamento!';$('#selUnidadeSolucoes').focus();break
 					case frequenciaSolucoes: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaSolucoes').focus();break
 					case selTipoAprazamentoSolucoes: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoSolucoes').focus();break
-					case dataInicioSolucoes: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioSolucoes').focus();break
 					case descricaoPosologiaSolucoes: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaSolucoes').focus();break
 				}
 

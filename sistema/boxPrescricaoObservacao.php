@@ -72,7 +72,7 @@
                     <label>Tipo de Aprazamento <span class="text-danger">*</span></label>
                 </div>
                 <div class="col-lg-2">
-                    <label>Data Início Tratamento <span class="text-danger">*</span></label>
+                    <label>Data Início Tratamento</label>
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-2">
@@ -243,7 +243,7 @@
                     <label>Tipo de Aprazamento <span class="text-danger">*</span></label>
                 </div>
                 <div class="col-lg-2">
-                    <label>Data Início Tratamento <span class="text-danger">*</span></label>
+                    <label>Data Início Tratamento</label>
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-2">
