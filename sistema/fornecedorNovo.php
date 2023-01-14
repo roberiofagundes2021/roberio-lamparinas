@@ -1,11 +1,12 @@
-<?php 
-include_once("sessao.php"); 
+<?php
+include_once("sessao.php");
 $_SESSION['PaginaAtual'] = 'Novo Fornecedor';
 include('global_assets/php/conexao.php');
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -24,258 +25,355 @@ include('global_assets/php/conexao.php');
 	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
 	<script src="../../../../global_assets/js/demo_pages/components_popups.js"></script>
 
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>	
-	<!-- /theme JS files -->	
-	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
+	<!-- /theme JS files -->
+
 	<!-- Validação -->
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
 
 	<!-- Adicionando Javascript -->
-	<script type="text/javascript" >
-	
-	$(document).ready(function() {
-		
-		//$("#cmbEstado").addClass("form-control-select2");
-						
-		function limpa_formulário_cep() {
-			// Limpa valores do formulário de cep.
-			$("#inputEndereco").val("");
-			$("#inputBairro").val("");
-			$("#inputCidade").val("");
-			$("#cmbEstado").val("");                
-		}
-		
-		//Quando o campo cep perde o foco.
-		$("#inputCep").blur(function() {
+	<script type="text/javascript">
+		$(document).ready(function() {
 
-			$("#cmbEstado").removeClass("form-control-select2");
-			
-			//Nova variável "cep" somente com dígitos.
-			var cep = $(this).val().replace(/\D/g, '');
+			selecionaPessoa('PF');
+			//$("#cmbEstado").addClass("form-control-select2");
 
-			//Verifica se campo cep possui valor informado.
-			if (cep != "") {
+			function limpa_formulário_cep() {
+				// Limpa valores do formulário de cep.
+				$("#inputEndereco").val("");
+				$("#inputBairro").val("");
+				$("#inputCidade").val("");
+				$("#cmbEstado").val("");
+			}
 
-				//Expressão regular para validar o CEP.
-				var validacep = /^[0-9]{8}$/;
+			//Quando o campo cep perde o foco.
+			$("#inputCep").blur(function() {
 
-				//Valida o formato do CEP.
-				if(validacep.test(cep)) {
+				$("#cmbEstado").removeClass("form-control-select2");
 
-					//Preenche os campos com "..." enquanto consulta webservice.
-					$("#inputEndereco").val("...");
-					$("#inputBairro").val("...");
-					$("#inputCidade").val("...");
-					$("#cmbEstado").val("...");                        
+				//Nova variável "cep" somente com dígitos.
+				var cep = $(this).val().replace(/\D/g, '');
 
-					//Consulta o webservice viacep.com.br/
-					$.getJSON("https://viacep.com.br/ws/"+ cep +"/json/?callback=?", function(dados) {
+				//Verifica se campo cep possui valor informado.
+				if (cep != "") {
 
-						if (!("erro" in dados)) {
+					//Expressão regular para validar o CEP.
+					var validacep = /^[0-9]{8}$/;
 
-							//Atualiza os campos com os valores da consulta.
-							$("#inputEndereco").val(dados.logradouro);
-							$("#inputBairro").val(dados.bairro);
-							$("#inputCidade").val(dados.localidade);                                
-							$("#cmbEstado").val(dados.uf);        
-						} //end if.
-						else {
-							//CEP pesquisado não foi encontrado.
-							limpa_formulário_cep();
-							alerta("Erro","CEP não encontrado.", "erro");
-						}
-					});
+					//Valida o formato do CEP.
+					if (validacep.test(cep)) {
+
+						//Preenche os campos com "..." enquanto consulta webservice.
+						$("#inputEndereco").val("...");
+						$("#inputBairro").val("...");
+						$("#inputCidade").val("...");
+						$("#cmbEstado").val("...");
+
+						//Consulta o webservice viacep.com.br/
+						$.getJSON("https://viacep.com.br/ws/" + cep + "/json/?callback=?", function(dados) {
+
+							if (!("erro" in dados)) {
+
+								//Atualiza os campos com os valores da consulta.
+								$("#inputEndereco").val(dados.logradouro);
+								$("#inputBairro").val(dados.bairro);
+								$("#inputCidade").val(dados.localidade);
+								$("#cmbEstado").val(dados.uf);
+							} //end if.
+							else {
+								//CEP pesquisado não foi encontrado.
+								limpa_formulário_cep();
+								alerta("Erro", "CEP não encontrado.", "erro");
+							}
+						});
+					} //end if.
+					else {
+						//cep é inválido.
+						limpa_formulário_cep();
+						alerta("Erro", "Formato de CEP inválido.", "erro");
+					}
 				} //end if.
 				else {
-					//cep é inválido.
+					//cep sem valor, limpa formulário.
 					limpa_formulário_cep();
-					alerta("Erro","Formato de CEP inválido.","erro");
 				}
-			} //end if.
-			else {
-				//cep sem valor, limpa formulário.
-				limpa_formulário_cep();
-			}
-		});
-		
-		//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-		$('#cmbCategoria').on('change', function(e){
-			
-			Filtrando();
-			
-			var cmbCategoria = $('#cmbCategoria').val();
-
-			$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
-				
-				var option = '<option>Selecione a SubCategoria</option>';
-				
-				if (dados.length){						
-					
-					$.each(dados, function(i, obj){
-						option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-					});
-					
-					$('#cmbSubCategoria').html(option).show();
-				} else {
-					Reset();
-				}					
 			});
+
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbCategoria').on('change', function(e) {
+
+				Filtrando();
+
+				var cmbCategoria = $('#cmbCategoria').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
+
+					var option = '<option>Selecione a SubCategoria</option>';
+
+					if (dados.length) {
+
+						$.each(dados, function(i, obj) {
+							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
+						});
+
+						$('#cmbSubCategoria').html(option).show();
+					} else {
+						Reset();
+					}
+				});
+			});
+
+			//Valida Registro Duplicado
+			$('#enviar').on('click', function(e) {
+
+				e.preventDefault();
+
+				// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
+				var cep = $("#inputCep").val()
+				cep = cep.replace(' ', '')
+				$("#inputCep").val(cep)
+
+				var inputTipo = $('input[name="inputTipo"]:checked').val();
+				var inputNome = $('#inputNome').val();
+				var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
+				var inputCnpj = $('#inputCnpj').val();
+				var cmbSubCategoria = $('#cmbSubCategoria').val();
+
+				//remove os espaços desnecessários antes e depois
+				inputNome = inputNome.trim();
+
+				if (cmbSubCategoria[0] == 'Filtrando') {
+					alerta('Atenção', 'Por algum problema na sua conexão o campo SubCategoria parece não conseguindo ser filtrado! Favor cancelar a edição e tentar novamente.', 'error');
+					return false;
+				}
+
+				//Esse ajax está sendo usado para verificar no banco se o registro já existe
+				$.ajax({
+					type: "POST",
+					url: "fornecedorValida.php",
+					data: {
+						tipo: inputTipo,
+						nome: inputNome,
+						cpf: inputCpf,
+						cnpj: inputCnpj
+					},
+					success: function(resposta) {
+
+						if (resposta == 1) {
+							alerta('Atenção', 'Esse registro já existe!', 'error');
+							return false;
+						}
+
+						$("#formFornecedor").submit();
+					}
+				}); //ajax
+
+			}); // enviar
+
+			function Filtrando() {
+				$('#cmbSubCategoria').empty().append('<option value="Filtrando">Filtrando...</option>');
+			}
+
+			function Reset() {
+				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+			}
+
+		}); // document.ready
+
+
+		function selecionaPessoa(tipo) {
+			var camposPFObrigatorios = [
+				'inputCpf',
+				'inputRg',
+				'inputEmissor',
+				'cmbUf',
+				'inputNaturalidade',
+				'inputNaturalidadeUf',
+				'inputNacionalidade',
+				'inputAno',
+				'inputCarteiraTrabalho',
+				'cmbSexo',
+				'inputAniversario'
+			]
+			var camposPJObrigatorios = [
+				'inputCnpj',
+				'inputInscricaoMunicipal',
+				'inputInscricaoEstadual',
+				'inputRazaoSocial'
+			]
+			if (tipo == 'PF') {
+				camposPFObrigatorios.forEach(element => $("#" + element).attr('required', true));
+				camposPFObrigatorios.forEach(element => $("#" + element).parent().parent().css("display", "block"));
+				camposPJObrigatorios.forEach(element => $("#" + element).attr('required', false));
+				camposPJObrigatorios.forEach(element => $("#" + element).parent().parent().css("display", "none"));
+				document.getElementById('inputNome').placeholder = "Nome Completo";
+				document.getElementById('foto').style.display = 'flex';
+
+			} else {
+				camposPJObrigatorios.forEach(element => $("#" + element).attr('required', true));
+				camposPJObrigatorios.forEach(element => $("#" + element).parent().parent().css("display", "block"));
+				camposPFObrigatorios.forEach(element => $("#" + element).attr('required', false));
+				camposPFObrigatorios.forEach(element => $("#" + element).parent().parent().css("display", "none"));
+				document.getElementById('inputNome').placeholder = "Nome Fantasia";
+				document.getElementById('foto').style.display = 'none';
+			}
+		}
+
+		function selecionaPessoa2(tipo) {
+			if (tipo == 'PF') {
+				document.getElementById('CPF').style.display = "block";
+				document.getElementById('CNPJ').style.display = "none";
+				document.getElementById('dadosPF').style.display = "block";
+				document.getElementById('foto').style.display = "block";
+				document.getElementById('dadosPJ').style.display = "none";
+
+				document.getElementById('inputCpf').setAttribute('required', 'required');
+				document.getElementById('inputCnpj').removeAttribute('required', 'required');
+			} else {
+				document.getElementById('CPF').style.display = "none";
+				document.getElementById('CNPJ').style.display = "block";
+				document.getElementById('dadosPF').style.display = "none";
+				document.getElementById('foto').style.display = "none";
+				document.getElementById('dadosPJ').style.display = "block";
+
+				document.getElementById('inputCpf').removeAttribute('required', 'required');
+				document.getElementById('inputCnpj').setAttribute('required', 'required');
+			}
+		}
+
+
+		function validaEFormataCnpj() {
+			let cnpj = $('#inputCnpj').val();
+			let resultado = validarCNPJ(cnpj);
+			if (!resultado) {
+				let labelErro = $('#inputCnpj-error')
+				labelErro.removeClass('validation-valid-label');
+				labelErro[0].innerHTML = "CNPJ Inválido";
+				$('#inputCnpj').val("");
+			}
+
+		}
+
+		function validaEFormataCpf() {
+			let cpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
+			let resultado = validaCPF(cpf);
+			if (!resultado) {
+				let labelErro = $('#inputCpf-error')
+				labelErro.removeClass('validation-valid-label');
+				labelErro[0].innerHTML = "CPF Inválido";
+				$('#inputCpf').val("");
+			}
+		}
+
+		function validaDataNascimento(dataASerValidada) {
+			//Adicionado um espaço para forçar o fuso horário de brasília		
+			let dataObj = new Date(dataASerValidada + " ");
+			let hoje = new Date();
+			if ((hoje - dataObj) < 0) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+
+		function formataCampoDataNascimento() {
+			let dataPreenchida = $('#inputAniversario').val();
+			if (!validaDataNascimento(dataPreenchida)) {
+				let labelErro = $('#inputAniversario-error');
+				labelErro.removeClass('validation-valid-label');
+				labelErro[0].innerHTML = "Data não pode ser futura";
+				$('#inputAniversario').val("");
+			}
+		}
+
+		//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
+		$('#addFoto').on('click', function(e) {
+			e.preventDefault(); // Isso aqui não deixa o formulário "formFornecedor" ser submetido ao clicar no Incluir Foto, ou seja, ao executar o método ajax
+
+			$('#imagem').trigger("click");
 		});
 
-		//Valida Registro Duplicado
-		$('#enviar').on('click', function(e){
-			
-			e.preventDefault();
+		// #imagem é o id do input, ao alterar o conteudo do input execurará a função abaixo
+		$('#imagem').on('change', function() {
 
-			// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
-			var cep = $("#inputCep").val()
-			cep = cep.replace(' ','')
-			$("#inputCep").val(cep)
-			
-			var inputTipo = $('input[name="inputTipo"]:checked').val();				
-			var inputNome = $('#inputNome').val();
-			var inputCpf  = $('#inputCpf').val().replace(/[^\d]+/g,'');
-			var inputCnpj = $('#inputCnpj').val();
-			var cmbSubCategoria = $('#cmbSubCategoria').val();
-			
-			//remove os espaços desnecessários antes e depois
-			inputNome = inputNome.trim();
+			$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
 
-			if (cmbSubCategoria[0] == 'Filtrando'){
-				alerta('Atenção','Por algum problema na sua conexão o campo SubCategoria parece não conseguindo ser filtrado! Favor cancelar a edição e tentar novamente.','error');
-				return false;
-			}
-			
-			//Esse ajax está sendo usado para verificar no banco se o registro já existe
+			// Get form
+			var form = $('#formFoto')[0];
+			var formData = new FormData(form);
+			//var inputFoto = $('#inputFoto').val();
+			//alert($('#imagem')[0].files[0]);
+
+			formData.append('file', $('#imagem')[0].files[0]);
+			formData.append('tela', 'produto');
+
 			$.ajax({
 				type: "POST",
-				url: "fornecedorValida.php",
-				data: {tipo: inputTipo, nome: inputNome, cpf: inputCpf, cnpj: inputCnpj},
-				success: function(resposta){
-					
-					if(resposta == 1){
-						alerta('Atenção','Esse registro já existe!','error');
-						return false;
-					}
-					
-					$( "#formFornecedor" ).submit();
+				enctype: 'multipart/form-data',
+				url: "upload.php",
+				processData: false, // impedir que o jQuery tranforma a "data" em querystring					
+				contentType: false, // desabilitar o cabeçalho "Content-Type"
+				cache: false, // desabilitar o "cache"
+				data: formData, //{imagem: inputImagem},
+				success: function(resposta) {
+					//console.log(resposta);
+
+					$('#visualizar').html(resposta);
+					$('#addFoto').text("Alterar Foto...");
+
+					//Aqui sou obrigado a instanciar novamente a utilização do fancybox
+					$(".fancybox").fancybox({
+						// options
+					});
+
+					return false;
 				}
 			}); //ajax
-			
-		}); // enviar
 
-		function Filtrando(){
-			$('#cmbSubCategoria').empty().append('<option value="Filtrando">Filtrando...</option>');
-		}
-		
-		function Reset(){
-			$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
-		}	
-		
-	}); // document.ready
-	
-	function selecionaPessoa(tipo) {
-		if (tipo == 'PF'){
-			document.getElementById('CPF').style.display = "block";
-			document.getElementById('CNPJ').style.display = "none";
-			document.getElementById('dadosPF').style.display = "block";
-			document.getElementById('dadosPJ').style.display = "none";
-			document.getElementById('inputNome').placeholder = "Nome Completo";
-			document.getElementById('inputCpf').setAttribute('required', 'required');
-			document.getElementById('inputCnpj').removeAttribute('required', 'required');
-		} else {
-			document.getElementById('CPF').style.display = "none";
-			document.getElementById('CNPJ').style.display = "block";				
-			document.getElementById('dadosPF').style.display = "none";
-			document.getElementById('dadosPJ').style.display = "block";
-			document.getElementById('inputNome').placeholder = "Nome Fantasia";
-			document.getElementById('inputCpf').removeAttribute('required', 'required');
-			document.getElementById('inputCnpj').setAttribute('required', 'required');
-		}
-	}			
+			//$('#formFoto').submit();
 
-
-	function validaEFormataCnpj(){
-		let cnpj = $('#inputCnpj').val();
-		let resultado = validarCNPJ(cnpj);
-		if (!resultado){
-			let labelErro = $('#inputCnpj-error')
-			labelErro.removeClass('validation-valid-label');
-			labelErro[0].innerHTML = "CNPJ Inválido";	
-			$('#inputCnpj').val("");
-		}
-		
-	}
-	
-	function validaEFormataCpf(){
-		let cpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
-		let resultado = validaCPF(cpf);
-		if (!resultado){
-			let labelErro = $('#inputCpf-error')
-			labelErro.removeClass('validation-valid-label');
-			labelErro[0].innerHTML = "CPF Inválido";	
-			$('#inputCpf').val("");
-		}			
-	}
-
-	function validaDataNascimento(dataASerValidada){			
-		//Adicionado um espaço para forçar o fuso horário de brasília		
-		let dataObj = new Date(dataASerValidada+" ");
-		let hoje = new Date();
-		if((hoje-dataObj)<0){
-			return false;				
-		}
-		else{
-			return true;
-		}
-	}
-
-	function formataCampoDataNascimento(){
-		let dataPreenchida = $('#inputAniversario').val();
-		if (!validaDataNascimento(dataPreenchida)){
-			let labelErro = $('#inputAniversario-error');
-			labelErro.removeClass('validation-valid-label');
-			labelErro[0].innerHTML = "Data não pode ser futura";
-			$('#inputAniversario').val("");		
-		}
-	}
-</script>	
+			// Efetua o Upload sem dar refresh na pagina
+			$('#formFoto').ajaxForm({
+				target: '#visualizar' // o callback será no elemento com o id #visualizar
+			}).submit();
+		});
+	</script>
 
 </head>
-	
+
 </head>
 
 <body class="navbar-top">
 
-	<?php include_once("topo.php"); ?>	
+	<?php include_once("topo.php"); ?>
 
 	<!-- Page content -->
 	<div class="page-content">
-		
+
 		<?php include_once("menu-left.php"); ?>
 
 		<!-- Main content -->
 		<div class="content-wrapper">
 
-			<?php include_once("cabecalho.php"); ?>	
+			<?php include_once("cabecalho.php"); ?>
 
 			<!-- Content area -->
 			<div class="content">
-				
+
 				<!-- Info blocks -->
 				<div class="card">
-					
+
 					<form name="formFornecedor" id="formFornecedor" method="post" class="form-validate-jquery">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Fornecedor</h5>
 						</div>
-						
-						<div class="card-body">								
+
+						<div class="card-body">
 							<div class="row">
 								<div class="col-lg-4">
-									<div class="form-group">							
+									<div class="form-group">
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
 												<input type="radio" id="inputTipo" name="inputTipo" value="F" class="form-input-styled" data-fouc onclick="selecionaPessoa('PF')">
@@ -287,253 +385,90 @@ include('global_assets/php/conexao.php');
 												<input type="radio" id="inputTipo" name="inputTipo" value="J" class="form-input-styled" data-fouc onclick="selecionaPessoa('PJ')" checked>
 												Pessoa Jurídica
 											</label>
-										</div>										
-									</div>									
+										</div>
+									</div>
 								</div>
 							</div>
-							
 							<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
 							<br>
-							<div class="row">									
-								<div class="col-lg-6">
+							<div id="foto" style="text-align:center;width:260px; height:260px; background:pink; display:flex; flex-direction:column; position:absolute; z-index:1; margin-left:70%">
+								<div id="visualizar">
+									<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Fornecedor" style="border:2px solid #ccc;">
+								</div>
+								<br>
+								<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
+									<input type="file" id="imagem" name="imagem" />
+								</form>
+								<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>
+							</div>
+							<div class="row">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNome">Nome<span class="text-danger">*</span></label>
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Fantasia" required autofocus>
 									</div>
-								</div>	
-								
-								<div class="col-lg-3" id="CPF" style="display:none;">
+								</div>
+
+								<div class="col-lg-3" id="CPF">
 									<div class="form-group">
 										<label for="inputCpf">CPF<span class="text-danger">*</span></label>
 										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" onblur="validaEFormataCpf()">
-									</div>	
+									</div>
 								</div>
-								
+
 								<div class="col-lg-3" id="CNPJ">
-									<div class="form-group">				
+									<div class="form-group">
 										<label for="inputCnpj">CNPJ<span class="text-danger">*</span></label>
-										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" onblur="validaEFormataCnpj()"required>
-									</div>	
-								</div>	
-								
-								<div class="col-lg-3">
-									<div class="form-group">				
+										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" onblur="validaEFormataCnpj()" required>
+									</div>
+								</div>
+
+								<div class="col-lg-2">
+									<div class="form-group">
 										<label for="inputNit">NIT</label>
 										<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT">
-									</div>	
-								</div>
-							</div>
-
-							<div class="row">				
-								<div class="col-lg-12">
-									<div id="dadosPF" style="display:none">										
-										<div class="row">
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputRg">RG</label>
-													<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG">
-												</div>
-											</div>
-
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputEmissor">Emissor</label>
-													<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor">
-												</div>
-											</div>
-
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="cmbUf">UF</label>
-													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
-														<option value="#">Selecione um estado</option>
-														<option value="AC">Acre</option>
-														<option value="AL">Alagoas</option>
-														<option value="AP">Amapá</option>
-														<option value="AM">Amazonas</option>
-														<option value="BA">Bahia</option>
-														<option value="CE">Ceará</option>
-														<option value="DF">Distrito Federal</option>
-														<option value="ES">Espírito Santo</option>
-														<option value="GO">Goiás</option>
-														<option value="MA">Maranhão</option>
-														<option value="MT">Mato Grosso</option>
-														<option value="MS">Mato Grosso do Sul</option>
-														<option value="MG">Minas Gerais</option>
-														<option value="PA">Pará</option>
-														<option value="PB">Paraíba</option>
-														<option value="PR">Paraná</option>
-														<option value="PE">Pernambuco</option>
-														<option value="PI">Piauí</option>
-														<option value="RJ">Rio de Janeiro</option>
-														<option value="RN">Rio Grande do Norte</option>
-														<option value="RS">Rio Grande do Sul</option>
-														<option value="RO">Rondônia</option>
-														<option value="RR">Roraima</option>
-														<option value="SC">Santa Catarina</option>
-														<option value="SP">São Paulo</option>
-														<option value="SE">Sergipe</option>
-														<option value="TO">Tocantins</option>
-														<option value="ES">Estrangeiro</option>
-													</select>
-												</div>
-											</div>
-											
-											<div class="col-lg-3">
-												<div class="form-group">
-													<label for="inputNaturalidade">Naturalidade</label>
-													<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
-												</div>
-											</div>
-
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputNaturalidadeUf">UF de Naturalidade</label>
-													<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
-														<option value="#">Selecione um estado</option>
-														<option value="AC">Acre</option>
-														<option value="AL">Alagoas</option>
-														<option value="AP">Amapá</option>
-														<option value="AM">Amazonas</option>
-														<option value="BA">Bahia</option>
-														<option value="CE">Ceará</option>
-														<option value="DF">Distrito Federal</option>
-														<option value="ES">Espírito Santo</option>
-														<option value="GO">Goiás</option>
-														<option value="MA">Maranhão</option>
-														<option value="MT">Mato Grosso</option>
-														<option value="MS">Mato Grosso do Sul</option>
-														<option value="MG">Minas Gerais</option>
-														<option value="PA">Pará</option>
-														<option value="PB">Paraíba</option>
-														<option value="PR">Paraná</option>
-														<option value="PE">Pernambuco</option>
-														<option value="PI">Piauí</option>
-														<option value="RJ">Rio de Janeiro</option>
-														<option value="RN">Rio Grande do Norte</option>
-														<option value="RS">Rio Grande do Sul</option>
-														<option value="RO">Rondônia</option>
-														<option value="RR">Roraima</option>
-														<option value="SC">Santa Catarina</option>
-														<option value="SP">São Paulo</option>
-														<option value="SE">Sergipe</option>
-														<option value="TO">Tocantins</option>
-														<option value="ES">Estrangeiro</option>
-													</select>
-												</div>
-											</div>	
-										</div>
-
-										<div class="row">
-											<div class="col-lg-3">
-												<div class="form-group">
-													<label for="inputNacionalidade">Nacionalidade</label>
-													<input type="text" id="inputNacionalidade" name="inputNacionalidade" class="form-control" placeholder="Nacionalidade">
-												</div>
-											</div>
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputAno">Ano</label>
-													<div class="lamparinasTooltip"><button type="button" class="btn btn-light" data-popup="tooltip" title="Entrada no Brasil (se estrangeiro)" data-placement="right" id="right"><i class="icon-question4"></i></button></>
-													</div>
-													<!-- <div class="btn btn-primary" style="background-color: #fff; color: #2196f3;" title="Entrada no Brasil (se estrangeiro)" data-placement="right"><i class="icon-question4"></i></div> -->
-													<input type="text" id="inputAno" name="inputAno" class="form-control" placeholder="Ano">
-												</div>
-											</div>
-
-											<div class="col-lg-3">
-												<div class="form-group">
-													<label for="inputCarteiraTrabalho">Carteira de Trabalho</label>
-													<input type="text" id="inputCarteiraTrabalho" name="inputCarteiraTrabalho" class="form-control" placeholder="Carteira de Trabalho">
-												</div>
-											</div>
-
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="cmbSexo">Sexo</label>
-													<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
-														<option value="#">Selecione o sexo</option>
-														<option value="F">Feminino</option>
-														<option value="M">Masculino</option>
-													</select>
-												</div>
-											</div>
-
-											<div class="col-lg-2">
-												<div class="form-group">
-													<label for="inputAniversario">Aniversário</label>
-													<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" onblur="formataCampoDataNascimento()">
-												</div>
-											</div>	
-										</div>
-									</div> <!-- Fim dadosPF -->
-									
-									<div id="dadosPJ">
-										<div class="row">
-											<div class="col-lg-6">
-												<div class="form-group">
-													<label for="inputRazaoSocial">Razão Social</label>
-													<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social">
-												</div>
-											</div>
-
-											<div class="col-lg-3">
-												<div class="form-group">
-													<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
-													<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal">
-												</div>
-											</div>
-
-											<div class="col-lg-3">
-												<div class="form-group">
-													<label for="inputInscricaoEstadual">Inscrição Estadual</label>
-													<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Inscrição Estadual">
-												</div>
-											</div>	
-										</div>	
-									</div> <!-- Fim dadosPJ -->
-								</div>
-
-								<div id="pFfoto" style="display:none"  style="text-align:center;">
-									<div id="visualizar">										
-										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Fornecedor" style="max-height:250px; border:2px solid #ccc;">
 									</div>
-									<br>
-									<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>	
+								</div>
+
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="inputRazaoSocial">Razão Social</label>
+										<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social">
+									</div>
 								</div>
 							</div>
-							
 							<div class="row">
-								<div class="col-lg-4">
+
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputCategoriaCredor">Categoria do Credor</label>
 										<input type="text" id="inputCategoriaCredor" name="inputCategoriaCredor" class="form-control" placeholder="Categoria do Credor">
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
 										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2" required>
 											<option value="">Selecione uma categoria</option>
-											<?php 
-												$sql = "SELECT CategId, CategNome
+											<?php
+											$sql = "SELECT CategId, CategNome
 														FROM Categoria															     
-														WHERE CategEmpresa = ".$_SESSION['EmpreId']." and CategStatus = 1
+														WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and CategStatus = 1
 														ORDER BY CategNome ASC";
-												$result = $conn->query($sql);
-												$row = $result->fetchAll(PDO::FETCH_ASSOC);
-												
-												foreach ($row as $item){															
-													print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
-												}
-											
+											$result = $conn->query($sql);
+											$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+											foreach ($row as $item) {
+												print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
+											}
+
 											?>
 										</select>
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<div class="form-group" style="border-bottom:1px solid #ddd;">
 										<label for="cmbSubCategoria">SubCategoria</label>
 										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
@@ -541,11 +476,164 @@ include('global_assets/php/conexao.php');
 										</select>
 									</div>
 								</div>
+
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
+										<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal">
+									</div>
+								</div>
+
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputInscricaoEstadual">Inscrição Estadual</label>
+										<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Inscrição Estadual">
+									</div>
+								</div>
+
 							</div>
-							<br>
-							
+
 							<div class="row">
-								<div class="col-lg-12">									
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputRg">RG</label>
+										<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG">
+									</div>
+								</div>
+
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputEmissor">Emissor</label>
+										<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor">
+									</div>
+								</div>
+
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="cmbUf">UF</label>
+										<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
+											<option value="#">Selecione um estado</option>
+											<option value="AC">Acre</option>
+											<option value="AL">Alagoas</option>
+											<option value="AP">Amapá</option>
+											<option value="AM">Amazonas</option>
+											<option value="BA">Bahia</option>
+											<option value="CE">Ceará</option>
+											<option value="DF">Distrito Federal</option>
+											<option value="ES">Espírito Santo</option>
+											<option value="GO">Goiás</option>
+											<option value="MA">Maranhão</option>
+											<option value="MT">Mato Grosso</option>
+											<option value="MS">Mato Grosso do Sul</option>
+											<option value="MG">Minas Gerais</option>
+											<option value="PA">Pará</option>
+											<option value="PB">Paraíba</option>
+											<option value="PR">Paraná</option>
+											<option value="PE">Pernambuco</option>
+											<option value="PI">Piauí</option>
+											<option value="RJ">Rio de Janeiro</option>
+											<option value="RN">Rio Grande do Norte</option>
+											<option value="RS">Rio Grande do Sul</option>
+											<option value="RO">Rondônia</option>
+											<option value="RR">Roraima</option>
+											<option value="SC">Santa Catarina</option>
+											<option value="SP">São Paulo</option>
+											<option value="SE">Sergipe</option>
+											<option value="TO">Tocantins</option>
+											<option value="ES">Estrangeiro</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputNaturalidade">Naturalidade</label>
+										<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+									</div>
+
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="inputNaturalidadeUf">UF da Naturalidade</label>
+										<select id="inputNaturalidadeUf" name="inputNaturalidadeUf" class="form-control form-control-select2">
+											<option value="#">Selecione um estado</option>
+											<option value="AC">Acre</option>
+											<option value="AL">Alagoas</option>
+											<option value="AP">Amapá</option>
+											<option value="AM">Amazonas</option>
+											<option value="BA">Bahia</option>
+											<option value="CE">Ceará</option>
+											<option value="DF">Distrito Federal</option>
+											<option value="ES">Espírito Santo</option>
+											<option value="GO">Goiás</option>
+											<option value="MA">Maranhão</option>
+											<option value="MT">Mato Grosso</option>
+											<option value="MS">Mato Grosso do Sul</option>
+											<option value="MG">Minas Gerais</option>
+											<option value="PA">Pará</option>
+											<option value="PB">Paraíba</option>
+											<option value="PR">Paraná</option>
+											<option value="PE">Pernambuco</option>
+											<option value="PI">Piauí</option>
+											<option value="RJ">Rio de Janeiro</option>
+											<option value="RN">Rio Grande do Norte</option>
+											<option value="RS">Rio Grande do Sul</option>
+											<option value="RO">Rondônia</option>
+											<option value="RR">Roraima</option>
+											<option value="SC">Santa Catarina</option>
+											<option value="SP">São Paulo</option>
+											<option value="SE">Sergipe</option>
+											<option value="TO">Tocantins</option>
+											<option value="ES">Estrangeiro</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="inputNacionalidade">Nacionalidade</label>
+										<input type="text" id="inputNacionalidade" name="inputNacionalidade" class="form-control" placeholder="Nacionalidade">
+									</div>
+								</div>
+								<div class="col-lg-2">
+									<div class="form-group">
+										<label for="inputAno">Ano &nbsp<i style="color:#375b82;" class="icon-question4" data-popup="tooltip" data-original-title="Entrada no Brasil (se estrangeiro)" data-placement="right"></i></label>
+										<input type="text" id="inputAno" name="inputAno" class="form-control" placeholder="Ano">
+									</div>
+								</div>
+							</div>
+							<div class="row">
+
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="inputCarteiraTrabalho">Carteira de Trabalho</label>
+										<input type="text" id="inputCarteiraTrabalho" name="inputCarteiraTrabalho" class="form-control" placeholder="Carteira de Trabalho">
+									</div>
+								</div>
+
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="cmbSexo">Sexo</label>
+										<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
+											<option value="#">Selecione o sexo</option>
+											<option value="F">Feminino</option>
+											<option value="M">Masculino</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="inputAniversario">Aniversário</label>
+										<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" onblur="formataCampoDataNascimento()">
+									</div>
+								</div>
+
+							</div>
+							<div class="row">
+								<div class="col-lg-12">
 									<h5 class="mb-0 font-weight-semibold">Endereço</h5>
 									<br>
 									<div class="row">
@@ -555,7 +643,7 @@ include('global_assets/php/conexao.php');
 												<input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP" maxLength="8">
 											</div>
 										</div>
-										
+
 										<div class="col-lg-5">
 											<div class="form-group">
 												<label for="inputEndereco">Endereço</label>
@@ -577,7 +665,7 @@ include('global_assets/php/conexao.php');
 											</div>
 										</div>
 									</div>
-									
+
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
@@ -630,15 +718,16 @@ include('global_assets/php/conexao.php');
 											</div>
 										</div>
 									</div>
+
+
 								</div>
 							</div>
 							<br>
-							
 							<div class="row">
-								<div class="col-lg-12">									
+								<div class="col-lg-12">
 									<h5 class="mb-0 font-weight-semibold">Contato</h5>
 									<br>
-									<div class="row">								
+									<div class="row">
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputNomeContato">Nome</label>
@@ -659,29 +748,29 @@ include('global_assets/php/conexao.php');
 												<input type="tel" id="inputTelefoneComercial" name="inputTelefoneComercial" class="form-control" placeholder="Telefone Comercial" data-mask="(99) 9999-9999">
 											</div>
 										</div>
-										
+
 										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputCelular">Celular</label>
 												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
 											</div>
 										</div>
-										
+
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputEmail">E-mail</label>
 												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail">
 											</div>
 										</div>
-										
+
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputSite">Site</label>
 												<input type="url" id="inputSite" name="inputSite" class="form-control" placeholder="URL">
 											</div>
-										</div>										
+										</div>
 									</div>
-									
+
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group">
@@ -689,122 +778,21 @@ include('global_assets/php/conexao.php');
 												<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" placeholder="Observação"></textarea>
 											</div>
 										</div>
-									</div>										
-								</div>
-							</div>
-							<br>
-							
-							<div class="row">
-								<div class="col-lg-12">									
-									<h5 class="mb-0 font-weight-semibold">Dados Bancários</h5>
-									<br>
-									<div class="row">
-										<div class="col-lg-5">
-											<label for="cmbBanco">Banco</label>
-											<select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2">
-												<option value="#">Selecione um banco</option>
-												<?php 
-													$sql = "SELECT BancoId, BancoCodigo, BancoNome
-															FROM Banco
-															JOIN Situacao on SituaId = BancoStatus
-															WHERE SituaChave = 'ATIVO'
-															ORDER BY BancoCodigo ASC";
-													$result = $conn->query($sql);
-													$row = $result->fetchAll(PDO::FETCH_ASSOC);
-													
-													foreach ($row as $item){
-														print('<option value="'.$item['BancoId'].'">'.$item['BancoCodigo'] . " - " . $item['BancoNome'].'</option>');
-													}
-												
-												?>
-											</select>
-										</div>
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputAgencia">Agência</label>
-												<input type="text" id="inputAgencia" name="inputAgencia" class="form-control" placeholder="Agência + dígito">												
-											</div>
-										</div>
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputConta">Conta</label>
-												<input type="text" id="inputConta" name="inputConta" class="form-control" placeholder="Conta + dígito">
-											</div>
-										</div>
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputInfoAdicional">Informação Adicional</label>
-												<input type="text" id="inputInfoAdicional" name="inputInfoAdicional" class="form-control">
-											</div>
-										</div>
 									</div>
 								</div>
 							</div>
 							<br>
-							
-							<div class="row">
-								<div class="col-lg-12">									
-									<h5 class="mb-0 font-weight-semibold">Tributos</h5>
-									<br>
-									<div class="row">
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="cmbBanco">IPI (%)</label>
-												<input type="text" id="inputIpi" name="inputIpi" class="form-control" placeholder="IPI (%)" onKeyUp="moeda(this)" maxLength="6">
-											</div>
-										</div>
-										
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputFrete">Frete (%)</label>
-												<input type="text" id="inputFrete" name="inputFrete" class="form-control" placeholder="Frete (%)" onKeyUp="moeda(this)" maxLength="6">
-											</div>
-										</div>
-										
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputIcms">ICMS (%)</label>
-												<input type="text" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)" onKeyUp="moeda(this)" maxLength="6">
-											</div>
-										</div>
-
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label for="inputOutros">Outros (%)</label>
-												<input type="text" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)" onKeyUp="moeda(this)" maxLength="6">
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="row" style="margin-top: 40px;">
-								<div class="col-lg-12">								
-									<div class="form-group">
-										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
-										<a href="fornecedor.php" class="btn btn-basic" role="button">Cancelar</a>
-									</div>
-								</div>
-							</div>
-													
-
-						</div>
-						<!-- /card-body -->
+						</div><!-- /card-body -->
 					</form>
 
-					<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
-						<input type="file" id="imagem" name="imagem" style="display:none;"/>
-					</form>	
-					
+
+
 				</div>
 				<!-- /info blocks -->
 
 			</div>
-			<!-- /content area -->			
-			
+			<!-- /content area -->
+
 			<?php include_once("footer.php"); ?>
 
 		</div>
@@ -814,4 +802,5 @@ include('global_assets/php/conexao.php');
 	<!-- /page content -->
 
 </body>
+
 </html>
