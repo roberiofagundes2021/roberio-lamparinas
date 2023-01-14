@@ -21,7 +21,6 @@ $_SESSION['gastosAdicionaisProdutos'] = [];
 	<?php include_once("head.php"); ?>
 	
 	<link href="global_assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
-	<link href="global_assets/css/lamparinas/layout.min.css" rel="stylesheet" type="text/css">
 	<link href="global_assets/css/lamparinas/components.min.css" rel="stylesheet" type="text/css">
 
 	<script src="global_assets/js/main/bootstrap.bundle.min.js"></script>

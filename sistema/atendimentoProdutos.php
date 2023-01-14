@@ -224,57 +224,18 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 
 				window.opener.$('#nomeMedicamentoEstoqueMedicamentos').val(item.descricao);
 				window.opener.document.getElementById('medicamentoEstoqueMedicamentos').value = item.id;
-
-				//unidade
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimentoObservacaoHospitalar.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'UNIDADEMEDIDA'
-					},
-					success: function(response) {
-						window.opener.$('#selUnidadeMedicamentos').empty();
-						window.opener.$('#selUnidadeMedicamentos').append(`<option value=''>Selecione</option>`)
-						response.forEach(itemn => {
-							let opt = '<option value="' + itemn.id + '" ' + (item.unidade == itemn.nome ? "selected" : "")  + '>' + itemn.nome + '</option>'
-							window.opener.$('#selUnidadeMedicamentos').append(opt)
-							fecharJanela()
-						})
-					}
-				});
+				fecharJanela()
 
 			<?php } elseif ($_SESSION['tipoPesquisa'] == 'SOLUCAO') { ?>
 
 				window.opener.$('#nomeMedicamentoEstoqueSolucoes').val(item.descricao);
 				window.opener.document.getElementById('medicamentoEstoqueSolucoes').value = item.id;
-
-				//unidade
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimentoObservacaoHospitalar.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'UNIDADEMEDIDA'
-					},
-					success: function(response) {
-	
-						window.opener.$('#selUnidadeSolucoes').empty();
-						window.opener.$('#selUnidadeSolucoes').append(`<option value=''>Selecione</option>`)
-						response.forEach(itemn => {
-
-							let opt = '<option value="' + itemn.id + '" ' + (item.unidade == itemn.nome ? "selected" : "")  + '>' + itemn.nome + '</option>'
-							window.opener.$('#selUnidadeSolucoes').append(opt)
-							fecharJanela()
-						})
-					}
-				});
+				fecharJanela()
 
 			<?php } elseif ($_SESSION['tipoPesquisa'] == 'SOLUCAODILUENTE') { ?>
 
 				window.opener.$('#nomeDiluenteSolucoes').val(item.descricao);
 				window.opener.document.getElementById('diluenteSolucoes').value = item.id;
-
 				fecharJanela()
 
 			<?php }

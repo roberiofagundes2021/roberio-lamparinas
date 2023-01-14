@@ -98,7 +98,6 @@ if ($row['ClienSexo'] == 'F'){
 	<?php include_once("head.php"); ?>
 	
 	<link href="global_assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
-	<link href="global_assets/css/lamparinas/layout.min.css" rel="stylesheet" type="text/css">
 	<link href="global_assets/css/lamparinas/components.min.css" rel="stylesheet" type="text/css">
 
 	<script src="global_assets/js/main/bootstrap.bundle.min.js"></script>
@@ -411,7 +410,6 @@ if ($row['ClienSexo'] == 'F'){
 					case selUnidadeMedicamentos: msg = 'Informe a unidade do medicamento!';$('#selUnidadeMedicamentos').focus();break
 					case frequenciaMedicamentos: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaMedicamentos').focus();break
 					case selTipoAprazamentoMedicamentos: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoMedicamentos').focus();break
-					case dataInicioMedicamentos: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioMedicamentos').focus();break
 					case descricaoPosologiaMedicamentos: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaMedicamentos').focus();break
 				}
 
@@ -505,7 +503,6 @@ if ($row['ClienSexo'] == 'F'){
 					case selUnidadeSolucoes: msg = 'Informe a unidade do medicamento!';$('#selUnidadeSolucoes').focus();break
 					case frequenciaSolucoes: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaSolucoes').focus();break
 					case selTipoAprazamentoSolucoes: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoSolucoes').focus();break
-					case dataInicioSolucoes: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioSolucoes').focus();break
 					case descricaoPosologiaSolucoes: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaSolucoes').focus();break
 				}
 
@@ -765,7 +762,6 @@ if ($row['ClienSexo'] == 'F'){
 					case selUnidadeMedicamentos: msg = 'Informe a unidade do medicamento!';$('#selUnidadeMedicamentos').focus();break
 					case frequenciaMedicamentos: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaMedicamentos').focus();break
 					case selTipoAprazamentoMedicamentos: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoMedicamentos').focus();break
-					case dataInicioMedicamentos: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioMedicamentos').focus();break
 					case descricaoPosologiaMedicamentos: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaMedicamentos').focus();break
 				}
 
@@ -863,7 +859,6 @@ if ($row['ClienSexo'] == 'F'){
 					case selUnidadeSolucoes: msg = 'Informe a unidade do medicamento!';$('#selUnidadeSolucoes').focus();break
 					case frequenciaSolucoes: msg = 'Informe a frequência de administração do medicamento!';$('#frequenciaSolucoes').focus();break
 					case selTipoAprazamentoSolucoes: msg = 'Informe o tipo de aprazamento do medicamento!';$('#selTipoAprazamentoSolucoes').focus();break
-					case dataInicioSolucoes: msg = 'Informe a data de início da administração do medicamento';$('#dataInicioSolucoes').focus();break
 					case descricaoPosologiaSolucoes: msg = 'Informe a posologia da administração do medicamento!';$('#descricaoPosologiaSolucoes').focus();break
 				}
 
@@ -1107,6 +1102,34 @@ if ($row['ClienSexo'] == 'F'){
 					$('#complementoCuidados').attr("disabled", true);
 				}
 			});
+
+			$('#selTipoDeDieta').on('change', function(e){
+				
+				let selTipoDeDieta = $('#selTipoDeDieta').val()
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimentoObservacaoHospitalar.php',
+					dataType: 'json',
+					data:{
+						'tipoRequest': 'FILTRAVIADIETA',
+						'tipoDieta' : selTipoDeDieta
+					},
+					success: function(response) {
+
+						if (response.length !== 0) {
+							$('#selViaDieta').empty();
+							$('#selViaDieta').append(`<option value=''>Selecione</option>`)
+							response.forEach(item => {
+
+								let opt = `<option value="${item.id}">${item.nome}</option>`
+								$('#selViaDieta').append(opt)
+							})			
+						}				
+					}
+				});
+
+			})
 
 		}); //document.ready
 
@@ -1537,7 +1560,6 @@ if ($row['ClienSexo'] == 'F'){
 
 			let nomeMedicamento = $('#nomeMedicamentoEstoqueMedicamentos').val()
 			let medicamentoDl = $('#medicamentoDlMedicamentos').val()			
-			let viaMed = $('#selViaMedicamentos option:selected').text()			
 			let doseMed = $('#doseMedicamentos').val()
 			let unidadeMed = $('#selUnidadeMedicamentos option:selected').text()
 			let frequenciaMed = $('#frequenciaMedicamentos').val()
@@ -1553,7 +1575,6 @@ if ($row['ClienSexo'] == 'F'){
 
 				(nomeMedicamento != '' ? nomeMedicamento : '') + 
 				(medicamentoDl != '' ? ' - ' + medicamentoDl : '') + 
-				(viaMed != 'Selecione' ? ' - ' + viaMed : '') + 
 				(doseMed != '' ? ' - ' + doseMed : '') + 
 				(unidadeMed != 'Selecione' ? ' - ' + unidadeMed : '') +
 				(frequenciaMed != '' ? ' - ' + frequenciaMed : '') +
@@ -1570,7 +1591,6 @@ if ($row['ClienSexo'] == 'F'){
 
 			let nomeSolucao = $('#nomeMedicamentoEstoqueSolucoes').val()
 			let solucaoDl = $('#medicamentoDlSolucoes').val()			
-			let viaSol = $('#selViaSolucoes option:selected').text()			
 			let doseSol = $('#doseSolucoes').val()
 			let unidadeSol = $('#selUnidadeSolucoes option:selected').text()
 			let frequenciaSol = $('#frequenciaSolucoes').val()
@@ -1591,7 +1611,6 @@ if ($row['ClienSexo'] == 'F'){
 
 				(nomeSolucao != '' ? nomeSolucao : '') + 
 				(solucaoDl != '' ? ' - ' + solucaoDl : '') + 
-				(viaSol != 'Selecione' ? ' - ' + viaSol : '') + 
 				(doseSol != '' ? ' - ' + doseSol : '') + 
 				(unidadeSol != 'Selecione' ? ' - ' + unidadeSol : '') +
 				(frequenciaSol != '' ? ' - ' + frequenciaSol : '') +
@@ -1612,7 +1631,6 @@ if ($row['ClienSexo'] == 'F'){
 		function setDescricaoDieta() {
 
 			let tipoDieta = $('#selTipoDeDieta option:selected').text();
-			let viaDieta = $('#selViaDieta option:selected').text();
 			let frequenciaDieta = $('#freqDieta').val();
 			let aprazamentoDieta = $('#selTipoAprazamentoDieta option:selected').text();		
 			let bombaInfusaoDieta = '';
@@ -1622,8 +1640,7 @@ if ($row['ClienSexo'] == 'F'){
 			}
 
 			$('#descricaoDieta').val(
-				(tipoDieta != 'Selecione' ? tipoDieta : '') + 
-				(viaDieta != 'Selecione' ? ' - ' + viaDieta : '') + 
+				(tipoDieta != 'Selecione' ? tipoDieta : '') +  
 				(frequenciaDieta != '' ? ' - ' + frequenciaDieta : '') + 
 				(aprazamentoDieta != 'Selecione' ?  ' - ' + aprazamentoDieta : '') +
 				(bombaInfusaoDieta != '' ? ' - ' + bombaInfusaoDieta : '')

@@ -37,7 +37,7 @@ $result = $conn->query($sql);
 $rowExameFisico= $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoExameFisicoId = $rowExameFisico?$rowExameFisico['EnExFId']:null;
-
+//$iAtendimentoExameFisicoId = null;
 // essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
 
 $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
@@ -316,265 +316,264 @@ if (isset($_POST['inputInicio'])) {
             
         }
 
-
         if ($iAtendimentoExameFisicoId) {
 
             $sql = "UPDATE EnfermagemExameFisico SET 
-                EnExFAtendimento = :sAtendimento
-                EnExFDataInicio = :sDataInicio
-                EnExFHoraInicio = :sHoraInicio
-                EnExFDataFim = :sDataFim
-                EnExFHoraFim = :sHoraFim
-                EnExFProfissional = :sProfissional
-                EnExFTPas = :sTPas
-                EnExFPad = :sPad
-                EnExFFreqCardiaca = :sFreqCardiaca
-                EnExFFreqRespiratoria = :sFreqRespiratoria
-                EnExFTemperatura = :sTemperatura
-                EnExFSPO = :sSPO
-                EnExFHGT = :sHGT
-                EnExPeso = :sPeso
-                EnExFAlergia = :sAlergia
-                EnExFAlergiaDescricao = :sAlergiaDescricao
-                EnExFDiabetes = :sDiabetes
-                EnExFDiabetesDescricao = :sDiabetesDescricao
-                EnExFHipertensao = :sHipertensao
-                EnExFHipertensaoDescricao = :sHipertensaoDescricao
-                EnExFNeoplasia = :sNeoplasia
-                EnExFNeoplasiaDescricao = :sNeoplasiaDescricao
-                EnExFUsoMedicamento = :sUsoMedicamento
-                EnExFUsoMedicamentoDescricao = :sUsoMedicamentoDescricao
-                EnExFOcular = :sOcular
-                EnExFVerbal = :sVerbal
-                EnExFMotora = :sMotora
-                EnExFScore = :sScore
-                EnExFPupilaIsocorica = :sPupilaIsocorica
-                EnExFPupilaAnisocorica = :sPupilaAnisocorica
-                EnExFPupilaMidriase = :	sPupilaMidriase
-                EnExFPupilaMiose = :sPupilaMiose
-                EnExFPupilaFotorreagente = :sPupilaFotorreagente
-                EnExFPupilaParalitica = :sPupilaParalitica
-                EnExFNivelConscienciaLucido = :sNivelConscienciaLucido
-                EnExFNivelConscienciaOrientado = :sNivelConscienciaOrientado
-                EnExFNivelConscienciaDesorientado = :sNivelConscienciaDesorientado
-                EnExFNivelConscienciaSonolento = :sNivelConscienciaSonolento
-                EnExFNivelConscienciaAgitado = :sNivelConscienciaAgitado
-                EnExFNivelConscienciaAtivo = :sNivelConscienciaAtivo
-                EnExFNivelConscienciaHipoativo = :sNivelConscienciaHipoativo
-                EnExFNivelConscienciaInconsciente = :sNivelConscienciaInconsciente
-                EnExFRegulacaoTermicaNormoTermico = :sRegulacaoTermicaNormoTermico
-                EnExFRegulacaoTermicaHipoTermico = :sRegulacaoTermicaHipoTermico
-                EnExFRegulacaoTermicaFebre = :sRegulacaoTermicaFebre
-                EnExFRegulacaoTermicaPirexia = :sRegulacaoTermicaPirexia
-                EnExFRegulacaoTermicaSudorese = :sRegulacaoTermicaSudorese
-                EnExFOlfato = :sOlfato
-                EnExFOlfatoAlteracao = :sOlfatoAlteracao
-                EnExFAcuidadeVisual = :sAcuidadeVisual
-                EnExFAcuidadeVisualAlteracao = :sAcuidadeVisualAlteracao
-                EnExFAudicao = :sAudicao
-                EnExFAudicaoAlteracao = :sAudicaoAlteracao
-                EnExFTato = :sTato
-                EnExFTatoAlteracao = :sTatoAlteracao
-                EnExFPaladar = :sPaladar
-                EnExFPaladarAlteracao = :sPaladarAlteracao
-                EnExFDorAguda = :sDorAguda
-                EnExFDorAgudaLocal = :sDorAgudaLocal
-                EnExFPeleAspectoIntegra = :sPeleAspectoIntegra
-                EnExFPeleAspectoCicatriz = :sPeleAspectoCicatriz
-                EnExFPeleAspectoIncisao = :sPeleAspectoIncisao
-                EnExFPeleAspectoEscoriacao = :sPeleAspectoEscoriacao
-                EnExFPeleAspectoDescamacao = :sPeleAspectoDescamacao
-                EnExFPeleAspectoErupcao = :sPeleAspectoErupcao
-                EnExFPeleAspectoUmida = :sPeleAspectoUmida
-                EnExFPeleAspectoAspera = :sPeleAspectoAspera
-                EnExFPeleAspectoEspessa = :sPeleAspectoEspessa
-                EnExFPeleAspectoFina = :sPeleAspectoFina
-                EnExFPeleAspectoFeridaOperatoria = :sPeleAspectoFeridaOperatoria
-                EnExFPeleAspectoUlceraDecubito = :sPeleAspectoUlceraDecubito
-                EnExFPeleTurgorSemAlteracao = :sPeleTurgorSemAlteracao
-                EnExFPeleTurgorDiminuida = :sPeleTurgorDiminuida
-                EnExFPeleTurgorAumentada = :sPeleTurgorAumentada
-                EnExFPeleTurgorHidratada = :sPeleTurgorHidratada
-                EnExFPeleTurgorDesidratada = :sPeleTurgorDesidratada
-                EnExFPeleCorPalidez = :sPeleCorPalidez
-                EnExFPeleCorCianose = :sPeleCorCianose
-                EnExFPeleCorIctericia = :sPeleCorIctericia
-                EnExFPeleCorSemAlteracao = :sPeleCorSemAlteracao
-                EnExFPeleEdema = :sPeleEdema
-                EnExFPeleHematoma = :sPeleHematoma
-                EnExFPeleHigiene = :sPeleHigiene
-                EnExFPeleOutroDreno = :sPeleOutroDreno
-                EnExFPeleOutroSecrecao = :sPeleOutroSecrecao
-                EnExFCoroCabeludoIntegro = :sCoroCabeludoIntegro
-                EnExFCoroCabeludoComLesao = :sCoroCabeludoComLesao
-                EnExFCoroCabeludoCeborreia = :sCoroCabeludoCeborreia
-                EnExFCoroCabeludoPediculose = :sCoroCabeludoPediculose
-                EnExFCoroCabeludoCicatriz = :sCoroCabeludoCicatriz
-                EnExFCoroCabeludoLimpo = :sCoroCabeludoLimpo
-                EnExFMucosaOcularNormocromica = :sMucosaOcularNormocromica
-                EnExFMucosaOcularHipocromica = :sMucosaOcularHipocromica
-                EnExFMucosaOcularHipercromica = :sMucosaOcularHipercromica
-                EnExFAuricularNasalSemAlteracao = :sAuricularNasalSemAlteracao
-                EnExFAuricularNasalOtorragia = :sAuricularNasalOtorragia
-                EnExFAuricularNasalRinorragia = :sAuricularNasalRinorragia
-                EnExFAuricularNasalSecrecao = :sAuricularNasalSecrecao
-                EnExFCavidadeOralSemAlteracao = :sCavidadeOralSemAlteracao
-                EnExFCavidadeOralComLesao = :sCavidadeOralComLesao
-                EnExFCavidadeOralOutro = :sCavidadeOralOutro
-                EnExFCavidadeOralOutroDescricao = :sCavidadeOralOutroDescricao
-                EnExFPescocoSemAlteracao = :sPescocoSemAlteracao
-                EnExFPescocoLinfonodoInfartado = :sPescocoLinfonodoInfartado
-                EnExFPescocoOutro = :sPescocoOutro
-                EnExFPescocoOutroDescricao = :sPescocoOutroDescricao
-                EnExFToraxSemAlteracao = :sToraxSemAlteracao
-                EnExFToraxSimetrico = :sToraxSimetrico
-                EnExFToraxAssimetrico = :sToraxAssimetrico
-                EnExFToraxDrreno = :sToraxDrreno
-                EnExFToraxUsaMarcapasso = :sToraxUsaMarcapasso
-                EnExFToraxOutro = :sToraxOutro
-                EnExFToraxOutroDescricao = :sToraxOutroDescricao
-                EnExFRespiracaoEupneico = :sRespiracaoEupneico
-                EnExFRespiracaoDispneico = :sRespiracaoDispneico
-                EnExFRespiracaoBradipneico = :sRespiracaoBradipneico
-                EnExFRespiracaoTaquipneico = :sRespiracaoTaquipneico
-                EnExFRespiracaoApneia = :sRespiracaoApneia
-                EnExFRespiracaoTiragemIntercostal = :sRespiracaoTiragemIntercostal
-                EnExFRespiracaoRetracaoFurcula = :sRespiracaoRetracaoFurcula
-                EnExFRespiracaoAletasNasais = :sRespiracaoAletasNasais
-                EnExFAuscutaPulmonarNvfds = :sAuscutaPulmonarNvfds
-                EnExFAuscutaPulmonarSibilo = :sAuscutaPulmonarSibilo
-                EnExFAuscutaPulmonarCrepto = :sAuscutaPulmonarCrepto
-                EnExFAuscutaPulmonarRonco = :sAuscutaPulmonarRonco
-                EnExFAuscutaPulmonarOutro = :sAuscutaPulmonarOutro
-                EnExFAuscutaPulmonarOutroDescricao = :sAuscutaPulmonarOutroDescricao
-                EnExFBatimentoCardiacoBcnf = :sBatimentoCardiacoBcnf
-                EnExFBatimentoCardiacoNormocardico = :sBatimentoCardiacoNormocardico
-                EnExFBatimentoCardiacoTaquicardico = :sBatimentoCardiacoTaquicardico
-                EnExFBatimentoCardiacoBradicardico = :sBatimentoCardiacoBradicardico
-                EnExFBatimentoCardiacoOutro = :sBatimentoCardiacoOutro
-                EnExFBatimentoCardiacoOutroDescricao = :sBatimentoCardiacoOutroDescricao
-                EnExFPulsoRegular = :sPulsoRegular
-                EnExFPulsoIrregular = :sPulsoIrregular
-                EnExFPulsoFiliforme = :sPulsoFiliforme
-                EnExFPulsoNaoPalpavel = :sPulsoNaoPalpavel
-                EnExFPulsoCheio = :sPulsoCheio
-                EnExFPressaoArterialNormotenso = :sPressaoArterialNormotenso
-                EnExFPressaoArterialHipertenso = :sPressaoArterialHipertenso
-                EnExFPressaoArterialHipotenso = :sPressaoArterialHipotenso
-                EnExFPressaoArterialInaldivel = :sPressaoArterialInaldivel
-                EnExFRedeVenosaPeriferica = :sRedeVenosaPeriferica
-                EnExFPerfusaoPeriferica = :sPerfusaoPeriferica
-                EnExFAcessoCentral = :sAcessoCentral
-                EnExFAcessoAvp = :sAcessoAvp
-                EnExFAcessoDisseccao = :sAcessoDisseccao
-                EnExFAcessoOutro = :sAcessoOutro
-                EnExFAcessoOutroDescricao = :sAcessoOutroDescricao
-                EnExFAbdomenPlano = :sAbdomenPlano
-                EnExFAbdomenGloboso = :sAbdomenGloboso
-                EnExFAbdomenDistendido = :sAbdomenDistendido
-                EnExFAbdomenPlacido = :sAbdomenPlacido
-                EnExFAbdomenEndurecido = :sAbdomenEndurecido
-                EnExFAbdomenTimpanico = :sAbdomenTimpanico
-                EnExFAbdomenIndolor = :sAbdomenIndolor
-                EnExFAbdomenDoloroso = :sAbdomenDoloroso
-                EnExFAbdomenAscitico = :sAbdomenAscitico
-                EnExFAbdomenGravidico = :sAbdomenGravidico
-                EnExFGenitaliaIntegra = :sGenitaliaIntegra
-                EnExFGenitaliaComLesao = :sGenitaliaComLesao
-                EnExFGenitaliaSangramento = :sGenitaliaSangramento
-                EnExFGenitaliaSecrecao = :sGenitaliaSecrecao
-                EnExFMembroSuperiorPreservado = :sMembroSuperiorPreservado
-                EnExFMembroSuperiorComLesao = :sMembroSuperiorComLesao
-                EnExFMembroSuperiorParesia = :sMembroSuperiorParesia
-                EnExFMembroSuperiorPlegia = :sMembroSuperiorPlegia
-                EnExFMembroSuperiorParestesia = :sMembroSuperiorParestesia
-                EnExFMembroSuperiorMovIncoordenado = :sMembroSuperiorMovIncoordenado
-                EnExFMembroInferiorPreservado = :sMembroInferiorPreservado
-                EnExFMembroInferiorComLesao = :sMembroInferiorComLesao
-                EnExFMembroInferiorParesia = :sMembroInferiorParesia
-                EnExFMembroInferiorPlegia = :sMembroInferiorPlegia
-                EnExFMembroInferiorParestesia = :sMembroInferiorParestesia
-                EnExFMembroInferiorMovIncoordenado = :sMembroInferiorMovIncoordenado
-                EnExFIntestinalNormal = :sIntestinalNormal
-                EnExFIntestinalConstipacao = :sIntestinalConstipacao
-                EnExFIntestinalFrequencia = :sIntestinalFrequencia
-                EnExFIntestinalDiarreia = :sIntestinalDiarreia
-                EnExFIntestinalMelena = :sIntestinalMelena
-                EnExFIntestinalOutro = :sIntestinalOutro
-                EnExFIntestinalFrequenciaDescricao = :sIntestinalFrequenciaDescricao
-                EnExFIntestinalOutroDescricao = :sIntestinalOutroDescricao
-                EnExFEmeseNao = :sEmeseNao
-                EnExFEmeseSim = :sEmeseSim
-                EnExFEmeseHematemese = :sEmeseHematemese
-                EnExFEmeseFrequencia = :sEmeseFrequencia
-                EnExFEmeseFrequenciaDescricao = :sEmeseFrequenciaDescricao
-                EnExFUrinariaEspontanea = :sUrinariaEspontanea
-                EnExFUrinariaPoliuria = :sUrinariaPoliuria
-                EnExFUrinariaRetencao = :sUrinariaRetencao
-                EnExFUrinariaIncontinencia = :sUrinariaIncontinencia
-                EnExFUrinariaDisuria = :sUrinariaDisuria
-                EnExFUrinariaOliguria = :sUrinariaOliguria
-                EnExFUrinariaSvd = :sUrinariaSvd
-                EnExFUrinariaSva = :sUrinariaSva
-                EnExFUrinariaOutro = :sUrinariaOutro
-                EnExFUrinariaOutroDescricao = :sUrinariaOutroDescricao
-                EnExFAspectoUrinaClara = :sAspectoUrinaClara
-                EnExFAspectoUrinaAmbar = :sAspectoUrinaAmbar
-                EnExFAspectoUrinaHematuria = :sAspectoUrinaHematuria
-                EnExFNutricaoLactario = :sNutricaoLactario
-                EnExFNutricaoOral = :sNutricaoOral
-                EnExFNutricaoParental = :sNutricaoParental
-                EnExFNutricaoSng = :sNutricaoSng
-                EnExFNutricaoSne = :sNutricaoSne
-                EnExFNutricaoGgt = :sNutricaoGgt
-                EnExFDegluticaoSemAlteracao = :sDegluticaoSemAlteracao
-                EnExFDegluticaoComDificuldade = :sDegluticaoComDificuldade
-                EnExFDegluticaoNaoConsDeglutir = :sDegluticaoNaoConsDeglutir
-                EnExFSuccaoSemAlteracao = :sSuccaoSemAlteracao
-                EnExFSuccaoComDificuldade = :sSuccaoComDificuldade
-                EnExFSuccaoNaoConsegueSugar = :sSuccaoNaoConsegueSugar
-                EnExFApetitePreservado = :sApetitePreservado
-                EnExFApetiteAumentado = :sApetiteAumentado
-                EnExFApetiteDiminuido = :sApetiteDiminuido
-                EnExFApetitePrejudicado = :sApetitePrejudicado
-                EnExFDenticaoTotal = :sDenticaoTotal
-                EnExFDenticaoParcial = :sDenticaoParcial
-                EnExFDenticaoAusente = :sDenticaoAusente
-                EnExFDenticaoSuperior = :sDenticaoSuperior
-                EnExFDenticaoInferior = :sDenticaoInferior
-                EnExFDenticaoProtese = :sDenticaoProtese
-                EnExFSonoRepousoPreservado = :sSonoRepousoPreservado
-                EnExFSonoRepousoDifAdormecer = :sSonoRepousoDifAdormecer
-                EnExFSonoRepousoInsonia = :sSonoRepousoInsonia
-                EnExFSonoRepousoUsoMedicacao = :sSonoRepousoUsoMedicacao
-                EnExFSonoRepousoCansacoAcordar = :sSonoRepousoCansacoAcordar
-                EnExFHigieneCorporal = :sHigieneCorporal
-                EnExFHigieneBucal = :sHigieneBucal
-                EnExFRegulacaoAlergia = :sRegulacaoAlergia
-                EnExFRegulacaoAlergiaQual = :sRegulacaoAlergiaQual
-                EnExFDoencaSistImunologico = :sDoencaSistImunologico
-                EnExFDoencaSistImunologicoQual = :sDoencaSistImunologicoQual
-                EnExFCalendarioVacinalCompleto = :sCalendarioVacinalCompleto
-                EnExFCalendarioVacinalNaoTrouxe = :sCalendarioVacinalNaoTrouxe
-                EnExFCalendarioVacinalNaoTem = :sCalendarioVacinalNaoTem
-                EnExFCalendarioVacinalIncompleto = :sCalendarioVacinalIncompleto
-                EnExFCalendarioVacinalQual = :sCalendarioVacinalQual
-                EnExFZonaMoradiaUrbana = :sZonaMoradiaUrbana
-                EnExFZonaMoradiaRural = :sZonaMoradiaRural
-                EnExFZonaMoradiaInstitucionalizada = :sZonaMoradiaInstitucionalizada
-                EnExFZonaMoradiaMoradorRua = :sZonaMoradiaMoradorRua
-                EnExFColetaLixoRegular = :sColetaLixoRegular
-                EnExFAguaTratada = :sAguaTratada
-                EnExFRedeEsgotoPublica = :sRedeEsgotoPublica
-                EnExFRedeEsgotoFossa = :sRedeEsgotoFossa
-                EnExFRedeEsgotoCeuAberto = :sRedeEsgotoCeuAberto
-                EnExFRedeEsgotoNaoSeAplica = :sRedeEsgotoNaoSeAplica
-                EnExFComerBeber = :sComerBeber
-                EnExFVestir = :sVestir
-                EnExFSubirEscada = :sSubirEscada
-                EnExFBanho = :sBanho
-                EnExFDeambular = :sDeambular
-                EnExFAndar = :sAndar
+                EnExFAtendimento = :sAtendimento ,
+                EnExFDataInicio = :sDataInicio ,
+                EnExFHoraInicio = :sHoraInicio ,
+                EnExFDataFim = :sDataFim ,
+                EnExFHoraFim = :sHoraFim ,
+                EnExFProfissional = :sProfissional ,
+                EnExFTPas = :sTPas ,
+                EnExFPad = :sPad ,
+                EnExFFreqCardiaca = :sFreqCardiaca ,
+                EnExFFreqRespiratoria = :sFreqRespiratoria ,
+                EnExFTemperatura = :sTemperatura ,
+                EnExFSPO = :sSPO ,
+                EnExFHGT = :sHGT ,
+                EnExPeso = :sPeso ,
+                EnExFAlergia = :sAlergia ,
+                EnExFAlergiaDescricao = :sAlergiaDescricao ,
+                EnExFDiabetes = :sDiabetes ,
+                EnExFDiabetesDescricao = :sDiabetesDescricao ,
+                EnExFHipertensao = :sHipertensao ,
+                EnExFHipertensaoDescricao = :sHipertensaoDescricao ,
+                EnExFNeoplasia = :sNeoplasia ,
+                EnExFNeoplasiaDescricao = :sNeoplasiaDescricao ,
+                EnExFUsoMedicamento = :sUsoMedicamento ,
+                EnExFUsoMedicamentoDescricao = :sUsoMedicamentoDescricao ,
+                EnExFOcular = :sOcular ,
+                EnExFVerbal = :sVerbal ,
+                EnExFMotora = :sMotora ,
+                EnExFScore = :sScore ,
+                EnExFPupilaIsocorica = :sPupilaIsocorica ,
+                EnExFPupilaAnisocorica = :sPupilaAnisocorica ,
+                EnExFPupilaMidriase = :sPupilaMidriase ,
+                EnExFPupilaMiose = :sPupilaMiose ,
+                EnExFPupilaFotorreagente = :sPupilaFotorreagente ,
+                EnExFPupilaParalitica = :sPupilaParalitica ,
+                EnExFNivelConscienciaLucido = :sNivelConscienciaLucido ,
+                EnExFNivelConscienciaOrientado = :sNivelConscienciaOrientado ,
+                EnExFNivelConscienciaDesorientado = :sNivelConscienciaDesorientado ,
+                EnExFNivelConscienciaSonolento = :sNivelConscienciaSonolento ,
+                EnExFNivelConscienciaAgitado = :sNivelConscienciaAgitado ,
+                EnExFNivelConscienciaAtivo = :sNivelConscienciaAtivo ,
+                EnExFNivelConscienciaHipoativo = :sNivelConscienciaHipoativo ,
+                EnExFNivelConscienciaInconsciente = :sNivelConscienciaInconsciente ,
+                EnExFRegulacaoTermicaNormoTermico = :sRegulacaoTermicaNormoTermico ,
+                EnExFRegulacaoTermicaHipoTermico = :sRegulacaoTermicaHipoTermico ,
+                EnExFRegulacaoTermicaFebre = :sRegulacaoTermicaFebre ,
+                EnExFRegulacaoTermicaPirexia = :sRegulacaoTermicaPirexia ,
+                EnExFRegulacaoTermicaSudorese = :sRegulacaoTermicaSudorese ,
+                EnExFOlfato = :sOlfato ,
+                EnExFOlfatoAlteracao = :sOlfatoAlteracao ,
+                EnExFAcuidadeVisual = :sAcuidadeVisual ,
+                EnExFAcuidadeVisualAlteracao = :sAcuidadeVisualAlteracao ,
+                EnExFAudicao = :sAudicao ,
+                EnExFAudicaoAlteracao = :sAudicaoAlteracao ,
+                EnExFTato = :sTato ,
+                EnExFTatoAlteracao = :sTatoAlteracao ,
+                EnExFPaladar = :sPaladar ,
+                EnExFPaladarAlteracao = :sPaladarAlteracao ,
+                EnExFDorAguda = :sDorAguda ,
+                EnExFDorAgudaLocal = :sDorAgudaLocal ,
+                EnExFPeleAspectoIntegra = :sPeleAspectoIntegra ,
+                EnExFPeleAspectoCicatriz = :sPeleAspectoCicatriz ,
+                EnExFPeleAspectoIncisao = :sPeleAspectoIncisao ,
+                EnExFPeleAspectoEscoriacao = :sPeleAspectoEscoriacao ,
+                EnExFPeleAspectoDescamacao = :sPeleAspectoDescamacao ,
+                EnExFPeleAspectoErupcao = :sPeleAspectoErupcao ,
+                EnExFPeleAspectoUmida = :sPeleAspectoUmida ,
+                EnExFPeleAspectoAspera = :sPeleAspectoAspera ,
+                EnExFPeleAspectoEspessa = :sPeleAspectoEspessa ,
+                EnExFPeleAspectoFina = :sPeleAspectoFina ,
+                EnExFPeleAspectoFeridaOperatoria = :sPeleAspectoFeridaOperatoria ,
+                EnExFPeleAspectoUlceraDecubito = :sPeleAspectoUlceraDecubito ,
+                EnExFPeleTurgorSemAlteracao = :sPeleTurgorSemAlteracao ,
+                EnExFPeleTurgorDiminuida = :sPeleTurgorDiminuida ,
+                EnExFPeleTurgorAumentada = :sPeleTurgorAumentada ,
+                EnExFPeleTurgorHidratada = :sPeleTurgorHidratada ,
+                EnExFPeleTurgorDesidratada = :sPeleTurgorDesidratada ,
+                EnExFPeleCorPalidez = :sPeleCorPalidez ,
+                EnExFPeleCorCianose = :sPeleCorCianose ,
+                EnExFPeleCorIctericia = :sPeleCorIctericia ,
+                EnExFPeleCorSemAlteracao = :sPeleCorSemAlteracao ,
+                EnExFPeleEdema = :sPeleEdema ,
+                EnExFPeleHematoma = :sPeleHematoma ,
+                EnExFPeleHigiene = :sPeleHigiene ,
+                EnExFPeleOutroDreno = :sPeleOutroDreno ,
+                EnExFPeleOutroSecrecao = :sPeleOutroSecrecao ,
+                EnExFCoroCabeludoIntegro = :sCoroCabeludoIntegro ,
+                EnExFCoroCabeludoComLesao = :sCoroCabeludoComLesao ,
+                EnExFCoroCabeludoCeborreia = :sCoroCabeludoCeborreia ,
+                EnExFCoroCabeludoPediculose = :sCoroCabeludoPediculose ,
+                EnExFCoroCabeludoCicatriz = :sCoroCabeludoCicatriz ,
+                EnExFCoroCabeludoLimpo = :sCoroCabeludoLimpo ,
+                EnExFMucosaOcularNormocromica = :sMucosaOcularNormocromica ,
+                EnExFMucosaOcularHipocromica = :sMucosaOcularHipocromica ,
+                EnExFMucosaOcularHipercromica = :sMucosaOcularHipercromica ,
+                EnExFAuricularNasalSemAlteracao = :sAuricularNasalSemAlteracao ,
+                EnExFAuricularNasalOtorragia = :sAuricularNasalOtorragia ,
+                EnExFAuricularNasalRinorragia = :sAuricularNasalRinorragia ,
+                EnExFAuricularNasalSecrecao = :sAuricularNasalSecrecao ,
+                EnExFCavidadeOralSemAlteracao = :sCavidadeOralSemAlteracao ,
+                EnExFCavidadeOralComLesao = :sCavidadeOralComLesao ,
+                EnExFCavidadeOralOutro = :sCavidadeOralOutro ,
+                EnExFCavidadeOralOutroDescricao = :sCavidadeOralOutroDescricao ,
+                EnExFPescocoSemAlteracao = :sPescocoSemAlteracao ,
+                EnExFPescocoLinfonodoInfartado = :sPescocoLinfonodoInfartado ,
+                EnExFPescocoOutro = :sPescocoOutro ,
+                EnExFPescocoOutroDescricao = :sPescocoOutroDescricao ,
+                EnExFToraxSemAlteracao = :sToraxSemAlteracao ,
+                EnExFToraxSimetrico = :sToraxSimetrico ,
+                EnExFToraxAssimetrico = :sToraxAssimetrico ,
+                EnExFToraxDrreno = :sToraxDrreno ,
+                EnExFToraxUsaMarcapasso = :sToraxUsaMarcapasso ,
+                EnExFToraxOutro = :sToraxOutro ,
+                EnExFToraxOutroDescricao = :sToraxOutroDescricao ,
+                EnExFRespiracaoEupneico = :sRespiracaoEupneico ,
+                EnExFRespiracaoDispneico = :sRespiracaoDispneico ,
+                EnExFRespiracaoBradipneico = :sRespiracaoBradipneico ,
+                EnExFRespiracaoTaquipneico = :sRespiracaoTaquipneico ,
+                EnExFRespiracaoApneia = :sRespiracaoApneia ,
+                EnExFRespiracaoTiragemIntercostal = :sRespiracaoTiragemIntercostal ,
+                EnExFRespiracaoRetracaoFurcula = :sRespiracaoRetracaoFurcula ,
+                EnExFRespiracaoAletasNasais = :sRespiracaoAletasNasais ,
+                EnExFAuscutaPulmonarNvfds = :sAuscutaPulmonarNvfds ,
+                EnExFAuscutaPulmonarSibilo = :sAuscutaPulmonarSibilo ,
+                EnExFAuscutaPulmonarCrepto = :sAuscutaPulmonarCrepto ,
+                EnExFAuscutaPulmonarRonco = :sAuscutaPulmonarRonco ,
+                EnExFAuscutaPulmonarOutro = :sAuscutaPulmonarOutro ,
+                EnExFAuscutaPulmonarOutroDescricao = :sAuscutaPulmonarOutroDescricao ,
+                EnExFBatimentoCardiacoBcnf = :sBatimentoCardiacoBcnf ,
+                EnExFBatimentoCardiacoNormocardico = :sBatimentoCardiacoNormocardico ,
+                EnExFBatimentoCardiacoTaquicardico = :sBatimentoCardiacoTaquicardico ,
+                EnExFBatimentoCardiacoBradicardico = :sBatimentoCardiacoBradicardico ,
+                EnExFBatimentoCardiacoOutro = :sBatimentoCardiacoOutro ,
+                EnExFBatimentoCardiacoOutroDescricao = :sBatimentoCardiacoOutroDescricao ,
+                EnExFPulsoRegular = :sPulsoRegular ,
+                EnExFPulsoIrregular = :sPulsoIrregular ,
+                EnExFPulsoFiliforme = :sPulsoFiliforme ,
+                EnExFPulsoNaoPalpavel = :sPulsoNaoPalpavel ,
+                EnExFPulsoCheio = :sPulsoCheio ,
+                EnExFPressaoArterialNormotenso = :sPressaoArterialNormotenso ,
+                EnExFPressaoArterialHipertenso = :sPressaoArterialHipertenso ,
+                EnExFPressaoArterialHipotenso = :sPressaoArterialHipotenso ,
+                EnExFPressaoArterialInaldivel = :sPressaoArterialInaldivel ,
+                EnExFRedeVenosaPeriferica = :sRedeVenosaPeriferica ,
+                EnExFPerfusaoPeriferica = :sPerfusaoPeriferica ,
+                EnExFAcessoCentral = :sAcessoCentral ,
+                EnExFAcessoAvp = :sAcessoAvp ,
+                EnExFAcessoDisseccao = :sAcessoDisseccao ,
+                EnExFAcessoOutro = :sAcessoOutro ,
+                EnExFAcessoOutroDescricao = :sAcessoOutroDescricao ,
+                EnExFAbdomenPlano = :sAbdomenPlano ,
+                EnExFAbdomenGloboso = :sAbdomenGloboso ,
+                EnExFAbdomenDistendido = :sAbdomenDistendido ,
+                EnExFAbdomenPlacido = :sAbdomenPlacido ,
+                EnExFAbdomenEndurecido = :sAbdomenEndurecido ,
+                EnExFAbdomenTimpanico = :sAbdomenTimpanico ,
+                EnExFAbdomenIndolor = :sAbdomenIndolor ,
+                EnExFAbdomenDoloroso = :sAbdomenDoloroso ,
+                EnExFAbdomenAscitico = :sAbdomenAscitico ,
+                EnExFAbdomenGravidico = :sAbdomenGravidico ,
+                EnExFGenitaliaIntegra = :sGenitaliaIntegra ,
+                EnExFGenitaliaComLesao = :sGenitaliaComLesao ,
+                EnExFGenitaliaSangramento = :sGenitaliaSangramento ,
+                EnExFGenitaliaSecrecao = :sGenitaliaSecrecao ,
+                EnExFMembroSuperiorPreservado = :sMembroSuperiorPreservado ,
+                EnExFMembroSuperiorComLesao = :sMembroSuperiorComLesao ,
+                EnExFMembroSuperiorParesia = :sMembroSuperiorParesia ,
+                EnExFMembroSuperiorPlegia = :sMembroSuperiorPlegia ,
+                EnExFMembroSuperiorParestesia = :sMembroSuperiorParestesia ,
+                EnExFMembroSuperiorMovIncoordenado = :sMembroSuperiorMovIncoordenado ,
+                EnExFMembroInferiorPreservado = :sMembroInferiorPreservado ,
+                EnExFMembroInferiorComLesao = :sMembroInferiorComLesao ,
+                EnExFMembroInferiorParesia = :sMembroInferiorParesia ,
+                EnExFMembroInferiorPlegia = :sMembroInferiorPlegia ,
+                EnExFMembroInferiorParestesia = :sMembroInferiorParestesia ,
+                EnExFMembroInferiorMovIncoordenado = :sMembroInferiorMovIncoordenado ,
+                EnExFIntestinalNormal = :sIntestinalNormal ,
+                EnExFIntestinalConstipacao = :sIntestinalConstipacao ,
+                EnExFIntestinalFrequencia = :sIntestinalFrequencia ,
+                EnExFIntestinalDiarreia = :sIntestinalDiarreia ,
+                EnExFIntestinalMelena = :sIntestinalMelena ,
+                EnExFIntestinalOutro = :sIntestinalOutro ,
+                EnExFIntestinalFrequenciaDescricao = :sIntestinalFrequenciaDescricao ,
+                EnExFIntestinalOutroDescricao = :sIntestinalOutroDescricao ,
+                EnExFEmeseNao = :sEmeseNao ,
+                EnExFEmeseSim = :sEmeseSim ,
+                EnExFEmeseHematemese = :sEmeseHematemese ,
+                EnExFEmeseFrequencia = :sEmeseFrequencia ,
+                EnExFEmeseFrequenciaDescricao = :sEmeseFrequenciaDescricao ,
+                EnExFUrinariaEspontanea = :sUrinariaEspontanea ,
+                EnExFUrinariaPoliuria = :sUrinariaPoliuria ,
+                EnExFUrinariaRetencao = :sUrinariaRetencao ,
+                EnExFUrinariaIncontinencia = :sUrinariaIncontinencia ,
+                EnExFUrinariaDisuria = :sUrinariaDisuria ,
+                EnExFUrinariaOliguria = :sUrinariaOliguria ,
+                EnExFUrinariaSvd = :sUrinariaSvd ,
+                EnExFUrinariaSva = :sUrinariaSva ,
+                EnExFUrinariaOutro = :sUrinariaOutro ,
+                EnExFUrinariaOutroDescricao = :sUrinariaOutroDescricao ,
+                EnExFAspectoUrinaClara = :sAspectoUrinaClara ,
+                EnExFAspectoUrinaAmbar = :sAspectoUrinaAmbar ,
+                EnExFAspectoUrinaHematuria = :sAspectoUrinaHematuria ,
+                EnExFNutricaoLactario = :sNutricaoLactario ,
+                EnExFNutricaoOral = :sNutricaoOral ,
+                EnExFNutricaoParental = :sNutricaoParental ,
+                EnExFNutricaoSng = :sNutricaoSng ,
+                EnExFNutricaoSne = :sNutricaoSne ,
+                EnExFNutricaoGgt = :sNutricaoGgt ,
+                EnExFDegluticaoSemAlteracao = :sDegluticaoSemAlteracao ,
+                EnExFDegluticaoComDificuldade = :sDegluticaoComDificuldade ,
+                EnExFDegluticaoNaoConsDeglutir = :sDegluticaoNaoConsDeglutir ,
+                EnExFSuccaoSemAlteracao = :sSuccaoSemAlteracao ,
+                EnExFSuccaoComDificuldade = :sSuccaoComDificuldade ,
+                EnExFSuccaoNaoConsegueSugar = :sSuccaoNaoConsegueSugar ,
+                EnExFApetitePreservado = :sApetitePreservado ,
+                EnExFApetiteAumentado = :sApetiteAumentado ,
+                EnExFApetiteDiminuido = :sApetiteDiminuido ,
+                EnExFApetitePrejudicado = :sApetitePrejudicado ,
+                EnExFDenticaoTotal = :sDenticaoTotal ,
+                EnExFDenticaoParcial = :sDenticaoParcial ,
+                EnExFDenticaoAusente = :sDenticaoAusente ,
+                EnExFDenticaoSuperior = :sDenticaoSuperior ,
+                EnExFDenticaoInferior = :sDenticaoInferior ,
+                EnExFDenticaoProtese = :sDenticaoProtese ,
+                EnExFSonoRepousoPreservado = :sSonoRepousoPreservado ,
+                EnExFSonoRepousoDifAdormecer = :sSonoRepousoDifAdormecer ,
+                EnExFSonoRepousoInsonia = :sSonoRepousoInsonia ,
+                EnExFSonoRepousoUsoMedicacao = :sSonoRepousoUsoMedicacao ,
+                EnExFSonoRepousoCansacoAcordar = :sSonoRepousoCansacoAcordar ,
+                EnExFHigieneCorporal = :sHigieneCorporal ,
+                EnExFHigieneBucal = :sHigieneBucal ,
+                EnExFRegulacaoAlergia = :sRegulacaoAlergia ,
+                EnExFRegulacaoAlergiaQual = :sRegulacaoAlergiaQual ,
+                EnExFDoencaSistImunologico = :sDoencaSistImunologico ,
+                EnExFDoencaSistImunologicoQual = :sDoencaSistImunologicoQual ,
+                EnExFCalendarioVacinalCompleto = :sCalendarioVacinalCompleto ,
+                EnExFCalendarioVacinalNaoTrouxe = :sCalendarioVacinalNaoTrouxe ,
+                EnExFCalendarioVacinalNaoTem = :sCalendarioVacinalNaoTem ,
+                EnExFCalendarioVacinalIncompleto = :sCalendarioVacinalIncompleto ,
+                EnExFCalendarioVacinalQual = :sCalendarioVacinalQual ,
+                EnExFZonaMoradiaUrbana = :sZonaMoradiaUrbana ,
+                EnExFZonaMoradiaRural = :sZonaMoradiaRural ,
+                EnExFZonaMoradiaInstitucionalizada = :sZonaMoradiaInstitucionalizada ,
+                EnExFZonaMoradiaMoradorRua = :sZonaMoradiaMoradorRua ,
+                EnExFColetaLixoRegular = :sColetaLixoRegular ,
+                EnExFAguaTratada = :sAguaTratada ,
+                EnExFRedeEsgotoPublica = :sRedeEsgotoPublica ,
+                EnExFRedeEsgotoFossa = :sRedeEsgotoFossa ,
+                EnExFRedeEsgotoCeuAberto = :sRedeEsgotoCeuAberto ,
+                EnExFRedeEsgotoNaoSeAplica = :sRedeEsgotoNaoSeAplica ,
+                EnExFComerBeber = :sComerBeber ,
+                EnExFVestir = :sVestir ,
+                EnExFSubirEscada = :sSubirEscada ,
+                EnExFBanho = :sBanho ,
+                EnExFDeambular = :sDeambular ,
+                EnExFAndar = :sAndar ,
                 EnExFUnidade = :sUnidade
                 WHERE EnExFId = :iAtendimentoExameFisico";
 
@@ -1646,7 +1645,7 @@ if (isset($_POST['inputInicio'])) {
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Admissão Anamnase</title>
+	<title>Lamparinas | Admissão Anamnese</title>
 
 	<?php include_once("head.php"); ?>
 
@@ -1674,18 +1673,52 @@ if (isset($_POST['inputInicio'])) {
             calculaScore()
 	     
 			$('.enviarAnamnese').on('click', function(e){
-				
 				e.preventDefault();
+
+                let msg = ''
+                let cid10 = $('#cmbCId10').val()
+                let procedimento = $('#cmbProcedimento').val()
+
+                switch(msg){
+                    case cid10: msg = 'Informe o CID10!';$('#cmbCId10').focus();break
+                    case procedimento: msg = 'Informe o Procedimento!';$('#cmbProcedimento').focus();break
+                }
+                if(msg){
+                    $(".box-anamnese").css('display', 'block');
+				    $(".box-exameFisico").css('display', 'none');
+                    alerta('Campo Obrigatório!', msg, 'error')
+                    return
+                }
 		
 				$( "#formAtendimentoAnamnese" ).submit();
 			})
 
-			$(".caracteressummernote1").text((500 - $("#summernote1").val().length) + ' restantes'); //restantes no input1
-			$(".caracteressummernote2").text((500 - $("#summernote2").val().length) + ' restantes'); //restantes no input2
-			$(".caracteressummernote3").text((500 - $("#summernote3").val().length) + ' restantes'); //restantes no input3
-			$(".caracteressummernote4").text((500 - $("#summernote4").val().length) + ' restantes'); //restantes no input4
-			$(".caracteressummernote5").text((500 - $("#summernote5").val().length) + ' restantes'); //restantes no input5
-			$(".caracteressummernote6").text((1000 - $("#summernote6").val().length) + ' restantes'); //restantes no input6
+			$(".caracteressummernote1").text(' - ' + (500 - $("#summernote1").val().length) + ' restantes');
+			$(".caracteressummernote2").text(' - ' + (500 - $("#summernote2").val().length) + ' restantes');
+			$(".caracteressummernote3").text(' - ' + (500 - $("#summernote3").val().length) + ' restantes');
+			$(".caracteressummernote4").text(' - ' + (500 - $("#summernote4").val().length) + ' restantes');
+			$(".caracteressummernote5").text(' - ' + (500 - $("#summernote5").val().length) + ' restantes');
+			$(".caracteressummernote6").text(' - ' + (1000 - $("#summernote6").val().length) + ' restantes');
+			$(".caracteresinputAlteracaoOlfato").text(' - ' + (80 - $("#inputAlteracaoOlfato").val().length) + ' restantes');
+			$(".caracteresinputAlteracaoAcuidadeVisual").text(' - ' + (80 - $("#inputAlteracaoAcuidadeVisual").val().length) + ' restantes');
+			$(".caracteresinputAlteracaoAudicao").text(' - ' + (80 - $("#inputAlteracaoAudicao").val().length) + ' restantes');
+			$(".caracteresinputAlteracaoTato").text(' - ' + (80 - $("#inputAlteracaoTato").val().length) + ' restantes');
+			$(".caracteresinputAlteracaoPaladar").text(' - ' + (80 - $("#inputAlteracaoPaladar").val().length) + ' restantes');
+			$(".caracteresinputAlteracaoDorAguda").text(' - ' + (80 - $("#inputAlteracaoDorAguda").val().length) + ' restantes');
+			$(".caracteresinputEdema").text(' - ' + (80 - $("#inputEdema").val().length) + ' restantes');
+			$(".caracteresinputCavidadeOral").text(' - ' + (80 - $("#inputCavidadeOral").val().length) + ' restantes');
+			$(".caracteresinputPescoco").text(' - ' + (80 - $("#inputPescoco").val().length) + ' restantes');
+			$(".caracteresinputTorax").text(' - ' + (80 - $("#inputTorax").val().length) + ' restantes');
+			$(".caracteresinputAuscutaPulmonar").text(' - ' + (80 - $("#inputAuscutaPulmonar").val().length) + ' restantes');
+			$(".caracteresinputBatimentoCardiaco").text(' - ' + (80 - $("#inputBatimentoCardiaco").val().length) + ' restantes');
+			$(".caracteresinputAcessos").text(' - ' + (80 - $("#inputAcessos").val().length) + ' restantes');
+			$(".caracteresinputFrequenciaIntestinais").text(' - ' + (80 - $("#inputFrequenciaIntestinais").val().length) + ' restantes');
+			$(".caracteresinputFrequenciaEmese").text(' - ' + (80 - $("#inputFrequenciaEmese").val().length) + ' restantes');
+			$(".caracteresinputOutrosIntestinais").text(' - ' + (80 - $("#inputOutrosIntestinais").val().length) + ' restantes');
+			$(".caracteresinputOutrosUrinarias").text(' - ' + (80 - $("#inputOutrosUrinarias").val().length) + ' restantes');
+			$(".caracteresinputQualAlergia").text(' - ' + (80 - $("#inputQualAlergia").val().length) + ' restantes');
+			$(".caracteresinputQualDoenca").text(' - ' + (80 - $("#inputQualDoenca").val().length) + ' restantes');
+			$(".caracteresinputIncQual").text(' - ' + (80 - $("#inputIncQual").val().length) + ' restantes');
 
             
 		}); //document.ready
@@ -1849,7 +1882,7 @@ if (isset($_POST['inputInicio'])) {
             let cmbVerbal = $('#cmbVerbal').val()
             let cmbMotora = $('#cmbMotora').val()
 
-            let valorOcular, valorVerbal, valorMotora;
+            let valorOcular = 0, valorVerbal = 0, valorMotora = 0;
 
             if (cmbOcular == 'ES') { valorOcular = 4}
             if (cmbOcular == 'OV') { valorOcular = 3}
@@ -1883,12 +1916,12 @@ if (isset($_POST['inputInicio'])) {
 		});
 
         function mudarGrid(grid){
-			if (grid == 'anamnase') {				
-				$(".box-anamnase").css('display', 'block');
+			if (grid == 'anamnese') {				
+				$(".box-anamnese").css('display', 'block');
 				$(".box-exameFisico").css('display', 'none');
 			} else if (grid == 'exameFisico') {
 				$(".box-exameFisico").css('display', 'block');
-				$(".box-anamnase").css('display', 'none');
+				$(".box-anamnese").css('display', 'none');
 			}
 		}
 
@@ -1904,12 +1937,11 @@ if (isset($_POST['inputInicio'])) {
 				$(`textarea[id=${params.id}]`).val(texto.substr(0, limite));
 				$(".caracteres" + params.id).text("0 " + informativo);
 			} else {
-				$(".caracteres" + params.id).text(caracteresRestantes + " " + informativo);
+				$(".caracteres" + params.id).text(" - " + caracteresRestantes + " " + informativo);
 			}
 		}
 
 	</script>
-
 
     <style>
 
@@ -2002,14 +2034,14 @@ if (isset($_POST['inputInicio'])) {
                             <div class="card">
                                 <div class="card-header header-elements-inline">
                                     <div class="col-lg-11">	
-                                        <button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg active mr-2 " onclick="mudarGrid('anamnase')" style="margin-left: -10px;" >Anamnase</button>
+                                        <button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg active mr-2 " onclick="mudarGrid('anamnese')" style="margin-left: -10px;" >Anamnese</button>
                                         <button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg " onclick="mudarGrid('exameFisico')" >Exame Físico</button>
                                     </div>
                                 </div>                                
                                 
                             </div>
 
-                            <div class="box-anamnase" style="display: block;">
+                            <div class="box-anamnese" style="display: block;">
 
                                 <div class="card">
 
@@ -2031,42 +2063,39 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-6">
                                                 <select id="cmbCId10" name="cmbCId10" class="select-search" >
-                                                <?php 
+                                                    <option value="">Selecione</option>
+                                                    <?php 
+                                                        $sql = "SELECT Cid10Id,Cid10Capitulo, Cid10Codigo, Cid10Descricao
+                                                                FROM Cid10
+                                                                JOIN Situacao on SituaId = Cid10Status
+                                                                WHERE SituaChave = 'ATIVO'
+                                                                ORDER BY Cid10Codigo ASC";
+                                                        $result = $conn->query($sql);
+                                                        $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                    $sql = "SELECT Cid10Id,Cid10Capitulo, Cid10Codigo, Cid10Descricao
-                                                            FROM Cid10
-                                                            JOIN Situacao on SituaId = Cid10Status
-                                                            WHERE SituaChave = 'ATIVO'
-                                                            ORDER BY Cid10Codigo ASC";
-                                                    $result = $conn->query($sql);
-                                                    $row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                    foreach ($row as $item){
-                                                        $seleciona = $item['Cid10Id'] == $rowAnamnese['EnAnaCid10'] ? "selected" : "";
-                                                        print('<option value="'.$item['Cid10Id'].'" '. $seleciona .'>'.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
-                                                    }
-
-                                                ?>
+                                                        foreach ($row as $item){
+                                                            $seleciona = $item['Cid10Id'] == $rowAnamnese['EnAnaCid10'] ? "selected" : "";
+                                                            print('<option value="'.$item['Cid10Id'].'" '. $seleciona .'>'.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
+                                                        }
+                                                    ?>
                                                 </select>
                                             </div>
                                             <div class="col-lg-6">
                                                 <select id="cmbProcedimento" name="cmbProcedimento" class="select-search" >
+                                                    <option value="">Selecione</option>
+                                                    <?php  
+                                                        $sql = "SELECT SrVenId,SrVenCodigo, SrVenNome
+                                                                FROM ServicoVenda
+                                                                WHERE SrVenUnidade = ". $_SESSION['UnidadeId'] ."
+                                                                ORDER BY SrVenNome ASC";
+                                                        $result = $conn->query($sql);
+                                                        $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
-                                                <?php  
-
-                                                    $sql = "SELECT SrVenId,SrVenCodigo, SrVenNome
-                                                            FROM ServicoVenda
-                                                            WHERE SrVenUnidade = ". $_SESSION['UnidadeId'] ."
-                                                            ORDER BY SrVenNome ASC";
-                                                    $result = $conn->query($sql);
-                                                    $row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                    foreach ($row as $item) {
-                                                        $seleciona = $item['SrVenId'] == $rowAnamnese['EnAnaProcedimento'] ? "selected" : "";
-                                                        print('<option value="' . $item['SrVenId'] . '" ' . $seleciona . '>' . $item['SrVenCodigo'] . ' - ' . $item['SrVenNome'] . '</option>');
-                                                    }
-
-                                                ?>
+                                                        foreach ($row as $item) {
+                                                            $seleciona = $item['SrVenId'] == $rowAnamnese['EnAnaProcedimento'] ? "selected" : "";
+                                                            print('<option value="' . $item['SrVenId'] . '" ' . $seleciona . '>' . $item['SrVenCodigo'] . ' - ' . $item['SrVenNome'] . '</option>');
+                                                        }
+                                                    ?>
                                                 </select>											
                                             </div>
 
@@ -2077,7 +2106,7 @@ if (isset($_POST['inputInicio'])) {
 
 
                                     <div class="card-header header-elements-inline">
-                                        <h3 class="card-title font-weight-bold ">Anamnase</h3>  
+                                        <h3 class="card-title font-weight-bold ">Anamnese</h3>  
                                     </div>
 
                                     <div class="card-body">
@@ -2090,7 +2119,7 @@ if (isset($_POST['inputInicio'])) {
                                                             <div class="collapse" id="collapse1-link" style="">
                                                                 <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);"  id="summernote1" name="txtareaConteudo1" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na queixa principal)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaQueixaPrincipal']; ?></textarea>
-                                                                    <small class="text-muted form-text">Max. 500 caracteres - <span class="caracteressummernote1"></span></small>
+                                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote1"></span></small>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2103,7 +2132,7 @@ if (isset($_POST['inputInicio'])) {
                                                             <div class="collapse" id="collapse2-link" style="">
                                                                 <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote2" name="txtareaConteudo2" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça nna história da moléstia atual)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaMolestiaAtual']; ?></textarea>
-                                                                    <small class="text-muted form-text">Max. 500 caracteres - <span class="caracteressummernote2"></span></small>
+                                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote2"></span></small>
                                                                 
                                                                 </div>
                                                             </div>
@@ -2117,7 +2146,7 @@ if (isset($_POST['inputInicio'])) {
                                                             <div class="collapse" id="collapse3-link" style="">
                                                                 <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote3" name="txtareaConteudo3" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na história patológica pregressa)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaPatologicaPregressa']; ?></textarea>
-                                                                    <small class="text-muted form-text">Max. 500 caracteres - <span class="caracteressummernote3"></span></small>
+                                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote3"></span></small>
                                                                 
                                                                 </div>
                                                             </div>
@@ -2131,7 +2160,7 @@ if (isset($_POST['inputInicio'])) {
                                                             <div class="collapse" id="collapse4-link" style="">
                                                                 <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote4" name="txtareaConteudo4" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na história familiar)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaFamiliar']; ?></textarea>
-                                                                    <small class="text-muted form-text">Max. 500 caracteres - <span class="caracteressummernote4"></span></small>
+                                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote4"></span></small>
                                                                 
                                                                 </div>
                                                             </div>
@@ -2145,7 +2174,7 @@ if (isset($_POST['inputInicio'])) {
                                                             <div class="collapse" id="collapse5-link" style="">
                                                                 <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote5" name="txtareaConteudo5" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na história sócioeconômica)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHipoteseSocioEconomica']; ?></textarea>
-                                                                    <small class="text-muted form-text">Max. 500 caracteres - <span class="caracteressummernote5"></span></small>
+                                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote5"></span></small>
                                                                 
                                                                 </div>
                                                             </div>
@@ -2159,7 +2188,7 @@ if (isset($_POST['inputInicio'])) {
                                                             <div class="collapse" id="collapse6-link" style="">
                                                                 <div class="mt-3">
                                                                     <textarea rows="5" cols="5" maxLength="1000" onInput="contarCaracteres(this);" id="summernote6" name="txtareaConteudo6" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na anamnese)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaDigitacaoLivre']; ?></textarea>
-                                                                    <small class="text-muted form-text">Max. 1000 caracteres - <span class="caracteressummernote6"></span></small>
+                                                                    <small class="text-muted form-text">Max. 1000 caracteres<span class="caracteressummernote6"></span></small>
                                                                 
                                                                 </div>
                                                             </div>
@@ -2199,13 +2228,13 @@ if (isset($_POST['inputInicio'])) {
                                         <div class="col-lg-12 mb-3 row">
                                             <!-- titulos -->
                                             <div class="col-lg-4">
-                                                <label>Ocular <span class="text-danger">*</span></label>
+                                                <label>Ocular</label>
                                             </div>
                                             <div class="col-lg-4">
-                                                <label>Verbal <span class="text-danger">*</span></label>
+                                                <label>Verbal</label>
                                             </div>
                                             <div class="col-lg-3">
-                                                <label>Motora <span class="text-danger">*</span></label>
+                                                <label>Motora</label>
                                             </div>
                                             <div class="col-lg-1">
                                                 <label>Score</label>
@@ -2214,44 +2243,47 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-4">
                                                 <select id="cmbOcular" name="cmbOcular" class="form-control-select2" onChange="calculaScore()" >
-                                                <?php
-                                                    $arrayOcular = [ 'ES' => 'ESPONTÂNEA', 'OV' => 'ORDEM VERBAL', 'ED' => 'ESTÍMULO DOLOROSO', 'NR' => 'NÃO RESPONDE' ]; 
-                                                    foreach ($arrayOcular as $key => $item) {
-                                                        if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFOcular'] ==  $key) ) {																
-                                                            print('<option value="' . $key . '" selected>' . $item . '</option>');
-                                                        } else {
-                                                            print('<option value="' . $key . '">' . $item . '</option>');
+                                                    <option value="">Selecione</option>
+                                                    <?php
+                                                        $arrayOcular = [ 'ES' => 'ESPONTÂNEA', 'OV' => 'ORDEM VERBAL', 'ED' => 'ESTÍMULO DOLOROSO', 'NR' => 'NÃO RESPONDE' ]; 
+                                                        foreach ($arrayOcular as $key => $item) {
+                                                            if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFOcular'] ==  $key) ) {																
+                                                                print('<option value="' . $key . '" selected>' . $item . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $key . '">' . $item . '</option>');
+                                                            }
                                                         }
-                                                    }
-                                                ?>
+                                                    ?>
                                                 </select>
                                             </div>
                                             <div class="col-lg-4">
                                                 <select id="cmbVerbal" name="cmbVerbal" class="form-control-select2" onChange="calculaScore()" >
-                                                <?php
-                                                    $arrayVerbal = [ 'OR' => 'ORIENTADO', 'CO' => 'CONFUSO', 'PI' => 'PALAVRAS INAPROPRIADAS', 'PC' => 'PALAVRAS INCOMPREENSÍVAS', 'NR' => 'NÃO RESPONDE' ]; 
-                                                    foreach ($arrayVerbal as $key => $item) {
-                                                        if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFVerbal'] ==  $key) ) {																
-                                                            print('<option value="' . $key . '" selected>' . $item . '</option>');
-                                                        } else {
-                                                            print('<option value="' . $key . '">' . $item . '</option>');
+                                                    <option value="">Selecione</option>
+                                                    <?php
+                                                        $arrayVerbal = [ 'OR' => 'ORIENTADO', 'CO' => 'CONFUSO', 'PI' => 'PALAVRAS INAPROPRIADAS', 'PC' => 'PALAVRAS INCOMPREENSÍVAS', 'NR' => 'NÃO RESPONDE' ]; 
+                                                        foreach ($arrayVerbal as $key => $item) {
+                                                            if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFVerbal'] ==  $key) ) {																
+                                                                print('<option value="' . $key . '" selected>' . $item . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $key . '">' . $item . '</option>');
+                                                            }
                                                         }
-                                                    }
-                                                ?>
+                                                    ?>
                                                 </select>											
                                             </div>
                                             <div class="col-lg-3">
                                                 <select id="cmbMotora" name="cmbMotora" class="form-control-select2" onChange="calculaScore()" >
-                                                <?php
-                                                    $arrayMotora = [ 'OA' => 'OBEDECE AO COMANDO', 'RO' => 'RETIRA O ESTÍMULO', 'LE' => 'LOCALIZA ESTÍMULO', 'RF' => 'RESPOSTA EM FLEXÃO', 'RE' => 'RESPOSTA EM EXTENSÃO', 'NR' => 'NÃO RESPONDE' ]; 
-                                                    foreach ($arrayMotora as $key => $item) {
-                                                        if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFMotora'] ==  $key) ) {																
-                                                            print('<option value="' . $key . '" selected>' . $item . '</option>');
-                                                        } else {
-                                                            print('<option value="' . $key . '">' . $item . '</option>');
+                                                    <option value="">Selecione</option>
+                                                    <?php
+                                                        $arrayMotora = [ 'OA' => 'OBEDECE AO COMANDO', 'RO' => 'RETIRA O ESTÍMULO', 'LE' => 'LOCALIZA ESTÍMULO', 'RF' => 'RESPOSTA EM FLEXÃO', 'RE' => 'RESPOSTA EM EXTENSÃO', 'NR' => 'NÃO RESPONDE' ]; 
+                                                        foreach ($arrayMotora as $key => $item) {
+                                                            if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFMotora'] ==  $key) ) {																
+                                                                print('<option value="' . $key . '" selected>' . $item . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $key . '">' . $item . '</option>');
+                                                            }
                                                         }
-                                                    }
-                                                ?>
+                                                    ?>
                                                 </select>
                                             </div>
                                             
@@ -2262,7 +2294,7 @@ if (isset($_POST['inputInicio'])) {
 
                                         <div class="col-lg-12 mb-3 row">
                                             <div class="col-lg-4">
-                                                <label>Pupilas <span class="text-danger">*</span></label>
+                                                <label>Pupilas</label>
                                             </div>
                                             <div class="col-lg-8"></div>
                                             <div class="col-lg-4">
@@ -2280,7 +2312,7 @@ if (isset($_POST['inputInicio'])) {
 
                                         <div class="col-lg-12 mb-3 row">
                                             <div class="col-lg-4">
-                                                <label>Nível de Consciência <span class="text-danger">*</span></label>
+                                                <label>Nível de Consciência</label>
                                             </div>
                                             <div class="col-lg-8"></div>
                                             <div class="col-lg-4">
@@ -2361,18 +2393,21 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-4">
                                                 <select id="cmbOlfato" name="cmbOlfato" class="form-control-select2" onChange="textoOlfato()" >
+                                                    <option value="">Selecione</option>
                                                     <option value='SA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfato'] == 'SA' ? 'selected' : ''; ?> >SEM ALTERAÇÕES</option>
                                                     <option value='AL' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfato'] == 'AL' ? 'selected' : ''; ?> >ALTERADO. QUAL?</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-4">
                                                 <select id="cmbAcuidadeVisual" name="cmbAcuidadeVisual" class="form-control-select2" onChange="textoAcuidadeVisual()"  >
+                                                    <option value="">Selecione</option>
                                                     <option value='SA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAcuidadeVisual'] == 'SA' ? 'selected' : ''; ?> >SEM ALTERAÇÕES</option>
                                                     <option value='AL' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAcuidadeVisual'] == 'AL' ? 'selected' : ''; ?> >ALTERADO. QUAL?</option>
                                                 </select>											
                                             </div>
                                             <div class="col-lg-4">
                                                 <select id="cmbAudicao" name="cmbAudicao" class="form-control-select2" onChange="textoAudicao()"  >
+                                                    <option value="">Selecione</option>
                                                     <option value='SA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAudicao'] == 'SA' ? 'selected' : ''; ?> >SEM ALTERAÇÕES</option>
                                                     <option value='AL' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAudicao'] == 'AL' ? 'selected' : ''; ?> >ALTERADO. QUAL?</option>
                                                 </select>
@@ -2395,20 +2430,20 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-4 "  >
                                                 <div class="alteracaoCmbOlfato" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFOlfato'] == 'AL' ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputAlteracaoOlfato" name="inputAlteracaoOlfato" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfatoAlteracao']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputAlteracaoOlfato" name="inputAlteracaoOlfato" maxLength="80" onInput="contarCaracteres(this);" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfatoAlteracao']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputAlteracaoOlfato"></span></small>
                                                 </div>
                                             </div>
                                             <div class="col-lg-4 "  >
                                                 <div class="alteracaoCmbAcuidadeVisual" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFAcuidadeVisual'] == 'AL' ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputAlteracaoAcuidadeVisual" name="inputAlteracaoAcuidadeVisual" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAcuidadeVisualAlteracao']; ?>">											
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputAlteracaoAcuidadeVisual" name="inputAlteracaoAcuidadeVisual" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAcuidadeVisualAlteracao']; ?>">											
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputAlteracaoAcuidadeVisual"></span></small>
                                                 </div>
                                             </div>
                                             <div class="col-lg-4 "  >
                                                 <div class="alteracaoCmbAudicao" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFAudicao'] == 'AL' ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputAlteracaoAudicao" name="inputAlteracaoAudicao" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAudicaoAlteracao']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputAlteracaoAudicao" name="inputAlteracaoAudicao" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAudicaoAlteracao']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputAlteracaoAudicao"></span></small>
                                                 </div>
                                             </div>
                                             
@@ -2429,29 +2464,31 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-4">
                                                 <select id="cmbTato" name="cmbTato" class="form-control-select2" onChange="textoTato()">
+                                                    <option value="">Selecione</option>
                                                     <option value='SA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFTato'] == 'SA' ? 'selected' : ''; ?> >SEM ALTERAÇÕES</option>
                                                     <option value='AL' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFTato'] == 'AL' ? 'selected' : ''; ?> >ALTERADO. QUAL?</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-4">
                                                 <select id="cmbPaladar" name="cmbPaladar" class="form-control-select2" onChange="textoPaladar()" >
+                                                    <option value="">Selecione</option>
                                                     <option value='SA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFPaladar'] == 'SA' ? 'selected' : ''; ?> >SEM ALTERAÇÕES</option>
                                                     <option value='AL' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFPaladar'] == 'AL' ? 'selected' : ''; ?> >ALTERADO. QUAL?</option>
                                                 </select>											
                                             </div>
                                             <div class="col-lg-4">
                                                 <select id="cmbDorAguda" name="cmbDorAguda" class="form-control-select2" onChange="textoDorAguda()" >
-
-                                                <?php
-                                                    $arrayGrauDependencia = [ 'SD' => 'SEM ALTERAÇÕES', 'DL' => 'DOR LEVE', 'DM' => 'DOR MODERADA', 'DI' => 'DOR INTENSA' ]; 
-                                                    foreach ($arrayGrauDependencia as $key => $item) {
-                                                        if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFDorAguda'] ==  $key) ) {																
-                                                            print('<option value="' . $key . '" selected>' . $item . '</option>');
-                                                        } else {
-                                                            print('<option value="' . $key . '">' . $item . '</option>');
+                                                    <option value="">Selecione</option>
+                                                    <?php
+                                                        $arrayGrauDependencia = [ 'SD' => 'SEM ALTERAÇÕES', 'DL' => 'DOR LEVE', 'DM' => 'DOR MODERADA', 'DI' => 'DOR INTENSA' ]; 
+                                                        foreach ($arrayGrauDependencia as $key => $item) {
+                                                            if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFDorAguda'] ==  $key) ) {																
+                                                                print('<option value="' . $key . '" selected>' . $item . '</option>');
+                                                            } else {
+                                                                print('<option value="' . $key . '">' . $item . '</option>');
+                                                            }
                                                         }
-                                                    }
-                                                ?>
+                                                    ?>
 
                                                 </select>
                                             </div>
@@ -2473,20 +2510,20 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-4">
                                                 <div class="alteracaoCmbTato" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFTato'] == 'AL' ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputAlteracaoTato" name="inputAlteracaoTato" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFTatoAlteracao']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputAlteracaoTato" name="inputAlteracaoTato" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFTatoAlteracao']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputAlteracaoTato"></span></small>
                                                 </div>
                                             </div>
                                             <div class="col-lg-4">
                                                 <div class="alteracaoCmbPaladar" style="display: <?php echo isset($iAtendimentoExameFisicoId ) ? ($rowExameFisico['EnExFPaladar'] == 'AL' ? 'block' : 'none') : 'none';  ?>;">
-                                                    <input type="text" id="inputAlteracaoPaladar" name="inputAlteracaoPaladar" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFPaladarAlteracao']; ?>">											
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputAlteracaoPaladar" name="inputAlteracaoPaladar" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFPaladarAlteracao']; ?>">											
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputAlteracaoPaladar"></span></small>
                                                 </div>
                                             </div>
                                             <div class="col-lg-4">
                                                 <div class="alteracaoCmbDorAguda" style="display: <?php echo isset($iAtendimentoExameFisicoId ) ? ($rowExameFisico['EnExFDorAguda'] != 'SD' ? 'block' : 'none') : 'none'; ?>;">                                                    
-                                                    <input type="text" id="inputAlteracaoDorAguda" name="inputAlteracaoDorAguda" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFDorAgudaLocal']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputAlteracaoDorAguda" name="inputAlteracaoDorAguda" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFDorAgudaLocal']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputAlteracaoDorAguda"></span></small>
                                                 </div>
                                             </div>
                                             
@@ -2578,17 +2615,19 @@ if (isset($_POST['inputInicio'])) {
                                             
                                             <!-- campos -->										
                                             <div class="col-lg-3">
-                                                <input type="text" id="inputEdema" name="inputEdema" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFPeleEdema']; ?>">
-                                                <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                <input type="text" id="inputEdema" name="inputEdema" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFPeleEdema']; ?>">
+                                                <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputEdema"></span></small>
                                             </div>
                                             <div class="col-lg-3">
                                                 <select id="cmbHematoma" name="cmbHematoma" class="form-control-select2" >
+                                                    <option value="">Selecione</option>
                                                     <option value='SI'>SIM</option>
                                                     <option value='NA'>NÃO</option>
                                                 </select>											
                                             </div>
                                             <div class="col-lg-3">
                                                 <select id="cmbHigiene" name="cmbHigiene" class="form-control-select2" >
+                                                    <option value="">Selecione</option>
                                                     <option value='SA'>SATISFATÓRIA</option>
                                                     <option value='PR'>PRECÁRIA</option>
                                                 </select>
@@ -2684,8 +2723,8 @@ if (isset($_POST['inputInicio'])) {
                                             </div>
                                             <div class="col-lg-3 ">
                                                 <div class="outrosCavidadeOral" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFCavidadeOralOutro'] == 1 ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputCavidadeOral" name="inputCavidadeOral" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFCavidadeOralOutroDescricao']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputCavidadeOral" name="inputCavidadeOral" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFCavidadeOralOutroDescricao']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputCavidadeOral"></span></small>
                                                 </div>
                                             </div>
 
@@ -2766,22 +2805,22 @@ if (isset($_POST['inputInicio'])) {
 
                                             <div class="col-lg-3 ">
                                                 <div class="outrosPescoco" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFPescocoOutro'] == 1 ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputPescoco" name="inputPescoco" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFPescocoOutroDescricao']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputPescoco" name="inputPescoco" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFPescocoOutroDescricao']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputPescoco"></span></small>
                                                 </div>
                                             </div>
                                             <div class="col-lg-3 ">
                                                 <div class="outrosTorax" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFToraxOutro'] == 1 ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputTorax" name="inputTorax" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFToraxOutroDescricao']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputTorax" name="inputTorax" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFToraxOutroDescricao']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputTorax"></span></small>
                                                 </div>
                                             </div>
                                             <div class="col-lg-3">
                                             </div>
                                             <div class="col-lg-3 ">
                                                 <div class="outrosAuscutaPulmonar" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFAuscutaPulmonarOutro'] == 1 ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputAuscutaPulmonar" name="inputAuscutaPulmonar" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAuscutaPulmonarOutroDescricao']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputAuscutaPulmonar" name="inputAuscutaPulmonar" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAuscutaPulmonarOutroDescricao']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputAuscutaPulmonar"></span></small>
                                                 </div>
                                             </div>
 
@@ -2859,8 +2898,8 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-4 ">
                                                 <div class="outrosBatimentoCardiaco" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFBatimentoCardiacoOutro'] == 1 ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputBatimentoCardiaco" name="inputBatimentoCardiaco" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFBatimentoCardiacoOutroDescricao']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputBatimentoCardiaco" name="inputBatimentoCardiaco" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFBatimentoCardiacoOutroDescricao']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputBatimentoCardiaco"></span></small>
                                                 </div>
                                             </div>
                                             <div class="col-lg-8">											
@@ -2884,12 +2923,14 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-4">
                                                 <select id="cmbRVPeriferica" name="cmbRVPeriferica" class="form-control-select2" >
+                                                    <option value="">Selecione</option>
                                                     <option value='PR'>PRESERVADA</option>
                                                     <option value='CO'>COMPROMETIDA</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-4">
                                                 <select id="cmbPPeriferica" name="cmbPPeriferica" class="form-control-select2" >
+                                                    <option value="">Selecione</option>
                                                     <option value='NO'>NORMAL</option>
                                                     <option value='LE'>LENTIFICADA</option>
                                                 </select>											
@@ -2917,8 +2958,8 @@ if (isset($_POST['inputInicio'])) {
                                             </div>									
                                             <div class="col-lg-4 ">
                                                 <div class="outrosAcessos" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFAcessoOutroDescricao'] == 1 ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputAcessos" name="inputAcessos" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAcessoOutroDescricao']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputAcessos" name="inputAcessos" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFAcessoOutroDescricao']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputAcessos"></span></small>
                                                 </div>
                                             </div>
                                             
@@ -3099,12 +3140,12 @@ if (isset($_POST['inputInicio'])) {
                                                     
                                                     <!-- campos -->	
                                                     <div class="col-lg-6">
-                                                        <input type="text" id="inputFrequenciaIntestinais" name="inputFrequenciaIntestinais" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFIntestinalFrequenciaDescricao']; ?>">
-                                                        <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                        <input type="text" id="inputFrequenciaIntestinais" name="inputFrequenciaIntestinais" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFIntestinalFrequenciaDescricao']; ?>">
+                                                        <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputFrequenciaIntestinais"></span></small>
                                                     </div>
                                                     <div class="col-lg-6">
-                                                        <input type="text" id="inputFrequenciaEmese" name="inputFrequenciaEmese" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFEmeseFrequenciaDescricao']; ?>">											
-                                                        <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                        <input type="text" id="inputFrequenciaEmese" name="inputFrequenciaEmese" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFEmeseFrequenciaDescricao']; ?>">											
+                                                        <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputFrequenciaEmese"></span></small>
                                                     </div>
 
                                                 </div>
@@ -3117,8 +3158,8 @@ if (isset($_POST['inputInicio'])) {
                                                     <div class="col-lg-6"></div>
                                                     <div class="col-lg-6">
                                                         <div class="outrosIntestinais" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFIntestinalOutro'] == 1 ? 'block' : 'none' ) :  'none' ; ?>;">                                                            
-                                                            <input type="text" id="inputOutrosIntestinais" name="inputOutrosIntestinais" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFIntestinalOutroDescricao']; ?>">
-                                                            <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                            <input type="text" id="inputOutrosIntestinais" name="inputOutrosIntestinais" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFIntestinalOutroDescricao']; ?>">
+                                                            <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputOutrosIntestinais"></span></small>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6"></div>
@@ -3173,8 +3214,8 @@ if (isset($_POST['inputInicio'])) {
                                                     
                                                     <!-- campos -->										
                                                     <div class="col-lg-6 outrosUrinarias">
-													    <input type="text" id="inputOutrosUrinarias" name="inputOutrosUrinarias" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFUrinariaOutroDescricao']; ?>">
-                                                        <small class="text-muted form-text">Max. de 30 caracteres</small>
+													    <input type="text" id="inputOutrosUrinarias" name="inputOutrosUrinarias" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFUrinariaOutroDescricao']; ?>">
+                                                        <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputOutrosUrinarias"></span></small>
                                                     </div>
                                                     <div class="col-lg-6">											
                                                     </div>
@@ -3324,12 +3365,14 @@ if (isset($_POST['inputInicio'])) {
                                                 <!-- campos -->										
                                                 <div class="col-lg-6">
                                                     <select id="cmbHigieneCorporal" name="cmbHigieneCorporal" class="form-control-select2" >
+                                                        <option value="">Selecione</option>
                                                         <option value='SA'>SATISFATÓRIO</option>
                                                         <option value='IN'>INSATISFATÓRIO</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-lg-6">
                                                     <select id="cmbHigieneBucal" name="cmbHigieneBucal" class="form-control-select2" >
+                                                        <option value="">Selecione</option>
                                                         <option value='SA'>SATISFATÓRIO</option>
                                                         <option value='IN'>INSATISFATÓRIO</option>
                                                     </select>											
@@ -3377,12 +3420,14 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-4">
                                                 <select id="cmbAlergias" name="cmbAlergias" class="form-control-select2"  onChange="textoAlergias()">
+                                                    <option value="">Selecione</option>
                                                     <option value='NA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfato'] == 'NA' ? 'selected' : ''; ?> >NÃO</option>
                                                     <option value='SI' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfato'] == 'SI' ? 'selected' : ''; ?> >SIM. QUAL?</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-4">
                                                 <select id="cmbDSImunologico" name="cmbDSImunologico" class="form-control-select2" onChange="teXtoDSImunologico()">
+                                                    <option value="">Selecione</option>
                                                     <option value='NA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfato'] == 'NA' ? 'selected' : ''; ?> >NÃO</option>
                                                     <option value='SI' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfato'] == 'SI' ? 'selected' : ''; ?> >SIM. QUAL?</option>
                                                 </select>											
@@ -3413,20 +3458,20 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-4 ">
                                                 <div class="qualAlergia" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFRegulacaoAlergia'] == 'SI' ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputQualAlergia" name="inputQualAlergia" maxLength="30"class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFRegulacaoAlergiaQual']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputQualAlergia" name="inputQualAlergia" maxLength="80"class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFRegulacaoAlergiaQual']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputQualAlergia"></span></small>
                                                 </div>
                                             </div>
                                             <div class="col-lg-4 ">
                                                 <div class="qualDoenca" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFDoencaSistImunologico'] == 'SI' ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputQualDoenca" name="inputQualDoenca" maxLength="30" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFDoencaSistImunologicoQual']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputQualDoenca" name="inputQualDoenca" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFDoencaSistImunologicoQual']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputQualDoenca"></span></small>
                                                 </div>
                                             </div>
                                             <div class="col-lg-4 ">
                                                 <div class="qualCalVacinal" style="display: <?php echo isset($iAtendimentoExameFisicoId) ? ($rowExameFisico['EnExFCalendarioVacinalIncompleto'] == 'IN' ? 'block' : 'none' ) :  'none' ; ?>;">
-                                                    <input type="text" id="inputIncQual" name="inputIncQual" maxLength="30" class="form-control"  placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFCalendarioVacinalQual']; ?>">
-                                                    <small class="text-muted form-text">Max. de 30 caracteres</small>
+                                                    <input type="text" id="inputIncQual" name="inputIncQual" maxLength="80" class="form-control"  placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFCalendarioVacinalQual']; ?>">
+                                                    <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputIncQual"></span></small>
                                                 </div>
                                             </div>
                                             
@@ -3478,6 +3523,7 @@ if (isset($_POST['inputInicio'])) {
                                             </div>
                                             <div class="col-lg-3">
                                                 <select id="cmbCLixoRegular" name="cmbCLixoRegular" class="form-control-select2" >
+                                                    <option value="">Selecione</option>
                                                     <option value='SI'>SIM</option>
                                                     <option value='NA'>NÃO</option>
                                                     <option value='NS'>NÃO SE APLICA</option>
@@ -3485,6 +3531,7 @@ if (isset($_POST['inputInicio'])) {
                                             </div>
                                             <div class="col-lg-3">
                                                 <select id="cmbAguaTratada" name="cmbAguaTratada" class="form-control-select2" >
+                                                    <option value="">Selecione</option>
                                                     <option value='SI'>SIM</option>
                                                     <option value='NA'>NÃO</option>
                                                     <option value='NS'>NÃO SE APLICA</option>
@@ -3528,17 +3575,16 @@ if (isset($_POST['inputInicio'])) {
                                                     <label class="col-form-label col-lg-4">COMER/BEBER</label>
                                                     <div class="col-lg-8">
                                                         <select id="cmbComerBeber" name="cmbComerBeber" class="form-control form-control-select2">
-
-                                                        <?php
-                                                            foreach ($arrayGrauDependencia as $key => $item) {
-                                                                if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFComerBeber'] ==  $key) ) {																
-                                                                    print('<option value="' . $key . '" selected>' . $item . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $key . '">' . $item . '</option>');
+                                                            <option value="">Selecione</option>
+                                                            <?php
+                                                                foreach ($arrayGrauDependencia as $key => $item) {
+                                                                    if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFComerBeber'] ==  $key) ) {																
+                                                                        print('<option value="' . $key . '" selected>' . $item . '</option>');
+                                                                    } else {
+                                                                        print('<option value="' . $key . '">' . $item . '</option>');
+                                                                    }
                                                                 }
-                                                            }
-                                                        ?>
-
+                                                            ?>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -3549,17 +3595,16 @@ if (isset($_POST['inputInicio'])) {
                                                     <label class="col-form-label col-lg-4">VESTIR-SE</label>
                                                     <div class="col-lg-8">
                                                         <select id="cmbVestirSe" name="cmbVestirSe" class="form-control form-control-select2">
-
-                                                        <?php
-                                                            foreach ($arrayGrauDependencia as $key => $item) {
-                                                                if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFVestir'] ==  $key) ) {																
-                                                                    print('<option value="' . $key . '" selected>' . $item . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $key . '">' . $item . '</option>');
+                                                            <option value="">Selecione</option>
+                                                            <?php
+                                                                foreach ($arrayGrauDependencia as $key => $item) {
+                                                                    if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFVestir'] ==  $key) ) {																
+                                                                        print('<option value="' . $key . '" selected>' . $item . '</option>');
+                                                                    } else {
+                                                                        print('<option value="' . $key . '">' . $item . '</option>');
+                                                                    }
                                                                 }
-                                                            }
-                                                        ?>
-
+                                                            ?>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -3570,17 +3615,16 @@ if (isset($_POST['inputInicio'])) {
                                                     <label class="col-form-label col-lg-4">SUBIR ESCADAS</label>
                                                     <div class="col-lg-8">
                                                         <select id="cmbSubirEscadas" name="cmbSubirEscadas" class="form-control form-control-select2">
-                                                        
-                                                        <?php
-                                                            foreach ($arrayGrauDependencia as $key => $item) {
-                                                                if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFSubirEscada'] ==  $key) ) {																
-                                                                    print('<option value="' . $key . '" selected>' . $item . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $key . '">' . $item . '</option>');
+                                                            <option value="">Selecione</option>                                                        
+                                                            <?php
+                                                                foreach ($arrayGrauDependencia as $key => $item) {
+                                                                    if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFSubirEscada'] ==  $key) ) {																
+                                                                        print('<option value="' . $key . '" selected>' . $item . '</option>');
+                                                                    } else {
+                                                                        print('<option value="' . $key . '">' . $item . '</option>');
+                                                                    }
                                                                 }
-                                                            }
-                                                        ?>
-
+                                                            ?>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -3591,17 +3635,16 @@ if (isset($_POST['inputInicio'])) {
                                                     <label class="col-form-label col-lg-4">BANHO</label>
                                                     <div class="col-lg-8">
                                                         <select id="cmbBanho" name="cmbBanho" class="form-control form-control-select2">
-                                                        
-                                                        <?php
-                                                            foreach ($arrayGrauDependencia as $key => $item) {
-                                                                if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFBanho'] ==  $key) ) {																
-                                                                    print('<option value="' . $key . '" selected>' . $item . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $key . '">' . $item . '</option>');
+                                                            <option value="">Selecione</option>                                                        
+                                                            <?php
+                                                                foreach ($arrayGrauDependencia as $key => $item) {
+                                                                    if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFBanho'] ==  $key) ) {																
+                                                                        print('<option value="' . $key . '" selected>' . $item . '</option>');
+                                                                    } else {
+                                                                        print('<option value="' . $key . '">' . $item . '</option>');
+                                                                    }
                                                                 }
-                                                            }
-                                                        ?>
-
+                                                            ?>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -3612,17 +3655,16 @@ if (isset($_POST['inputInicio'])) {
                                                     <label class="col-form-label col-lg-4">DEAMBULAR</label>
                                                     <div class="col-lg-8">
                                                         <select id="cmbDeambular" name="cmbDeambular" class="form-control form-control-select2">
-                                                        
-                                                        <?php
-                                                            foreach ($arrayGrauDependencia as $key => $item) {
-                                                                if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFDeambular'] ==  $key) ) {																
-                                                                    print('<option value="' . $key . '" selected>' . $item . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $key . '">' . $item . '</option>');
+                                                            <option value="">Selecione</option>                                                        
+                                                            <?php
+                                                                foreach ($arrayGrauDependencia as $key => $item) {
+                                                                    if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFDeambular'] ==  $key) ) {																
+                                                                        print('<option value="' . $key . '" selected>' . $item . '</option>');
+                                                                    } else {
+                                                                        print('<option value="' . $key . '">' . $item . '</option>');
+                                                                    }
                                                                 }
-                                                            }
-                                                        ?>
-
+                                                            ?>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -3633,17 +3675,16 @@ if (isset($_POST['inputInicio'])) {
                                                     <label class="col-form-label col-lg-4">ANDAR</label>
                                                     <div class="col-lg-8">
                                                         <select id="cmbAndar" name="cmbAndar" class="form-control form-control-select2">
-                                                        
-                                                        <?php
-                                                            foreach ($arrayGrauDependencia as $key => $item) {
-                                                                if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFAndar'] ==  $key) ) {																
-                                                                    print('<option value="' . $key . '" selected>' . $item . '</option>');
-                                                                } else {
-                                                                    print('<option value="' . $key . '">' . $item . '</option>');
+                                                            <option value="">Selecione</option>                                                        
+                                                            <?php
+                                                                foreach ($arrayGrauDependencia as $key => $item) {
+                                                                    if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFAndar'] ==  $key) ) {																
+                                                                        print('<option value="' . $key . '" selected>' . $item . '</option>');
+                                                                    } else {
+                                                                        print('<option value="' . $key . '">' . $item . '</option>');
+                                                                    }
                                                                 }
-                                                            }
-                                                        ?>
-
+                                                            ?>
                                                         </select>
                                                     </div>
                                                 </div>

@@ -3158,7 +3158,7 @@ try{
 			$sql = "INSERT INTO  EnfermagemAnotacaoTecnico(EnAnTAtendimento,EnAnTDataInicio,EnAnTHoraInicio,EnAnTProfissional,EnAnTPas,EnAnTPad,EnAnTFreqCardiaca,EnAnTFreqRespiratoria,
 														EnAnTTemperatura,EnAnTSPO,EnAnTHGT, EnAnTAlergia, EnAnTAlergiaDescricao, EnAnTDiabetes, EnAnTDiabetesDescricao, EnAnTHipertensao, 
 														EnAnTHipertensaoDescricao, EnAnTNeoplasia, EnAnTNeoplasiaDescricao, EnAnTUsoMedicamento, EnAnTUsoMedicamentoDescricao, 
-														EnAnTDataHora,EnAnTJustificativaLancRetroativo,EnAnTPeso,EnAnTAnotacao,EnAnTEditavel,EnAnTUnidade)
+														EnAnTDataHora,EnAnTJustificativaLancRetroativo,EnAnPeso,EnAnTAnotacao,EnAnTEditavel,EnAnTUnidade)
 			VALUES ('$iAtendimentoId', '$dataInicio', '$horaInicio', '$usuarioId', '$inputSistolica', '$inputDiatolica', '$inputCardiaca', '$inputRespiratoria',
 					'$inputTemperatura', '$inputSPO', '$inputHGT', '$inputAlergia', '$inputAlergiaDescricao', '$inputDiabetes', '$inputDiabetesDescricao', '$inputHipertensao', '$inputHipertensaoDescricao', 
 					'$inputNeoplasia', '$inputNeoplasiaDescricao', '$inputUsoMedicamento', '$inputUsoMedicamentoDescricao',  '$dataHoraAtual', '$justificativaAnotacao', '$peso', '$anotacao', 1, '$iUnidade')";
@@ -3195,7 +3195,7 @@ try{
 			EnAnTUsoMedicamentoDescricao = '$inputUsoMedicamentoDescricao',
 			EnAnTDataHora = '$dataHoraAtual',
 			EnAnTJustificativaLancRetroativo = '$justificativaAnotacao',
-			EnAnTPeso = '$peso',
+			EnAnPeso = '$peso',
 			EnAnTAnotacao = '$anotacao'
 			WHERE EnAnTId = '$idAnotacao'";
 
@@ -3255,7 +3255,7 @@ try{
 				'anotacao'=> substr($item['EnAnTAnotacao'], 0, 100) . '...',
 				'justificativaCompleta' => $item['EnAnTJustificativaLancRetroativo'],
 				'anotacaoCompleta' => $item['EnAnTAnotacao'],
-				'peso' => $item['EnAnTPeso'],
+				'peso' => $item['EnAnPeso'],
 				'editavel' => $item['EnAnTEditavel']
 			]);
 		}
@@ -3301,6 +3301,7 @@ try{
 		$inputTemperatura = $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'];
 		$inputSPO = $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'];
 		$inputHGT = $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'];
+		$inputPeso = $_POST['inputPeso'] == "" ? 0 : gravaValor($_POST['inputPeso']);
 
 		$inputAlergia = $_POST['inputAlergia'];
 		$inputAlergiaDescricao = $_POST['inputAlergiaDescricao'];
@@ -3324,12 +3325,12 @@ try{
 			$iAtendimentoId = $_POST['iAtendimentoId'];
 
 			$sql = "INSERT INTO  EnfermagemEvolucao(EnEvoAtendimento,EnEvoDataInicio,EnEvoHoraInicio,EnEvoProfissional,EnEvoPas,EnEvoPad,EnEvoFreqCardiaca,EnEvoFreqRespiratoria,
-														EnEvoTemperatura,EnEvoSPO,EnEvoHGT, EnEvoAlergia, EnEvoAlergiaDescricao, EnEvoDiabetes, EnEvoDiabetesDescricao, EnEvoHipertensao, 
+														EnEvoTemperatura,EnEvoSPO,EnEvoHGT, EnEvoPeso, EnEvoAlergia, EnEvoAlergiaDescricao, EnEvoDiabetes, EnEvoDiabetesDescricao, EnEvoHipertensao, 
 														EnEvoHipertensaoDescricao, EnEvoNeoplasia, EnEvoNeoplasiaDescricao, EnEvoUsoMedicamento, EnEvoUsoMedicamentoDescricao,
 														EnEvoDataHora,EnEvoJustificativaLancRetroativo,EnEvoEvolucao,EnEvoEditavel,EnEvoUnidade)
 
 			VALUES ('$iAtendimentoId', '$dataInicio', '$horaInicio', '$usuarioId', '$inputSistolica', '$inputDiatolica', '$inputCardiaca', '$inputRespiratoria',
-					'$inputTemperatura', '$inputSPO', '$inputHGT', '$inputAlergia', '$inputAlergiaDescricao', '$inputDiabetes', '$inputDiabetesDescricao', '$inputHipertensao', 
+					'$inputTemperatura', '$inputSPO', '$inputHGT', '$inputPeso' , '$inputAlergia', '$inputAlergiaDescricao', '$inputDiabetes', '$inputDiabetesDescricao', '$inputHipertensao', 
 					'$inputHipertensaoDescricao', '$inputNeoplasia', '$inputNeoplasiaDescricao', '$inputUsoMedicamento', '$inputUsoMedicamentoDescricao',  '$dataHoraAtual', '$justificativaEvolucao', '$evolucaoEnfermagem', 1, '$iUnidade')";
 			$conn->query($sql);
 
@@ -3353,6 +3354,7 @@ try{
 			EnEvoTemperatura = '$inputTemperatura',
 			EnEvoSPO = '$inputSPO',
 			EnEvoHGT = '$inputHGT',
+			EnEvoPeso = '$inputPeso',
 			EnEvoAlergia = '$inputAlergia', 
 			EnEvoAlergiaDescricao = '$inputAlergiaDescricao', 
 			EnEvoDiabetes = '$inputDiabetes', 
