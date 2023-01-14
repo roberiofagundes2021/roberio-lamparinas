@@ -136,10 +136,15 @@ if ($row['ClienSexo'] == 'F'){
 					width: "5%", //15
 					targets: [4]
 				},
+				{ 
+					orderable: true,   //cid10
+					width: "10%", //15
+					targets: [5]
+				},
                 { 
 					orderable: true,   //acoes
 					width: "10%", //15
-					targets: [5]
+					targets: [6]
 				},
                 ],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
@@ -165,6 +170,16 @@ if ($row['ClienSexo'] == 'F'){
 					alerta('Campo obrigatório!!', menssagem, 'error')
 					return
 				}
+
+				let chave = $("#modelo option:selected").data('chave')
+				if (chave == "ATESTADOMEDICOCOMCID") {
+					if ($("#cmbCId10").val() == '') {
+						$('#cmbCId10').focus();
+						alerta('Campo obrigatório!!', 'Infomrme o CID!', 'error')
+						return						
+					}
+				}
+
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAtendimento.php',
@@ -174,12 +189,14 @@ if ($row['ClienSexo'] == 'F'){
 						'idAtendimento': '<?php echo $iAtendimentoId ?>',
 						'profissional': '<?php echo $userId ?>',
 						'modelo': $('#modelo').val(),
+						'cid' : $("#cmbCId10").val(),
 						'descricao': $('#summernote').val(),
 					},
 					success: function(response) {
                         if (response.status == 'success') {
                             getCmbs()
                             checkDocumentos()
+							$(".box-cid10").css('display', 'none');
                             alerta(response.titulo, response.menssagem, response.status);
                         }else{
                             alerta(response.titulo, response.menssagem, response.status);
@@ -189,6 +206,14 @@ if ($row['ClienSexo'] == 'F'){
 			})
 
 			$('#modelo').on('change', function(){
+
+				let chave = $("#modelo option:selected").data('chave')
+				if (chave == "ATESTADOMEDICOCOMCID") {
+					$(".box-cid10").css('display', 'block');
+				} else {
+					$("#cmbCId10").val('').change();
+					$(".box-cid10").css('display', 'none');		
+				}
 
 				// vai preencher MODELOS
 				$.ajax({
@@ -217,7 +242,8 @@ if ($row['ClienSexo'] == 'F'){
 
 		function getCmbs(){
 			// limpa o campo text
-			$('#summernote').val('')
+			$('#summernote').summernote('code', '')
+			$("#cmbCId10").val('').change();
 
 			// vai preencher MODELOS
 			$.ajax({
@@ -231,7 +257,7 @@ if ($row['ClienSexo'] == 'F'){
 					$('#modelo').empty();
 					$('#modelo').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
+						let opt = `<option value="${item.id}" data-chave="${item.chave}">${item.nome}</option>`
 						$('#modelo').append(opt)
 					})
 				}
@@ -269,6 +295,7 @@ if ($row['ClienSexo'] == 'F'){
 								<td class="text-left">${item.tipoDocumento}</td>
 								<td class="text-left">${item.profissional}</td>
 								<td class="text-left">${item.cbo}</td>
+								<td class="text-left">${item.cid10}</td>
 								<td class="text-center">${acoes}</td>
 							</tr>`
 						})
@@ -368,16 +395,41 @@ if ($row['ClienSexo'] == 'F'){
 
 								<div class="card-body">
 
-									<div class="col-lg-6 row">
-										<div class="col-lg-12">
+									<div class="col-lg-12 row">
+										<div class="col-lg-6">
 											<label>Tipo de documento <span class="text-danger">*</span></label>
 										</div>
+										<div class="col-lg-6">
+											<label class="box-cid10" style="display:none">CID <span class="text-danger">*</span></label>
+										</div>
 
-										<div class="col-lg-12 input-group">
+										<div class="col-lg-6 input-group">
 											<select id="modelo" name="modelo" class="form-control select-search">
 												<option value="">Selecione</option>
 											</select>
-										</div>										
+										</div>	
+										
+										<div class="col-lg-6">
+											<div class="box-cid10" style="display:none">
+												<select id="cmbCId10" name="cmbCId10" class="select-search" >
+													<option value="">Selecione</option>
+													<?php 
+														$sql = "SELECT Cid10Id,Cid10Capitulo, Cid10Codigo, Cid10Descricao
+																FROM Cid10
+																JOIN Situacao on SituaId = Cid10Status
+																WHERE SituaChave = 'ATIVO'
+																ORDER BY Cid10Codigo ASC";
+														$result = $conn->query($sql);
+														$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($row as $item){
+															$seleciona = $item['Cid10Id'] == $rowAnamnese['EnAnaCid10'] ? "selected" : "";
+															print('<option value="'.$item['Cid10Id'].'" '. $seleciona .'>'.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
+														}
+													?>
+												</select>
+											</div>
+										</div>
 									</div>
 
 									<br/>
@@ -411,6 +463,7 @@ if ($row['ClienSexo'] == 'F'){
 													<th>Tipo de Documento</th>
 													<th>Profissional</th>
 													<th>CBO</th>
+													<th>CID-10</th>													
 													<th class="text-center">Ações</th>
 												</tr>
 											</thead>

@@ -2832,10 +2832,10 @@ try{
 		]);
 	} elseif ($tipoRequest == 'ATENDMODELOS') {
 
-		$sql = "SELECT AtModId,AtModDescricao
+		$sql = "SELECT AtModId,AtModDescricao, AtTMoChave
 		FROM AtendimentoModelo
         JOIN AtendimentoTipoModelo ON AtModTipoModelo = AtTMoId
-        AND AtTMoChave IN ('ATESTADOMEDICO', 'ATESTADOMEDICOCID', 
+        AND AtTMoChave IN ('ATESTADOMEDICO', 'ATESTADOMEDICOCOMCID', 
                         'DECLARACAOCOMPARECIMENTO', 'DECLARACAOCOMPARECIMENTOACOMPANHANTE', 
                         'RELATORIOMEDICO', 'DIGITACAOLIVRE')";
 		$result = $conn->query($sql);
@@ -2845,7 +2845,8 @@ try{
 		foreach($row as $item){
 			array_push($array,[
 				'id' => $item['AtModId'],
-				'nome' => $item['AtModDescricao']
+				'nome' => $item['AtModDescricao'],
+				'chave' => $item['AtTMoChave']
 			]);
 		}
 		echo json_encode($array);
@@ -2869,12 +2870,13 @@ try{
 		$profissional = $_POST['profissional'];
         $modelo = $_POST['modelo'];		
 		$descricao = $_POST['descricao'];
+		$cid = $_POST['cid'] == '' ? "NULL" : $_POST['cid'];
         
         $dataHora = date('Y-m-d H:i:s');
 
         $sql = "INSERT INTO AtendimentoDocumento(
-            AtDocAtendimento, AtDocModelo, AtDocDescricao, AtDocDataHora, AtDocProfissional, AtDocUnidade)
-            VALUES('$idAtendimento', '$modelo', '$descricao', '$dataHora', '$profissional', '$iUnidade')";
+            AtDocAtendimento, AtDocModelo, AtDocCid10, AtDocDescricao, AtDocDataHora, AtDocProfissional, AtDocUnidade)
+            VALUES('$idAtendimento', '$modelo', $cid, '$descricao', '$dataHora', '$profissional', '$iUnidade')";
 		$conn->query($sql);
 
 		echo json_encode([
@@ -2887,12 +2889,13 @@ try{
 
 		$iAtendimento = $_POST['id'];
 
-        $sql = "SELECT AtDocId, AtDocAtendimento, AtDocModelo, AtDocDescricao, AtDocDataHora, 
+        $sql = "SELECT AtDocId, AtDocAtendimento, AtDocModelo, AtDocDescricao, AtDocDataHora, Cid10Codigo,
             AtDocProfissional,Profissional.ProfiNome, ProfiCbo, AtTMoNome
 			FROM AtendimentoDocumento
             JOIN AtendimentoModelo ON AtDocModelo = AtModId
             JOIN AtendimentoTipoModelo ON AtModTipoModelo = AtTMoId
 			JOIN Profissional ON AtDocProfissional = Profissional.ProfiId
+			LEFT JOIN Cid10 ON AtDocCid10 = Cid10Id
 			JOIN Profissao ON ProfiProfissao = Profissao.ProfiId
 			WHERE AtDocAtendimento = $iAtendimento";
 
@@ -2915,6 +2918,7 @@ try{
                 'tipoDocumento' => $item['AtTMoNome'],
 				'profissional'=>$item['ProfiNome'],
 				'cbo'=>$item['ProfiCbo'],
+				'cid10'=>$item['Cid10Codigo'] == ''? '--' : $item['Cid10Codigo']
 			]);
 		}
 		
