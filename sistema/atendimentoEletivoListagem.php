@@ -583,6 +583,7 @@ $acesso = 'ATENDIMENTO';
 						rowNodeA = tableA.row.add(item.data).draw().node()
 						$(rowNodeA).attr('class', 'text-left')
 						$(rowNodeA).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
+						$(rowNodeA).find('td:eq(5)').attr('class', 'text-center')
 						$(rowNodeA).find('td:eq(7)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeA).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeA).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
