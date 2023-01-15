@@ -175,7 +175,13 @@
 
 						<li class="nav-item pt-3">
 							<div class="col-lg-12">
-								<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php if($SituaChave != 'ATENDIDO'){?>
+
+									<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php }?>
+								
 							</div>
 						</li>
 					</ul>
@@ -236,7 +242,13 @@
 
 						<li class="nav-item pt-3">
 							<div class="col-lg-12">
-								<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php if($SituaChave != 'ATENDIDO'){?>
+
+									<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php }?>
+									
 							</div>
 						</li>
 					</ul>
@@ -332,7 +344,13 @@
 
 						<li class="nav-item pt-3">
 							<div class="col-lg-12">
-								<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php if($SituaChave != 'ATENDIDO'){?>
+
+									<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php }?>
+								
 							</div>
 						</li>
 					</ul>
