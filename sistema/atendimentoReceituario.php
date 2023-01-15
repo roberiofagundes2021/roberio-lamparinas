@@ -48,6 +48,7 @@ $iAtendimentoReceituarioId = $rowReceituario?$rowReceituario['AtRecId']:null;
 
 $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
+$SituaChave = isset($_POST['SituaChave'])?$_POST['SituaChave']:'';
 
 
 //Essa consulta é para verificar  o profissional
@@ -361,7 +362,11 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-												<button class="btn btn-lg btn-principal" id="enviar">Salvar</button>
+												<?php 
+													if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+														echo "<button class='btn btn-lg btn-success mr-1' id='enviar'>Salvar</button>";
+														}
+												?>
 												<?php
 													if($rowReceituario && !$rowReceituario['AtRecDataFim']){
 														echo "<a id='imprimirBTN' href='#' class='btn btn-basic' role='button'>Imprimir</a>";

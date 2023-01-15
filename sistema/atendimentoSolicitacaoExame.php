@@ -38,6 +38,7 @@ $iAtendimentoSolicitacaoExameId = $rowSolicitacaoExame?$rowSolicitacaoExame['AtS
 
 $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
+$SituaChave = isset($_POST['SituaChave'])?$_POST['SituaChave']:'';
 
 
 //Essa consulta é para verificar  o profissional
@@ -528,7 +529,12 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:15px;">
-												<button class="btn btn-lg btn-success" id="adicionarExame" data-tipo="ADICIONAREXAME" >Adicionar</button>
+												<?php 
+													if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+														echo "<button class='btn btn-lg btn-success' id='adicionarExame' data-tipo='ADICIONAREXAME' >Adicionar</button>";
+														}
+												?>
+												
 											</div>
 										</div>
 									</div> 
