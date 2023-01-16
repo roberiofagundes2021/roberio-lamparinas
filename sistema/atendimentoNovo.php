@@ -1512,7 +1512,7 @@ $_SESSION['atendimento'] = [
 							<div id="dados">
 								<form id="dadosPaciente" class="form-validate-jquery" action="#" data-fouc>
 									<div class="card-header header-elements-inline" style="margin-left:10px;">
-										<h5 class="text-uppercase font-weight-bold">Cadastro de Paciente</h5>
+										<h5 class="text-uppercase font-weight-bold">Dados do Paciente</h5>
 									</div>
 									<div class="col-12 row text-center justify-content-center mb-5" id="selectPaciente">
 										<div class="col-lg-12 my-3 text-black-50">
@@ -1532,7 +1532,7 @@ $_SESSION['atendimento'] = [
 								</form>
 								<form id="dadosResponsavel" class="form-validate-jquery d-none" action="#" data-fouc>
 									<div class="card-header header-elements-inline" style="margin-left:10px;">
-										<h5 class="text-uppercase font-weight-bold">Cadastro de Responsável</h5>
+										<h5 class="text-uppercase font-weight-bold">Dados do Responsável</h5>
 									</div>
 									<div class="col-12 row text-center justify-content-center mb-5" id="selectResponsavel">
 										<div class="col-lg-12 my-3 text-black-50">
@@ -1551,10 +1551,10 @@ $_SESSION['atendimento'] = [
 								</form>
 								<form id="dadosAtendimento" class="form-validate-jquery d-none" action="#" data-fouc>
 									<div class="card-header header-elements-inline" style="margin-left:10px;">
-										<h5 class="text-uppercase font-weight-bold">Cadastro de Atendimento</h5>
+										<h5 class="text-uppercase font-weight-bold">Dados do Atendimento</h5>
 									</div>
 									<div class="card-body">
-										<div class="col-lg-12 mb-4 row mt-4">
+										<div class="col-lg-12 mb-4 row mt-2">
 											<!-- titulos -->
 											<div class='col-lg-3'>
 												<label>Data do Registro</label>
