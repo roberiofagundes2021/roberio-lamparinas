@@ -417,6 +417,32 @@ if(isset($_POST['inputNome'])){
 			$('#imagem').on('change',function(){
 
 				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
+				resetImagem = '<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">';
+
+				var inputFile = $('#imagem').val();
+				var id = $("input:file").attr('id');
+				var tamanho =  1024 * 1024 * 3; //3MB
+								
+				//Verifica se o campo só possui espaços em branco
+				if (inputFile == ''){
+					alerta('Atenção','Selecione o arquivo!','error');
+					$('#visualizar').html(resetImagem);
+					return false;
+				}
+								
+				//Verifica se a extensão é  diferente de CSV
+				if (ext(inputFile) != 'jpg' && ext(inputFile) != 'jpeg' && ext(inputFile) != 'gif' && ext(inputFile) != 'png' && ext(inputFile) != 'bmp'){
+					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: JPG, JPEG, GIF, PNG, BMP!','error');
+					$('#visualizar').html(resetImagem);
+					return false;
+				}
+
+				//Verifica o tamanho do arquivo
+				if ($('#'+id)[0].files[0].size > tamanho){
+					alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 3MB.','error');
+					$('#visualizar').html(resetImagem);
+					return false;
+				}								
 								
 				// Get form
 				var form = $('#formFoto')[0];
@@ -475,6 +501,12 @@ if(isset($_POST['inputNome'])){
 			})
 		
 		});
+
+		function ext(path) {
+			var final = path.substr(path.lastIndexOf('/')+1);
+			var separador = final.lastIndexOf('.');
+			return separador <= 0 ? '' : final.substr(separador + 1);
+		}		
 
 	</script>
 		
