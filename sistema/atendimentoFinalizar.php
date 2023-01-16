@@ -150,7 +150,9 @@ if(isset($_POST['condulta'])){
 		$result = $conn->query($sql);
 		$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
-		$sql = "UPDATE Atendimento SET AtendSituacao = '$situacao[SituaId]' WHERE AtendId = '$iAtendimentoId'";
+		$sql = "UPDATE Atendimento SET AtendSituacao = $situacao[SituaId],
+		AtendDesfechoChave = '$_POST[condulta]'
+		WHERE AtendId = '$iAtendimentoId'";
 		$conn->query($sql);
 
 		switch($_POST['condulta']){
@@ -200,7 +202,7 @@ if(isset($_POST['condulta'])){
 					case 'COMRECEITA': URL = 'atendimentoReceituario.php';break;
 					case 'SEMRECEITA': URL = 'atendimentoFinalizar.php';break;
 					case 'LIBERADO': URL = 'atendimentoFinalizar.php';break;
-					case 'OBSERVACAO': URL = 'atendimentoFinalizar.php';break;
+					case 'AMBULATORIAL': URL = 'atendimentoFinalizar.php';break;
 					case 'INTERNACAO': URL = 'atendimentoFinalizar.php';break;
 					case 'TRANSFERENCIA': URL = 'atendimentoTransferencia.php';break;
 					default: URL = 'atendimentoFinalizar.php';
