@@ -60,7 +60,7 @@ if(isset($_SESSION['aberturaCaixaId'])) {
                             WHERE CxAbeOperador = ".$_SESSION['UsuarId']." AND CxAbeUnidade = $_SESSION[UnidadeId] AND CxAbeStatus = $iStatus
                             ORDER BY CxAbeId DESC";
     $resultSaldoInicial  = $conn->query($sql_saldoInicial);
-    
+
     if($rowSaldoInicial = $resultSaldoInicial->fetch(PDO::FETCH_ASSOC)) {
         $arrayDataAbertura = explode(' ', $rowSaldoInicial['CxAbeDataHoraAbertura']);
         $dataAbertura = $arrayDataAbertura[0];
@@ -83,116 +83,6 @@ if(isset($_SESSION['aberturaCaixaId'])) {
     }
 }
 
-if(isset($_POST['inputAtendimentoId'])) {
-    $nomeCaixa = $_POST['inputCaixaNome'];
-
-    $aberturaCaixaId = $_POST['inputCaixaId'];
-    $dataHora = date("Y-m-d H:i:s");
-    $atendimentoId = $_POST['inputAtendimentoId'];
-    $valor = gravaValor($_POST['inputValorTotal']);
-    $desconto = gravaValor($_POST['inputDesconto']);
-    $valorFinal = gravaValor($_POST['inputValorFinal']);
-    $formaPagamentoId = $_POST['inputFormaPagamento'];
-    $numeroCheque = $_POST['inputNumeroCheque'] != '' ? $_POST['inputNumeroCheque'] : null;
-    $valorCheque = $_POST['inputValorCheque'] != '' ? gravaValor($_POST['inputValorCheque']) : null; 
-    $dataEmissaoCheque = $_POST['inputDataEmissaoCheque'] != '' ?  $_POST['inputDataEmissaoCheque'] : null;
-    $dataVencimentoCheque = $_POST['inputDataVencimentoCheque'] != '' ?  $_POST['inputDataVencimentoCheque'] : null;
-    $bancoCheque = $_POST['inputBancoCheque'] != '' ?  $_POST['inputBancoCheque'] : null;
-    $agenciaCheque = $_POST['inputAgenciaCheque'] != '' ?  $_POST['inputAgenciaCheque'] : null;
-    $contaCheque = $_POST['inputContaCheque'] != '' ?  $_POST['inputContaCheque'] : null;
-    $nomeCheque = $_POST['inputNomeCheque'] != '' ?  $_POST['inputNomeCheque'] : null;
-    $cpfCheque = $_POST['inputCpfCheque'] != '' ?  $_POST['inputCpfCheque'] : null;
-    $parcelas = $_POST['inputParcelas'] != '' ?  $_POST['inputParcelas'] : null;
-
-    $sql_saldoInicial    = "SELECT CxRecId 
-                            FROM CaixaRecebimento
-                            WHERE CxRecAtendimento = " . $atendimentoId . "";
-    $resultSaldoInicial  = $conn->query($sql_saldoInicial);
-
-    if($rowSaldoInicial = $resultSaldoInicial->fetch(PDO::FETCH_ASSOC)) {
-        $_SESSION['msg']['titulo'] = "Erro";
-        $_SESSION['msg']['mensagem'] = "Esse atendimento já foi registrado em outro caixa!!!";
-        $_SESSION['msg']['tipo'] = "error";
-    }else {
-        if($parcelas == 1) {
-            $sql = "SELECT SituaId
-                    FROM Situacao
-                    WHERE SituaChave = 'RECEBIDO'";
-            $result = $conn->query($sql);
-            $row = $result->fetch(PDO::FETCH_ASSOC);
-            $iStatus = $row['SituaId'];		
-
-            try{
-                $conn->beginTransaction();
-
-                $sql = "INSERT INTO CaixaRecebimento (CxRecCaixaAbertura, CxRecDataHora, CxRecAtendimento, CxRecValor, CxRecDesconto, CxRecValorTotal, 
-                                                    CxRecFormaPagamento, CxRecNumCheque, CxRecValorCheque, CxRecDtEmissaoCheque, CxRecDtVencimentoCheque, 
-                                                    CxRecBancoCheque, CxRecAgenciaCheque, CxRecContaCheque, CxRecNomeCheque, CxRecCpfCheque, CxRecStatus, CxRecUnidade)
-                        VALUES (:iAberturaCaixa, :sDataHora, :iAtendimento, :fValor, :fDesconto, :fValorTotal, :iFormaPagamento, :sNumCheque, 
-                        :fValorCheque, :sDtEmissaoCheque, :sDtVencimentoCheque, :iBancoCheque, :sAgenciaCheque, :sContaCheque, :sNomeCheque, :sCpfCheque, :bStatus, :iUnidade)";
-                $result = $conn->prepare($sql);
-                        
-                $result->execute(array(
-                    ':iAberturaCaixa' => $aberturaCaixaId,
-                    ':sDataHora' => $dataHora,
-                    ':iAtendimento' => $atendimentoId,
-                    ':fValor' => $valor,
-                    ':fDesconto' => $desconto,
-                    ':fValorTotal' => $valorFinal,
-                    ':iFormaPagamento' => $formaPagamentoId,
-                    ':sNumCheque' => $numeroCheque,
-                    ':fValorCheque' => $valorCheque,
-                    ':sDtEmissaoCheque' => $dataEmissaoCheque,
-                    ':sDtVencimentoCheque' => $dataVencimentoCheque,
-                    ':iBancoCheque' => $bancoCheque,
-                    ':sAgenciaCheque' => $agenciaCheque,
-                    ':sContaCheque' => $contaCheque,
-                    ':sNomeCheque' => $nomeCheque,
-                    ':sCpfCheque' => $cpfCheque,
-                    ':bStatus' => $iStatus,
-                    ':iUnidade' => $_SESSION['UnidadeId'],
-                ));
-
-                //Consulta o saldo de recebimento atual que está na abertura do caixa
-                $sql = "SELECT CxAbeTotalRecebido
-                        FROM CaixaAbertura
-                        WHERE CxAbeId = $aberturaCaixaId";
-                $result = $conn->query($sql);
-                $row = $result->fetch(PDO::FETCH_ASSOC);
-                $valorFinal = $row['CxAbeTotalRecebido'] + $valorFinal;	
-
-                $sql = "UPDATE CaixaAbertura SET CxAbeTotalRecebido = :fValorRecebido
-                        WHERE CxAbeId = :iCaixaAberturaId";
-                $result = $conn->prepare($sql);
-                        
-                $result->execute(array(
-                    ':fValorRecebido' => $valorFinal,
-                    ':iCaixaAberturaId' => $aberturaCaixaId 
-                ));
-
-                $conn->commit();
-                        
-                $_SESSION['msg']['titulo'] = "Sucesso";
-                $_SESSION['msg']['mensagem'] = "Atendimento incluído ao caixa!!!";
-                $_SESSION['msg']['tipo'] = "success";
-                            
-            } catch(PDOException $e) {
-
-                $conn->rollback();
-                
-                $_SESSION['msg']['titulo'] = "Erro";
-                $_SESSION['msg']['mensagem'] = "Erro aos cadastrar atendimento no caixa!!!";
-                $_SESSION['msg']['tipo'] = "error";	
-                
-                echo 'Error: ' . $e->getMessage();
-            }
-        }else {
-            $_SESSION['msg']['titulo'] = "Erro";
-            $_SESSION['msg']['mensagem'] = "Pagamento parcelado ainda não está disponível!!!";
-            $_SESSION['msg']['tipo'] = "error";	
-        }
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -671,7 +561,8 @@ if(isset($_POST['inputAtendimentoId'])) {
                 }
 
                 let nomeFormaPagamento = $('#cmbFormaPagamento :selected').text();
-
+                let caixaNome = $("#inputCaixaNome").val();
+                let caixaId = $("#inputCaixaId").val();
                 let idAtendimento = $("#cmbAtendimento").val();
                 let valorTotal = $("#valorTotal").text();
                 let desconto = $("#desconto").text();
@@ -688,23 +579,49 @@ if(isset($_POST['inputAtendimentoId'])) {
                 let nomeCheque = nomeFormaPagamento == 'Cheque' ? $("#nomeCheque").val() : '';
                 let cpfCheque = nomeFormaPagamento == 'Cheque' ? $("#cpfCheque").val().replaceAll(".", "").replace("-", "") : '';
 
-                $("#inputAtendimentoId").val(idAtendimento);
-                $("#inputValorTotal").val(valorTotal);
-                $("#inputDesconto").val(desconto);
-                $("#inputValorFinal").val(valorFinal);
-                $("#inputFormaPagamento").val(formaPagamento[0]);
-                $("#inputParcelas").val(parcelamento);
-                $("#inputNumeroCheque").val(numeroCheque);
-                $("#inputValorCheque").val(valorCheque);
-                $("#inputDataEmissaoCheque").val(dataEmissao);
-                $("#inputDataVencimentoCheque").val(dataVencimento);
-                $("#inputBancoCheque").val(bancoCheque);
-                $("#inputAgenciaCheque").val(agenciaCheque);
-                $("#inputContaCheque").val(contaCheque);
-                $("#inputNomeCheque").val(nomeCheque);
-                $("#inputCpfCheque").val(cpfCheque);
+                $('#modal_small_Recebimento').modal('hide');
 
-                document.formAtendimento.submit();
+                $.ajax({
+                    type: 'POST',
+                    url: 'filtraCaixaPDV.php',
+                    dataType: 'json',
+                    data:{
+                        'tipoRequest': 'FINALIZARATENDIMENTO',
+                        'inputCaixaNome' : caixaNome,
+                        'inputCaixaId' : caixaId,
+                        'inputAtendimentoId' : idAtendimento,
+                        'inputValorTotal' : valorTotal,
+                        'inputDesconto' : desconto,
+                        'inputValorFinal' : valorFinal,
+                        'inputFormaPagamento' : formaPagamento[0],
+                        'inputNumeroCheque' : numeroCheque,
+                        'inputValorCheque' : valorCheque,
+                        'inputDataEmissaoCheque' : dataEmissao,
+                        'inputDataVencimentoCheque' : dataVencimento,
+                        'inputBancoCheque' : bancoCheque,
+                        'inputAgenciaCheque' : agenciaCheque,
+                        'inputContaCheque' : contaCheque,
+                        'inputNomeCheque' : nomeCheque,
+                        'inputCpfCheque' : cpfCheque,
+                        'inputParcelas' : parcelamento
+                    },
+                    success: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
+                        $("#cmbAtendimento").val('').change();
+                        $("#valorTotal").text(float2moeda(0));
+                        $("#desconto").text(float2moeda(0));
+                        $("#valorFinal").text(float2moeda(0));
+                        let table 
+                        table = $('#tblAtendimento').DataTable()
+                        table = $('#tblAtendimento').DataTable().clear().draw()
+                        table = $('#tblAtendimento').DataTable()
+                        getContent();
+					},
+					error: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
+					}
+                });
+
             })
         });
 

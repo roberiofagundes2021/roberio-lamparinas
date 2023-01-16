@@ -23,7 +23,7 @@ if(!$iAtendimentoId){
 		irpara("atendimentoEletivoListagem.php");
 	} elseif ($uTipoAtendimento == "AMBULATORIAL") {
 		irpara("atendimentoAmbulatorialListagem.php");
-	} elseif ($uTipoAtendimento == "INTERNACAO") {
+	} elseif ($uTipoAtendimento == "HOSPITALAR") {
 		irpara("atendimentoHospitalarListagem.php");
 	}	
 }
@@ -90,7 +90,7 @@ if(isset($_POST['condulta'])){
 		switch($_SESSION['UltimaPagina']){
 			case "ELETIVO":irpara("atendimentoEletivoListagem.php");break;
 			case "AMBULATORIAL":irpara("atendimentoAmbulatorialListagem.php");break;
-			case "INTERNACAO":irpara("atendimentoHospitalarListagem.php");break;
+			case "HOSPITALAR":irpara("atendimentoHospitalarListagem.php");break;
 			default: irpara("atendimentoEletivoListagem.php");break;
 		}
 	} else{
@@ -150,7 +150,9 @@ if(isset($_POST['condulta'])){
 		$result = $conn->query($sql);
 		$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
-		$sql = "UPDATE Atendimento SET AtendSituacao = '$situacao[SituaId]' WHERE AtendId = '$iAtendimentoId'";
+		$sql = "UPDATE Atendimento SET AtendSituacao = $situacao[SituaId],
+		AtendDesfechoChave = '$_POST[condulta]'
+		WHERE AtendId = '$iAtendimentoId'";
 		$conn->query($sql);
 
 		switch($_POST['condulta']){
@@ -200,7 +202,7 @@ if(isset($_POST['condulta'])){
 					case 'COMRECEITA': URL = 'atendimentoReceituario.php';break;
 					case 'SEMRECEITA': URL = 'atendimentoFinalizar.php';break;
 					case 'LIBERADO': URL = 'atendimentoFinalizar.php';break;
-					case 'OBSERVACAO': URL = 'atendimentoFinalizar.php';break;
+					case 'AMBULATORIAL': URL = 'atendimentoFinalizar.php';break;
 					case 'INTERNACAO': URL = 'atendimentoFinalizar.php';break;
 					case 'TRANSFERENCIA': URL = 'atendimentoTransferencia.php';break;
 					default: URL = 'atendimentoFinalizar.php';
@@ -282,7 +284,7 @@ if(isset($_POST['condulta'])){
 														echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
 														echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
-													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
+													} elseif (isset($ClaChave) && $ClaChave == "HOSPITALAR") {
 														echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													}
 												?>

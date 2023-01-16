@@ -34,8 +34,9 @@
              
             // converte o tamanho para KB
             $tamanho = round($tamanho_imagem / 1024);
+            $tamanhoMaximo = 1024 * 1024 * 3; //3MB
              
-            if($tamanho < 1024){ //se imagem for até 1MB envia
+            if($tamanho < $tamanhoMaximo){ //se imagem for até 3MB envia
                 $nome_atual = md5(uniqid(time())).$ext; //nome que dará a imagem
 
                 $tmp = $_FILES['imagem']['tmp_name']; //caminho temporário da imagem
@@ -68,7 +69,7 @@
 					unset($_SESSION['fotoAtual']);
                 }
             }else{
-                echo "A imagem deve ser de no máximo 1MB";
+                echo "A imagem deve ser de no máximo 3MB";
             }
         }else{
             echo "Formatos aceitos: .jpg, .jpeg, .gif, .png, .bmp";

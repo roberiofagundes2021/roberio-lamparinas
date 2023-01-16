@@ -762,7 +762,7 @@ try{
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'INTERNACAO'
+			AND AtClaChave = 'HOSPITALAR'
 			ORDER BY AtClRTempo ASC";
 		$resultEspera = $conn->query($sql);
 		$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
@@ -781,7 +781,7 @@ try{
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'INTERNACAO'
+			AND AtClaChave = 'HOSPITALAR'
 			ORDER BY AtXSeId DESC";
 		$resultEmAtendimento = $conn->query($sql);
 		$rowEmAtendimento = $resultEmAtendimento->fetchAll(PDO::FETCH_ASSOC);
@@ -800,7 +800,7 @@ try{
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMOBSERVACAO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'INTERNACAO'
+			AND AtClaChave = 'HOSPITALAR'
 			ORDER BY AtXSeId DESC";
 		$resultObservacao = $conn->query($sql);
 		$rowObservacao = $resultObservacao->fetchAll(PDO::FETCH_ASSOC);
@@ -819,7 +819,7 @@ try{
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'INTERNACAO'
+			AND AtClaChave = 'HOSPITALAR'
 			ORDER BY AtXSeId DESC";
 		$resultAtendido = $conn->query($sql);
 		$rowAtendido = $resultAtendido->fetchAll(PDO::FETCH_ASSOC);
@@ -1375,7 +1375,7 @@ try{
 			$nome = $item['AtClRNomePersonalizado']?$item['AtClRNomePersonalizado']:$item['AtClRNome'];
 
 			$classificacao = "<div class='btn-group justify-content-center' title='$nome \n $item[AtClRDeterminantes]'>
-								<div class='btn dropdown-toggle' data-toggle='dropdown' style='height: 35px; width: 35px; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
+								<div data-toggle='dropdown' style='height: 30px; width: 30px; cursor: pointer; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
 								<div class='dropdown-menu'>
 									$riscos
 								</div>
@@ -1466,8 +1466,8 @@ try{
 
 			$nome = $item['AtClRNomePersonalizado']?$item['AtClRNomePersonalizado']:$item['AtClRNome'];
 			
-			$classificacao = "<div class='btn-group justify-content-center' title='$nome \n $item[AtClRDeterminantes]'>
-								<div class='btn dropdown-toggle' data-toggle='dropdown' style='height: 35px; width: 35px; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
+			$classificacao = "<div style='cursor: pointer;' class='btn-group justify-content-center' title='$nome \n $item[AtClRDeterminantes]'>
+								<div data-toggle='dropdown' style='height: 30px; width: 30px; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
 								<div class='dropdown-menu'>
 									$riscos
 								</div>
@@ -1558,8 +1558,13 @@ try{
 
 			$nome = $item['AtClRNomePersonalizado']?$item['AtClRNomePersonalizado']:$item['AtClRNome'];
 			
-			$classificacao = "<div class='btn-group justify-content-center' title='$nome \n $item[AtClRDeterminantes]'>
-								<div class='btn dropdown-toggle' data-toggle='dropdown' style='height: 35px; width: 35px; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
+<<<<<<< HEAD
+			$classificacao = "<div class='btn-group justify-content-center' title='$nome \n$item[AtClRDeterminantes]'>
+								<div data-toggle='dropdown' style='height: 30px; width: 30px; cursor: pointer; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
+=======
+			$classificacao = "<div style='cursor: pointer;' class='btn-group justify-content-center' title='$nome \n $item[AtClRDeterminantes]'>
+								<div data-toggle='dropdown' style='height: 30px; width: 30px; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
+>>>>>>> 18de56dbad53745b012f09ce581a478e435ca88e
 								<div class='dropdown-menu'>
 									$riscos
 								</div>

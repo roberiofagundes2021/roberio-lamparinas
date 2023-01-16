@@ -197,7 +197,7 @@ if(isset($_POST['inputNomePersonalizado'])){
 									<br>
 
                                     <div class="row" style="text-align:center;">
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<div class="form-group">							
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
@@ -207,7 +207,7 @@ if(isset($_POST['inputNomePersonalizado'])){
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<div class="form-group">
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
@@ -217,32 +217,49 @@ if(isset($_POST['inputNomePersonalizado'])){
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-4">
+										<div class="col-lg-3">
 											<div class="form-group">		
 												<div class="form-check form-check-inline">
 													<label class="form-check-label">
-														<input type="radio" id="inputModelo" name="inputModelo" value="I" class="form-input-styled" <?php if ($row['AtClaModelo'] == 'I') echo "checked"; ?> <?php if ($row['AtClaChave'] != null) echo "disabled"; ?>>
-														Internação
+														<input type="radio" id="inputModelo" name="inputModelo" value="H" class="form-input-styled" <?php if ($row['AtClaModelo'] == 'H') echo "checked"; ?> <?php if ($row['AtClaChave'] != null) echo "disabled"; ?>>
+														Hospitalar
+													</label>
+												</div>									
+											</div>			
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">		
+												<div class="form-check form-check-inline">
+													<label class="form-check-label">
+														<input type="radio" id="inputModelo" name="inputModelo" value="O" class="form-input-styled" <?php if ($row['AtClaModelo'] == 'O') echo "checked"; ?> <?php if ($row['AtClaChave'] != null) echo "disabled"; ?>>
+														Odontológico
 													</label>
 												</div>									
 											</div>			
 										</div>
 
-										<div class="col-lg-4" style="text-align:center;">
+										<div class="col-lg-3" style="text-align:center;">
 											<div>										
 												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">
 													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
 												</a>
 											</div>
 										</div>
-										<div class="col-lg-4" style="text-align:center;">
+										<div class="col-lg-3" style="text-align:center;">
 											<div>	
 												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">									
 													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
 												</a>
 											</div>
 										</div>
-										<div class="col-lg-4" style="text-align:center;">
+										<div class="col-lg-3" style="text-align:center;">
+											<div>		
+												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">								
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+												</a>
+											</div>		
+										</div>
+										<div class="col-lg-3" style="text-align:center;">
 											<div>		
 												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">								
 													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
