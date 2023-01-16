@@ -169,6 +169,19 @@ if(isset($_POST['inputAtendimentoId'])) {
                     ':fValorRecebido' => $valorFinal,
                     ':iCaixaAberturaId' => $aberturaCaixaId 
                 ));
+       
+                $sql = "SELECT SituaId FROM Situacao WHERE SituaChave = 'EMESPERA'";
+                $result = $conn->query($sql);
+                $row = $result->fetch(PDO::FETCH_ASSOC);
+                $newStatusAtend = $row['SituaId'];	
+               
+                $sql = "UPDATE Atendimento SET AtendSituacao = :sNewStatusAtend
+                        WHERE AtendId = :iAtendimento";
+                $result = $conn->prepare($sql);
+                $result->execute(array(
+                    ':sNewStatusAtend' => $newStatusAtend,
+                    ':iAtendimento' => $atendimentoId
+                ));
 
                 $conn->commit();
                         
