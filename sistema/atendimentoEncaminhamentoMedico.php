@@ -204,7 +204,48 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 			getCmbs()
 			checkEncaminhamentos()
 
-			$('#encaminhamentoTable').hide()
+			$('#encaminhamentoTable').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+				searching: false,
+				ordering: false, 
+				paging: false,
+			    columnDefs: [
+				{ 
+					orderable: true,   //item
+					width: "5%", //15
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //data-hora
+					width: "15%", //20
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //grupo
+					width: "30%", //15
+					targets: [2]
+				},				
+				{ 
+					orderable: true,   //subgrupo
+					width: "30%", //15
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //procedimento
+					width: "5%", //15
+					targets: [4]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+                
+			});
         
 			$('#enviar').on('click', function(e){
 				e.preventDefault();
@@ -367,7 +408,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 				},
 				success: function(response) {
 					if(response.length){
-						$('#encaminhamentoTable').show()
+						
 						$('#dataEncaminhamento').html('')
 						let HTML = ''
 						response.forEach((item,index) => {
@@ -387,6 +428,8 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 							</tr>`
 						})
 						$('#dataEncaminhamento').html(HTML)
+					}else{
+						$('#dataEncaminhamento').html('')
 					}
 				}
 			});
@@ -403,8 +446,8 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 				},
 				success: function(response) {
 					alerta(response.titulo, response.menssagem, response.status)
-					getCmbs()
 					checkEncaminhamentos()
+					getCmbs()
 				}
 			});
 		}
