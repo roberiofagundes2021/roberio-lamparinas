@@ -20,7 +20,7 @@ if(!$iAtendimentoId){
 		irpara("atendimentoEletivoListagem.php");
 	} elseif ($uTipoAtendimento == "AMBULATORIAL") {
 		irpara("atendimentoAmbulatorialListagem.php");
-	} elseif ($uTipoAtendimento == "INTERNACAO") {
+	} elseif ($uTipoAtendimento == "HOSPITALAR") {
 		irpara("atendimentoHospitalarListagem.php");
 	}	
 }

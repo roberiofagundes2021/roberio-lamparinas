@@ -562,7 +562,7 @@
   //     $result->execute(array(
   //       ':sNome' => 'Internação',
   //       ':sModelo' => 'I',
-  //       ':sChave' => 'INTERNACAO',
+  //       ':sChave' => 'HOSPITALAR',
   //       ':bStatus' => 1,
   //       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
   //       ':iUnidade' => $unidadeIdNovo
@@ -1265,9 +1265,17 @@ try{
       ':iUnidade' => $unidadeIdNovo
     ));				
     $result->execute(array(
-      ':sNome' => 'Internação',
-      ':sModelo' => 'I',
-      ':sChave' => 'INTERNACAO',
+      ':sNome' => 'Hospitalar',
+      ':sModelo' => 'H',
+      ':sChave' => 'HOSPITALAR',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Odontológico',
+      ':sModelo' => 'O',
+      ':sChave' => 'ODONTOLOGICO',
       ':bStatus' => 1,
       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
       ':iUnidade' => $unidadeIdNovo

@@ -14,7 +14,8 @@ if(isset($_POST['inputAtendimentoClassificacaoId'])){
 	$arrayNativos= [
 		'AMBULATORIAL',
 		'ELETIVO',
-		'INTERNACAO',
+		'HOSPITALAR',
+		'ODONTOLOGICO'
 	];
         	
 	try{

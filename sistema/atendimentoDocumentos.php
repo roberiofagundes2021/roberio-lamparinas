@@ -20,7 +20,7 @@ if(!$iAtendimentoId){
 		irpara("atendimentoEletivoListagem.php");
 	} elseif ($uTipoAtendimento == "AMBULATORIAL") {
 		irpara("atendimentoAmbulatorialListagem.php");
-	} elseif ($uTipoAtendimento == "INTERNACAO") {
+	} elseif ($uTipoAtendimento == "HOSPITALAR") {
 		irpara("atendimentoHospitalarListagem.php");
 	}	
 }
@@ -481,7 +481,7 @@ if ($row['ClienSexo'] == 'F'){
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
 													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
-													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
+													} elseif (isset($ClaChave) && $ClaChave == "HOSPITALAR") {
 													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													}					
 												?>

@@ -22,7 +22,7 @@ if(!$iAtendimentoId){
 		irpara("atendimentoEletivoListagem.php");
 	} elseif ($uTipoAtendimento == "AMBULATORIAL") {
 		irpara("atendimentoAmbulatorialListagem.php");
-	} elseif ($uTipoAtendimento == "INTERNACAO") {
+	} elseif ($uTipoAtendimento == "HOSPITALAR") {
 		irpara("atendimentoHospitalarListagem.php");
 	}	
 }
@@ -88,7 +88,7 @@ $rowAtendimentoClassificacao = $result->fetch(PDO::FETCH_ASSOC);
 // 	FROM AtendimentoAmbulatorial
 // 	WHERE AtAmbAtendimento = $iAtendimentoId
 // 	ORDER BY AtAmbId DESC";
-// }elseif($rowAtendimentoClassificacao['AtClaChave'] == 'INTERNACAO'){
+// }elseif($rowAtendimentoClassificacao['AtClaChave'] == 'HOSPITALAR'){
 // 	$sql = "SELECT TOP(1) AtIEnDataInicio as dataInicio, AtIEnHoraInicio as horaInicio, AtIEnDataFim as dataFim, AtIEnHoraFim as horaFim
 // 	FROM AtendimentoInternacaoEntrada
 // 	WHERE AtIEnAtendimento = $iAtendimentoId
@@ -148,7 +148,7 @@ if (isset($_POST['inputTipoTransferencia']) && isset($_POST['inputCid'])){
 		switch($rowAtendimentoClassificacao['AtClaChave']){
 			case "ELETIVO":irpara("atendimentoEletivoListagem.php");break;
 			case "AMBULATORIAL":irpara("atendimentoAmbulatorialListagem.php");break;
-			case "INTERNACAO":irpara("atendimentoHospitalarListagem.php");break;
+			case "HOSPITALAR":irpara("atendimentoHospitalarListagem.php");break;
 			default: irpara("atendimentoEletivoListagem.php");break;
 		}
 					

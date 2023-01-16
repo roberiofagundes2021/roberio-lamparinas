@@ -261,7 +261,7 @@
 							</div>
 						</li>
 					</ul>
-				<?php }elseif($ClaChave == 'INTERNACAO'){ ?>
+				<?php }elseif($ClaChave == 'HOSPITALAR'){ ?>
 					<ul class="nav nav-sidebar" data-nav-type="accordion">
 						<li style="padding: 20px 0px 0px 20px;"><h2 style="font-weight: 500"><?php echo "".strtoupper($ClaNome); ?></b></li>
 

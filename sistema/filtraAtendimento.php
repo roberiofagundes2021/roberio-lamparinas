@@ -762,7 +762,7 @@ try{
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'INTERNACAO'
+			AND AtClaChave = 'HOSPITALAR'
 			ORDER BY AtClRTempo ASC";
 		$resultEspera = $conn->query($sql);
 		$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
@@ -781,7 +781,7 @@ try{
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'INTERNACAO'
+			AND AtClaChave = 'HOSPITALAR'
 			ORDER BY AtXSeId DESC";
 		$resultEmAtendimento = $conn->query($sql);
 		$rowEmAtendimento = $resultEmAtendimento->fetchAll(PDO::FETCH_ASSOC);
@@ -800,7 +800,7 @@ try{
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'EMOBSERVACAO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'INTERNACAO'
+			AND AtClaChave = 'HOSPITALAR'
 			ORDER BY AtXSeId DESC";
 		$resultObservacao = $conn->query($sql);
 		$rowObservacao = $resultObservacao->fetchAll(PDO::FETCH_ASSOC);
@@ -819,7 +819,7 @@ try{
 			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
 			LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
 			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'INTERNACAO'
+			AND AtClaChave = 'HOSPITALAR'
 			ORDER BY AtXSeId DESC";
 		$resultAtendido = $conn->query($sql);
 		$rowAtendido = $resultAtendido->fetchAll(PDO::FETCH_ASSOC);
