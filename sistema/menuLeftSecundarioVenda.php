@@ -1,7 +1,7 @@
 <?php
 	// essas variáveis são utilizadas para colocar o nome da classificação do atendimento no menu secundario
 
-	$sql = "SELECT AtClaNome, AtClaChave, AtendCliente, ClienCodigo, ClienNome, SituaChave
+	$sql = "SELECT AtClaNome, AtClaChave, AtendCliente, ClienCodigo, ClienNome, SituaChave,AtendDesfechoChave
 	FROM Atendimento
 	JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
 	JOIN Cliente ON ClienId = AtendCliente
@@ -15,6 +15,7 @@
 	$prontuario = $rowClassificacao['ClienCodigo'];
 	$Cliente = $rowClassificacao['ClienNome'];
 	$SituaChave = $rowClassificacao['SituaChave'];
+	$desfechoChave = $rowClassificacao['AtendDesfechoChave'];
 ?>
 
 <script language ="javascript">
@@ -136,17 +137,21 @@
 						</li>
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='encaminhamentoMedico'><i class="icon-folder-plus4"></i> Encaminhamento Médico</a>
-						</li>	
+						</li>
 						
-						<!-- Esse item de menu só deve aparecer em paciente atendidos e que o desfecho foi com receita -->	
-						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='receituarioMedico'><i class="icon-folder-plus4"></i> Receituário</a>
-						</li>
+						<?php if($SituaChave == 'ATENDIDO'){?>
+							<!-- Esse item de menu só deve aparecer em paciente atendidos e que o desfecho foi com receita -->	
+							<li class="nav-item">
+								<a href="#" class="nav-link itemLink" data-tipo='receituarioMedico'><i class="icon-folder-plus4"></i> Receituário</a>
+							</li>
+						<?php }?>
 
-						<!-- Esse item de menu só deve aparecer em paciente atendidos e que o desfecho foi com transferência -->
-						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='receituarioMedico'><i class="icon-folder-plus4"></i> Transferência</a>
-						</li>
+						<?php if($desfechoChave == 'TRANSFERENCIA'){?>
+							<!-- Esse item de menu só deve aparecer em paciente atendidos e que o desfecho foi com transferência -->
+							<li class="nav-item">
+								<a href="#" class="nav-link itemLink" data-tipo='receituarioMedico'><i class="icon-folder-plus4"></i> Transferência</a>
+							</li>
+						<?php }?>
 
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='exportacaoProntuario'><i class="icon-drawer-out"></i> Exportação do Prontuário</a>
@@ -175,7 +180,13 @@
 
 						<li class="nav-item pt-3">
 							<div class="col-lg-12">
-								<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php if($SituaChave != 'ATENDIDO'){?>
+
+									<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php }?>
+								
 							</div>
 						</li>
 					</ul>
@@ -214,15 +225,19 @@
 							<a href="#" class="nav-link itemLink" data-tipo='encaminhamentoMedico'><i class="icon-folder-plus4"></i> Encaminhamento Médico</a>
 						</li>
 
-						<!-- Esse item de menu só deve aparecer em paciente atendidos e que o desfecho foi com receita -->	
-						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='receituarioMedico'><i class="icon-folder-plus4"></i> Receituário</a>
-						</li>
+						<?php if($SituaChave == 'ATENDIDO'){?>
+							<!-- Esse item de menu só deve aparecer em paciente atendidos e que o desfecho foi com receita -->	
+							<li class="nav-item">
+								<a href="#" class="nav-link itemLink" data-tipo='receituarioMedico'><i class="icon-folder-plus4"></i> Receituário</a>
+							</li>
+						<?php }?>
 
-						<!-- Esse item de menu só deve aparecer em paciente atendidos e que o desfecho foi com transferência -->
-						<li class="nav-item">
-							<a href="#" class="nav-link itemLink" data-tipo='receituarioMedico'><i class="icon-folder-plus4"></i> Transferência</a>
-						</li>
+						<?php if($SituaChave == 'ATENDIDO' && $desfechoChave == 'TRANSFERENCIA'){?>
+							<!-- Esse item de menu só deve aparecer em paciente atendidos e que o desfecho foi com transferência -->
+							<li class="nav-item">
+								<a href="#" class="nav-link itemLink" data-tipo='receituarioMedico'><i class="icon-folder-plus4"></i> Transferência</a>
+							</li>
+						<?php }?>
 
 						<li class="nav-item">
 							<a href="#" class="nav-link itemLink" data-tipo='exportacaoProntuario'><i class="icon-office"></i> Exportação do Prontuário</a>
@@ -236,11 +251,17 @@
 
 						<li class="nav-item pt-3">
 							<div class="col-lg-12">
-								<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php if($SituaChave != 'ATENDIDO'){?>
+
+									<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php }?>
+									
 							</div>
 						</li>
 					</ul>
-				<?php }elseif($ClaChave == 'INTERNACAO'){ ?>
+				<?php }elseif($ClaChave == 'HOSPITALAR'){ ?>
 					<ul class="nav nav-sidebar" data-nav-type="accordion">
 						<li style="padding: 20px 0px 0px 20px;"><h2 style="font-weight: 500"><?php echo "".strtoupper($ClaNome); ?></b></li>
 
@@ -332,7 +353,13 @@
 
 						<li class="nav-item pt-3">
 							<div class="col-lg-12">
-								<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php if($SituaChave != 'ATENDIDO'){?>
+
+									<button class="btn w-100 btn-lg btn-principal" id="finalizarAtendimento">Finalizar atendimento</button>
+
+								<?php }?>
+								
 							</div>
 						</li>
 					</ul>

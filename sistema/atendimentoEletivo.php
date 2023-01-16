@@ -379,7 +379,12 @@ if (isset($_POST['inputInicio']) ){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-												<button class="btn btn-lg btn-success mr-1" id="enviar">Salvar</button>
+												
+												<?php 
+													if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+														echo "<button class='btn btn-lg btn-success mr-1' id='enviar'>Salvar</button>";
+														}
+												?>
 												<button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
 
 												<?php 
@@ -387,7 +392,7 @@ if (isset($_POST['inputInicio']) ){
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
 													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
-													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
+													} elseif (isset($ClaChave) && $ClaChave == "HOSPITALAR") {
 													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													}					
 												?>

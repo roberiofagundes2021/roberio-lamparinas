@@ -383,11 +383,13 @@ $acesso = 'ATENDIMENTO';
 					let iAtendimentoEletivo = $(this).data('eletivo')
 					let AtClaChave = $(this).data('clachave')
 					let AtClaNome = $(this).data('clanome')
+					let SituaChave = $(this).data('situachave')
 
 					$('#iAtendimentoId').val(iAtendimento)
 					$('#iAtendimentoEletivoId').val(iAtendimentoEletivo)
 					$('#ClaChave').val(AtClaChave)
 					$('#ClaNome').val(AtClaNome)
+					$('#SituaChave').val(SituaChave)
 
 					$('#dadosPost').attr('action', 'atendimentoEletivo.php')
 					$('#dadosPost').attr('method', 'POST')
@@ -402,11 +404,13 @@ $acesso = 'ATENDIMENTO';
 					let iAtendimentoEletivo = $(this).data('eletivo')
 					let AtClaChave = $(this).data('clachave')
 					let AtClaNome = $(this).data('clanome')
+					let SituaChave = $(this).data('situachave')
 
 					$('#iAtendimentoId').val(iAtendimento)
 					$('#iAtendimentoEletivoId').val(iAtendimentoEletivo)
 					$('#ClaChave').val(AtClaChave)
 					$('#ClaNome').val(AtClaNome)
+					$('#SituaChave').val(SituaChave)
 
 					$('#dadosPost').attr('action', 'atendimentoTriagem.php')
 					$('#dadosPost').attr('method', 'POST')
@@ -421,11 +425,13 @@ $acesso = 'ATENDIMENTO';
 					let iAtendimentoEletivo = $(this).data('eletivo')
 					let AtClaChave = $(this).data('clachave')
 					let AtClaNome = $(this).data('clanome')
+					let SituaChave = $(this).data('situachave')
 
 					$('#iAtendimentoId').val(iAtendimento)
 					$('#iAtendimentoEletivoId').val(iAtendimentoEletivo)
 					$('#ClaChave').val(AtClaChave)
 					$('#ClaNome').val(AtClaNome)
+					$('#SituaChave').val(SituaChave)
 
 					$('#dadosPost').attr('action', 'atendimentoClassificacaoRisco.php')
 					$('#dadosPost').attr('method', 'POST')
@@ -440,11 +446,13 @@ $acesso = 'ATENDIMENTO';
 					let iAtendimentoEletivo = $(this).data('eletivo')
 					let AtClaChave = $(this).data('clachave')
 					let AtClaNome = $(this).data('clanome')
-
+					let SituaChave = $(this).data('situachave')
+					
 					$('#iAtendimentoId').val(iAtendimento)
 					$('#iAtendimentoEletivoId').val(iAtendimentoEletivo)
 					$('#ClaChave').val(AtClaChave)
 					$('#ClaNome').val(AtClaNome)
+					$('#SituaChave').val(SituaChave)
 
 					$('#dadosPost').attr('action', 'atendimentoHistoricoPaciente.php')
 					$('#dadosPost').attr('method', 'POST')
@@ -459,11 +467,13 @@ $acesso = 'ATENDIMENTO';
 					let iAtendimentoEletivo = $(this).data('eletivo')
 					let AtClaChave = $(this).data('clachave')
 					let AtClaNome = $(this).data('clanome')
+					let SituaChave = $(this).data('situachave')
 
 					$('#iAtendimentoId').val(iAtendimento)
 					$('#iAtendimentoEletivoId').val(iAtendimentoEletivo)
 					$('#ClaChave').val(AtClaChave)
 					$('#ClaNome').val(AtClaNome)
+					$('#SituaChave').val(SituaChave)
 
 					$('#dadosPost').attr('action', 'atendimentoReceituario.php')
 					$('#dadosPost').attr('method', 'POST')
@@ -569,6 +579,7 @@ $acesso = 'ATENDIMENTO';
 						rowNodeE = tableE.row.add(item.data).draw().node()
 						$(rowNodeE).attr('class', 'text-left')
 						$(rowNodeE).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
+						$(rowNodeE).find('td:eq(5)').addClass('text-center')
 						$(rowNodeE).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeE).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})					
@@ -576,6 +587,7 @@ $acesso = 'ATENDIMENTO';
 						rowNodeEmAtendimento = tableEmAtendimento.row.add(item.data).draw().node()
 						$(rowNodeEmAtendimento).attr('class', 'text-left')
 						$(rowNodeEmAtendimento).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
+						$(rowNodeEmAtendimento).find('td:eq(5)').addClass('text-center')
 						$(rowNodeEmAtendimento).find('td:eq(8)').attr('data-atendimento', `${item.identify.iAtendimento}`)
 						$(rowNodeEmAtendimento).find('td:eq(8)').attr('data-observacao', `${item.identify.sObservacao}`)
 					})					

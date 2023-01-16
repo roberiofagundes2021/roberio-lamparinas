@@ -20,7 +20,7 @@ if(!$iAtendimentoId){
 		irpara("atendimentoEletivoListagem.php");
 	} elseif ($uTipoAtendimento == "AMBULATORIAL") {
 		irpara("atendimentoAmbulatorialListagem.php");
-	} elseif ($uTipoAtendimento == "INTERNACAO") {
+	} elseif ($uTipoAtendimento == "HOSPITALAR") {
 		irpara("atendimentoHospitalarListagem.php");
 	}	
 }
@@ -996,7 +996,11 @@ if (isset($_POST['inputAlergia']) ){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-												<button class="btn btn-lg btn-success" id="enviar">Salvar</button>
+												<?php 
+													if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+														echo "<button class='btn btn-lg btn-success mr-1' id='enviar'>Salvar</button>";
+														}
+												?>
 												<button class="btn btn-lg btn-secondary" id="imprimir" style="margin-left: 5px;" >Imprimir</button>
 
 												<?php 
@@ -1004,7 +1008,7 @@ if (isset($_POST['inputAlergia']) ){
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													} elseif (isset($ClaChave) && $ClaChave == "AMBULATORIAL") {
 													echo "<a href='atendimentoAmbulatorialListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
-													} elseif (isset($ClaChave) && $ClaChave == "INTERNACAO") {
+													} elseif (isset($ClaChave) && $ClaChave == "HOSPITALAR") {
 													echo "<a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
 													}					
 												?>
