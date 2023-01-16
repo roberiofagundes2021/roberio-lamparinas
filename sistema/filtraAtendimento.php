@@ -1558,13 +1558,8 @@ try{
 
 			$nome = $item['AtClRNomePersonalizado']?$item['AtClRNomePersonalizado']:$item['AtClRNome'];
 			
-<<<<<<< HEAD
 			$classificacao = "<div class='btn-group justify-content-center' title='$nome \n$item[AtClRDeterminantes]'>
 								<div data-toggle='dropdown' style='height: 30px; width: 30px; cursor: pointer; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
-=======
-			$classificacao = "<div style='cursor: pointer;' class='btn-group justify-content-center' title='$nome \n $item[AtClRDeterminantes]'>
-								<div data-toggle='dropdown' style='height: 30px; width: 30px; background-color: $item[AtClRCor]; border-radius: 20px;border: 2px solid $borderColor;' ></div>
->>>>>>> 18de56dbad53745b012f09ce581a478e435ca88e
 								<div class='dropdown-menu'>
 									$riscos
 								</div>
