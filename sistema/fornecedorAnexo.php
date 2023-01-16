@@ -11,7 +11,7 @@ if (isset($_POST['inputFornecedorId'])){
 	$_SESSION['nomeFornecedor'] = $_POST['inputFornecedorNome']; 
 }
 
-$sql = "SELECT FnAneId, FnAneData, FnAneNome, FnAneArquivo
+$sql = "SELECT FnAneId, FnAneData, FnAneNome, FnAneArquivo, FnAneFornecedor, FnAneUsuarioAtualizador, FnAneEmpresa
         FROM FornecedorAnexo
         WHERE FnAneEmpresa = ". $_SESSION['EmpreId'] ." and FnAneFornecedor = ". $_SESSION['idFornecedor'] ."
         ORDER BY FnAneNome ASC";

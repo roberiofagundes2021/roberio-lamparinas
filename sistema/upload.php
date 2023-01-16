@@ -1,15 +1,19 @@
 <?php
    
-	include_once("sessao.php");    
-	//include('global_assets/php/conexao.php');
+	include_once("sessao.php");
    
-	//echo json_encode($_FILES['imagem']['name']);die;
-    //print_r($_POST);die;
-    //print_r($_FILES); die;
-    if ($_POST['tela'] ==  'produto'){
-        $pasta = "global_assets/images/produtos/";
-    } else if ($_POST['tela'] ==  'empresa') {
-        $pasta = "global_assets/images/empresas/";
+
+    $pasta = "";
+    switch($_POST['tela']){
+        case 'produto':
+            $pasta = "global_assets/images/produtos/";
+            break;
+        case 'empresa':
+            $pasta = "global_assets/images/empresas/";
+            break;
+        case 'fornecedor':
+            $pasta = "global_assets/images/fornecedores/";
+            break;
     }
     
     // formatos de imagem permitidos
@@ -21,7 +25,7 @@
 		
         $nome_imagem    = $_FILES['imagem']['name'];
         $tamanho_imagem = $_FILES['imagem']['size'];
-		
+  
         // pega a extensão do arquivo
         $ext = strtolower(strrchr($nome_imagem,"."));
          

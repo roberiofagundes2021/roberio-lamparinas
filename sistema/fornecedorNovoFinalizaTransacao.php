@@ -7,7 +7,12 @@ include('global_assets/php/conexao.php');
 if(isset($_POST['inputTipo'])){
 		
 try{
-		
+	$input_foto = null;
+	if($_POST['inputTipo'] == 'F'){
+		if(isset($_POST['inputFoto'])){
+			$input_foto = $_POST['inputFoto'];
+		}
+	} 
 	$sql = "INSERT INTO Fornecedor (ForneTipo, ForneNome, ForneRazaoSocial, ForneCnpj, ForneInscricaoMunicipal, ForneInscricaoEstadual, ForneCategoria,
 									ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, ForneAniversario, ForneNaturalidade, ForneNaturalidadeUf,
 									ForneNacionalidade, ForneAno, ForneCarteiraTrabalho, ForneNit, ForneCategoriaCredor, ForneFoto, ForneCep, ForneEndereco,
@@ -46,7 +51,7 @@ try{
 						':sCarteiraTrabalho' => $_POST['inputTipo'] == 'F' ? null : $_POST['inputCarteiraTrabalho'],
 						':sNit' => $_POST['inputNit'],
 						':sCategoriaCredor' => $_POST['inputCategoriaCredor'],
-						':sFoto' => $_POST['inputTipo'] == 'F' ? ($_POST['inputFoto']) : null,
+						':sFoto' => $input_foto,
 						':sCep' => $_POST['inputCep'],
 						':sEndereco' => $_POST['inputEndereco'],
 						':sNumero' => $_POST['inputNumero'],
@@ -72,7 +77,7 @@ try{
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 						':iEmpresa' => $_SESSION['EmpreId']
-						));
+					));
 
 		$insertId = $conn->lastInsertId(); 
 		
