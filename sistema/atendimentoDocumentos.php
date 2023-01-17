@@ -29,6 +29,7 @@ if(!$iAtendimentoId){
 
 $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
+$SituaChave = isset($_POST['SituaChave'])?$_POST['SituaChave']:'';
 
 //Essa consulta é para verificar  o profissional
 $sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo
@@ -445,7 +446,11 @@ if ($row['ClienSexo'] == 'F'){
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <div class="form-group" style="padding-top:15px; margin-left: 10px;">
-												<button type="button" class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+											<?php 
+												if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+													echo "<button type='button' class='btn btn-lg btn-principal' id='enviar'>Incluir</button>";
+												}
+											?>
                                             </div>
                                         </div>
                                     </div>

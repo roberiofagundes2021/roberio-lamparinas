@@ -38,6 +38,7 @@ $iAtendimentoEncaminhamentoMedicoId = $rowEncaminhamentoMedico?$rowEncaminhament
 
 $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
+$SituaChave = isset($_POST['SituaChave'])?$_POST['SituaChave']:'';
 
 //Essa consulta é para verificar  o profissional
 $sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo
@@ -592,7 +593,11 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-												<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+											<?php 
+												if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+													echo "	<button class='btn btn-lg btn-principal' id='enviar'>Incluir</button>";
+												}
+											?>
 												<?php 
 													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";

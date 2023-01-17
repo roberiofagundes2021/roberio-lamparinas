@@ -38,6 +38,7 @@ $iAtendimentoTriagemId = $rowTriagem?$rowTriagem['AtTriId']:null;
 
 $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
+$SituaChave = isset($_POST['SituaChave'])?$_POST['SituaChave']:'';
 
 
 ///Essa consulta é para verificar  o profissional
@@ -959,9 +960,15 @@ if (isset($_POST['inputAlergia']) ){
 													</div>
 																										
 													<div class="col-lg-1">
-														<button id="incluirServico" class="btn btn-lg btn-light" data-tipo="INCLUIRSERVICO">
-															<i class="icon-plus3 p-0" style="cursor: pointer; color: black"></i>
-														</button>														
+
+													<?php 
+														if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+															echo "<button id='incluirServico' class='btn btn-lg btn-light' data-tipo='INCLUIRSERVICO'>
+																	<i class='icon-plus3 p-0' style='cursor: pointer; color: black'></i>
+																  </button>";
+														}
+													?>
+																											
 													</div>
 
 												</div>

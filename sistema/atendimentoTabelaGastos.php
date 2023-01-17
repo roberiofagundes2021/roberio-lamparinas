@@ -29,6 +29,7 @@ if(!$iAtendimentoId){
 
 $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
+$SituaChave = isset($_POST['SituaChave'])?$_POST['SituaChave']:'';
 
 $_SESSION['atendimentoTabelaServicos'] = [];
 $_SESSION['atendimentoTabelaProdutos'] = [];
@@ -260,7 +261,11 @@ if ($row['ClienSexo'] == 'F'){
 
 			divTotal = `<div class="row " style="padding-right: 13%;">
                             <div class="col-lg-9">
-								<button class="btn btn-lg btn-principal fecharConta" id="">Fechar Conta</button>
+								<?php 
+									if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+										echo "<button class='btn btn-lg btn-principal fecharConta' id=''>Fechar Conta</button>";
+									}
+								?>
 								<a href="atendimento.php" class="btn btn-basic" role="button">Voltar</a>
 							</div>
 							<div id="tabelaValores" class="col-lg-3 text-right " >	
@@ -271,7 +276,11 @@ if ($row['ClienSexo'] == 'F'){
 			
 			divTotalP = `<div class="row" style="padding-right: 14%;">
                             <div class="col-lg-9">
-								<button class="btn btn-lg btn-principal fecharConta" id="">Fechar Conta</button>
+								<?php 
+									if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+										echo "<button class='btn btn-lg btn-principal fecharConta' id=''>Fechar Conta</button>";
+									}
+								?>
 								<a href="atendimento.php" class="btn btn-basic" role="button">Voltar</a>
 							</div>
 							<div id="tabelaValoresProdutos" class="col-lg-3 text-right" >	
@@ -893,7 +902,11 @@ if ($row['ClienSexo'] == 'F'){
 											</div>
 											
 											<div class="col-lg-1" style="margin-top: -5px;">
-												<a id="inserirServico" class="btn btn-lg btn-principal">Incluir</a>
+												<?php 
+													if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+														echo "<a id='inserirServico' class='btn btn-lg btn-principal'>Incluir</a>";
+													}
+												?>
 											</div>
 										</div>
 									</form>
@@ -943,7 +956,11 @@ if ($row['ClienSexo'] == 'F'){
 													</select>
 												</div>
 												<div class="col-lg-1" style="margin-top: -5px;">
-													<a id="inserirProduto" class="btn btn-lg btn-principal">Incluir</a>
+													<?php 
+														if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+															echo "<a id='inserirProduto' class='btn btn-lg btn-principal'>Incluir</a>";
+														}
+													?>
 												</div>
 											</div>
 											
