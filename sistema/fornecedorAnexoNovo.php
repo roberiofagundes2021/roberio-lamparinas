@@ -35,7 +35,7 @@ if(isset($_POST['inputData'])){
 		if (move_uploaded_file($_FILES['inputArquivo']['tmp_name'], $_UP['pasta'] . $nome_final)) {
 		
 			$sql = "INSERT INTO FornecedorAnexo (FnAneData, FnAneNome,FnAneArquivo, FnAneFornecedor, FnAneUsuarioAtualizador, FnAneEmpresa)
-					VALUES (:iData, :sNome, :iArquivo, :iProfissional, :iUsuarioAtualizador, :iEmpresa)";
+					VALUES (:iData, :sNome, :iArquivo, :iFornecedor, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
@@ -57,13 +57,10 @@ if(isset($_POST['inputData'])){
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir Anexo!!!";
 		$_SESSION['msg']['tipo'] = "error";	
-		
 		echo 'Error: ' . $e->getMessage();
 	}
-	echo $e;
-	die;
 	
-	//irpara("fornecedorAnexo.php");
+	irpara("fornecedorAnexo.php");
 }
 
 ?>

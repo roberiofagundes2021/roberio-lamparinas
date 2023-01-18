@@ -2,7 +2,7 @@
    
 	include_once("sessao.php");    
 
-	$pasta = "global_assets/images/fornecedor/";
+	$pasta = "global_assets/images/fornecedores/";
                    
 	if (file_exists($pasta.$_POST['foto'])){
 		unlink($pasta.$_POST['foto']);

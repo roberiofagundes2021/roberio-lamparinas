@@ -325,8 +325,6 @@ include('global_assets/php/conexao.php');
 
 </head>
 
-</head>
-
 <body class="navbar-top">
 
 	<?php include_once("topo.php"); ?>
@@ -375,7 +373,7 @@ include('global_assets/php/conexao.php');
 							<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
 							<br>
 
-							<div id="foto" style="text-align:center;width:260px; height:310px; overflow:hidden; justify-content: flex-start; display:flex; flex-direction:column; position:absolute; z-index:1; margin-left:70%">
+							<div id="foto" style="text-align:center;width:260px; height:310px; overflow:hidden; justify-content: flex-start; display:flex; flex-direction:column; position:absolute; z-index:1; margin-left:74%">
 								<div id="visualizar">
 									<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" width="200px" alt="Fornecedores" style="border:2px solid #ccc;">
 								</div>
@@ -405,14 +403,14 @@ include('global_assets/php/conexao.php');
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNit">NIT</label>
 										<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT">
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputRazaoSocial">Razão Social</label>
 										<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social">
@@ -421,7 +419,7 @@ include('global_assets/php/conexao.php');
 							</div>
 
 							<div class="row">
-								<div class="col-lg-2">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputCategoriaCredor">Categoria do Credor</label>
 										<input type="text" id="inputCategoriaCredor" name="inputCategoriaCredor" class="form-control" placeholder="Categoria do Credor">
@@ -435,10 +433,10 @@ include('global_assets/php/conexao.php');
 											<option value="#">Selecione uma categoria</option>
 											<?php
 											$sql = "SELECT CategId, CategNome
-														FROM Categoria
-														JOIN Situacao on SituaId = CategStatus
-														WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-														ORDER BY CategNome ASC";
+													FROM Categoria
+													JOIN Situacao on SituaId = CategStatus
+													WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+													ORDER BY CategNome ASC";
 											$result = $conn->query($sql);
 											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -467,10 +465,10 @@ include('global_assets/php/conexao.php');
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-1">
 									<div class="form-group">
-										<label for="inputInscricaoEstadual">Inscrição Estadual</label>
-										<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Inscrição Estadual">
+										<label for="inputInscricaoEstadual">Ins. Estadual</label>
+										<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Ins. Estadual">
 									</div>
 								</div>
 							</div>
@@ -527,7 +525,7 @@ include('global_assets/php/conexao.php');
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNaturalidade">Naturalidade</label>
 										<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
@@ -536,7 +534,7 @@ include('global_assets/php/conexao.php');
 							</div>
 
 							<div class="row">
-								<div class="col-lg-3">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputNaturalidadeUf">UF da Naturalidade</label>
 										<select id="inputNaturalidadeUf" name="inputNaturalidadeUf" class="form-control form-control-select2">
@@ -573,14 +571,14 @@ include('global_assets/php/conexao.php');
 									</div>
 								</div>
 
-								<div class="col-lg-3">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputNacionalidade">Nacionalidade</label>
 										<input type="text" id="inputNacionalidade" name="inputNacionalidade" class="form-control" placeholder="Nacionalidade">
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputAno">Ano &nbsp<i style="color:#375b82;" class="icon-question4" data-popup="tooltip" data-original-title="Entrada no Brasil (se estrangeiro)" data-placement="right"></i></label>
 										<input type="text" id="inputAno" name="inputAno" class="form-control" placeholder="Ano">
@@ -669,7 +667,7 @@ include('global_assets/php/conexao.php');
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="cmbEstado">Estado</label>
-												<select id="cmbEstado" name="cmbEstado" class="form-control"> <!-- retirei isso da class: form-control-select2 para que funcionasse a seleção do texto do estado, além do valor -->
+												<select id="cmbEstado" name="cmbEstado" class="form-control">
 													<option value="#">Selecione um estado</option>
 													<option value="AC">Acre</option>
 													<option value="AL">Alagoas</option>
@@ -767,6 +765,7 @@ include('global_assets/php/conexao.php');
 									</div>
 								</div>
 							</div>
+
 							<br>
 
 							<div class="row">
@@ -782,10 +781,10 @@ include('global_assets/php/conexao.php');
 												<option value="#">Selecione um banco</option>
 												<?php
 												$sql = "SELECT BancoId, BancoCodigo, BancoNome
-															FROM Banco
-															JOIN Situacao on SituaId = BancoStatus
-															WHERE SituaChave = 'ATIVO'
-															ORDER BY BancoCodigo ASC";
+														FROM Banco
+														JOIN Situacao on SituaId = BancoStatus
+														WHERE SituaChave = 'ATIVO'
+														ORDER BY BancoCodigo ASC";
 												$result = $conn->query($sql);
 												$rowBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 

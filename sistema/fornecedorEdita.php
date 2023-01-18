@@ -48,129 +48,7 @@ if (isset($_POST['inputFornecedorId'])) {
 	irpara("fornecedor.php");
 }
 
-if (isset($_POST['inputTipo'])) {
-
-	try {
-
-		$sql = "UPDATE Fornecedor SET ForneTipo = :sTipo, ForneNome = :sNome, ForneRazaoSocial = :sRazaoSocial, ForneCnpj = :sCnpj, 
-									  ForneInscricaoMunicipal = :sInscricaoMunicipal, ForneInscricaoEstadual = :sInscricaoEstadual, 
-									  ForneCategoria = :iCategoria, ForneCpf = :sCpf, 
-									  ForneRg = :sRg, ForneOrgaoEmissor = :sOrgaoEmissor, ForneUf = :sUf, ForneSexo = :sSexo, 
-									  ForneAniversario = :dAniversario, ForneNaturalidade = :sNaturalidade, ForneNaturalidadeUf = :sNaturalidadeUf,
-									  ForneNacionalidade = :sNacionalidade, ForneAno = :sAno, ForneCarteiraTrabalho = :sCarteiraTrabalho, ForneNit = :sNit,
-									  ForneCategoriaCredor = :sCategoriaCredor, ForneFoto = :sFoto, ForneCep = :sCep, ForneEndereco = :sEndereco, 
-									  ForneNumero = :sNumero, ForneComplemento = :sComplemento, ForneBairro = :sBairro, 
-									  ForneCidade = :sCidade, ForneEstado = :sEstado, ForneContato = :sContato, ForneTelefone = :sTelefone, ForneTelefoneComercial = :sTelefoneComercial,
-									  ForneCelular = :sCelular, ForneEmail = :sEmail, ForneSite = :sSite, ForneObservacao = :sObservacao,
-									  ForneBanco = :iBanco, ForneAgencia = :sAgencia, ForneConta = :sConta, 
-									  ForneInformacaoAdicional = :sInformacaoAdicional, ForneIpi = :iIpi, ForneFrete = :iFrete, 
-									  ForneIcms = :iIcms, ForneOutros = :iOutros, ForneUsuarioAtualizador = :iUsuarioAtualizador
-				WHERE ForneId = :iFornecedor";
-		$result = $conn->prepare($sql);
-
-		$conn->beginTransaction();
-
-		$result->execute(array(
-			':sTipo' => $_POST['inputTipo'],
-			':sNome' => $_POST['inputNome'],
-			':sRazaoSocial' => $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null,
-			':sCnpj' => $_POST['inputTipo'] == 'J' ? limpaCPF_CNPJ($_POST['inputCnpj']) : null,
-			':sInscricaoMunicipal' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null,
-			':sInscricaoEstadual' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoEstadual'] : null,
-			':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-			//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
-			':sCpf' => $_POST['inputTipo'] == 'F' ? limpaCPF_CNPJ($_POST['inputCpf']) : null,
-			':sRg' => $_POST['inputTipo'] == 'F' ? $_POST['inputRg'] : null,
-			':sOrgaoEmissor' => $_POST['inputTipo'] == 'F' ? $_POST['inputEmissor'] : null,
-			':sUf' => $_POST['inputTipo'] == 'J' || $_POST['cmbUf'] == '#' ? null : $_POST['cmbUf'],
-			':sSexo' => $_POST['inputTipo'] == 'J' || $_POST['cmbSexo'] == '#' ? null : $_POST['cmbSexo'],
-			':dAniversario' => $_POST['inputTipo'] == 'F' ? ($_POST['inputAniversario'] == '' ? null : $_POST['inputAniversario']) : null,
-			':sNaturalidade' => $_POST['inputTipo'] == 'F' ? ($_POST['inputNaturalidade'] == '' ? null : $_POST['inputNaturalidade']) : null,
-			':sNaturalidadeUf' => $_POST['inputTipo'] == 'F' ? ($_POST['inputNaturalidadeUf'] == '' ? null : $_POST['inputNaturalidadeUf']) : null,
-			':sNacionalidade' => $_POST['inputTipo'] == 'F' ? ($_POST['inputNacionalidade'] == '' ? null : $_POST['inputNacionalidade']) : null,
-			':sAno' => $_POST['inputTipo'] == 'F' ? ($_POST['inputAno'] == '' ? null : $_POST['inputAno']) : null,
-			':sCarteiraTrabalho' => $_POST['inputTipo'] == 'F' ? ($_POST['inputCarteiraTrabalho'] == '' ? null : $_POST['inputCarteiraTrabalho']) : null,
-			':sNit' => $_POST['inputNit'],
-			'sCategoriaCredor' => $_POST['inputCategoriaCredor'],
-			':sCep' => trim($_POST['inputCep']) == "" ? null : $_POST['inputCep'],
-			':sEndereco' => $_POST['inputEndereco'],
-			':sNumero' => $_POST['inputNumero'],
-			':sComplemento' => $_POST['inputComplemento'],
-			':sBairro' => $_POST['inputBairro'],
-			':sCidade' => $_POST['inputCidade'],
-			':sEstado' => $_POST['cmbEstado'],
-			':sContato' => $_POST['inputNomeContato'],
-			':sTelefone' => $_POST['inputTelefoneResidencial'] == '(__) ____-____' ? null : $_POST['inputTelefoneResidencial'],
-			':sTelefoneComercial' => $_POST['inputTelefoneComercial'] == '(__) ____-____' ? null : $_POST['inputTelefoneComercial'],
-			':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
-			':sEmail' => $_POST['inputEmail'],
-			':sSite' => $_POST['inputSite'],
-			':sObservacao' => $_POST['txtareaObservacao'],
-			':iBanco' => $_POST['cmbBanco'] == '#' ? null : $_POST['cmbBanco'],
-			':sAgencia' => $_POST['inputAgencia'],
-			':sConta' => $_POST['inputConta'],
-			':sInformacaoAdicional' => $_POST['inputInfoAdicional'],
-			':iIpi' => $_POST['inputIpi'] == null ? 0.00 : gravaValor($_POST['inputIpi']),
-			':iFrete' => $_POST['inputFrete'] == null ? 0.00 : gravaValor($_POST['inputFrete']),
-			':iIcms' => $_POST['inputIcms'] == null ? 0.00 : gravaValor($_POST['inputIcms']),
-			':iOutros' => $_POST['inputOutros'] == null ? 0.00 : gravaValor($_POST['inputOutros']),
-			':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-			':iFornecedor'	=> $_POST['inputFornecedorId']
-		));
-
-		$sql = "DELETE FROM FornecedorXSubCategoria
-				WHERE FrXSCFornecedor = :iFornecedor and FrXSCUnidade = :iUnidade";
-		$result = $conn->prepare($sql);
-
-		$result->execute(array(
-			':iFornecedor' => $_POST['inputFornecedorId'],
-			':iUnidade' => $_SESSION['UnidadeId']
-		));
-
-		if (isset($_POST['cmbSubCategoria'])) {
-
-			try {
-				$sql = "INSERT INTO FornecedorXSubCategoria 
-							(FrXSCFornecedor, FrXSCSubCategoria, FrXSCUnidade)
-						VALUES 
-							(:iFornecedor, :iSubCategoria, :iUnidade)";
-				$result = $conn->prepare($sql);
-
-				foreach ($_POST['cmbSubCategoria'] as $key => $value) {
-
-					$result->execute(array(
-						':iFornecedor' => $_POST['inputFornecedorId'],
-						':iSubCategoria' => $value,
-						':iUnidade' => $_SESSION['UnidadeId']
-					));
-				}
-			} catch (PDOException $e) {
-				$conn->rollback();
-				echo 'Error: ' . $e->getMessage();
-				exit;
-			}
-		}
-
-		$conn->commit();
-
-		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Fornecedor alterado!!!";
-		$_SESSION['msg']['tipo'] = "success";
-	} catch (PDOException $e) {
-
-		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar fornecedor!!!";
-		$_SESSION['msg']['tipo'] = "error";
-
-		echo 'Error: ' . $e->getMessage();
-		exit;
-	}
-
-	irpara("fornecedor.php");
-}
-
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -199,15 +77,51 @@ if (isset($_POST['inputTipo'])) {
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		window.onload = function() {
-			//Ao carregar a página é verificado se é PF ou PJ para aparecer os campos relacionados e esconder o que não estiver
-			var tipo = $('input[name="inputTipo"]:checked').val();
-
-			selecionaPessoa(tipo);
-
-		}
+		function adicionaFoto() {
+			$('#imagem').trigger("click");
+		};
 
 		$(document).ready(function() {
+
+			$('#imagem').on('change', function() {
+				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
+
+				var form = $('#formFoto')[0];
+				var formData = new FormData(form);
+				formData.append('file', $('#imagem')[0].files[0]);
+				formData.append('tela', 'fornecedor');
+
+				$.ajax({
+					type: "POST",
+					enctype: 'multipart/form-data',
+					url: "upload.php",
+					processData: false, // impedir que o jQuery tranforma a "data" em querystring
+					contentType: false, // desabilitar o cabeçalho "Content-Type"
+					cache: false, // desabilitar o "cache"
+					data: formData, //{imagem: inputImagem},
+					success: function(resposta) {
+						$('#visualizar').html(resposta);
+						$('#addFoto').text("Alterar Foto...");
+						//Aqui sou obrigado a instanciar novamente a utilização do fancybox
+						$(".fancybox").fancybox({
+							// options
+						});
+						return false;
+					}
+				}); //ajax
+
+				//$('#formFoto').submit();
+
+				// Efetua o Upload sem dar refresh na pagina
+				$('#formFoto').ajaxForm({
+					target: '#visualizar' // o callback será no elemento com o id #visualizar
+				}).submit();
+			});
+			if ($('#inputTipoPF:checked').val()) {
+				selecionaPessoa('PF');
+			} else {
+				selecionaPessoa('PJ');
+			}
 
 			function limpa_formulário_cep() {
 				// Limpa valores do formulário de cep.
@@ -267,7 +181,7 @@ if (isset($_POST['inputTipo'])) {
 					//cep sem valor, limpa formulário.
 					limpa_formulário_cep();
 				}
-			}); //cep
+			});
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbCategoria').on('change', function(e) {
@@ -303,7 +217,12 @@ if (isset($_POST['inputTipo'])) {
 				cep = cep.replace(' ', '')
 				$("#inputCep").val(cep)
 
-				var inputTipo = $('input[name="inputTipo"]:checked').val();
+				var inputTipo = "";
+				if ($('input[name="inputTipoPF"]:checked').val()) {
+					inputTipo = 'F';
+				} else {
+					inputTipo = 'J';
+				}
 				var inputNomeNovo = $('#inputNome').val();
 				var inputNomeVelho = $('#inputFornecedorNome').val();
 				var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
@@ -485,7 +404,6 @@ if (isset($_POST['inputTipo'])) {
 
 </head>
 
-
 <body class="navbar-top">
 
 	<?php include_once("topo.php"); ?>
@@ -520,13 +438,13 @@ if (isset($_POST['inputTipo'])) {
 									<div class="form-group">
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" value="F" class="form-input-styled" data-fouc onclick="selecionaPessoa('PF')" <?php if ($row['ForneTipo'] == 'F') echo "checked"; ?>>
+												<input type="radio" id="inputTipoPF" name="inputTipo" value="F" class="form-input-styled" data-fouc onclick="selecionaPessoa('PF')" <?php if ($row['ForneTipo'] == 'F') echo "checked"; ?>>
 												Pessoa Física
 											</label>
 										</div>
 										<div class="form-check form-check-inline">
 											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" value="J" class="form-input-styled" data-fouc onclick="selecionaPessoa('PJ')" <?php if ($row['ForneTipo'] == 'J') echo "checked"; ?>>
+												<input type="radio" id="inputTipoPJ" name="inputTipo" value="J" class="form-input-styled" data-fouc onclick="selecionaPessoa('PJ')" <?php if ($row['ForneTipo'] == 'J') echo "checked"; ?>>
 												Pessoa Jurídica
 											</label>
 										</div>
@@ -537,12 +455,12 @@ if (isset($_POST['inputTipo'])) {
 							<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
 							<br>
 
-							<div id="foto" style="text-align:center;width:260px; height:310px; overflow:hidden; justify-content: flex-start; display:flex; flex-direction:column; position:absolute; z-index:1; margin-left:70%">
+							<div id="foto" style="text-align:center;width:260px; height:310px; overflow:hidden; justify-content: flex-start; display:flex; flex-direction:column; position:absolute; z-index:1; margin-left:74%">
 								<div id="visualizar">
 									<img class="ml-3" src="<?php echo $sFoto; ?>" width="200px" alt="Fornecedores" style="border:2px solid #ccc;">
 								</div>
 								<br>
-								<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%"><?php echo $sButtonFoto; ?></button>
+								<button id="addFoto" type="button" onclick="adicionaFoto()" class="ml-3 btn btn-lg btn-principal" style="width:90%"><?php echo $sButtonFoto; ?></button>
 							</div>
 
 							<div class="row">
@@ -567,14 +485,14 @@ if (isset($_POST['inputTipo'])) {
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNit">NIT</label>
 										<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT" value="<?php echo $row['ForneNit']; ?>">
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputRazaoSocial">Razão Social</label>
 										<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" value="<?php echo $row['ForneRazaoSocial']; ?>">
@@ -583,7 +501,7 @@ if (isset($_POST['inputTipo'])) {
 							</div>
 
 							<div class="row">
-								<div class="col-lg-2">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputCategoriaCredor">Categoria do Credor</label>
 										<input type="text" id="inputCategoriaCredor" name="inputCategoriaCredor" class="form-control" placeholder="Categoria do Credor" value="<?php echo $row['ForneCategoriaCredor']; ?>">
@@ -597,10 +515,10 @@ if (isset($_POST['inputTipo'])) {
 											<option value="#">Selecione uma categoria</option>
 											<?php
 											$sql = "SELECT CategId, CategNome
-														FROM Categoria
-														JOIN Situacao on SituaId = CategStatus
-														WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-														ORDER BY CategNome ASC";
+													FROM Categoria
+													JOIN Situacao on SituaId = CategStatus
+													WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+													ORDER BY CategNome ASC";
 											$result = $conn->query($sql);
 											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
 
@@ -651,10 +569,10 @@ if (isset($_POST['inputTipo'])) {
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-1">
 									<div class="form-group">
-										<label for="inputInscricaoEstadual">Inscrição Estadual</label>
-										<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Inscrição Estadual" value="<?php echo $row['ForneInscricaoEstadual']; ?>">
+										<label for="inputInscricaoEstadual">Ins. Estadual</label>
+										<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Ins. Estadual" value="<?php echo $row['ForneInscricaoEstadual']; ?>">
 									</div>
 								</div>
 							</div>
@@ -711,7 +629,7 @@ if (isset($_POST['inputTipo'])) {
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNaturalidade">Naturalidade</label>
 										<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade" value="<?php echo $row['ForneNaturalidade']; ?>">
@@ -720,7 +638,7 @@ if (isset($_POST['inputTipo'])) {
 							</div>
 
 							<div class="row">
-								<div class="col-lg-3">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputNaturalidadeUf">UF da Naturalidade</label>
 										<select id="inputNaturalidadeUf" name="inputNaturalidadeUf" class="form-control form-control-select2">
@@ -757,14 +675,14 @@ if (isset($_POST['inputTipo'])) {
 									</div>
 								</div>
 
-								<div class="col-lg-3">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputNacionalidade">Nacionalidade</label>
 										<input type="text" id="inputNacionalidade" name="inputNacionalidade" class="form-control" placeholder="Nacionalidade" value="<?php echo $row['ForneNacionalidade']; ?>">
 									</div>
 								</div>
 
-								<div class="col-lg-2">
+								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="inputAno">Ano &nbsp<i style="color:#375b82;" class="icon-question4" data-popup="tooltip" data-original-title="Entrada no Brasil (se estrangeiro)" data-placement="right"></i></label>
 										<input type="text" id="inputAno" name="inputAno" class="form-control" placeholder="Ano" value="<?php echo $row['ForneAno']; ?>">
@@ -779,6 +697,7 @@ if (isset($_POST['inputTipo'])) {
 										<input type="text" id="inputCarteiraTrabalho" name="inputCarteiraTrabalho" class="form-control" placeholder="Carteira de Trabalho" value="<?php echo $row['ForneCarteiraTrabalho']; ?>">
 									</div>
 								</div>
+
 								<div class="col-lg-4">
 									<div class="form-group">
 										<label for="cmbSexo">Sexo</label>
@@ -798,267 +717,283 @@ if (isset($_POST['inputTipo'])) {
 								</div>
 							</div>
 
-							<br>
-
 							<div class="row">
-								<h5 class="mb-0 font-weight-semibold">Endereço</h5>
-								<br>
+								<div class="col-lg-12">
 
-								<div class="row">
-									<div class="col-lg-1">
-										<div class="form-group">
-											<label for="inputCep">CEP</label>
-											<input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP" value="<?php echo $row['ForneCep']; ?>" maxLength="8">
+									<h5 class="mb-0 font-weight-semibold">Endereço</h5>
+									<br>
+
+									<div class="row">
+										<div class="col-lg-1">
+											<div class="form-group">
+												<label for="inputCep">CEP</label>
+												<input type="text" id="inputCep" name="inputCep" class="form-control" placeholder="CEP" value="<?php echo $row['ForneCep']; ?>" maxLength="8">
+											</div>
+										</div>
+
+										<div class="col-lg-5">
+											<div class="form-group">
+												<label for="inputEndereco">Endereço</label>
+												<input type="text" id="inputEndereco" name="inputEndereco" class="form-control" placeholder="Endereço" value="<?php echo $row['ForneEndereco']; ?>">
+											</div>
+										</div>
+
+										<div class="col-lg-1">
+											<div class="form-group">
+												<label for="inputNumero">Nº</label>
+												<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número" value="<?php echo $row['ForneNumero']; ?>">
+											</div>
+										</div>
+
+										<div class="col-lg-5">
+											<div class="form-group">
+												<label for="inputComplemento">Complemento</label>
+												<input type="text" id="inputComplemento" name="inputComplemento" class="form-control" placeholder="complemento" value="<?php echo $row['ForneComplemento']; ?>">
+											</div>
 										</div>
 									</div>
 
-									<div class="col-lg-5">
-										<div class="form-group">
-											<label for="inputEndereco">Endereço</label>
-											<input type="text" id="inputEndereco" name="inputEndereco" class="form-control" placeholder="Endereço" value="<?php echo $row['ForneEndereco']; ?>">
+									<div class="row">
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputBairro">Bairro</label>
+												<input type="text" id="inputBairro" name="inputBairro" class="form-control" placeholder="Bairro" value="<?php echo $row['ForneBairro']; ?>">
+											</div>
 										</div>
-									</div>
 
-									<div class="col-lg-1">
-										<div class="form-group">
-											<label for="inputNumero">Nº</label>
-											<input type="text" id="inputNumero" name="inputNumero" class="form-control" placeholder="Número" value="<?php echo $row['ForneNumero']; ?>">
+										<div class="col-lg-5">
+											<div class="form-group">
+												<label for="inputCidade">Cidade</label>
+												<input type="text" id="inputCidade" name="inputCidade" class="form-control" placeholder="Cidade" value="<?php echo $row['ForneCidade']; ?>">
+											</div>
 										</div>
-									</div>
 
-									<div class="col-lg-5">
-										<div class="form-group">
-											<label for="inputComplemento">Complemento</label>
-											<input type="text" id="inputComplemento" name="inputComplemento" class="form-control" placeholder="complemento" value="<?php echo $row['ForneComplemento']; ?>">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="cmbEstado">Estado</label>
+												<select id="cmbEstado" name="cmbEstado" class="form-control">
+													<option value="#">Selecione um estado</option>
+													<option value="AC" <?php if ($row['ForneEstado'] == 'AC') echo "selected"; ?>>Acre</option>
+													<option value="AL" <?php if ($row['ForneEstado'] == 'AL') echo "selected"; ?>>Alagoas</option>
+													<option value="AP" <?php if ($row['ForneEstado'] == 'AP') echo "selected"; ?>>Amapá</option>
+													<option value="AM" <?php if ($row['ForneEstado'] == 'AM') echo "selected"; ?>>Amazonas</option>
+													<option value="BA" <?php if ($row['ForneEstado'] == 'BA') echo "selected"; ?>>Bahia</option>
+													<option value="CE" <?php if ($row['ForneEstado'] == 'CE') echo "selected"; ?>>Ceará</option>
+													<option value="DF" <?php if ($row['ForneEstado'] == 'DF') echo "selected"; ?>>Distrito Federal</option>
+													<option value="ES" <?php if ($row['ForneEstado'] == 'ES') echo "selected"; ?>>Espírito Santo</option>
+													<option value="GO" <?php if ($row['ForneEstado'] == 'GO') echo "selected"; ?>>Goiás</option>
+													<option value="MA" <?php if ($row['ForneEstado'] == 'MA') echo "selected"; ?>>Maranhão</option>
+													<option value="MT" <?php if ($row['ForneEstado'] == 'MT') echo "selected"; ?>>Mato Grosso</option>
+													<option value="MS" <?php if ($row['ForneEstado'] == 'MS') echo "selected"; ?>>Mato Grosso do Sul</option>
+													<option value="MG" <?php if ($row['ForneEstado'] == 'MG') echo "selected"; ?>>Minas Gerais</option>
+													<option value="PA" <?php if ($row['ForneEstado'] == 'PA') echo "selected"; ?>>Pará</option>
+													<option value="PB" <?php if ($row['ForneEstado'] == 'PB') echo "selected"; ?>>Paraíba</option>
+													<option value="PR" <?php if ($row['ForneEstado'] == 'PR') echo "selected"; ?>>Paraná</option>
+													<option value="PE" <?php if ($row['ForneEstado'] == 'PE') echo "selected"; ?>>Pernambuco</option>
+													<option value="PI" <?php if ($row['ForneEstado'] == 'PI') echo "selected"; ?>>Piauí</option>
+													<option value="RJ" <?php if ($row['ForneEstado'] == 'RJ') echo "selected"; ?>>Rio de Janeiro</option>
+													<option value="RN" <?php if ($row['ForneEstado'] == 'RN') echo "selected"; ?>>Rio Grande do Norte</option>
+													<option value="RS" <?php if ($row['ForneEstado'] == 'RS') echo "selected"; ?>>Rio Grande do Sul</option>
+													<option value="RO" <?php if ($row['ForneEstado'] == 'RO') echo "selected"; ?>>Rondônia</option>
+													<option value="RR" <?php if ($row['ForneEstado'] == 'RR') echo "selected"; ?>>Roraima</option>
+													<option value="SC" <?php if ($row['ForneEstado'] == 'SC') echo "selected"; ?>>Santa Catarina</option>
+													<option value="SP" <?php if ($row['ForneEstado'] == 'SP') echo "selected"; ?>>São Paulo</option>
+													<option value="SE" <?php if ($row['ForneEstado'] == 'SE') echo "selected"; ?>>Sergipe</option>
+													<option value="TO" <?php if ($row['ForneEstado'] == 'TO') echo "selected"; ?>>Tocantins</option>
+													<option value="ES" <?php if ($row['ForneEstado'] == 'ES') echo "selected"; ?>>Estrangeiro</option>
+												</select>
+											</div>
 										</div>
 									</div>
 								</div>
+							</div>
+							<br>
 
-								<div class="row">
-									<div class="col-lg-4">
-										<div class="form-group">
-											<label for="inputBairro">Bairro</label>
-											<input type="text" id="inputBairro" name="inputBairro" class="form-control" placeholder="Bairro" value="<?php echo $row['ForneBairro']; ?>">
+							<div class="row">
+								<div class="col-lg-12">
+
+									<h5 class="mb-0 font-weight-semibold">Contato</h5>
+									<br>
+
+									<div class="row">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputNomeContato">Nome</label>
+												<input type="text" id="inputNomeContato" name="inputNomeContato" class="form-control" placeholder="Contato" value="<?php echo $row['ForneContato']; ?>">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputTelefoneResidencial">Telefone Residencial</label>
+												<input type="tel" id="inputTelefoneResidencial" name="inputTelefoneResidencial" class="form-control" placeholder="Telefone Residencial" data-mask="(99) 9999-9999" value="<?php echo $row['ForneTelefone']; ?>">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputTelefoneComercial">Telefone Comercial</label>
+												<input type="tel" id="inputTelefoneComercial" name="inputTelefoneComercial" class="form-control" placeholder="Telefone Comercial" data-mask="(99) 9999-9999" value="<?php echo $row['ForneTelefoneComercial']; ?>">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputCelular">Celular</label>
+												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999" value="<?php echo $row['ForneCelular']; ?>">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputEmail">E-mail</label>
+												<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" value="<?php echo $row['ForneEmail']; ?>">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputSite">Site</label>
+												<input type="url" id="inputSite" name="inputSite" class="form-control" placeholder="URL" value="<?php echo $row['ForneSite']; ?>">
+											</div>
 										</div>
 									</div>
 
-									<div class="col-lg-5">
-										<div class="form-group">
-											<label for="inputCidade">Cidade</label>
-											<input type="text" id="inputCidade" name="inputCidade" class="form-control" placeholder="Cidade" value="<?php echo $row['ForneCidade']; ?>">
-										</div>
-									</div>
-
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label for="cmbEstado">Estado</label>
-											<select id="cmbEstado" name="cmbEstado" class="form-control">
-												<option value="#">Selecione um estado</option>
-												<option value="AC" <?php if ($row['ForneEstado'] == 'AC') echo "selected"; ?>>Acre</option>
-												<option value="AL" <?php if ($row['ForneEstado'] == 'AL') echo "selected"; ?>>Alagoas</option>
-												<option value="AP" <?php if ($row['ForneEstado'] == 'AP') echo "selected"; ?>>Amapá</option>
-												<option value="AM" <?php if ($row['ForneEstado'] == 'AM') echo "selected"; ?>>Amazonas</option>
-												<option value="BA" <?php if ($row['ForneEstado'] == 'BA') echo "selected"; ?>>Bahia</option>
-												<option value="CE" <?php if ($row['ForneEstado'] == 'CE') echo "selected"; ?>>Ceará</option>
-												<option value="DF" <?php if ($row['ForneEstado'] == 'DF') echo "selected"; ?>>Distrito Federal</option>
-												<option value="ES" <?php if ($row['ForneEstado'] == 'ES') echo "selected"; ?>>Espírito Santo</option>
-												<option value="GO" <?php if ($row['ForneEstado'] == 'GO') echo "selected"; ?>>Goiás</option>
-												<option value="MA" <?php if ($row['ForneEstado'] == 'MA') echo "selected"; ?>>Maranhão</option>
-												<option value="MT" <?php if ($row['ForneEstado'] == 'MT') echo "selected"; ?>>Mato Grosso</option>
-												<option value="MS" <?php if ($row['ForneEstado'] == 'MS') echo "selected"; ?>>Mato Grosso do Sul</option>
-												<option value="MG" <?php if ($row['ForneEstado'] == 'MG') echo "selected"; ?>>Minas Gerais</option>
-												<option value="PA" <?php if ($row['ForneEstado'] == 'PA') echo "selected"; ?>>Pará</option>
-												<option value="PB" <?php if ($row['ForneEstado'] == 'PB') echo "selected"; ?>>Paraíba</option>
-												<option value="PR" <?php if ($row['ForneEstado'] == 'PR') echo "selected"; ?>>Paraná</option>
-												<option value="PE" <?php if ($row['ForneEstado'] == 'PE') echo "selected"; ?>>Pernambuco</option>
-												<option value="PI" <?php if ($row['ForneEstado'] == 'PI') echo "selected"; ?>>Piauí</option>
-												<option value="RJ" <?php if ($row['ForneEstado'] == 'RJ') echo "selected"; ?>>Rio de Janeiro</option>
-												<option value="RN" <?php if ($row['ForneEstado'] == 'RN') echo "selected"; ?>>Rio Grande do Norte</option>
-												<option value="RS" <?php if ($row['ForneEstado'] == 'RS') echo "selected"; ?>>Rio Grande do Sul</option>
-												<option value="RO" <?php if ($row['ForneEstado'] == 'RO') echo "selected"; ?>>Rondônia</option>
-												<option value="RR" <?php if ($row['ForneEstado'] == 'RR') echo "selected"; ?>>Roraima</option>
-												<option value="SC" <?php if ($row['ForneEstado'] == 'SC') echo "selected"; ?>>Santa Catarina</option>
-												<option value="SP" <?php if ($row['ForneEstado'] == 'SP') echo "selected"; ?>>São Paulo</option>
-												<option value="SE" <?php if ($row['ForneEstado'] == 'SE') echo "selected"; ?>>Sergipe</option>
-												<option value="TO" <?php if ($row['ForneEstado'] == 'TO') echo "selected"; ?>>Tocantins</option>
-												<option value="ES" <?php if ($row['ForneEstado'] == 'ES') echo "selected"; ?>>Estrangeiro</option>
-											</select>
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label for="txtObservacao">Observação</label>
+												<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" placeholder="Observação"><?php echo $row['ForneObservacao']; ?></textarea>
+											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 
 							<br>
+
 							<div class="row">
-								<h5 class="mb-0 font-weight-semibold">Contato</h5>
-								<br>
-								<div class="row">
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputNomeContato">Nome</label>
-											<input type="text" id="inputNomeContato" name="inputNomeContato" class="form-control" placeholder="Contato" value="<?php echo $row['ForneContato']; ?>">
-										</div>
-									</div>
+								<div class="col-lg-12">
 
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputTelefoneResidencial">Telefone Residencial</label>
-											<input type="tel" id="inputTelefoneResidencial" name="inputTelefoneResidencial" class="form-control" placeholder="Telefone Residencial" data-mask="(99) 9999-9999" value="<?php echo $row['ForneTelefone']; ?>">
-										</div>
-									</div>
+									<h5 class="mb-0 font-weight-semibold">Dados Bancários</h5>
+									<br>
 
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputTelefoneComercial">Telefone Comercial</label>
-											<input type="tel" id="inputTelefoneComercial" name="inputTelefoneComercial" class="form-control" placeholder="Telefone Comercial" data-mask="(99) 9999-9999" value="<?php echo $row['ForneTelefoneComercial']; ?>">
-										</div>
-									</div>
-
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputCelular">Celular</label>
-											<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999" value="<?php echo $row['ForneCelular']; ?>">
-										</div>
-									</div>
-
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputEmail">E-mail</label>
-											<input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-mail" value="<?php echo $row['ForneEmail']; ?>">
-										</div>
-									</div>
-
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputSite">Site</label>
-											<input type="url" id="inputSite" name="inputSite" class="form-control" placeholder="URL" value="<?php echo $row['ForneSite']; ?>">
-										</div>
-									</div>
-								</div>
-
-								<div class="row">
-									<div class="col-lg-12">
-										<div class="form-group">
-											<label for="txtObservacao">Observação</label>
-											<textarea rows="5" cols="5" class="form-control" id="txtareaObservacao" name="txtareaObservacao" placeholder="Observação"><?php echo $row['ForneObservacao']; ?></textarea>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<br>
-							<div class="row">
-								<h5 class="mb-0 font-weight-semibold">Dados Bancários</h5>
-								<br>
-								<div class="row">
-									<div class="col-lg-5">
-										<label for="cmbBanco">Banco</label>
-										<select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2">
-											<option value="#">Selecione um banco</option>
-											<?php
-											$sql = "SELECT BancoId, BancoCodigo, BancoNome
+									<div class="row">
+										<div class="col-lg-5">
+											<label for="cmbBanco">Banco</label>
+											<select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2">
+												<option value="#">Selecione um banco</option>
+												<?php
+												$sql = "SELECT BancoId, BancoCodigo, BancoNome
 															FROM Banco
 															JOIN Situacao on SituaId = BancoStatus
 															WHERE SituaChave = 'ATIVO'
 															ORDER BY BancoCodigo ASC";
-											$result = $conn->query($sql);
-											$rowBanco = $result->fetchAll(PDO::FETCH_ASSOC);
+												$result = $conn->query($sql);
+												$rowBanco = $result->fetchAll(PDO::FETCH_ASSOC);
 
-											foreach ($rowBanco as $item) {
-												$seleciona = $item['BancoId'] == $row['ForneBanco'] ? "selected" : "";
-												print('<option value="' . $item['BancoId'] . '" ' . $seleciona . '>' . $item['BancoCodigo'] . " - " . $item['BancoNome'] . '</option>');
-											}
+												foreach ($rowBanco as $item) {
+													$seleciona = $item['BancoId'] == $row['ForneBanco'] ? "selected" : "";
+													print('<option value="' . $item['BancoId'] . '" ' . $seleciona . '>' . $item['BancoCodigo'] . " - " . $item['BancoNome'] . '</option>');
+												}
 
-											?>
-										</select>
-									</div>
-
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputAgencia">Agência</label>
-											<input type="text" id="inputAgencia" name="inputAgencia" class="form-control" placeholder="Agência + dígito" value="<?php echo $row['ForneAgencia']; ?>">
+												?>
+											</select>
 										</div>
-									</div>
 
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputConta">Conta</label>
-											<input type="text" id="inputConta" name="inputConta" class="form-control" placeholder="Conta + dígito" value="<?php echo $row['ForneConta']; ?>">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputAgencia">Agência</label>
+												<input type="text" id="inputAgencia" name="inputAgencia" class="form-control" placeholder="Agência + dígito" value="<?php echo $row['ForneAgencia']; ?>">
+											</div>
 										</div>
-									</div>
 
-									<div class="col-lg-2">
-										<div class="form-group">
-											<label for="inputInfoAdicional">Informação Adicional</label>
-											<input type="text" id="inputInfoAdicional" name="inputInfoAdicional" class="form-control" value="<?php echo $row['ForneInformacaoAdicional']; ?>">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputConta">Conta</label>
+												<input type="text" id="inputConta" name="inputConta" class="form-control" placeholder="Conta + dígito" value="<?php echo $row['ForneConta']; ?>">
+											</div>
+										</div>
+
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputInfoAdicional">Informação Adicional</label>
+												<input type="text" id="inputInfoAdicional" name="inputInfoAdicional" class="form-control" value="<?php echo $row['ForneInformacaoAdicional']; ?>">
+											</div>
 										</div>
 									</div>
 								</div>
 							</div>
+							<br>
 
-							<br> 
 							<div class="row">
-								<h5 class="mb-0 font-weight-semibold">Tributos</h5>
-								<br>
+								<div class="col-lg-12">
 
-								<div class="row">
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label for="cmbBanco">IPI (%)</label>
-											<input type="text" id="inputIpi" name="inputIpi" class="form-control" placeholder="IPI (%)" value="<?php echo mostraValor($row['ForneIpi']); ?>" onKeyUp="moeda(this)" maxLength="6">
+									<h5 class="mb-0 font-weight-semibold">Tributos</h5>
+									<br>
+
+									<div class="row">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="cmbBanco">IPI (%)</label>
+												<input type="text" id="inputIpi" name="inputIpi" class="form-control" placeholder="IPI (%)" value="<?php echo mostraValor($row['ForneIpi']); ?>" onKeyUp="moeda(this)" maxLength="6">
+											</div>
 										</div>
-									</div>
 
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label for="inputFrete">Frete (%)</label>
-											<input type="text" id="inputFrete" name="inputFrete" class="form-control" placeholder="Frete (%)" value="<?php echo mostraValor($row['ForneFrete']); ?>" onKeyUp="moeda(this)" maxLength="6">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputFrete">Frete (%)</label>
+												<input type="text" id="inputFrete" name="inputFrete" class="form-control" placeholder="Frete (%)" value="<?php echo mostraValor($row['ForneFrete']); ?>" onKeyUp="moeda(this)" maxLength="6">
+											</div>
 										</div>
-									</div>
 
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label for="inputIcms">ICMS (%)</label>
-											<input type="text" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)" value="<?php echo mostraValor($row['ForneIcms']); ?>" onKeyUp="moeda(this)" maxLength="6">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputIcms">ICMS (%)</label>
+												<input type="text" id="inputIcms" name="inputIcms" class="form-control" placeholder="ICMS (%)" value="<?php echo mostraValor($row['ForneIcms']); ?>" onKeyUp="moeda(this)" maxLength="6">
+											</div>
 										</div>
-									</div>
 
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label for="inputOutros">Outros (%)</label>
-											<input type="text" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)" value="<?php echo mostraValor($row['ForneOutros']); ?>" onKeyUp="moeda(this)" maxLength="6">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputOutros">Outros (%)</label>
+												<input type="text" id="inputOutros" name="inputOutros" class="form-control" placeholder="Outros (%)" value="<?php echo mostraValor($row['ForneOutros']); ?>" onKeyUp="moeda(this)" maxLength="6">
+											</div>
 										</div>
 									</div>
 								</div>
-						</div>
-
-						<div class="row" style="margin-top: 40px;">
-							<div class="form-group">
-								<?php
-								if ($_POST['inputPermission']) {
-									echo '<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>';
-								}
-								?>
-								<a href="fornecedor.php" class="btn btn-basic" role="button">Cancelar</a>
 							</div>
-						</div>
-				</div> <!-- /card-body -->
-				</form>
 
-				<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
-					<input type="file" id="imagem" name="imagem" style="display:none;" />
-				</form>
+							<div class="row" style="margin-top: 40px;">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<?php
+										if ($_POST['inputPermission']) {
+											echo '<button class="btn btn-lg btn-principal" id="enviar">Alterar</button>';
+										}
+										?>
+										<a href="fornecedor.php" class="btn btn-basic" role="button">Cancelar</a>
+									</div>
+								</div>
+							</div>
+						</div><!-- /card-body -->
+
+					</form>
+
+					<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
+						<input type="file" id="imagem" name="imagem" style="display:none;" />
+					</form>
+
+				</div>
+				<!-- /info blocks -->
 
 			</div>
-			<!-- /info blocks -->
+			<!-- /content area -->
+
+			<?php include_once("footer.php"); ?>
 
 		</div>
-		<!-- /content area -->
-
-		<?php include_once("footer.php"); ?>
-
-	</div>
-	<!-- /main content -->
+		<!-- /main content -->
 
 	</div>
 	<!-- /page content -->
