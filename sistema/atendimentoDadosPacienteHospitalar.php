@@ -75,6 +75,7 @@
         <input type="hidden" id="inputConselho" name="inputConselho" class="form-control"  value="<?php echo $rowUser['PrConNome']; ?>" >
         <input type="hidden" id="inputProfissional" name="inputProfissional" class="form-control"  value="<?php echo $rowUser['ProfissionalNome']; ?>" >
         <input type="hidden" id="inputCbo" name="inputCbo" class="form-control"  value="<?php echo $rowUser['ProfissaoCbo']; ?>" >
+        <input type="hidden" id="inputPrevisaoAlta" name="inputPrevisaoAlta" class="form-control"  value="" >
         <input type="hidden" id="inputTipoInternacao" name="inputTipoInternacao" class="form-control"  value="<?php echo $row['TpIntId']; ?>" >
         <input type="hidden" id="inputEspLeito" name="inputEspLeito" class="form-control"  value="<?php echo $row['EsLeiId']; ?>" >
         <input type="hidden" id="inputAla" name="inputAla" class="form-control"  value="<?php echo $row['AlaId']; ?>" >
