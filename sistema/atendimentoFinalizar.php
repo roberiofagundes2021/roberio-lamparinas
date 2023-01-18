@@ -73,7 +73,7 @@ if(isset($_POST['condulta'])){
 	$creatNew = false;
 	switch($_POST['condulta']){
 		case "AMBULATORIAL":$creatNew = true;break;
-		case "INTERNACAO":$creatNew = true;break;
+		case "HOSPITALAR":$creatNew = true;break;
 		default: $creatNew = false;
 	}
 
@@ -157,7 +157,7 @@ if(isset($_POST['condulta'])){
 
 		switch($_POST['condulta']){
 			case "AMBULATORIAL":irpara("atendimentoObservacaoEntrada.php");break;
-			case "INTERNACAO":irpara("atendimentoInternacaoEntrada.php");break;
+			case "HOSPITALAR":irpara("atendimentoInternacaoEntrada.php");break;
 			default: irpara("atendimentoAmbulatorialListagem.php");break;
 		}
 	}
@@ -203,7 +203,7 @@ if(isset($_POST['condulta'])){
 					case 'SEMRECEITA': URL = 'atendimentoFinalizar.php';break;
 					case 'LIBERADO': URL = 'atendimentoFinalizar.php';break;
 					case 'AMBULATORIAL': URL = 'atendimentoFinalizar.php';break;
-					case 'INTERNACAO': URL = 'atendimentoFinalizar.php';break;
+					case 'HOSPITALAR': URL = 'atendimentoFinalizar.php';break;
 					case 'TRANSFERENCIA': URL = 'atendimentoTransferencia.php';break;
 					default: URL = 'atendimentoFinalizar.php';
 				}
@@ -270,7 +270,7 @@ if(isset($_POST['condulta'])){
 												<option value='LIBERADO'>Liberado após exames/procedimentos solicitados</option>
 												
 												<option value='AMBULATORIAL'>Observação Hospitalar</option>
-												<option value='INTERNACAO'>Internação Hospitalar</option>
+												<option value='HOSPITALAR'>Internação Hospitalar</option>
 												<option value='TRANSFERENCIA'>Transferência</option>
 											</select>
 										</div>
