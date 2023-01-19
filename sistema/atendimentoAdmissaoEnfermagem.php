@@ -3421,15 +3421,15 @@ if (isset($_POST['inputInicio'])) {
                                             <div class="col-lg-4">
                                                 <select id="cmbAlergias" name="cmbAlergias" class="form-control-select2"  onChange="textoAlergias()">
                                                     <option value="">Selecione</option>
-                                                    <option value='NA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfato'] == 'NA' ? 'selected' : ''; ?> >NÃO</option>
-                                                    <option value='SI' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfato'] == 'SI' ? 'selected' : ''; ?> >SIM. QUAL?</option>
+                                                    <option value='NA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFRegulacaoAlergia'] == 'NA' ? 'selected' : ''; ?> >NÃO</option>
+                                                    <option value='SI' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFRegulacaoAlergia'] == 'SI' ? 'selected' : ''; ?> >SIM. QUAL?</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-4">
                                                 <select id="cmbDSImunologico" name="cmbDSImunologico" class="form-control-select2" onChange="teXtoDSImunologico()">
                                                     <option value="">Selecione</option>
-                                                    <option value='NA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfato'] == 'NA' ? 'selected' : ''; ?> >NÃO</option>
-                                                    <option value='SI' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFOlfato'] == 'SI' ? 'selected' : ''; ?> >SIM. QUAL?</option>
+                                                    <option value='NA' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFDoencaSistImunologico'] == 'NA' ? 'selected' : ''; ?> >NÃO</option>
+                                                    <option value='SI' <?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFDoencaSistImunologico'] == 'SI' ? 'selected' : ''; ?> >SIM. QUAL?</option>
                                                 </select>											
                                             </div>
                                             <div class="col-lg-4">
