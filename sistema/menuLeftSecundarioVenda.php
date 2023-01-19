@@ -44,6 +44,7 @@
 					case 'evolucaoEnfermagem': URL = 'atendimentoEvolucaoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'anotacaoTecnicoEnfermagem': URL = 'atendimentoAnotacaoTecnicoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'admissaoPediatrica': URL = 'atendimentoAdmissaoPediatrica.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'admissaoEnfermagemMultidisciplinar': URL = 'atendimentoAdmissaoEnfermagemMultidisciplinar.php'; $('#dadosPost').attr('target', '_self'); break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
@@ -334,7 +335,7 @@
 							<a href="#" class="nav-link legitRipple">Ato de Multidisciplinar</a>
 							<ul class="nav nav-group-sub">
 								<li class="nav-item">
-									<a href="#" class="nav-link itemLink" data-tipo='admissao'><i class="icon-certificate"></i> Admissão</a>
+									<a href="#" class="nav-link itemLink" data-tipo='admissaoEnfermagemMultidisciplinar'><i class="icon-certificate"></i> Admissão</a>
 								</li>
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='evolucaoDiaria'><i class="icon-certificate"></i> Evolução Diária</a>
