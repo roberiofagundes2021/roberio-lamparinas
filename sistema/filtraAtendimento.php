@@ -3162,7 +3162,7 @@ try{
 			$sql = "INSERT INTO  EnfermagemAnotacaoTecnico(EnAnTAtendimento,EnAnTDataInicio,EnAnTHoraInicio,EnAnTProfissional,EnAnTPas,EnAnTPad,EnAnTFreqCardiaca,EnAnTFreqRespiratoria,
 														EnAnTTemperatura,EnAnTSPO,EnAnTHGT, EnAnTAlergia, EnAnTAlergiaDescricao, EnAnTDiabetes, EnAnTDiabetesDescricao, EnAnTHipertensao, 
 														EnAnTHipertensaoDescricao, EnAnTNeoplasia, EnAnTNeoplasiaDescricao, EnAnTUsoMedicamento, EnAnTUsoMedicamentoDescricao, 
-														EnAnTDataHora,EnAnTJustificativaLancRetroativo,EnAnPeso,EnAnTAnotacao,EnAnTEditavel,EnAnTUnidade)
+														EnAnTDataHora,EnAnTJustificativaLancRetroativo,EnAnTPeso,EnAnTAnotacao,EnAnTEditavel,EnAnTUnidade)
 			VALUES ('$iAtendimentoId', '$dataInicio', '$horaInicio', '$usuarioId', '$inputSistolica', '$inputDiatolica', '$inputCardiaca', '$inputRespiratoria',
 					'$inputTemperatura', '$inputSPO', '$inputHGT', '$inputAlergia', '$inputAlergiaDescricao', '$inputDiabetes', '$inputDiabetesDescricao', '$inputHipertensao', '$inputHipertensaoDescricao', 
 					'$inputNeoplasia', '$inputNeoplasiaDescricao', '$inputUsoMedicamento', '$inputUsoMedicamentoDescricao',  '$dataHoraAtual', '$justificativaAnotacao', '$peso', '$anotacao', 1, '$iUnidade')";
@@ -3199,7 +3199,7 @@ try{
 			EnAnTUsoMedicamentoDescricao = '$inputUsoMedicamentoDescricao',
 			EnAnTDataHora = '$dataHoraAtual',
 			EnAnTJustificativaLancRetroativo = '$justificativaAnotacao',
-			EnAnPeso = '$peso',
+			EnAnTPeso = '$peso',
 			EnAnTAnotacao = '$anotacao'
 			WHERE EnAnTId = '$idAnotacao'";
 
@@ -3259,7 +3259,7 @@ try{
 				'anotacao'=> substr($item['EnAnTAnotacao'], 0, 100) . '...',
 				'justificativaCompleta' => $item['EnAnTJustificativaLancRetroativo'],
 				'anotacaoCompleta' => $item['EnAnTAnotacao'],
-				'peso' => $item['EnAnPeso'],
+				'peso' => $item['EnAnTPeso'],
 				'editavel' => $item['EnAnTEditavel']
 			]);
 		}

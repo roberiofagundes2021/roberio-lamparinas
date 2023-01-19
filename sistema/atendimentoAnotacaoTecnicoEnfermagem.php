@@ -423,7 +423,7 @@ if ($row['ClienSexo'] == 'F'){
                     $('#idAnotacao').val(response.EnAnTId)
 
                     $('#justificativaAnotacao').val(response.EnAnTJustificativaLancRetroativo)
-                    $('#peso').val(response.EnAnPeso.replace(".", ","))
+                    $('#peso').val(response.EnAnTPeso.replace(".", ","))
                     $('#anotacao').val(response.EnAnTAnotacao)
 
                     $('#inputSistolica').val(response.EnAnTPas)
