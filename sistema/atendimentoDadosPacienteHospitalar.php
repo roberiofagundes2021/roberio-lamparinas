@@ -1,4 +1,4 @@
-<div class="card ">
+<div class="card card-collapsed">
     <div class="card-header header-elements-inline">
         <h4 class="card-title font-weight-bold">
             <label>PRONTUÁRIO ELETRÔNICO: <?php echo $row['ClienCodigo'] != '' ? $row['ClienCodigo'] : 'XXXXXX'; ?></label>
