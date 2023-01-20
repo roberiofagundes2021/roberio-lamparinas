@@ -29,7 +29,6 @@ if(!$iAtendimentoId){
 
 $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
-$SituaChave = isset($_POST['SituaChave'])?$_POST['SituaChave']:'';
 
 $_SESSION['atendimentoTabelaServicos'] = [];
 $_SESSION['atendimentoTabelaProdutos'] = [];
@@ -48,7 +47,7 @@ $userId = $rowUser['ProfissionalId'];
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtClaNome, AtendDataRegistro, AtModNome, ClienId,
 		ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,ClienNomeMae, ClienCartaoSus, ClienCelular,
-		ClResNome, AtClaChave
+		ClResNome, AtClaChave, SituaChave
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
@@ -62,6 +61,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoId = $row['AtendId'];
 $iClienteId = $row['ClienId'];
+$SituaChave = $row['SituaChave'];
 
 $sql = "SELECT AtTGaId, AtTGaAtendimento, AtTGaDataRegistro, AtTGaServico, AtTGaProfissional, AtTGaHorario, 
                AtTGaValor, AtTGaDesconto, AtTGaDesconto, AtendCliente, AtendDataRegistro, SrVenNome, ProfiNome
