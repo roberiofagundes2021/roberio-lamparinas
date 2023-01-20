@@ -247,7 +247,7 @@ include('global_assets/php/conexao.php');
                 for(key in itensRequest){
                   $('#infoCard').append(`
                   <div class='row col-lg-10 text-center mt-4'>
-                    <span id='textProgress'>Inclindo ${itensRequest[key]}</span>
+                    <span id='textProgress'>Incluindo ${itensRequest[key]}</span>
                     <div id="imgLoading-${key}" class="ml-2">
                       <img src='global_assets/images/lamparinas/loader.gif' style='width: 80px; height: 40px;'>
                     </div>
@@ -279,6 +279,8 @@ include('global_assets/php/conexao.php');
                 if(erros.length){
                   // colocar uma menssagem falando que houve erro ao cadastrar alguns itens e apresentar
                   // botão de nova tentativa
+                }else{
+                  alerta('Unidade', 'Unidade Criada com Sucesso!!!', 'success')
                 }
               }
             })

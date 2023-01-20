@@ -806,7 +806,7 @@ $usuaId = $_SESSION['UsuarId'];
 $EmpresaId = isset($_SESSION['EmpresaId'])?$_SESSION['EmpresaId']:$_SESSION['EmpreId'];
 
 try{
-  $conn->beginTransaction();
+  // $conn->beginTransaction();
   
   if($typeRequest == "UNIDADE"){
     $sql = "INSERT INTO Unidade (UnidaNome, UnidaCNES, UnidaCnpj, UnidaTelefone, UnidaDiretorAdministrativo, UnidaDiretorTecnico, UnidaDiretorClinico, UnidaCep, UnidaEndereco, UnidaNumero, UnidaComplemento, UnidaBairro, 
@@ -1453,7 +1453,7 @@ try{
   }
   $conn->commit();
 }catch(PDOException $e) {
-  $conn->rollback();
+  // $conn->rollback();
   $_SESSION['msg']['titulo'] = "Erro";
   $_SESSION['msg']['mensagem'] = "Erro ao incluir unidade!!!";
   $_SESSION['msg']['tipo'] = "error";
