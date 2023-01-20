@@ -3461,6 +3461,249 @@ try{
 			'menssagem' => 'Evolução excluída!!!',
 		]);
 		
+	} elseif ($tipoRequest == 'GETANOTACOESTECENFERMAGEMRN') {
+
+		$iAtendimento = $_POST['id'];
+	
+		$sql = "SELECT *
+			FROM EnfermagemAnotacaoTecnicoRN
+			WHERE EnAnTAtendimento = $iAtendimento";
+
+		$result = $conn->query($sql);
+		$anotacoes = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($anotacoes as $key => $item){
+
+			array_push($array,[
+				'item' => ($key + 1),
+				'id'=>$item['EnAnTId'],
+				'dataHora'=> mostraData($item['EnAnTDataInicio']) . ' ' . mostraHora($item['EnAnTHoraInicio']),
+				'fc' => $item['EnAnTFreqCardiaca'],
+				'fr' => $item['EnAnTFreqRespiratoria'],
+				'temperatura' => $item['EnAnTTemperatura'],
+				'spo' => $item['EnAnTSPO'],
+				'peso' => mostraValor($item['EnAnTPeso']),
+				'anotacao' => $item['EnAnTAnotacaoEnfermagem'],
+				'editavel' => $item['EnAnTEditavel']
+			]);
+		}
+		
+		echo json_encode($array);
+		
+	} elseif ($tipoRequest == 'INCLUIRANOTACAOTECENFERMAGEMRN') {
+
+		$tipo = $_POST['tipo'];
+
+		$iAtendimentoId = $_POST['iAtendimentoId'];
+
+		$inputDataInicio = date('Y-m-d');
+		$inputInicio = date('H:i:s');
+		$inputPrevisaoAlta = $_POST['inputPrevisaoAlta'] == '' ? 'null' : "'" . $_POST['inputPrevisaoAlta'] . "'";;
+		$inputTipoInternacao = $_POST['inputTipoInternacao'];
+		$inputEspLeito = $_POST['inputEspLeito'];
+		$inputAla = $_POST['inputAla'];
+		$inputQuarto = $_POST['inputQuarto'];
+		$inputLeito = $_POST['inputLeito'];
+
+		$profissional = $_POST['profissional'];
+
+		$inputNomeMae = $_POST['inputNomeMae'];
+		$inputDtNascimento = $_POST['inputDtNascimento'] == '' ? 'null' : "'" . $_POST['inputDtNascimento'] . "'";
+		$inputHrNascimento = $_POST['inputHrNascimento'] == '' ? 'null' : "'" . $_POST['inputHrNascimento'] . "'";
+		$cmbSexo = $_POST['cmbSexo'];
+		$cmbChoroPresente = $_POST['cmbChoroPresente']== '' ? 'null' : "'" . $_POST['cmbChoroPresente'] . "'";
+		$cmbSuccao = $_POST['cmbSuccao']== '' ? 'null' : "'" . $_POST['cmbSuccao'] . "'";
+		
+		$inputAmamentacao = $_POST['inputAmamentacao'] == '' ? 'null' : $_POST['inputAmamentacao'];
+		$inputAmamentacaoDescricao = $_POST['inputAmamentacaoDescricao'];
+
+		$inputCardiacaM = $_POST['inputCardiacaM'];
+		$inputRespiratoriaM = $_POST['inputRespiratoriaM'];
+		$inputTemperaturaM = $_POST['inputTemperaturaM'];
+		$inputSPOM = $_POST['inputSPOM'];
+		$inputHGTM = $_POST['inputHGTM'];
+		$inputPesoM = $_POST['inputPesoM'] == '' ? 'null' : gravaValor($_POST['inputPesoM']);
+
+		$checkAtividadeHipoativo = $_POST['checkAtividadeHipoativo'];
+		$checkAtividadeSonolento = $_POST['checkAtividadeSonolento'];
+		$checkAtividadeAtivo = $_POST['checkAtividadeAtivo'];
+		$checkAtividadeChoroso = $_POST['checkAtividadeChoroso'];
+		$checkAtividadeGemente = $_POST['checkAtividadeGemente'];
+		$inputAtividadeDescricao = $_POST['inputAtividadeDescricao'];
+
+		$checkColoracaoCorado = $_POST['checkColoracaoCorado'];
+		$checkColoracaoHipocorado = $_POST['checkColoracaoHipocorado'];
+		$checkColoracaoCianotico = $_POST['checkColoracaoCianotico'];
+		$checkColoracaoIcterico = $_POST['checkColoracaoIcterico'];
+		$checkColoracaoPletorico = $_POST['checkColoracaoPletorico'];
+		$inputColoracaoDescricao = $_POST['inputColoracaoDescricao'];
+
+		$cmbHidratacao = $_POST['cmbHidratacao']  == '' ? 'null' : "'" . $_POST['cmbHidratacao'] . "'";
+		$cmbAbdome = $_POST['cmbAbdome'] == '' ? 'null' : $_POST['cmbAbdome'];
+
+		$inputPele = $_POST['inputPele'];
+		$inputPeleDescricao = $_POST['inputPeleDescricao'];
+
+		$inputPadraoRespiratorio = $_POST['inputPadraoRespiratorio'];
+		$inputPadraoRespDescricao = $_POST['inputPadraoRespDescricao'];
+
+		$checkCotoLimpoSeco = $_POST['checkCotoLimpoSeco'];
+		$checkCotoGelatinoso = $_POST['checkCotoGelatinoso'];
+		$checkCotoMumificado = $_POST['checkCotoMumificado'];
+		$checkCotoUmido = $_POST['checkCotoUmido'];
+		$checkCotoSujo = $_POST['checkCotoSujo'];
+		$checkCotoFetido = $_POST['checkCotoFetido'];
+		$inputCotoDescricao = $_POST['inputCotoDescricao'];
+
+		$inputAnotacoesDescricao = $_POST['inputAnotacoesDescricao'];
+
+		if (isset($tipo) && $tipo == 'INSERT') {
+
+			$iAtendimentoId = $_POST['iAtendimentoId'];
+
+			$sql = "INSERT INTO  EnfermagemAnotacaoTecnicoRN
+			(EnAnTAtendimento,EnAnTDataInicio,EnAnTHoraInicio,EnAnTPrevisaoAlta,EnAnTTipoInternacao,EnAnTEspecialidadeLeito,
+			EnAnTAla,EnAnTQuarto,EnAnTLeito,EnAnTProfissional,EnAnTNomeMae,	EnAnTDataNascimento,EnAnTHoraNascimento,
+			EnAnTSexo,EnAnTChoroPresente,EnAnTSuccao,EnAnTAmamentacao,EnAnTAmamentacaoDescricao,EnAnTFreqCardiaca,
+			EnAnTFreqRespiratoria,EnAnTTemperatura,EnAnTSPO,EnAnTHGT,EnAnTPeso,	EnAnTAtividadeHipoativo,EnAnTAtividadeSonolento,
+			EnAnTAtividadeAtivo,EnAnTAtividadeChoroso,EnAnTAtividadeGemente,EnAnTAtividadeDescricao,EnAnTColoracaoCorado,
+			EnAnTColoracaoHipoCorado,EnAnTColoracaoCianotico,EnAnTColoracaoIcterico,EnAnTColoracaoPletorico,EnAnTColoracaoDescricao,
+			EnAnTHidratacao,EnAnTAbdome,EnAnTPele,EnAnTPeleDescricao,EnAnTPadraoRespiratorio,EnAnTPadraoRespiratorioDescricao,
+			EnAnTCotoLimpoSeco,	EnAnTCotoGelatinoso,EnAnTCotoMumificado,EnAnTCotoUmido,	EnAnTCotoSujo,EnAnTCotoFetido,
+			EnAnTCotoDescricao,	EnAnTAnotacaoEnfermagem,EnAnTEditavel,	EnAnTUnidade)
+			VALUES 
+			('$iAtendimentoId', '$inputDataInicio', '$inputInicio',	$inputPrevisaoAlta,	'$inputTipoInternacao',	'$inputEspLeito', 
+			'$inputAla','$inputQuarto',	'$inputLeito',	'$profissional','$inputNomeMae',$inputDtNascimento,	$inputHrNascimento,
+			'$cmbSexo',	$cmbChoroPresente,$cmbSuccao,	$inputAmamentacao,	'$inputAmamentacaoDescricao','$inputCardiacaM',
+			'$inputRespiratoriaM','$inputTemperaturaM','$inputSPOM','$inputHGTM',$inputPesoM,$checkAtividadeHipoativo,$checkAtividadeSonolento,
+			$checkAtividadeAtivo,$checkAtividadeChoroso,$checkAtividadeGemente,	'$inputAtividadeDescricao',	$checkColoracaoCorado,
+			$checkColoracaoHipocorado,$checkColoracaoCianotico,	$checkColoracaoIcterico,$checkColoracaoPletorico,'$inputColoracaoDescricao',
+			$cmbHidratacao,	$cmbAbdome,	'$inputPele','$inputPeleDescricao',	'$inputPadraoRespiratorio',	'$inputPadraoRespDescricao',
+			$checkCotoLimpoSeco,$checkCotoGelatinoso,$checkCotoMumificado,$checkCotoUmido,$checkCotoSujo,$checkCotoFetido,
+			'$inputCotoDescricao',	'$inputAnotacoesDescricao', 1, '$iUnidade')";
+			$conn->query($sql);
+
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Incluir Anotação',
+				'menssagem' => 'Anotação inserida com sucesso!!!'
+			]);		
+			
+		} else {
+
+			$idAnotacao = $_POST['idAnotacao'];
+
+			$sql = "UPDATE EnfermagemAnotacaoTecnicoRN SET
+			EnAnTDataInicio = '$inputDataInicio',
+			EnAnTHoraInicio = '$inputInicio',
+			EnAnTPrevisaoAlta = $inputPrevisaoAlta,
+			EnAnTTipoInternacao = '$inputTipoInternacao',
+			EnAnTEspecialidadeLeito = '$inputEspLeito',
+			EnAnTAla = '$inputAla',
+			EnAnTQuarto = '$inputQuarto',
+			EnAnTLeito = '$inputLeito',
+			EnAnTProfissional = '$profissional',
+			EnAnTNomeMae = '$inputNomeMae',
+			EnAnTDataNascimento = $inputDtNascimento,
+			EnAnTHoraNascimento = $inputHrNascimento,
+			EnAnTSexo = '$cmbSexo',
+			EnAnTChoroPresente = $cmbChoroPresente,
+			EnAnTSuccao = $cmbSuccao,
+			EnAnTAmamentacao = $inputAmamentacao,
+			EnAnTAmamentacaoDescricao = '$inputAmamentacaoDescricao',
+			EnAnTFreqCardiaca = '$inputCardiacaM',
+			EnAnTFreqRespiratoria = '$inputRespiratoriaM',
+			EnAnTTemperatura = '$inputTemperaturaM',
+			EnAnTSPO = '$inputSPOM',
+			EnAnTHGT = '$inputHGTM',
+			EnAnTPeso = $inputPesoM,
+			EnAnTAtividadeHipoativo = $checkAtividadeHipoativo,
+			EnAnTAtividadeSonolento = $checkAtividadeSonolento,
+			EnAnTAtividadeAtivo = $checkAtividadeAtivo,
+			EnAnTAtividadeChoroso = $checkAtividadeChoroso,
+			EnAnTAtividadeGemente = $checkAtividadeGemente,
+			EnAnTAtividadeDescricao = '$inputAtividadeDescricao',
+			EnAnTColoracaoCorado = $checkColoracaoCorado,
+			EnAnTColoracaoHipoCorado = $checkColoracaoHipocorado,
+			EnAnTColoracaoCianotico = $checkColoracaoCianotico,
+			EnAnTColoracaoIcterico = $checkColoracaoIcterico,
+			EnAnTColoracaoPletorico = $checkColoracaoPletorico,
+			EnAnTColoracaoDescricao = '$inputColoracaoDescricao',
+			EnAnTHidratacao = $cmbHidratacao,
+			EnAnTAbdome = $cmbAbdome,
+			EnAnTPele = '$inputPele',
+			EnAnTPeleDescricao = '$inputPeleDescricao',
+			EnAnTPadraoRespiratorio = '$inputPadraoRespiratorio',
+			EnAnTPadraoRespiratorioDescricao = '$inputPadraoRespDescricao',
+			EnAnTCotoLimpoSeco = $checkCotoLimpoSeco,
+			EnAnTCotoGelatinoso = $checkCotoGelatinoso,
+			EnAnTCotoMumificado = $checkCotoMumificado,
+			EnAnTCotoUmido = $checkCotoUmido,
+			EnAnTCotoSujo = $checkCotoSujo,
+			EnAnTCotoFetido = $checkCotoFetido,
+			EnAnTCotoDescricao = '$inputCotoDescricao',
+			EnAnTAnotacaoEnfermagem = '$inputAnotacoesDescricao',
+			EnAnTUnidade = '$iUnidade'
+			WHERE EnAnTId = '$idAnotacao'";
+			$conn->query($sql);
+
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Alterar Anotação',
+				'menssagem' => 'Anotação alterada com sucesso!!!'
+			]);
+
+		}
+
+	} elseif ($tipoRequest == 'SALVARANOTACAOTECENFERMAGEMRN') {
+
+		$iAtendimentoId = $_POST['iAtendimentoId'];
+		$dataFim = date('Y-m-d'); 
+		$horaFim =date('H:i:s');
+
+		$sql = "UPDATE EnfermagemAnotacaoTecnicoRN SET
+		EnAnTDataFim = '$dataFim',
+		EnAnTHoraFim = '$horaFim',
+		EnAnTEditavel = 0	
+		WHERE EnAnTAtendimento = '$iAtendimentoId'";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Anotação Técnico de Enfermagem RN',
+			'menssagem' => 'Dados Salvos com Sucesso!!!'
+		]);
+
+		
+	} elseif ($tipoRequest == 'DELETEANOTACAOTECENFERMAGEMRN') {
+
+		$id = $_POST['id'];
+	
+		$sql = "DELETE FROM EnfermagemAnotacaoTecnicoRN
+		WHERE EnAnTId = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Anotação Técnico de Enfermagem RN',
+			'menssagem' => 'Anotação excluída!!!',
+		]);
+		
+	} elseif ($tipoRequest == 'GETANOTACAOTECENFERMAGEMRN') {
+
+		$id = $_POST['id'];
+
+		$sql = "SELECT *
+		FROM EnfermagemAnotacaoTecnicoRN
+		WHERE EnAnTId = $id
+		AND EnAnTUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode($row);
+		
 	}
 
 }catch(PDOException $e) {
