@@ -514,60 +514,66 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 							<div class="card">
 
 								<div class="card-body">
-									<div class="col-lg-12 row">
-										<div class="col-lg-6">
-											<label>Profissional <span class="text-danger">*</span></label>
-										</div>
-										<div class="col-lg-6">
-											<label>Especialidade <span class="text-danger">*</span></label>
-										</div>
+									<?php 
+										if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+											echo "<div class='col-lg-12 row'>
+												<div class='col-lg-6'>
+													<label>Profissional <span class='text-danger'>*</span></label>
+												</div>
+												<div class='col-lg-6'>
+													<label>Especialidade <span class='text-danger'>*</span></label>
+												</div>
 
-										<div class="col-lg-6 input-group">
-											<select id="profissional" name="profissional" class="form-control select-search">
-												<option value="">Selecione</option>
-											</select>
-										</div>
-										<div class="col-lg-6 input-group">
-											<select id="especialidade" name="especialidade" class="form-control select-search">
-												<option value="">Selecione</option>
-											</select>
-										</div>
-									</div>
+												<div class='col-lg-6 input-group'>
+													<select id='profissional' name='profissional' class='form-control select-search'>
+														<option value=''>Selecione</option>
+													</select>
+												</div>
+												<div class='col-lg-6 input-group'>
+													<select id='especialidade' name='especialidade' class='form-control select-search'>
+														<option value=''>Selecione</option>
+													</select>
+												</div>
+											</div>";
 
-									<br/>
+											echo "<br/>";
 
-									<div class="col-lg-12 row">
-										<div class="col-lg-6">
-											<label>Tipo de encaminhamento <span class="text-danger">*</span></label>
-										</div>
-										<div class="col-lg-6">
-											<label>CID-10</label>
-										</div>
+											echo "<div class='col-lg-12 row'>
+												<div class='col-lg-6'>
+													<label>Tipo de encaminhamento <span class='text-danger'>*</span></label>
+												</div>
+												<div class='col-lg-6'>
+													<label>CID-10</label>
+												</div>
 
-										<div class="col-lg-6 input-group">
-											<select id="modelo" name="modelo" class="form-control select-search">
-												<option value="">Selecione</option>
-											</select>
-										</div>
-										<div class="col-lg-6 input-group">
-											<select id="cid" name="cid" class="form-control select-search">
-												<option value="">Selecione</option>
-											</select>
-										</div>
-									</div>
+												<div class='col-lg-6 input-group'>
+													<select id='modelo' name='modelo' class='form-control select-search'>
+														<option value=''>Selecione</option>
+													</select>
+												</div>
+												<div class='col-lg-6 input-group'>
+													<select id='cid' name='cid' class='form-control select-search'>
+														<option value=''>Selecione</option>
+													</select>
+												</div>
+											</div>";
+										
 
-									<br/>
+											echo "<br/>";
 
-									<div class="col-lg-12">
-										<div class="form-group">
-											<label>Encaminhamento Médico <span class="text-danger">*</span></label>
-											<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control"></textarea>
-											<small class="text-muted form-text">
-												Máx. 2000 caracteres<br>
-												<span id="caracteresInputEncaminhamentoMedico"></span>
-											</small>
-										</div>
-									</div>
+											echo "<div class='col-lg-12'>
+												<div class='form-group'>
+													<label>Encaminhamento Médico <span class='text-danger'>*</span></label>
+													<textarea rows='5' cols='5'  id='summernote' name='txtareaConteudo' class='form-control'></textarea>
+													<small class='text-muted form-text'>
+														Máx. 2000 caracteres<br>
+														<span id='caracteresInputEncaminhamentoMedico'></span>
+													</small>
+												</div>
+											</div>";
+										}
+									?>	 
+
 
 									<div class="col-lg-12 mt-2">
 										<div class="col-lg-12 card-header p-0">

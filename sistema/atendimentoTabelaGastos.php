@@ -872,43 +872,44 @@ if ($row['ClienSexo'] == 'F'){
 
 								<div class="card-body">
 									<form id="formTabelaGastos" name="formTabelaGastos" method="post" class="form-validate-jquery">
-										<div class="col-lg-10 mb-2 row">
-											<!-- titulos -->
-											<div class="col-lg-3">
-												<label>Grupo <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>Subgrupo <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-4">
-												<label>Procedimentos <span class="text-danger">*</span></label>
-											</div>
-											
-											<!-- campos -->										
-											<div class="col-lg-3">
-												<select id="grupo" name="grupo" class="select-search" >
-													<option value=''>Selecione</option>
-												</select>
-											</div>
-											<div class="col-lg-3">
-												<select id="subgrupo" name="subgrupo" class="select-search" >
-													<option value=''>Selecione</option>
-												</select>											
-											</div>
-											<div class="col-lg-4">
-												<select id="procedimentos" name="procedimentos" class="select-search" >
-													<option value=''>Selecione</option>
-												</select>
-											</div>
-											
-											<div class="col-lg-1" style="margin-top: -5px;">
-												<?php 
-													if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
-														echo "<a id='inserirServico' class='btn btn-lg btn-principal'>Incluir</a>";
-													}
-												?>
-											</div>
-										</div>
+
+										<?php 
+											if (isset($SituaChave) && $SituaChave != "ATENDIDO") {	
+												echo "<div class='col-lg-10 mb-2 row'>
+													<!-- titulos -->
+													<div class='col-lg-3'>
+														<label>Grupo <span class='text-danger'>*</span></label>
+													</div>
+													<div class='col-lg-3'>
+														<label>Subgrupo <span class='text-danger'>*</span></label>
+													</div>
+													<div class='col-lg-4'>
+														<label>Procedimentos <span class='text-danger'>*</span></label>
+													</div>
+													
+													<!-- campos -->										
+													<div class='col-lg-3'>
+														<select id='grupo' name='grupo' class='select-search' >
+															<option value=''>Selecione</option>
+														</select>
+													</div>
+													<div class='col-lg-3'>
+														<select id='subgrupo' name='subgrupo' class='select-search' >
+															<option value=''>Selecione</option>
+														</select>											
+													</div>
+													<div class='col-lg-4'>
+														<select id='procedimentos' name='procedimentos' class='select-search' >
+															<option value=''>Selecione</option>
+														</select>
+													</div>
+													
+													<div class='col-lg-1' style='margin-top: -5px;'>
+														<a id='inserirServico' class='btn btn-lg btn-principal'>Incluir</a>
+													</div>
+												</div>";
+											}
+										?>
 									</form>
 								</div>
 								<div class="row">
@@ -939,32 +940,33 @@ if ($row['ClienSexo'] == 'F'){
 
 								<div class="card-body">
 									<form id="formTabelaGastosProduto" name="formTabelaGastosProduto" method="post" class="form-validate-jquery">
-										<div class="col-lg-10 mb-2" style="margin-top: -20px">
-											<!-- titulos -->
-											<div class="row">
-												<div class="col-lg-10">
-													<label>Produtos em Estoque <span class="text-danger">*</span></label>
-												</div>
-											</div>
-											
-											<!-- campos -->										
-											<br>
-											<div class="row" style="margin-top: -20px">												
-												<div class="col-lg-9">
-													<select id="produtos" name="produtos" class="select-search" >
-														<!--  -->
-													</select>
-												</div>
-												<div class="col-lg-1" style="margin-top: -5px;">
-													<?php 
-														if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
-															echo "<a id='inserirProduto' class='btn btn-lg btn-principal'>Incluir</a>";
-														}
-													?>
-												</div>
-											</div>
-											
-										</div>
+										<?php 
+											if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+												echo "<div class='col-lg-10 mb-2' style='margin-top: -20px'>
+													<!-- titulos -->
+
+													<div class='row'>
+														<div class='col-lg-10'>
+															<label>Produtos em Estoque <span class='text-danger'>*</span></label>
+														</div>
+													</div>
+													
+													<!-- campos -->										
+													<br>
+													<div class='row' style='margin-top: -20px'>												
+														<div class='col-lg-9'>
+															<select id='produtos' name='produtos' class='select-search' >
+																<!--  -->
+															</select>
+														</div>
+														<div class='col-lg-1' style='margin-top: -5px;'>
+															<a id='inserirProduto' class='btn btn-lg btn-principal'>Incluir</a>
+														</div>
+													</div>
+													
+												</div>";
+											}
+										?>
 									</form>
 								</div>
 								<div class="row">
