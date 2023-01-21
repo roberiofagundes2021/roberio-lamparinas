@@ -14,7 +14,13 @@
 	$ClaNome = $rowClassificacao['AtClaNome'] == 'Internação' ? "HOSPITALAR" : $rowClassificacao['AtClaNome'];
 	$prontuario = $rowClassificacao['ClienCodigo'];
 	$Cliente = $rowClassificacao['ClienNome'];
-	$SituaChave = $rowClassificacao['SituaChave'];
+
+	//Situação do Atendimento na Sessão
+	if (isset($_POST['SituaChave'])){
+		$_SESSION['SituaChave'] = $_POST['SituaChave'];
+	}
+
+	$SituaChave = $_SESSION['SituaChave'];//$rowClassificacao['SituaChave'];
 	$desfechoChave = $rowClassificacao['AtendDesfechoChave'];
 ?>
 
