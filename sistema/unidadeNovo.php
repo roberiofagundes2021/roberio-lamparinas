@@ -161,7 +161,7 @@ include('global_assets/php/conexao.php');
           'FORMASPAGAMENTO': 'Formas de pagamento',
           'CLASSIFICACAO': 'Classificação',
           'CLASSIFICACAORISCO': 'Classificação de risco',
-          'CENTOCUSTO': 'Centro de custos',
+          'CENTROCUSTO': 'Centro de custos',
           'MODALIDADE': 'Modalidades',
         }
         let increment = 100 / Object.keys(itensRequest).length
@@ -269,18 +269,16 @@ include('global_assets/php/conexao.php');
                     error: function(response){
                       $(`#imgLoading-${key}`).html('<i class="icon-x text-danger" style="font-size:30px;"></i>')
                       porcentagem += increment
-                      // alerta(response.titulo, response.mensagem, response.status)
                       erros.push(key)
                     }
                   })
                 }
-                // window.location.href='empresa.php'
 
                 if(erros.length){
                   // colocar uma menssagem falando que houve erro ao cadastrar alguns itens e apresentar
                   // botão de nova tentativa
                 }else{
-                  alerta('Unidade', 'Unidade Criada com Sucesso!!!', 'success')
+                  window.location.href='empresa.php'
                 }
               }
             })
