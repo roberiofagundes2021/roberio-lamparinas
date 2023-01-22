@@ -749,6 +749,7 @@ $acesso = 'ATENDIMENTO';
 					<input type='hidden' id='iAtendimentoEletivoId' name='iAtendimentoEletivoId' value='' />
 					<input type='hidden' id='ClaChave' name='ClaChave' value='' />
 					<input type='hidden' id='ClaNome' name='ClaNome' value='' />
+					<input type='hidden' id='SituaChave' name='SituaChave' value='' />
 				</form>	
 				<div class="row">
 					<div class="col-lg-12">
