@@ -105,22 +105,15 @@ if ($row['ClienSexo'] == 'F'){
 	<script src="global_assets/js/plugins/loaders/blockui.min.js"></script>
 	<script src="global_assets/js/plugins/ui/ripple.min.js"></script>
 
-	<script src="global_assets/js/plugins/forms/wizards/steps.min.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
+	
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
-	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
-    <script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
+	<script src="global_assets/js/plugins/tables/datatables/datatables.min.js"></script>
     <script src="global_assets/js/plugins/tables/datatables/extensions/responsive.min.js"></script>
     <script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
     <script src="global_assets/js/demo_pages/datatables_sorting.js"></script>
-	<script src="global_assets/js/plugins/editors/summernote/summernote.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
-	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	
 	<script src="global_assets/js/plugins/ui/moment/moment.min.js"></script>
 	<script src="global_assets/js/plugins/pickers/daterangepicker.js"></script>
@@ -187,7 +180,7 @@ if ($row['ClienSexo'] == 'F'){
 				},
 				{ 
 					orderable: true,   //procedimento
-					width: "30%", //15
+					width: "40%", //15
 					targets: [4]
 				},
 				{ 
@@ -226,7 +219,7 @@ if ($row['ClienSexo'] == 'F'){
 				},
 				{ 
 					orderable: true,   //data-hora
-					width: "10%", //20
+					width: "15%", //20
 					targets: [1]
 				},
 				{ 
@@ -236,7 +229,7 @@ if ($row['ClienSexo'] == 'F'){
 				},				
 				{ 
 					orderable: true,   //produto
-					width: "35%", //15
+					width: "50%", //15
 					targets: [3]
 				},
 				{ 
@@ -872,43 +865,44 @@ if ($row['ClienSexo'] == 'F'){
 
 								<div class="card-body">
 									<form id="formTabelaGastos" name="formTabelaGastos" method="post" class="form-validate-jquery">
-										<div class="col-lg-10 mb-2 row">
-											<!-- titulos -->
-											<div class="col-lg-3">
-												<label>Grupo <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-3">
-												<label>Subgrupo <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-4">
-												<label>Procedimentos <span class="text-danger">*</span></label>
-											</div>
-											
-											<!-- campos -->										
-											<div class="col-lg-3">
-												<select id="grupo" name="grupo" class="select-search" >
-													<option value=''>Selecione</option>
-												</select>
-											</div>
-											<div class="col-lg-3">
-												<select id="subgrupo" name="subgrupo" class="select-search" >
-													<option value=''>Selecione</option>
-												</select>											
-											</div>
-											<div class="col-lg-4">
-												<select id="procedimentos" name="procedimentos" class="select-search" >
-													<option value=''>Selecione</option>
-												</select>
-											</div>
-											
-											<div class="col-lg-1" style="margin-top: -5px;">
-												<?php 
-													if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
-														echo "<a id='inserirServico' class='btn btn-lg btn-principal'>Incluir</a>";
-													}
-												?>
-											</div>
-										</div>
+
+										<?php 
+											if (isset($SituaChave) && $SituaChave != "ATENDIDO") {	
+												echo "<div class='col-lg-10 mb-2 row'>
+													<!-- titulos -->
+													<div class='col-lg-3'>
+														<label>Grupo <span class='text-danger'>*</span></label>
+													</div>
+													<div class='col-lg-3'>
+														<label>Subgrupo <span class='text-danger'>*</span></label>
+													</div>
+													<div class='col-lg-4'>
+														<label>Procedimentos <span class='text-danger'>*</span></label>
+													</div>
+													
+													<!-- campos -->										
+													<div class='col-lg-3'>
+														<select id='grupo' name='grupo' class='select-search' >
+															<option value=''>Selecione</option>
+														</select>
+													</div>
+													<div class='col-lg-3'>
+														<select id='subgrupo' name='subgrupo' class='select-search' >
+															<option value=''>Selecione</option>
+														</select>											
+													</div>
+													<div class='col-lg-4'>
+														<select id='procedimentos' name='procedimentos' class='select-search' >
+															<option value=''>Selecione</option>
+														</select>
+													</div>
+													
+													<div class='col-lg-1' style='margin-top: -5px;'>
+														<a id='inserirServico' class='btn btn-lg btn-principal'>Incluir</a>
+													</div>
+												</div>";
+											}
+										?>
 									</form>
 								</div>
 								<div class="row">
@@ -930,8 +924,7 @@ if ($row['ClienSexo'] == 'F'){
 										</table>
 										<div class="footerProcedimento" style="margin-left: 25px"></div>
 									</div>		
-								</div>							
-						
+								</div>					
 							</div>
 
 
@@ -939,32 +932,33 @@ if ($row['ClienSexo'] == 'F'){
 
 								<div class="card-body">
 									<form id="formTabelaGastosProduto" name="formTabelaGastosProduto" method="post" class="form-validate-jquery">
-										<div class="col-lg-10 mb-2" style="margin-top: -20px">
-											<!-- titulos -->
-											<div class="row">
-												<div class="col-lg-10">
-													<label>Produtos em Estoque <span class="text-danger">*</span></label>
-												</div>
-											</div>
-											
-											<!-- campos -->										
-											<br>
-											<div class="row" style="margin-top: -20px">												
-												<div class="col-lg-9">
-													<select id="produtos" name="produtos" class="select-search" >
-														<!--  -->
-													</select>
-												</div>
-												<div class="col-lg-1" style="margin-top: -5px;">
-													<?php 
-														if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
-															echo "<a id='inserirProduto' class='btn btn-lg btn-principal'>Incluir</a>";
-														}
-													?>
-												</div>
-											</div>
-											
-										</div>
+										<?php 
+											if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+												echo "<div class='col-lg-10 mb-2' style='margin-top: -20px'>
+													<!-- titulos -->
+
+													<div class='row'>
+														<div class='col-lg-10'>
+															<label>Produtos em Estoque <span class='text-danger'>*</span></label>
+														</div>
+													</div>
+													
+													<!-- campos -->										
+													<br>
+													<div class='row' style='margin-top: -20px'>												
+														<div class='col-lg-9'>
+															<select id='produtos' name='produtos' class='select-search' >
+																<!--  -->
+															</select>
+														</div>
+														<div class='col-lg-1' style='margin-top: -5px;'>
+															<a id='inserirProduto' class='btn btn-lg btn-principal'>Incluir</a>
+														</div>
+													</div>
+													
+												</div>";
+											}
+										?>
 									</form>
 								</div>
 								<div class="row">
@@ -985,13 +979,8 @@ if ($row['ClienSexo'] == 'F'){
 										</table>
 										<div class="footerProduto" style="margin-left: 25px"></div>
 									</div>		
-								</div>
-
-							
-							</div>
-
-
-							
+								</div>							
+							</div>							
 						</div>
 							<!-- /basic responsive configuration -->
 

@@ -38,7 +38,7 @@ $userId = $rowUser['ProfissionalId'];
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, AtendClassificacaoRisco, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
                ClienNomeMae, ClienCartaoSus, ClienCelular, ClienStatus, ClienUsuarioAtualizador, ClienUnidade, ClResNome, AtTriPeso,
-			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI, AtClRCor
+			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI, AtClRCor, SituaChave
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
@@ -53,6 +53,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoCliente = $row['AtendCliente'] ;
 $iAtendimentoId = $row['AtendId'];
+$SituaChave = $row['SituaChave'];
 
 //Essa consulta é para preencher o sexo
 if ($row['ClienSexo'] == 'F'){
@@ -519,7 +520,11 @@ if ($row['ClienSexo'] == 'F'){
 
                                     <div class="col-md-6" style="text-align: right;">
                                         <div class="form-group" style="margin:20px;" >
-                                            <button class="btn btn-lg btn-success mr-1 salvarEvolucaoEnfermagem" >Salvar</button>
+                                            <?php 
+                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                    echo "<button class='btn btn-lg btn-success mr-1 salvarEvolucaoEnfermagem' >Salvar</button>";
+                                                }
+                                            ?>
                                             <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
                                             <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
                                         </div>
@@ -542,51 +547,55 @@ if ($row['ClienSexo'] == 'F'){
                                 </div>
 
                                 <div class="card-body">
+                                    <?php 
+                                        if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
 
-                                    <form id="formEvolucaoEnfermagem" name="formEvolucaoEnfermagem" method="post" class="form-validate-jquery">
-                                        <input type="hidden" name="idEvolucao" id="idEvolucao">
-                            
-                                        <div class="col-lg-12 mb-2 row" style='margin-left: -20px;'>
-											<!-- titulos -->
-											<div class="col-lg-2">
-												<label>Data/Hora <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-10">
-												<label>Justificativa de Lançamento Retroativo</label>
-											</div>
-											
-											<!-- campos -->										
-											<div class="col-lg-2">
-                                                <input type="datatime-local" class="form-control" name="dataHoraEvolucaoEnfermagem" id="dataHoraEvolucaoEnfermagem" value="<?php echo date('d/m/Y H:i');?>" readonly>	
-											</div>
-											<div class="col-lg-10">
-                                                <input type="text" class="form-control" name="justificativaEvolucao" id="justificativaEvolucao" value="">	
-											
-											</div>
-											
-										</div>
+                                            echo " <form id='formEvolucaoEnfermagem' name='formEvolucaoEnfermagem' method='post' class='form-validate-jquery'>
+                                                <input type='hidden' name='idEvolucao' id='idEvolucao'>";
                                         
-                                        <div class="row">
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <label for="evolucaoEnfermagem">Evolução de Enfermagem <span class="text-danger">*</span></label>
-                                                    <textarea rows="5" cols="5" maxLength="500" id="evolucaoEnfermagem" name="evolucaoEnfermagem"  class="form-control" onInput="contarCaracteres(this);" placeholder="Corpo da evolução (informe aqui o texto que você queira que apareça na evolução)" ></textarea>
-                                                    <small class="text-muted form-text">Max. 500 caracteres <span class="caracteresevolucaoEnfermagem"></span></small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
+                                                echo " <div class='col-lg-12 mb-2 row' style='margin-left: -20px;'>
+                                                    <!-- titulos -->
+                                                    <div class='col-lg-2'>
+                                                        <label>Data/Hora <span class='text-danger'>*</span></label>
+                                                    </div>
+                                                    <div class='col-lg-10'>
+                                                        <label>Justificativa de Lançamento Retroativo</label>
+                                                    </div>
+                                                    
+                                                    <!-- campos -->										
+                                                    <div class='col-lg-2'>
+                                                        <input type='datatime-local' class='form-control' name='dataHoraEvolucaoEnfermagem' id='dataHoraEvolucaoEnfermagem' value='";echo date('d/m/Y H:i'); echo "' readonly>	
+                                                    </div>
+                                                    <div class='col-lg-10'>
+                                                        <input type='text' class='form-control' name='justificativaEvolucao' id='justificativaEvolucao' value=''>	
+                                                    
+                                                    </div>
+                                                    
+                                                </div>";
+                                                
+                                                echo "<div class='row'>
+                                                    <div class='col-lg-12'>
+                                                        <div class='form-group'>
+                                                            <label for='evolucaoEnfermagem'>Evolução de Enfermagem <span class='text-danger'>*</span></label>
+                                                            <textarea rows='5' cols='5' maxLength='500' id='evolucaoEnfermagem' name='evolucaoEnfermagem'  class='form-control' onInput='contarCaracteres(this);' placeholder='Corpo da evolução (informe aqui o texto que você queira que apareça na evolução)' ></textarea>
+                                                            <small class='text-muted form-text'>Max. 500 caracteres <span class='caracteresevolucaoEnfermagem'></span></small>
+                                                        </div>
+                                                    </div>
+                                                </div>"; 
+                                            echo "</form>";
 
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="form-group row" style="padding-top:15px;">
-                                                <button class="btn btn-lg btn-success mr-1" id="incluirEvolucaoEnfermagem" style="display: block;"  >Adicionar</button>
-                                                <button class="btn btn-lg btn-success mr-1" id="salvarEdEvolucao" style="display: none;">Salvar Alterações</button>
-                                                <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
-                                                <!--<button class="btn btn-lg btn-success" type='button' onClick='abrirJanela()' style="display: block;"  >Testar Botao</button>-->
-                                            </div>
-                                        </div>
-                                    </div> 
+                                            echo "<div class='row'>
+                                                <div class='col-lg-12'>
+                                                    <div class='form-group row' style='padding-top:15px;'>
+                                                        <button class='btn btn-lg btn-success mr-1' id='incluirEvolucaoEnfermagem' style='display: block;'  >Adicionar</button>
+                                                        <button class='btn btn-lg btn-success mr-1' id='salvarEdEvolucao' style='display: none;'>Salvar Alterações</button>
+                                                        <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
+                                                        <!--<button class='btn btn-lg btn-success' type='button' onClick='abrirJanela()' style='display: block;'  >Testar Botao</button>-->
+                                                    </div>
+                                                </div>
+                                            </div> ";
+                                        }
+                                    ?>	 
                                 </div>
 
                                 <div class="row">
@@ -620,7 +629,11 @@ if ($row['ClienSexo'] == 'F'){
                                 <div class=" card-body row">
                                     <div class="col-lg-12">
                                         <div class="form-group" style="margin-bottom:0px;">
-                                            <button class="btn btn-lg btn-success mr-1 salvarEvolucaoEnfermagem" >Salvar</button>
+                                            <?php 
+                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                    echo "<button class='btn btn-lg btn-success mr-1 salvarEvolucaoEnfermagem' >Salvar</button>";
+                                                }
+                                            ?>
                                             <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
                                             <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
                                         </div>

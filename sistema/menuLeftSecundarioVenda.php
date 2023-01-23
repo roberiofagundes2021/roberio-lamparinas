@@ -14,7 +14,13 @@
 	$ClaNome = $rowClassificacao['AtClaNome'] == 'Internação' ? "HOSPITALAR" : $rowClassificacao['AtClaNome'];
 	$prontuario = $rowClassificacao['ClienCodigo'];
 	$Cliente = $rowClassificacao['ClienNome'];
-	$SituaChave = $rowClassificacao['SituaChave'];
+
+	//Situação do Atendimento na Sessão
+	if (isset($_POST['SituaChave'])){
+		$_SESSION['SituaChave'] = $_POST['SituaChave'];
+	}
+
+	$SituaChave = $_SESSION['SituaChave'];//$rowClassificacao['SituaChave'];
 	$desfechoChave = $rowClassificacao['AtendDesfechoChave'];
 ?>
 
@@ -43,6 +49,7 @@
 					case 'admissaoEnfermagem': URL = 'atendimentoAdmissaoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'evolucaoEnfermagem': URL = 'atendimentoEvolucaoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'anotacaoTecnicoEnfermagem': URL = 'atendimentoAnotacaoTecnicoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'anotacaoTecnicoEnfermagemRN': URL = 'atendimentoAnotacaoTecnicoEnfermagemRN.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'admissaoPediatrica': URL = 'atendimentoAdmissaoPediatrica.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'admissaoEnfermagemMultidisciplinar': URL = 'atendimentoAdmissaoEnfermagemMultidisciplinar.php'; $('#dadosPost').attr('target', '_self'); break;
 					default: URL = ''; console.log(tipo); return; break;
@@ -284,6 +291,9 @@
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='anotacaoTecnicoEnfermagem'><i class="icon-certificate"></i> Anotações</a>
 								</li>								
+								<li class="nav-item">
+									<a href="#" class="nav-link itemLink" data-tipo='anotacaoTecnicoEnfermagemRN'><i class="icon-certificate"></i> Anotações RN</a>
+								</li>
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='admissaoPediatrica'><i class="icon-certificate"></i> Admissão Pediátrica</a>
 								</li>								

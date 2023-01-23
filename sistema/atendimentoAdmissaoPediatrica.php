@@ -60,7 +60,7 @@ $userId = $rowUser['ProfissionalId'];
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, AtendClassificacaoRisco, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
                ClienNomeMae, ClienCartaoSus, ClienCelular, ClienStatus, ClienUsuarioAtualizador, ClienUnidade, ClResNome, AtTriPeso,
 			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI, AtClRCor,
-               TpIntNome, TpIntId, EsLeiNome, EsLeiId, AlaNome, AlaId, QuartNome, QuartId, LeitoNome, LeitoId
+               TpIntNome, TpIntId, EsLeiNome, EsLeiId, AlaNome, AlaId, QuartNome, QuartId, LeitoNome, LeitoId, SituaChave
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
@@ -81,6 +81,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoCliente = $row['AtendCliente'] ;
 $iAtendimentoId = $row['AtendId'];
+$SituaChave = $row['SituaChave'];
 
 //Essa consulta é para preencher o sexo
 if ($row['ClienSexo'] == 'F'){
@@ -2119,7 +2120,11 @@ if (isset($_POST['inputInicio'])) {
                                     <div class="col-md-6" style="text-align: right;">
 
                                         <div class="form-group" style="margin:20px;" >
-                                            <button class="btn btn-lg btn-success mr-1 salvarAdmissao" >Salvar</button>
+                                            <?php 
+                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                    echo "<button class='btn btn-lg btn-success mr-1 salvarAdmissao' >Salvar</button>";
+                                                }
+                                            ?>
                                             <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
                                             <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
 
@@ -3847,7 +3852,11 @@ if (isset($_POST['inputInicio'])) {
                                 <div class=" card-body row">
                                     <div class="col-lg-12">
                                         <div class="form-group" style="margin-bottom:0px;">
-                                            <button class="btn btn-lg btn-success mr-1 salvarAdmissao" >Salvar</button>
+                                            <?php 
+                                                if (isset($SituaChave) && $SituaChave == "ATENDIDO") {
+                                                    echo "<button class='btn btn-lg btn-success mr-1 salvarAdmissao' >Salvar</button>";
+                                                }
+                                            ?>
                                             <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
                                             <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
                                         </div>

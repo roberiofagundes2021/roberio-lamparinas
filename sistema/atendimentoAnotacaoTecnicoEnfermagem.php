@@ -35,7 +35,7 @@ $userId = $rowUser['ProfissionalId'];
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, AtendClassificacaoRisco, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
                ClienNomeMae, ClienCartaoSus, ClienCelular, ClienStatus, ClienUsuarioAtualizador, ClienUnidade, ClResNome, AtTriPeso,
-			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI, AtClRCor
+			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI, AtClRCor,SituaChave
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
@@ -50,6 +50,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoCliente = $row['AtendCliente'] ;
 $iAtendimentoId = $row['AtendId'];
+$SituaChave = $row['SituaChave'];
 
 //Essa consulta é para preencher o sexo
 if ($row['ClienSexo'] == 'F'){
@@ -516,7 +517,11 @@ if ($row['ClienSexo'] == 'F'){
 
                                     <div class="col-md-6" style="text-align: right;">
                                         <div class="form-group" style="margin:20px;" >
-                                            <button class="btn btn-lg btn-success mr-1 salvarAnotacaoTecEnfermagem" >Salvar</button>
+											<?php 
+                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                    echo "<button class='btn btn-lg btn-success mr-1 salvarAnotacaoTecEnfermagem' >Salvar</button>";
+                                                }
+                                            ?>
                                             <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
                                             <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
                                         </div>
@@ -539,55 +544,59 @@ if ($row['ClienSexo'] == 'F'){
                                 </div>
 
                                 <div class="card-body">
+									<?php 
+                                        if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                            echo "<form id='formAnotacao' name='formAnotacao' method='post' class='form-validate-jquery'>
+												<input type='hidden' name='idAnotacao' id='idAnotacao'>";
+									
+												echo "<div class='col-lg-12 mb-2 row' style='margin-left: -20px;'>
+													<!-- titulos -->
+													<div class='col-lg-2'>
+														<label>Data/Hora <span class='text-danger'>*</span></label>
+													</div>
+													<div class='col-lg-9'>
+														<label>Justificativa de Lançamento Retroativo</label>
+													</div>
+													<div class='col-lg-1'>
+														<label>Peso(KG)</label>
+													</div>
+													
+													<!-- campos -->										
+													<div class='col-lg-2'>
+														<input type='datatime-local' class='form-control' name='dataHoraAnotacao' id='dataHoraAnotacao' value='"; echo date('d/m/Y H:i');echo"' readonly>	
+													</div>
+													<div class='col-lg-9'>
+														<input type='text' class='form-control' name='justificativaAnotacao' id='justificativaAnotacao' value=''>	
+													
+													</div>
+													<div class='col-lg-1'>
+														<input type='text' onKeyUp='moeda(this); ' class='form-control' name='peso' id='peso' value=''>	
+													</div>
+												
+												</div>";
+											
+												echo "<div class='row'>
+													<div class='col-lg-12'>
+														<div class='form-group'>
+															<label for='anotacao'>Anotação <span class='text-danger'>*</span></label>
+															<textarea rows='5' cols='5' maxLength='500' id='anotacao' name='anotacao'  class='form-control' onInput='contarCaracteres(this);' placeholder='Corpo da anotação (informe aqui o texto que você queira que apareça na anotação)' ></textarea>
+															<small class='text-muted form-text'>Max. 500 caracteres <span class='caracteresanotacao'></span></small>
+														</div>
+													</div>
+												</div>";
+											echo "</form>";
 
-                                    <form id="formAnotacao" name="formAnotacao" method="post" class="form-validate-jquery">
-                                        <input type="hidden" name="idAnotacao" id="idAnotacao">
-                            
-                                        <div class="col-lg-12 mb-2 row" style='margin-left: -20px;'>
-											<!-- titulos -->
-											<div class="col-lg-2">
-												<label>Data/Hora <span class="text-danger">*</span></label>
-											</div>
-											<div class="col-lg-9">
-												<label>Justificativa de Lançamento Retroativo</label>
-											</div>
-											<div class="col-lg-1">
-												<label>Peso(KG)</label>
-											</div>
-											
-											<!-- campos -->										
-											<div class="col-lg-2">
-                                                <input type="datatime-local" class="form-control" name="dataHoraAnotacao" id="dataHoraAnotacao" value="<?php echo date('d/m/Y H:i');?>" readonly>	
-											</div>
-											<div class="col-lg-9">
-                                                <input type="text" class="form-control" name="justificativaAnotacao" id="justificativaAnotacao" value="">	
-											
-											</div>
-											<div class="col-lg-1">
-                                                <input type="text" onKeyUp="moeda(this); " class="form-control" name="peso" id="peso" value="">	
-											</div>
-											
-										</div>
-                                        
-                                        <div class="row">
-                                            <div class="col-lg-12">
-                                                <div class="form-group">
-                                                    <label for="anotacao">Anotação <span class="text-danger">*</span></label>
-                                                    <textarea rows="5" cols="5" maxLength="500" id="anotacao" name="anotacao"  class="form-control" onInput="contarCaracteres(this);" placeholder="Corpo da anotação (informe aqui o texto que você queira que apareça na anotação)" ></textarea>
-                                                    <small class="text-muted form-text">Max. 500 caracteres <span class="caracteresanotacao"></span></small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
+											echo "<div class='row'>
+												<div class='col-lg-12'>
+													<div class='form-group' style='padding-top:15px;'>
+														<button class='btn btn-lg btn-success' id='incluirAnotacao' style='display: block;'  >Adicionar</button>	
+														<button class='btn btn-lg btn-success' id='salvarEdAnotacao' style='display: none;'>Salvar Alterações</button>
+													</div>
+												</div>
+											</div>";
+                                        }
+                                    ?>	 
 
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="form-group" style="padding-top:15px;">
-                                                <button class="btn btn-lg btn-success" id="incluirAnotacao" style="display: block;"  >Adicionar</button>
-                                                <button class="btn btn-lg btn-success" id="salvarEdAnotacao" style="display: none;">Salvar Alterações</button>
-                                            </div>
-                                        </div>
-                                    </div> 
                                 </div>
 
                                 <div class="row">
@@ -616,7 +625,11 @@ if ($row['ClienSexo'] == 'F'){
                                 <div class=" card-body row">
                                     <div class="col-lg-12">
                                         <div class="form-group" style="margin-bottom:0px;">
-                                            <button class="btn btn-lg btn-success mr-1 salvarAnotacaoTecEnfermagem" >Salvar</button>
+											<?php 
+												if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+													echo "<button class='btn btn-lg btn-success mr-1 salvarAnotacaoTecEnfermagem' >Salvar</button>";
+												}
+											?>
                                             <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
                                             <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
                                         </div>
