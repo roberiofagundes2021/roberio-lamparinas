@@ -48,6 +48,7 @@
 					case 'documento': URL = 'atendimentoDocumentos.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'admissaoEnfermagem': URL = 'atendimentoAdmissaoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'evolucaoEnfermagem': URL = 'atendimentoEvolucaoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'efetivacaoAlta': URL = 'atendimentoEfetivacaoAlta.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'anotacaoTecnicoEnfermagem': URL = 'atendimentoAnotacaoTecnicoEnfermagem.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'anotacaoTecnicoEnfermagemRN': URL = 'atendimentoAnotacaoTecnicoEnfermagemRN.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'admissaoPediatrica': URL = 'atendimentoAdmissaoPediatrica.php'; $('#dadosPost').attr('target', '_self'); break;
@@ -115,6 +116,9 @@
 									</li>								
 									<li class="nav-item">
 										<a href="#" class="nav-link itemLink" data-tipo='formularios'><i class="icon-certificate"></i> Formulários</a>
+									</li>
+									<li class="nav-item">
+										<a href="#" class="nav-link itemLink" data-tipo='efetivacaoAlta'><i class="icon-certificate"></i> Efetivação de Alta</a>
 									</li>
 									<li class="nav-item">
 										<a href="#" class="nav-link itemLink" data-tipo='relatorioAta'><i class="icon-certificate"></i> Relatório de Alta</a>
@@ -296,7 +300,10 @@
 								</li>
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='admissaoPediatrica'><i class="icon-certificate"></i> Admissão Pediátrica</a>
-								</li>								
+								</li>				
+								<li class="nav-item">
+									<a href="#" class="nav-link itemLink" data-tipo='efetivacaoAlta'><i class="icon-certificate"></i> Efetivação de Alta</a>
+								</li>				
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='formularios'><i class="icon-certificate"></i> Formulários</a>
 								</li>
