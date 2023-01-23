@@ -20,7 +20,7 @@
 		$_SESSION['SituaChave'] = $_POST['SituaChave'];
 	}
 
-	$SituaChave = $_SESSION['SituaChave'];//$rowClassificacao['SituaChave'];
+	$SituaChave = $_SESSION['SituaChave'];
 	$desfechoChave = $rowClassificacao['AtendDesfechoChave'];
 ?>
 

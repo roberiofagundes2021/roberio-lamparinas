@@ -66,7 +66,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoCliente = $row['AtendCliente'] ;
 $iAtendimentoId = $row['AtendId'];
-$SituaChave = $row['SituaChave'];
+$SituaChave = $_SESSION['SituaChave'];
 
 
 

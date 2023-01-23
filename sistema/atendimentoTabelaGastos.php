@@ -61,7 +61,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoId = $row['AtendId'];
 $iClienteId = $row['ClienId'];
-$SituaChave = $row['SituaChave'];
+$SituaChave = $_SESSION['SituaChave'];
 
 $sql = "SELECT AtTGaId, AtTGaAtendimento, AtTGaDataRegistro, AtTGaServico, AtTGaProfissional, AtTGaHorario, 
                AtTGaValor, AtTGaDesconto, AtTGaDesconto, AtendCliente, AtendDataRegistro, SrVenNome, ProfiNome
