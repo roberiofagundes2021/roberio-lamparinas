@@ -6,9 +6,11 @@ $_SESSION['PaginaAtual'] = 'Profissionais';
 
 include('global_assets/php/conexao.php');
 
-$sql = "SELECT ProfiId, ProfiNome,ProfiTipo, ProfiCpf, ProfiCnpj, ProfiTelefone, ProfiCelular, ProfiStatus, ProfiEmail, SituaNome, SituaCor, SituaChave
+$sql = "SELECT ProfiId, ProfiNome,ProfiTipo, ProfiCpf, ProfiCnpj, ProfiTelefone, ProfiCelular, ProfiStatus, 
+		ProfiEmail, SituaNome, SituaCor, SituaChave, UsuarLogin
         FROM Profissional
         JOIN Situacao on SituaId = ProfiStatus
+		LEFT JOIN Usuario on UsuarId = ProfiUsuario
         WHERE ProfiUnidade = ". $_SESSION['UnidadeId'] ." 
         ORDER BY ProfiNome ASC";
 $result = $conn->query($sql);
@@ -58,7 +60,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //CPF/CNPJ
-					width: "20%",
+					width: "15%",
 					targets: [1]
 				},				
 				{ 
@@ -68,18 +70,23 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},
 				{ 
 					orderable: true,   //E-mail
-					width: "25%",
+					width: "20%",
 					targets: [3]
+				},
+				{ 
+					orderable: true,   //Usuario
+					width: "10%",
+					targets: [4]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "5%",
-					targets: [4]
+					targets: [5]
 				},
 				{ 
 					orderable: false,  //Ações
 					width: "5%",
-					targets: [5]
+					targets: [6]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -203,6 +210,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										<th>CPF/CNPJ</th>
 										<th>Celular</th>										
 										<th>E-mail</th>
+										<th>Usuário</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>
@@ -224,6 +232,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.formatarCPF_Cnpj($documento).'</td>
 											<td>'.$telefone.'</td>
 											<td>'.$item['ProfiEmail'].'</td>
+											<td>'.$item['UsuarLogin'].'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaProfissional(1,'.$item['ProfiId'].', \''.$item['ProfiNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
