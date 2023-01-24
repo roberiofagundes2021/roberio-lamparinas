@@ -54,6 +54,7 @@
 					case 'admissaoPediatrica': URL = 'atendimentoAdmissaoPediatrica.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'admissaoEnfermagemMultidisciplinar': URL = 'atendimentoAdmissaoEnfermagemMultidisciplinar.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'admissaoCirurgica': URL = 'admissaoCirurgicaPreOperatorio.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'anotacaoTransOperatoria': URL = 'anotacaoTransOperatoria.php'; $('#dadosPost').attr('target', '_self'); break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
@@ -126,6 +127,9 @@
 									</li>
 									<li class="nav-item">
 										<a href="#" class="nav-link itemLink" data-tipo='admissaoCirurgica'><i class="icon-certificate"></i> Admissão Cirúrgica Pré-Operatório</a>
+									</li>
+									<li class="nav-item">
+										<a href="#" class="nav-link itemLink" data-tipo='anotacaoTransOperatoria'><i class="icon-certificate"></i> Anotação Trans-Operatória</a>
 									</li>
 								</ul>
 							</li>
@@ -316,6 +320,9 @@
 								</li>
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='admissaoCirurgica'><i class="icon-certificate"></i> Admissão Cirúrgica Pré-Operatório</a>
+								</li>
+								<li class="nav-item">
+									<a href="#" class="nav-link itemLink" data-tipo='anotacaoTransOperatoria'><i class="icon-certificate"></i> Anotação Trans-Operatória</a>
 								</li>
 							</ul>
 						</li>
