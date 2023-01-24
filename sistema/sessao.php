@@ -238,15 +238,16 @@ if (array_key_exists('Servico_ProfissionalId', $_SESSION) && !in_array(basename(
 	unset($_SESSION['Servico_ProfissionalId']);
 }
 
-/*$atendimentoSituaChave = array(
+$atendimentoSituaChave = array(
 	'atendimentoAdmissaoEnfermagem.php', 'atendimentoAdmissaoEnfermagemMultidisciplinar.php', 
 	'atendimentoAdmissaoPediatrica.php', 'atendimentoAmbulatorial.php', 'atendimentoAnotacaoTecnicoEnfermagem.php',
 	'atendimentoAnotacaoTecnicoEnfermagemRN.php', 'atendimentoAtestadoMedico.php', 'atendimentoDocumentos.php',
 	'atendimentoEletivo.php', 'atendimentoEncaminhamentoMedico.php', 'atendimentoEvolucaoEnfermagem.php',
 	'atendimentoReceituario.php', 'atendimentoSolicitacaoExame.php', 'atendimentoSolicitacaoProcedimento.php',
-	'atendimentoTabelaGastos.php', 'atendimentoTriagem.php', 'menuLeftSecundarioVenda.php', 'filtraAtendimento.php'
+	'atendimentoTabelaGastos.php', 'atendimentoTriagem.php', 'filtraTriagem.php', 'menuLeftSecundarioVenda.php', 
+	'filtraAtendimento.php'
 );
 
 if (array_key_exists('SituaChave', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $atendimentoSituaChave)) {
 	unset($_SESSION['SituaChave']);
-}*/
+}

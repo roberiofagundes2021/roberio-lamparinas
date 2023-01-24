@@ -283,12 +283,22 @@ if ($row['ClienSexo'] == 'F'){
 
 						response.forEach((item,index) => {  
 
+							let situaChave = $("#atendimentoSituaChave").val();
 							let exc = `<a style='color: black; cursor:pointer' onclick='excluiDocumento(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Encaminhamento'></i></a>`;
 							let print = `<a style='color: black; cursor:pointer' onclick='imprimirDocumento(\"${item.id}\")' class='list-icons-item'><i class='icon-printer2' title='Imprimir Encaminhamento'></i></a>`;
-							let acoes = `<div class='list-icons'>
+							let acoes = '';
+
+							if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
                                         ${print}
 										${exc}
 									</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        ${print}
+									</div>`;
+							}
+							
 							HTML += `
 							<tr class='servicoItem'>
 								<td class="text-left">${index+1}</td>
@@ -383,6 +393,7 @@ if ($row['ClienSexo'] == 'F'){
 						<form name="formAtendimentoDocumento" id="formAtendimentoDocumento" method="post" class="form-validate-jquery">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+								echo "<input type='hidden' id='atendimentoSituaChave' value='".$_SESSION['SituaChave']."' />";
 							?>
 							<div class="card">
 								<div class="card-header header-elements-inline">
