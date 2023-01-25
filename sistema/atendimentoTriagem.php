@@ -66,7 +66,6 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoCliente = $row['AtendCliente'] ;
 $iAtendimentoId = $row['AtendId'];
-$SituaChave = $_SESSION['SituaChave'];
 
 
 
@@ -422,10 +421,20 @@ if (isset($_POST['inputAlergia']) ){
 
 						response.array.forEach(item => {
 
+							let situaChave = $("#atendimentoSituaChave").val();
 							let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.AtTXSTriagem}\", \"${item.AtTXSServicoVenda}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Procedimento'></i></a>`;
-							let acoes = `<div class='list-icons'>
-										${exc}
+							let acoes = '';
+
+							if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
+									${exc}
 									</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        
+								</div>`;
+							}
+
 							HTML += `
 							<tr class='servicoItem'>
 								<td class="text-left" style="width: 10%"> ${item.SrVenCodigo} </td>
@@ -569,6 +578,7 @@ if (isset($_POST['inputAlergia']) ){
 						<form name="formAtendimentoTriagem" id="formAtendimentoTriagem" method="post" class="form-validate-jquery">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+								echo "<input type='hidden' id='atendimentoSituaChave' value='".$_SESSION['SituaChave']."' />";
 							?>
 							<input type='hidden' id='iAtTriId' name='iAtTriId' value='<?php echo $iAtendimentoTriagemId != null ? $iAtendimentoTriagemId : '' ?>' />
 							<div class="card">
@@ -963,7 +973,7 @@ if (isset($_POST['inputAlergia']) ){
 													<div class="col-lg-1">
 
 													<?php 
-														if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+														if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 															echo "<button id='incluirServico' class='btn btn-lg btn-light' data-tipo='INCLUIRSERVICO'>
 																	<i class='icon-plus3 p-0' style='cursor: pointer; color: black'></i>
 																  </button>";
@@ -1005,7 +1015,7 @@ if (isset($_POST['inputAlergia']) ){
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
 												<?php 
-													if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+													if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 														echo "<button class='btn btn-lg btn-success mr-1' id='enviar'>Salvar</button>";
 														}
 												?>
