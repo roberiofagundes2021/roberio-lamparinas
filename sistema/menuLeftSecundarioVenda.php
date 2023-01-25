@@ -56,6 +56,7 @@
 					case 'admissaoCirurgica': URL = 'admissaoCirurgicaPreOperatorio.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'anotacaoTransOperatoria': URL = 'anotacaoTransOperatoria.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'admissaoRN': URL = 'admissaoRecemNascido.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'admissaoPreParto': URL = 'atendimentoAdmissaoPreParto.php'; $('#dadosPost').attr('target', '_self'); break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
@@ -312,6 +313,9 @@
 								</li>
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='admissaoPediatrica'><i class="icon-certificate"></i> Admissão Pediátrica</a>
+								</li>
+								<li class="nav-item">
+									<a href="#" class="nav-link itemLink" data-tipo='admissaoPreParto'><i class="icon-certificate"></i> Admissão Pré Parto</a>
 								</li>				
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='efetivacaoAlta'><i class="icon-certificate"></i> Efetivação de Alta</a>
