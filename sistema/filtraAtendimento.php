@@ -3704,6 +3704,121 @@ try{
 
 		echo json_encode($row);
 		
+	} elseif ($tipoRequest == 'INCLUIREVOLUCAOADMISSAOPREPARTO') {
+
+		$tipo = $_POST['tipo'];
+		$idAdmissao = $_POST['idAdmissao'] == "" ? null : $_POST['idAdmissao'];
+		$cmbRealizadoToque = $_POST['cmbRealizadoToque'] == "" ? null : $_POST['cmbRealizadoToque'];
+		$inputDilatacao = $_POST['inputDilatacao'] == "" ? null : $_POST['inputDilatacao'];
+		$inputApagamento = $_POST['inputApagamento'] == "" ? null : $_POST['inputApagamento'];
+		$cmbApresentacao = $_POST['cmbApresentacao'] == "" ? null : $_POST['cmbApresentacao'];
+		$cmbPlanoLee = $_POST['cmbPlanoLee'] == "" ? null : $_POST['cmbPlanoLee'];
+		$inputLiquido = $_POST['inputLiquido'] == "" ? null : $_POST['inputLiquido'];
+		$cmbMeconio = $_POST['cmbMeconio'] == "" ? null : $_POST['cmbMeconio'];
+
+		$dataHoraAtual = date('Y-m-d H:i:s');
+
+		if (isset($tipo) && $tipo == 'INSERT') {
+
+			$sql = "INSERT INTO  EnfermagemAdmissaoPrePartoEvolucao(
+				EnAPEAdmissaoPreParto, EnAPEDataHora, EnAPERealizadoToque, EnAPEDilatacao, EnAPEApagamento,
+				EnAPEApresentacao, EnAPEPlano, EnAPELiquido, EnAPEMeconio, EnAPEEditavel, EnAPEUnidade )
+			VALUES (
+				'$idAdmissao', '$dataHoraAtual', '$cmbRealizadoToque', '$inputDilatacao','$inputApagamento', 
+				'$cmbApresentacao', '$cmbPlanoLee', '$inputLiquido', '$cmbMeconio',  1, '$iUnidade')";
+			$conn->query($sql);
+
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Incluir Evolução',
+				'menssagem' => 'Evolução inserida com sucesso!!!'
+			]);		
+			
+		} else {
+
+			$idEvolucao = $_POST['idEvolucao'];
+
+			$sql = "UPDATE EnfermagemAdmissaoPrePartoEvolucao SET
+			EnAPEAdmissaoPreParto = '$idAdmissao', 
+			EnAPEDataHora = '$dataHoraAtual', 
+			EnAPERealizadoToque = '$cmbRealizadoToque', 
+			EnAPEDilatacao = '$inputDilatacao', 
+			EnAPEApagamento = '$inputApagamento',
+			EnAPEApresentacao = '$cmbApresentacao', 
+			EnAPEPlano = '$cmbPlanoLee', 
+			EnAPELiquido = '$inputLiquido', 
+			EnAPEMeconio = '$cmbMeconio'
+			WHERE EnAPEId = '$idEvolucao'";
+
+			$conn->query($sql);
+
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Alterar Evolução',
+				'menssagem' => 'Evolução alterada com sucesso!!!'
+			]);
+
+		}
+
+	}elseif ($tipoRequest == 'GETADMISSOESPREPARTO') {
+
+		$idAdmissao = $_POST['idAdmissao'] == "" ? null : $_POST['idAdmissao'];
+	
+		$sql = "SELECT *
+			FROM EnfermagemAdmissaoPrePartoEvolucao
+			WHERE EnAPEAdmissaoPreParto = $idAdmissao";
+
+		$result = $conn->query($sql);
+		$admissoes = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($admissoes as $key => $item){
+
+			$dataHora = explode(" ", $item['EnAPEDataHora']);
+
+			array_push($array,[
+				'item' => ($key + 1),
+				'id'=>$item['EnAPEId'],
+				'dataHora'=> mostraData($dataHora[0]) . ' ' . mostraHora($dataHora[1]),
+				'dilatacao' => $item['EnAPEDilatacao'],
+				'apagamento' => $item['EnAPEApagamento'],
+				'planoLee' => $item['EnAPEPlano'],
+				'liquido' => $item['EnAPELiquido'],
+				'meconio' => $item['EnAPEMeconio'],
+				'editavel' => $item['EnAPEEditavel']
+			]);
+		}
+		
+		echo json_encode($array);
+		
+	}elseif ($tipoRequest == 'DELETEADMISSAOPREPARTO') {
+
+		$id = $_POST['id'];
+	
+		$sql = "DELETE FROM EnfermagemAdmissaoPrePartoEvolucao
+		WHERE EnAPEId = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Evolução de Admissão',
+			'menssagem' => 'Evolução excluída!!!',
+		]);
+		
+	} elseif ($tipoRequest == 'GETADMISSAOEVOLUCAO') {
+
+		$id = $_POST['id'];
+
+		$sql = "SELECT *
+		FROM EnfermagemAdmissaoPrePartoEvolucao
+		WHERE EnAPEId = $id
+		AND EnAPEUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode($row);
+		
 	}
 
 }catch(PDOException $e) {
