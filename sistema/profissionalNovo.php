@@ -463,10 +463,10 @@ include('global_assets/php/conexao.php');
                                                             <option value="">Seleciona uma profissão</option>
                                                             <?php
                                                             $sql = "SELECT ProfiId, ProfiNome
-                                                                            FROM Profissao
-                                                                            JOIN Situacao on SituaId = ProfiStatus
-                                                                            WHERE ProfiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
-                                                                            ORDER BY ProfiNome ASC";
+																	FROM Profissao
+																	JOIN Situacao on SituaId = ProfiStatus
+																	WHERE SituaChave = 'ATIVO'
+																	ORDER BY ProfiNome ASC";
                                                             $result = $conn->query($sql);
                                                             $row = $result->fetchAll(PDO::FETCH_ASSOC);
 

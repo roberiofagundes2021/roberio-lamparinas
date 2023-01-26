@@ -28,9 +28,9 @@ try{
 	}
 	
  	 // feito consultas para buscar a profissão do profissional do atendimento
-	$sql = "SELECT Profissao.ProfiNome as ProfissaoNome
+	$sql = "SELECT P.ProfiNome as ProfissaoNome, P.ProfiChave as ProfissaoChave
 			FROM Profissional
-			JOIN Profissao ON Profissao.ProfiId = Profissional.ProfiProfissao
+			JOIN Profissao P ON P.ProfiId = Profissional.ProfiProfissao
 			WHERE ProfiUsuario = $usuarioId";
 	$result = $conn->query($sql);
 	$rowProfissao = $result->fetch(PDO::FETCH_ASSOC);
@@ -1221,60 +1221,75 @@ try{
 		$iProfissional = $row['ProfiId'];
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,
-			AtClRNome,AtClRTempo,AtClRNomePersonalizado,AtClRDeterminantes,
-			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda, AtClRCor
-			FROM AtendimentoXServico
-			JOIN Atendimento ON AtendId = AtXSeAtendimento
-			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			JOIN Situacao ON SituaId = AtendSituacao
-			JOIN Cliente ON ClienId = AtendCliente
-			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			JOIN ServicoVenda ON SrVenId = AtXSeServico
-			JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
-			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'EMESPERA' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'ELETIVO'
-			ORDER BY AtClRTempo ASC";
+		AtClRNome,AtClRTempo,AtClRNomePersonalizado,AtClRDeterminantes,
+		AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
+		AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda, AtClRCor
+		FROM AtendimentoXServico
+		JOIN Atendimento ON AtendId = AtXSeAtendimento
+		JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+		JOIN Situacao ON SituaId = AtendSituacao
+		JOIN Cliente ON ClienId = AtendCliente
+		JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+		JOIN ServicoVenda ON SrVenId = AtXSeServico
+		JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
+		LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+		JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
+		WHERE SituaChave = 'EMESPERA' AND AtXSeUnidade = $iUnidade AND AtClaChave = 'ELETIVO'
+		";
+		
+		if ($rowProfissao['ProfissaoChave'] == 'MEDICO'){
+			$sql .= " AND AtXSeProfissional = $iProfissional ";
+		}
+
+		$sql .=	" ORDER BY AtClRTempo ASC";
 		$resultEspera = $conn->query($sql);
 		$rowEspera = $resultEspera->fetchAll(PDO::FETCH_ASSOC);
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
-			AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
-			AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda, AtClRCor
-			FROM AtendimentoXServico
-			JOIN Atendimento ON AtendId = AtXSeAtendimento
-			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			JOIN Situacao ON SituaId = AtendSituacao
-			JOIN Cliente ON ClienId = AtendCliente
-			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			JOIN ServicoVenda ON SrVenId = AtXSeServico
-			JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
-			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'ATENDIDO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'ELETIVO'
-			ORDER BY AtXSeId DESC";
+		AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
+		AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda, AtClRCor
+		FROM AtendimentoXServico
+		JOIN Atendimento ON AtendId = AtXSeAtendimento
+		JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+		JOIN Situacao ON SituaId = AtendSituacao
+		JOIN Cliente ON ClienId = AtendCliente
+		JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+		JOIN ServicoVenda ON SrVenId = AtXSeServico
+		JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
+		LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+		JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
+		WHERE SituaChave = 'ATENDIDO' AND AtXSeUnidade = $iUnidade AND AtClaChave = 'ELETIVO'
+		";
+
+		if ($rowProfissao['ProfissaoChave'] == 'MEDICO'){
+			$sql .= " AND AtXSeProfissional = $iProfissional ";
+		}
+
+		$sql .= " ORDER BY AtXSeId DESC";
 		$resultAtendido = $conn->query($sql);
 		$rowAtendido = $resultAtendido->fetchAll(PDO::FETCH_ASSOC);
 
 		$sql = "SELECT AtendId,AtXSeId,AtendDataRegistro,ClienNome,ClienCodigo,AtModNome,AtClaChave,AtClaNome,AtClRNome,AtClRNomePersonalizado,AtClRDeterminantes,
 		AtendObservacao,AtendSituacao,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,SituaCor,AtendNumRegistro,
 		AtXSeData,AtXSeHorario,AtXSeAtendimentoLocal,AtEleId,SrVenNome,SVXMoValorVenda, AtClRCor
-			FROM AtendimentoXServico
-			JOIN Atendimento ON AtendId = AtXSeAtendimento
-			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
-			JOIN Situacao ON SituaId = AtendSituacao
-			JOIN Cliente ON ClienId = AtendCliente
-			JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
-			JOIN ServicoVenda ON SrVenId = AtXSeServico
-			JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
-			LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
-			JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
-			WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeProfissional = $iProfissional AND AtXSeUnidade = $iUnidade
-			AND AtClaChave = 'ELETIVO'
-			ORDER BY AtXSeId DESC";
+		FROM AtendimentoXServico
+		JOIN Atendimento ON AtendId = AtXSeAtendimento
+		JOIN AtendimentoModalidade ON AtModId = AtendModalidade
+		JOIN Situacao ON SituaId = AtendSituacao
+		JOIN Cliente ON ClienId = AtendCliente
+		JOIN AtendimentoClassificacao ON AtClaId = AtendClassificacao
+		JOIN ServicoVenda ON SrVenId = AtXSeServico
+		JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
+		LEFT JOIN AtendimentoEletivo ON AtEleAtendimento = AtendId
+		JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
+		WHERE SituaChave = 'EMATENDIMENTO' AND AtXSeUnidade = $iUnidade AND AtClaChave = 'ELETIVO'
+		";
+
+		if ($rowProfissao['ProfissaoChave'] == 'MEDICO'){
+			$sql .= " AND AtXSeProfissional = $iProfissional ";
+		}
+			
+		$sql .=	" ORDER BY AtXSeId DESC";
 		$resultEmAtendimento = $conn->query($sql);
 		$rowEmAtendimento = $resultEmAtendimento->fetchAll(PDO::FETCH_ASSOC);
 		
@@ -1296,7 +1311,7 @@ try{
 			
 			$acoes = "<div class='list-icons'>";
 
-				if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {					
+				if ($rowProfissao['ProfissaoChave'] == 'ENFERMEIRO' || $rowProfissao['ProfissaoChave'] == 'TECNICODEENFERMAGEM') {					
 					
 					$acoes .= "
 						$att
@@ -1313,32 +1328,10 @@ try{
 								<a href='#' class='dropdown-item historico' data-situachave='$item[SituaChave]' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
 							</div>
 						</div>";
-				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
+				} elseif ($rowProfissao['ProfissaoChave'] == 'MEDICO'){
 					$acoes .= "$atender";
 				}	
 			$acoes .= "</div>";
-				
-			/* -- Deixar um de backup caso precise voltar
-			$acoes = "<div class='list-icons'>
-						$att
-						<div class='dropdown'>													
-							<a href='#' class='list-icons-item' data-toggle='dropdown'>
-								<i class='icon-menu9'></i>
-							</a>
-
-							<div class='dropdown-menu dropdown-menu-right'> 
-								<a href='#' class='dropdown-item atender' data-situachave='$item[SituaChave]' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Atender'></i> Atender</a>";
-								if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {
-									$acoes .="<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item triagem' data-situachave='$item[SituaChave]' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Triagem'></i> Triagem</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item classificacao' data-situachave='$item[SituaChave]' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Classificação de Risco'></i> Classificação de Risco</a>
-									<div class='dropdown-divider'></div>
-									<a href='#' class='dropdown-item historico' data-situachave='$item[SituaChave]' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>";
-								}	
-							$acoes .=" </div>
-						</div>
-					</div>";*/
 			
 			$borderColor = "";
 			switch($item['AtClRCor']){
@@ -1410,7 +1403,7 @@ try{
 			$atender = "<button href='#'  type='button' class='btn btn-success btn-sm atender' data-situachave='$item[SituaChave]' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'>Atender</button>";
 			$acoes = "<div class='list-icons'>";
 
-				if (!$rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {					
+				if (!$rowProfissao['ProfissaoChave'] == 'ENFERMEIRO' || $rowProfissao['ProfissaoChave'] == 'TECNICODEENFERMAGEM') {					
 					
 					$acoes .= "
 						$att
@@ -1427,7 +1420,7 @@ try{
 								<a href='#' class='dropdown-item historico' data-situachave='$item[SituaChave]' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Histórico do Paciente'></i> Histórico do Paciente</a>
 							</div>
 						</div>";
-				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
+				}elseif ($rowProfissao['ProfissaoChave'] == 'MEDICO'){
 					$acoes .= "$atender";
 				}	
 			$acoes .= "</div>";
@@ -1501,7 +1494,7 @@ try{
 			$atender = "<button href='#'  type='button' class='btn btn-success btn-sm atender' data-situachave='$item[SituaChave]' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'>Visualizar</button>";
 			$acoes = "<div class='list-icons'>";
 
-				if ($rowProfissao['ProfissaoNome'] == 'Enfermeiro' || $rowProfissao['ProfissaoNome'] == 'Técnico de  Enfermagem') {					
+				if ($rowProfissao['ProfissaoChave'] == 'ENFERMEIRO' || $rowProfissao['ProfissaoChave'] == 'TECNICODEENFERMAGEM') {
 					
 					$acoes .= "
 						$att
@@ -1519,7 +1512,7 @@ try{
 								<a href='#' class='dropdown-item receituario' data-situachave='$item[SituaChave]' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 							</div>
 						</div>";
-				}elseif ($rowProfissao['ProfissaoNome'] == 'Médico'){
+				}elseif ($rowProfissao['ProfissaoChave'] == 'MEDICO'){
 					$acoes .= "$atender";
 				}	
 			$acoes .= "</div>";

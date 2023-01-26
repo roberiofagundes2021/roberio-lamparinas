@@ -10,7 +10,6 @@ include('global_assets/php/conexao.php');
 $sql = "SELECT ProfiId, ProfiNome, ProfiCbo, ProfiStatus, SituaNome, SituaCor, SituaChave
 		FROM Profissao
 		JOIN Situacao on SituaId = ProfiStatus
-	    WHERE ProfiUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY ProfiNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -52,16 +51,15 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO Profissao (ProfiNome, ProfiCbo, ProfiStatus, ProfiUsuarioAtualizador, ProfiUnidade)
-					VALUES (:sNome, :sCbo, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+			$sql = "INSERT INTO Profissao (ProfiNome, ProfiCbo, ProfiStatus, ProfiUsuarioAtualizador)
+					VALUES (:sNome, :sCbo, :bStatus, :iUsuarioAtualizador)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
 							':sCbo' => $_POST['inputCbo'],
 							':bStatus' => 1,
-							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-							':iUnidade' => $_SESSION['UnidadeId'],
+							':iUsuarioAtualizador' => $_SESSION['UsuarId']
 							));
 	
 			$_SESSION['msg']['mensagem'] = "Profissão incluída!!!";
@@ -279,13 +277,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-5">
 											<div class="form-group">
 												<label for="inputNome">Nome da Profissão <span class="text-danger"> *</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Profissão" value="<?php if (isset($_POST['inputProfissaoId'])) echo $rowProfissao['ProfiNome']; ?>" required autofocus>
 											</div>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputCbo">CBO </label>
 												<input type="text" id="inputCbo" name="inputCbo" class="form-control" placeholder="CBO" value="<?php if (isset($_POST['inputCbo'])) echo $rowProfissao['ProfiCbo']; ?>" autofocus>

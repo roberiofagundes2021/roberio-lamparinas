@@ -504,7 +504,7 @@ if(isset($_POST['inputProfissionalId'])){
                                                                 $sql = "SELECT ProfiId, ProfiNome
                                                                         FROM Profissao
                                                                         JOIN Situacao on SituaId = ProfiStatus
-                                                                        WHERE ProfiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+                                                                        WHERE SituaChave = 'ATIVO'
                                                                         ORDER BY ProfiNome ASC";
                                                                 $result = $conn->query($sql);
                                                                 $rowProfissao = $result->fetchAll(PDO::FETCH_ASSOC);
