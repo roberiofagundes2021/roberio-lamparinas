@@ -56,7 +56,6 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoCliente = $row['AtendCliente'] ;
 $iAtendimentoId = $row['AtendId'];
-$SituaChave = $_SESSION['SituaChave'];
 
 
 //Essa consulta é para preencher o sexo
@@ -457,7 +456,7 @@ if ($row['ClienSexo'] == 'F'){
 
 								<div class="card-body">	
 									<?php 
-										if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+										if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 											echo "<div class='row'  style='margin-top:25px;'>									
 												<form id='formTabelaGastos' name='formTabelaGastos' method='post' class='form-validate-jquery'>
 													<div class='col-lg-12 row'>

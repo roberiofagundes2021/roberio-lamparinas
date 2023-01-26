@@ -177,6 +177,7 @@ if(isset($_POST['alergias'])){
     //     ":EnTrOObservacao" => $_POST[''],
     // ));
 }
+// campos ID/Name inputs
 // alergias
 // textAlergias
 // medicamentos
@@ -475,7 +476,6 @@ if(isset($_POST['alergias'])){
 
             $('#salvarAcessoModal').on('click',function(e){
                 e.preventDefault()
-
             })
             $('#salvarConcentimentoModal').on('click',function(e){
                 e.preventDefault()

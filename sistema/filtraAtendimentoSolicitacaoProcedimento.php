@@ -58,10 +58,17 @@ try {
         foreach ($rowProcedimentos as $item) {
             $print = "<a style='color: blue;' href='#' onclick='imprimirSolProcedimento($item[AtSPrId])' class='list-icons-item'><i class='icon-printer2' title='Imprimir Solicitação'></i></a>";
             $exc = "<button style='color: black' type='button' onclick='excluirProcedimento($item[AtSPrId])' class='btn btn-link list-icons-item'><i class='icon-bin' title='Excluir Procedimento'></i></button>";
-            $acoes = "<div class='list-icons'>
-                        ${print}
-						${exc}
-					</div>";
+           
+            if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
+                $acoes = "<div class='list-icons'>
+                            ${print}
+                            ${exc}
+                        </div>";
+            } else{
+                $acoes = "<div class='list-icons'>
+                            ${print}
+                        </div>";
+            }
             
             array_push($dataProcedimentos, [
                 'data' => [

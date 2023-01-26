@@ -81,7 +81,6 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoCliente = $row['AtendCliente'] ;
 $iAtendimentoId = $row['AtendId'];
-$SituaChave = $_SESSION['SituaChave'];
 
 //Essa consulta é para preencher o sexo
 if ($row['ClienSexo'] == 'F'){
@@ -2101,7 +2100,7 @@ if (isset($_POST['inputInicio'])) {
 
                                         <div class="form-group" style="margin:20px;" >
                                             <?php 
-                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
                                                     echo "<button class='btn btn-lg btn-success mr-1 enviarAnamnese' >Salvar</button>";
                                                 }
                                             ?>
@@ -3794,7 +3793,7 @@ if (isset($_POST['inputInicio'])) {
                                     <div class="col-lg-12">
                                         <div class="form-group" style="margin-bottom:0px;">
                                             <?php 
-                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
                                                     echo "<button class='btn btn-lg btn-success mr-1 enviarAnamnese' >Salvar</button>";
                                                 }
                                             ?>

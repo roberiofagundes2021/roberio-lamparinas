@@ -61,7 +61,6 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoId = $row['AtendId'];
 $iClienteId = $row['ClienId'];
-$SituaChave = $_SESSION['SituaChave'];
 
 $sql = "SELECT AtTGaId, AtTGaAtendimento, AtTGaDataRegistro, AtTGaServico, AtTGaProfissional, AtTGaHorario, 
                AtTGaValor, AtTGaDesconto, AtTGaDesconto, AtendCliente, AtendDataRegistro, SrVenNome, ProfiNome
@@ -255,7 +254,7 @@ if ($row['ClienSexo'] == 'F'){
 			divTotal = `<div class="row " style="padding-right: 13%;">
                             <div class="col-lg-9">
 								<?php 
-									if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+									if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 										echo "<button class='btn btn-lg btn-principal fecharConta' id=''>Fechar Conta</button>";
 									}
 								?>
@@ -270,7 +269,7 @@ if ($row['ClienSexo'] == 'F'){
 			divTotalP = `<div class="row" style="padding-right: 14%;">
                             <div class="col-lg-9">
 								<?php 
-									if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+									if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 										echo "<button class='btn btn-lg btn-principal fecharConta' id=''>Fechar Conta</button>";
 									}
 								?>
@@ -310,7 +309,6 @@ if ($row['ClienSexo'] == 'F'){
 				let grupo = $('#grupo').val()
 				let subgrupo = $('#subgrupo').val()
 				let procedimentos  = $('#procedimentos').val()
-
 				let profissional = <?php echo $userId; ?>
 
 				switch(menssageError){
@@ -588,13 +586,22 @@ if ($row['ClienSexo'] == 'F'){
 						let i = 1;
 						response.array.forEach(item => {
 							if(item.status != 'rem'){
+
+								let situaChave = $("#atendimentoSituaChave").val();
 								let exc = `<a class='list-icons-item removeItem' style='color: black; cursor:pointer' data-id="${item.id}" data-valor="${item.valor}"><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
 								let popup = `<a class='list-icons-item openPopUp' style="color:${(item.desconto?'#50b900':'#000')}; cursor:pointer" data-value="${float2moeda(item.valor)}" data-titulo="${item.servico}" data-id="${item.id}"><i class='icon-cash' title='Desconto'></i></a>`;
-								
-								let acoes = `<div class='list-icons'>
-											${popup}
-											${exc}
-										</div>`;
+								let acoes = '';
+
+							if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
+									${popup}
+									${exc}
+									</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        
+								</div>`;
+							}
 								HTML += `
 								<tr class='servicoItem'>
 									<td class="text-left">${i}</td>
@@ -694,13 +701,22 @@ if ($row['ClienSexo'] == 'F'){
 						let i = 1;
 						response.array.forEach(item => {
 							if(item.status != 'rem'){
+
+								let situaChave = $("#atendimentoSituaChave").val();
 								let exc = `<a class='list-icons-item removeItemP' style='color: black; cursor:pointer' data-id="${item.id}" data-valor="${item.valor}"><i class='icon-bin' title='Excluir Produto'></i></a>`;
 								let popup = `<a class='list-icons-item openPopUpProduto' style="color:${(item.desconto?'#50b900':'#000')}; cursor:pointer" data-value="${float2moeda(item.valor)}" data-titulo="${item.servico}" data-id="${item.id}"><i class='icon-cash' title='Desconto'></i></a>`;
-								
-								let acoes = `<div class='list-icons'>
-											${popup}
-											${exc}
-										</div>`;
+								let acoes = '';
+
+							if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
+									${popup}
+									${exc}
+									</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        
+								</div>`;
+							}
 								HTML += `
 								<tr class='servicoItem'>
 									<td class="text-left">${i}</td>
@@ -836,13 +852,14 @@ if ($row['ClienSexo'] == 'F'){
 					<div class="col-lg-12">
 						<form id='dadosPost'>
 							<?php
-								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";		
 							?>
 						</form>
 						<!-- Basic responsive configuration -->
 						
 						<?php
 							echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+							echo "<input type='hidden' id='atendimentoSituaChave' value='".$_SESSION['SituaChave']."' />";
 						?>
 						<div class="card">
 							<div class="card-header header-elements-inline">
@@ -867,7 +884,7 @@ if ($row['ClienSexo'] == 'F'){
 									<form id="formTabelaGastos" name="formTabelaGastos" method="post" class="form-validate-jquery">
 
 										<?php 
-											if (isset($SituaChave) && $SituaChave != "ATENDIDO") {	
+											if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {	
 												echo "<div class='col-lg-10 mb-2 row'>
 													<!-- titulos -->
 													<div class='col-lg-3'>
@@ -933,7 +950,7 @@ if ($row['ClienSexo'] == 'F'){
 								<div class="card-body">
 									<form id="formTabelaGastosProduto" name="formTabelaGastosProduto" method="post" class="form-validate-jquery">
 										<?php 
-											if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+											if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 												echo "<div class='col-lg-10 mb-2' style='margin-top: -20px'>
 													<!-- titulos -->
 

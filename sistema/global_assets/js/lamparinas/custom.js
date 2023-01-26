@@ -439,3 +439,18 @@ function WebSocketConnect(unidade, empresa){
 		return false
 	}
 }
+
+function cantaCaracteres(htmlTextId, numMaxCaracteres, htmlIdMostraRestantes) {
+	var caracteresDigitados = $(`#${htmlTextId}`).val().length;
+	var caracteresRestantes = numMaxCaracteres - caracteresDigitados;
+	let inform = '';
+
+	if (caracteresRestantes <= 0) {
+		var texto = $(`#${htmlTextId}`).val();
+		$(`#${htmlTextId}`).val(texto.substr(0, numMaxCaracteres));
+		$(`#${htmlIdMostraRestantes}`).text("0 restantes");
+	} else {
+		inform = caracteresRestantes==numMaxCaracteres?'':`${caracteresRestantes} restantes`
+		$(`#${htmlIdMostraRestantes}`).text(inform);
+	}
+}

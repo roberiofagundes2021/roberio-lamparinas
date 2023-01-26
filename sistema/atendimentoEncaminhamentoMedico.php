@@ -66,7 +66,7 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoCliente = $row['AtendCliente'] ;
 $iAtendimentoId = $row['AtendId'];
-$SituaChave = $_SESSION['SituaChave'];
+
 
 
 //Essa consulta é para preencher o sexo
@@ -413,12 +413,22 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 						$('#dataEncaminhamento').html('')
 						let HTML = ''
 						response.forEach((item,index) => {
+
+							let situaChave = $("#atendimentoSituaChave").val();
 							let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Encaminhamento'></i></a>`;
 							let print = `<a style='color: black; cursor:pointer' onclick='imprimirServico(\"${item.id}\")' class='list-icons-item'><i class='icon-printer2' title='Imprimir Encaminhamento'></i></a>`;
-							let acoes = `<div class='list-icons'>
+							let acoes = '';			
+
+							if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
+                                        ${print}
 										${exc}
-										${print}
 									</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        ${print}
+									</div>`;
+							}
 							HTML += `
 							<tr class='servicoItem'>
 								<td class="text-left">${index+1}</td>
@@ -502,6 +512,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 						<form name="formAtendimentoEncaminhamentoMedico" id="formAtendimentoEncaminhamentoMedico" method="post" class="form-validate-jquery">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+								echo "<input type='hidden' id='atendimentoSituaChave' value='".$_SESSION['SituaChave']."' />";
 							?>
 							<div class="card">
 								<div class="card-header header-elements-inline">
@@ -515,7 +526,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 
 								<div class="card-body">
 									<?php 
-										if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+										if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 											echo "<div class='col-lg-12 row'>
 												<div class='col-lg-6'>
 													<label>Profissional <span class='text-danger'>*</span></label>
@@ -600,7 +611,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
 											<?php 
-												if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+												if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 													echo "	<button class='btn btn-lg btn-principal' id='enviar'>Incluir</button>";
 												}
 											?>

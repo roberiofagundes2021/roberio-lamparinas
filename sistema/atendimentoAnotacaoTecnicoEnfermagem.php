@@ -50,7 +50,6 @@ $row = $result->fetch(PDO::FETCH_ASSOC);
 
 $iAtendimentoCliente = $row['AtendCliente'] ;
 $iAtendimentoId = $row['AtendId'];
-$SituaChave = $_SESSION['SituaChave'];
 
 //Essa consulta é para preencher o sexo
 if ($row['ClienSexo'] == 'F'){
@@ -518,7 +517,7 @@ if ($row['ClienSexo'] == 'F'){
                                     <div class="col-md-6" style="text-align: right;">
                                         <div class="form-group" style="margin:20px;" >
 											<?php 
-                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
                                                     echo "<button class='btn btn-lg btn-success mr-1 salvarAnotacaoTecEnfermagem' >Salvar</button>";
                                                 }
                                             ?>
@@ -545,7 +544,7 @@ if ($row['ClienSexo'] == 'F'){
 
                                 <div class="card-body">
 									<?php 
-                                        if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                        if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
                                             echo "<form id='formAnotacao' name='formAnotacao' method='post' class='form-validate-jquery'>
 												<input type='hidden' name='idAnotacao' id='idAnotacao'>";
 									
@@ -626,7 +625,7 @@ if ($row['ClienSexo'] == 'F'){
                                     <div class="col-lg-12">
                                         <div class="form-group" style="margin-bottom:0px;">
 											<?php 
-												if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+												if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 													echo "<button class='btn btn-lg btn-success mr-1 salvarAnotacaoTecEnfermagem' >Salvar</button>";
 												}
 											?>

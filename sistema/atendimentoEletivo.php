@@ -381,7 +381,7 @@ if (isset($_POST['inputInicio']) ){
 											<div class="form-group" style="padding-top:25px;">
 												
 												<?php 
-													if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+													if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 														echo "<button class='btn btn-lg btn-success mr-1' id='enviar'>Salvar</button>";
 														}
 												?>
