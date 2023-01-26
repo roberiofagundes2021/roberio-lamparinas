@@ -6,7 +6,7 @@ $_SESSION['PaginaAtual'] = 'Admissão Pré Parto';
 
 include('global_assets/php/conexao.php');
 
-$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:43;
+$iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
 if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
 	$iAtendimentoId = $_SESSION['iAtendimentoId'];
