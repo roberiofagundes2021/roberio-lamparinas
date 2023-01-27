@@ -870,9 +870,11 @@ $acesso = 'ATENDIMENTO';
 							<!-- Pacientes Em Observacao -->
 							<div id="box-pacientes-observacao" style="display: none;">
 
+								<hr /> 
+								
 								<div class="card-body pb-1">
 
-									<div class="" style="">									
+									<div class="" style="">
 										<div class="row">
 											<div class="col-md-9">
 												<h3 class="card-title" id="card-title">Pacientes em Observação</h3>
@@ -885,7 +887,7 @@ $acesso = 'ATENDIMENTO';
 											<div class="" style="float: left">
 												Leitos Ocupados:	
 											</div>
-											<div class="form-group text-white text-bold" style="float: left; margin-left: 5px; margin-Top: -10px; height: 30px; width: 30px; background-color:blue; border-radius: 50px; display: flex;justify-content: center;align-items: center;" >
+											<div class="form-group text-white text-bold" style="float: left; margin-left: 5px; margin-Top: -5px; height: 30px; width: 30px; background-color:blue; border-radius: 50px; display: flex;justify-content: center;align-items: center;" >
 												10
 											</div>
 
@@ -894,24 +896,24 @@ $acesso = 'ATENDIMENTO';
 											<div class="" style="float: left;">
 												Leitos Livres:
 											</div>
-											<div class="form-group text-white text-bold " style="float: right; margin-left: 5px; margin-Top: -10px; height: 30px; width: 30px; background-color:green; border-radius: 50px; display: flex;justify-content: center;align-items: center;" >
+											<div class="form-group text-white text-bold " style="float: right; margin-left: 5px; margin-Top: -5px; height: 30px; width: 30px; background-color:green; border-radius: 50px; display: flex;justify-content: center;align-items: center;" >
 												10
 											</div>
 										</div>
 									</div>
 									
-									<div class="col-lg-12 mb-4">	
+									<div class="col-lg-12 mb-2 pl-0 ml-0">	
 										<?php
 											$sql = "SELECT *
 											FROM EspecialidadeLeito
-											WHERE EsLeiStatus = 1
-											AND EsLeiUnidade = $iUnidade
+											JOIN Situacao on SituaId = EsLeiStatus
+											WHERE SituaChave = 'ATIVO' AND EsLeiUnidade = $iUnidade
 											ORDER BY EsLeiNome ASC" ;
 											$result = $conn->query($sql);
 
 											foreach ($result as $key => $item) {
 												$active = $key == 0 ? 'active' : '';
-												echo "<button type='button' id='pacientes-espera-btn' class=' m-1 btn-grid2 btn btn-outline-secondary btn-lg " . $active . " ' onclick='mudarGridEspecialidade(`boxEspecialidade". $item['EsLeiId'] . "`)'  >" . $item['EsLeiNome'] . "</button>";
+												echo "<button type='button' id='pacientes-espera-btn' class=' mr-2 btn-grid2 btn btn-outline-secondary btn-lg " . $active . " ' onclick='mudarGridEspecialidade(`boxEspecialidade". $item['EsLeiId'] . "`)'  >" . $item['EsLeiNome'] . "</button>";
 											}
 										?>
 									</div>
@@ -922,8 +924,8 @@ $acesso = 'ATENDIMENTO';
 
 									$sql = "SELECT *
 									FROM EspecialidadeLeito
-									WHERE EsLeiStatus = 1
-									AND EsLeiUnidade = $iUnidade
+									JOIN Situacao on SituaId = EsLeiStatus
+									WHERE SituaChave = 'ATIVO' AND EsLeiUnidade = $iUnidade
 									ORDER BY EsLeiNome ASC" ;
 									$result = $conn->query($sql);
 									
@@ -931,19 +933,19 @@ $acesso = 'ATENDIMENTO';
 							
 										$sql = "SELECT *
 										FROM Quarto
-										WHERE QuartStatus = 1
-										AND QuartUnidade = $iUnidade
+										JOIN Situacao on SituaId = QuartStatus
+										WHERE  SituaChave = 'ATIVO'	AND QuartUnidade = $iUnidade
 										ORDER BY QuartNome ASC" ;
-										$result2 = $conn->query($sql);
+										$resultQuarto = $conn->query($sql);
 
 										$display = $key == 0 ? 'block' : 'none';
 
 										echo "<div class='box-especialidade' id='boxEspecialidade" . $item['EsLeiId'] . "' style='display: " . $display . ";'>";
 											
-											foreach($result2 as $item2){											
-												if($item['EsLeiTipoInternacao'] == $item2['QuartTipoInternacao']) {
+											foreach($resultQuarto as $itemQuarto){											
+												if($item['EsLeiTipoInternacao'] == $itemQuarto['QuartTipoInternacao']) {
 													echo "<div class='card-header header-elements-inline ' style='margin-bottom: -30px' >
-															<h3 class='card-title' >" . $item2['QuartNome'] . "</h3>
+															<h3 class='card-title' >" . $itemQuarto['QuartNome'] . "</h3>
 															<hr />
 														</div >";
 
@@ -958,11 +960,11 @@ $acesso = 'ATENDIMENTO';
 															</div>
 
 															<div class='card-body'>
-															<img src='global_assets/images/lamparinas/leito-ocupado.png' alt='Leito ocupado' width='100' height='100'>
+																<div class='m-3'><img src='global_assets/images/lamparinas/leito-ocupado.png' alt='Leito ocupado' width='80' height='80'></div>
 																<h4 class='card-title'>ALDO DA SILVA BARBOSA</h4>
 																<p class='card-text mb-1'>Nrº do Registro: 4465</p>
 																<p class='card-text'>Data da Internação: 10/10/2010</p>
-																<button onclick='entrar(88)'  type='button' class='btn btn-success btn-sm'>Atender</button>
+																<button onclick='entrar(88)' type='button' class='btn btn-success btn-sm'>Atender</button>
 															</div>
 														</div>
 													</div>";
