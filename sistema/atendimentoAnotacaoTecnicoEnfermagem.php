@@ -22,7 +22,7 @@ $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
 $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
 
 //Essa consulta é para verificar  o profissional
-$sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo
+$sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo, ProfiNumConselho
 		FROM Usuario
 		JOIN Profissional A ON A.ProfiUsuario = UsuarId
 		LEFT JOIN Profissao B ON B.ProfiId = A.ProfiProfissao
@@ -35,13 +35,20 @@ $userId = $rowUser['ProfissionalId'];
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, AtendClassificacaoRisco, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
                ClienNomeMae, ClienCartaoSus, ClienCelular, ClienStatus, ClienUsuarioAtualizador, ClienUnidade, ClResNome, AtTriPeso,
-			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI, AtClRCor,SituaChave
+			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI, AtClRCor,
+               TpIntNome, TpIntId, EsLeiNome, EsLeiId, AlaNome, AlaId, QuartNome, QuartId, LeitoNome, LeitoId,SituaChave
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
 		LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 		LEFT JOIN AtendimentoTriagem ON AtTriAtendimento = AtendId
 		LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
+        LEFT JOIN AtendimentoXLeito ON AtXLeAtendimento = AtendId
+        LEFT JOIN EspecialidadeLeito ON AtXLeEspecialidadeLeito = EsLeiId
+        LEFT JOIN TipoInternacao ON EsLeiTipoInternacao = TpIntId
+        LEFT JOIN Leito ON AtXLeLeito = LeitoId
+        LEFT JOIN Quarto ON LeitoQuarto = QuartId
+        LEFT JOIN Ala ON QuartAla = AlaId
 		JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE  AtendId = $iAtendimentoId 
 		ORDER BY AtendNumRegistro ASC";
@@ -157,6 +164,13 @@ if ($row['ClienSexo'] == 'F'){
 				let peso = $('#peso').val()
 				let anotacao = $('#anotacao').val()
 
+				let inputPrevisaoAlta = $('#inputPrevisaoAlta').val()
+                let inputTipoInternacao = $('#inputTipoInternacao').val()
+                let inputEspLeito = $('#inputEspLeito').val()
+                let inputAla = $('#inputAla').val()
+                let inputQuarto = $('#inputQuarto').val()
+                let inputLeito = $('#inputLeito').val()
+
 				let inputSistolica = $('#inputSistolica').val()
 				let inputDiatolica = $('#inputDiatolica').val()
 				let inputCardiaca = $('#inputCardiaca').val()
@@ -194,6 +208,13 @@ if ($row['ClienSexo'] == 'F'){
 						'tipoRequest': 'INCLUIRANOTACAOTECENFERMAGEM',
                         'tipo' : 'INSERT',
 						'iAtendimentoId' : <?php echo $iAtendimentoId; ?>,
+						'profissional' : <?php echo $userId; ?> ,
+						'inputPrevisaoAlta' : inputPrevisaoAlta,
+                        'inputTipoInternacao' : inputTipoInternacao,
+                        'inputEspLeito' : inputEspLeito,
+                        'inputAla' : inputAla,
+                        'inputQuarto' : inputQuarto,
+                        'inputLeito' : inputLeito,
 						'justificativaAnotacao' : justificativaAnotacao,		
 						'peso' : peso,		
 						'anotacao' : anotacao,		
@@ -239,6 +260,13 @@ if ($row['ClienSexo'] == 'F'){
 				let peso = $('#peso').val()
 				let anotacao = $('#anotacao').val()
 
+				let inputPrevisaoAlta = $('#inputPrevisaoAlta').val()
+                let inputTipoInternacao = $('#inputTipoInternacao').val()
+                let inputEspLeito = $('#inputEspLeito').val()
+                let inputAla = $('#inputAla').val()
+                let inputQuarto = $('#inputQuarto').val()
+                let inputLeito = $('#inputLeito').val()
+
 				let inputSistolica = $('#inputSistolica').val()
 				let inputDiatolica = $('#inputDiatolica').val()
 				let inputCardiaca = $('#inputCardiaca').val()
@@ -275,7 +303,13 @@ if ($row['ClienSexo'] == 'F'){
                         'tipoRequest': 'INCLUIRANOTACAOTECENFERMAGEM',
                         'tipo' : 'UPDATE',
                         'idAnotacao' : idAnotacao,
-                        'justificativaAnotacao' : justificativaAnotacao,		
+                        'justificativaAnotacao' : justificativaAnotacao,
+						'inputPrevisaoAlta' : inputPrevisaoAlta,
+                        'inputTipoInternacao' : inputTipoInternacao,
+                        'inputEspLeito' : inputEspLeito,
+                        'inputAla' : inputAla,
+                        'inputQuarto' : inputQuarto,
+                        'inputLeito' : inputLeito,		
 						'peso' : peso,		
 						'anotacao' : anotacao,		
 						'inputSistolica' : inputSistolica,		
@@ -532,7 +566,7 @@ if ($row['ClienSexo'] == 'F'){
 							</div>
 
 							<div> 
-                                <?php include ('atendimentoDadosPaciente.php'); ?>
+                                <?php include ('atendimentoDadosPacienteHospitalar.php'); ?>
                                 <?php include ('atendimentoDadosSinaisVitais.php'); ?>
                             </div>
                         

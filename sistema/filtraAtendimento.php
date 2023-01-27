@@ -3168,6 +3168,14 @@ try{
 		$inputTemperatura = $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'];
 		$inputSPO = $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'];
 		$inputHGT = $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'];
+		$profissional = $_POST['profissional'] == "" ? null : $_POST['profissional'];
+
+		$inputPrevisaoAlta = $_POST['inputPrevisaoAlta'] == '' ? 'null' : "'" . $_POST['inputPrevisaoAlta'] . "'";;
+		$inputTipoInternacao = $_POST['inputTipoInternacao'];
+		$inputEspLeito = $_POST['inputEspLeito'];
+		$inputAla = $_POST['inputAla'];
+		$inputQuarto = $_POST['inputQuarto'];
+		$inputLeito = $_POST['inputLeito'];
 
 		$inputAlergia = $_POST['inputAlergia'];
 		$inputAlergiaDescricao = $_POST['inputAlergiaDescricao'];
@@ -3190,11 +3198,13 @@ try{
 
 			$iAtendimentoId = $_POST['iAtendimentoId'];
 
-			$sql = "INSERT INTO  EnfermagemAnotacaoTecnico(EnAnTAtendimento,EnAnTDataInicio,EnAnTHoraInicio,EnAnTProfissional,EnAnTPas,EnAnTPad,EnAnTFreqCardiaca,EnAnTFreqRespiratoria,
+			$sql = "INSERT INTO  EnfermagemAnotacaoTecnico(EnAnTAtendimento,EnAnTDataInicio,EnAnTHoraInicio, EnAnTPrevisaoAlta ,EnAnTTipoInternacao , EnAnTEspecialidadeLeito , EnAnTAla , EnAnTQuarto , EnAnTLeito ,
+														EnAnTProfissional,EnAnTPas,EnAnTPad,EnAnTFreqCardiaca,EnAnTFreqRespiratoria,
 														EnAnTTemperatura,EnAnTSPO,EnAnTHGT, EnAnTAlergia, EnAnTAlergiaDescricao, EnAnTDiabetes, EnAnTDiabetesDescricao, EnAnTHipertensao, 
 														EnAnTHipertensaoDescricao, EnAnTNeoplasia, EnAnTNeoplasiaDescricao, EnAnTUsoMedicamento, EnAnTUsoMedicamentoDescricao, 
 														EnAnTDataHora,EnAnTJustificativaLancRetroativo,EnAnTPeso,EnAnTAnotacao,EnAnTEditavel,EnAnTUnidade)
-			VALUES ('$iAtendimentoId', '$dataInicio', '$horaInicio', '$usuarioId', '$inputSistolica', '$inputDiatolica', '$inputCardiaca', '$inputRespiratoria',
+			VALUES ('$iAtendimentoId', '$dataInicio', '$horaInicio',$inputPrevisaoAlta,	'$inputTipoInternacao',	'$inputEspLeito', '$inputAla','$inputQuarto',	'$inputLeito',
+			 		'$profissional', '$inputSistolica', '$inputDiatolica', '$inputCardiaca', '$inputRespiratoria',
 					'$inputTemperatura', '$inputSPO', '$inputHGT', '$inputAlergia', '$inputAlergiaDescricao', '$inputDiabetes', '$inputDiabetesDescricao', '$inputHipertensao', '$inputHipertensaoDescricao', 
 					'$inputNeoplasia', '$inputNeoplasiaDescricao', '$inputUsoMedicamento', '$inputUsoMedicamentoDescricao',  '$dataHoraAtual', '$justificativaAnotacao', '$peso', '$anotacao', 1, '$iUnidade')";
 			$conn->query($sql);
@@ -3210,7 +3220,13 @@ try{
 			$idAnotacao = $_POST['idAnotacao'];
 
 			$sql = "UPDATE EnfermagemAnotacaoTecnico SET
-			EnAnTProfissional = '$usuarioId',
+			EnAnTProfissional = '$profissional',
+			EnAnTPrevisaoAlta = $inputPrevisaoAlta,
+			EnAnTTipoInternacao = '$inputTipoInternacao',
+			EnAnTEspecialidadeLeito = '$inputEspLeito',
+			EnAnTAla = '$inputAla',
+			EnAnTQuarto = '$inputQuarto',
+			EnAnTLeito = '$inputLeito',
 			EnAnTPas = '$inputSistolica',
 			EnAnTPad = '$inputDiatolica',
 			EnAnTFreqCardiaca = '$inputCardiaca',
@@ -3329,6 +3345,13 @@ try{
 		$justificativaEvolucao = $_POST['justificativaEvolucao'] == "" ? null : $_POST['justificativaEvolucao'];
 		$evolucaoEnfermagem = $_POST['evolucaoEnfermagem'];
 
+		$inputPrevisaoAlta = $_POST['inputPrevisaoAlta'] == '' ? 'null' : "'" . $_POST['inputPrevisaoAlta'] . "'";;
+		$inputTipoInternacao = $_POST['inputTipoInternacao'];
+		$inputEspLeito = $_POST['inputEspLeito'];
+		$inputAla = $_POST['inputAla'];
+		$inputQuarto = $_POST['inputQuarto'];
+		$inputLeito = $_POST['inputLeito'];
+
 		$inputSistolica = $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'];
 		$inputDiatolica = $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'];
 		$inputCardiaca = $_POST['inputCardiaca'] == "" ? null : $_POST['inputCardiaca'];
@@ -3359,12 +3382,14 @@ try{
 
 			$iAtendimentoId = $_POST['iAtendimentoId'];
 
-			$sql = "INSERT INTO  EnfermagemEvolucao(EnEvoAtendimento,EnEvoDataInicio,EnEvoHoraInicio,EnEvoProfissional,EnEvoPas,EnEvoPad,EnEvoFreqCardiaca,EnEvoFreqRespiratoria,
+			$sql = "INSERT INTO  EnfermagemEvolucao(EnEvoAtendimento,EnEvoDataInicio,EnEvoHoraInicio, EnEvoPrevisaoAlta, EnEvoTipoInternacao, EnEvoEspecialidadeLeito, EnEvoAla, EnEvoQuarto, EnEvoLeito,
+														EnEvoProfissional,EnEvoPas,EnEvoPad,EnEvoFreqCardiaca,EnEvoFreqRespiratoria,
 														EnEvoTemperatura,EnEvoSPO,EnEvoHGT, EnEvoPeso, EnEvoAlergia, EnEvoAlergiaDescricao, EnEvoDiabetes, EnEvoDiabetesDescricao, EnEvoHipertensao, 
 														EnEvoHipertensaoDescricao, EnEvoNeoplasia, EnEvoNeoplasiaDescricao, EnEvoUsoMedicamento, EnEvoUsoMedicamentoDescricao,
 														EnEvoDataHora,EnEvoJustificativaLancRetroativo,EnEvoEvolucao,EnEvoEditavel,EnEvoUnidade)
 
-			VALUES ('$iAtendimentoId', '$dataInicio', '$horaInicio', '$usuarioId', '$inputSistolica', '$inputDiatolica', '$inputCardiaca', '$inputRespiratoria',
+			VALUES ('$iAtendimentoId', '$dataInicio', '$horaInicio',$inputPrevisaoAlta,	'$inputTipoInternacao',	'$inputEspLeito', '$inputAla','$inputQuarto',	'$inputLeito',
+			 		'$usuarioId', '$inputSistolica', '$inputDiatolica', '$inputCardiaca', '$inputRespiratoria',
 					'$inputTemperatura', '$inputSPO', '$inputHGT', '$inputPeso' , '$inputAlergia', '$inputAlergiaDescricao', '$inputDiabetes', '$inputDiabetesDescricao', '$inputHipertensao', 
 					'$inputHipertensaoDescricao', '$inputNeoplasia', '$inputNeoplasiaDescricao', '$inputUsoMedicamento', '$inputUsoMedicamentoDescricao',  '$dataHoraAtual', '$justificativaEvolucao', '$evolucaoEnfermagem', 1, '$iUnidade')";
 			$conn->query($sql);
@@ -3380,6 +3405,13 @@ try{
 			$idEvolucao = $_POST['idEvolucao'];
 
 			$sql = "UPDATE EnfermagemEvolucao SET
+
+			EnEvoPrevisaoAlta = $inputPrevisaoAlta,
+			EnEvoTipoInternacao = '$inputTipoInternacao',
+			EnEvoEspecialidadeLeito = '$inputEspLeito',
+			EnEvoAla = '$inputAla',
+			EnEvoQuarto = '$inputQuarto',
+			EnEvoLeito = '$inputLeito',
 
 			EnEvoProfissional = '$usuarioId',
 			EnEvoPas = '$inputSistolica',

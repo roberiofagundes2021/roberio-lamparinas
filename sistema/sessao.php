@@ -244,7 +244,8 @@ $atendimentoSituaChave = array(
 	'atendimentoAnotacaoTecnicoEnfermagemRN.php', 'atendimentoAtestadoMedico.php', 'atendimentoDocumentos.php',
 	'atendimentoEletivo.php', 'atendimentoEncaminhamentoMedico.php', 'atendimentoEvolucaoEnfermagem.php',
 	'atendimentoReceituario.php', 'atendimentoSolicitacaoExame.php', 'atendimentoSolicitacaoProcedimento.php',
-	'atendimentoTabelaGastos.php', 'atendimentoTriagem.php', 'atendimentoProntuarioExportacao.php', 'filtraTriagem.php', 'menuLeftSecundarioVenda.php', 
+	'atendimentoTabelaGastos.php', 'atendimentoTriagem.php', 'atendimentoProntuarioExportacao.php', 'atendimentoObservacaoHospitalar.php',
+	'filtraAtendimentoObservacaoHospitalar.php', 'boxPrescricaoObservacao.php','boxEvolucaoObservacao.php', 'filtraTriagem.php', 'menuLeftSecundarioVenda.php', 
 	'filtraAtendimento.php', 'atendimentoHistoricoPacienteValida.php', 'filtraTriagem.php', 'filtraAtendimentoSolicitacaoExame.php',
 	'filtraAtendimentoSolicitacaoProcedimento.php', 'filtraAtendimentoTabelaGastos.php', 'evolucaoAnexo.php'
 

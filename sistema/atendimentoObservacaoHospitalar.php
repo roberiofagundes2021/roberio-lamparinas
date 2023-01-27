@@ -1170,22 +1170,38 @@ if ($row['ClienSexo'] == 'F'){
 					
 					response.forEach(item => {
 
+						let situaChave = $("#atendimentoSituaChave").val();
 						let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarEvolucao (\"${item.evolucaoCompl}\")'><i class='icon-files-empty' title='Copiar Evolução'></i></a>`;
 						let editar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='editarEvolucao(\"${item.id}\")' class='list-icons-item' ><i class='icon-pencil7' title='Editar Evolução'></i></a>`;
 						let exc = `<a style='color: black; cursor:pointer' onclick='excluirEvolucao(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Evolução'></i></a>`;
 						let acoes = ``;
 
 						if (item.editavel == 1) {
-							acoes = `<div class='list-icons'>
+
+							if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
 									${copiar}
 									${editar}
 									${exc}
 								</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+										
+								</div>`;
+							}	
+									
 						} else {
-							acoes = `<div class='list-icons'>
+
+							if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
 									${copiar}
-								
-								</div>`;		
+						
+								</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+											
+								</div>`;
+							}			
 						}
 						
 
@@ -1221,15 +1237,22 @@ if ($row['ClienSexo'] == 'F'){
 					
 					response.forEach(item => {
 
+						let situaChave = $("#atendimentoSituaChave").val();
 						let editar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='editarMedicamento(\"${item.id}\", \"${item.tipo}\")' class='list-icons-item' ><i class='icon-pencil7' title='Editar Medicamento'></i></a>`;
 						let exc = `<a style='color: black; cursor:pointer' onclick='excluirMedicamento(\"${item.id}\", \"${item.tipo}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Medicamento'></i></a>`;
 						let acoes = ``;
 						
 						if (item.editavel == 1) {							
-							acoes = `<div class='list-icons'>
+							if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
 										${editar}
 										${exc}
 									</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        
+								</div>`;
+							}			
 						}
 						
 						HTML += `
@@ -1266,15 +1289,24 @@ if ($row['ClienSexo'] == 'F'){
 					
 					response.forEach(item => {
 
+						let situaChave = $("#atendimentoSituaChave").val();
 						let editar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='editarDieta(\"${item.id}\")' class='list-icons-item' ><i class='icon-pencil7' title='Editar Dieta'></i></a>`;
 						let exc = `<a style='color: black; cursor:pointer' onclick='excluirDieta(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Dieta'></i></a>`;
 						let acoes = ``;
 						
-						if (item.editavel == 1) {							
-							acoes = `<div class='list-icons'>
+						if (item.editavel == 1) {
+
+							if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
 										${editar}
 										${exc}
 									</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        
+								</div>`;
+							}							
+							
 						}
 						
 						HTML += `
@@ -1310,16 +1342,26 @@ if ($row['ClienSexo'] == 'F'){
 					
 					response.forEach(item => {
 
+						let situaChave = $("#atendimentoSituaChave").val();
 						let editar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='editarCuidado(\"${item.id}\")' class='list-icons-item' ><i class='icon-pencil7' title='Editar Cuidado'></i></a>`;
 						let exc = `<a style='color: black; cursor:pointer' onclick='excluirCuidado(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Cuidado'></i></a>`;
 						let acoes = ``;
 						
-						if (item.editavel == 1) {							
-							acoes = `<div class='list-icons'>
+						if (item.editavel == 1) {
+													
+							if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
 										${editar}
 										${exc}
 									</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        
+								</div>`;
+							}
 						}
+
+							
 						
 						HTML += `
 						<tr class='cuidadoItem'>
@@ -1958,6 +2000,7 @@ if ($row['ClienSexo'] == 'F'){
 						
 						<?php
 							echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
+							echo "<input type='hidden' id='atendimentoSituaChave' value='".$_SESSION['SituaChave']."' />";
 						?>
 						<div class="card">
 							<div class="card-header header-elements-inline">
@@ -1987,7 +2030,11 @@ if ($row['ClienSexo'] == 'F'){
                             <div class="col-md-12">
                                 <div class="row">                                    
                                     <div class="col-md-10" style="text-align: left;">
-                                        <button type="button" class="btn btn-lg btn-success mr-1" id="salvarEvolucaoPrescricao">Salvar</button>
+										<?php 
+											if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
+												echo " <button type='button' class='btn btn-lg btn-success mr-1' id='salvarEvolucaoPrescricao'>Salvar</button>";
+											}
+										?>
                                         <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
                                     </div>                                                             
                                 </div>
