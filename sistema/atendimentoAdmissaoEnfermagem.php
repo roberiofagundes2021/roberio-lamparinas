@@ -45,7 +45,7 @@ $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
 
 
 //Essa consulta é para verificar  o profissional
-$sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo
+$sql = "SELECT UsuarId, A.ProfiUsuario, A.ProfiId as ProfissionalId, A.ProfiNome as ProfissionalNome, PrConNome, B.ProfiCbo as ProfissaoCbo, ProfiNumConselho
 		FROM Usuario
 		JOIN Profissional A ON A.ProfiUsuario = UsuarId
 		LEFT JOIN Profissao B ON B.ProfiId = A.ProfiProfissao
@@ -59,13 +59,20 @@ $userId = $rowUser['ProfissionalId'];
 //Essa consulta é para verificar qual é o atendimento e cliente 
 $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, AtendClassificacaoRisco, ClienId, ClienCodigo, ClienNome, ClienSexo, ClienDtNascimento,
                ClienNomeMae, ClienCartaoSus, ClienCelular, ClienStatus, ClienUsuarioAtualizador, ClienUnidade, ClResNome, AtTriPeso,
-			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI, AtClRCor, SituaChave
+			   AtTriAltura, AtTriImc, AtTriPressaoSistolica, AtTriPressaoDiatolica, AtTriFreqCardiaca, AtTriTempAXI, AtClRCor,
+               TpIntNome, TpIntId, EsLeiNome, EsLeiId, AlaNome, AlaId, QuartNome, QuartId, LeitoNome, LeitoId,SituaChave
 		FROM Atendimento
 		JOIN Cliente ON ClienId = AtendCliente
 		LEFT JOIN ClienteResponsavel on ClResCliente = AtendCliente
 		LEFT JOIN AtendimentoModalidade ON AtModId = AtendModalidade
 		LEFT JOIN AtendimentoTriagem ON AtTriAtendimento = AtendId
 		LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
+        LEFT JOIN AtendimentoXLeito ON AtXLeAtendimento = AtendId
+        LEFT JOIN EspecialidadeLeito ON AtXLeEspecialidadeLeito = EsLeiId
+        LEFT JOIN TipoInternacao ON EsLeiTipoInternacao = TpIntId
+        LEFT JOIN Leito ON AtXLeLeito = LeitoId
+        LEFT JOIN Quarto ON LeitoQuarto = QuartId
+        LEFT JOIN Ala ON QuartAla = AlaId
 		JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE  AtendId = $iAtendimentoId 
 		ORDER BY AtendNumRegistro ASC";
@@ -123,6 +130,14 @@ if (isset($_POST['inputInicio'])) {
                 EnAnaHoraInicio = :sHoraInicio,
                 EnAnaDataFim = :sDataFim,
                 EnAnaHoraFim = :sHoraFim,
+
+                EnAnaPrevisaoAlta = :sPrevisaoAlta,
+                EnAnaTipoInternacao = :sTipoInternacao,
+                EnAnaEspecialidadeLeito = :sEspecialidadeLeito,
+                EnAnaAla = :sAla,
+                EnAnaQuarto = :sQuarto,
+                EnAnaLeito = :sLeito,
+
                 EnAnaProfissional = :sProfissional,
                 EnAnaPas = :sPas,
                 EnAnaPad = :sPad,
@@ -161,6 +176,13 @@ if (isset($_POST['inputInicio'])) {
                 ':sDataFim' => date('m/d/Y'),
                 ':sHoraInicio' => date('H:i'),
                 ':sHoraFim' => date('H:i'),
+
+                ':sPrevisaoAlta' => $_POST['inputPrevisaoAlta'] == "" ? null : $_POST['inputPrevisaoAlta'], 
+                ':sTipoInternacao' => $_POST['inputTipoInternacao'] == "" ? null : $_POST['inputTipoInternacao'], 
+                ':sEspecialidadeLeito' => $_POST['inputEspLeito'] == "" ? null : $_POST['inputEspLeito'],
+                ':sAla' => $_POST['inputAla'] == "" ? null : $_POST['inputAla'], 
+                ':sQuarto' => $_POST['inputQuarto'] == "" ? null : $_POST['inputQuarto'], 
+                ':sLeito' => $_POST['inputLeito'] == "" ? null : $_POST['inputLeito'],
                 ':sProfissional' => $userId,
 
                 ':sPas' => $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'],
@@ -208,6 +230,14 @@ if (isset($_POST['inputInicio'])) {
                 EnAnaHoraInicio, 
                 EnAnaDataFim, 
                 EnAnaHoraFim, 
+
+                EnAnaPrevisaoAlta,
+                EnAnaTipoInternacao,
+                EnAnaEspecialidadeLeito,
+                EnAnaAla,
+                EnAnaQuarto,
+                EnAnaLeito,
+
                 EnAnaProfissional, 
                 EnAnaPas, 
                 EnAnaPad, 
@@ -242,6 +272,14 @@ if (isset($_POST['inputInicio'])) {
                 :sHoraInicio,
                 :sDataFim,
                 :sHoraFim,
+
+                :sPrevisaoAlta, 
+                :sTipoInternacao,  
+                :sEspecialidadeLeito,
+                :sAla,
+                :sQuarto,  
+                :sLeito, 
+
                 :sProfissional,
                 :sPas,
                 :sPad,
@@ -279,6 +317,13 @@ if (isset($_POST['inputInicio'])) {
                 ':sDataFim' => date('m/d/Y'),
                 ':sHoraInicio' => date('H:i'),
                 ':sHoraFim' => date('H:i'),
+
+                ':sPrevisaoAlta' => $_POST['inputPrevisaoAlta'] == "" ? null : $_POST['inputPrevisaoAlta'], 
+                ':sTipoInternacao' => $_POST['inputTipoInternacao'] == "" ? null : $_POST['inputTipoInternacao'], 
+                ':sEspecialidadeLeito' => $_POST['inputEspLeito'] == "" ? null : $_POST['inputEspLeito'],
+                ':sAla' => $_POST['inputAla'] == "" ? null : $_POST['inputAla'], 
+                ':sQuarto' => $_POST['inputQuarto'] == "" ? null : $_POST['inputQuarto'], 
+                ':sLeito' => $_POST['inputLeito'] == "" ? null : $_POST['inputLeito'],
                 ':sProfissional' => $userId,
 
                 ':sPas' => $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'],
@@ -324,6 +369,14 @@ if (isset($_POST['inputInicio'])) {
                 EnExFHoraInicio = :sHoraInicio ,
                 EnExFDataFim = :sDataFim ,
                 EnExFHoraFim = :sHoraFim ,
+
+                EnExFPrevisaoAlta = :sPrevisaoAlta,
+                EnExFTipoInternacao = :sTipoInternacao,
+                EnExFEspecialidadeLeito = :sEspecialidadeLeito,
+                EnExFAla = :sAla,
+                EnExFQuarto = :sQuarto,
+                EnExFLeito = :sLeito,
+
                 EnExFProfissional = :sProfissional ,
                 EnExFPas = :sTPas ,
                 EnExFPad = :sPad ,
@@ -585,6 +638,14 @@ if (isset($_POST['inputInicio'])) {
                 ':sHoraInicio' => date('H:i') ,
                 ':sDataFim' => date('m/d/Y') ,
                 ':sHoraFim' => date('H:i') ,
+
+                ':sPrevisaoAlta' => $_POST['inputPrevisaoAlta'] == "" ? null : $_POST['inputPrevisaoAlta'], 
+                ':sTipoInternacao' => $_POST['inputTipoInternacao'] == "" ? null : $_POST['inputTipoInternacao'], 
+                ':sEspecialidadeLeito' => $_POST['inputEspLeito'] == "" ? null : $_POST['inputEspLeito'],
+                ':sAla' => $_POST['inputAla'] == "" ? null : $_POST['inputAla'], 
+                ':sQuarto' => $_POST['inputQuarto'] == "" ? null : $_POST['inputQuarto'], 
+                ':sLeito' => $_POST['inputLeito'] == "" ? null : $_POST['inputLeito'],
+
                 ':sProfissional' => $userId ,
                 ':sTPas' => $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'],
                 ':sPad' => $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'],
@@ -849,6 +910,14 @@ if (isset($_POST['inputInicio'])) {
                 EnExFHoraInicio ,
                 EnExFDataFim ,
                 EnExFHoraFim ,
+
+                EnExFPrevisaoAlta ,
+                EnExFTipoInternacao ,
+                EnExFEspecialidadeLeito ,
+                EnExFAla ,
+                EnExFQuarto ,
+                EnExFLeito ,
+
                 EnExFProfissional ,
                 EnExFPas ,
                 EnExFPad ,
@@ -1106,6 +1175,14 @@ if (isset($_POST['inputInicio'])) {
                 :sHoraInicio,
                 :sDataFim,
                 :sHoraFim,
+
+                :sPrevisaoAlta,
+                :sTipoInternacao,
+                :sEspecialidadeLeito,
+                :sAla,
+                :sQuarto,
+                :sLeito,
+
                 :sProfissional,
                 :sTPas,
                 :sPad,
@@ -1366,6 +1443,14 @@ if (isset($_POST['inputInicio'])) {
                 ':sHoraInicio' => date('H:i') ,
                 ':sDataFim' => date('m/d/Y') ,
                 ':sHoraFim' => date('H:i') ,
+
+                ':sPrevisaoAlta' => $_POST['inputPrevisaoAlta'] == "" ? null : $_POST['inputPrevisaoAlta'], 
+                ':sTipoInternacao' => $_POST['inputTipoInternacao'] == "" ? null : $_POST['inputTipoInternacao'], 
+                ':sEspecialidadeLeito' => $_POST['inputEspLeito'] == "" ? null : $_POST['inputEspLeito'],
+                ':sAla' => $_POST['inputAla'] == "" ? null : $_POST['inputAla'], 
+                ':sQuarto' => $_POST['inputQuarto'] == "" ? null : $_POST['inputQuarto'], 
+                ':sLeito' => $_POST['inputLeito'] == "" ? null : $_POST['inputLeito'],
+
                 ':sProfissional' => $userId ,
                 ':sTPas' => $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'],
                 ':sPad' => $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'],
@@ -2031,7 +2116,7 @@ if (isset($_POST['inputInicio'])) {
 							</div>
 
 							<div> 
-                                <?php include ('atendimentoDadosPaciente.php'); ?>
+                                <?php include ('atendimentoDadosPacienteHospitalar.php'); ?>
                                 <?php include ('atendimentoDadosSinaisVitais.php'); ?>
                             </div>
 
