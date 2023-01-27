@@ -33,8 +33,12 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="form-group" style="padding-top:15px;">
-                    <button class="btn btn-lg btn-success" id="incluirEvolucaoDiaria" style="display: block;"  >Incluir</button>
-                    <button class="btn btn-lg btn-success" id="salvarEdEvolucao" style="display: none;">Salvar Alterações</button>
+                    <?php 
+                        if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
+                            echo " <button class='btn btn-lg btn-success' id='incluirEvolucaoDiaria' style='display: block;'  >Incluir</button>
+                            <button class='btn btn-lg btn-success' id='salvarEdEvolucao'style='display: none;'>Salvar Alterações</button>";
+                        }
+                    ?>
                 </div>
             </div>
         </div> 

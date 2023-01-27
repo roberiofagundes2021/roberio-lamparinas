@@ -95,7 +95,11 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="form-group" style="padding-top:15px;">
-                    <button class="btn btn-lg btn-success" id="adicionarDieta"  >Adicionar</button>
+                    <?php 
+                        if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
+                            echo "<button class='btn btn-lg btn-success' id='adicionarDieta'  >Adicionar</button>";
+                        }
+                    ?>
                     <button class="btn btn-lg btn-success" id="salvarEdDieta" style="display: none;"  >Salvar Alterações</button>
                 </div>
             </div>
@@ -284,7 +288,12 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="form-group" style="padding-top:15px;">
-                    <button class="btn btn-lg btn-success" id="adicionarMedicamento"  >Adicionar</button>
+                    
+                    <?php 
+                        if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
+                            echo "<button class='btn btn-lg btn-success' id='adicionarMedicamento'  >Adicionar</button>";
+                        }
+                    ?>
                     <button class="btn btn-lg btn-success" id="salvarEdMedicamento" style="display: none;"  >Salvar Alterações</button>
                 </div>
             </div>
@@ -503,8 +512,12 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="form-group" style="padding-top:15px;">
-                    <button class="btn btn-lg btn-success" id="adicionarSolucao"  >Adicionar</button>
-                    <button class="btn btn-lg btn-success" id="salvarEdSolucao" style="display: none;"  >Salvar Alterações</button>
+                    <?php 
+                        if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
+                            echo "<button class='btn btn-lg btn-success' id='adicionarSolucao'  >Adicionar</button>";
+                        }
+                    ?>
+                        <button class="btn btn-lg btn-success" id="salvarEdSolucao" style="display: none;"  >Salvar Alterações</button>
                 </div>
             </div>
         </div> 
@@ -633,7 +646,11 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="form-group" style="padding-top:10px;">
-                    <button class="btn btn-lg btn-success" id="adicionarCuidado"  >Adicionar</button>
+                    <?php 
+                        if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
+                            echo "<button class='btn btn-lg btn-success' id='adicionarCuidado'  >Adicionar</button>";
+                        }
+                    ?>
                     <button class="btn btn-lg btn-success" id="salvarEdCuidado" style="display: none;" >Salvar Alterações</button>
                 </div>
             </div>
