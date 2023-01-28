@@ -411,6 +411,7 @@ if ($row['ClienSexo'] == 'F'){
                     
                     response.forEach(item => {
 
+                        let situaChave = $("#atendimentoSituaChave").val();
                         let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarEvolucao(\"${item.justificativaCompleta}\", \"${item.evolucaoCompleta}\" )'><i class='icon-files-empty' title='Copiar Evolução'></i></a>`; 
                         let anexos = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='anexosEvolucao(\"${item.id}\")' class='list-icons-item' ><i class='icon-attachment' title='Anexos da Evolução'></i></a>`;
                         let editar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='editarEvolucao(\"${item.id}\")' class='list-icons-item' ><i class='icon-pencil7' title='Editar Evolução'></i></a>`;
@@ -418,18 +419,35 @@ if ($row['ClienSexo'] == 'F'){
                         let acoes = ``;
 
                         if (item.editavel == 1) {
-                            acoes = `<div class='list-icons'>
+
+                            if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
                                     ${copiar}
                                     ${anexos}
                                     ${editar}
                                     ${exc}
-                                </div>`;
+								</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                    ${anexos}
+                                        
+								</div>`;
+							}
+
                         } else {
-                            acoes = `<div class='list-icons'>
+
+                            if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
                                     ${copiar}
                                     ${anexos}
-                                
-                                </div>`;		
+								</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                    ${anexos}
+                                        
+								</div>`;
+							}
+                            	
                         }
                         
                         HTML += `
@@ -542,7 +560,8 @@ if ($row['ClienSexo'] == 'F'){
 						<form name="formAtendimentoAmbulatorial" id="formAtendimentoAmbulatorial" method="post">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
-							?>
+                                echo "<input type='hidden' id='atendimentoSituaChave' value='".$_SESSION['SituaChave']."' />";
+                            ?>
 							<div class="card">
 
                             <div class="col-md-12">

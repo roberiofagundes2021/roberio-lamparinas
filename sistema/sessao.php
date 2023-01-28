@@ -241,13 +241,14 @@ if (array_key_exists('Servico_ProfissionalId', $_SESSION) && !in_array(basename(
 $atendimentoSituaChave = array(
 	'atendimentoAdmissaoEnfermagem.php', 'atendimentoAdmissaoEnfermagemMultidisciplinar.php', 'atendimentoHistoricoPaciente.php',
 	'atendimentoAdmissaoPediatrica.php', 'atendimentoAmbulatorial.php', 'atendimentoAnotacaoTecnicoEnfermagem.php',
-	'atendimentoAnotacaoTecnicoEnfermagemRN.php', 'atendimentoAtestadoMedico.php', 'atendimentoDocumentos.php',
-	'atendimentoEletivo.php', 'atendimentoEncaminhamentoMedico.php', 'atendimentoEvolucaoEnfermagem.php',
-	'atendimentoReceituario.php', 'atendimentoSolicitacaoExame.php', 'atendimentoSolicitacaoProcedimento.php',
+	'atendimentoAnotacaoTecnicoEnfermagemRN.php', 'atendimentoAtestadoMedico.php', 'atendimentoDocumentos.php','anotacaoTransOperatoria.php',
+	'atendimentoEletivo.php', 'atendimentoEncaminhamentoMedico.php', 'atendimentoEvolucaoEnfermagem.php', 'atendimentoEfetivacaoAlta.php',
+	'atendimentoReceituario.php', 'atendimentoSolicitacaoExame.php', 'atendimentoSolicitacaoProcedimento.php', 'atendimentoAdmissaoPreParto.php',
 	'atendimentoTabelaGastos.php', 'atendimentoTriagem.php', 'atendimentoProntuarioExportacao.php', 'atendimentoObservacaoHospitalar.php',
 	'filtraAtendimentoObservacaoHospitalar.php', 'boxPrescricaoObservacao.php','boxEvolucaoObservacao.php', 'filtraTriagem.php', 'menuLeftSecundarioVenda.php', 
 	'filtraAtendimento.php', 'atendimentoHistoricoPacienteValida.php', 'filtraTriagem.php', 'filtraAtendimentoSolicitacaoExame.php',
-	'filtraAtendimentoSolicitacaoProcedimento.php', 'filtraAtendimentoTabelaGastos.php', 'evolucaoAnexo.php', 'admissaoCirurgicaPreOperatorio.php'
+	'filtraAtendimentoSolicitacaoProcedimento.php', 'filtraAtendimentoTabelaGastos.php', 'evolucaoAnexo.php', 'admissaoCirurgicaPreOperatorio.php',
+	'filtraAdmissaoCirurgicaPreOperatorio.php', 'admissaoRecemNascido.php'
 );
 
 if (array_key_exists('SituaChave', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $atendimentoSituaChave)) {
