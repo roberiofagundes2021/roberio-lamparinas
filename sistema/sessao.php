@@ -247,8 +247,7 @@ $atendimentoSituaChave = array(
 	'atendimentoTabelaGastos.php', 'atendimentoTriagem.php', 'atendimentoProntuarioExportacao.php', 'atendimentoObservacaoHospitalar.php',
 	'filtraAtendimentoObservacaoHospitalar.php', 'boxPrescricaoObservacao.php','boxEvolucaoObservacao.php', 'filtraTriagem.php', 'menuLeftSecundarioVenda.php', 
 	'filtraAtendimento.php', 'atendimentoHistoricoPacienteValida.php', 'filtraTriagem.php', 'filtraAtendimentoSolicitacaoExame.php',
-	'filtraAtendimentoSolicitacaoProcedimento.php', 'filtraAtendimentoTabelaGastos.php', 'evolucaoAnexo.php'
-
+	'filtraAtendimentoSolicitacaoProcedimento.php', 'filtraAtendimentoTabelaGastos.php', 'evolucaoAnexo.php', 'admissaoCirurgicaPreOperatorio.php'
 );
 
 if (array_key_exists('SituaChave', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $atendimentoSituaChave)) {
