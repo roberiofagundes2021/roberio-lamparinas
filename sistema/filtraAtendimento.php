@@ -1165,9 +1165,9 @@ try{
 							<a href='#' class='dropdown-item receituario' data-situachave='$item[SituaChave]' data-clachave='$item[AtClaChave]' data-clanome='$item[AtClaNome]' data-atendimento='$item[AtendId]' data-eletivo='$item[AtEleId]'><i class='icon-stackoverflow' title='Receituário'></i> Receituário</a>
 						</div>
 					</div>";
-			} elseif ($rowProfissao['ProfissaoNome'] == 'MEDICO'){
+			} elseif ($rowProfissao['ProfissaoChave'] == 'MEDICO'){
 				$acoes .= "$atender";
-			}	
+			}
 			$acoes .= "</div>";
 
 			$borderColor = "";
