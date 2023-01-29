@@ -17,6 +17,8 @@
         irpara("atendimentoHospitalarListagem.php");	
     }
 
+    $iUnidade = $_SESSION['UnidadeId'];
+
     //exame físico
     $sql = "SELECT TOP(1) EnAdPId
     FROM EnfermagemAdmissaoPediatrica
@@ -88,6 +90,152 @@
     WHERE KtCmeUnidade = $_SESSION[UnidadeId]";
     $result = $conn->query($sql);
     $rowKitCME = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    if(isset($_POST['entradaHora'])){
+        $sql = "INSERT INTO EnfermagemTransOperatoria(EnTrOAtendimento,EnTrODataInicio,EnTrOHoraInicio,
+            EnTrOPrevisaoAlta,EnTrOTipoInternacao,EnTrOEspecialidadeLeito,EnTrOAla,EnTrOQuarto,EnTrOLeito,
+            EnTrOProfissional,EnTrOPas,EnTrOPad,EnTrOFreqCardiaca,EnTrOFreqRespiratoria,EnTrOTemperatura,
+            EnTrOSPO,EnTrOHGT,EnTrOPeso,EnTrOHoraEntrada,EnTrOHoraSaida,EnTrOSala,EnTrOProfiCirculante,
+            EnTrOInicioAnestesia,EnTrOTerminoAnestesia,EnTrOTipoAnestesia,EnTrOProfiAnestesista,
+            EnTrOProfiInstrumentador,EnTrOInicioCirurgia,EnTrOTerminoCirurgia,EnTrOProfiCirurgiao,
+            EnTrOProfiCirurgiaoAssistente,EnTrODescPosicaoOperatoria,EnTrOServAdicionalBancoSangue,
+            EnTrOServAdicionalRadiologia,EnTrOServAdicionalLaboratorio,EnTrOServAdicionalAnatPatologica,
+            EnTrOServAdicionalUsoContraste,EnTrOServAdicionalOutros,EnTrOEncaminhamentoPosCirurgia,
+            EnTrOEmUsoCateterEpidural,EnTrOEmUsoDrenoTubular,EnTrOEmUsoEntubacaoTraqueal,EnTrOEmUsoIntracath,
+            EnTrOEmUsoKehr,EnTrOEmUsoPecaCirurgica,EnTrOEmUsoPenrose,EnTrOEmUsoProntuario,
+            EnTrOEmUsoPuncaoPeriferica,EnTrOEmUsoRadiografia,EnTrOEmUsoSistemaSuccao,EnTrOEmUsoSondaGastrica,
+            EnTrOEmUsoSondaVesical,EnTrOProfiEnfermeiro,EnTrOProfiTecnico,EnTrOProfiEnfermeiroCCO,
+            EnTrOProfiTecnicoCCO,EnTrOProfiTecnicoRPA,EnTrOKitCME,EnTrOMedicacaoAdministrada,EnTrOObservacao)
+        VALUES(
+            :EnTrOAtendimento,
+            :EnTrODataInicio,
+            :EnTrOHoraInicio,
+            :EnTrOPrevisaoAlta,
+            :EnTrOTipoInternacao,
+            :EnTrOEspecialidadeLeito,
+            :EnTrOAla,
+            :EnTrOQuarto,
+            :EnTrOLeito,
+            :EnTrOProfissional,
+            :EnTrOPas,
+            :EnTrOPad,
+            :EnTrOFreqCardiaca,
+            :EnTrOFreqRespiratoria,
+            :EnTrOTemperatura,
+            :EnTrOSPO,
+            :EnTrOHGT,
+            :EnTrOPeso,
+            :EnTrOHoraEntrada,
+            :EnTrOHoraSaida,
+            :EnTrOSala,
+            :EnTrOProfiCirculante,
+            :EnTrOInicioAnestesia,
+            :EnTrOTerminoAnestesia,
+            :EnTrOTipoAnestesia,
+            :EnTrOProfiAnestesista,
+            :EnTrOProfiInstrumentador,
+            :EnTrOInicioCirurgia,
+            :EnTrOTerminoCirurgia,
+            :EnTrOProfiCirurgiao,
+            :EnTrOProfiCirurgiaoAssistente,
+            :EnTrODescPosicaoOperatoria,
+            :EnTrOServAdicionalBancoSangue,
+            :EnTrOServAdicionalRadiologia,
+            :EnTrOServAdicionalLaboratorio,
+            :EnTrOServAdicionalAnatPatologica,
+            :EnTrOServAdicionalUsoContraste,
+            :EnTrOServAdicionalOutros,
+            :EnTrOEncaminhamentoPosCirurgia,
+            :EnTrOEmUsoCateterEpidural,
+            :EnTrOEmUsoDrenoTubular,
+            :EnTrOEmUsoEntubacaoTraqueal,
+            :EnTrOEmUsoIntracath,
+            :EnTrOEmUsoKehr,
+            :EnTrOEmUsoPecaCirurgica,
+            :EnTrOEmUsoPenrose,
+            :EnTrOEmUsoProntuario,
+            :EnTrOEmUsoPuncaoPeriferica,
+            :EnTrOEmUsoRadiografia,
+            :EnTrOEmUsoSistemaSuccao,
+            :EnTrOEmUsoSondaGastrica,
+            :EnTrOEmUsoSondaVesical,
+            :EnTrOProfiEnfermeiro,
+            :EnTrOProfiTecnico,
+            :EnTrOProfiEnfermeiroCCO,
+            :EnTrOProfiTecnicoCCO,
+            :EnTrOProfiTecnicoRPA,
+            :EnTrOKitCME,
+            :EnTrOMedicacaoAdministrada,
+            :EnTrOObservacao)";
+        $result = $conn->prepare($sql);
+
+        $result->execute(array(
+            ':EnTrOAtendimento' => $iAtendimentoId,
+            ':EnTrODataInicio' => date('Y-m-d'),
+            ':EnTrOHoraInicio' => date('H:i'),
+            ':EnTrOPrevisaoAlta' => '',
+            ':EnTrOTipoInternacao' => $row['TpIntId'],
+            ':EnTrOEspecialidadeLeito' => $row['EsLeiId'],
+            ':EnTrOAla' => $row['AlaId'],
+            ':EnTrOQuarto' => $row['QuartId'],
+            ':EnTrOLeito' => $row['LeitoId'],
+            ':EnTrOProfissional' => $userId,
+            ':EnTrOPas' => null,
+            ':EnTrOPad' => null,
+            ':EnTrOFreqCardiaca' => null,
+            ':EnTrOFreqRespiratoria' => null,
+            ':EnTrOTemperatura' => null,
+            ':EnTrOSPO' => null,
+            ':EnTrOHGT' => null,
+            ':EnTrOPeso' => null,
+            ':EnTrOHoraEntrada' => null,
+            ':EnTrOHoraSaida' => null,
+            ':EnTrOSala' => null,
+            ':EnTrOProfiCirculante' => null,
+            ':EnTrOInicioAnestesia' => isset($_POST['inicioAnestesia'])?$_POST['inicioAnestesia']:null,
+            ':EnTrOTerminoAnestesia' => isset($_POST['terminoAnestesia'])?$_POST['terminoAnestesia']:null,
+            ':EnTrOTipoAnestesia' => isset($_POST['tipoAnestesia'])?$_POST['tipoAnestesia']:null,
+            ':EnTrOProfiAnestesista' => isset($_POST['profissionalAnestesista'])?$_POST['profissionalAnestesista']:null,
+            ':EnTrOProfiInstrumentador' => isset($_POST['profissionalInstrumentador'])?$_POST['profissionalInstrumentador']:null,
+            ':EnTrOInicioCirurgia' => isset($_POST['inicioCirurgia'])?$_POST['inicioCirurgia']:null,
+            ':EnTrOTerminoCirurgia' => isset($_POST['terminoCirurgia'])?$_POST['terminoCirurgia']:null,
+            ':EnTrOProfiCirurgiao' => isset($_POST['profissionalCirurgiao'])?$_POST['profissionalCirurgiao']:null,
+            ':EnTrOProfiCirurgiaoAssistente' => isset($_POST['profissionalAssistente'])?$_POST['profissionalAssistente']:null,
+            ':EnTrODescPosicaoOperatoria' => isset($_POST['descricaoPosicao'])?$_POST['descricaoPosicao']:null,
+            ':EnTrOEncaminhamentoPosCirurgia' => isset($_POST['encaminhamento'])?$_POST['encaminhamento']:null,
+            ':EnTrOProfiEnfermeiro' => isset($_POST['profissionalEnfermeiro'])?$_POST['profissionalEnfermeiro']:null,
+            ':EnTrOProfiTecnico' => isset($_POST['profissionalTecnico'])?$_POST['profissionalTecnico']:null,
+            ':EnTrOProfiEnfermeiroCCO' => isset($_POST['profissionalEnfermeiroCCO'])?$_POST['profissionalEnfermeiroCCO']:null,
+            ':EnTrOProfiTecnicoCCO' => isset($_POST['profissionalTecnicoCCO'])?$_POST['profissionalTecnicoCCO']:null,
+            ':EnTrOProfiTecnicoRPA' => isset($_POST['profissionalTecnicoRPA'])?$_POST['profissionalTecnicoRPA']:null,
+            ':EnTrOKitCME' => isset($_POST['kitCME'])?$_POST['kitCME']:null,
+            ':EnTrOMedicacaoAdministrada' => isset($_POST['textMedicacao'])?$_POST['textMedicacao']:null,
+            ':EnTrOObservacao' => isset($_POST['textObservacao'])?$_POST['textObservacao']:null,
+
+            // servicosAdicionais[]
+            ':EnTrOServAdicionalBancoSangue' => isset($_POST['servicosAdicionais'])?(in_array('BS',$_POST['servicosAdicionais'])?1:0):null,
+            ':EnTrOServAdicionalRadiologia' => isset($_POST['servicosAdicionais'])?(in_array('RA',$_POST['servicosAdicionais'])?1:0):null,
+            ':EnTrOServAdicionalLaboratorio' => isset($_POST['servicosAdicionais'])?(in_array('LA',$_POST['servicosAdicionais'])?1:0):null,
+            ':EnTrOServAdicionalAnatPatologica' => isset($_POST['servicosAdicionais'])?(in_array('AN',$_POST['servicosAdicionais'])?1:0):null,
+            ':EnTrOServAdicionalUsoContraste' => isset($_POST['servicosAdicionais'])?(in_array('UC',$_POST['servicosAdicionais'])?1:0):null,
+            ':EnTrOServAdicionalOutros' => isset($_POST['servicosAdicionais'])?(in_array('OU',$_POST['servicosAdicionais'])?1:0):null,
+
+            // usoPosCirurgia[]
+            ':EnTrOEmUsoCateterEpidural' => isset($_POST['usoPosCirurgia'])?(in_array('CE',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoDrenoTubular' => isset($_POST['usoPosCirurgia'])?(in_array('DT',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoEntubacaoTraqueal' => isset($_POST['usoPosCirurgia'])?(in_array('ET',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoIntracath' => isset($_POST['usoPosCirurgia'])?(in_array('IN',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoKehr' => isset($_POST['usoPosCirurgia'])?(in_array('KE',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoPecaCirurgica' => isset($_POST['usoPosCirurgia'])?(in_array('PC',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoPenrose' => isset($_POST['usoPosCirurgia'])?(in_array('PE',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoProntuario' => isset($_POST['usoPosCirurgia'])?(in_array('PR',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoPuncaoPeriferica' => isset($_POST['usoPosCirurgia'])?(in_array('PP',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoRadiografia' => isset($_POST['usoPosCirurgia'])?(in_array('RA',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoSistemaSuccao' => isset($_POST['usoPosCirurgia'])?(in_array('SS',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoSondaGastrica' => isset($_POST['usoPosCirurgia'])?(in_array('SG',$_POST['usoPosCirurgia'])?1:0):null,
+            ':EnTrOEmUsoSondaVesical' => isset($_POST['usoPosCirurgia'])?(in_array('SV',$_POST['usoPosCirurgia'])?1:0):null
+        ));
+    }
 ?>
 
 <!DOCTYPE html>
@@ -363,13 +511,13 @@
                                             
                                             <!-- campos -->                                            
                                             <div class="col-lg-3">
-                                                <input id="entradaHora" class="form-control" type="text" name="entradaHora">
+                                                <input id="entradaHora" class="form-control" type="time" name="entradaHora">
                                             </div>
                                             <div class="col-lg-3">
                                                 <input id="sala" class="form-control" type="text" name="sala">
                                             </div>
                                             <div class="col-lg-3">
-                                                <input id="saidaHora" class="form-control" type="text" name="saidaHora">
+                                                <input id="saidaHora" class="form-control" type="time" name="saidaHora">
                                             </div>
                                             <div class="col-lg-3">
                                                 <select id="profissional" name="profissional" class="select-search">
@@ -461,10 +609,10 @@
                                             <!-- campos -->
 
                                             <div class="col-lg-2">
-                                                <input id="inicioAnestesia" class="form-control" type="time" name="inicioAnestesia">
+                                                <input id="inicioCirurgia" class="form-control" type="time" name="inicioCirurgia">
                                             </div>
                                             <div class="col-lg-2">
-                                                <input id="terminoAnestesia" class="form-control" type="time" name="terminoAnestesia">
+                                                <input id="terminoCirurgia" class="form-control" type="time" name="terminoCirurgia">
                                             </div>
                                             <div class="col-lg-4">
                                                 <select id="profissionalCirurgiao" name="profissionalCirurgiao" class="select-search">
