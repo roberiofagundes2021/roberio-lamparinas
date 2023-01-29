@@ -494,21 +494,38 @@ if (isset($_POST['inputInicio'])) {
                     
                     response.forEach(item => {
 
+                        let situaChave = $("#atendimentoSituaChave").val();
                         let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarAdmissaoEvolucao(\"${item.id}\")'><i class='icon-files-empty' title='Copiar Evolução'></i></a>`; 
                         let editar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='editarAdmissaoEvolucao(\"${item.id}\")' class='list-icons-item' ><i class='icon-pencil7' title='Editar Evolução'></i></a>`;
                         let exc = `<a style='color: black; cursor:pointer' onclick='excluirAdmissaoEvolucao(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Evolução'></i></a>`;
                         let acoes = ``;
 
                         if (item.editavel == 1) {
-                            acoes = `<div class='list-icons'>
-                                    ${copiar}
+                            
+                            if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
+									${copiar}
                                     ${editar}
                                     ${exc}
-                                </div>`;
+								</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        
+								</div>`;
+							}
+
                         } else {
-                            acoes = `<div class='list-icons'>
-                                    ${copiar}                                
-                                </div>`;		
+                           
+                            if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
+									${copiar}
+								</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        
+								</div>`;
+							}
+
                         }
                         
                         HTML += `
@@ -691,7 +708,8 @@ if (isset($_POST['inputInicio'])) {
 						<form name="formAtendimentoAdmissaoPreParto" id="formAtendimentoAdmissaoPreParto" method="post">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
-							?>
+                                echo "<input type='hidden' id='atendimentoSituaChave' value='".$_SESSION['SituaChave']."' />";
+                            ?>
 							<div class="card">
 
                             <div class="col-md-12">
@@ -1220,7 +1238,7 @@ if (isset($_POST['inputInicio'])) {
                                     <div class="col-lg-12">
                                         <div class="form-group" style="margin-bottom:0px;">
                                             <?php 
-                                                if (isset($SituaChave) && $SituaChave == "ATENDIDO") {
+                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
                                                     echo "<button class='btn btn-lg btn-success mr-1 salvarAdmissao' >Salvar</button>";
                                                 }
                                             ?>

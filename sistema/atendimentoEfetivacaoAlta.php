@@ -376,7 +376,11 @@ if (isset($_POST['inputInicio'])) {
                                         <div class="col-md-6" style="text-align: right;">
 
                                             <div class="form-group" style="margin:20px;">
-                                                <button class="btn btn-lg btn-success mr-1 salvarEfetivacaoAlta">Salvar</button>
+                                                <?php 
+                                                    if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                        echo "<button class='btn btn-lg btn-success mr-1 salvarEfetivacaoAlta'>Salvar</button>";
+                                                    }
+                                                ?>
                                                 <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
                                                 <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
 
@@ -479,7 +483,11 @@ if (isset($_POST['inputInicio'])) {
                                 <div class=" card-body row">
                                     <div class="col-lg-12">
                                         <div class="form-group" style="margin-bottom:0px;">
-                                            <button class="btn btn-lg btn-success mr-1 salvarEfetivacaoAlta">Salvar</button>
+                                            <?php 
+                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                    echo "<button class='btn btn-lg btn-success mr-1 salvarEfetivacaoAlta'>Salvar</button>";
+                                                }
+                                            ?>
                                             <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
                                             <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
                                         </div>

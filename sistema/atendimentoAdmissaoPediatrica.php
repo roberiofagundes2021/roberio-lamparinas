@@ -3852,7 +3852,7 @@ if (isset($_POST['inputInicio'])) {
                                     <div class="col-lg-12">
                                         <div class="form-group" style="margin-bottom:0px;">
                                             <?php 
-                                                if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] == "ATENDIDO") {
+                                                if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
                                                     echo "<button class='btn btn-lg btn-success mr-1 salvarAdmissao' >Salvar</button>";
                                                 }
                                             ?>

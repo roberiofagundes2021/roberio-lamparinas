@@ -532,21 +532,36 @@ if ($row['ClienSexo'] == 'F'){
                     
                     response.forEach(item => {
 
+                        let situaChave = $("#atendimentoSituaChave").val();
                         let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarAnotacao(\"${item.id}\" )'><i class='icon-files-empty' title='Copiar Anotacao'></i></a>`;
                         let editar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='editarAnotacao(\"${item.id}\")' class='list-icons-item' ><i class='icon-pencil7' title='Editar Anotacao'></i></a>`;
                         let exc = `<a style='color: black; cursor:pointer' onclick='excluirAnotacao(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Anotacao'></i></a>`;
                         let acoes = ``;
 
                         if (item.editavel == 1) {
-                            acoes = `<div class='list-icons'>
-                                    ${copiar}
+
+                            if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
+									${copiar}
                                     ${editar}
                                     ${exc}
-                                </div>`;
+								</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        
+								</div>`;
+							}
                         } else {
-                            acoes = `<div class='list-icons'>
-                                    ${copiar}                                
-                                </div>`;		
+                            
+                            if (situaChave != 'ATENDIDO'){
+								acoes = `<div class='list-icons'>
+									${copiar}
+								</div>`;
+							} else{
+								acoes = `<div class='list-icons'>
+                                        
+								</div>`;
+							}	
                         }
                         
                         HTML += `
@@ -1057,7 +1072,8 @@ if ($row['ClienSexo'] == 'F'){
                             <input type="hidden" name="idAnotacao" id="idAnotacao">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
-							?>
+                                echo "<input type='hidden' id='atendimentoSituaChave' value='".$_SESSION['SituaChave']."' />";
+                            ?>
 							<div class="card">
 
                             <div class="col-md-12">
