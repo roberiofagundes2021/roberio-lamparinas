@@ -17,6 +17,8 @@
         irpara("atendimentoHospitalarListagem.php");	
     }
 
+    $iUnidade = $_SESSION['UnidadeId'];
+
     //exame físico
     $sql = "SELECT TOP(1) EnAdPId
     FROM EnfermagemAdmissaoPediatrica
@@ -76,6 +78,226 @@
         $sexo = 'Masculino';
     }
 
+    if(isset($_POST['RN'])){
+        $sql = "INSERT INTO EnfermagemAdmissaoRN(EnAdRAtendimento,EnAdRDataInicio,EnAdRHoraInicio,
+            EnAdRPrevisaoAlta,EnAdRTipoInternacao,EnAdREspecialidadeLeito,EnAdRAla,EnAdRQuarto,EnAdRLeito,
+            EnAdRProfissional,EnAdRNomeMae,EnAdRDataNascimento,EnAdRHoraNascimento,EnAdRSexo,EnAdRChoroPresente,
+            EnAdRApgar1min,EnAdRApgar5min,EnAdRAmamentacao1h,EnAdRMotivoNaoAleitamento,EnAdRFreqCardiaca,
+            EnAdRFreqRespiratoria,EnAdRTemperatura,EnAdRSPO,EnAdRHGT,EnAdRPeso,EnAdRIdadeGestacional,EnAdRFatorRH,
+            EnAdREstatura,EnAdRPerimetroCefalico,EnAdRPerimetroToraxico,EnAdRPerimetroAbdominal,
+            EnAdRAtividadeHipoativo,EnAdRAtividadeSonolento,EnAdRAtividadeAtivo,EnAdRAtividadeChoroso,
+            EnAdRAtividadeGemente,EnAdRAtividadeDescricao,EnAdRColoracaoCorado,EnAdRColoracaoHipoCorado,
+            EnAdRColoracaoCianotico,EnAdRColoracaoIcterico,EnAdRColoracaoPletorico,EnAdRColoracaoDescricao,
+            EnAdRHidratacao,EnAdRFontanela,EnAdRPele,EnAdRPeleDescricao,EnAdRReflexoSuccao,EnAdRReflexoMoro,
+            EnAdRReflexoPreensaoPalmar,EnAdRReflexoPressaoPlantar,EnAdRCabecaEscoriacao,EnAdRCabecaPIG,
+            EnAdRCabecaGIG,EnAdRCabecaBossa,EnAdRCabecaCefalohematoma,EnAdRCabecaMascaraEquimotica,EnAdRAbdome,
+            EnAdRSuccaoSatisfatoria,EnAdRPadraoRespiratorio,EnAdRPadraoRespiratorioDescricao,EnAdRGenturinarioIntegro,
+            EnAdRGenturinarioDiurese,EnAdRGenturinarioAnusPervio,EnAdRGenturinarioMeconio,EnAdRGenturinarioOutro,
+            EnAdRGenturinarioDescricao,EnAdRCotoLimpoSeco,EnAdRCotoGelatinoso,EnAdRCotoMumificado,EnAdRCotoUmido,
+            EnAdRCotoSujo,EnAdRCotoFetido,EnAdRCotoHiperemia,EnAdRCotoDescricao,EnAdRCateter,EnAdRCateterDescricao,
+            EnAdRSonda,EnAdRSondaDescricao,EnAdRDiagnosticoDorAguda,EnAdRDiagnosticoDeficitAutoCuidado,
+            EnAdRDiagnosticoEliminacaoUrinaria,EnAdRDiagnosticoNutricaoDesequilibrada,
+            EnAdRDiagnosticoPadraoRespiratorio,EnAdRDiagnosticoPadraoSono,EnAdRDiagnosticoRiscoConstipacao,
+            EnAdRDiagnosticoRiscoGlicemia,EnAdRDiagnosticoRiscoIctericia,EnAdRDiagnosticoRiscoInfeccao,
+            EnAdRDiagnosticoRiscoIntegridade,EnAdRDiagnosticoRiscoSufocacao,EnAdRDiagnosticoTermoRregulacao,
+            EnAdRDiagnosticoOutro,EnAdRAvaliacaoEnfermagem,EnAdRUnidade)
+        VALUES(:EnAdRAtendimento,
+            :EnAdRDataInicio,
+            :EnAdRHoraInicio,
+            :EnAdRPrevisaoAlta,
+            :EnAdRTipoInternacao,
+            :EnAdREspecialidadeLeito,
+            :EnAdRAla,
+            :EnAdRQuarto,
+            :EnAdRLeito,
+            :EnAdRProfissional,
+            :EnAdRNomeMae,
+            :EnAdRDataNascimento,
+            :EnAdRHoraNascimento,
+            :EnAdRSexo,
+            :EnAdRChoroPresente,
+            :EnAdRApgar1min,
+            :EnAdRApgar5min,
+            :EnAdRAmamentacao1h,
+            :EnAdRMotivoNaoAleitamento,
+            :EnAdRFreqCardiaca,
+            :EnAdRFreqRespiratoria,
+            :EnAdRTemperatura,
+            :EnAdRSPO,
+            :EnAdRHGT,
+            :EnAdRPeso,
+            :EnAdRIdadeGestacional,
+            :EnAdRFatorRH,
+            :EnAdREstatura,
+            :EnAdRPerimetroCefalico,
+            :EnAdRPerimetroToraxico,
+            :EnAdRPerimetroAbdominal,
+            :EnAdRAtividadeHipoativo,
+            :EnAdRAtividadeSonolento,
+            :EnAdRAtividadeAtivo,
+            :EnAdRAtividadeChoroso,
+            :EnAdRAtividadeGemente,
+            :EnAdRAtividadeDescricao,
+            :EnAdRColoracaoCorado,
+            :EnAdRColoracaoHipoCorado,
+            :EnAdRColoracaoCianotico,
+            :EnAdRColoracaoIcterico,
+            :EnAdRColoracaoPletorico,
+            :EnAdRColoracaoDescricao,
+            :EnAdRHidratacao,
+            :EnAdRFontanela,
+            :EnAdRPele,
+            :EnAdRPeleDescricao,
+            :EnAdRReflexoSuccao,
+            :EnAdRReflexoMoro,
+            :EnAdRReflexoPreensaoPalmar,
+            :EnAdRReflexoPressaoPlantar,
+            :EnAdRCabecaEscoriacao,
+            :EnAdRCabecaPIG,
+            :EnAdRCabecaGIG,
+            :EnAdRCabecaBossa,
+            :EnAdRCabecaCefalohematoma,
+            :EnAdRCabecaMascaraEquimotica,
+            :EnAdRAbdome,
+            :EnAdRSuccaoSatisfatoria,
+            :EnAdRPadraoRespiratorio,
+            :EnAdRPadraoRespiratorioDescricao,
+            :EnAdRGenturinarioIntegro,
+            :EnAdRGenturinarioDiurese,
+            :EnAdRGenturinarioAnusPervio,
+            :EnAdRGenturinarioMeconio,
+            :EnAdRGenturinarioOutro,
+            :EnAdRGenturinarioDescricao,
+            :EnAdRCotoLimpoSeco,
+            :EnAdRCotoGelatinoso,
+            :EnAdRCotoMumificado,
+            :EnAdRCotoUmido,
+            :EnAdRCotoSujo,
+            :EnAdRCotoFetido,
+            :EnAdRCotoHiperemia,
+            :EnAdRCotoDescricao,
+            :EnAdRCateter,
+            :EnAdRCateterDescricao,
+            :EnAdRSonda,
+            :EnAdRSondaDescricao,
+            :EnAdRDiagnosticoDorAguda,
+            :EnAdRDiagnosticoDeficitAutoCuidado,
+            :EnAdRDiagnosticoEliminacaoUrinaria,
+            :EnAdRDiagnosticoNutricaoDesequilibrada,
+            :EnAdRDiagnosticoPadraoRespiratorio,
+            :EnAdRDiagnosticoPadraoSono,
+            :EnAdRDiagnosticoRiscoConstipacao,
+            :EnAdRDiagnosticoRiscoGlicemia,
+            :EnAdRDiagnosticoRiscoIctericia,
+            :EnAdRDiagnosticoRiscoInfeccao,
+            :EnAdRDiagnosticoRiscoIntegridade,
+            :EnAdRDiagnosticoRiscoSufocacao,
+            :EnAdRDiagnosticoTermoRregulacao,
+            :EnAdRDiagnosticoOutro,
+            :EnAdRAvaliacaoEnfermagem,
+            :EnAdRUnidade)";
+        $result = $conn->prepare($sql);
+
+        $result->execute(array(
+            ':EnAdRAtendimento' => $iAtendimentoId,
+            ':EnAdRDataInicio' => date('Y-m-d'),
+            ':EnAdRHoraInicio' => date('H:i'),
+            ':EnAdRPrevisaoAlta' => '',
+            ':EnAdRTipoInternacao' => $row['TpIntId'],
+            ':EnAdREspecialidadeLeito' => $row['EsLeiId'],
+            ':EnAdRAla' => $row['AlaId'],
+            ':EnAdRQuarto' => $row['QuartId'],
+            ':EnAdRLeito' => $row['LeitoId'],
+            ':EnAdRProfissional' => $userId, /****/
+            ':EnAdRNomeMae' => isset($_POST['RN'])?$_POST['RN']:'',
+            ':EnAdRDataNascimento' => isset($_POST['dataNascimento'])?$_POST['dataNascimento']:'',
+            ':EnAdRHoraNascimento' => isset($_POST['horaNascimento'])?$_POST['horaNascimento']:'',
+            ':EnAdRSexo' => isset($_POST['sexo'])?$_POST['sexo']:'',
+            ':EnAdRChoroPresente' => isset($_POST['choro'])?($_POST['choro']=="SIM"?1:0):'',
+            ':EnAdRApgar1min' => isset($_POST['Apgar1'])?$_POST['Apgar1']:'',
+            ':EnAdRApgar5min' => isset($_POST['Apgar5'])?$_POST['Apgar5']:'',
+            ':EnAdRAmamentacao1h' => isset($_POST['amamentacao'])?($_POST['amamentacao']=="SIM"?1:0):'',
+            ':EnAdRMotivoNaoAleitamento' => isset($_POST['motivoAleitamento'])?$_POST['motivoAleitamento']:'',
+            ':EnAdRFreqCardiaca' => isset($_POST['FC'])?$_POST['FC']:null,
+            ':EnAdRFreqRespiratoria' => isset($_POST['FR'])?$_POST['FR']:null,
+            ':EnAdRTemperatura' => isset($_POST['Temperatura'])?$_POST['Temperatura']:null,
+            ':EnAdRSPO' => isset($_POST['SPO'])?$_POST['SPO']:null,
+            ':EnAdRHGT' => isset($_POST['HGT'])?$_POST['HGT']:null,
+            ':EnAdRPeso' => isset($_POST['Peso'])?$_POST['Peso']:null,
+            ':EnAdRIdadeGestacional' => isset($_POST['idadeGestacional'])?$_POST['idadeGestacional']:'',
+            ':EnAdRFatorRH' => isset($_POST['fatorRH'])?$_POST['fatorRH']:'',
+            ':EnAdREstatura' => isset($_POST['Estatura'])?$_POST['Estatura']:null,
+            ':EnAdRPerimetroCefalico' => isset($_POST['PC'])?$_POST['PC']:null,
+            ':EnAdRPerimetroToraxico' => isset($_POST['PT'])?$_POST['PT']:null,
+            ':EnAdRPerimetroAbdominal' => isset($_POST['PA'])?$_POST['PA']:null,
+            ':EnAdRAtividadeHipoativo' => isset($_POST['hipoativo'])?1:0,
+            ':EnAdRAtividadeSonolento' => isset($_POST['sonolento'])?1:0,
+            ':EnAdRAtividadeAtivo' => isset($_POST['ativo'])?1:0,
+            ':EnAdRAtividadeChoroso' => isset($_POST['choroso'])?1:0,
+            ':EnAdRAtividadeGemente' => isset($_POST['gemente'])?1:0,
+            ':EnAdRAtividadeDescricao' => isset($_POST['textAtividade'])?$_POST['textAtividade']:'',
+            ':EnAdRColoracaoCorado' => isset($_POST['corado'])?1:0,
+            ':EnAdRColoracaoHipoCorado' => isset($_POST['hipocorado'])?1:0,
+            ':EnAdRColoracaoCianotico' => isset($_POST['cianotico'])?1:0,
+            ':EnAdRColoracaoIcterico' => isset($_POST['icterico'])?1:0,
+            ':EnAdRColoracaoPletorico' => isset($_POST['pletorico'])?1:0,
+            ':EnAdRColoracaoDescricao' => isset($_POST['textColoracao'])?$_POST['textColoracao']:'',
+            ':EnAdRHidratacao' => isset($_POST['hidratacao'])?($_POST['hidratacao']=='S'?1:0):'',
+            ':EnAdRFontanela' => isset($_POST['fontanela'])?$_POST['fontanela']:'',
+            ':EnAdRPele' => isset($_POST['pele'])?$_POST['pele']:'',
+            ':EnAdRPeleDescricao' => isset($_POST['textPele'])?$_POST['textPele']:'',
+            ':EnAdRReflexoSuccao' => isset($_POST['succao'])?1:0,
+            ':EnAdRReflexoMoro' => isset($_POST['moro'])?1:0,
+            ':EnAdRReflexoPreensaoPalmar' => isset($_POST['preensaoPalmar'])?1:0,
+            ':EnAdRReflexoPressaoPlantar' => isset($_POST['pressaoPlantar'])?1:0,
+            // ':EnAdRReflexoDescricao' => isset($_POST['textReflexos'])?$_POST['textReflexos']:'',
+            ':EnAdRCabecaEscoriacao' => isset($_POST['escoriacoes'])?$_POST['escoriacoes']:'',
+            ':EnAdRCabecaPIG' => isset($_POST['pig'])?1:0,
+            ':EnAdRCabecaGIG' => isset($_POST['gig'])?1:0,
+            ':EnAdRCabecaBossa' => isset($_POST['bossa'])?1:0,
+            ':EnAdRCabecaCefalohematoma' => isset($_POST['Cefalohematoma'])?1:0,
+            ':EnAdRCabecaMascaraEquimotica' => isset($_POST['mascaraEquimotica'])?1:0,
+            ':EnAdRAbdome' => isset($_POST['abdome'])?$_POST['abdome']:'',
+            ':EnAdRSuccaoSatisfatoria' => isset($_POST['succao'])?($_POST['succao']=="S"?1:0):null,
+            ':EnAdRPadraoRespiratorio' => isset($_POST['padraoRespiratorio'])?$_POST['padraoRespiratorio']:'',
+            ':EnAdRPadraoRespiratorioDescricao' => isset($_POST['textPadraoRespiratorio'])?$_POST['textPadraoRespiratorio']:'',
+            ':EnAdRGenturinarioIntegro' => isset($_POST['integro'])?1:0,
+            ':EnAdRGenturinarioDiurese' => isset($_POST['diurese'])?1:0,
+            ':EnAdRGenturinarioAnusPervio' => isset($_POST['anusPervio'])?1:0,
+            ':EnAdRGenturinarioMeconio' => isset($_POST['Meconio'])?1:0,
+            ':EnAdRGenturinarioOutro' => isset($_POST['outros'])?1:0,
+            ':EnAdRGenturinarioDescricao' => isset($_POST['textGenturinario'])?$_POST['textGenturinario']:'',
+            ':EnAdRCotoLimpoSeco' => isset($_POST['limpoSeco'])?1:0,
+            ':EnAdRCotoGelatinoso' => isset($_POST['gelatinoso'])?1:0,
+            ':EnAdRCotoMumificado' => isset($_POST['mumificado'])?1:0,
+            ':EnAdRCotoUmido' => isset($_POST['umido'])?1:0,
+            ':EnAdRCotoSujo' => isset($_POST['sujo'])?1:0,
+            ':EnAdRCotoFetido' => isset($_POST['fetido'])?1:0,
+            ':EnAdRCotoHiperemia' => isset($_POST['hiperemia'])?1:0,
+            ':EnAdRCotoDescricao' => isset($_POST['textCotoUmbilical'])?$_POST['textCotoUmbilical']:'',
+            ':EnAdRCateter' => isset($_POST['cateter'])?($_POST['cateter']=="SIM"?1:0):'',
+            ':EnAdRCateterDescricao' => isset($_POST['textCateter'])?$_POST['textCateter']:'',
+            ':EnAdRSonda' => isset($_POST['sonda'])?($_POST['sonda']=="SIM"?1:0):'',
+            ':EnAdRSondaDescricao' => isset($_POST['textSonda'])?$_POST['textSonda']:'',
+            ':EnAdRDiagnosticoDorAguda' => isset($_POST['dorAguda'])?1:0,
+            ':EnAdRDiagnosticoDeficitAutoCuidado' => isset($_POST['deficitAutoCuidado'])?1:0,
+            ':EnAdRDiagnosticoEliminacaoUrinaria' => isset($_POST['eliminacaoUrinaria'])?1:0,
+            ':EnAdRDiagnosticoNutricaoDesequilibrada' => isset($_POST['nutricaoDesequilibrada'])?1:0,
+            ':EnAdRDiagnosticoPadraoRespiratorio' => isset($_POST['padraoRespiratorio'])?1:0,
+            ':EnAdRDiagnosticoPadraoSono' => isset($_POST['padraoSono'])?1:0,
+            ':EnAdRDiagnosticoRiscoConstipacao' => isset($_POST['riscoConstipacao'])?1:0,
+            ':EnAdRDiagnosticoRiscoGlicemia' => isset($_POST['riscoGlicemia'])?1:0,
+            ':EnAdRDiagnosticoRiscoIctericia' => isset($_POST['riscoIctericia'])?1:0,
+            ':EnAdRDiagnosticoRiscoInfeccao' => isset($_POST['riscoInfeccao'])?1:0,
+            ':EnAdRDiagnosticoRiscoIntegridade' => isset($_POST['riscoIntegridade'])?1:0,
+            ':EnAdRDiagnosticoRiscoSufocacao' => isset($_POST['riscoSufocacao'])?1:0,
+            ':EnAdRDiagnosticoTermoRregulacao' => isset($_POST['termorregulacao'])?1:0,
+            ':EnAdRDiagnosticoOutro' => isset($_POST['riscoOutros'])?1:0,
+            ':EnAdRAvaliacaoEnfermagem' => $_POST['textAvaliacao'],
+            ':EnAdRUnidade' => $iUnidade
+        ));
+        irpara('atendimentoHospitalarListagem.php');
+    }
 ?>
 
 <!DOCTYPE html>
@@ -421,7 +643,7 @@
 		
 		<?php
 			include_once("menu-left.php");
-			// include_once("menuLeftSecundarioVenda.php");
+			include_once("menuLeftSecundarioVenda.php");
 		?>
 
 		<!-- Main content -->
@@ -620,7 +842,7 @@
                                                 <label>Temperatura (C°)</label>
                                             </div>
                                             <div class="col-lg-2">
-                                                <label>SPO   (%)</label>
+                                                <label>SPO (%)</label>
                                             </div>
                                             <div class="col-lg-2">
                                                 <label>HGT (mg/dl)</label>
@@ -631,22 +853,22 @@
                                             
                                             <!-- campos -->
                                             <div class="col-lg-2">
-                                                <input id="FC" name="FC"  class="form-control" type="text">
+                                                <input id="FC" name="FC"  class="form-control" type="number">
                                             </div>
                                             <div class="col-lg-2">
-                                                <input id="FR" name="FR" class="form-control" type="text">
+                                                <input id="FR" name="FR" class="form-control" type="number">
                                             </div>
                                             <div class="col-lg-2">
-                                                <input id="Temperatura" name="Temperatura"  class="form-control" type="text">
+                                                <input id="Temperatura" name="Temperatura"  class="form-control" type="number">
                                             </div>
                                             <div class="col-lg-2">
-                                                <input id="SPO" name="SPO" class="form-control" type="text">
+                                                <input id="SPO" name="SPO" class="form-control" type="number">
                                             </div>
                                             <div class="col-lg-2">
-                                                <input id="HGT" name="HGT"  class="form-control" type="text">
+                                                <input id="HGT" name="HGT"  class="form-control" type="number">
                                             </div>
                                             <div class="col-lg-2">
-                                                <input id="Peso" name="Peso" class="form-control" type="text">
+                                                <input id="Peso" name="Peso" class="form-control" type="number">
                                             </div>
                                         </div>
 
@@ -794,7 +1016,7 @@
                                                 </select>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="fatorRH" name="fatorRH" class="select">
+                                                <select id="fontanela" name="fontanela" class="select">
                                                     <option value=''>selecione</option>
                                                     <option value='NO'>NOMOTENSA</option>
                                                     <option value='AB'>ABAULADA</option>
@@ -876,30 +1098,31 @@
                                             </div>
                                             <div class="col-lg-8">
                                                 <div class="col-lg-12 row">
-                                                    <div class="col-lg-3">
-                                                        <input name="mascaraEquimotica" type="checkbox"/>
-                                                        <label>Máscara Equimótica</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="Cefalohematoma" type="checkbox"/>
-                                                        <label>Cefalohematoma</label>
-                                                    </div>
                                                     <div class="col-lg-2">
-                                                        <input name="bossa" type="checkbox"/>
-                                                        <label>BOSSA</label>
-                                                    </div>
-                                                    <div class="col-lg-1">
-                                                        <input name="gig" type="checkbox"/>
-                                                        <label>GIG</label>
+                                                        <input name="escoriacoes" type="checkbox"/>
+                                                        <label>Escoriações</label>
                                                     </div>
                                                     <div class="col-lg-1">
                                                         <input name="pig" type="checkbox"/>
                                                         <label>PIG</label>
                                                     </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="escoriacoes" type="checkbox"/>
-                                                        <label>Escoriações</label>
+                                                    <div class="col-lg-1">
+                                                        <input name="gig" type="checkbox"/>
+                                                        <label>GIG</label>
                                                     </div>
+                                                    <div class="col-lg-2">
+                                                        <input name="bossa" type="checkbox"/>
+                                                        <label>BOSSA</label>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <input name="Cefalohematoma" type="checkbox"/>
+                                                        <label>Cefalohematoma</label>
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <input name="mascaraEquimotica" type="checkbox"/>
+                                                        <label>Máscara Equimótica</label>
+                                                    </div>
+
                                                     <div class="col-lg-12">
                                                         <textarea id="textCabeca" name="textCabeca" class="form-control" rows="4" cols="4" maxLength="50" placeholder="" ></textarea>
                                                         <small class="text-muted form-text">
@@ -1016,31 +1239,31 @@
                                             </div>
                                             <div class="col-lg-12 row">
                                                 <div class="col-lg-2">
-                                                    <input name="padraoRespiratorio" type="checkbox"/>
+                                                    <input name="limpoSeco" type="checkbox"/>
                                                     <label>Limpo e Seco</label>
                                                 </div>
                                                 <div class="col-lg-2">
-                                                    <input name="padraoRespiratorio" type="checkbox"/>
+                                                    <input name="gelatinoso" type="checkbox"/>
                                                     <label>Gelatinoso</label>
                                                 </div>
                                                 <div class="col-lg-2">
-                                                    <input name="padraoRespiratorio" type="checkbox"/>
+                                                    <input name="mumificado" type="checkbox"/>
                                                     <label>Mumificado</label>
                                                 </div>
                                                 <div class="col-lg-2">
-                                                    <input name="padraoRespiratorio" type="checkbox"/>
+                                                    <input name="umido" type="checkbox"/>
                                                     <label>Úmido</label>
                                                 </div>
                                                 <div class="col-lg-1">
-                                                    <input name="padraoRespiratorio" type="checkbox"/>
+                                                    <input name="sujo" type="checkbox"/>
                                                     <label>Sujo</label>
                                                 </div>
                                                 <div class="col-lg-1">
-                                                    <input name="padraoRespiratorio" type="checkbox"/>
+                                                    <input name="fetido" type="checkbox"/>
                                                     <label>Fétido</label>
                                                 </div>
                                                 <div class="col-lg-2">
-                                                    <input name="padraoRespiratorio" type="checkbox"/>
+                                                    <input name="hiperemia" type="checkbox"/>
                                                     <label>Hiperemia</label>
                                                 </div>
                                             </div>
