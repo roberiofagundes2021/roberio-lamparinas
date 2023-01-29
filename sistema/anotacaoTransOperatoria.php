@@ -273,7 +273,7 @@
 		
 		<?php
 			include_once("menu-left.php");
-			// include_once("menuLeftSecundarioVenda.php");
+			include_once("menuLeftSecundarioVenda.php");
 		?>
 
 		<!-- Main content -->
