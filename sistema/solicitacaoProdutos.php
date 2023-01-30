@@ -6,13 +6,13 @@ include('global_assets/php/conexao.php');
 if (isset($_POST['solicitacaoId'])) {
 
     $sqlProduto = "SELECT SolicId, SlXPrQuantidade as Quantidade, ProduId as Id, ProduCodigo as Codigo,
-    ProduNome as Nome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
+    ProduNome as Nome, ProduFoto, CategNome, dbo.fnSaldoEstoque(SolicUnidade, ProduId, 'P', NULL) as Estoque
             FROM Solicitacao
             JOIN SolicitacaoXProduto on SlXPrSolicitacao = SolicId
             JOIN Produto on ProduId = SlXPrProduto
             JOIN Categoria on CategId = ProduCategoria
             JOIN Situacao on SituaId = ProduStatus
-            WHERE SolicId = " . $_POST['solicitacaoId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . "
+            WHERE SolicId = " . $_POST['solicitacaoId'] . " and SolicUnidade = " . $_SESSION['UnidadeId'] . "
             ";
     $resultProduto = $conn->query($sqlProduto);
     $rowProdutos = $resultProduto->fetchAll(PDO::FETCH_ASSOC);

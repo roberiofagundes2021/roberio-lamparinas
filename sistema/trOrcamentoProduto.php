@@ -101,7 +101,7 @@ foreach ($rowSubCategoria as $item) {
 $sql = "SELECT TXOXPProduto
 		FROM TRXOrcamentoXProduto
 		JOIN Produto on ProduId = TXOXPProduto
-		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
+		WHERE TXOXPUnidade = " . $_SESSION['UnidadeId'] . " and TXOXPOrcamento = " . $iOrcamento;
 $result = $conn->query($sql);
 $rowProdutoUtilizado = $result->fetchAll(PDO::FETCH_ASSOC);
 $countProdutoUtilizado = count($rowProdutoUtilizado);
@@ -322,7 +322,7 @@ foreach ($rowProdutoUtilizado as $itemProdutoUtilizado) {
 											JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 											JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 											JOIN SubCategoria on SbCatId = ProduSubCategoria
-											WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'
+											WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'
 											ORDER BY SbCatNome, ProduNome ASC";
 									$result = $conn->query($sql);
 									$rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);

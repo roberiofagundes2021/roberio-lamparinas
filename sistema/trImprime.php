@@ -125,7 +125,7 @@ try {
 						JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
 						JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 						JOIN SubCategoria on SbCatId = ProduSubCategoria
-						WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR." and ProduSubCategoria = ".$sbcat['SbCatId']."
+						WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and TRXPrTermoReferencia = " . $iTR." and ProduSubCategoria = ".$sbcat['SbCatId']."
 						ORDER BY SbCatNome, ProduNome ASC";
 			}
 			$result = $conn->query($sql);

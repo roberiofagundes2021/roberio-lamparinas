@@ -33,7 +33,7 @@ $rowProdutosOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT TRXPrProduto
 		FROM TermoReferenciaXProduto
 		JOIN Produto on ProduId = TRXPrProduto
-		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
+		WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = " . $iTR . " and TRXPrTabela = 'Produto'";
 $result = $conn->query($sql);
 $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
 $countProdutosTr2 = count($rowProdutos);
@@ -102,7 +102,7 @@ if (count($rowProdutosOrcamento) >= 1) {
 			FROM Produto
 			JOIN Categoria on CategId = ProduCategoria
 			JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and ProduId in (" . $lista . ")
+			WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduId in (" . $lista . ")
 			";
 	//echo $sql;
 

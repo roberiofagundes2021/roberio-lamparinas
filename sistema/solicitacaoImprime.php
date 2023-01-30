@@ -119,7 +119,7 @@ try {
 	FROM Produto
 	JOIN SolicitacaoXProduto on SlXPrProduto = ProduId
 	JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-	WHERE ProduUnidade = ".$_SESSION['UnidadeId']." and SlXPrSolicitacao = ".$iSolicitacao;
+	WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and SlXPrSolicitacao = ".$iSolicitacao;
 
 	$resultProduto = $conn->query($sql);
 	$rowProdutos = $resultProduto->fetchAll(PDO::FETCH_ASSOC);

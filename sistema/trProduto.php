@@ -171,7 +171,7 @@ if (count($rowProdutoOrcamentoUtilizado) >= 1) {
 $sql = "SELECT TRXPrProduto
 		FROM TermoReferenciaXProduto
 		JOIN Produto on ProduId = TRXPrProduto
- 		WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+ 		WHERE TRXPrProduto = " . $_SESSION['UnidadeId'] . " 
    		AND TRXPrTermoReferencia = " . $iTR . " 
 	 	AND TRXPrTabela = 'Produto' ";
 $result = $conn->query($sql);
@@ -439,7 +439,7 @@ if (count($rowProdutoUtilizado) >= 1) {
 																$sql = "SELECT ProduId, ProduNome
 																		FROM Produto
 																		JOIN Situacao on SituaId = ProduStatus		
-																	 	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+																	 	WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " 
 																	   	AND SituaChave = 'ATIVO' and ProduCategoria = " . $iCategoria . "";
 
 																if ($subcategoria['TRXSCSubcategoria'] != '' and $subcategoria['TRXSCSubcategoria'] != null) {
@@ -464,7 +464,7 @@ if (count($rowProdutoUtilizado) >= 1) {
 															$sql = "SELECT ProduId, ProduNome
 																	FROM Produto
 																	JOIN Situacao on SituaId = ProduStatus		
-																 	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+																 	WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . "  
 																   	AND SituaChave = 'ATIVO' 
 																	AND ProduCategoria = " . $iCategoria . "";
 
@@ -610,7 +610,7 @@ if (count($rowProdutoUtilizado) >= 1) {
 												JOIN Produto ON ProduId = TRXPrProduto
 												JOIN UnidadeMedida ON UnMedId = ProduUnidadeMedida
 												JOIN SubCategoria on SbCatId = ProduSubCategoria
-											 	WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " 
+											 	WHERE TRXPrUnidade = " . $_SESSION['UnidadeId'] . " 
 											   	AND TRXPrTermoReferencia = " . $iTR . " 
 												AND TRXPrTabela = 'Produto' 
 												Order By SbCatNome, ProduNome ASC";

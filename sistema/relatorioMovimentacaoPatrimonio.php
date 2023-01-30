@@ -1021,7 +1021,7 @@ if (isset($_POST['inputPatriNumero']) && $_POST['inputPatriNumero'] != "") {
                                                             JOIN Situacao on SituaId = ProduStatus 
                                                             LEFT JOIN Marca on MarcaId = ProduMarca
                                                             LEFT JOIN Fabricante on FabriId = ProduFabricante
-                                                            WHERE ProduUnidade = ". $_SESSION['UnidadeId'] ." and SituaChave = 'ATIVO'
+                                                            WHERE ProduEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
                                                             ORDER BY ProduNome ASC";
                                                     $result = $conn->query($sql);
                                                     $rowEstCo = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -39,11 +39,11 @@ if (!empty($_POST['inputId'])) {
                 //Carregar o no item na tela de modal do carrinho da pagina de solicitação
                 if($_POST['type'] == 'P'){
                     $sql = "SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduFoto, CategNome,
-                    dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
+                    dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', NULL) as Estoque
                     FROM Produto
                     JOIN Categoria on CategId = ProduCategoria
                     JOIN Situacao on SituaId = ProduStatus
-                    WHERE ProduId = " . $_POST['inputId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
+                    WHERE ProduId = " . $_POST['inputId'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'";
                 } else {
                     $sql = "SELECT ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, CategNome
                     CategNome, dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ServiId, 'S', NULL) as Estoque
@@ -93,11 +93,11 @@ if (!empty($_POST['inputId'])) {
                 //Carregar o no item na tela de modal do carrinho da pagina de solicitação
                 if($_POST['type'] == 'P'){
                     $sql = "SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduFoto, CategNome,
-                    dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
+                    dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', NULL) as Estoque
                     FROM Produto
                     JOIN Categoria on CategId = ProduCategoria
                     JOIN Situacao on SituaId = ProduStatus
-                    WHERE ProduId = " . $_POST['inputId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
+                    WHERE ProduId = " . $_POST['inputId'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'";
                 } else {
                     $sql = "SELECT ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, CategNome
                     CategNome, dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ServiId, 'S', NULL) as Estoque
@@ -152,11 +152,11 @@ if (!empty($_POST['inputId'])) {
             //Carregar o no item na tela de modal do carrinho da pagina de solicitação
             if($_POST['type'] == 'P'){
                 $sql = "SELECT ProduId as Id, ProduCodigo as Codigo, ProduNome as Nome, ProduFoto, CategNome,
-                dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
+                dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', NULL) as Estoque
                 FROM Produto
                 JOIN Categoria on CategId = ProduCategoria
                 JOIN Situacao on SituaId = ProduStatus
-                WHERE ProduId = " . $_POST['inputId'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
+                WHERE ProduId = " . $_POST['inputId'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'";
             } else {
                 $sql = "SELECT ServiId as Id, ServiCodigo as Codigo, ServiNome as Nome, CategNome
                 CategNome, dbo.fnSaldoEstoque(".$_SESSION['UnidadeId'].", ServiId, 'S', NULL) as Estoque
