@@ -36,12 +36,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
-			$sql = "UPDATE Profissao SET ProfiNome = :sNome, ProfiCbo = :sCbo, ProfiUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE Profissao SET ProfiNome = :sNome, ProfiChave = :sChave, ProfiCbo = :sCbo, ProfiUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE ProfiId = :iProfissao";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sChave' => formatarChave($_POST['inputNome']),
 							':sCbo' => $_POST['inputCbo'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iProfissao' => $_POST['inputProfissaoId']
@@ -51,12 +52,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO Profissao (ProfiNome, ProfiCbo, ProfiStatus, ProfiUsuarioAtualizador)
-					VALUES (:sNome, :sCbo, :bStatus, :iUsuarioAtualizador)";
+			$sql = "INSERT INTO Profissao (ProfiNome, ProfiChave, ProfiCbo, ProfiStatus, ProfiUsuarioAtualizador)
+					VALUES (:sNome, :sChave, :sCbo, :bStatus, :iUsuarioAtualizador)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sChave' => formatarChave($_POST['inputNome']),
 							':sCbo' => $_POST['inputCbo'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId']
