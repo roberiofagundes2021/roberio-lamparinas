@@ -28,13 +28,13 @@ if(isset($_POST['inputKitCmeId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação do Kit Cme alterado!!!";
+		$_SESSION['msg']['mensagem'] = "Situação do Kit CME alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do Kit Cme!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação do Kit CME!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();
