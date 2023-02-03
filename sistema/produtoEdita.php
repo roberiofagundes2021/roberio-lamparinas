@@ -118,8 +118,8 @@ if(isset($_POST['inputNome'])){
 								   ProduFoto = :sFoto, ProduCategoria = :iCategoria, ProduSubCategoria = :iSubCategoria, ProduValorCusto = :fValorCusto, 
 								   ProduOutrasDespesas = :fOutrasDespesas, ProduCustoFinal = :fCustoFinal, ProduMargemLucro = :fMargemLucro, 
 								   ProduValorVenda = :fValorVenda, ProduEstoqueMinimo = :iEstoqueMinimo, ProduUnidadeMedida = :iUnidadeMedida, 
-								   ProduTipoFiscal = :iTipoFiscal, ProduNcmFiscal = :iNcmFiscal, ProduOrigemFiscal = :iOrigemFiscal, 
-								   ProduCest = :iCest, ProduUsuarioAtualizador = :iUsuarioAtualizador ";
+								   ProduUnidadeMedidaSaida = :iUnidadeMedidaSaida, ProduTipoFiscal = :iTipoFiscal, ProduNcmFiscal = :iNcmFiscal, 
+								   ProduOrigemFiscal = :iOrigemFiscal, ProduCest = :iCest, ProduUsuarioAtualizador = :iUsuarioAtualizador ";
 
 		if ($_POST['inputProdutoStatus'] == 'ALTERAR'){
 			$sql .= ", ProduStatus = ".$Status." ";
@@ -143,6 +143,7 @@ if(isset($_POST['inputNome'])){
 						':fValorVenda' => $_POST['inputValorVenda'] == null ? null : gravaValor($_POST['inputValorVenda']),
 						':iEstoqueMinimo' => $_POST['inputEstoqueMinimo'] == '' ? null : $_POST['inputEstoqueMinimo'],
 						':iUnidadeMedida' => $_POST['cmbUnidadeMedida'] == '#' ? null : $_POST['cmbUnidadeMedida'],
+						':iUnidadeMedidaSaida' => $_POST['cmbUnidadeMedidaSaida'] == '#' ? null : $_POST['cmbUnidadeMedidaSaida'],
 						':iTipoFiscal' => $_POST['cmbTipoFiscal'] == '#' ? null : $_POST['cmbTipoFiscal'],
 						':iNcmFiscal' => $_POST['cmbNcmFiscal'] == '#' ? null : $_POST['cmbNcmFiscal'],
 						':iOrigemFiscal' => $_POST['cmbOrigemFiscal'] == '#' ? null : $_POST['cmbOrigemFiscal'],
@@ -607,7 +608,7 @@ if(isset($_POST['inputNome'])){
 									<h5 class="mb-0 font-weight-semibold">Classificação</h5>
 									<br>
 									<div class="row">
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoria">Categoria <span class="text-danger">*</span></label>
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control select-search" required <?php $contTRs >= 1 ? print('disabled') : ''?>>
@@ -631,7 +632,7 @@ if(isset($_POST['inputNome'])){
 											</div>
 										</div>
 
-										<div class="col-lg-6">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbSubCategoria">SubCategoria</label>
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control select-search" <?php $contTRs >= 1 ? print('disabled') : ''?>>
@@ -654,9 +655,103 @@ if(isset($_POST['inputNome'])){
 												</select>
 											</div>
 										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputFamilia">Família</label>
+												<input type="text" id="inputFamilia" name="inputFamilia" class="form-control" placeholder="Família" value="<?php echo $row['ProduFamilia']; ?>">
+											</div>
+										</div>
+										
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="cmbFinalistico">Finalístico</label>
+												<select id="cmbFinalistico" name="cmbFinalistico" class="form-control select-search">
+													<option value="#">Selecione</option>
+
+												</select>
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>
+
+							<div class="row">
+								<div class="col-lg-12">									
+									<h5 class="mb-0 font-weight-semibold">Característica</h5>
+									<br>
+									<div class="row">	
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="cmbCor">Cor</label>
+												<select id="cmbCor" name="cmbCor" class="form-control select-search">
+													<option value="#">Selecione</option>
+
+												</select>
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="cmbTamanho">Tamanho</label>
+												<select id="cmbTamanho" name="cmbTamanho" class="form-control select-search">
+													<option value="#">Selecione</option>
+
+												</select>
+											</div>
+										</div>
+
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbUnidadeMedida">Unidade de Medida - Entrada<span class="text-danger">*</span></label>
+												<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control select-search" required>
+													<option value="">Selecione</option>
+													<?php 
+														$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
+																FROM UnidadeMedida
+																JOIN Situacao on SituaId = UnMedStatus
+																WHERE UnMedEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
+																ORDER BY UnMedNome ASC";
+														$result = $conn->query($sql);
+														$rowUnidadeMedida = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($rowUnidadeMedida as $item){
+															$seleciona = $item['UnMedId'] == $row['ProduUnidadeMedida'] ? "selected" : "";
+															print('<option value="'.$item['UnMedId'].'" '. $seleciona .'>'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbUnidadeMedidaSaida">Unidade de Medida - Saída<span class="text-danger">*</span></label>
+												<select id="cmbUnidadeMedidaSaida" name="cmbUnidadeMedidaSaida" class="form-control select-search" required>
+													<option value="">Selecione</option>
+													<?php 
+														$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
+																FROM UnidadeMedida
+																JOIN Situacao on SituaId = UnMedStatus
+																WHERE UnMedEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
+																ORDER BY UnMedNome ASC";
+														$result = $conn->query($sql);
+														$rowUnidadeMedida = $result->fetchAll(PDO::FETCH_ASSOC);
+
+														foreach ($rowUnidadeMedida as $item){
+															$seleciona = $item['UnMedId'] == $row['ProduUnidadeMedidaSaida'] ? "selected" : "";
+															print('<option value="'.$item['UnMedId'].'" '. $seleciona .'>'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
+														}
+													
+													?>
+												</select>
+											</div>
+										</div>
+									</div> <!-- /row -->
+									
+								</div> <!-- /col -->
+							</div>	<!-- /row -->
 									
 							<div class="row">
 								<div class="col-lg-6">
@@ -713,30 +808,7 @@ if(isset($_POST['inputNome'])){
 								<div class="col-lg-12">									
 									<h5 class="mb-0 font-weight-semibold">Dados Fiscais</h5>
 									<br>
-									<div class="row">								
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="cmbUnidadeMedida">Unidade de Medida<span class="text-danger">*</span></label>
-												<select id="cmbUnidadeMedida" name="cmbUnidadeMedida" class="form-control select-search" required>
-													<option value="">Selecione</option>
-													<?php 
-														$sql = "SELECT UnMedId, UnMedNome, UnMedSigla
-																FROM UnidadeMedida
-																JOIN Situacao on SituaId = UnMedStatus
-																WHERE UnMedEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
-																ORDER BY UnMedNome ASC";
-														$result = $conn->query($sql);
-														$rowUnidadeMedida = $result->fetchAll(PDO::FETCH_ASSOC);
-
-														foreach ($rowUnidadeMedida as $item){
-															$seleciona = $item['UnMedId'] == $row['ProduUnidadeMedida'] ? "selected" : "";
-															print('<option value="'.$item['UnMedId'].'" '. $seleciona .'>'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
-														}
-													
-													?>
-												</select>
-											</div>
-										</div>
+									<div class="row">							
 									
 										<div class="col-lg-4">
 											<div class="form-group">
@@ -784,11 +856,9 @@ if(isset($_POST['inputNome'])){
 													?>
 												</select>
 											</div>
-										</div>								
-									</div> <!-- /row -->
-								
-									<div class="row" style="display:none;">
-										<div class="col-lg-10">
+										</div>	
+										
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="cmbNcmFiscal">NCM</label>
 												<select id="cmbNcmFiscal" name="cmbNcmFiscal" class="form-control select-search">
@@ -817,8 +887,9 @@ if(isset($_POST['inputNome'])){
 												<label for="inputCest">CEST</label>
 												<input type="text" id="inputCest" name="inputCest" class="form-control" placeholder="CEST">
 											</div>
-										</div>												
-									</div>
+										</div>	
+									</div> <!-- /row -->
+							
 								</div> <!-- /col -->
 							</div>	<!-- /row -->
 
