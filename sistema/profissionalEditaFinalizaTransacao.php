@@ -18,7 +18,7 @@ try{
 		$sUf= $_POST['inputTipo'] == 'J' || $_POST['cmbUf'] == '#' ? null : $_POST['cmbUf'];
 		$sSexo= $_POST['inputTipo'] == 'J' || $_POST['cmbSexo'] == '#' ? null : $_POST['cmbSexo'];
 		$dDtNascimento= $_POST['inputTipo'] == 'F' ? ($_POST['inputDtNascimento'] == '' ? null : $_POST['inputDtNascimento']) : null;
-		$sProfissao= $_POST['inputTipo'] == 'F'? ($_POST['cmbProfissao'] == '#' || $_POST['cmbProfissao'] == '' ? null : $_POST['cmbProfissao']) : null;
+		$sProfissao= $_POST['inputTipo'] == 'J'? $_POST['cmbProfissaoPJ'] : $_POST['cmbProfissaoPF'];
 		$sConselho= $_POST['inputTipo'] == 'F' ? ($_POST['cmbConselho'] == '#' ? null : $_POST['cmbConselho']) : null;
 		$sNumConselho= $_POST['inputTipo'] == 'F' ? $_POST['inputNumConselho'] : null;
 		$sCnes= $_POST['inputTipo']  == 'J' ? $_POST['inputCnesPJ'] : $_POST['inputCnesPF'];

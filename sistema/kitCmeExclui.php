@@ -17,13 +17,13 @@ if(isset($_POST['inputKitCmeId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Kit Cme excluído!!!";
+		$_SESSION['msg']['mensagem'] = "Kit CME excluído!!!";
 		$_SESSION['msg']['tipo'] = "success";		
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir Kit Cme !!! O registro a ser excluído está sendo usado em outro local.";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir Kit CME !!! O registro a ser excluído está sendo usado em outro local.";
 		$_SESSION['msg']['tipo'] = "error";			
 		
 		//echo 'Error: ' . $e->getMessage();die;

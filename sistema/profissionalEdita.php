@@ -264,14 +264,14 @@ if(isset($_POST['inputProfissionalId'])){
 					'cmbUf',
 					'cmbSexo',
 					'inputDtNascimento',
-					'cmbProfissao',
+					'cmbProfissaoPF',
 					'cmbConselho',
 					'inputNumConselho',
-					'inputCnesPF',
 					'cmbEspecialidade'
 			]
 			var camposPJObrigatorios = [
 				'inputNomePJ',
+				'cmbProfissaoPJ',
 				'inputCnpj'
 			]
 			if (tipo == 'F'){
@@ -497,8 +497,8 @@ if(isset($_POST['inputProfissionalId'])){
                                                 <br>
                                                 <div class="row">								
                                                     <div class="col-lg-2">
-                                                        <label for="cmbProfissao">Profissão<span class="text-danger"> *</span></label>
-                                                        <select id="cmbProfissao" name="cmbProfissao" class="form-control select-search">
+                                                        <label for="cmbProfissaoPF">Profissão<span class="text-danger"> *</span></label>
+                                                        <select id="cmbProfissaoPF" name="cmbProfissaoPF" class="form-control select-search" required>
                                                             <option value="">Selecione uma profissão</option>
                                                             <?php 
                                                                 $sql = "SELECT ProfiId, ProfiNome
@@ -612,7 +612,7 @@ if(isset($_POST['inputProfissionalId'])){
 										</div>
 
 										<div class="row">
-											<div class="col-lg-6">
+											<div class="col-lg-4">
 												<div class="form-group">
 													<label for="inputRazaoSocial">Razão Social</label>
 													<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social" value="<?php echo $row['ProfiRazaoSocial']; ?>">
@@ -637,6 +637,26 @@ if(isset($_POST['inputProfissionalId'])){
 													<label for="inputCnesPJ">CNES</label>
 													<input type="text" id="inputCnesPJ" name="inputCnesPJ" class="form-control" placeholder="CNES" value="<?php echo $row['ProfiCNES']; ?>">
 												</div>
+											</div>
+											<div class="col-lg-2">
+												<label for="cmbProfissaoPJ">Profissão<span class="text-danger"> *</span></label>
+												<select id="cmbProfissaoPJ" name="cmbProfissaoPJ" class="form-control select-search" required>
+													<option value="">Selecione uma profissão</option>
+													<?php 
+														$sql = "SELECT ProfiId, ProfiNome
+																FROM Profissao
+																JOIN Situacao on SituaId = ProfiStatus
+																WHERE SituaChave = 'ATIVO'
+																ORDER BY ProfiNome ASC";
+														$result = $conn->query($sql);
+														$rowProfissao = $result->fetchAll(PDO::FETCH_ASSOC);
+														
+														foreach ($rowProfissao as $item){
+															$seleciona = $item['ProfiId'] == $row['ProfiProfissao'] ? "selected" : "";
+															print("<option value='$item[ProfiId]' $seleciona>$item[ProfiNome]</option>");
+														}
+													?>
+												</select>
 											</div>	
 										</div>	
 									</div> <!-- Fim dadosPJ -->

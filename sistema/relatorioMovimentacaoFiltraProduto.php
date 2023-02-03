@@ -86,7 +86,7 @@ function queryPesquisa()
                 END as Destino, 
                 MvXPrQuantidade, ProduNome, CategNome, 
                 IsNull(ProduEstoqueMinimo, 0) as EstoqueMinimo,
-                dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', MovimDestinoLocal) as Saldo
+                dbo.fnSaldoEstoque(MovimUnidade, ProduId, 'P', MovimDestinoLocal) as Saldo
             FROM Movimentacao   
             JOIN MovimentacaoXProduto on MvXPrMovimentacao = MovimId
             JOIN Produto on ProduId = MvXPrProduto

@@ -67,7 +67,7 @@ function queryPesquisa(){
                     LEFT JOIN LocalEstoque LocalD on LocalD.LcEstId = MovimDestinoLocal 
                     LEFT JOIN Setor SetorO on SetorO.SetorId = MovimOrigemSetor 
                     LEFT JOIN Setor SetorD on SetorD.SetorId = MovimDestinoSetor 
-                    WHERE $string ProduUnidade = ".$_SESSION['UnidadeId'];
+                    WHERE $string MovimUnidade = ".$_SESSION['UnidadeId'];
             $result = $conn->query($sql);
             $rowData = $result->fetchAll(PDO::FETCH_ASSOC);
 

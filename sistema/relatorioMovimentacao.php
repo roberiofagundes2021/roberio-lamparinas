@@ -649,7 +649,7 @@ $dataFim = date("Y-m-d");
 													$sql = "SELECT ProduCodigo
 																FROM Produto
 																JOIN Situacao on SituaId = ProduStatus
-																WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 																ORDER BY ProduNome ASC";
 													$result = $conn->query($sql);
 													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -674,7 +674,7 @@ $dataFim = date("Y-m-d");
 															$sql = "SELECT ProduId, ProduNome
 																			FROM Produto
 																			JOIN Situacao on SituaId = ProduStatus
-																			WHERE ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+																			WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 																			ORDER BY ProduNome ASC";
 															$result = $conn->query($sql);
 															$row = $result->fetchAll(PDO::FETCH_ASSOC);

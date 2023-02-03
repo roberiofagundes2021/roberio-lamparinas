@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Kit Cme';
+$_SESSION['PaginaAtual'] = 'Kit CME';
 
 include('global_assets/php/conexao.php');
 
@@ -20,7 +20,7 @@ $count = count($row);
 //Se estiver editando
 if(isset($_POST['inputKitCmeId']) && $_POST['inputKitCmeId']){
 
-	//Essa consulta é para preencher o campo Nome com o Kit Cme a ser editar
+	//Essa consulta é para preencher o campo Nome com o Kit CME a ser editar
 	$sql = "SELECT KtCmeId, KtCmeNome
 			FROM KitCme
 			WHERE KtCmeId = " . $_POST['inputKitCmeId'];
@@ -48,7 +48,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iKitCme' => $_POST['inputKitCmeId']
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Kit Cme alterado!!!";
+			$_SESSION['msg']['mensagem'] = "Kit CME alterado!!!";
 	
 		} else { //inclusão
 		
@@ -63,7 +63,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iUnidade' => $_SESSION['UnidadeId'],
 							));
 	
-			$_SESSION['msg']['mensagem'] = "Kit Cme incluído!!!";
+			$_SESSION['msg']['mensagem'] = "Kit CME incluído!!!";
 					
 		}
 	
@@ -73,7 +73,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro reportado com o Kit Cme!!!";
+		$_SESSION['msg']['mensagem'] = "Erro reportado com o Kit CME!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
@@ -90,7 +90,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Kit Cme</title>
+	<title>Lamparinas | Kit CME</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -118,7 +118,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				responsive: true,
 			    columnDefs: [
 				{
-					orderable: true,   //Kit Cme
+					orderable: true,   //Kit CME
 					width: "80%",
 					targets: [0]
 				},
@@ -215,7 +215,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					document.getElementById('inputEstadoAtual').value = "EDITA";
 					document.formKitCme.action = "kitCme.php";		
 				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formKitCme, "Tem certeza que deseja excluir esse Kit Cme?", "kitCmeExclui.php");
+					confirmaExclusao(document.formKitCme, "Tem certeza que deseja excluir esse Kit CME?", "kitCmeExclui.php");
 				} else if (Tipo == 'mudaStatus'){
 					document.formKitCme.action = "kitCmeMudaSituacao.php";
 				} 
@@ -253,7 +253,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Kit Cme</h3>
+								<h3 class="card-title">Relação de Kit CME</h3>
 							</div>
 
 							<div class="card-body">
@@ -267,8 +267,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<div class="row">
 										<div class="col-lg-6">
 											<div class="form-group">
-												<label for="inputNome">Nome do Kit Cme <span class="text-danger"> *</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Kit Cme" value="<?php if (isset($_POST['inputKitCmeId'])) echo $rowKitCme['KtCmeNome']; ?>" required autofocus>
+												<label for="inputNome">Nome do Kit CME <span class="text-danger"> *</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Kit CME" value="<?php if (isset($_POST['inputKitCmeId'])) echo $rowKitCme['KtCmeNome']; ?>" required autofocus>
 											</div>
 										</div>
 										<div class="col-lg-6">
@@ -294,7 +294,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							<table id="tblKitCme" class="table">
 								<thead>
 									<tr class="bg-slate">
-										<th data-filter>Kit Cme</th>
+										<th data-filter>Kit CME</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>

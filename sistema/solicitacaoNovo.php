@@ -8,11 +8,11 @@ include('global_assets/php/conexao.php');
 
 // verifica se existe um valor minimo e maximo para paginação de itens
 $sql = "WITH itens as (SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, 
-		dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ProduNome) as rownum
+		dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', NULL) as Estoque, ROW_NUMBER() OVER(ORDER BY ProduNome) as rownum
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN Situacao on SituaId = ProduStatus
-		WHERE dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) > 0 and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO')
+		WHERE dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', NULL) > 0 and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO')
 		SELECT ProduId, ProduCodigo, ProduDetalhamento, ProduNome, ProduFoto, CategNome, Estoque, rownum
 		FROM itens WHERE rownum >= 0 and rownum <= 20 ORDER BY ProduNome ASC";
 $result = $conn->query($sql);
@@ -26,7 +26,7 @@ $sqlCount = "SELECT COUNT(ProduId) as quantidade
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		JOIN Situacao on SituaId = ProduStatus
-	    WHERE dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) > 0 and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'";
+	    WHERE dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', NULL) > 0 and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'";
 $resultCount = $conn->query($sqlCount);
 $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 
@@ -915,11 +915,11 @@ $count = $resultCount->fetch(PDO::FETCH_ASSOC);
 
 						foreach ($_SESSION['Carrinho'] as $item) {
 							if ($item['quantidade'] > 0) {
-								$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(ProduUnidade, ProduId, 'P', NULL) as Estoque
+								$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFoto, CategNome, dbo.fnSaldoEstoque(" . $_SESSION['UnidadeId'] . ", ProduId, 'P', NULL) as Estoque
 		                            FROM Produto
 		                            JOIN Categoria on CategId = ProduCategoria
 									JOIN Situacao on SituaId = ProduStatus
-	                                WHERE ProduId = " . $item['id'] . " and ProduUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
+	                                WHERE ProduId = " . $item['id'] . " and ProduEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
 		                            ";
 								$result = $conn->query($sql);
 								$row = $result->fetch(PDO::FETCH_ASSOC);
