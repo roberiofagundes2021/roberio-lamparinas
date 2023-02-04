@@ -8,8 +8,6 @@ if(!$_SESSION['PerfiChave'] == "SUPER"){
 
 $_SESSION['PaginaAtual'] = 'Banco';
 
-include('global_assets/php/conexao.php');
-
 //Essa consulta é para preencher a grid
 $sql = "SELECT BancoId, BancoCodigo, BancoNome, BancoStatus, SituaNome, SituaChave, SituaCor
 		FROM Banco

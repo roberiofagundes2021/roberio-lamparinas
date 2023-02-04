@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-include('global_assets/php/conexao.php');
+include_once('global_assets/php/conexao.php');
 require_once("global_assets/php/funcoesgerais.php");
 
 if (!array_key_exists('UsuarId', $_SESSION) or !array_key_exists('UnidadeId', $_SESSION)) {  // or !$_SESSION['UsuarLogado']
