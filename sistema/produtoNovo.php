@@ -125,23 +125,34 @@ if(isset($_POST['inputNome'])){
 				
 				Filtrando();
 				
-				var cmbCategoria = $('#cmbCategoria').val();
+				let cmbCategoria = $('#cmbCategoria').val();
+				let codCategoria = "";
+				let codSubCategoria = "";
+				
+				$('#cmbCategoria option').each(function(e){
+					if ($(this).val() == cmbCategoria){
+						codCategoria = $(this).data('codcategoria');
+					}
+				});
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 					
-					var option = '<option value="#">Selecione a SubCategoria</option>';
+					let option = '<option value="#">Selecione a SubCategoria</option>';
 					
 					if (dados.length){
 						
 						$.each(dados, function(i, obj){
 							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+							codSubCategoria = obj.SbCatCodigo;
 						});						
 						
-						$('#cmbSubCategoria').html(option).show();
+						$('#cmbSubCategoria').html(option).show();						
 					} else {
 						Reset();
-					}					
-				});
+					}
+
+					$('#inputFamilia').val(codCategoria + '.' + codSubCategoria);
+				});				
 			});
 
 			//Ao mudar o Custo, atualiza o CustoFinal
@@ -466,7 +477,7 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control select-search" required>
 													<option value="">Selecione</option>
 													<?php 
-														$sql = "SELECT CategId, CategNome
+														$sql = "SELECT CategId, CategCodigo, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus
 																WHERE CategEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
@@ -475,7 +486,7 @@ if(isset($_POST['inputNome'])){
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($row as $item){															
-															print('<option value="'.$item['CategId'].'">'.$item['CategNome'].'</option>');
+															print('<option value="'.$item['CategId'].'" data-codcategoria="'.$item['CategCodigo'].'">'.$item['CategNome'].'</option>');
 														}
 													
 													?>
@@ -553,7 +564,7 @@ if(isset($_POST['inputNome'])){
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 														foreach ($row as $item){
-															print('<option value="'.$item['UnMedId'].'">'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
+															print('<option value="'.$item['UnMedId'].'#'.$item['UnMedSigla'].'">'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
 														}
 													
 													?>

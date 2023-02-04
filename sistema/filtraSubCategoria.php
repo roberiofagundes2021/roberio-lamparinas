@@ -50,7 +50,7 @@ if (isset($_GET['idOrcamento'])){
 			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and ServiId = ". $_GET['idServico'];
 
 } else if (isset($_GET['idProduto']) && $_GET['idProduto'] != -1){
-	$sql = "SELECT SbCatId, SbCatNome
+	$sql = "SELECT SbCatId, SbCatCodigo, SbCatNome
 			FROM SubCategoria 
 			JOIN Produto on ProduSubCategoria = SbCatId
 			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and ProduId = ". $_GET['idProduto'];
@@ -69,7 +69,7 @@ if (isset($_GET['idOrcamento'])){
 			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and SbCatCategoria = ".
 			$_GET['idCategoria']." and SituaChave = 'ATIVO'";
 }else {
-	$sql = "SELECT SbCatId, SbCatNome
+	$sql = "SELECT SbCatId, SbCatCodigo, SbCatNome
 			FROM SubCategoria
 			JOIN Situacao on SituaId = SbCatStatus
 			WHERE SbCatEmpresa = ".$_SESSION['EmpreId']." and SbCatCategoria = ".
