@@ -22,7 +22,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 if(isset($_POST['inputCategoriaId']) && $_POST['inputCategoriaId']){
 
 	//Essa consulta é para preencher o campo Nome com a categoria a ser editada
-	$sql = "SELECT CategId, CategNome
+	$sql = "SELECT CategId, CategCodigo, CategNome
 			FROM Categoria
 			WHERE CategId = " . $_POST['inputCategoriaId'];
 	$result = $conn->query($sql);
@@ -39,12 +39,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
-			$sql = "UPDATE Categoria SET CategNome = :sNome, CategUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE Categoria SET CategCodigo = :sCodigo, CategNome = :sNome, CategUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE CategId = :iCategoria";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sCodigo' => $_POST['inputCodigo'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iCategoria' => $_POST['inputCategoriaId']
 							));
@@ -53,12 +54,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO Categoria (CategNome, CategStatus, CategUsuarioAtualizador, CategEmpresa)
-					VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+			$sql = "INSERT INTO Categoria (CategCodigo, CategNome, CategStatus, CategUsuarioAtualizador, CategEmpresa)
+					VALUES (:sCodigo,:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sCodigo' => $_POST['inputCodigo'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iEmpresa' => $_SESSION['EmpreId'],
@@ -276,7 +278,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											// verifica se o perfil possui permissão de inserir caso possua ira aparecer esse camo
 											if($inserir){
 												print('
-												<div class="col-lg-6">
+												<div class="col-lg-2">
+													<div class="form-group">
+														<label for="inputCodigo">Código </span></label>
+														<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="'.(isset($_POST['inputCategoriaId'])?$rowCategoria['CategCodigo']:'').'"autofocus>
+													</div>
+												</div>
+												<div class="col-lg-4">
 													<div class="form-group">
 														<label for="inputNome">Nome da Categoria <span class="text-danger"> *</span></label>
 														<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Categoria" value="'.(isset($_POST['inputCategoriaId'])?$rowCategoria['CategNome']:'').'" required autofocus>
