@@ -7,7 +7,7 @@ $_SESSION['PaginaAtual'] = 'Sub Categoria';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT SbCatId, SbCatNome, SbCatCategoria, SbCatStatus, CategNome, SituaNome, SituaCor, SituaChave
+$sql = "SELECT SbCatId, SbCatCodigo, SbCatNome, SbCatCategoria, SbCatStatus, CategNome, SituaNome, SituaCor, SituaChave
 		FROM SubCategoria
 		JOIN Categoria on CategId = SbCatCategoria
 		JOIN Situacao on SituaId = SbCatStatus
@@ -21,7 +21,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 if(isset($_POST['inputSubCategoriaId']) && $_POST['inputSubCategoriaId']){
 
 	//Essa consulta é para preencher o campo Nome com a SubCategoria a ser editada
-	$sql = "SELECT SbCatId, SbCatNome, SbCatCategoria
+	$sql = "SELECT SbCatId, SbCatCodigo, SbCatNome, SbCatCategoria
 			FROM SubCategoria
 			WHERE SbCatId = " . $_POST['inputSubCategoriaId'];
 	$result = $conn->query($sql);
@@ -38,12 +38,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
 			
-			$sql = "UPDATE SubCategoria SET SbCatNome = :sNome, SbCatCategoria = :iCategoria, SbCatUsuarioAtualizador = :iUsuarioAtualizador
+			$sql = "UPDATE SubCategoria SET SbCatCodigo = :sCodigo, SbCatNome = :sNome, SbCatCategoria = :iCategoria, SbCatUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE SbCatId = :iSubCategoria";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sCodigo' => $_POST['inputCodigo'],
 							':iCategoria' => $_POST['cmbCategoria'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iSubCategoria' => $_POST['inputSubCategoriaId']
@@ -53,12 +54,13 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	
 		} else { //inclusão
 		
-			$sql = "INSERT INTO SubCategoria (SbCatNome, SbCatCategoria, SbCatStatus, SbCatUsuarioAtualizador, SbCatEmpresa)
-					VALUES (:sNome, :sCategoria, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
+			$sql = "INSERT INTO SubCategoria (SbCatCodigo, SbCatNome, SbCatCategoria, SbCatStatus, SbCatUsuarioAtualizador, SbCatEmpresa)
+					VALUES (:sCodigo, :sNome, :sCategoria, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 			$result = $conn->prepare($sql);
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
+							':sCodigo' => $_POST['inputCodigo'],
 							':sCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
@@ -125,24 +127,29 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				responsive: true,
 			    columnDefs: [
 				{
-					orderable: true,   //SubCategoria
-					width: "45%",
+					orderable: true,   //Código
+					width: "20%",
 					targets: [0]
+				},
+				{
+					orderable: true,   //SubCategoria
+					width: "30%",
+					targets: [1]
 				},
 				{ 
 					orderable: true,   //Categoria
-					width: "35%",
-					targets: [1]
+					width: "30%",
+					targets: [2]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "10%",
-					targets: [2]
+					targets: [3]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [3]
+					targets: [4]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -292,13 +299,19 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
 									<div class="row">
-										<div class="col-lg-5">
+										<div class="col-lg-2">
 											<div class="form-group">
-												<label for="inputNome">Nome da SubCategoria <span class="text-danger"> *</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="SubCategoria" value="<?php if (isset($_POST['inputSubCategoriaId'])) echo $rowSubCategoria['SbCatNome']; ?>" required autofocus>
+												<label for="inputCodigo">Código </label>
+												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="<?php if (isset($_POST['inputSubCategoriaId'])) echo $rowSubCategoria['SbCatCodigo']; ?>"autofocus>
 											</div>
 										</div>
 										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="inputNome">Nome da SubCategoria <span class="text-danger"> *</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="SubCategoria" value="<?php if (isset($_POST['inputSubCategoriaId'])) echo $rowSubCategoria['SbCatNome']; ?>" required>
+											</div>
+										</div>
+										<div class="col-lg-3">
 											<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
 											<select id="cmbCategoria" name="cmbCategoria" class="form-control select-search" required>
 												<option value="">Selecione</option>
@@ -342,6 +355,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							<table id="tblSubCategoria" class="table">
 								<thead>
 									<tr class="bg-slate">
+										<th>Sub Código</th>
 										<th>Sub Categoria</th>
 										<th>Categoria</th>
 										<th>Situação</th>
@@ -358,6 +372,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										
 										print('
 										<tr>
+											<td>'.$item['SbCatCodigo'].'</td>
 											<td>'.$item['SbCatNome'].'</td>
 											<td>'.$item['CategNome'].'</td>
 											');
@@ -367,8 +382,8 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										print('<td class="text-center">
 												<div class="list-icons">
 													<div class="list-icons list-icons-extended">
-														<a href="#" onclick="atualizaSubCategoria('.$atualizar.','.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
-														<a href="#" onclick="atualizaSubCategoria('.$excluir.','.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
+														<a href="#" onclick="atualizaSubCategoria(1,'.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'edita\');" class="list-icons-item"><i class="icon-pencil7" data-popup="tooltip" data-placement="bottom" title="Editar"></i></a>
+														<a href="#" onclick="atualizaSubCategoria(1,'.$item['SbCatId'].', \''.addslashes($item['SbCatNome']).'\', '.$item['SbCatCategoria'].','.$item['SbCatStatus'].', \'exclui\');" class="list-icons-item"><i class="icon-bin" data-popup="tooltip" data-placement="bottom" title="Exluir"></i></a>														
 													</div>
 												</div>
 											</td>
