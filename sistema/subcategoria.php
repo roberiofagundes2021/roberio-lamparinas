@@ -44,7 +44,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
-							':sCodigo' => $_POST['inputCodigo'],
+							':sCodigo' => $_POST['inputCodigo'] == '' ? '000' : $_POST['inputCodigo'],
 							':iCategoria' => $_POST['cmbCategoria'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iSubCategoria' => $_POST['inputSubCategoriaId']
@@ -60,7 +60,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
-							':sCodigo' => $_POST['inputCodigo'],
+							':sCodigo' => $_POST['inputCodigo'] == '' ? '000' : $_POST['inputCodigo'],
 							':sCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
