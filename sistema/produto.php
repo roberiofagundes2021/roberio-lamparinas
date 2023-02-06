@@ -9,7 +9,7 @@ if (isset($_SESSION['fotoAtual'])) {
 	unset($_SESSION['fotoAtual']);
 }
 
-$sql = "SELECT ProduId, ProduCodigo, ProduNome, CategNome, SbCatNome, ProduValorVenda, ProduStatus, 
+$sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFamilia, ProduFinalistico, ProduDetalhamento, CategNome, SbCatNome, ProduValorVenda, ProduStatus, 
 			   ProduCustoFinal, ProduValorCusto, ProduValorVenda, SituaNome, SituaChave, SituaCor
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
@@ -364,8 +364,8 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
 										print('
 										<tr>
-											<td>' . $item['ProduCodigo'] . '</td>
-											<td>' . $item['ProduNome'] . '</td>
+											<td>' . $item['ProduFamilia'] . '.' . $item['ProduFinalistico'] . '.' . $item['ProduCodigo'] . '</td>
+											<td class="form-control" data-popup="tooltip" title="'. substr($item['ProduDetalhamento'],0,380).'...">' . $item['ProduNome'] . '</td>
 											<td>' . $item['CategNome'] . '</td>
 											<td>' . $item['SbCatNome'] . '</td>
 											' . $tipoValorProduto . '

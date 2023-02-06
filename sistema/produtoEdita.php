@@ -137,9 +137,9 @@ if(isset($_POST['inputNome'])){
 						':sTamanho' => $_POST['cmbTamanho'],
 						':sFoto' => isset($_POST['inputFoto']) ? $_POST['inputFoto'] : null,
 						':iCategoria' => $_POST['cmbCategoria'],
-						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
 						':sFamilia' => $_POST['inputFamilia'] == '#' ? null : $_POST['inputFamilia'],
-						':iFinalistico' => $_POST['cmbFinalistico'] == '#' ? null : $_POST['cmbFinalistico'],
+						':iFinalistico' => $_POST['cmbFinalistico'] == '#' ? '000' : $_POST['cmbFinalistico'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
 						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
@@ -707,8 +707,8 @@ if(isset($_POST['inputNome'])){
 												<label for="cmbFinalistico">Finalístico</label>
 												<select id="cmbFinalistico" name="cmbFinalistico" class="form-control select-search">
 													<option value="#">Selecione</option>
-													<option value="SIM" <?php if ($row['ProduFinalistico'] == 'SIM') echo "selected"; ?> >SIM</option>
-													<option value="NAO" <?php if ($row['ProduFinalistico'] == 'NAO') echo "selected"; ?> >NAO</option>
+													<option value="001" <?php if ($row['ProduFinalistico'] == '001') echo "selected"; ?> >001</option>
+													<option value="002" <?php if ($row['ProduFinalistico'] == '002') echo "selected"; ?> >002</option>
 
 												</select>
 											</div>
