@@ -160,11 +160,10 @@ if(isset($_POST['inputNome'])){
 				FROM ProdutoOrcamento
 				WHERE PrOrcProduto = ".$_POST['inputProdutoId'];
 		$result = $conn->query($sql);
-		$rowProdutoOrcamento = $result->fetch(PDO::FETCH_ASSOC);							
+		$rowProdutoOrcamento = $result->fetchAll(PDO::FETCH_ASSOC);							
 		$count = count($rowProdutoOrcamento);
 		
 		if ($count){
-
 			$sql = "UPDATE ProdutoOrcamento SET PrOrcDetalhamento = :sDetalhamento, PrOrcUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE PrOrcProduto = :iProduto and PrOrcEmpresa = :iEmpresa";
 			$result = $conn->prepare($sql);
@@ -259,14 +258,13 @@ if(isset($_POST['inputNome'])){
 					Reset();
 				}					
 			});
-		}	
+		}
 
-        $(document).ready(function() {	
-		
+        $(document).ready(function() {
 			//Aqui sou obrigado a instanciar novamente a utilização do fancybox
 			$(".fancybox").fancybox({
 				// options
-			});	
+			});
 
 			//Limpa o campo Nome quando for digitado só espaços em branco
 			$("#inputNome").on('blur', function(e){
@@ -285,36 +283,62 @@ if(isset($_POST['inputNome'])){
 			$('#cmbCategoria').on('change', function(e){
 				
 				Filtrando();
-				
-				var cmbCategoria = $('#cmbCategoria').val();
-				var codCategoria = "";
-				var  codSubCategoria = "";
-				
-				$('#cmbCategoria option').each(function(e){
-					if ($(this).val() == cmbCategoria){
-						codCategoria = $(this).data('codcategoria');
-					}
-				});
+				$('#inputFamilia').val('');
+				if($(this).val()){
+					let cmbCategoria = $(this).val();
+					let codCategoria = "";
+					let codSubCategoria = "";
+					
+					$('#cmbCategoria option').each(function(e){
+						if ($(this).val() == cmbCategoria){
+							codCategoria = $(this).data('codcategoria');
+						}
+					});
+	
+					$.ajax({
+						type: 'GET',
+						url: 'filtraSubCategoria.php',
+						dataType: 'json',
+						data:{
+							'idCategoria': cmbCategoria
+						},
+						success: async function(response) {
+							let option = '<option value="">Selecione a SubCategoria</option>';
+							if (response.length){
+								$.each(response, function(i, obj){
+									option += '<option value="'+obj.SbCatId+'">'+obj.SbCatCodigo+' - '+obj.SbCatNome+'</option>';
+									codSubCategoria = obj.SbCatCodigo;
+								});
+								$('#cmbSubCategoria').html(option)
+							} else {
+								Reset();
+							}
+							$('#inputFamilia').val(`${codCategoria}.000`);
+						}
+					})
+				}
+			});
 
-				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbSubCategoria').on('change', function(e){
+				let codSubCategoria = '000'
+				let inputFamilia = $('#inputFamilia').val()
+				inputFamilia = inputFamilia.split('.')[0]
+
+				if($(this).val()){
+					$('#cmbSubCategoria option').each(function(e){
+						if ($(this).val() == $('#cmbSubCategoria').val()){
+							codSubCategoria = $(this).html();
+						}
+					});
+					console.log(codSubCategoria)
 					
-					var option = '<option value="#">Selecione a SubCategoria</option>';
-					
-					if (dados.length){						
-						
-						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
-							codSubCategoria = obj.SbCatCodigo;
-						});						
-						
-						$('#cmbSubCategoria').html(option).show();
-					} else {
-						Reset();
-					}	
-					
-					$('#inputFamilia').val(codCategoria + '.' + codSubCategoria);
-				});
-			});			
+					codSubCategoria = codSubCategoria.split('-')
+					codSubCategoria = codSubCategoria[0].split(' ')
+					codSubCategoria = codSubCategoria[0]
+				}
+				$('#inputFamilia').val(`${inputFamilia}.${codSubCategoria}`)
+			});	
 		
 			//Ao mudar o Custo, atualiza o CustoFinal
 			$('#inputValorCusto').on('blur', function(e){
