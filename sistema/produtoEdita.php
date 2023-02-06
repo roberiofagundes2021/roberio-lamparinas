@@ -114,8 +114,8 @@ if(isset($_POST['inputNome'])){
 			$Status = $rowSituacao['SituaId'];
 		}
 
-		$sql = "UPDATE Produto SET ProduCodigo = :sCodigo, ProduCodigoBarras = :sCodigoBarras, ProduNome = :sNome, ProduDetalhamento = :sDetalhamento, 
-								   ProduFoto = :sFoto, ProduCategoria = :iCategoria, ProduSubCategoria = :iSubCategoria, ProduValorCusto = :fValorCusto, 
+		$sql = "UPDATE Produto SET ProduCodigo = :sCodigo, ProduCodigoBarras = :sCodigoBarras, ProduNome = :sNome, ProduDetalhamento = :sDetalhamento,  ProduCor = :sCor,  ProduTamanho = :sTamanho,
+								   ProduFoto = :sFoto, ProduCategoria = :iCategoria, ProduSubCategoria = :iSubCategoria, ProduFinalistico = :iFinalistico, ProduFamilia = :sFamilia,ProduValorCusto = :fValorCusto, 
 								   ProduOutrasDespesas = :fOutrasDespesas, ProduCustoFinal = :fCustoFinal, ProduMargemLucro = :fMargemLucro, 
 								   ProduValorVenda = :fValorVenda, ProduEstoqueMinimo = :iEstoqueMinimo, ProduUnidadeMedida = :iUnidadeMedida, 
 								   ProduUnidadeMedidaSaida = :iUnidadeMedidaSaida, ProduTipoFiscal = :iTipoFiscal, ProduNcmFiscal = :iNcmFiscal, 
@@ -133,9 +133,13 @@ if(isset($_POST['inputNome'])){
 						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
+						':sCor' => $_POST['cmbCor'],
+						':sTamanho' => $_POST['cmbTamanho'],
 						':sFoto' => isset($_POST['inputFoto']) ? $_POST['inputFoto'] : null,
 						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						':sFamilia' => $_POST['inputFamilia'] == '#' ? null : $_POST['inputFamilia'],
+						':iFinalistico' => $_POST['cmbFinalistico'] == '#' ? null : $_POST['cmbFinalistico'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
 						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
@@ -283,6 +287,14 @@ if(isset($_POST['inputNome'])){
 				Filtrando();
 				
 				var cmbCategoria = $('#cmbCategoria').val();
+				var codCategoria = "";
+				var  codSubCategoria = "";
+				
+				$('#cmbCategoria option').each(function(e){
+					if ($(this).val() == cmbCategoria){
+						codCategoria = $(this).data('codcategoria');
+					}
+				});
 
 				$.getJSON('filtraSubCategoria.php?idCategoria='+cmbCategoria, function (dados){
 					
@@ -292,12 +304,15 @@ if(isset($_POST['inputNome'])){
 						
 						$.each(dados, function(i, obj){
 							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+							codSubCategoria = obj.SbCatCodigo;
 						});						
 						
 						$('#cmbSubCategoria').html(option).show();
 					} else {
 						Reset();
-					}					
+					}	
+					
+					$('#inputFamilia').val(codCategoria + '.' + codSubCategoria);
 				});
 			});			
 		
@@ -614,7 +629,7 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbCategoria" name="cmbCategoria" class="form-control select-search" required <?php $contTRs >= 1 ? print('disabled') : ''?>>
 													<option value="">Selecione</option>
 													<?php 
-														$sql = "SELECT CategId, CategNome
+														$sql = "SELECT CategId, CategCodigo, CategNome
 																FROM Categoria
 																JOIN Situacao on SituaId = CategStatus
 																WHERE CategEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
@@ -624,7 +639,7 @@ if(isset($_POST['inputNome'])){
 														
 														foreach ($rowCategoria as $item){
 															$seleciona = $item['CategId'] == $row['ProduCategoria'] ? "selected" : "";
-															print('<option value="'.$item['CategId'].'" '. $seleciona .'>'.$item['CategNome'].'</option>');
+															print('<option value="'.$item['CategId'].'" data-codcategoria="'.$item['CategCodigo'].'" '. $seleciona .'>'.$item['CategCodigo'].' - '.$item['CategNome'].'</option>');
 														}
 													
 													?>
@@ -638,7 +653,7 @@ if(isset($_POST['inputNome'])){
 												<select id="cmbSubCategoria" name="cmbSubCategoria" class="form-control select-search" <?php $contTRs >= 1 ? print('disabled') : ''?>>
 													<option value="#">Selecione</option>
 													<?php 
-														$sql = "SELECT SbCatId, SbCatNome
+														$sql = "SELECT SbCatId, SbCatCodigo, SbCatNome
 																FROM SubCategoria
 																JOIN Situacao on SituaId = SbCatStatus
 																WHERE SbCatEmpresa = ". $_SESSION['EmpreId'] ." and SituaChave = 'ATIVO'
@@ -648,7 +663,7 @@ if(isset($_POST['inputNome'])){
 														
 														foreach ($rowSubCategoria as $item){
 															$seleciona = $item['SbCatId'] == $row['ProduSubCategoria'] ? "selected" : "";
-															print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatNome'].'</option>');
+															print('<option value="'.$item['SbCatId'].'" '. $seleciona .'>'.$item['SbCatCodigo'].' - '.$item['SbCatNome'].'</option>');
 														}
 													
 													?>
@@ -668,6 +683,8 @@ if(isset($_POST['inputNome'])){
 												<label for="cmbFinalistico">Finalístico</label>
 												<select id="cmbFinalistico" name="cmbFinalistico" class="form-control select-search">
 													<option value="#">Selecione</option>
+													<option value="SIM" <?php if ($row['ProduFinalistico'] == 'SIM') echo "selected"; ?> >SIM</option>
+													<option value="NAO" <?php if ($row['ProduFinalistico'] == 'NAO') echo "selected"; ?> >NAO</option>
 
 												</select>
 											</div>
@@ -685,8 +702,15 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbCor">Cor</label>
 												<select id="cmbCor" name="cmbCor" class="form-control select-search">
-													<option value="#">Selecione</option>
-
+												<option value="#">Selecione</option>
+													<option value="VM" <?php if ($row['ProduCor'] == 'VM') echo "selected"; ?> >Vermelho</option>
+													<option value="AZ" <?php if ($row['ProduCor'] == 'AZ') echo "selected"; ?> >Azul</option>
+													<option value="AM" <?php if ($row['ProduCor'] == 'AM') echo "selected"; ?> >Amarelo</option>
+													<option value="VD" <?php if ($row['ProduCor'] == 'VD') echo "selected"; ?> >Verde</option>
+													<option value="LA" <?php if ($row['ProduCor'] == 'LA') echo "selected"; ?> >Laranja</option>
+													<option value="RO" <?php if ($row['ProduCor'] == 'RO') echo "selected"; ?> >Roxo</option>
+													<option value="PR" <?php if ($row['ProduCor'] == 'PR') echo "selected"; ?> >Preto</option>
+													<option value="BR" <?php if ($row['ProduCor'] == 'BR') echo "selected"; ?> >Branco</option>
 												</select>
 											</div>
 										</div>
@@ -696,6 +720,9 @@ if(isset($_POST['inputNome'])){
 												<label for="cmbTamanho">Tamanho</label>
 												<select id="cmbTamanho" name="cmbTamanho" class="form-control select-search">
 													<option value="#">Selecione</option>
+													<option value="PE" <?php if ($row['ProduTamanho'] == 'PE') echo "selected"; ?> >Pequeno</option>
+													<option value="GR" <?php if ($row['ProduTamanho'] == 'GR') echo "selected"; ?> >Grande</option>
+													<option value="ME" <?php if ($row['ProduTamanho'] == 'ME') echo "selected"; ?> >Médio</option>
 
 												</select>
 											</div>
@@ -885,7 +912,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputCest">CEST</label>
-												<input type="text" id="inputCest" name="inputCest" class="form-control" placeholder="CEST">
+												<input type="text" id="inputCest" name="inputCest" class="form-control" placeholder="CEST"value="<?php echo $row['ProduCest']; ?>">
 											</div>
 										</div>	
 									</div> <!-- /row -->

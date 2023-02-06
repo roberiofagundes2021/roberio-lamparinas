@@ -8,7 +8,7 @@ include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
 //O ALTERAR é usado na importação de Produtos (eles não devem aparecer aqui)
-$sql = "SELECT CategId, CategNome, CategStatus, SituaNome, SituaChave, SituaCor
+$sql = "SELECT CategId, CategCodigo, CategNome, CategStatus, SituaNome, SituaChave, SituaCor
 		FROM Categoria
 		JOIN Situacao on SituaId = CategStatus
 	    WHERE CategEmpresa = ".$_SESSION['EmpreId']." and SituaChave != 'ALTERAR'
@@ -124,19 +124,24 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				responsive: true,
 			    columnDefs: [
 				{
-					orderable: true,   //Categoria
-					width: "80%",
+					orderable: true,   //Código
+					width: "10%",
 					targets: [0]
+				},
+				{
+					orderable: true,   //Categoria
+					width: "70%",
+					targets: [1]
 				},
 				{ 
 					orderable: true,   //Situação
 					width: "10%",
-					targets: [1]
+					targets: [2]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [2]
+					targets: [3]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
 				language: {
@@ -278,16 +283,16 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											// verifica se o perfil possui permissão de inserir caso possua ira aparecer esse camo
 											if($inserir){
 												print('
-												<div class="col-lg-2">
+												<div class="col-lg-1">
 													<div class="form-group">
 														<label for="inputCodigo">Código </span></label>
-														<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="'.(isset($_POST['inputCategoriaId'])?$rowCategoria['CategCodigo']:'').'"autofocus>
+														<input type="number" max="999" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="'.(isset($_POST['inputCategoriaId'])?$rowCategoria['CategCodigo']:'').'"autofocus>
 													</div>
 												</div>
-												<div class="col-lg-4">
+												<div class="col-lg-5">
 													<div class="form-group">
 														<label for="inputNome">Nome da Categoria <span class="text-danger"> *</span></label>
-														<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Categoria" value="'.(isset($_POST['inputCategoriaId'])?$rowCategoria['CategNome']:'').'" required autofocus>
+														<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Categoria" value="'.(isset($_POST['inputCategoriaId'])?$rowCategoria['CategNome']:'').'" required >
 													</div>
 												</div>
 											');
@@ -320,6 +325,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							<table id="tblCategoria" class="table">
 								<thead>
 									<tr class="bg-slate">
+										<th data-filter>Código</th>
 										<th data-filter>Categoria</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
@@ -334,6 +340,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										
 										print('
 										<tr>
+											<td>'.$item['CategCodigo'].'</td>
 											<td>'.$item['CategNome'].'</td>
 											');
 										

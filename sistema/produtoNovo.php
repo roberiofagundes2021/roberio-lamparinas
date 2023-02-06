@@ -24,11 +24,11 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduDetalhamento, ProduFoto, ProduCategoria, ProduSubCategoria, ProduValorCusto, 
+		$sql = "INSERT INTO Produto (ProduCodigo, ProduCodigoBarras, ProduNome, ProduDetalhamento, ProduCor, ProduTamanho, ProduFoto, ProduCategoria, ProduSubCategoria, ProduFamilia, ProduFinalistico, ProduValorCusto, 
 									 ProduOutrasDespesas, ProduCustoFinal, ProduMargemLucro, ProduValorVenda, 
 									 ProduEstoqueMinimo, ProduUnidadeMedida, ProduUnidadeMedidaSaida, ProduTipoFiscal, ProduNcmFiscal, 
 									 ProduOrigemFiscal, ProduCest, ProduStatus, ProduUsuarioAtualizador, ProduEmpresa) 
-				VALUES (:sCodigo, :sCodigoBarras, :sNome, :sDetalhamento, :sFoto, :iCategoria, :iSubCategoria, :fValorCusto, 
+				VALUES (:sCodigo, :sCodigoBarras, :sNome, :sDetalhamento, :sCor, :sTamanho, :sFoto, :iCategoria, :iSubCategoria, :sFamilia, :iFinalistico, :fValorCusto, 
 						:fOutrasDespesas, :fCustoFinal, :fMargemLucro, :fValorVenda, :iEstoqueMinimo, :iUnidadeMedida, :iUnidadeMedidaSaida,
 						:iTipoFiscal, :iNcmFiscal, :iOrigemFiscal, :iCest, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
 		$result = $conn->prepare($sql);
@@ -38,9 +38,13 @@ if(isset($_POST['inputNome'])){
 						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
+						':sCor' => $_POST['cmbCor'],
+						':sTamanho' => $_POST['cmbTamanho'],
 						':sFoto' => isset($_POST['inputFoto']) ? $_POST['inputFoto'] : null,
 						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						':sFamilia' => $_POST['inputFamilia'] == '#' ? null : $_POST['inputFamilia'],
+						':iFinalistico' => $_POST['cmbFinalistico'] == '#' ? null : $_POST['cmbFinalistico'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
 						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
@@ -142,7 +146,7 @@ if(isset($_POST['inputNome'])){
 					if (dados.length){
 						
 						$.each(dados, function(i, obj){
-							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatNome+'</option>';
+							option += '<option value="'+obj.SbCatId+'">'+obj.SbCatCodigo+' - '+obj.SbCatNome+'</option>';
 							codSubCategoria = obj.SbCatCodigo;
 						});						
 						
@@ -486,7 +490,7 @@ if(isset($_POST['inputNome'])){
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 														foreach ($row as $item){															
-															print('<option value="'.$item['CategId'].'" data-codcategoria="'.$item['CategCodigo'].'">'.$item['CategNome'].'</option>');
+															print('<option value="'.$item['CategId'].'" data-codcategoria="'.$item['CategCodigo'].'">'.$item['CategCodigo'].' - '.$item['CategNome'].'</option>');
 														}
 													
 													?>
@@ -515,6 +519,8 @@ if(isset($_POST['inputNome'])){
 												<label for="cmbFinalistico">Finalístico</label>
 												<select id="cmbFinalistico" name="cmbFinalistico" class="form-control select-search">
 													<option value="#">Selecione</option>
+													<option value='SI'>SIM</option>
+                                                    <option value='NA'>NÃO</option>
 
 												</select>
 											</div>
@@ -533,7 +539,15 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbCor">Cor</label>
 												<select id="cmbCor" name="cmbCor" class="form-control select-search">
-													<option value="#">Selecione</option>
+												<option value="#">Selecione</option>
+													<option value='VM'>Vermelho</option>
+                                                    <option value='AZ'>Azul</option>
+													<option value='AM'>Amarelo</option>
+													<option value='VD'>Verde</option>
+													<option value='LA'>Laranja</option>
+													<option value='RO'>Roxo</option>
+													<option value='PR'>Preto</option>
+													<option value='BR'>Branco</option>
 
 												</select>
 											</div>
@@ -543,8 +557,12 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbTamanho">Tamanho</label>
 												<select id="cmbTamanho" name="cmbTamanho" class="form-control select-search">
-													<option value="#">Selecione</option>
+												<option value="#">Selecione</option>
+													<option value='PE'>Pequeno</option>
+                                                    <option value='GR'>Grande</option>
+													<option value='ME'>Médio</option>
 
+												</select>
 												</select>
 											</div>
 										</div>
@@ -564,7 +582,7 @@ if(isset($_POST['inputNome'])){
 														$row = $result->fetchAll(PDO::FETCH_ASSOC);
 
 														foreach ($row as $item){
-															print('<option value="'.$item['UnMedId'].'#'.$item['UnMedSigla'].'">'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
+															print('<option value="'.$item['UnMedId'].'">'.$item['UnMedNome'] . ' (' . $item['UnMedSigla'] . ')' .'</option>');
 														}
 													
 													?>

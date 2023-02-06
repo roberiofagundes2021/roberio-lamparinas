@@ -128,17 +128,17 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			    columnDefs: [
 				{
 					orderable: true,   //Código
-					width: "20%",
+					width: "10%",
 					targets: [0]
 				},
 				{
 					orderable: true,   //SubCategoria
-					width: "30%",
+					width: "35%",
 					targets: [1]
 				},
 				{ 
 					orderable: true,   //Categoria
-					width: "30%",
+					width: "35%",
 					targets: [2]
 				},
 				{ 
@@ -299,10 +299,10 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
 
 									<div class="row">
-										<div class="col-lg-2">
+										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputCodigo">Código </label>
-												<input type="text" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="<?php if (isset($_POST['inputSubCategoriaId'])) echo $rowSubCategoria['SbCatCodigo']; ?>"autofocus>
+												<input type="number" max="999" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="<?php if (isset($_POST['inputSubCategoriaId'])) echo $rowSubCategoria['SbCatCodigo']; ?>"autofocus>
 											</div>
 										</div>
 										<div class="col-lg-4">
@@ -311,7 +311,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="SubCategoria" value="<?php if (isset($_POST['inputSubCategoriaId'])) echo $rowSubCategoria['SbCatNome']; ?>" required>
 											</div>
 										</div>
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
 											<select id="cmbCategoria" name="cmbCategoria" class="form-control select-search" required>
 												<option value="">Selecione</option>
@@ -355,7 +355,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							<table id="tblSubCategoria" class="table">
 								<thead>
 									<tr class="bg-slate">
-										<th>Sub Código</th>
+										<th>Código</th>
 										<th>Sub Categoria</th>
 										<th>Categoria</th>
 										<th>Situação</th>
