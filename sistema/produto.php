@@ -365,7 +365,7 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 										print('
 										<tr>
 											<td>' . $item['ProduFamilia'] . '.' . $item['ProduFinalistico'] . '.' . $item['ProduCodigo'] . '</td>
-											<td class="form-control" data-popup="tooltip" title="'. substr($item['ProduDetalhamento'],0,380).'...">' . $item['ProduNome'] . '</td>
+											<td data-popup="tooltip" title="'. substr($item['ProduDetalhamento'],0,380).'...">' . $item['ProduNome'] . '</td>
 											<td>' . $item['CategNome'] . '</td>
 											<td>' . $item['SbCatNome'] . '</td>
 											' . $tipoValorProduto . '
