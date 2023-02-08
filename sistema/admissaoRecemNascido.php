@@ -20,14 +20,16 @@
     $iUnidade = $_SESSION['UnidadeId'];
 
     //exame físico
-    $sql = "SELECT TOP(1) EnAdPId
-    FROM EnfermagemAdmissaoPediatrica
-    WHERE EnAdPAtendimento = $iAtendimentoId
-    ORDER BY EnAdPId DESC";
+    $sql = "SELECT TOP(1) *
+    FROM EnfermagemAdmissaoRN
+    WHERE EnAdRAtendimento = $iAtendimentoId
+    ORDER BY EnAdRId DESC";
     $result = $conn->query($sql);
-    $rowExameFisico= $result->fetch(PDO::FETCH_ASSOC);
+    $rowAdmissao= $result->fetch(PDO::FETCH_ASSOC);
 
-    $iAtendimentoAdmissaoPediatrica = $rowExameFisico?$rowExameFisico['EnAdPId']:null;
+    $iAtendimentoAdmissaoRN = $rowAdmissao?$rowAdmissao['EnAdRId']:null;
+
+    //var_dump($iAtendimentoAdmissaoRN);die;
 
     $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
     $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
@@ -79,224 +81,489 @@
     }
 
     if(isset($_POST['RN'])){
-        $sql = "INSERT INTO EnfermagemAdmissaoRN(EnAdRAtendimento,EnAdRDataInicio,EnAdRHoraInicio,
-            EnAdRPrevisaoAlta,EnAdRTipoInternacao,EnAdREspecialidadeLeito,EnAdRAla,EnAdRQuarto,EnAdRLeito,
-            EnAdRProfissional,EnAdRNomeMae,EnAdRDataNascimento,EnAdRHoraNascimento,EnAdRSexo,EnAdRChoroPresente,
-            EnAdRApgar1min,EnAdRApgar5min,EnAdRAmamentacao1h,EnAdRMotivoNaoAleitamento,EnAdRFreqCardiaca,
-            EnAdRFreqRespiratoria,EnAdRTemperatura,EnAdRSPO,EnAdRHGT,EnAdRPeso,EnAdRIdadeGestacional,EnAdRFatorRH,
-            EnAdREstatura,EnAdRPerimetroCefalico,EnAdRPerimetroToraxico,EnAdRPerimetroAbdominal,
-            EnAdRAtividadeHipoativo,EnAdRAtividadeSonolento,EnAdRAtividadeAtivo,EnAdRAtividadeChoroso,
-            EnAdRAtividadeGemente,EnAdRAtividadeDescricao,EnAdRColoracaoCorado,EnAdRColoracaoHipoCorado,
-            EnAdRColoracaoCianotico,EnAdRColoracaoIcterico,EnAdRColoracaoPletorico,EnAdRColoracaoDescricao,
-            EnAdRHidratacao,EnAdRFontanela,EnAdRPele,EnAdRPeleDescricao,EnAdRReflexoSuccao,EnAdRReflexoMoro,
-            EnAdRReflexoPreensaoPalmar,EnAdRReflexoPressaoPlantar,EnAdRCabecaEscoriacao,EnAdRCabecaPIG,
-            EnAdRCabecaGIG,EnAdRCabecaBossa,EnAdRCabecaCefalohematoma,EnAdRCabecaMascaraEquimotica,EnAdRAbdome,
-            EnAdRSuccaoSatisfatoria,EnAdRPadraoRespiratorio,EnAdRPadraoRespiratorioDescricao,EnAdRGenturinarioIntegro,
-            EnAdRGenturinarioDiurese,EnAdRGenturinarioAnusPervio,EnAdRGenturinarioMeconio,EnAdRGenturinarioOutro,
-            EnAdRGenturinarioDescricao,EnAdRCotoLimpoSeco,EnAdRCotoGelatinoso,EnAdRCotoMumificado,EnAdRCotoUmido,
-            EnAdRCotoSujo,EnAdRCotoFetido,EnAdRCotoHiperemia,EnAdRCotoDescricao,EnAdRCateter,EnAdRCateterDescricao,
-            EnAdRSonda,EnAdRSondaDescricao,EnAdRDiagnosticoDorAguda,EnAdRDiagnosticoDeficitAutoCuidado,
-            EnAdRDiagnosticoEliminacaoUrinaria,EnAdRDiagnosticoNutricaoDesequilibrada,
-            EnAdRDiagnosticoPadraoRespiratorio,EnAdRDiagnosticoPadraoSono,EnAdRDiagnosticoRiscoConstipacao,
-            EnAdRDiagnosticoRiscoGlicemia,EnAdRDiagnosticoRiscoIctericia,EnAdRDiagnosticoRiscoInfeccao,
-            EnAdRDiagnosticoRiscoIntegridade,EnAdRDiagnosticoRiscoSufocacao,EnAdRDiagnosticoTermoRregulacao,
-            EnAdRDiagnosticoOutro,EnAdRAvaliacaoEnfermagem,EnAdRUnidade)
-        VALUES(:EnAdRAtendimento,
-            :EnAdRDataInicio,
-            :EnAdRHoraInicio,
-            :EnAdRPrevisaoAlta,
-            :EnAdRTipoInternacao,
-            :EnAdREspecialidadeLeito,
-            :EnAdRAla,
-            :EnAdRQuarto,
-            :EnAdRLeito,
-            :EnAdRProfissional,
-            :EnAdRNomeMae,
-            :EnAdRDataNascimento,
-            :EnAdRHoraNascimento,
-            :EnAdRSexo,
-            :EnAdRChoroPresente,
-            :EnAdRApgar1min,
-            :EnAdRApgar5min,
-            :EnAdRAmamentacao1h,
-            :EnAdRMotivoNaoAleitamento,
-            :EnAdRFreqCardiaca,
-            :EnAdRFreqRespiratoria,
-            :EnAdRTemperatura,
-            :EnAdRSPO,
-            :EnAdRHGT,
-            :EnAdRPeso,
-            :EnAdRIdadeGestacional,
-            :EnAdRFatorRH,
-            :EnAdREstatura,
-            :EnAdRPerimetroCefalico,
-            :EnAdRPerimetroToraxico,
-            :EnAdRPerimetroAbdominal,
-            :EnAdRAtividadeHipoativo,
-            :EnAdRAtividadeSonolento,
-            :EnAdRAtividadeAtivo,
-            :EnAdRAtividadeChoroso,
-            :EnAdRAtividadeGemente,
-            :EnAdRAtividadeDescricao,
-            :EnAdRColoracaoCorado,
-            :EnAdRColoracaoHipoCorado,
-            :EnAdRColoracaoCianotico,
-            :EnAdRColoracaoIcterico,
-            :EnAdRColoracaoPletorico,
-            :EnAdRColoracaoDescricao,
-            :EnAdRHidratacao,
-            :EnAdRFontanela,
-            :EnAdRPele,
-            :EnAdRPeleDescricao,
-            :EnAdRReflexoSuccao,
-            :EnAdRReflexoMoro,
-            :EnAdRReflexoPreensaoPalmar,
-            :EnAdRReflexoPressaoPlantar,
-            :EnAdRCabecaEscoriacao,
-            :EnAdRCabecaPIG,
-            :EnAdRCabecaGIG,
-            :EnAdRCabecaBossa,
-            :EnAdRCabecaCefalohematoma,
-            :EnAdRCabecaMascaraEquimotica,
-            :EnAdRAbdome,
-            :EnAdRSuccaoSatisfatoria,
-            :EnAdRPadraoRespiratorio,
-            :EnAdRPadraoRespiratorioDescricao,
-            :EnAdRGenturinarioIntegro,
-            :EnAdRGenturinarioDiurese,
-            :EnAdRGenturinarioAnusPervio,
-            :EnAdRGenturinarioMeconio,
-            :EnAdRGenturinarioOutro,
-            :EnAdRGenturinarioDescricao,
-            :EnAdRCotoLimpoSeco,
-            :EnAdRCotoGelatinoso,
-            :EnAdRCotoMumificado,
-            :EnAdRCotoUmido,
-            :EnAdRCotoSujo,
-            :EnAdRCotoFetido,
-            :EnAdRCotoHiperemia,
-            :EnAdRCotoDescricao,
-            :EnAdRCateter,
-            :EnAdRCateterDescricao,
-            :EnAdRSonda,
-            :EnAdRSondaDescricao,
-            :EnAdRDiagnosticoDorAguda,
-            :EnAdRDiagnosticoDeficitAutoCuidado,
-            :EnAdRDiagnosticoEliminacaoUrinaria,
-            :EnAdRDiagnosticoNutricaoDesequilibrada,
-            :EnAdRDiagnosticoPadraoRespiratorio,
-            :EnAdRDiagnosticoPadraoSono,
-            :EnAdRDiagnosticoRiscoConstipacao,
-            :EnAdRDiagnosticoRiscoGlicemia,
-            :EnAdRDiagnosticoRiscoIctericia,
-            :EnAdRDiagnosticoRiscoInfeccao,
-            :EnAdRDiagnosticoRiscoIntegridade,
-            :EnAdRDiagnosticoRiscoSufocacao,
-            :EnAdRDiagnosticoTermoRregulacao,
-            :EnAdRDiagnosticoOutro,
-            :EnAdRAvaliacaoEnfermagem,
-            :EnAdRUnidade)";
-        $result = $conn->prepare($sql);
 
-        $result->execute(array(
-            ':EnAdRAtendimento' => $iAtendimentoId,
-            ':EnAdRDataInicio' => date('Y-m-d'),
-            ':EnAdRHoraInicio' => date('H:i'),
-            ':EnAdRPrevisaoAlta' => '',
-            ':EnAdRTipoInternacao' => $row['TpIntId'],
-            ':EnAdREspecialidadeLeito' => $row['EsLeiId'],
-            ':EnAdRAla' => $row['AlaId'],
-            ':EnAdRQuarto' => $row['QuartId'],
-            ':EnAdRLeito' => $row['LeitoId'],
-            ':EnAdRProfissional' => $userId, /****/
-            ':EnAdRNomeMae' => isset($_POST['RN'])?$_POST['RN']:'',
-            ':EnAdRDataNascimento' => isset($_POST['dataNascimento'])?$_POST['dataNascimento']:'',
-            ':EnAdRHoraNascimento' => isset($_POST['horaNascimento'])?$_POST['horaNascimento']:'',
-            ':EnAdRSexo' => isset($_POST['sexo'])?$_POST['sexo']:'',
-            ':EnAdRChoroPresente' => isset($_POST['choro'])?($_POST['choro']=="SIM"?1:0):'',
-            ':EnAdRApgar1min' => isset($_POST['Apgar1'])?$_POST['Apgar1']:'',
-            ':EnAdRApgar5min' => isset($_POST['Apgar5'])?$_POST['Apgar5']:'',
-            ':EnAdRAmamentacao1h' => isset($_POST['amamentacao'])?($_POST['amamentacao']=="SIM"?1:0):'',
-            ':EnAdRMotivoNaoAleitamento' => isset($_POST['motivoAleitamento'])?$_POST['motivoAleitamento']:'',
-            ':EnAdRFreqCardiaca' => isset($_POST['FC'])?$_POST['FC']:null,
-            ':EnAdRFreqRespiratoria' => isset($_POST['FR'])?$_POST['FR']:null,
-            ':EnAdRTemperatura' => isset($_POST['Temperatura'])?$_POST['Temperatura']:null,
-            ':EnAdRSPO' => isset($_POST['SPO'])?$_POST['SPO']:null,
-            ':EnAdRHGT' => isset($_POST['HGT'])?$_POST['HGT']:null,
-            ':EnAdRPeso' => isset($_POST['Peso'])?$_POST['Peso']:null,
-            ':EnAdRIdadeGestacional' => isset($_POST['idadeGestacional'])?$_POST['idadeGestacional']:'',
-            ':EnAdRFatorRH' => isset($_POST['fatorRH'])?$_POST['fatorRH']:'',
-            ':EnAdREstatura' => isset($_POST['Estatura'])?$_POST['Estatura']:null,
-            ':EnAdRPerimetroCefalico' => isset($_POST['PC'])?$_POST['PC']:null,
-            ':EnAdRPerimetroToraxico' => isset($_POST['PT'])?$_POST['PT']:null,
-            ':EnAdRPerimetroAbdominal' => isset($_POST['PA'])?$_POST['PA']:null,
-            ':EnAdRAtividadeHipoativo' => isset($_POST['hipoativo'])?1:0,
-            ':EnAdRAtividadeSonolento' => isset($_POST['sonolento'])?1:0,
-            ':EnAdRAtividadeAtivo' => isset($_POST['ativo'])?1:0,
-            ':EnAdRAtividadeChoroso' => isset($_POST['choroso'])?1:0,
-            ':EnAdRAtividadeGemente' => isset($_POST['gemente'])?1:0,
-            ':EnAdRAtividadeDescricao' => isset($_POST['textAtividade'])?$_POST['textAtividade']:'',
-            ':EnAdRColoracaoCorado' => isset($_POST['corado'])?1:0,
-            ':EnAdRColoracaoHipoCorado' => isset($_POST['hipocorado'])?1:0,
-            ':EnAdRColoracaoCianotico' => isset($_POST['cianotico'])?1:0,
-            ':EnAdRColoracaoIcterico' => isset($_POST['icterico'])?1:0,
-            ':EnAdRColoracaoPletorico' => isset($_POST['pletorico'])?1:0,
-            ':EnAdRColoracaoDescricao' => isset($_POST['textColoracao'])?$_POST['textColoracao']:'',
-            ':EnAdRHidratacao' => isset($_POST['hidratacao'])?($_POST['hidratacao']=='S'?1:0):'',
-            ':EnAdRFontanela' => isset($_POST['fontanela'])?$_POST['fontanela']:'',
-            ':EnAdRPele' => isset($_POST['pele'])?$_POST['pele']:'',
-            ':EnAdRPeleDescricao' => isset($_POST['textPele'])?$_POST['textPele']:'',
-            ':EnAdRReflexoSuccao' => isset($_POST['succao'])?1:0,
-            ':EnAdRReflexoMoro' => isset($_POST['moro'])?1:0,
-            ':EnAdRReflexoPreensaoPalmar' => isset($_POST['preensaoPalmar'])?1:0,
-            ':EnAdRReflexoPressaoPlantar' => isset($_POST['pressaoPlantar'])?1:0,
-            // ':EnAdRReflexoDescricao' => isset($_POST['textReflexos'])?$_POST['textReflexos']:'',
-            ':EnAdRCabecaEscoriacao' => isset($_POST['escoriacoes'])?$_POST['escoriacoes']:'',
-            ':EnAdRCabecaPIG' => isset($_POST['pig'])?1:0,
-            ':EnAdRCabecaGIG' => isset($_POST['gig'])?1:0,
-            ':EnAdRCabecaBossa' => isset($_POST['bossa'])?1:0,
-            ':EnAdRCabecaCefalohematoma' => isset($_POST['Cefalohematoma'])?1:0,
-            ':EnAdRCabecaMascaraEquimotica' => isset($_POST['mascaraEquimotica'])?1:0,
-            ':EnAdRAbdome' => isset($_POST['abdome'])?$_POST['abdome']:'',
-            ':EnAdRSuccaoSatisfatoria' => isset($_POST['succao'])?($_POST['succao']=="S"?1:0):null,
-            ':EnAdRPadraoRespiratorio' => isset($_POST['padraoRespiratorio'])?$_POST['padraoRespiratorio']:'',
-            ':EnAdRPadraoRespiratorioDescricao' => isset($_POST['textPadraoRespiratorio'])?$_POST['textPadraoRespiratorio']:'',
-            ':EnAdRGenturinarioIntegro' => isset($_POST['integro'])?1:0,
-            ':EnAdRGenturinarioDiurese' => isset($_POST['diurese'])?1:0,
-            ':EnAdRGenturinarioAnusPervio' => isset($_POST['anusPervio'])?1:0,
-            ':EnAdRGenturinarioMeconio' => isset($_POST['Meconio'])?1:0,
-            ':EnAdRGenturinarioOutro' => isset($_POST['outros'])?1:0,
-            ':EnAdRGenturinarioDescricao' => isset($_POST['textGenturinario'])?$_POST['textGenturinario']:'',
-            ':EnAdRCotoLimpoSeco' => isset($_POST['limpoSeco'])?1:0,
-            ':EnAdRCotoGelatinoso' => isset($_POST['gelatinoso'])?1:0,
-            ':EnAdRCotoMumificado' => isset($_POST['mumificado'])?1:0,
-            ':EnAdRCotoUmido' => isset($_POST['umido'])?1:0,
-            ':EnAdRCotoSujo' => isset($_POST['sujo'])?1:0,
-            ':EnAdRCotoFetido' => isset($_POST['fetido'])?1:0,
-            ':EnAdRCotoHiperemia' => isset($_POST['hiperemia'])?1:0,
-            ':EnAdRCotoDescricao' => isset($_POST['textCotoUmbilical'])?$_POST['textCotoUmbilical']:'',
-            ':EnAdRCateter' => isset($_POST['cateter'])?($_POST['cateter']=="SIM"?1:0):'',
-            ':EnAdRCateterDescricao' => isset($_POST['textCateter'])?$_POST['textCateter']:'',
-            ':EnAdRSonda' => isset($_POST['sonda'])?($_POST['sonda']=="SIM"?1:0):'',
-            ':EnAdRSondaDescricao' => isset($_POST['textSonda'])?$_POST['textSonda']:'',
-            ':EnAdRDiagnosticoDorAguda' => isset($_POST['dorAguda'])?1:0,
-            ':EnAdRDiagnosticoDeficitAutoCuidado' => isset($_POST['deficitAutoCuidado'])?1:0,
-            ':EnAdRDiagnosticoEliminacaoUrinaria' => isset($_POST['eliminacaoUrinaria'])?1:0,
-            ':EnAdRDiagnosticoNutricaoDesequilibrada' => isset($_POST['nutricaoDesequilibrada'])?1:0,
-            ':EnAdRDiagnosticoPadraoRespiratorio' => isset($_POST['padraoRespiratorio'])?1:0,
-            ':EnAdRDiagnosticoPadraoSono' => isset($_POST['padraoSono'])?1:0,
-            ':EnAdRDiagnosticoRiscoConstipacao' => isset($_POST['riscoConstipacao'])?1:0,
-            ':EnAdRDiagnosticoRiscoGlicemia' => isset($_POST['riscoGlicemia'])?1:0,
-            ':EnAdRDiagnosticoRiscoIctericia' => isset($_POST['riscoIctericia'])?1:0,
-            ':EnAdRDiagnosticoRiscoInfeccao' => isset($_POST['riscoInfeccao'])?1:0,
-            ':EnAdRDiagnosticoRiscoIntegridade' => isset($_POST['riscoIntegridade'])?1:0,
-            ':EnAdRDiagnosticoRiscoSufocacao' => isset($_POST['riscoSufocacao'])?1:0,
-            ':EnAdRDiagnosticoTermoRregulacao' => isset($_POST['termorregulacao'])?1:0,
-            ':EnAdRDiagnosticoOutro' => isset($_POST['riscoOutros'])?1:0,
-            ':EnAdRAvaliacaoEnfermagem' => $_POST['textAvaliacao'],
-            ':EnAdRUnidade' => $iUnidade
-        ));
-        irpara('atendimentoHospitalarListagem.php');
+        try {
+
+            if ($iAtendimentoAdmissaoRN) {
+
+                $sql = "UPDATE EnfermagemAdmissaoRN SET 
+                    EnAdRDataInicio = :sEnAdRDataInicio,
+                    EnAdRHoraInicio = :sEnAdRHoraInicio,
+                    EnAdRPrevisaoAlta = :sEnAdRPrevisaoAlta,
+                    EnAdRTipoInternacao = :sEnAdRTipoInternacao,
+                    EnAdREspecialidadeLeito = :sEnAdREspecialidadeLeito,
+                    EnAdRAla = :sEnAdRAla,
+                    EnAdRQuarto = :sEnAdRQuarto,
+                    EnAdRLeito = :sEnAdRLeito,
+                    EnAdRProfissional = :sEnAdRProfissional,
+                    EnAdRNomeMae = :sEnAdRNomeMae,
+                    EnAdRDataNascimento = :sEnAdRDataNascimento,
+                    EnAdRHoraNascimento = :sEnAdRHoraNascimento,
+                    EnAdRSexo = :sEnAdRSexo,
+                    EnAdRChoroPresente = :sEnAdRChoroPresente,
+                    EnAdRApgar1min = :sEnAdRApgar1min,
+                    EnAdRApgar5min = :sEnAdRApgar5min,
+                    EnAdRAmamentacao1h = :sEnAdRAmamentacao1h,
+                    EnAdRMotivoNaoAleitamento = :sEnAdRMotivoNaoAleitamento,
+                    EnAdRFreqCardiaca = :sEnAdRFreqCardiaca,
+                    EnAdRFreqRespiratoria = :sEnAdRFreqRespiratoria,
+                    EnAdRTemperatura = :sEnAdRTemperatura,
+                    EnAdRSPO = :sEnAdRSPO,
+                    EnAdRHGT = :sEnAdRHGT,
+                    EnAdRPeso = :sEnAdRPeso,
+                    EnAdRIdadeGestacional = :sEnAdRIdadeGestacional,
+                    EnAdRFatorRH = :sEnAdRFatorRH,
+                    EnAdREstatura = :sEnAdREstatura,
+                    EnAdRPerimetroCefalico = :sEnAdRPerimetroCefalico,
+                    EnAdRPerimetroToraxico = :sEnAdRPerimetroToraxico,
+                    EnAdRPerimetroAbdominal = :sEnAdRPerimetroAbdominal,
+                    EnAdRAtividadeHipoativo = :sEnAdRAtividadeHipoativo,
+                    EnAdRAtividadeSonolento = :sEnAdRAtividadeSonolento,
+                    EnAdRAtividadeAtivo = :sEnAdRAtividadeAtivo,
+                    EnAdRAtividadeChoroso = :sEnAdRAtividadeChoroso,
+                    EnAdRAtividadeGemente = :sEnAdRAtividadeGemente,
+                    EnAdRAtividadeDescricao = :sEnAdRAtividadeDescricao,
+                    EnAdRColoracaoCorado = :sEnAdRColoracaoCorado,
+                    EnAdRColoracaoHipoCorado = :sEnAdRColoracaoHipoCorado,
+                    EnAdRColoracaoCianotico = :sEnAdRColoracaoCianotico,
+                    EnAdRColoracaoIcterico = :sEnAdRColoracaoIcterico,
+                    EnAdRColoracaoPletorico = :sEnAdRColoracaoPletorico,
+                    EnAdRColoracaoDescricao = :sEnAdRColoracaoDescricao,
+                    EnAdRHidratacao = :sEnAdRHidratacao,
+                    EnAdRFontanela = :sEnAdRFontanela,
+                    EnAdRPele = :sEnAdRPele,
+                    EnAdRPeleDescricao = :sEnAdRPeleDescricao,
+                    EnAdRReflexoSuccao = :sEnAdRReflexoSuccao,
+                    EnAdRReflexoMoro = :sEnAdRReflexoMoro,
+                    EnAdRReflexoPreensaoPalmar = :sEnAdRReflexoPreensaoPalmar,
+                    EnAdRReflexoPressaoPlantar = :sEnAdRReflexoPressaoPlantar,
+                    EnAdRCabecaEscoriacao = :sEnAdRCabecaEscoriacao,
+                    EnAdRCabecaPIG = :sEnAdRCabecaPIG,
+                    EnAdRCabecaGIG = :sEnAdRCabecaGIG,
+                    EnAdRCabecaBossa = :sEnAdRCabecaBossa,
+                    EnAdRCabecaCefalohematoma = :sEnAdRCabecaCefalohematoma,
+                    EnAdRCabecaMascaraEquimotica = :sEnAdRCabecaMascaraEquimotica,
+                    EnAdRAbdome = :sEnAdRAbdome,
+                    EnAdRSuccaoSatisfatoria = :sEnAdRSuccaoSatisfatoria,
+                    EnAdRPadraoRespiratorio = :sEnAdRPadraoRespiratorio,
+                    EnAdRPadraoRespiratorioDescricao = :sEnAdRPadraoRespiratorioDescricao,
+                    EnAdRGenturinarioIntegro = :sEnAdRGenturinarioIntegro,
+                    EnAdRGenturinarioDiurese = :sEnAdRGenturinarioDiurese,
+                    EnAdRGenturinarioAnusPervio = :sEnAdRGenturinarioAnusPervio,
+                    EnAdRGenturinarioMeconio = :sEnAdRGenturinarioMeconio,
+                    EnAdRGenturinarioOutro = :sEnAdRGenturinarioOutro,
+                    EnAdRGenturinarioDescricao = :sEnAdRGenturinarioDescricao,
+                    EnAdRCotoLimpoSeco = :sEnAdRCotoLimpoSeco,
+                    EnAdRCotoGelatinoso = :sEnAdRCotoGelatinoso,
+                    EnAdRCotoMumificado = :sEnAdRCotoMumificado,
+                    EnAdRCotoUmido = :sEnAdRCotoUmido,
+                    EnAdRCotoSujo = :sEnAdRCotoSujo,
+                    EnAdRCotoFetido = :sEnAdRCotoFetido,
+                    EnAdRCotoHiperemia = :sEnAdRCotoHiperemia,
+                    EnAdRCotoDescricao = :sEnAdRCotoDescricao,
+                    EnAdRCateter = :sEnAdRCateter,
+                    EnAdRCateterDescricao = :sEnAdRCateterDescricao,
+                    EnAdRSonda = :sEnAdRSonda,
+                    EnAdRSondaDescricao = :sEnAdRSondaDescricao,
+                    EnAdRDiagnosticoDorAguda = :sEnAdRDiagnosticoDorAguda,
+                    EnAdRDiagnosticoDeficitAutoCuidado = :sEnAdRDiagnosticoDeficitAutoCuidado,
+                    EnAdRDiagnosticoEliminacaoUrinaria = :sEnAdRDiagnosticoEliminacaoUrinaria,
+                    EnAdRDiagnosticoNutricaoDesequilibrada = :sEnAdRDiagnosticoNutricaoDesequilibrada,
+                    EnAdRDiagnosticoPadraoRespiratorio = :sEnAdRDiagnosticoPadraoRespiratorio,
+                    EnAdRDiagnosticoPadraoSono = :sEnAdRDiagnosticoPadraoSono,
+                    EnAdRDiagnosticoRiscoConstipacao = :sEnAdRDiagnosticoRiscoConstipacao,
+                    EnAdRDiagnosticoRiscoGlicemia = :sEnAdRDiagnosticoRiscoGlicemia,
+                    EnAdRDiagnosticoRiscoIctericia = :sEnAdRDiagnosticoRiscoIctericia,
+                    EnAdRDiagnosticoRiscoInfeccao = :sEnAdRDiagnosticoRiscoInfeccao,
+                    EnAdRDiagnosticoRiscoIntegridade = :sEnAdRDiagnosticoRiscoIntegridade,
+                    EnAdRDiagnosticoRiscoSufocacao = :sEnAdRDiagnosticoRiscoSufocacao,
+                    EnAdRDiagnosticoTermoRregulacao = :sEnAdRDiagnosticoTermoRregulacao,
+                    EnAdRDiagnosticoOutro = :sEnAdRDiagnosticoOutro,
+                    EnAdRAvaliacaoEnfermagem = :sEnAdRAvaliacaoEnfermagem,
+                    EnAdRUnidade = :sEnAdRUnidade          
+                    WHERE EnAdRId = :sAdmissaoId";
+
+                $result->execute(array(
+
+                    ':sEnAdRDataInicio' => date('Y-m-d'),
+                    ':sEnAdRHoraInicio' => date('H:i'),
+                    ':sEnAdRPrevisaoAlta' => '',
+                    ':sEnAdRTipoInternacao' => $row['TpIntId'],
+                    ':sEnAdREspecialidadeLeito' => $row['EsLeiId'],
+                    ':sEnAdRAla' => $row['AlaId'],
+                    ':sEnAdRQuarto' => $row['QuartId'],
+                    ':sEnAdRLeito' => $row['LeitoId'],
+                    ':sEnAdRProfissional' => $userId, /****/
+                    ':sEnAdRNomeMae' => $_POST['RN'] == "" ? null : $_POST['RN'],
+                    ':sEnAdRDataNascimento' => $_POST['dataNascimento'] == "" ? null : $_POST['dataNascimento'], 
+                    ':sEnAdRHoraNascimento' => $_POST['horaNascimento'] == "" ? null : $_POST['horaNascimento'],
+                    ':sEnAdRSexo' =>$_POST['sexo'] == "" ? null : $_POST['sexo'],
+                    ':sEnAdRChoroPresente' => isset($_POST['choro'])?($_POST['choro']=="SIM"?1:0):'',
+                    ':sEnAdRApgar1min' => $_POST['Apgar1'] == "" ? null : $_POST['Apgar1'],
+                    ':sEnAdRApgar5min' => $_POST['Apgar5'] == "" ? null : $_POST['Apgar5'],
+                    ':sEnAdRAmamentacao1h' => isset($_POST['amamentacao'])?($_POST['amamentacao']=="SIM"?1:0):'',                        
+                    ':sEnAdRMotivoNaoAleitamento' => $_POST['motivoAleitamento'] == "" ? null : $_POST['motivoAleitamento'],
+                    ':sEnAdRFreqCardiaca' => $_POST['FC'] == "" ? null : $_POST['FC'], 
+                    ':sEnAdRFreqRespiratoria' => $_POST['FR'] == "" ? null : $_POST['FR'],   
+                    ':sEnAdRTemperatura' => $_POST['Temperatura'] == "" ? null : $_POST['Temperatura'],
+                    ':sEnAdRSPO' => $_POST['SPO'] == "" ? null : $_POST['SPO'],
+                    ':sEnAdRHGT' => $_POST['HGT'] == "" ? null : $_POST['HGT'],
+                    ':sEnAdRPeso' => $_POST['Peso'] == "" ? null : $_POST['Peso'],
+                    ':sEnAdRIdadeGestacional' => $_POST['idadeGestacional'] == "" ? null : $_POST['idadeGestacional'], 
+                    ':sEnAdRFatorRH' => $_POST['fatorRH'] == "" ? null : $_POST['fatorRH'], 
+                    ':sEnAdREstatura' => $_POST['Estatura'] == "" ? null : $_POST['Estatura'],
+                    ':sEnAdRPerimetroCefalico' => $_POST['PC'] == "" ? null : $_POST['PC'], 
+                    ':sEnAdRPerimetroToraxico' => $_POST['PT'] == "" ? null : $_POST['PT'], 
+                    ':sEnAdRPerimetroAbdominal' => $_POST['PA'] == "" ? null : $_POST['PA'],
+                    ':sEnAdRAtividadeHipoativo' => isset($_POST['hipoativo'])?1:0,
+                    ':sEnAdRAtividadeSonolento' => isset($_POST['sonolento'])?1:0,
+                    ':sEnAdRAtividadeAtivo' => isset($_POST['ativo'])?1:0,
+                    ':sEnAdRAtividadeChoroso' => isset($_POST['choroso'])?1:0,
+                    ':sEnAdRAtividadeGemente' => isset($_POST['gemente'])?1:0,
+                    ':sEnAdRAtividadeDescricao' => $_POST['textAtividade'] == "" ? null : $_POST['textAtividade'],
+                    ':sEnAdRColoracaoCorado' => isset($_POST['corado'])?1:0,
+                    ':sEnAdRColoracaoHipoCorado' => isset($_POST['hipocorado'])?1:0,
+                    ':sEnAdRColoracaoCianotico' => isset($_POST['cianotico'])?1:0,
+                    ':sEnAdRColoracaoIcterico' => isset($_POST['icterico'])?1:0,
+                    ':sEnAdRColoracaoPletorico' => isset($_POST['pletorico'])?1:0,
+                    ':sEnAdRColoracaoDescricao' => $_POST['textColoracao'] == "" ? null : $_POST['textColoracao'],
+                    ':sEnAdRHidratacao' => isset($_POST['hidratacao'])?($_POST['hidratacao']=='S'?1:0):null,
+                    ':sEnAdRFontanela' => $_POST['fontanela'] == "" ? null : $_POST['fontanela'],
+                    ':sEnAdRPele' => isset($_POST['pele'])?$_POST['pele']:'',
+                    ':sEnAdRPeleDescricao' => $_POST['textPele'] == "" ? null : $_POST['textPele'], 
+                    ':sEnAdRReflexoSuccao' => isset($_POST['succaoR'])?1:0,
+                    ':sEnAdRReflexoMoro' => isset($_POST['moro'])?1:0,
+                    ':sEnAdRReflexoPreensaoPalmar' => isset($_POST['preensaoPalmar'])?1:0,
+                    ':sEnAdRReflexoPressaoPlantar' => isset($_POST['pressaoPlantar'])?1:0,
+                    ':sEnAdRCabecaEscoriacao' => isset($_POST['escoriacoes'])?$_POST['escoriacoes']:null,
+                    ':sEnAdRCabecaPIG' => isset($_POST['pig'])?1:0,
+                    ':sEnAdRCabecaGIG' => isset($_POST['gig'])?1:0,
+                    ':sEnAdRCabecaBossa' => isset($_POST['bossa'])?1:0,
+                    ':sEnAdRCabecaCefalohematoma' => isset($_POST['Cefalohematoma'])?1:0,
+                    ':sEnAdRCabecaMascaraEquimotica' => isset($_POST['mascaraEquimotica'])?1:0,
+                    ':sEnAdRAbdome' => $_POST['abdome'] == "" ? null : $_POST['abdome'], 
+                    ':sEnAdRSuccaoSatisfatoria' => isset($_POST['succao'])?($_POST['succao']=="S"?1:0):null,
+                    ':sEnAdRPadraoRespiratorio' => isset($_POST['padraoRespiratorio'])?$_POST['padraoRespiratorio']:'',
+                    ':sEnAdRPadraoRespiratorioDescricao' => $_POST['textPadraoRespiratorio'] == "" ? null : $_POST['textPadraoRespiratorio'], 
+                    ':sEnAdRGenturinarioIntegro' => isset($_POST['integro'])?1:0,
+                    ':sEnAdRGenturinarioDiurese' => isset($_POST['diurese'])?1:0,
+                    ':sEnAdRGenturinarioAnusPervio' => isset($_POST['anusPervio'])?1:0,
+                    ':sEnAdRGenturinarioMeconio' => isset($_POST['Meconio'])?1:0,
+                    ':sEnAdRGenturinarioOutro' => isset($_POST['outros'])?1:0,
+                    ':sEnAdRGenturinarioDescricao' => $_POST['textGenturinario'] == "" ? null : $_POST['textGenturinario'],
+                    ':sEnAdRCotoLimpoSeco' => isset($_POST['limpoSeco'])?1:0,
+                    ':sEnAdRCotoGelatinoso' => isset($_POST['gelatinoso'])?1:0,
+                    ':sEnAdRCotoMumificado' => isset($_POST['mumificado'])?1:0,
+                    ':sEnAdRCotoUmido' => isset($_POST['umido'])?1:0,
+                    ':sEnAdRCotoSujo' => isset($_POST['sujo'])?1:0,
+                    ':sEnAdRCotoFetido' => isset($_POST['fetido'])?1:0,
+                    ':sEnAdRCotoHiperemia' => isset($_POST['hiperemia'])?1:0,
+                    ':sEnAdRCotoDescricao' => $_POST['textCotoUmbilical'] == "" ? null : $_POST['textCotoUmbilical'], 
+                    ':sEnAdRCateter' => isset($_POST['cateter'])?($_POST['cateter']=="SIM"?1:0):'',
+                    ':sEnAdRCateterDescricao' => $_POST['textCateter'] == "" ? null : $_POST['textCateter'],
+                    ':sEnAdRSonda' => isset($_POST['sonda'])?($_POST['sonda']=="SIM"?1:0):'',
+                    ':sEnAdRSondaDescricao' => $_POST['textSonda'] == "" ? null : $_POST['textSonda'], 
+                    ':sEnAdRDiagnosticoDorAguda' => isset($_POST['dorAguda'])?1:0,
+                    ':sEnAdRDiagnosticoDeficitAutoCuidado' => isset($_POST['deficitAutoCuidado'])?1:0,
+                    ':sEnAdRDiagnosticoEliminacaoUrinaria' => isset($_POST['eliminacaoUrinaria'])?1:0,
+                    ':sEnAdRDiagnosticoNutricaoDesequilibrada' => isset($_POST['nutricaoDesequilibrada'])?1:0,
+                    ':sEnAdRDiagnosticoPadraoRespiratorio' => isset($_POST['padraoRespiratorio'])?1:0,
+                    ':sEnAdRDiagnosticoPadraoSono' => isset($_POST['padraoSono'])?1:0,
+                    ':sEnAdRDiagnosticoRiscoConstipacao' => isset($_POST['riscoConstipacao'])?1:0,
+                    ':sEnAdRDiagnosticoRiscoGlicemia' => isset($_POST['riscoGlicemia'])?1:0,
+                    ':sEnAdRDiagnosticoRiscoIctericia' => isset($_POST['riscoIctericia'])?1:0,
+                    ':sEnAdRDiagnosticoRiscoInfeccao' => isset($_POST['riscoInfeccao'])?1:0,
+                    ':sEnAdRDiagnosticoRiscoIntegridade' => isset($_POST['riscoIntegridade'])?1:0,
+                    ':sEnAdRDiagnosticoRiscoSufocacao' => isset($_POST['riscoSufocacao'])?1:0,
+                    ':sEnAdRDiagnosticoTermoRregulacao' => isset($_POST['termorregulacao'])?1:0,
+                    ':sEnAdRDiagnosticoOutro' => isset($_POST['riscoOutros'])?1:0,
+                    ':sEnAdRAvaliacaoEnfermagem' => $_POST['textAvaliacao'] == "" ? null : $_POST['textAvaliacao'],
+                    ':sEnAdRUnidade' => $iUnidade,
+                    ':sAdmissaoId' => $iAtendimentoAdmissaoRN
+                ));
+
+
+                $_SESSION['msg']['titulo'] = "Sucesso";
+                $_SESSION['msg']['mensagem'] = "Admissão alterada com sucesso!!!";
+                $_SESSION['msg']['tipo'] = "success";
+                $_SESSION['iAtendimentoId'] = $iAtendimentoId;
+
+
+            }else {
+
+                $sql = "INSERT INTO EnfermagemAdmissaoRN(EnAdRAtendimento,EnAdRDataInicio,EnAdRHoraInicio,
+                    EnAdRPrevisaoAlta,EnAdRTipoInternacao,EnAdREspecialidadeLeito,EnAdRAla,EnAdRQuarto,EnAdRLeito,
+                    EnAdRProfissional,EnAdRNomeMae,EnAdRDataNascimento,EnAdRHoraNascimento,EnAdRSexo,EnAdRChoroPresente,
+                    EnAdRApgar1min,EnAdRApgar5min,EnAdRAmamentacao1h,EnAdRMotivoNaoAleitamento,EnAdRFreqCardiaca,
+                    EnAdRFreqRespiratoria,EnAdRTemperatura,EnAdRSPO,EnAdRHGT,EnAdRPeso,EnAdRIdadeGestacional,EnAdRFatorRH,
+                    EnAdREstatura,EnAdRPerimetroCefalico,EnAdRPerimetroToraxico,EnAdRPerimetroAbdominal,
+                    EnAdRAtividadeHipoativo,EnAdRAtividadeSonolento,EnAdRAtividadeAtivo,EnAdRAtividadeChoroso,
+                    EnAdRAtividadeGemente,EnAdRAtividadeDescricao,EnAdRColoracaoCorado,EnAdRColoracaoHipoCorado,
+                    EnAdRColoracaoCianotico,EnAdRColoracaoIcterico,EnAdRColoracaoPletorico,EnAdRColoracaoDescricao,
+                    EnAdRHidratacao,EnAdRFontanela,EnAdRPele,EnAdRPeleDescricao,EnAdRReflexoSuccao,EnAdRReflexoMoro,
+                    EnAdRReflexoPreensaoPalmar,EnAdRReflexoPressaoPlantar,EnAdRCabecaEscoriacao,EnAdRCabecaPIG,
+                    EnAdRCabecaGIG,EnAdRCabecaBossa,EnAdRCabecaCefalohematoma,EnAdRCabecaMascaraEquimotica,EnAdRAbdome,
+                    EnAdRSuccaoSatisfatoria,EnAdRPadraoRespiratorio,EnAdRPadraoRespiratorioDescricao,EnAdRGenturinarioIntegro,
+                    EnAdRGenturinarioDiurese,EnAdRGenturinarioAnusPervio,EnAdRGenturinarioMeconio,EnAdRGenturinarioOutro,
+                    EnAdRGenturinarioDescricao,EnAdRCotoLimpoSeco,EnAdRCotoGelatinoso,EnAdRCotoMumificado,EnAdRCotoUmido,
+                    EnAdRCotoSujo,EnAdRCotoFetido,EnAdRCotoHiperemia,EnAdRCotoDescricao,EnAdRCateter,EnAdRCateterDescricao,
+                    EnAdRSonda,EnAdRSondaDescricao,EnAdRDiagnosticoDorAguda,EnAdRDiagnosticoDeficitAutoCuidado,
+                    EnAdRDiagnosticoEliminacaoUrinaria,EnAdRDiagnosticoNutricaoDesequilibrada,
+                    EnAdRDiagnosticoPadraoRespiratorio,EnAdRDiagnosticoPadraoSono,EnAdRDiagnosticoRiscoConstipacao,
+                    EnAdRDiagnosticoRiscoGlicemia,EnAdRDiagnosticoRiscoIctericia,EnAdRDiagnosticoRiscoInfeccao,
+                    EnAdRDiagnosticoRiscoIntegridade,EnAdRDiagnosticoRiscoSufocacao,EnAdRDiagnosticoTermoRregulacao,
+                    EnAdRDiagnosticoOutro,EnAdRAvaliacaoEnfermagem,EnAdRUnidade)
+                VALUES(:EnAdRAtendimento,
+                    :EnAdRDataInicio,
+                    :EnAdRHoraInicio,
+                    :EnAdRPrevisaoAlta,
+                    :EnAdRTipoInternacao,
+                    :EnAdREspecialidadeLeito,
+                    :EnAdRAla,
+                    :EnAdRQuarto,
+                    :EnAdRLeito,
+                    :EnAdRProfissional,
+                    :EnAdRNomeMae,
+                    :EnAdRDataNascimento,
+                    :EnAdRHoraNascimento,
+                    :EnAdRSexo,
+                    :EnAdRChoroPresente,
+                    :EnAdRApgar1min,
+                    :EnAdRApgar5min,
+                    :EnAdRAmamentacao1h,
+                    :EnAdRMotivoNaoAleitamento,
+                    :EnAdRFreqCardiaca,
+                    :EnAdRFreqRespiratoria,
+                    :EnAdRTemperatura,
+                    :EnAdRSPO,
+                    :EnAdRHGT,
+                    :EnAdRPeso,
+                    :EnAdRIdadeGestacional,
+                    :EnAdRFatorRH,
+                    :EnAdREstatura,
+                    :EnAdRPerimetroCefalico,
+                    :EnAdRPerimetroToraxico,
+                    :EnAdRPerimetroAbdominal,
+                    :EnAdRAtividadeHipoativo,
+                    :EnAdRAtividadeSonolento,
+                    :EnAdRAtividadeAtivo,
+                    :EnAdRAtividadeChoroso,
+                    :EnAdRAtividadeGemente,
+                    :EnAdRAtividadeDescricao,
+                    :EnAdRColoracaoCorado,
+                    :EnAdRColoracaoHipoCorado,
+                    :EnAdRColoracaoCianotico,
+                    :EnAdRColoracaoIcterico,
+                    :EnAdRColoracaoPletorico,
+                    :EnAdRColoracaoDescricao,
+                    :EnAdRHidratacao,
+                    :EnAdRFontanela,
+                    :EnAdRPele,
+                    :EnAdRPeleDescricao,
+                    :EnAdRReflexoSuccao,
+                    :EnAdRReflexoMoro,
+                    :EnAdRReflexoPreensaoPalmar,
+                    :EnAdRReflexoPressaoPlantar,
+                    :EnAdRCabecaEscoriacao,
+                    :EnAdRCabecaPIG,
+                    :EnAdRCabecaGIG,
+                    :EnAdRCabecaBossa,
+                    :EnAdRCabecaCefalohematoma,
+                    :EnAdRCabecaMascaraEquimotica,
+                    :EnAdRAbdome,
+                    :EnAdRSuccaoSatisfatoria,
+                    :EnAdRPadraoRespiratorio,
+                    :EnAdRPadraoRespiratorioDescricao,
+                    :EnAdRGenturinarioIntegro,
+                    :EnAdRGenturinarioDiurese,
+                    :EnAdRGenturinarioAnusPervio,
+                    :EnAdRGenturinarioMeconio,
+                    :EnAdRGenturinarioOutro,
+                    :EnAdRGenturinarioDescricao,
+                    :EnAdRCotoLimpoSeco,
+                    :EnAdRCotoGelatinoso,
+                    :EnAdRCotoMumificado,
+                    :EnAdRCotoUmido,
+                    :EnAdRCotoSujo,
+                    :EnAdRCotoFetido,
+                    :EnAdRCotoHiperemia,
+                    :EnAdRCotoDescricao,
+                    :EnAdRCateter,
+                    :EnAdRCateterDescricao,
+                    :EnAdRSonda,
+                    :EnAdRSondaDescricao,
+                    :EnAdRDiagnosticoDorAguda,
+                    :EnAdRDiagnosticoDeficitAutoCuidado,
+                    :EnAdRDiagnosticoEliminacaoUrinaria,
+                    :EnAdRDiagnosticoNutricaoDesequilibrada,
+                    :EnAdRDiagnosticoPadraoRespiratorio,
+                    :EnAdRDiagnosticoPadraoSono,
+                    :EnAdRDiagnosticoRiscoConstipacao,
+                    :EnAdRDiagnosticoRiscoGlicemia,
+                    :EnAdRDiagnosticoRiscoIctericia,
+                    :EnAdRDiagnosticoRiscoInfeccao,
+                    :EnAdRDiagnosticoRiscoIntegridade,
+                    :EnAdRDiagnosticoRiscoSufocacao,
+                    :EnAdRDiagnosticoTermoRregulacao,
+                    :EnAdRDiagnosticoOutro,
+                    :EnAdRAvaliacaoEnfermagem,
+                    :EnAdRUnidade)";
+                $result = $conn->prepare($sql);
+
+                $result->execute(array(
+                    ':EnAdRAtendimento' => $iAtendimentoId,
+                    ':EnAdRDataInicio' => date('Y-m-d'),
+                    ':EnAdRHoraInicio' => date('H:i'),
+                    ':EnAdRPrevisaoAlta' => '',
+                    ':EnAdRTipoInternacao' => $row['TpIntId'],
+                    ':EnAdREspecialidadeLeito' => $row['EsLeiId'],
+                    ':EnAdRAla' => $row['AlaId'],
+                    ':EnAdRQuarto' => $row['QuartId'],
+                    ':EnAdRLeito' => $row['LeitoId'],
+                    ':EnAdRProfissional' => $userId, /****/
+
+                    ':EnAdRNomeMae' => $_POST['RN'] == "" ? null : $_POST['RN'],
+
+                    ':EnAdRDataNascimento' => $_POST['dataNascimento'] == "" ? null : $_POST['dataNascimento'], 
+                    ':EnAdRHoraNascimento' => $_POST['horaNascimento'] == "" ? null : $_POST['horaNascimento'],
+                    ':EnAdRSexo' =>$_POST['sexo'] == "" ? null : $_POST['sexo'],
+
+                    ':EnAdRChoroPresente' => isset($_POST['choro'])?($_POST['choro']=="SIM"?1:0):'',
+
+                    ':EnAdRApgar1min' => $_POST['Apgar1'] == "" ? null : $_POST['Apgar1'],
+                    ':EnAdRApgar5min' => $_POST['Apgar5'] == "" ? null : $_POST['Apgar5'],
+
+                    ':EnAdRAmamentacao1h' => isset($_POST['amamentacao'])?($_POST['amamentacao']=="SIM"?1:0):'',
+                        
+                    ':EnAdRMotivoNaoAleitamento' => $_POST['motivoAleitamento'] == "" ? null : $_POST['motivoAleitamento'],
+                    ':EnAdRFreqCardiaca' => $_POST['FC'] == "" ? null : $_POST['FC'], 
+                    ':EnAdRFreqRespiratoria' => $_POST['FR'] == "" ? null : $_POST['FR'],   
+
+                    ':EnAdRTemperatura' => $_POST['Temperatura'] == "" ? null : $_POST['Temperatura'],
+                    ':EnAdRSPO' => $_POST['SPO'] == "" ? null : $_POST['SPO'],
+                    ':EnAdRHGT' => $_POST['HGT'] == "" ? null : $_POST['HGT'],
+                    ':EnAdRPeso' => $_POST['Peso'] == "" ? null : $_POST['Peso'],
+                    ':EnAdRIdadeGestacional' => $_POST['idadeGestacional'] == "" ? null : $_POST['idadeGestacional'], 
+                    ':EnAdRFatorRH' => $_POST['fatorRH'] == "" ? null : $_POST['fatorRH'], 
+                    ':EnAdREstatura' => $_POST['Estatura'] == "" ? null : $_POST['Estatura'],
+
+                    ':EnAdRPerimetroCefalico' => $_POST['PC'] == "" ? null : $_POST['PC'], 
+                    ':EnAdRPerimetroToraxico' => $_POST['PT'] == "" ? null : $_POST['PT'], 
+                    ':EnAdRPerimetroAbdominal' => $_POST['PA'] == "" ? null : $_POST['PA'],
+
+                    ':EnAdRAtividadeHipoativo' => isset($_POST['hipoativo'])?1:0,
+                    ':EnAdRAtividadeSonolento' => isset($_POST['sonolento'])?1:0,
+                    ':EnAdRAtividadeAtivo' => isset($_POST['ativo'])?1:0,
+                    ':EnAdRAtividadeChoroso' => isset($_POST['choroso'])?1:0,
+                    ':EnAdRAtividadeGemente' => isset($_POST['gemente'])?1:0,
+
+                    ':EnAdRAtividadeDescricao' => $_POST['textAtividade'] == "" ? null : $_POST['textAtividade'],
+
+                    ':EnAdRColoracaoCorado' => isset($_POST['corado'])?1:0,
+                    ':EnAdRColoracaoHipoCorado' => isset($_POST['hipocorado'])?1:0,
+                    ':EnAdRColoracaoCianotico' => isset($_POST['cianotico'])?1:0,
+                    ':EnAdRColoracaoIcterico' => isset($_POST['icterico'])?1:0,
+                    ':EnAdRColoracaoPletorico' => isset($_POST['pletorico'])?1:0,
+
+                    ':EnAdRColoracaoDescricao' => $_POST['textColoracao'] == "" ? null : $_POST['textColoracao'],
+                    ':EnAdRHidratacao' => isset($_POST['hidratacao'])?($_POST['hidratacao']=='S'?1:0):null,
+                    ':EnAdRFontanela' => $_POST['fontanela'] == "" ? null : $_POST['fontanela'],
+
+                    ':EnAdRPele' => isset($_POST['pele'])?$_POST['pele']:'',
+
+
+                    ':EnAdRPeleDescricao' => $_POST['textPele'] == "" ? null : $_POST['textPele'], 
+
+
+                    ':EnAdRReflexoSuccao' => isset($_POST['succaoR'])?1:0,
+                    ':EnAdRReflexoMoro' => isset($_POST['moro'])?1:0,
+                    ':EnAdRReflexoPreensaoPalmar' => isset($_POST['preensaoPalmar'])?1:0,
+                    ':EnAdRReflexoPressaoPlantar' => isset($_POST['pressaoPlantar'])?1:0,
+                    // ':EnAdRReflexoDescricao' => isset($_POST['textReflexos'])?$_POST['textReflexos']:'',
+                    ':EnAdRCabecaEscoriacao' => isset($_POST['escoriacoes'])?$_POST['escoriacoes']:null,
+                    ':EnAdRCabecaPIG' => isset($_POST['pig'])?1:0,
+                    ':EnAdRCabecaGIG' => isset($_POST['gig'])?1:0,
+                    ':EnAdRCabecaBossa' => isset($_POST['bossa'])?1:0,
+                    ':EnAdRCabecaCefalohematoma' => isset($_POST['Cefalohematoma'])?1:0,
+                    ':EnAdRCabecaMascaraEquimotica' => isset($_POST['mascaraEquimotica'])?1:0,
+
+
+                    ':EnAdRAbdome' => $_POST['abdome'] == "" ? null : $_POST['abdome'], 
+
+                    ':EnAdRSuccaoSatisfatoria' => isset($_POST['succao'])?($_POST['succao']=="S"?1:0):null,
+
+                    ':EnAdRPadraoRespiratorio' => isset($_POST['padraoRespiratorio'])?$_POST['padraoRespiratorio']:'',
+
+                    ':EnAdRPadraoRespiratorioDescricao' => $_POST['textPadraoRespiratorio'] == "" ? null : $_POST['textPadraoRespiratorio'], 
+
+                    ':EnAdRGenturinarioIntegro' => isset($_POST['integro'])?1:0,
+                    ':EnAdRGenturinarioDiurese' => isset($_POST['diurese'])?1:0,
+                    ':EnAdRGenturinarioAnusPervio' => isset($_POST['anusPervio'])?1:0,
+                    ':EnAdRGenturinarioMeconio' => isset($_POST['Meconio'])?1:0,
+                    ':EnAdRGenturinarioOutro' => isset($_POST['outros'])?1:0,
+
+
+                    ':EnAdRGenturinarioDescricao' => $_POST['textGenturinario'] == "" ? null : $_POST['textGenturinario'],
+
+
+                    ':EnAdRCotoLimpoSeco' => isset($_POST['limpoSeco'])?1:0,
+                    ':EnAdRCotoGelatinoso' => isset($_POST['gelatinoso'])?1:0,
+                    ':EnAdRCotoMumificado' => isset($_POST['mumificado'])?1:0,
+                    ':EnAdRCotoUmido' => isset($_POST['umido'])?1:0,
+                    ':EnAdRCotoSujo' => isset($_POST['sujo'])?1:0,
+                    ':EnAdRCotoFetido' => isset($_POST['fetido'])?1:0,
+                    ':EnAdRCotoHiperemia' => isset($_POST['hiperemia'])?1:0,
+
+
+                    ':EnAdRCotoDescricao' => $_POST['textCotoUmbilical'] == "" ? null : $_POST['textCotoUmbilical'], 
+
+
+                    ':EnAdRCateter' => isset($_POST['cateter'])?($_POST['cateter']=="SIM"?1:0):'',
+
+
+                    ':EnAdRCateterDescricao' => $_POST['textCateter'] == "" ? null : $_POST['textCateter'],
+
+
+                    ':EnAdRSonda' => isset($_POST['sonda'])?($_POST['sonda']=="SIM"?1:0):'',
+
+
+                    ':EnAdRSondaDescricao' => $_POST['textSonda'] == "" ? null : $_POST['textSonda'], 
+
+
+                    ':EnAdRDiagnosticoDorAguda' => isset($_POST['dorAguda'])?1:0,
+                    ':EnAdRDiagnosticoDeficitAutoCuidado' => isset($_POST['deficitAutoCuidado'])?1:0,
+                    ':EnAdRDiagnosticoEliminacaoUrinaria' => isset($_POST['eliminacaoUrinaria'])?1:0,
+                    ':EnAdRDiagnosticoNutricaoDesequilibrada' => isset($_POST['nutricaoDesequilibrada'])?1:0,
+                    ':EnAdRDiagnosticoPadraoRespiratorio' => isset($_POST['padraoRespiratorio'])?1:0,
+                    ':EnAdRDiagnosticoPadraoSono' => isset($_POST['padraoSono'])?1:0,
+                    ':EnAdRDiagnosticoRiscoConstipacao' => isset($_POST['riscoConstipacao'])?1:0,
+                    ':EnAdRDiagnosticoRiscoGlicemia' => isset($_POST['riscoGlicemia'])?1:0,
+                    ':EnAdRDiagnosticoRiscoIctericia' => isset($_POST['riscoIctericia'])?1:0,
+                    ':EnAdRDiagnosticoRiscoInfeccao' => isset($_POST['riscoInfeccao'])?1:0,
+                    ':EnAdRDiagnosticoRiscoIntegridade' => isset($_POST['riscoIntegridade'])?1:0,
+                    ':EnAdRDiagnosticoRiscoSufocacao' => isset($_POST['riscoSufocacao'])?1:0,
+                    ':EnAdRDiagnosticoTermoRregulacao' => isset($_POST['termorregulacao'])?1:0,
+                    ':EnAdRDiagnosticoOutro' => isset($_POST['riscoOutros'])?1:0,
+                    ':EnAdRAvaliacaoEnfermagem' => $_POST['textAvaliacao'] == "" ? null : $_POST['textAvaliacao'],
+                    ':EnAdRUnidade' => $iUnidade
+                ));
+
+                $_SESSION['msg']['titulo'] = "Sucesso";
+                $_SESSION['msg']['mensagem'] = "Admissão inserida com sucesso!!!";
+                $_SESSION['msg']['tipo'] = "success";	
+                $_SESSION['iAtendimentoId'] = $iAtendimentoId;
+
+            }
+
+        } catch (PDOException $e) {
+            $_SESSION['msg']['titulo'] = "Erro";
+            $_SESSION['msg']['mensagem'] = "Erro reportado com a Admissao!!!";
+            $_SESSION['msg']['tipo'] = "error";		
+            echo 'Error: ' . $e->getMessage();      
+        }
+
+        irpara("admissaoRecemNascido.php");
+        
     }
 ?>
 
@@ -587,31 +854,22 @@
                 }
             });
         }
-        function mudarGrid(grid){
-            // if (grid == 'preparto') {
-            //     document.getElementById("box-pacientes-espera").style.display = 'block';
-            //     document.getElementById("box-pacientes-atendidos").style.display = 'none';
-            //     document.getElementById("box-pacientes-observacao").style.display = 'none';
-            //     document.getElementById("box-pacientes-atendimento").style.display = 'none';
 
-            // } else if (grid == 'admissao') {
-            //     document.getElementById("box-pacientes-atendidos").style.display = 'block';
-            //     document.getElementById("box-pacientes-espera").style.display = 'none';
-            //     document.getElementById("box-pacientes-observacao").style.display = 'none';
-            //     document.getElementById("box-pacientes-atendimento").style.display = 'none';
+        function contarCaracteres(params) {
+            var limite = params.maxLength;
+            var informativo = " restantes.";
+            var caracteresDigitados = params.value.length;
+            var caracteresRestantes = limite - caracteresDigitados;
 
-            // }
+            if (caracteresRestantes <= 0) {
+                var texto = $(`textarea[id=${params.id}]`).val();
+                $(`textarea[id=${params.id}]`).val(texto.substr(0, limite));
+                $(".caracteres" + params.id).text("0 " + informativo);
+            } else {
+                $(".caracteres" + params.id).text(" - " + caracteresRestantes + " " + informativo);
+            }  
         }
 
-        // $.ajax({
-        //     type: 'POST',
-        //     url: 'filtraAdmissaoCirurgicaPreOperatorio.php',
-        //     dataType: 'json',
-        //     data:{
-        //         'tipoRequest': 'ACESSOVENOSO',
-        //     },
-        //     success: function(response) {}
-        // });
 
 	</script>
 
@@ -630,6 +888,21 @@
             padding-left: 10px;
             padding-right: 10px;
         }
+
+        .fieldset-border {
+            border: 1px groove #ddd !important;
+            padding: 0 1.4em 1.4em 1.4em !important;
+            margin: 0 0 1.5em 0 !important;
+        }
+
+        .fieldset-border .legend-border {
+            font-size: 1.2em !important;
+            text-align: left !important;
+            width: auto;
+            padding: 0 10px;
+            border-bottom: none;
+        }
+
 	</style>
 
 </head>
@@ -670,28 +943,28 @@
 							?>
 							<div class="card">
 
-                            <div class="col-md-12">
-                                <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
 
-                                    <div class="col-md-6" style="text-align: left;">
+                                        <div class="col-md-6" style="text-align: left;">
 
-                                        <div class="card-header header-elements-inline">
-                                            <h3 class="card-title"><b>Admissão de RN</b></h3>
+                                            <div class="card-header header-elements-inline">
+                                                <h3 class="card-title"><b>Admissão de RN</b></h3>
+                                            </div>
+                
                                         </div>
-            
-                                    </div>
 
-                                    <div class="col-md-6" style="text-align: right;">
+                                        <div class="col-md-6" style="text-align: right;">
 
-                                        <div class="form-group" style="margin:20px;" >
-                                            <button class="btn btn-lg btn-success mr-1 salvarAdmissao" >Salvar</button>
-                                            <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
-                                            <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
+                                            <div class="form-group" style="margin:20px;" >
+                                                <button class="btn btn-lg btn-success mr-1 salvarAdmissao" >Salvar</button>
+                                                <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
+                                                <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
+                                            </div>
                                         </div>
-                                    </div>
 
+                                    </div>
                                 </div>
-                            </div>
 
 								
 							</div>
@@ -705,8 +978,8 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-lg-12">	
-                                            <button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg" onclick="mudarGrid('preparto')" >Admissão Pré Parto</button>
-                                            <button type="button" id="pacientes-atendimento-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('admissao')" >Admissão RN</button>
+                                            <button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg itemLink" data-tipo='admissaoPreParto' >Admissão Pré Parto</button>
+                                            <button type="button" id="pacientes-atendimento-btn" class="btn-grid btn btn-outline-secondary btn-lg active" >Admissão RN</button>
                                         </div>
                                     </div>
                                 </div>
@@ -714,14 +987,15 @@
 
                             <div class="card">
                                 <div class="card-header header-elements-inline">
-                                    <h3 class="card-title">Admissão RN</h3>
+                                    <h3 class="card-title font-weight-bold">Admissão RN</h3>
                                 </div>
                             </div>
 
                             <div class="box-exameFisico" style="display: block;">
                                 <div class="card">
+
                                     <div class="card-header header-elements-inline">
-                                        <h3 class="card-title">Evolução Recém Nascido</h3>
+                                        <h3 class="card-title font-weight-bold ">Evolução Recém Nascido</h3>
 
                                         <div class="header-elements">
                                             <div class="list-icons">
@@ -731,700 +1005,857 @@
                                     </div>
 
                                     <div class="card-body">
-                                        <!-- linha 1 -->
-                                        <div class="col-lg-12 mb-3 row">
-                                            <!-- titulos -->
-                                            <div class="col-lg-5">
-                                                <label>RN / Mãe</label>
+                                        <div class="row">
+                                            <div class="col-lg-7">
+                                                <div class="form-group">
+                                                    <label for="RN">RN / Mãe</label>
+                                                    <input id="RN" class="form-control" type="text" name="RN" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRNomeMae'] : ''; ?>">
+                                                </div>
                                             </div>
-                                            <div class="col-lg-2">
-                                                <label>Data de Nascimento</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>Hora de Nascimento</label>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label>Sexo</label>
-                                            </div>
-                                            
-                                            <!-- campos -->                                            
-                                            <div class="col-lg-5">
-                                                <input id="RN" class="form-control" type="text" name="RN">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="dataNascimento" class="form-control" type="date" name="dataNascimento">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="horaNascimento" class="form-control" type="time" name="horaNascimento">
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <select id="sexo" name="sexo" class="select-search">
-                                                    <option value=''>selecione</option>
-                                                    <option value='M'>Masculino</option>
-                                                    <option value='F'>Feminino</option>
-                                                </select>
+
+                                            <div class="col-lg-5 row">
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label for="dataNascimento">Data de Nascimento</label>
+                                                        <input id="dataNascimento" class="form-control" type="date" name="dataNascimento" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRDataNascimento'] : ''; ?>">
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label for="horaNascimento">Hora de Nascimento</label>
+                                                        <input id="horaNascimento" class="form-control" type="time" name="horaNascimento" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRHoraNascimento'] : ''; ?>" >
+                                                    </div>                                                    
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label for="sexo">Sexo</label>
+                                                        <select id="sexo" name="sexo" class="select-search">
+                                                            <option value=''>selecione</option>
+                                                            <option value='M' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRSexo'] == 'M' ? 'selected' : ''; ?> >Masculino</option>
+                                                            <option value='F' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRSexo'] == 'F' ? 'selected' : ''; ?> >Feminino</option>
+                                                        </select>
+                                                    </div>                                                    
+                                                </div>                                                
                                             </div>
                                         </div>
 
-                                        <!-- linha 2 -->
-                                        <div class="col-lg-12 mb-3 row">
-                                            <!-- titulos -->
+                                        <div class="row">
                                             <div class="col-lg-2">
-                                                <label>Choro Presente</label>
+                                                <div class="form-group" id="box-choro-presente">
+                                                    <label class="d-block ">Choro Presente</label>
+                                                    <div class="form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" class="form-input-styled" name="choro" value="SIM" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRChoroPresente'] == '1' ? 'checked' : ''; ?> >
+                                                            Sim
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" class="form-input-styled" name="choro" value="NÃO" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRChoroPresente'] == '0' ? 'checked' : ''; ?> >
+                                                            Não
+                                                        </label>
+                                                    </div>
+                                                </div>
                                             </div>
+
                                             <div class="col-lg-1">
-                                                <label>Apgar 1 min</label>
+                                                <div class="form-group">
+                                                    <label for="Apgar1">Apgar 1 min</label>
+                                                    <input id="Apgar1" class="form-control" type="number" name="Apgar1" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRApgar1min'] : ''; ?>" >
+                                                </div>
                                             </div>
+
                                             <div class="col-lg-1">
-                                                <label>Apgar 5 min</label>
+                                                <div class="form-group">
+                                                    <label for="Apgar5">Apgar 5 min</label>
+                                                    <input id="Apgar5" class="form-control" type="number" name="Apgar5" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRApgar5min'] : ''; ?>" >
+                                                </div>
                                             </div>
+
                                             <div class="col-lg-3">
-                                                <label>Amamentação na 1ª hora de vida</label>
+                                                <div class="form-group" id="box-amamentacao">
+                                                    <label class="d-block ">Amamentação na 1ª hora de vida</label>
+                                                    <div class="form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" class="form-input-styled" name="amamentacao" value="SIM" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAmamentacao1h'] == '1' ? 'checked' : ''; ?> >
+                                                            Sim
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" class="form-input-styled" name="amamentacao" value="NÃO" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAmamentacao1h'] == '1' ? 'checked' : ''; ?> >
+                                                            Não
+                                                        </label>
+                                                    </div>
+                                                </div>
                                             </div>
+
                                             <div class="col-lg-5">
-                                                <label>Motivo do não aleitamento</label>
-                                            </div>
-                                            
-                                            <!-- campos -->                                            
-                                            <div class="col-lg-2">
-                                                <div class="row">
-                                                    <div class="col-lg-4">
-                                                        <input type="radio" name="choro" class="choro" value="SIM">
-                                                        <label>SIM</label>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <input type="radio" name="choro" class="choro" value="NÃO">
-                                                        <label>NÃO</label>
-                                                    </div>
+                                                <div class="form-group">
+                                                    <label for="motivoAleitamento">Motivo do não aleitamento</label>
+                                                    <textarea id="motivoAleitamento" name="motivoAleitamento" onInput="contarCaracteres(this);" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ><?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRMotivoNaoAleitamento'] : ''; ?></textarea>            
+                                                    <small class="text-muted form-text">Max. 30 caracteres<span class="caracteresmotivoAleitamento"></span></small>                              
                                                 </div>
                                             </div>
-                                            <div class="col-lg-1">
-                                                <input id="Apgar1" class="form-control" type="number" name="Apgar1">
-                                            </div>
-                                            <div class="col-lg-1">
-                                                <input id="Apgar5" class="form-control" type="number" name="Apgar5">
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <div class="row">
-                                                    <div class="col-lg-4">
-                                                        <input type="radio" name="amamentacao" class="" value="SIM">
-                                                        <label>SIM</label>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <input type="radio" name="amamentacao" class="" value="NÃO">
-                                                        <label>NÃO</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-5">
-                                                <textarea id="motivoAleitamento" name="motivoAleitamento" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
-                                                <small class="text-muted form-text">
-                                                    Máx. 30 caracteres<br>
-                                                    <span id="caracteresInputMotivoAleitamento"></span>
-                                                </small>
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="card-header header-elements-inline" style="margin-left: -10px">
+                                                <h3 class="card-title font-weight-bold">SSVV / Monitoramento</h3>
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-6">
-                                            <h4 class="card-title"><b>SSVV / Monitoramento</b></h4>
-                                        </div>
-
-                                        <!-- linha 3 -->
-                                        <div class="col-lg-12 mb-3 row">
-                                            <!-- titulos -->
-                                            <div class="col-lg-2">
-                                                <label>FC (bpm)</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>FR (irpm)</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>Temperatura (C°)</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>SPO (%)</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>HGT (mg/dl)</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>Peso (Kg)</label>
-                                            </div>
-                                            
-                                            <!-- campos -->
-                                            <div class="col-lg-2">
-                                                <input id="FC" name="FC"  class="form-control" type="number">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="FR" name="FR" class="form-control" type="number">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="Temperatura" name="Temperatura"  class="form-control" type="number">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="SPO" name="SPO" class="form-control" type="number">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="HGT" name="HGT"  class="form-control" type="number">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="Peso" name="Peso" class="form-control" type="number">
-                                            </div>
-                                        </div>
-
-                                        <!-- linha 4 -->
-                                        <div class="col-lg-12 mb-3 row">
-                                            <!-- titulos -->
-                                            <div class="col-lg-2">
-                                                <label>Idade Gestacional</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>TS/Fator RH</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>Estatura (cm)</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>PC (cm)</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>PT (cm)</label>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <label>PA (cm)</label>
-                                            </div>
-                                            
-                                            <!-- campos -->
-                                            <div class="col-lg-2">
-                                                <input id="idadeGestacional" name="idadeGestacional"  class="form-control" type="text">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <select id="fatorRH" name="fatorRH" class="select">
-                                                    <option value=''>selecione</option>
-                                                    <option value='A+'>A+</option>
-                                                    <option value='B+'>B+</option>
-                                                    <option value='AB+'>AB+</option>
-                                                    <option value='O+'>O+</option>
-                                                    <option value='A-'>A-</option>
-                                                    <option value='B-'>B-</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="Estatura" name="Estatura"  class="form-control" type="number" value="0">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="PC" name="PC" class="form-control" type="number" value="0">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="PT" name="PT"  class="form-control" type="number" value="0">
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <input id="PA" name="PA" class="form-control" type="number" value="0">
-                                            </div>
-                                        </div>
-
-                                        <!-- linha 5 -->
-                                        <div class="col-lg-12 mb-3 row">
-                                            <div class="col-lg-6">
-                                                <div class="col-lg-6r">
-                                                    <h4 class="card-title"><b>Atividade</b></h4>
-                                                </div>
-
-                                                <div class="col-lg-12 row">
-                                                    <div class="col-lg-2">
-                                                        <input name="hipoativo" type="checkbox"/>
-                                                        <label>Hipoativo</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="sonolento" type="checkbox"/>
-                                                        <label>Sonolento</label>
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="ativo" type="checkbox"/>
-                                                        <label>Ativo</label>
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="choroso" type="checkbox"/>
-                                                        <label>Choroso</label>
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="gemente" type="checkbox"/>
-                                                        <label>Gemente</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <textarea id="textAtividade" name="textAtividade" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ></textarea>
-                                                    <small class="text-muted form-text">
-                                                        Máx. 30 caracteres<br>
-                                                        <span id="caracteresInputAtividade"></span>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="col-lg-6r">
-                                                    <h4 class="card-title"><b>Coloração</b></h4>
-                                                </div>
-
-                                                <div class="col-lg-12 row">
-                                                    <div class="col-lg-2">
-                                                        <input name="corado" type="checkbox"/>
-                                                        <label>Corado</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="hipocorado" type="checkbox"/>
-                                                        <label>Hipocorado</label>
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="cianotico" type="checkbox"/>
-                                                        <label>Cianotico</label>
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="icterico" type="checkbox"/>
-                                                        <label>Ictérico</label>
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="pletorico" type="checkbox"/>
-                                                        <label>Pletórico</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <textarea id="textColoracao" name="textColoracao" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ></textarea>
-                                                    <small class="text-muted form-text">
-                                                        Máx. 30 caracteres<br>
-                                                        <span id="caracteresInputColoracao"></span>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- linha 6 -->
-                                        <div class="col-lg-6 mb-3 row">
-                                            <!-- titulos -->
-                                            <div class="col-lg-6">
-                                                <label>Hidratação</label>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <label>Fontanela</label>
-                                            </div>
-                                            
-                                            <!-- campos -->
-                                            <div class="col-lg-6">
-                                                <select id="hidratacao" name="hidratacao" class="select">
-                                                    <option value=''>selecione</option>
-                                                    <option value='S'>SIM</option>
-                                                    <option value='N'>NÃO</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <select id="fontanela" name="fontanela" class="select">
-                                                    <option value=''>selecione</option>
-                                                    <option value='NO'>NOMOTENSA</option>
-                                                    <option value='AB'>ABAULADA</option>
-                                                    <option value='DE'>DEPRIMIDA</option>
-                                                    <option value='CA'>CAVALGADURA</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <!-- linha 7 -->
-                                        <div class="col-lg-12 mb-3 row">
-                                            <div class="col-lg-6">
-                                                <div class="col-lg-12">
-                                                    <h4 class="card-title"><b>Pele</b></h4>
-                                                </div>
-                                                <div class="col-lg-12 row">
-                                                    <div class="col-lg-3">
-                                                        <input name="pele" type="radio"/>
-                                                        <label>Íntegra</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="pele" type="radio"/>
-                                                        <label>Descamativa</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="pele" type="radio"/>
-                                                        <label>Eritema Tóxico</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="pele" type="radio"/>
-                                                        <label>Enrugada</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <textarea id="textPele" name="textPele" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ></textarea>
-                                                    <small class="text-muted form-text">
-                                                        Máx. 30 caracteres<br>
-                                                        <span id="caracteresInputPele"></span>
-                                                    </small>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-lg-6">
-                                                <div class="col-lg-12">
-                                                    <h4 class="card-title"><b>Reflexos Normais</b></h4>
-                                                </div>
-                                                <div class="col-lg-12 row">
-                                                    <div class="col-lg-3">
-                                                        <input name="succao" type="checkbox"/>
-                                                        <label>Sucção</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="moro" type="checkbox"/>
-                                                        <label>Moro</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="preensaoPalmar" type="checkbox"/>
-                                                        <label>Preensão Palmar</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="pressaoPlantar" type="checkbox"/>
-                                                        <label>Pressão Plantar</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <textarea id="textReflexos" name="textReflexos" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ></textarea>
-                                                    <small class="text-muted form-text">
-                                                        Máx. 30 caracteres<br>
-                                                        <span id="caracteresInputReflexos"></span>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- linha 8 -->
-                                        <div class="col-lg-12 mb-3 row">
-                                            <div class="col-lg-12">
-                                                <h4 class="card-title"><b>Cabeça</b></h4>
-                                            </div>
-                                            <div class="col-lg-8">
-                                                <div class="col-lg-12 row">
-                                                    <div class="col-lg-2">
-                                                        <input name="escoriacoes" type="checkbox"/>
-                                                        <label>Escoriações</label>
-                                                    </div>
-                                                    <div class="col-lg-1">
-                                                        <input name="pig" type="checkbox"/>
-                                                        <label>PIG</label>
-                                                    </div>
-                                                    <div class="col-lg-1">
-                                                        <input name="gig" type="checkbox"/>
-                                                        <label>GIG</label>
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="bossa" type="checkbox"/>
-                                                        <label>BOSSA</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="Cefalohematoma" type="checkbox"/>
-                                                        <label>Cefalohematoma</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="mascaraEquimotica" type="checkbox"/>
-                                                        <label>Máscara Equimótica</label>
-                                                    </div>
-
-                                                    <div class="col-lg-12">
-                                                        <textarea id="textCabeca" name="textCabeca" class="form-control" rows="4" cols="4" maxLength="50" placeholder="" ></textarea>
-                                                        <small class="text-muted form-text">
-                                                            Máx. 50 caracteres<br>
-                                                            <span id="caracteresInputCabeca"></span>
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 row">
+                                        <div class="row">                                                                          
+                                            <!-- linha 3 -->
+                                            <div class="col-lg-12 mb-3 row">
                                                 <!-- titulos -->
-                                                <div class="col-lg-12">
-                                                    <h6 class="card-title"><b>Abdome</b></h6>
+                                                <div class="col-lg-2">
+                                                    <label>FC (bpm)</label>
                                                 </div>
+                                                <div class="col-lg-2">
+                                                    <label>FR (irpm)</label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label>Temperatura (C°)</label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label>SPO (%)</label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label>HGT (mg/dl)</label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label>Peso (Kg)</label>
+                                                </div>
+                                                
+                                                <!-- campos -->
+                                                <div class="col-lg-2">
+                                                    <input id="FC" name="FC"  class="form-control" type="number" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRFreqCardiaca'] : ''; ?>" >
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <input id="FR" name="FR" class="form-control" type="number" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRFreqRespiratoria'] : ''; ?>" >
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <input id="Temperatura" name="Temperatura"  class="form-control" type="number" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRTemperatura'] : ''; ?>" >
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <input id="SPO" name="SPO" class="form-control" type="number" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRSPO'] : ''; ?>" >
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <input id="HGT" name="HGT"  class="form-control" type="number" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRHGT'] : ''; ?>" >
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <input id="Peso" name="Peso" class="form-control" type="number" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRPeso'] : ''; ?>" >
+                                                </div>
+                                            </div>
 
-                                                <div class="col-lg-12">
-                                                    <select id="abdome" name="abdome" class="select">
+                                            <!-- linha 4 -->
+                                            <div class="col-lg-12 mb-3 row">
+                                                <!-- titulos -->
+                                                <div class="col-lg-2">
+                                                    <label>Idade Gestacional</label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label>TS/Fator RH</label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label>Estatura (cm)</label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label>PC (cm)</label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label>PT (cm)</label>
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <label>PA (cm)</label>
+                                                </div>
+                                                
+                                                <!-- campos -->
+                                                <div class="col-lg-2">
+                                                    <input id="idadeGestacional" name="idadeGestacional"  class="form-control" type="text" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRIdadeGestacional'] : ''; ?>" >
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <select id="fatorRH" name="fatorRH" class="select-search">
                                                         <option value=''>selecione</option>
-                                                        <option value='IN'>ÍNTEGRO</option>
-                                                        <option value='FL'>FLÁCIDO</option>
-                                                        <option value='GL'>GLOBOSO</option>
-                                                        <option value='DI'>DISTENTIDO</option>
-                                                        <option value='TI'>TIMPÂNICO</option>
+                                                        <option value='A+' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRFatorRH'] == 'A+' ? 'selected' : ''; ?> >A+</option>
+                                                        <option value='B+' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRFatorRH'] == 'B+' ? 'selected' : ''; ?> >B+</option>
+                                                        <option value='AB+' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRFatorRH'] == 'AB+' ? 'selected' : ''; ?> >AB+</option>
+                                                        <option value='O+' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRFatorRH'] == 'O+' ? 'selected' : ''; ?> >O+</option>
+                                                        <option value='A-' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRFatorRH'] == 'A-' ? 'selected' : ''; ?> >A-</option>
+                                                        <option value='B-' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRFatorRH'] == 'B-' ? 'selected' : ''; ?> >B-</option>
                                                     </select>
                                                 </div>
+                                                <div class="col-lg-2">
+                                                    <input id="Estatura" name="Estatura"  class="form-control" type="number" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdREstatura'] : '0'; ?>">
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <input id="PC" name="PC" class="form-control" type="number" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRPerimetroCefalico'] : '0'; ?>">
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <input id="PT" name="PT"  class="form-control" type="number" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRPerimetroToraxico'] : '0'; ?>">
+                                                </div>
+                                                <div class="col-lg-2">
+                                                    <input id="PA" name="PA" class="form-control" type="number" value="<?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRAtividadeHipoativo'] : '0'; ?>">
+                                                </div>
+                                            </div>                                        
+                                        </div>
+
+
+                                        <div class="row">
+                                            <div class="col-lg-6">
+
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px">
+                                                    <h3 class="card-title font-weight-bold">Atividade</h3>
+                                                </div>
+
+                                                <div class="col-lg-12">
+                                                    <div class="row">
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="hipoativo" id="checkAtividadeHipoativo" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAtividadeHipoativo'] == '1' ? 'checked' : ''; ?>  >
+                                                                Hipoativo
+                                                            </label>
+                                                        </div>
+
+                                                        <div class="form-check form-check-inline mr-4 " >
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="sonolento" id="checkAtividadeSonolento" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAtividadeSonolento'] == '1' ? 'checked' : ''; ?> >
+                                                                Sonolento
+                                                            </label>
+                                                        </div>
+
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="ativo" id="checkAtividadeAtivo" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAtividadeAtivo'] == '1' ? 'checked' : ''; ?> >
+                                                                Ativo
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="choroso" id="checkAtividadeChoroso" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAtividadeChoroso'] == '1' ? 'checked' : ''; ?> >
+                                                                Choroso
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="gemente" id="checkAtividadeGemente" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAtividadeGemente'] == '1' ? 'checked' : ''; ?> >
+                                                                Gemente
+                                                            </label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <textarea id="textAtividade" name="textAtividade" class="form-control" onInput="contarCaracteres(this);" rows="4" cols="4" maxLength="30" placeholder="" ><?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRAtividadeDescricao'] : ''; ?></textarea>
+                                                        <small class="text-muted form-text">Max. 30 caracteres<span class="caracterestextAtividade"></span></small> 
+                                                       
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="col-lg-6">
+
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px">
+                                                    <h3 class="card-title font-weight-bold">Coloração</h3>
+                                                </div>
+
+                                                <div class="col-lg-12">
+                                                    <div class="row">
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="corado" id="checkColoracaoCorado" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRColoracaoCorado'] == '1' ? 'checked' : ''; ?>  >
+                                                                Corado
+                                                            </label>
+                                                        </div>
+
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="hipocorado" id="checkColoracaoHipocorado" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRColoracaoHipoCorado'] == '1' ? 'checked' : ''; ?> >
+                                                                Hipocorado
+                                                            </label>
+                                                        </div>
+
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="cianotico" id="checkColoracaoCianotico" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRColoracaoCianotico'] == '1' ? 'checked' : ''; ?> >
+                                                                Cianotico
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="icterico" id="checkColoracaoIcterico" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRColoracaoIcterico'] == '1' ? 'checked' : ''; ?> >
+                                                                Ictério
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="pletorico" id="checkColoracaoPletorico" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRColoracaoPletorico'] == '1' ? 'checked' : ''; ?> >
+                                                                Pletórico
+                                                            </label>
+                                                        </div>                                                        
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <textarea id="textColoracao" name="textColoracao" class="form-control"  onInput="contarCaracteres(this);" rows="4" cols="4" maxLength="30" placeholder="" ><?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRColoracaoDescricao'] : ''; ?></textarea>
+                                                        <small class="text-muted form-text">Max. 30 caracteres<span class="caracterestextColoracao"></span></small>    
+                                                    </div>
+                                                </div>  
                                                 
-                                                <div class="col-lg-12 mt-2">
-                                                    <h6 class="card-title"><b>Sucção Satisfatória</b></h6>
+                                            </div>
+                                        </div>
+
+                                        <div class="row col-lg-6">
+                                            <div class="col-lg-4" style="margin-left: -10px;">
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px;">
+                                                    <h3 class="card-title font-weight-bold">Hidratação</h3>
+                                                </div>
+                                                <select id="hidratacao" name="hidratacao" class="select">
+                                                    <option value=''>selecione</option>
+                                                    <option value='S' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRHidratacao'] == '1' ? 'selected' : ''; ?> >SIM</option>
+                                                    <option value='N' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRHidratacao'] == '0' ? 'selected' : ''; ?> >NÃO</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-8">
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px;">
+                                                    <h3 class="card-title font-weight-bold">Fontanela</h3>
+                                                </div> 
+                                                <select id="fontanela" name="fontanela" class="select-search">
+                                                    <option value=''>selecione</option>
+                                                    <option value='NO' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRFontanela'] == 'NO' ? 'selected' : ''; ?> >NOMOTENSA</option>
+                                                    <option value='AB' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRFontanela'] == 'AB' ? 'selected' : ''; ?> >ABAULADA</option>
+                                                    <option value='DE' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRFontanela'] == 'DE' ? 'selected' : ''; ?> >DEPRIMIDA</option>
+                                                    <option value='CA' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRFontanela'] == 'CA' ? 'selected' : ''; ?> >CAVALGADURA</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px;">
+                                                    <h3 class="card-title font-weight-bold" >Pele</h3>
+                                                </div>
+
+                                                <div class="col-lg-12">
+                                                    <div class="row" id="box-pele" >
+                                                        <div class="form-check form-check-inline mr-4">
+                                                            <label class="form-check-label">
+                                                                <input type="radio" class="form-input-styled" name="pele" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRPele'] == 'IN' ? 'checked' : ''; ?> >
+                                                                Íntegra
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4">
+                                                            <label class="form-check-label">
+                                                                <input type="radio" class="form-input-styled" name="pele" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRPele'] == 'DE' ? 'checked' : ''; ?> >
+                                                                Descamativa
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4">
+                                                            <label class="form-check-label">
+                                                                <input type="radio" class="form-input-styled" name="pele" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRPele'] == 'ER' ? 'checked' : ''; ?> >
+                                                                Eritema Tóxico
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4">
+                                                            <label class="form-check-label">
+                                                                <input type="radio" class="form-input-styled" name="pele" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRPele'] == 'EN' ? 'checked' : ''; ?> >
+                                                                Enrugada
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <textarea id="textPele" name="textPele" class="form-control" onInput="contarCaracteres(this);" rows="4" cols="4" maxLength="30" placeholder="" ><?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRPeleDescricao'] : ''; ?></textarea>
+                                                        <small class="text-muted form-text">Max. 30 caracteres<span class="caracterestextPele"></span></small>                              
+                                                       
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-6">
+
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px;">
+                                                    <h3 class="card-title font-weight-bold" >Reflexos Normais</h3>
                                                 </div>
                                                 
                                                 <div class="col-lg-12">
-                                                    <select id="succao" name="succao" class="select">
+                                                    <div class="row">
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="succaoR" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRReflexoSuccao'] == '1' ? 'checked' : ''; ?> >
+                                                                Sucção
+                                                            </label>
+                                                        </div>
+
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="moro" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRReflexoMoro'] == '1' ? 'checked' : ''; ?>  >
+                                                                Moro
+                                                            </label>
+                                                        </div>
+
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="preensaoPalmar" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRReflexoPreensaoPalmar'] == '1' ? 'checked' : ''; ?>  >
+                                                                Preensão Palmar
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="pressaoPlantar" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRReflexoPressaoPlantar'] == '1' ? 'checked' : ''; ?>  >
+                                                                Pressão Plantar
+                                                            </label>
+                                                        </div>                                                        
+                                                    </div>
+                                                    <div class="row">
+                                                        <textarea id="textReflexos" name="textReflexos" class="form-control" onInput="contarCaracteres(this);" rows="4" cols="4" maxLength="30" placeholder="" ></textarea>
+                                                        <small class="text-muted form-text">Max. 30 caracteres<span class="caracterestextReflexos"></span></small>   
+                                                    </div>
+                                                </div>
+                                                
+
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-lg-8">
+
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px;">
+                                                    <h3 class="card-title font-weight-bold" >Cabeça</h3>
+                                                </div>
+
+                                                <div class="col-lg-12">
+                                                    <div class="row">
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="escoriacoes" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCabecaEscoriacao'] == '1' ? 'checked' : ''; ?> >
+                                                                Escoriações
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="pig" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCabecaPIG'] == '1' ? 'checked' : ''; ?> >
+                                                                PIG
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="gig" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCabecaGIG'] == '1' ? 'checked' : ''; ?> >
+                                                                GIG
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="bossa" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCabecaBossa'] == '1' ? 'checked' : ''; ?>  >
+                                                                BOSSA
+                                                            </label>
+                                                        </div>  
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="Cefalohematoma" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCabecaCefalohematoma'] == '1' ? 'checked' : ''; ?>  >
+                                                                Cefalohematoma
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="mascaraEquimotica" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCabecaMascaraEquimotica'] == '1' ? 'checked' : ''; ?>  >
+                                                                Máscara Equimótica
+                                                            </label>
+                                                        </div>                                                      
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <textarea id="textCabeca" name="textCabeca" class="form-control" onInput="contarCaracteres(this);" rows="4" cols="4" maxLength="50" placeholder="" ></textarea>
+                                                        <small class="text-muted form-text">Max. 50 caracteres<span class="caracterestextCabeca"></span></small>   
+                                                    </div>
+                                                </div>
+                                                
+
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <div class="card-header header-elements-inline" style="margin-left: -10px;">
+                                                    <h3 class="card-title font-weight-bold" >Abdome</h3>
+                                                </div>
+
+                                                <div class="col-lg-12">
+                                                    <select id="abdome" name="abdome" class="select-search">
                                                         <option value=''>selecione</option>
-                                                        <option value='S'>SIM</option>
-                                                        <option value='N'>NÃO</option>
+                                                        <option value='IN' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAbdome'] == 'IN' ? 'selected' : ''; ?> >ÍNTEGRO</option>
+                                                        <option value='FL' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAbdome'] == 'FL' ? 'selected' : ''; ?> >FLÁCIDO</option>
+                                                        <option value='GL' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAbdome'] == 'GL' ? 'selected' : ''; ?> >GLOBOSO</option>
+                                                        <option value='DI' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAbdome'] == 'DI' ? 'selected' : ''; ?> >DISTENTIDO</option>
+                                                        <option value='TI' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRAbdome'] == 'TI' ? 'selected' : ''; ?> >TIMPÂNICO</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="card-header header-elements-inline" style="margin-left: -10px;">
+                                                    <h3 class="card-title font-weight-bold" >Sucção Satisfatória</h3>
+                                                </div>
+
+                                                <div class="col-lg-12">
+                                                    <select id="succao" name="succao" class="select-search">
+                                                        <option value=''>selecione</option>
+                                                        <option value='S' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRSuccaoSatisfatoria'] == '1' ? 'selected' : ''; ?> >SIM</option>
+                                                        <option value='N' <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRSuccaoSatisfatoria'] == '0' ? 'selected' : ''; ?> >NÃO</option>
                                                     </select> 
+                                                </div>                                              
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px;">
+                                                    <h3 class="card-title font-weight-bold" >Padrão Respiratório</h3>
                                                 </div>
+
+                                                <div class="col-lg-12">
+                                                    <div class="row" id="box-pele" >
+                                                        <div class="form-check form-check-inline mr-4">
+                                                            <label class="form-check-label">
+                                                                <input type="radio" class="form-input-styled" name="padraoRespiratorio" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRPadraoRespiratorio'] == 'EU' ? 'checked' : ''; ?> >
+                                                                Eupnéico
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4">
+                                                            <label class="form-check-label"> 
+                                                                <input type="radio" class="form-input-styled" name="padraoRespiratorio" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRPadraoRespiratorio'] == 'TA' ? 'checked' : ''; ?> >
+                                                                Taquipnéia
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4">
+                                                            <label class="form-check-label">
+                                                                <input type="radio" class="form-input-styled" name="padraoRespiratorio" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRPadraoRespiratorio'] == 'BR' ? 'checked' : ''; ?> >
+                                                                Bradipnéia
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4">
+                                                            <label class="form-check-label">
+                                                                <input type="radio" class="form-input-styled" name="padraoRespiratorio" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRPadraoRespiratorio'] == 'ON' ? 'checked' : ''; ?> >
+                                                                Obestrução Nasal
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <textarea id="textPadraoRespiratorio" name="textPadraoRespiratorio" onInput="contarCaracteres(this);" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ><?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRPadraoRespiratorioDescricao'] : ''; ?></textarea>
+                                                        <small class="text-muted form-text">Max. 30 caracteres<span class="caracterestextPadraoRespiratorio"></span></small>   
+                                                    </div>
+                                                </div>                      
+                                            </div>
+
+                                            <div class="col-lg-6">
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px;">
+                                                    <h3 class="card-title font-weight-bold" >Genturinário</h3>
+                                                </div>
+
+                                                <div class="col-lg-12">
+                                                    <div class="row">
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="integro" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRGenturinarioIntegro'] == '1' ? 'checked' : ''; ?>  >
+                                                                Íntegro
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="diurese" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRGenturinarioDiurese'] == '1' ? 'checked' : ''; ?>  >
+                                                                Diurese
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="anusPervio" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRGenturinarioAnusPervio'] == '1' ? 'checked' : ''; ?>   >
+                                                                Ânus Pérvio
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="Mec1io" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRGenturinarioMeconio'] == '1' ? 'checked' : ''; ?>   >
+                                                                Mecônio
+                                                            </label>
+                                                        </div> 
+                                                        <div class="form-check form-check-inline mr-4 ">
+                                                            <label class="form-check-label">
+                                                                <input type="checkbox" class="form-check-input" name="outros" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRGenturinarioOutro'] == '1' ? 'checked' : ''; ?>  >
+                                                                Outros
+                                                            </label>
+                                                        </div>                                                       
+                                                    </div>
+                                                    <div class="row">
+                                                        <textarea id="textGenturinario" name="textGenturinario" onInput="contarCaracteres(this);" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ><?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRGenturinarioDescricao'] : ''; ?></textarea>
+                                                        <small class="text-muted form-text">Max. 30 caracteres<span class="caracterestextGenturinario"></span></small>   
+                                                    </div>
+                                                </div>                                               
                                             </div>
                                         </div>
 
-                                        <!-- linha 9 -->
-                                        <div class="col-lg-12 mb-3 row">
-                                            <div class="col-lg-6">
-                                                <div class="col-lg-12">
-                                                    <h4 class="card-title"><b>Padrão Respiratório</b></h4>
-                                                </div>
-                                                <div class="col-lg-12 row">
-                                                    <div class="col-lg-3">
-                                                        <input name="padraoRespiratorio" type="radio"/>
-                                                        <label>Eupnéico</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="padraoRespiratorio" type="radio"/>
-                                                        <label>Taquipnéia</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="padraoRespiratorio" type="radio"/>
-                                                        <label>Bradipnéia</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="padraoRespiratorio" type="radio"/>
-                                                        <label>Obestrução Nasal</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <textarea id="textPadraoRespiratorio" name="textPadraoRespiratorio" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ></textarea>
-                                                    <small class="text-muted form-text">
-                                                        Máx. 30 caracteres<br>
-                                                        <span id="caracteresInputPadraoRespiratorio"></span>
-                                                    </small>
-                                                </div>
-                                            </div>
 
-                                            <div class="col-lg-6">
-                                                <div class="col-lg-12">
-                                                    <h4 class="card-title"><b>Genturinário</b></h4>
-                                                </div>
-                                                <div class="col-lg-12 row">
-                                                    <div class="col-lg-2">
-                                                        <input name="integro" type="checkbox"/>
-                                                        <label>Íntegro</label>
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="diurese" type="checkbox"/>
-                                                        <label>Diurese</label>
-                                                    </div>
-                                                    <div class="col-lg-3">
-                                                        <input name="anusPervio" type="checkbox"/>
-                                                        <label>Ânus Pérvio</label>
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="Meconio" type="checkbox"/>
-                                                        <label>Mecônio</label>
-                                                    </div>
-                                                    <div class="col-lg-2">
-                                                        <input name="outros" type="checkbox"/>
-                                                        <label>Outros</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12">
-                                                    <textarea id="textGenturinario" name="textGenturinario" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ></textarea>
-                                                    <small class="text-muted form-text">
-                                                        Máx. 30 caracteres<br>
-                                                        <span id="caracteresInputGenturinario"></span>
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- linha 12 -->
-                                        <div class="col-lg-12 mb-3 row">
+                                        <div class="row col-lg-12">                                       
+                                            
+                                            <div class="card-header header-elements-inline" style="margin-left: -20px;">
+                                                <h3 class="card-title font-weight-bold" >Coto Umbilical</h3>
+                                            </div>    
+                                            
                                             <div class="col-lg-12">
-                                                <h4 class="card-title"><b>Coto Umbilical</b></h4>
-                                            </div>
-                                            <div class="col-lg-12 row">
-                                                <div class="col-lg-2">
-                                                    <input name="limpoSeco" type="checkbox"/>
-                                                    <label>Limpo e Seco</label>
-                                                </div>
-                                                <div class="col-lg-2">
-                                                    <input name="gelatinoso" type="checkbox"/>
-                                                    <label>Gelatinoso</label>
-                                                </div>
-                                                <div class="col-lg-2">
-                                                    <input name="mumificado" type="checkbox"/>
-                                                    <label>Mumificado</label>
-                                                </div>
-                                                <div class="col-lg-2">
-                                                    <input name="umido" type="checkbox"/>
-                                                    <label>Úmido</label>
-                                                </div>
-                                                <div class="col-lg-1">
-                                                    <input name="sujo" type="checkbox"/>
-                                                    <label>Sujo</label>
-                                                </div>
-                                                <div class="col-lg-1">
-                                                    <input name="fetido" type="checkbox"/>
-                                                    <label>Fétido</label>
-                                                </div>
-                                                <div class="col-lg-2">
-                                                    <input name="hiperemia" type="checkbox"/>
-                                                    <label>Hiperemia</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-12">
-                                                <textarea id="textCotoUmbilical" name="textCotoUmbilical" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ></textarea>
-                                                <small class="text-muted form-text">
-                                                    Máx. 30 caracteres<br>
-                                                    <span id="caracteresInputCotoUmbilical"></span>
-                                                </small>
-                                            </div>
-                                        </div>
+                                                <div class="row" style="justify-content: space-between;" >
+                                                    <div class="form-check form-check-inline mr-4 ">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" class="form-check-input" name="limpoSeco" id="checkCotoLimpoSeco"  <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCotoLimpoSeco'] == '1' ? 'checked' : ''; ?> >
+                                                            Limpo e Seco
+                                                        </label>
+                                                    </div>
 
-                                        <!-- linha 6 -->
-                                        <div class="col-lg-6 mb-3 row">
-                                            <!-- titulos -->
-                                            <div class="col-lg-6">
-                                                <label>Cateter</label>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <label>Sonda</label>
+                                                    <div class="form-check form-check-inline mr-4 ">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" class="form-check-input" name="gelatinoso" id="checkCotoGelatinoso" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCotoGelatinoso'] == '1' ? 'checked' : ''; ?> >
+                                                            Gelatinoso
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline mr-4 ">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" class="form-check-input" name="mumificado" id="checkCotoMumificado" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCotoMumificado'] == '1' ? 'checked' : ''; ?> >
+                                                            Mumificado
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline mr-4 ">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" class="form-check-input" name="umido" id="checkCotoUmido" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCotoUmido'] == '1' ? 'checked' : ''; ?> >
+                                                            Úmido
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline mr-4 ">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" class="form-check-input" name="sujo" id="checkCotoSujo" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCotoSujo'] == '1' ? 'checked' : ''; ?> >
+                                                            Sujo
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline mr-4 ">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" class="form-check-input" name="fetido" id="checkCotoFetido" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCotoFetido'] == '1' ? 'checked' : ''; ?> >
+                                                            Fétido
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline mr-4">
+                                                        <label class="form-check-label">
+                                                            <input type="checkbox" class="form-check-input" name="hiperemia" id="checkCotoFetido" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCotoHiperemia'] == '1' ? 'checked' : ''; ?> >
+                                                            Hiperemia
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <textarea id="textCotoUmbilical" name="textCotoUmbilical" onInput="contarCaracteres(this);" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ><?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRCotoDescricao'] : ''; ?></textarea>
+                                                    <small class="text-muted form-text">Max. 30 caracteres<span class="caracterestextCotoUmbilical"></span></small>   
+                                                </div>
                                             </div>
                                             
-                                            <!-- campos -->
-                                            <div class="col-lg-6">
-                                                <div class="col-lg-4">
-                                                    <div class="row">
-                                                        <div class="col-lg-6">
-                                                            <input type="radio" name="cateter" class="cateter" value="SIM">
-                                                            <label>SIM</label>
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <input type="radio" name="cateter" class="cateter" value="NÃO">
-                                                            <label>NÃO</label>
-                                                        </div>
+                                        </div>
+
+
+
+                                        <div class="row col-lg-6">
+                                            <div class="col-lg-6" style="margin-left: -10px;">
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px;">
+                                                    <h3 class="card-title font-weight-bold">Cateter</h3>
+                                                </div>
+
+                                                <div class="form-group" >
+                                                    <div class="form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" class="form-input-styled" name="cateter" class="cateter" value="SIM" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCateter'] == '1' ? 'checked' : ''; ?> >
+                                                            Sim
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" class="form-input-styled" name="cateter" class="cateter" value="NÃO" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRCateter'] == '0' ? 'checked' : ''; ?> >
+                                                            Não
+                                                        </label>
                                                     </div>
                                                 </div>
+
                                                 <div class="col-lg-12">
-                                                    <textarea id="textCateter" name="textCateter" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ></textarea>
-                                                    <small class="text-muted form-text">
-                                                        Máx. 30 caracteres<br>
-                                                        <span id="caracteresInputCateter"></span>
-                                                    </small>
+                                                    <textarea id="textCateter" name="textCateter" class="form-control" onInput="contarCaracteres(this);" rows="4" cols="4" maxLength="30" placeholder="" ><?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRCateterDescricao'] : ''; ?></textarea>
+                                                    <small class="text-muted form-text">Max. 30 caracteres<span class="caracterestextCateter"></span></small>
                                                 </div>
+
                                             </div>
+
                                             <div class="col-lg-6">
-                                                <div class="col-lg-4">
-                                                    <div class="row">
-                                                        <div class="col-lg-6">
-                                                            <input type="radio" name="sonda" class="sonda" value="SIM">
-                                                            <label>SIM</label>
-                                                        </div>
-                                                        <div class="col-lg-6">
-                                                            <input type="radio" name="sonda" class="sonda" value="NÃO">
-                                                            <label>NÃO</label>
-                                                        </div>
+                                                <div class="card-header header-elements-inline" style="margin-left: -20px;">
+                                                    <h3 class="card-title font-weight-bold">Sonda</h3>
+                                                </div>
+
+                                                <div class="form-group" >
+                                                    <div class="form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" class="form-input-styled" name="sonda" class="sonda" value="SIM" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRSonda'] == '1' ? 'checked' : ''; ?> >
+                                                            Sim
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" class="form-input-styled" name="sonda" class="sonda" value="NÃO" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRSonda'] == '0' ? 'checked' : ''; ?> >
+                                                            Não
+                                                        </label>
                                                     </div>
                                                 </div>
+
                                                 <div class="col-lg-12">
-                                                    <textarea id="textSonda" name="textSonda" class="form-control" rows="4" cols="4" maxLength="30" placeholder="" ></textarea>
-                                                    <small class="text-muted form-text">
-                                                        Máx. 30 caracteres<br>
-                                                        <span id="caracteresInputSonda"></span>
-                                                    </small>
+                                                    <textarea id="textSonda" name="textSonda" class="form-control" onInput="contarCaracteres(this);" rows="4" cols="4" maxLength="30" placeholder="" ><?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRSondaDescricao'] : ''; ?></textarea>
+                                                    <small class="text-muted form-text">Max. 30 caracteres<span class="caracterestextSonda"></span></small>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- xxxxxxxxxxxxxxxxxxxxxxxxxxx -->
+
                                     </div>
                                 </div>
                             </div>
+
                             <div class="card p-3">
-                                <div style="border: 1px solid black" class="p-3 mb-4">
-                                    <h5 class="card-title text-float-border"><b>Diagnóstico de Enfermagem</b></h5>
 
-                                    <div class="col-lg-12 row">
-                                        <div class="col-lg-6">
-                                            <input name="dorAguda" type="checkbox"/>
-                                            <label>DOR AGUDA</label>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <input name="riscoGlicemia" type="checkbox"/>
-                                            <label>RISCO DE GLICEMIA</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12 row">
-                                        <div class="col-lg-6">
-                                            <input name="deficitAutoCuidado" type="checkbox"/>
-                                            <label>DÉFICIT NO AUTO-CUIDADO</label>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <input name="riscoIctericia" type="checkbox"/>
-                                            <label>RISCO DE ICTERICIA</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12 row">
-                                        <div class="col-lg-6">
-                                            <input name="eliminacaoUrinaria" type="checkbox"/>
-                                            <label>ELIMINAÇÃO URINÁRIA</label>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <input name="riscoInfeccao" type="checkbox"/>
-                                            <label>RISCO DE INFECÇÃO</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12 row">
-                                        <div class="col-lg-6">
-                                            <input name="nutricaoDesequilibrada" type="checkbox"/>
-                                            <label>NUTRIÇÃO DESEQUILIBRADA QUE AS NECESSIDADES CORPORAIS</label>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <input name="riscoIntegridade" type="checkbox"/>
-                                            <label>RISCO DE INTEGRIDADE</label>
+                                <fieldset class=" col-lg-12 row fieldset-border " >
+                                    <legend class="legend-border font-weight-bold">Diagnóstico de Enfermagem</legend>
+                                    
+                                    <div class="col-lg-4">
+                                        <div class="form-group">                                        
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="dorAguda" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoDorAguda'] == '1' ? 'checked' : ''; ?> >
+                                                    DOR AGUDA
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="riscoIctericia" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoRiscoIctericia'] == '1' ? 'checked' : ''; ?> >
+                                                    RISCO DE ICTERICIA
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="nutricaoDesequilibrada" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoNutricaoDesequilibrada'] == '1' ? 'checked' : ''; ?> >
+                                                    NUTRIÇÃO DESEQUILIBRADA QUE AS NECESSIDADES CORPORAIS
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="riscoSufocacao" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoRiscoSufocacao'] == '1' ? 'checked' : ''; ?> >
+                                                    RISCO DE SUFOCAÇÃO
+                                                </label>
+                                            </div>
+
                                         </div>
                                     </div>
-                                    <div class="col-lg-12 row">
-                                        <div class="col-lg-6">
-                                            <input name="padraoRespiratorio" type="checkbox"/>
-                                            <label>PADRÃO RESPIRATÓRIO</label>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <input name="riscoSufocacao" type="checkbox"/>
-                                            <label>RISCO DE SUFOCAÇÃO</label>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="riscoGlicemia" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoRiscoGlicemia'] == '1' ? 'checked' : ''; ?> >
+                                                    RISCO DE GLICEMIA
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="eliminacaoUrinaria" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoEliminacaoUrinaria'] == '1' ? 'checked' : ''; ?> >
+                                                    ELIMINAÇÃO URINÁRIA
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="riscoIntegridade" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoRiscoIntegridade'] == '1' ? 'checked' : ''; ?> >
+                                                    RISCO DE INTEGRIDADE
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="padraoSono" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoPadraoSono'] == '1' ? 'checked' : ''; ?> >
+                                                    PADRÃO DE SONO
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="riscoConstipacao" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoRiscoConstipacao'] == '1' ? 'checked' : ''; ?> >
+                                                    RISCO DE CONSTIPAÇÃO
+                                                </label>
+                                            </div>
+
                                         </div>
                                     </div>
-                                    <div class="col-lg-12 row">
-                                        <div class="col-lg-6">
-                                            <input name="padraoSono" type="checkbox"/>
-                                            <label>PADRÃO DE SONO</label>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="deficitAutoCuidado" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoDeficitAutoCuidado'] == '1' ? 'checked' : ''; ?> >
+                                                    DÉFICIT NO AUTO-CUIDADO
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="riscoInfeccao" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoRiscoInfeccao'] == '1' ? 'checked' : ''; ?> >
+                                                    RISCO DE INFECÇÃO
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="padraoRespiratorio" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoPadraoRespiratorio'] == '1' ? 'checked' : ''; ?> >
+                                                    PADRÃO RESPIRATÓRIO
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="termorregulacao" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoTermoRregulacao'] == '1' ? 'checked' : ''; ?> >
+                                                    TERMORREGULAÇÃO
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="termorregulacao" class="form-check-input" <?php if (isset($iAtendimentoAdmissaoRN )) echo $rowAdmissao['EnAdRDiagnosticoOutro'] == '1' ? 'checked' : ''; ?> >
+                                                    OUTROS
+                                                </label>
+                                                <input name="riscoOutrosText" type="text" class="form-control" placeholder="Descrição Outros..." value=""/>
+
+                                            </div>
+
                                         </div>
-                                        <div class="col-lg-6">
-                                            <input name="termorregulacao" type="checkbox"/>
-                                            <label>TERMORREGULAÇÃO</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12 row">
-                                        <div class="col-lg-6">
-                                            <input name="riscoConstipacao" type="checkbox"/>
-                                            <label>RISCO DE CONSTIPAÇÃO</label>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <input name="riscoOutros" type="checkbox"/>
-                                            <label>OUTROS</label>
-                                            <input name="riscoOutrosText" type="text" class="form-control" placeholder="Descrição..."/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12 mb-3 row">
-                                    <!-- titulos -->
-                                    <div class="col-lg-12">
-                                        <label>Avaliação de Enfermagem</label>
+                                    </div>                                    
+                                    
+                                </fieldset> 
+
+                                <div class="row">
+                                    <div class="card-header header-elements-inline" style="margin-left: -10px;">
+                                        <h3 class="card-title font-weight-bold">Avaliação de Enfermagem</h3>
                                     </div>
 
-                                    <!-- campos -->
                                     <div class="col-lg-12">
-                                        <textarea id="textAvaliacao" name="textAvaliacao" class="form-control" rows="4" cols="4" maxLength="100" placeholder="" ></textarea>
-                                        <small class="text-muted form-text">
-                                            Máx. 100 caracteres<br>
-                                            <span id="caracteresInputAvaliacao"></span>
-                                        </small>
-                                    </div>
+                                        <textarea id="textAvaliacao" name="textAvaliacao" onInput="contarCaracteres(this);" class="form-control" rows="4" cols="4" maxLength="100" placeholder="" ><?php echo isset($iAtendimentoAdmissaoRN) ? $rowAdmissao['EnAdRAvaliacaoEnfermagem'] : ''; ?></textarea>
+                                        <small class="text-muted form-text">Max. 100 caracteres<span class="caracterestextAvaliacao"></span></small>   
+                                    </div>                                    
                                 </div>
+
                             </div>
+
                             <div class="card">
                                 <div class=" card-body row">
                                     <div class="col-lg-12">
@@ -1437,97 +1868,6 @@
                                 </div>  
                             </div>
 
-							<!--Modal-->
-                            <div id="page-modal-acesso" class="custon-modal">
-                                <div class="custon-modal-container" style="max-width: 1000px">
-                                    <div class="card custon-modal-content">
-                                        <div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
-                                            <p class="h5">Acesso Venoso</p>
-                                            <i id="modal-acesso-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
-                                        </div>
-                                        <div class="px-0" style="overflow-y: scroll;">
-                                            <div class="d-flex flex-row">
-                                                <div class="col-lg-12">
-                                                    <form id="novoAcessoVenoso" name="novoAcessoVenoso" method="POST" class="form-validate-jquery">
-                                                        <!-- linha 1 -->
-                                                        <div class="col-lg-12 m-0 p-0 mb-3 row">
-                                                            <!-- titulos -->
-                                                            <div class="col-lg-2">
-                                                                <label>Data</label>
-                                                            </div>
-                                                            <div class="col-lg-2">
-                                                                <label>Hora</label>
-                                                            </div>
-                                                            <div class="col-lg-3">
-                                                                <label>Local de punção</label>
-                                                            </div>
-                                                            <div class="col-lg-2">
-                                                                <label>Tipo/Calibre</label>
-                                                            </div>
-                                                            <div class="col-lg-2">
-                                                                <label>Responsável Técnico</label>
-                                                            </div>
-                                                            <div class="col-lg-1">
-                                                            </div>
-                                                            
-                                                            <!-- campos -->
-                                                            <div class="col-lg-2">
-                                                                <input id="dataAcessoVenoso" class="form-control" type="date" name="dataAcessoVenoso">
-                                                            </div>
-                                                            <div class="col-lg-2">
-                                                                <input id="horaAcessoVenoso" class="form-control" type="time" name="horaAcessoVenoso">
-                                                            </div>
-
-                                                            <div class="col-lg-3">
-                                                                <select id="ladoAcessoVenoso" name="ladoAcessoVenoso" class="select-search">
-                                                                    <option value=''>selecione</option>
-                                                                    <option value='ES'>Esquerdo</option>
-                                                                    <option value='DI'>Direito</option>
-                                                                </select>
-                                                            </div>
-
-                                                            <div class="col-lg-2">
-                                                                <input id="calibreAcessoVenoso" class="form-control" type="text" name="calibreAcessoVenoso">
-                                                            </div>
-
-                                                            <div class="col-lg-2">
-                                                                <input id="responsavelAcessoVenoso" class="form-control" type="text" name="responsavelAcessoVenoso">
-                                                            </div>
-                                                            <div class="col-lg-1">
-                                                                <button id="addAcesso" class="btn btn-lg btn-principal p-0 m-0" style="width:50px; height:35px;">
-                                                                    <i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-
-                                                    <div id="tblAcessoVenosoViwer" class="d-none">
-                                                        <table class="table" id="tblAcessoVenoso">
-                                                            <thead>
-                                                                <tr class="bg-slate">
-                                                                    <th>Item</th>
-                                                                    <th>Data/Hora</th>
-                                                                    <th>Local</th>
-                                                                    <th>Tipo</th>										
-                                                                    <th>Responsável</th>
-                                                                    <th class="text-center">Ações</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-    
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="text-left m-2">
-                                                <button id="salvarAcessoModal" class="btn btn-success" role="button">Confirmar</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 						</form>	
 
 							<!-- /basic responsive configuration -->

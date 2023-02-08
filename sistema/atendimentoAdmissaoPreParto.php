@@ -2,7 +2,7 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Admissão Pré Parto';
+$_SESSION['PaginaAtual'] = 'Admissão de Pré Parto';
 
 include('global_assets/php/conexao.php');
 
@@ -245,7 +245,10 @@ if (isset($_POST['inputInicio'])) {
 
                 $conn->query($sql);
     
-            $_SESSION['msg']['mensagem'] = "Anamnese alterada!!!";
+                $_SESSION['msg']['titulo'] = "Sucesso";
+                $_SESSION['msg']['mensagem'] = "Admissão alterada com sucesso!!!";
+                $_SESSION['msg']['tipo'] = "success";
+                $_SESSION['iAtendimentoId'] = $iAtendimentoId;
     
         } else {
 
@@ -330,6 +333,11 @@ if (isset($_POST['inputInicio'])) {
                 ':sObservacao' => $_POST['inputObservacoes'] == "" ? null : $_POST['inputObservacoes'] ,
                 ':sUnidade' => $_SESSION['UnidadeId']
             ));
+
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Admissão inserida com sucesso!!!";
+            $_SESSION['msg']['tipo'] = "success";
+            $_SESSION['iAtendimentoId'] = $iAtendimentoId;
            
         }
         
@@ -340,7 +348,7 @@ if (isset($_POST['inputInicio'])) {
 		echo 'Error: ' . $e->getMessage();      
     }
 
-    $_SESSION['iAtendimentoId'] = $iAtendimentoId;
+    
     irpara("atendimentoAdmissaoPreParto.php");
     
 }
@@ -403,7 +411,7 @@ if (isset($_POST['inputInicio'])) {
                     data: {
                         'tipoRequest': 'INCLUIREVOLUCAOADMISSAOPREPARTO',
                         'tipo' : 'INSERT',
-                        'idAdmissao' : <?php echo $iAtendimentoAdmissaoId; ?>,				
+                        'idAdmissao' : <?php echo isset($iAtendimentoAdmissaoId) ? $iAtendimentoAdmissaoId: 0 ; ?>,				
                         'cmbRealizadoToque' : cmbRealizadoToque,				
                         'inputDilatacao' : inputDilatacao,				
                         'inputApagamento' : inputApagamento,				
@@ -446,7 +454,7 @@ if (isset($_POST['inputInicio'])) {
                         'tipoRequest': 'INCLUIREVOLUCAOADMISSAOPREPARTO',
                         'tipo' : 'UPDATE',
                         'idEvolucao' : idEvolucao,
-                        'idAdmissao' : <?php echo $iAtendimentoAdmissaoId; ?>,				
+                        'idAdmissao' : <?php echo isset($iAtendimentoAdmissaoId) ? $iAtendimentoAdmissaoId: 0 ; ?>,				
                         'cmbRealizadoToque' : cmbRealizadoToque,				
                         'inputDilatacao' : inputDilatacao,				
                         'inputApagamento' : inputApagamento,				
@@ -485,7 +493,7 @@ if (isset($_POST['inputInicio'])) {
                 dataType: 'json',
                 data:{
                     'tipoRequest': 'GETADMISSOESPREPARTO',
-                    'idAdmissao' : <?php echo $iAtendimentoAdmissaoId; ?>,
+                    'idAdmissao' : <?php echo isset($iAtendimentoAdmissaoId) ? $iAtendimentoAdmissaoId: 0 ;?>,
                 },
                 success: function(response) {
 
@@ -630,9 +638,9 @@ if (isset($_POST['inputInicio'])) {
         function mudarGrid(grid){
 			if (grid == 'pre-parto') {				
 				$(".box-pre-parto").css('display', 'block');
-				$(".box-rn").css('display', 'none');
-			} else if (grid == 'rn') {
-				$(".box-rn").css('display', 'block');
+				$(".box-evolucao-parto").css('display', 'none');
+			} else if (grid == 'evolucao-parto') {
+				$(".box-evolucao-parto").css('display', 'block');
 				$(".box-pre-parto").css('display', 'none');
 			}
 		}
@@ -652,6 +660,30 @@ if (isset($_POST['inputInicio'])) {
 				$(".caracteres" + params.id).text(" - " + caracteresRestantes + " " + informativo);
 			}
 		}
+
+        function selecionaAlergiaDescricaoAd(tipo1) {
+            if (tipo1 == 1){	
+                document.getElementById('dadosAlergiad').style.display = "block";
+            } else {						
+                document.getElementById('dadosAlergiad').style.display = "none";
+            }
+        }
+
+        function selecionaInputIntercorrenciasDescricao(tipo) {
+            if (tipo == 1){
+                document.getElementById('dadosIntercorrencias').style.display = "block";	
+            } else {			
+                document.getElementById('dadosIntercorrencias').style.display = "none";		
+            }
+        }
+     
+        function selecionaUsoMedicamentosDescricao(tipo2) {
+            if (tipo2 == 1){	
+                document.getElementById('dadosUsoMedDescricao').style.display = "block";
+            } else {						
+                document.getElementById('dadosUsoMedDescricao').style.display = "none";
+            }
+        }
 
 	</script>
 
@@ -751,7 +783,12 @@ if (isset($_POST['inputInicio'])) {
                                 <div class="card-header header-elements-inline">
                                     <div class="col-lg-11">	
                                         <button type="button" class="btn-grid btn btn-lg btn-outline-secondary btn-lg active mr-2 " onclick="mudarGrid('pre-parto')" style="margin-left: -10px;" >Admissao Pré Parto</button>
-                                        <button type="button" class="btn-grid btn btn-lg btn-outline-secondary btn-lg " onclick="mudarGrid('rn')" >Admissão RN</button>
+                                        
+                                        <?php if ($iAtendimentoAdmissaoId) { ?>
+                                            <button type="button" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 " onclick="mudarGrid('evolucao-parto')" >Evolução do Parto</button>
+                                        <?php } ?>
+                                        
+                                        <button type="button" class="btn-grid btn btn-lg btn-outline-secondary btn-lg itemLink" data-tipo='admissaoRN' >Admissão RN</button>
                                     </div>
                                 </div>                                
                                 
@@ -856,7 +893,16 @@ if (isset($_POST['inputInicio'])) {
                                                     </div>
                                                 </div>
 
-                                               
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label for="cmbVacinaPNI">Vacinas no PNI</label>
+                                                        <select id="cmbVacinaPNI" name="cmbVacinaPNI" class="form-control-select2" >
+                                                            <option value="">Selecione</option>
+                                                            <option value='1' <?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPVacinaPNI'] == 1 ? 'selected' : ''; ?> >SIM</option>
+                                                            <option value='0' <?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPVacinaPNI'] == 0 ? 'selected' : ''; ?> >NÃO</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
 
                                         
                                             </div>
@@ -883,7 +929,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <div class="col-lg-2">
                                                     <div class="form-group">
                                                         <label for="cmbFatorRH">TS/Fator RH</label>
-                                                        <select id="cmbFatorRH" name="cmbFatorRH" class="form-control-select2" >
+                                                        <select id="cmbFatorRH" name="cmbFatorRH" class="select-search" >
                                                             <option value="">Selecione</option>                                                            
                                                             <option value='A+' <?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPFatorRH'] == 'A+' ? 'selected' : ''; ?> >A+</option>
                                                             <option value='A-' <?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPFatorRH'] == 'A-' ? 'selected' : ''; ?> >A-</option>
@@ -897,7 +943,7 @@ if (isset($_POST['inputInicio'])) {
                                                     </div>
                                                 </div>
 
-                                                <div class="col-lg-1">
+                                                <div class="col-lg-2">
                                                     <div class="form-group">
                                                         <label for="cmbHIV">HIV</label>
                                                         <select id="cmbHIV" name="cmbHIV" class="form-control-select2" >
@@ -908,7 +954,7 @@ if (isset($_POST['inputInicio'])) {
                                                     </div>
                                                 </div>
                                                                                 
-                                                <div class="col-lg-1">
+                                                <div class="col-lg-2">
                                                     <div class="form-group">
                                                         <label for="cmbVDRL">VDRL</label>
                                                         <select id="cmbVDRL" name="cmbVDRL" class="form-control-select2" >
@@ -928,19 +974,7 @@ if (isset($_POST['inputInicio'])) {
                                                             <option value='RE' <?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPHBsAg'] == 'RE' ? 'selected' : ''; ?> >REAGENTE</option>
                                                         </select>
                                                     </div>
-                                                </div>
-
-                                                <div class="col-lg-2">
-                                                    <div class="form-group">
-                                                        <label for="cmbVacinaPNI">Vacinas no PNI</label>
-                                                        <select id="cmbVacinaPNI" name="cmbVacinaPNI" class="form-control-select2" >
-                                                            <option value="">Selecione</option>
-                                                            <option value='1' <?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPVacinaPNI'] == 1 ? 'selected' : ''; ?> >SIM</option>
-                                                            <option value='0' <?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPVacinaPNI'] == 0 ? 'selected' : ''; ?> >NÃO</option>
-                                                        </select>
-                                                    </div>
-                                                </div>                          
-                                              
+                                                </div>    
                                         
                                             </div>
                                         </div>
@@ -952,7 +986,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <div class="col-lg-8">
                                                     <div class="row form-group">
                                                         <label for="cmbComorbidade">Comorbidades</label>
-                                                        <select id="cmbComorbidade" name="cmbComorbidade" class="form-control-select2" >
+                                                        <select id="cmbComorbidade" name="cmbComorbidade" class="select-search" >
                                                             <option value="">Selecione</option>
                                                             <option value='IT' <?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPComorbidade'] == 'IT' ? 'selected' : ''; ?> >ITU</option>
                                                             <option value='DM' <?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPComorbidade'] == 'DM' ? 'selected' : ''; ?> >DMG</option>
@@ -1000,13 +1034,13 @@ if (isset($_POST['inputInicio'])) {
                                                         <div class="form-group">							
                                                             <div class="form-check form-check-inline">
                                                                 <label class="form-check-label">
-                                                                    <input type="radio" id="inputAlergia" name="inputAlergia" value="1" class="form-input-styled" data-fouc onclick="selecionaAlergiaDescricao('1')" <?php if (isset($iAtendimentoAdmissaoId )) { if ($rowAdmissao['EnAdPAlergia'] == 1) echo "checked"; }?>>
+                                                                    <input type="radio" id="inputAlergia" name="inputAlergia" value="1" class="form-input-styled" data-fouc onclick="selecionaAlergiaDescricaoAd('1')" <?php if (isset($iAtendimentoAdmissaoId )) { if ($rowAdmissao['EnAdPAlergia'] == 1) echo "checked"; }?>>
                                                                     Sim
                                                                 </label>
                                                             </div>
                                                             <div class="form-check form-check-inline">
                                                                 <label class="form-check-label">
-                                                                    <input type="radio" id="inputAlergia" name="inputAlergia" value="0" class="form-input-styled" data-fouc onclick="selecionaAlergiaDescricao('0')" <?php if (isset($iAtendimentoAdmissaoId )) { if ($rowAdmissao['EnAdPAlergia'] == 0) echo "checked"; }else{ echo "checked"; }?>>
+                                                                    <input type="radio" id="inputAlergia" name="inputAlergia" value="0" class="form-input-styled" data-fouc onclick="selecionaAlergiaDescricaoAd('0')" <?php if (isset($iAtendimentoAdmissaoId )) { if ($rowAdmissao['EnAdPAlergia'] == 0) echo "checked"; }else{ echo "checked"; }?>>
                                                                     Não
                                                                 </label>
                                                             </div>										
@@ -1034,7 +1068,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <br>
                                                 <div class="row" style='justify-content: space-between;'>
                                                     <div class="col-lg-4"  >
-                                                        <div id="dadosAlergia" <?php if (!$iAtendimentoAdmissaoId) print('style="display:none"'); ?>>
+                                                        <div id="dadosIntercorrencias" <?php if (!$iAtendimentoAdmissaoId) print('style="display:none"'); ?>>
                                                             <div class="form-group">
                                                                 <textarea rows="4" id="inputIntercorrenciasDescricao" name="inputIntercorrenciasDescricao" onInput="contarCaracteres(this)" maxLength="150" class="form-control" placeholder="Descrição das Intercorrências" ><?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPIntercorrenciaGestacaoDescricao']; ?></textarea>
                                                                 <small class="text-muted form-text">
@@ -1045,7 +1079,7 @@ if (isset($_POST['inputInicio'])) {
                                                         </div> 
                                                     </div>
                                                     <div class="col-lg-4"  >
-                                                        <div id="dadosDiabete" <?php if (!$iAtendimentoAdmissaoId) print('style="display:none"'); ?>>
+                                                        <div id="dadosAlergiad" <?php if (!$iAtendimentoAdmissaoId) print('style="display:none"'); ?>>
                                                             <div class="form-group">
                                                                 <textarea rows="4" id="inputAlergiaDescricao" name="inputAlergiaDescricao" onInput="contarCaracteres(this)" maxLength="150" class="form-control" placeholder="Descrição da Alergia" ><?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPAlergiaDescricao']; ?></textarea>
                                                                 <small class="text-muted form-text">
@@ -1056,7 +1090,7 @@ if (isset($_POST['inputInicio'])) {
                                                         </div> 
                                                     </div>
                                                     <div class="col-lg-4"  >
-                                                        <div id="dadosHipertencao" <?php if (!$iAtendimentoAdmissaoId) print('style="display:none"'); ?>>
+                                                        <div id="dadosUsoMedDescricao" <?php if (!$iAtendimentoAdmissaoId) print('style="display:none"'); ?>>
                                                             <div class="form-group">
                                                                 <textarea rows="4" id="inputUsoMedDescricao" name="inputUsoMedDescricao" onInput="contarCaracteres(this)" maxLength="150" class="form-control" placeholder="Descrição do Medicamento" ><?php if (isset($iAtendimentoAdmissaoId )) echo $rowAdmissao['EnAdPUsoMedicamentoDescricao']; ?></textarea>
                                                                 <small class="text-muted form-text">
@@ -1233,27 +1267,10 @@ if (isset($_POST['inputInicio'])) {
                                 			
                             </div>
 
-                            <div class="card">
-                                <div class=" card-body row">
-                                    <div class="col-lg-12">
-                                        <div class="form-group" style="margin-bottom:0px;">
-                                            <?php 
-                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
-                                                    echo "<button class='btn btn-lg btn-success mr-1 salvarAdmissao' >Salvar</button>";
-                                                }
-                                            ?>
-                                            <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
-                                            <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
-                                        </div>
-                                    </div>
-                                </div>  
-                            </div>
+                             <!-- EVOLUCAO DE PARTO -->
+                             <?php if ($iAtendimentoAdmissaoId) { ?>
 
-
-                            <!-- EVOLUCAO DE PARTO -->
-                            <?php if ($iAtendimentoAdmissaoId) { ?>
-
-                                <div class="card box-pre-parto">
+                                <div class="card box-evolucao-parto" style="display: none;">
 
                                     <div class="card-header header-elements-inline">
                                         <h3 class="card-title font-weight-bold">Evolucao do Parto</h3>
@@ -1294,7 +1311,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <div class="col-lg-2">
                                                     <div class="form-group">
                                                         <label for="cmbApresentacao">Apresentação</label>
-                                                        <select id="cmbApresentacao" name="cmbApresentacao" class="form-control-select2" >
+                                                        <select id="cmbApresentacao" name="cmbApresentacao" class="select-search" >
                                                             <option value="">Selecione</option>
                                                             <option value='CE'>CEFÁLICA</option>
                                                             <option value='PE'>PÉLVICA</option>
@@ -1307,7 +1324,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <div class="col-lg-2">
                                                     <div class="form-group">
                                                         <label for="cmbPlanoLee">Plano de Lee</label>
-                                                        <select id="cmbPlanoLee" name="cmbPlanoLee" class="form-control-select2" >
+                                                        <select id="cmbPlanoLee" name="cmbPlanoLee" class="select-search" >
                                                             <option value="">Selecione</option>
                                                             <option value='-5cm'> - 5cm</option>
                                                             <option value='-4cm'> - 4cm</option>
@@ -1323,7 +1340,7 @@ if (isset($_POST['inputInicio'])) {
                                                     </div>
                                                 </div>
 
-                                                <div class="col-lg-1">
+                                                <div class="col-lg-2">
                                                     <div class="form-group">
                                                         <label for="inputLiquido">Líquido</label>
                                                         <input type="text" onKeyUp="" maxLength="30" id="inputLiquido" name="inputLiquido" class="form-control" placeholder="" value="">                                                
@@ -1342,8 +1359,8 @@ if (isset($_POST['inputInicio'])) {
                                                 </div>   
                                                 
                                                 <div class='col-lg-1 mt-2' >
-                                                    <a id="inserirEvolucaoAdmissaoPreParto" class='btn btn-lg btn-principal'>+</a>
-                                                    <a id="editarEvolucaoAdmissaoPreParto" class='btn btn-lg btn-info' style="display: none;">+</a>
+                                                    <a id="inserirEvolucaoAdmissaoPreParto" class='btn btn-lg btn-principal'>Adicionar</a>
+                                                    <a id="editarEvolucaoAdmissaoPreParto" class='btn btn-lg btn-principal' style="display: none;">Salvar</a>
                                                 </div>
                                                                                     
                                             </div>
@@ -1375,6 +1392,25 @@ if (isset($_POST['inputInicio'])) {
                                 </div>
 
                             <?php } ?>
+
+                            <div class="card">
+                                <div class=" card-body row">
+                                    <div class="col-lg-12">
+                                        <div class="form-group" style="margin-bottom:0px;">
+                                            <?php 
+                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                    echo "<button class='btn btn-lg btn-success mr-1 salvarAdmissao' >Salvar</button>";
+                                                }
+                                            ?>
+                                            <button type="button" class="btn btn-lg btn-secondary mr-1">Imprimir</button>
+                                            <a href='atendimentoHospitalarListagem.php' class='btn btn-basic' role='button'>Voltar</a>
+                                        </div>
+                                    </div>
+                                </div>  
+                            </div>
+
+
+                           
 
 
 							
