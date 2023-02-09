@@ -343,9 +343,9 @@ include('global_assets/php/conexao.php');
 			<div class="content">
 
 				<!-- Info blocks -->
-				<div class="card">
-
+				
 					<form name="formFornecedor" action="fornecedorNovoFinalizaTransacao.php" id="formFornecedor" method="post" class="form-validate-jquery">
+					<div class="card">
 						<div class="card-header header-elements-inline">
 							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Fornecedor</h5>
 						</div>
@@ -370,25 +370,10 @@ include('global_assets/php/conexao.php');
 								</div>
 							</div>
 
-							<h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5>
-							<br>
-
-							<div id="foto" style="text-align:center;width:260px; height:310px; overflow:hidden; justify-content: flex-start; display:flex; flex-direction:column; position:absolute; z-index:1; margin-left:74%">
-								<div id="visualizar">
-									<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" width="200px" alt="Fornecedores" style="border:2px solid #ccc;">
-								</div>
-								<br>
-								<button id="addFoto" type="button" onclick="adicionaFoto()" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>
-							</div>
-
 							<div class="row">
-								<div class="col-lg-3">
-									<div class="form-group">
-										<label for="inputNome">Nome<span class="text-danger">*</span></label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Fantasia" required autofocus>
-									</div>
+								<div class="col-lg-6" style='margin-top: 60px'>
+									 <h5 class="mb-0 font-weight-semibold">Dados Pessoais</h5> 
 								</div>
-
 								<div class="col-lg-3" id="CPF">
 									<div class="form-group">
 										<label for="inputCpf">CPF<span class="text-danger">*</span></label>
@@ -409,71 +394,31 @@ include('global_assets/php/conexao.php');
 										<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT">
 									</div>
 								</div>
+							</div>
+							<br>
 
-								<div class="col-lg-3">
+							<div id="foto" style="text-align:center;width:237px; height:310px; overflow:hidden; justify-content: flex-start; display:flex; flex-direction:column; position:absolute; z-index:1; margin-left:81%">
+								<div id="visualizar">
+									<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" width="200px" alt="Fornecedores" style="border:2px solid #ccc;">
+								</div>
+								<br>
+								<button id="addFoto" type="button" onclick="adicionaFoto()" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>
+							</div>
+
+							<div class="row">
+
+								<div class="col-lg-8">
 									<div class="form-group">
 										<label for="inputRazaoSocial">Razão Social</label>
 										<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social">
 									</div>
 								</div>
-							</div>
-
-							<div class="row">
-								<div class="col-lg-3">
+								<div class="col-lg-4">
 									<div class="form-group">
-										<label for="inputCategoriaCredor">Categoria do Credor</label>
-										<input type="text" id="inputCategoriaCredor" name="inputCategoriaCredor" class="form-control" placeholder="Categoria do Credor">
+										<label for="inputNome">Nome<span class="text-danger">*</span></label>
+										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Fantasia" required autofocus>
 									</div>
 								</div>
-
-								<div class="col-lg-3">
-									<div class="form-group">
-										<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione uma categoria</option>
-											<?php
-											$sql = "SELECT CategId, CategNome
-													FROM Categoria
-													JOIN Situacao on SituaId = CategStatus
-													WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-													ORDER BY CategNome ASC";
-											$result = $conn->query($sql);
-											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-
-											foreach ($rowCategoria as $item) {
-												print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
-											}
-
-											?>
-										</select>
-									</div>
-								</div>
-
-								<div class="col-lg-3">
-									<div class="form-group" style="border-bottom:1px solid #ddd;">
-										<label for="cmbSubCategoria">SubCategoria</label>
-										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
-											<option value="#">Selecione uma subcategoria</option>
-										</select>
-									</div>
-								</div>
-
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
-										<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal">
-									</div>
-								</div>
-
-								<div class="col-lg-1">
-									<div class="form-group">
-										<label for="inputInscricaoEstadual">Ins. Estadual</label>
-										<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Ins. Estadual">
-									</div>
-								</div>
-							</div>
-
-							<div class="row">
 								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputRg">RG</label>
@@ -524,17 +469,44 @@ include('global_assets/php/conexao.php');
 										</select>
 									</div>
 								</div>
+							</div>
 
+							<div class="row">
+								<div class="col-lg-4">
+									<div class="form-group">
+										<label for="inputCarteiraTrabalho">Carteira de Trabalho</label>
+										<input type="text" id="inputCarteiraTrabalho" name="inputCarteiraTrabalho" class="form-control" placeholder="Carteira de Trabalho">
+									</div>
+								</div>
+
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="inputAniversario">Data Nascimento</label>
+										<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" onblur="formataCampoDataNascimento()">
+									</div>
+								</div>
+
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="cmbSexo">Sexo</label>
+										<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
+											<option value="#">Selecione o sexo</option>
+											<option value="F">Feminino</option>
+											<option value="M">Masculino</option>
+										</select>
+									</div>
+								</div>
+
+							</div>
+
+							<div class="row">
 								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNaturalidade">Naturalidade</label>
 										<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
 									</div>
 								</div>
-							</div>
-
-							<div class="row">
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputNaturalidadeUf">UF da Naturalidade</label>
 										<select id="inputNaturalidadeUf" name="inputNaturalidadeUf" class="form-control form-control-select2">
@@ -571,14 +543,14 @@ include('global_assets/php/conexao.php');
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputNacionalidade">Nacionalidade</label>
 										<input type="text" id="inputNacionalidade" name="inputNacionalidade" class="form-control" placeholder="Nacionalidade">
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-2">
 									<div class="form-group">
 										<label for="inputAno">Ano &nbsp<i style="color:#375b82;" class="icon-question4" data-popup="tooltip" data-original-title="Entrada no Brasil (se estrangeiro)" data-placement="right"></i></label>
 										<input type="text" id="inputAno" name="inputAno" class="form-control" placeholder="Ano">
@@ -587,30 +559,59 @@ include('global_assets/php/conexao.php');
 							</div>
 
 							<div class="row">
-								<div class="col-lg-4">
+
+								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputCarteiraTrabalho">Carteira de Trabalho</label>
-										<input type="text" id="inputCarteiraTrabalho" name="inputCarteiraTrabalho" class="form-control" placeholder="Carteira de Trabalho">
+										<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
+										<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal">
 									</div>
 								</div>
 
-								<div class="col-lg-4">
+								<div class="col-lg-1">
 									<div class="form-group">
-										<label for="cmbSexo">Sexo</label>
-										<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
-											<option value="#">Selecione o sexo</option>
-											<option value="F">Feminino</option>
-											<option value="M">Masculino</option>
+										<label for="inputInscricaoEstadual">Ins. Estadual</label>
+										<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Ins. Estadual">
+									</div>
+								</div>
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="inputCategoriaCredor">Categoria do Credor</label>
+										<input type="text" id="inputCategoriaCredor" name="inputCategoriaCredor" class="form-control" placeholder="Categoria do Credor">
+									</div>
+								</div>
+
+								<div class="col-lg-3">
+									<div class="form-group">
+										<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
+										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+											<option value="#">Selecione uma categoria</option>
+											<?php
+											$sql = "SELECT CategId, CategNome
+													FROM Categoria
+													JOIN Situacao on SituaId = CategStatus
+													WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+													ORDER BY CategNome ASC";
+											$result = $conn->query($sql);
+											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+
+											foreach ($rowCategoria as $item) {
+												print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
+											}
+
+											?>
 										</select>
 									</div>
 								</div>
 
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputAniversario">Aniversário</label>
-										<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" onblur="formataCampoDataNascimento()">
+								<div class="col-lg-3">
+									<div class="form-group" style="border-bottom:1px solid #ddd;">
+										<label for="cmbSubCategoria">SubCategoria</label>
+										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
+											<option value="#">Selecione uma subcategoria</option>
+										</select>
 									</div>
 								</div>
+
 							</div>
 
 							<div class="row">
@@ -765,9 +766,11 @@ include('global_assets/php/conexao.php');
 									</div>
 								</div>
 							</div>
-
+						</div><!-- /card-body -->
 							<br>
-
+					</div>
+					<div class="card">		
+						<div class="card-body">
 							<div class="row">
 								<div class="col-lg-12">
 
@@ -858,7 +861,10 @@ include('global_assets/php/conexao.php');
 									</div>
 								</div>
 							</div>
-
+						</div><!-- /card-body -->
+					</div>
+					<div class="card">		
+						<div class="card-body">
 							<div class="row" style="margin-top: 40px;">
 								<div class="col-lg-12">
 									<div class="form-group">
@@ -868,14 +874,14 @@ include('global_assets/php/conexao.php');
 								</div>
 							</div>
 						</div><!-- /card-body -->
-
+					</div>
 					</form>
 
 					<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">
 						<input type="file" id="imagem" name="imagem" style="display:none;" />
 					</form>
 
-				</div>
+				
 				<!-- /info blocks -->
 
 			</div>
