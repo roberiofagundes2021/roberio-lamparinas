@@ -767,7 +767,7 @@ include('global_assets/php/conexao.php');
 								</div>
 							</div>
 						</div><!-- /card-body -->
-							<br>
+							
 					</div>
 					<div class="card">		
 						<div class="card-body">

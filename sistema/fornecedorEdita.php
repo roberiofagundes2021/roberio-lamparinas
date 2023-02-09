@@ -870,7 +870,7 @@ if (isset($_POST['inputFornecedorId'])) {
 								</div>
 							</div>
 						</div>
-							<br>
+						
 						<div class="card">	
 							<div class="card-body">
 								<div class="row">
