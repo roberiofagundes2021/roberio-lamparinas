@@ -900,8 +900,9 @@ if (isset($_POST['inputInicio'])) {
                 ':sUnidade' => $_SESSION['UnidadeId'],
                 ':iAtendimentoExameFisico' => $iAtendimentoExameFisicoId 
                 ));
-    
-            $_SESSION['msg']['mensagem'] = "Anamnese alterada!!!";
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Anamnese Alterada com Sucesso!!!";
+            $_SESSION['msg']['tipo'] = "success";
             
         } else {
 
@@ -1704,6 +1705,10 @@ if (isset($_POST['inputInicio'])) {
                 ':sAndar' => $_POST['cmbAndar'] == "" ? null : $_POST['cmbAndar'] ,
                 ':sUnidade' => $_SESSION['UnidadeId'],
             ));
+
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Anamnese Inserida Com Sucesso!!!";
+            $_SESSION['msg']['tipo'] = "success";
             
         }
         
@@ -2332,7 +2337,7 @@ if (isset($_POST['inputInicio'])) {
                                             
                                             <!-- campos -->										
                                             <div class="col-lg-4">
-                                                <select id="cmbOcular" name="cmbOcular" class="form-control-select2" onChange="calculaScore()" >
+                                                <select id="cmbOcular" name="cmbOcular" class="select-search" onChange="calculaScore()" >
                                                     <option value="">Selecione</option>
                                                     <?php
                                                         $arrayOcular = [ 'ES' => 'ESPONTÂNEA', 'OV' => 'ORDEM VERBAL', 'ED' => 'ESTÍMULO DOLOROSO', 'NR' => 'NÃO RESPONDE' ]; 
@@ -2347,7 +2352,7 @@ if (isset($_POST['inputInicio'])) {
                                                 </select>
                                             </div>
                                             <div class="col-lg-4">
-                                                <select id="cmbVerbal" name="cmbVerbal" class="form-control-select2" onChange="calculaScore()" >
+                                                <select id="cmbVerbal" name="cmbVerbal" class="select-search" onChange="calculaScore()" >
                                                     <option value="">Selecione</option>
                                                     <?php
                                                         $arrayVerbal = [ 'OR' => 'ORIENTADO', 'CO' => 'CONFUSO', 'PI' => 'PALAVRAS INAPROPRIADAS', 'PC' => 'PALAVRAS INCOMPREENSÍVAS', 'NR' => 'NÃO RESPONDE' ]; 
@@ -2362,7 +2367,7 @@ if (isset($_POST['inputInicio'])) {
                                                 </select>											
                                             </div>
                                             <div class="col-lg-3">
-                                                <select id="cmbMotora" name="cmbMotora" class="form-control-select2" onChange="calculaScore()" >
+                                                <select id="cmbMotora" name="cmbMotora" class="select-search" onChange="calculaScore()" >
                                                     <option value="">Selecione</option>
                                                     <?php
                                                         $arrayMotora = [ 'OA' => 'OBEDECE AO COMANDO', 'RO' => 'RETIRA O ESTÍMULO', 'LE' => 'LOCALIZA ESTÍMULO', 'RF' => 'RESPOSTA EM FLEXÃO', 'RE' => 'RESPOSTA EM EXTENSÃO', 'NR' => 'NÃO RESPONDE' ]; 
@@ -2567,7 +2572,7 @@ if (isset($_POST['inputInicio'])) {
                                                 </select>											
                                             </div>
                                             <div class="col-lg-4">
-                                                <select id="cmbDorAguda" name="cmbDorAguda" class="form-control-select2" onChange="textoDorAguda()" >
+                                                <select id="cmbDorAguda" name="cmbDorAguda" class="select-search" onChange="textoDorAguda()" >
                                                     <option value="">Selecione</option>
                                                     <?php
                                                         $arrayGrauDependencia = [ 'SD' => 'SEM ALTERAÇÕES', 'DL' => 'DOR LEVE', 'DM' => 'DOR MODERADA', 'DI' => 'DOR INTENSA' ]; 
@@ -3664,7 +3669,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-lg-4">COMER/BEBER</label>
                                                     <div class="col-lg-8">
-                                                        <select id="cmbComerBeber" name="cmbComerBeber" class="form-control form-control-select2">
+                                                        <select id="cmbComerBeber" name="cmbComerBeber" class="form-control select-search">
                                                             <option value="">Selecione</option>
                                                             <?php
                                                                 foreach ($arrayGrauDependencia as $key => $item) {
@@ -3684,7 +3689,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-lg-4">VESTIR-SE</label>
                                                     <div class="col-lg-8">
-                                                        <select id="cmbVestirSe" name="cmbVestirSe" class="form-control form-control-select2">
+                                                        <select id="cmbVestirSe" name="cmbVestirSe" class="form-control select-search">
                                                             <option value="">Selecione</option>
                                                             <?php
                                                                 foreach ($arrayGrauDependencia as $key => $item) {
@@ -3704,7 +3709,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-lg-4">SUBIR ESCADAS</label>
                                                     <div class="col-lg-8">
-                                                        <select id="cmbSubirEscadas" name="cmbSubirEscadas" class="form-control form-control-select2">
+                                                        <select id="cmbSubirEscadas" name="cmbSubirEscadas" class="form-control select-search">
                                                             <option value="">Selecione</option>                                                        
                                                             <?php
                                                                 foreach ($arrayGrauDependencia as $key => $item) {
@@ -3724,7 +3729,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-lg-4">BANHO</label>
                                                     <div class="col-lg-8">
-                                                        <select id="cmbBanho" name="cmbBanho" class="form-control form-control-select2">
+                                                        <select id="cmbBanho" name="cmbBanho" class="form-control select-search">
                                                             <option value="">Selecione</option>                                                        
                                                             <?php
                                                                 foreach ($arrayGrauDependencia as $key => $item) {
@@ -3744,7 +3749,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-lg-4">DEAMBULAR</label>
                                                     <div class="col-lg-8">
-                                                        <select id="cmbDeambular" name="cmbDeambular" class="form-control form-control-select2">
+                                                        <select id="cmbDeambular" name="cmbDeambular" class="form-control select-search">
                                                             <option value="">Selecione</option>                                                        
                                                             <?php
                                                                 foreach ($arrayGrauDependencia as $key => $item) {
@@ -3764,7 +3769,7 @@ if (isset($_POST['inputInicio'])) {
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-lg-4">ANDAR</label>
                                                     <div class="col-lg-8">
-                                                        <select id="cmbAndar" name="cmbAndar" class="form-control form-control-select2">
+                                                        <select id="cmbAndar" name="cmbAndar" class="form-control select-search">
                                                             <option value="">Selecione</option>                                                        
                                                             <?php
                                                                 foreach ($arrayGrauDependencia as $key => $item) {
