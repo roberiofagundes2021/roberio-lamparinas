@@ -45,7 +45,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
-							':sCodigo' => $_POST['inputCodigo'] == '' ? '000' : $_POST['inputCodigo'],
+							':sCodigo' => $_POST['inputCodigo'] == '' ? '00' : $_POST['inputCodigo'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iCategoria' => $_POST['inputCategoriaId']
 							));
@@ -60,7 +60,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
-							':sCodigo' => $_POST['inputCodigo'] == '' ? '000' : $_POST['inputCodigo'],
+							':sCodigo' => $_POST['inputCodigo'] == '' ? '00' : $_POST['inputCodigo'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iEmpresa' => $_SESSION['EmpreId'],
@@ -286,7 +286,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 												<div class="col-lg-1">
 													<div class="form-group">
 														<label for="inputCodigo">Código </span></label>
-														<input type="number" max="999" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="'.(isset($_POST['inputCategoriaId'])?$rowCategoria['CategCodigo']:'').'"autofocus>
+														<input type="number" max="99" id="inputCodigo" name="inputCodigo" class="form-control" placeholder="Código" value="'.(isset($_POST['inputCategoriaId'])?$rowCategoria['CategCodigo']:'').'"autofocus>
 													</div>
 												</div>
 												<div class="col-lg-5">
