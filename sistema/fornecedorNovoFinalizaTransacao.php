@@ -15,13 +15,13 @@ try{
 	} 
 	$sql = "INSERT INTO Fornecedor (ForneTipo, ForneNome, ForneRazaoSocial, ForneCnpj, ForneInscricaoMunicipal, ForneInscricaoEstadual, ForneCategoria,
 									ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, ForneAniversario, ForneNaturalidade, ForneNaturalidadeUf,
-									ForneNacionalidade, ForneAno, ForneCarteiraTrabalho, ForneNit, ForneCategoriaCredor, ForneFoto, ForneCep, ForneEndereco,
+									ForneNacionalidade, ForneAno, ForneCarteiraTrabalho, ForneNumSerie, ForneNit, ForneNire, ForneFoto, ForneCep, ForneEndereco,
 									ForneNumero, ForneComplemento, ForneBairro, ForneCidade, ForneEstado, ForneContato, ForneTelefone, ForneTelefoneComercial,
 									ForneCelular, ForneEmail, ForneSite, ForneObservacao, ForneBanco, ForneAgencia, ForneConta, ForneInformacaoAdicional,
 									ForneIpi, ForneFrete, ForneIcms, ForneOutros, ForneStatus, ForneUsuarioAtualizador, ForneEmpresa)
 			VALUES (:sTipo, :sNome, :sRazaoSocial, :sCnpj, :sInscricaoMunicipal, :sInscricaoEstadual, :iCategoria, 
 					:sCpf, :sRg, :sOrgaoEmissor, :sUf, :sSexo, :dAniversario, :sNaturalidade, :sNaturalidadeUf,
-					:sNacionalidade, :sAno, :sCarteiraTrabalho, :sNit, :sCategoriaCredor, :sFoto, :sCep, :sEndereco,
+					:sNacionalidade, :sAno, :sCarteiraTrabalho,  :sNumSerie, :sNit, :sNire, :sFoto, :sCep, :sEndereco,
 					:sNumero, :sComplemento, :sBairro, :sCidade, :sEstado, :sContato, :sTelefone, :sTelefoneComercial,
 					:sCelular, :sEmail, :sSite, :sObservacao, :iBanco, :sAgencia, :sConta, :sInformacaoAdicional,
 					:iIpi, :iFrete, :iIcms, :iOutros, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
@@ -49,8 +49,9 @@ try{
 						':sNacionalidade' => $_POST['inputTipo'] == 'J' || $_POST['inputNacionalidade'] == '#' ? null : $_POST['inputNacionalidade'],
 						':sAno' => $_POST['inputTipo'] == 'J' || $_POST['inputAno'] == '#' ? null : $_POST['inputAno'],
 						':sCarteiraTrabalho' => $_POST['inputTipo'] == 'J' || $_POST['inputCarteiraTrabalho'] == '#' ? null : $_POST['inputCarteiraTrabalho'],
+						':sNumSerie' => $_POST['inputTipo'] == 'F' ? $_POST['inputNumSerie'] : null,
 						':sNit' => $_POST['inputNit'],
-						':sCategoriaCredor' => $_POST['inputCategoriaCredor'],
+						':sNire' => $_POST['inputNire'],
 						':sFoto' => $input_foto,
 						':sCep' => $_POST['inputCep'],
 						':sEndereco' => $_POST['inputEndereco'],

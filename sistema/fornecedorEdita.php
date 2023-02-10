@@ -83,6 +83,60 @@ if (isset($_POST['inputFornecedorId'])) {
 
 		$(document).ready(function() {
 
+			 /* Início: Tabela Personalizada */
+			 $('#tblDadoSocietarios').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+				searching: false,
+				ordering: false, 
+				paging: false,
+			    columnDefs: [
+				{ 
+					orderable: true, 
+					width: "5%", 
+					targets: [0]
+				},
+				{ 
+					orderable: true,   
+					width: "25%", 
+					targets: [1]
+				},
+				{ 
+					orderable: true,
+					width: "20%", 
+					targets: [2]
+				},				
+				{ 
+					orderable: true,  
+					width: "20%", 
+					targets: [3]
+				},				
+				{ 
+					orderable: true,  
+					width: "10%", 
+					targets: [4]
+				},
+				{ 
+					orderable: true,  
+					width: "10%", 
+					targets: [5]
+				},				
+				{ 
+					orderable: true,  
+					width: "10%", 
+					targets: [6]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+                
+			});
+
 			$('#imagem').on('change', function() {
 				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
 
@@ -306,6 +360,7 @@ if (isset($_POST['inputFornecedorId'])) {
 			var camposPFVisiveis = [
 				'inputCpf',
 				'inputRg',
+				'inputNit',
 				'inputEmissor',
 				'cmbUf',
 				'inputNaturalidade',
@@ -313,11 +368,13 @@ if (isset($_POST['inputFornecedorId'])) {
 				'inputNacionalidade',
 				'inputAno',
 				'inputCarteiraTrabalho',
+				'inputNumSerie',
 				'cmbSexo',
 				'inputAniversario'
 			]
 			var camposPJVisiveis = [
 				'inputCnpj',
+				'inputNire',
 				'inputInscricaoMunicipal',
 				'inputInscricaoEstadual',
 				'inputRazaoSocial'
@@ -474,6 +531,13 @@ if (isset($_POST['inputFornecedorId'])) {
 
 									<div class="col-lg-3">
 										<div class="form-group">
+											<label for="inputNire">NIRE</label>
+											<input type="text" id="inputNire" name="inputNire" class="form-control" placeholder="NIRE" value="<?php echo $row['ForneNire']; ?>">
+										</div>
+									</div>
+
+									<div class="col-lg-3">
+										<div class="form-group">
 											<label for="inputNit">NIT</label>
 											<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT" value="<?php echo $row['ForneNit']; ?>">
 										</div>
@@ -555,21 +619,27 @@ if (isset($_POST['inputFornecedorId'])) {
 								</div>
 
 								<div class="row">
-									<div class="col-lg-4">
+									<div class="col-lg-3">
 										<div class="form-group">
 											<label for="inputCarteiraTrabalho">Carteira de Trabalho</label>
 											<input type="text" id="inputCarteiraTrabalho" name="inputCarteiraTrabalho" class="form-control" placeholder="Carteira de Trabalho" value="<?php echo $row['ForneCarteiraTrabalho']; ?>">
 										</div>
 									</div>
-
 									<div class="col-lg-3">
+										<div class="form-group">
+											<label for="inputNumSerie">Numero de Série</label>
+											<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Numero de Série" value="<?php echo $row['ForneNumSerie']; ?>">
+										</div>
+									</div>
+
+									<div class="col-lg-2">
 										<div class="form-group">
 											<label for="inputAniversario">Data Nascimento</label>
 											<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" onblur="formataCampoDataNascimento()" value="<?php echo $row['ForneAniversario']; ?>">
 										</div>
 									</div>
 
-									<div class="col-lg-3">
+									<div class="col-lg-2">
 										<div class="form-group">
 											<label for="cmbSexo">Sexo</label>
 											<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
@@ -648,20 +718,14 @@ if (isset($_POST['inputFornecedorId'])) {
 										</div>
 									</div>
 
-									<div class="col-lg-1">
+									<div class="col-lg-2">
 										<div class="form-group">
-											<label for="inputInscricaoEstadual">Ins. Estadual</label>
+											<label for="inputInscricaoEstadual">Inscrição Estadual</label>
 											<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Ins. Estadual" value="<?php echo $row['ForneInscricaoEstadual']; ?>">
 										</div>
 									</div>
-									<div class="col-lg-3">
-										<div class="form-group">
-											<label for="inputCategoriaCredor">Categoria do Credor</label>
-											<input type="text" id="inputCategoriaCredor" name="inputCategoriaCredor" class="form-control" placeholder="Categoria do Credor" value="<?php echo $row['ForneCategoriaCredor']; ?>">
-										</div>
-									</div>
 
-									<div class="col-lg-3">
+									<div class="col-lg-4">
 										<div class="form-group">
 											<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
 											<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
@@ -685,7 +749,7 @@ if (isset($_POST['inputFornecedorId'])) {
 										</div>
 									</div>
 
-									<div class="col-lg-3">
+									<div class="col-lg-4">
 										<div class="form-group" style="border-bottom:1px solid #ddd;">
 											<label for="cmbSubCategoria">SubCategoria</label>
 											<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
@@ -870,6 +934,92 @@ if (isset($_POST['inputFornecedorId'])) {
 								</div>
 							</div>
 						</div>
+
+						<div class="card">
+
+						<div class="card-header header-elements-inline">
+							<h5 class="card-title font-weight-bold">Dados Societários</h5>
+						</div>
+
+						<div class="card-body">
+
+							<form id="formDadoSocietarios" name="formDadoSocietarios" method="post" class="form-validate-jquery">
+								<input type="hidden" name="idDadoSocietarios" id="idDadoSocietarios">
+					
+								<div class="col-lg-12 mb-2 row" style='margin-left: -20px;'>
+									<!-- titulos -->
+									<div class="col-lg-4">
+										<label>Nome <span class="text-danger">*</span></label>
+									</div>
+									<div class="col-lg-2">
+										<label>CPF</label>
+									</div>
+									<div class="col-lg-2">
+										<label>RG</label>
+									</div>
+									<div class="col-lg-2">
+										<label>Celular</label>
+									</div>
+									<div class="col-lg-2">
+										<label>E-mail</label>
+									</div>
+									
+									<!-- campos -->										
+									<div class="col-lg-4">
+										<input type="text" class="form-control" name="dadoSocietariosNome" id="dadoSocietariosNome" value="">	
+									
+									</div>
+									<div class="col-lg-2">
+										<input type="text" class="form-control" name="dadoSocietariosCPF" id="dadoSocietariosCPF" value="">	
+									
+									</div>
+									<div class="col-lg-2">
+										<input type="text" class="form-control" name="dadoSocietariosRG" id="dadoSocietariosRG" value="">	
+									
+									</div>
+									<div class="col-lg-2">
+										<input type="text" class="form-control" name="dadoSocietariosCelular" id="dadoSocietariosCelular" value="">	
+									
+									</div>
+									<div class="col-lg-2">
+										<input type="text" class="form-control" name="dadoSocietariosEmail" id="dadoSocietariosEmail" value="">	
+									
+									</div>
+									
+								</div>
+								
+							</form>
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group" style="padding-top:15px;">	
+										<button class="btn btn-lg btn-success" id="incluirDadoSocietarios" style="display: block;"  >Adicionar</button>		
+									</div>
+								</div>
+							</div> 
+						</div>
+
+						<div class="row">
+							<div class="col-lg-12">
+								<table class="table" id="tblDadoSocietarios">
+									<thead>
+										<tr class="bg-slate">
+											<th class="text-left">Item</th>
+											<th class="text-left">Nome</th>
+											<th class="text-left">CPF</th>
+											<th class="text-left">RG</th>
+											<th class="text-left">Celular</th>
+											<th class="text-left">Email</th>
+											<th class="text-center">Ações</th>
+										</tr>
+									</thead>
+									<tbody id="dataDadoSocietarios">
+									</tbody>
+								</table>
+							</div>		
+						</div>							
+
+					</div>
 						
 						<div class="card">	
 							<div class="card-body">
@@ -966,6 +1116,7 @@ if (isset($_POST['inputFornecedorId'])) {
 								</div>
 							</div>
 						</div>
+						
 						<div class="card">
 							<div class="card-body">
 								<div class="row" style="margin-top: 40px;">
