@@ -44,7 +44,7 @@ if(isset($_POST['inputNome'])){
 						':iCategoria' => $_POST['cmbCategoria'],
 						':iSubCategoria' => $_POST['cmbSubCategoria'] == '' ? null : $_POST['cmbSubCategoria'],
 						':sFamilia' => $_POST['inputFamilia'] == '#' ? null : $_POST['inputFamilia'],
-						':iFinalistico' => $_POST['cmbFinalistico'] == '000' ? null : $_POST['cmbFinalistico'],
+						':iFinalistico' => $_POST['cmbFinalistico'] == '00' ? null : $_POST['cmbFinalistico'],
 						':fValorCusto' => $_POST['inputValorCusto'] == null ? null : gravaValor($_POST['inputValorCusto']),						
 						':fOutrasDespesas' => $_POST['inputOutrasDespesas'] == null ? null : gravaValor($_POST['inputOutrasDespesas']),
 						':fCustoFinal' => $_POST['inputCustoFinal'] == null ? null : gravaValor($_POST['inputCustoFinal']),
@@ -158,7 +158,7 @@ if(isset($_POST['inputNome'])){
 							} else {
 								Reset();
 							}
-							$('#inputFamilia').val(`${codCategoria}.000`);
+							$('#inputFamilia').val(`${codCategoria}.00`);
 						}
 					})
 				}
@@ -166,7 +166,7 @@ if(isset($_POST['inputNome'])){
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
 			$('#cmbSubCategoria').on('change', function(e){
-				let codSubCategoria = '000'
+				let codSubCategoria = '00'
 				let inputFamilia = $('#inputFamilia').val()
 				inputFamilia = inputFamilia.split('.')[0]
 
