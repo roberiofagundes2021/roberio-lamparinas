@@ -96,6 +96,40 @@ include('global_assets/php/conexao.php');
                 
 			});*/
 
+		/*$('#incluirDadoSocietarios').on('click', function (e) {
+
+			e.preventDefault();
+
+			let dadoSocietariosNome = $('#dadoSocietariosNome').val()
+			let dadoSocietariosCPF = $('#dadoSocietariosCPF').val()
+			let dadoSocietariosRG = $('#dadoSocietariosRG').val()
+			let dadoSocietariosCelular = $('#dadoSocietariosCelular').val()
+			let dadoSocietariosEmail = $('#dadoSocietariosEmail').val()
+
+
+			$.ajax({
+				type: 'POST',
+				url: 'filtraFornecedor.php',
+				dataType: 'json',
+
+				data: {
+					'tipoRequest': 'INCLUIRDADOSOCIETARIO',
+					'tipo' : 'INSERT',
+					'dadoSocietariosNome' : dadoSocietariosNome,		
+					'dadoSocietariosCPF' : dadoSocietariosCPF,		
+					'dadoSocietariosRG' : dadoSocietariosRG,	
+					'dadoSocietariosCelular' : dadoSocietariosCelular,
+					'dadoSocietariosEmail' : dadoSocietariosEmail,
+				},
+				success: function(response) {
+					
+					dadoSocietarios()              
+					
+				}
+			});
+
+		})*/
+
 			$('#imagem').on('change', function() {
 				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
 
