@@ -43,7 +43,7 @@ include('global_assets/php/conexao.php');
 		$(document).ready(function() {
 
 			 /* Início: Tabela Personalizada */
-			 $('#tblDadoSocietarios').DataTable( {
+			/* $('#tblDadoSocietarios').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
@@ -94,7 +94,7 @@ include('global_assets/php/conexao.php');
 					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
 				}
                 
-			});
+			});*/
 
 			$('#imagem').on('change', function() {
 				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
