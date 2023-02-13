@@ -2,7 +2,7 @@
 
     include_once("sessao.php"); 
 
-    $_SESSION['PaginaAtual'] = 'Admissão Cirúrgica Pré-Operatório';
+    $_SESSION['PaginaAtual'] = 'Anotação Trans-Operatória';
 
     include('global_assets/php/conexao.php');
 
@@ -19,15 +19,15 @@
 
     $iUnidade = $_SESSION['UnidadeId'];
 
-    //exame físico
-    $sql = "SELECT TOP(1) EnAdPId
-    FROM EnfermagemAdmissaoPediatrica
-    WHERE EnAdPAtendimento = $iAtendimentoId
-    ORDER BY EnAdPId DESC";
+    //anotação trans-operatória
+    $sql = "SELECT TOP(1) *
+    FROM EnfermagemTransOperatoria
+    WHERE EnTrOAtendimento = $iAtendimentoId
+    ORDER BY EnTrOId DESC";
     $result = $conn->query($sql);
-    $rowExameFisico= $result->fetch(PDO::FETCH_ASSOC);
+    $rowAnotacao = $result->fetch(PDO::FETCH_ASSOC);
 
-    $iAtendimentoAdmissaoPediatrica = $rowExameFisico?$rowExameFisico['EnAdPId']:null;
+    $iAtendimentoAnotacao = $rowAnotacao?$rowAnotacao['EnTrOId']:null;
 
     $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
     $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
@@ -92,149 +92,304 @@
     $rowKitCME = $result->fetchAll(PDO::FETCH_ASSOC);
 
     if(isset($_POST['entradaHora'])){
-        $sql = "INSERT INTO EnfermagemTransOperatoria(EnTrOAtendimento,EnTrODataInicio,EnTrOHoraInicio,
-            EnTrOPrevisaoAlta,EnTrOTipoInternacao,EnTrOEspecialidadeLeito,EnTrOAla,EnTrOQuarto,EnTrOLeito,
-            EnTrOProfissional,EnTrOPas,EnTrOPad,EnTrOFreqCardiaca,EnTrOFreqRespiratoria,EnTrOTemperatura,
-            EnTrOSPO,EnTrOHGT,EnTrOPeso,EnTrOHoraEntrada,EnTrOHoraSaida,EnTrOSala,EnTrOProfiCirculante,
-            EnTrOInicioAnestesia,EnTrOTerminoAnestesia,EnTrOTipoAnestesia,EnTrOProfiAnestesista,
-            EnTrOProfiInstrumentador,EnTrOInicioCirurgia,EnTrOTerminoCirurgia,EnTrOProfiCirurgiao,
-            EnTrOProfiCirurgiaoAssistente,EnTrODescPosicaoOperatoria,EnTrOServAdicionalBancoSangue,
-            EnTrOServAdicionalRadiologia,EnTrOServAdicionalLaboratorio,EnTrOServAdicionalAnatPatologica,
-            EnTrOServAdicionalUsoContraste,EnTrOServAdicionalOutros,EnTrOEncaminhamentoPosCirurgia,
-            EnTrOEmUsoCateterEpidural,EnTrOEmUsoDrenoTubular,EnTrOEmUsoEntubacaoTraqueal,EnTrOEmUsoIntracath,
-            EnTrOEmUsoKehr,EnTrOEmUsoPecaCirurgica,EnTrOEmUsoPenrose,EnTrOEmUsoProntuario,
-            EnTrOEmUsoPuncaoPeriferica,EnTrOEmUsoRadiografia,EnTrOEmUsoSistemaSuccao,EnTrOEmUsoSondaGastrica,
-            EnTrOEmUsoSondaVesical,EnTrOProfiEnfermeiro,EnTrOProfiTecnico,EnTrOProfiEnfermeiroCCO,
-            EnTrOProfiTecnicoCCO,EnTrOProfiTecnicoRPA,EnTrOKitCME,EnTrOMedicacaoAdministrada,EnTrOObservacao)
-        VALUES(
-            :EnTrOAtendimento,
-            :EnTrODataInicio,
-            :EnTrOHoraInicio,
-            :EnTrOPrevisaoAlta,
-            :EnTrOTipoInternacao,
-            :EnTrOEspecialidadeLeito,
-            :EnTrOAla,
-            :EnTrOQuarto,
-            :EnTrOLeito,
-            :EnTrOProfissional,
-            :EnTrOPas,
-            :EnTrOPad,
-            :EnTrOFreqCardiaca,
-            :EnTrOFreqRespiratoria,
-            :EnTrOTemperatura,
-            :EnTrOSPO,
-            :EnTrOHGT,
-            :EnTrOPeso,
-            :EnTrOHoraEntrada,
-            :EnTrOHoraSaida,
-            :EnTrOSala,
-            :EnTrOProfiCirculante,
-            :EnTrOInicioAnestesia,
-            :EnTrOTerminoAnestesia,
-            :EnTrOTipoAnestesia,
-            :EnTrOProfiAnestesista,
-            :EnTrOProfiInstrumentador,
-            :EnTrOInicioCirurgia,
-            :EnTrOTerminoCirurgia,
-            :EnTrOProfiCirurgiao,
-            :EnTrOProfiCirurgiaoAssistente,
-            :EnTrODescPosicaoOperatoria,
-            :EnTrOServAdicionalBancoSangue,
-            :EnTrOServAdicionalRadiologia,
-            :EnTrOServAdicionalLaboratorio,
-            :EnTrOServAdicionalAnatPatologica,
-            :EnTrOServAdicionalUsoContraste,
-            :EnTrOServAdicionalOutros,
-            :EnTrOEncaminhamentoPosCirurgia,
-            :EnTrOEmUsoCateterEpidural,
-            :EnTrOEmUsoDrenoTubular,
-            :EnTrOEmUsoEntubacaoTraqueal,
-            :EnTrOEmUsoIntracath,
-            :EnTrOEmUsoKehr,
-            :EnTrOEmUsoPecaCirurgica,
-            :EnTrOEmUsoPenrose,
-            :EnTrOEmUsoProntuario,
-            :EnTrOEmUsoPuncaoPeriferica,
-            :EnTrOEmUsoRadiografia,
-            :EnTrOEmUsoSistemaSuccao,
-            :EnTrOEmUsoSondaGastrica,
-            :EnTrOEmUsoSondaVesical,
-            :EnTrOProfiEnfermeiro,
-            :EnTrOProfiTecnico,
-            :EnTrOProfiEnfermeiroCCO,
-            :EnTrOProfiTecnicoCCO,
-            :EnTrOProfiTecnicoRPA,
-            :EnTrOKitCME,
-            :EnTrOMedicacaoAdministrada,
-            :EnTrOObservacao)";
-        $result = $conn->prepare($sql);
 
-        $result->execute(array(
-            ':EnTrOAtendimento' => $iAtendimentoId,
-            ':EnTrODataInicio' => date('Y-m-d'),
-            ':EnTrOHoraInicio' => date('H:i'),
-            ':EnTrOPrevisaoAlta' => '',
-            ':EnTrOTipoInternacao' => $row['TpIntId'],
-            ':EnTrOEspecialidadeLeito' => $row['EsLeiId'],
-            ':EnTrOAla' => $row['AlaId'],
-            ':EnTrOQuarto' => $row['QuartId'],
-            ':EnTrOLeito' => $row['LeitoId'],
-            ':EnTrOProfissional' => $userId,
-            ':EnTrOPas' => null,
-            ':EnTrOPad' => null,
-            ':EnTrOFreqCardiaca' => null,
-            ':EnTrOFreqRespiratoria' => null,
-            ':EnTrOTemperatura' => null,
-            ':EnTrOSPO' => null,
-            ':EnTrOHGT' => null,
-            ':EnTrOPeso' => null,
-            ':EnTrOHoraEntrada' => null,
-            ':EnTrOHoraSaida' => null,
-            ':EnTrOSala' => null,
-            ':EnTrOProfiCirculante' => null,
-            ':EnTrOInicioAnestesia' => isset($_POST['inicioAnestesia'])?$_POST['inicioAnestesia']:null,
-            ':EnTrOTerminoAnestesia' => isset($_POST['terminoAnestesia'])?$_POST['terminoAnestesia']:null,
-            ':EnTrOTipoAnestesia' => isset($_POST['tipoAnestesia'])?$_POST['tipoAnestesia']:null,
-            ':EnTrOProfiAnestesista' => isset($_POST['profissionalAnestesista'])?$_POST['profissionalAnestesista']:null,
-            ':EnTrOProfiInstrumentador' => isset($_POST['profissionalInstrumentador'])?$_POST['profissionalInstrumentador']:null,
-            ':EnTrOInicioCirurgia' => isset($_POST['inicioCirurgia'])?$_POST['inicioCirurgia']:null,
-            ':EnTrOTerminoCirurgia' => isset($_POST['terminoCirurgia'])?$_POST['terminoCirurgia']:null,
-            ':EnTrOProfiCirurgiao' => isset($_POST['profissionalCirurgiao'])?$_POST['profissionalCirurgiao']:null,
-            ':EnTrOProfiCirurgiaoAssistente' => isset($_POST['profissionalAssistente'])?$_POST['profissionalAssistente']:null,
-            ':EnTrODescPosicaoOperatoria' => isset($_POST['descricaoPosicao'])?$_POST['descricaoPosicao']:null,
-            ':EnTrOEncaminhamentoPosCirurgia' => isset($_POST['encaminhamento'])?$_POST['encaminhamento']:null,
-            ':EnTrOProfiEnfermeiro' => isset($_POST['profissionalEnfermeiro'])?$_POST['profissionalEnfermeiro']:null,
-            ':EnTrOProfiTecnico' => isset($_POST['profissionalTecnico'])?$_POST['profissionalTecnico']:null,
-            ':EnTrOProfiEnfermeiroCCO' => isset($_POST['profissionalEnfermeiroCCO'])?$_POST['profissionalEnfermeiroCCO']:null,
-            ':EnTrOProfiTecnicoCCO' => isset($_POST['profissionalTecnicoCCO'])?$_POST['profissionalTecnicoCCO']:null,
-            ':EnTrOProfiTecnicoRPA' => isset($_POST['profissionalTecnicoRPA'])?$_POST['profissionalTecnicoRPA']:null,
-            ':EnTrOKitCME' => isset($_POST['kitCME'])?$_POST['kitCME']:null,
-            ':EnTrOMedicacaoAdministrada' => isset($_POST['textMedicacao'])?$_POST['textMedicacao']:null,
-            ':EnTrOObservacao' => isset($_POST['textObservacao'])?$_POST['textObservacao']:null,
+        if ($iAtendimentoAnotacao) {
 
-            // servicosAdicionais[]
-            ':EnTrOServAdicionalBancoSangue' => isset($_POST['servicosAdicionais'])?(in_array('BS',$_POST['servicosAdicionais'])?1:0):null,
-            ':EnTrOServAdicionalRadiologia' => isset($_POST['servicosAdicionais'])?(in_array('RA',$_POST['servicosAdicionais'])?1:0):null,
-            ':EnTrOServAdicionalLaboratorio' => isset($_POST['servicosAdicionais'])?(in_array('LA',$_POST['servicosAdicionais'])?1:0):null,
-            ':EnTrOServAdicionalAnatPatologica' => isset($_POST['servicosAdicionais'])?(in_array('AN',$_POST['servicosAdicionais'])?1:0):null,
-            ':EnTrOServAdicionalUsoContraste' => isset($_POST['servicosAdicionais'])?(in_array('UC',$_POST['servicosAdicionais'])?1:0):null,
-            ':EnTrOServAdicionalOutros' => isset($_POST['servicosAdicionais'])?(in_array('OU',$_POST['servicosAdicionais'])?1:0):null,
+            $sql = "UPDATE EnfermagemTransOperatoria SET
+            EnTrOAtendimento = :EnTrOAtendimento,
+            EnTrODataInicio = :EnTrODataInicio,
+            EnTrOHoraInicio = :EnTrOHoraInicio,
+            EnTrOPrevisaoAlta = :EnTrOPrevisaoAlta,
+            EnTrOTipoInternacao = :EnTrOTipoInternacao,
+            EnTrOEspecialidadeLeito = :EnTrOEspecialidadeLeito,
+            EnTrOAla  = :EnTrOAla,
+            EnTrOQuarto   = :EnTrOQuarto,
+            EnTrOLeito = :EnTrOLeito,
+            EnTrOProfissional = :EnTrOProfissional,
+            EnTrOPas = :EnTrOPas,
+            EnTrOPad = :EnTrOPad,
+            EnTrOFreqCardiaca = :EnTrOFreqCardiaca,
+            EnTrOFreqRespiratoria = :EnTrOFreqRespiratoria,
+            EnTrOTemperatura = :EnTrOTemperatura,
+            EnTrOSPO = :EnTrOSPO,
+            EnTrOHGT = :EnTrOHGT,
+            EnTrOPeso = :EnTrOPeso,
+            EnTrOHoraEntrada = :EnTrOHoraEntrada,
+            EnTrOHoraSaida = :EnTrOHoraSaida,
+            EnTrOSala = :EnTrOSala,
+            EnTrOProfiCirculante = :EnTrOProfiCirculante,
+            EnTrOInicioAnestesia = :EnTrOInicioAnestesia,
+            EnTrOTerminoAnestesia = :EnTrOTerminoAnestesia,
+            EnTrOTipoAnestesia = :EnTrOTipoAnestesia,
+            EnTrOProfiAnestesista = :EnTrOProfiAnestesista,
+            EnTrOProfiInstrumentador = :EnTrOProfiInstrumentador,
+            EnTrOInicioCirurgia = :EnTrOInicioCirurgia,
+            EnTrOTerminoCirurgia = :EnTrOTerminoCirurgia,
+            EnTrOProfiCirurgiao = :EnTrOProfiCirurgiao,
+            EnTrOProfiCirurgiaoAssistente = :EnTrOProfiCirurgiaoAssistente,
+            EnTrODescPosicaoOperatoria = :EnTrODescPosicaoOperatoria,
+            EnTrOServAdicionalBancoSangue = :EnTrOServAdicionalBancoSangue,
+            EnTrOServAdicionalRadiologia = :EnTrOServAdicionalRadiologia,
+            EnTrOServAdicionalLaboratorio = :EnTrOServAdicionalLaboratorio,
+            EnTrOServAdicionalAnatPatologica = :EnTrOServAdicionalAnatPatologica,
+            EnTrOServAdicionalUsoContraste = :EnTrOServAdicionalUsoContraste,
+            EnTrOServAdicionalOutros = :EnTrOServAdicionalOutros,
+            EnTrOEncaminhamentoPosCirurgia = :EnTrOEncaminhamentoPosCirurgia,
+            EnTrOEmUsoCateterEpidural = :EnTrOEmUsoCateterEpidural,
+            EnTrOEmUsoDrenoTubular = :EnTrOEmUsoDrenoTubular,
+            EnTrOEmUsoEntubacaoTraqueal = :EnTrOEmUsoEntubacaoTraqueal,
+            EnTrOEmUsoIntracath = :EnTrOEmUsoIntracath,
+            EnTrOEmUsoKehr = :EnTrOEmUsoKehr,
+            EnTrOEmUsoPecaCirurgica = :EnTrOEmUsoPecaCirurgica,
+            EnTrOEmUsoPenrose = :EnTrOEmUsoPenrose,
+            EnTrOEmUsoProntuario = :EnTrOEmUsoProntuario,
+            EnTrOEmUsoPuncaoPeriferica = :EnTrOEmUsoPuncaoPeriferica,
+            EnTrOEmUsoRadiografia = :EnTrOEmUsoRadiografia,
+            EnTrOEmUsoSistemaSuccao = :EnTrOEmUsoSistemaSuccao,
+            EnTrOEmUsoSondaGastrica = :EnTrOEmUsoSondaGastrica,
+            EnTrOEmUsoSondaVesical = :EnTrOEmUsoSondaVesical,
+            EnTrOProfiEnfermeiro = :EnTrOProfiEnfermeiro,
+            EnTrOProfiTecnico = :EnTrOProfiTecnico,
+            EnTrOProfiEnfermeiroCCO = :EnTrOProfiEnfermeiroCCO,
+            EnTrOProfiTecnicoCCO = :EnTrOProfiTecnicoCCO,
+            EnTrOProfiTecnicoRPA = :EnTrOProfiTecnicoRPA,
+            EnTrOKitCME = :EnTrOKitCME,
+            EnTrOMedicacaoAdministrada = :EnTrOMedicacaoAdministrada,
+            EnTrOObservacao = :EnTrOObservacao
+            WHERE EnTrOId = :iAtendimentoAnotacao";
+                
+            $result = $conn->prepare($sql);
+                    
+            $result->execute(array(
+                ':EnTrOAtendimento' => $iAtendimentoId,
+                ':EnTrODataInicio' => date('Y-m-d'),
+                ':EnTrOHoraInicio' => date('H:i'),
+                ':EnTrOPrevisaoAlta' => '',
+                ':EnTrOTipoInternacao' => $row['TpIntId'],
+                ':EnTrOEspecialidadeLeito' => $row['EsLeiId'],
+                ':EnTrOAla' => $row['AlaId'],
+                ':EnTrOQuarto' => $row['QuartId'],
+                ':EnTrOLeito' => $row['LeitoId'],
+                ':EnTrOProfissional' => $userId,
+                ':EnTrOPas' => $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'],
+                ':EnTrOPad' => $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'],
+                ':EnTrOFreqCardiaca' => $_POST['inputCardiaca'] == "" ? null : $_POST['inputCardiaca'],
+                ':EnTrOFreqRespiratoria' => $_POST['inputRespiratoria'] == "" ? null : $_POST['inputRespiratoria'],
+                ':EnTrOTemperatura' => $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'],
+                ':EnTrOSPO' => $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'],
+                ':EnTrOHGT' => $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'],
+                ':EnTrOPeso' => $_POST['inputPeso'] == "" ? null : $_POST['inputPeso'],
+                ':EnTrOHoraEntrada' => isset($_POST['entradaHora'])?$_POST['entradaHora']:null,
+                ':EnTrOHoraSaida' => isset($_POST['saidaHora'])?$_POST['saidaHora']:null,
+                ':EnTrOSala' => isset($_POST['sala'])?$_POST['sala']:null,
+                ':EnTrOProfiCirculante' => isset($_POST['profissional'])?$_POST['profissional']:null,
+                ':EnTrOInicioAnestesia' => isset($_POST['inicioAnestesia'])?$_POST['inicioAnestesia']:null,
+                ':EnTrOTerminoAnestesia' => isset($_POST['terminoAnestesia'])?$_POST['terminoAnestesia']:null,
+                ':EnTrOTipoAnestesia' => isset($_POST['tipoAnestesia'])?$_POST['tipoAnestesia']:null,
+                ':EnTrOProfiAnestesista' => isset($_POST['profissionalAnestesista'])?$_POST['profissionalAnestesista']:null,
+                ':EnTrOProfiInstrumentador' => isset($_POST['profissionalInstrumentador'])?$_POST['profissionalInstrumentador']:null,
+                ':EnTrOInicioCirurgia' => isset($_POST['inicioCirurgia'])?$_POST['inicioCirurgia']:null,
+                ':EnTrOTerminoCirurgia' => isset($_POST['terminoCirurgia'])?$_POST['terminoCirurgia']:null,
+                ':EnTrOProfiCirurgiao' => isset($_POST['profissionalCirurgiao'])?$_POST['profissionalCirurgiao']:null,
+                ':EnTrOProfiCirurgiaoAssistente' => isset($_POST['profissionalAssistente'])?$_POST['profissionalAssistente']:null,
+                ':EnTrODescPosicaoOperatoria' => isset($_POST['descricaoPosicao'])?$_POST['descricaoPosicao']:null,
+                ':EnTrOEncaminhamentoPosCirurgia' => isset($_POST['encaminhamento'])?$_POST['encaminhamento']:null,
+                ':EnTrOProfiEnfermeiro' => isset($_POST['profissionalEnfermeiro'])?$_POST['profissionalEnfermeiro']:null,
+                ':EnTrOProfiTecnico' => isset($_POST['profissionalTecnico'])?$_POST['profissionalTecnico']:null,
+                ':EnTrOProfiEnfermeiroCCO' => isset($_POST['profissionalEnfermeiroCCO'])?$_POST['profissionalEnfermeiroCCO']:null,
+                ':EnTrOProfiTecnicoCCO' => isset($_POST['profissionalTecnicoCCO'])?$_POST['profissionalTecnicoCCO']:null,
+                ':EnTrOProfiTecnicoRPA' => isset($_POST['profissionalTecnicoRPA'])?$_POST['profissionalTecnicoRPA']:null,
+                ':EnTrOKitCME' => isset($_POST['kitCME'])?$_POST['kitCME']:null,
+                ':EnTrOMedicacaoAdministrada' => isset($_POST['textMedicacao'])?$_POST['textMedicacao']:null,
+                ':EnTrOObservacao' => isset($_POST['textObservacao'])?$_POST['textObservacao']:null,
 
-            // usoPosCirurgia[]
-            ':EnTrOEmUsoCateterEpidural' => isset($_POST['usoPosCirurgia'])?(in_array('CE',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoDrenoTubular' => isset($_POST['usoPosCirurgia'])?(in_array('DT',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoEntubacaoTraqueal' => isset($_POST['usoPosCirurgia'])?(in_array('ET',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoIntracath' => isset($_POST['usoPosCirurgia'])?(in_array('IN',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoKehr' => isset($_POST['usoPosCirurgia'])?(in_array('KE',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoPecaCirurgica' => isset($_POST['usoPosCirurgia'])?(in_array('PC',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoPenrose' => isset($_POST['usoPosCirurgia'])?(in_array('PE',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoProntuario' => isset($_POST['usoPosCirurgia'])?(in_array('PR',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoPuncaoPeriferica' => isset($_POST['usoPosCirurgia'])?(in_array('PP',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoRadiografia' => isset($_POST['usoPosCirurgia'])?(in_array('RA',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoSistemaSuccao' => isset($_POST['usoPosCirurgia'])?(in_array('SS',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoSondaGastrica' => isset($_POST['usoPosCirurgia'])?(in_array('SG',$_POST['usoPosCirurgia'])?1:0):null,
-            ':EnTrOEmUsoSondaVesical' => isset($_POST['usoPosCirurgia'])?(in_array('SV',$_POST['usoPosCirurgia'])?1:0):null
-        ));
+                // servicosAdicionais[]
+                ':EnTrOServAdicionalBancoSangue' => isset($_POST['servicosAdicionais'])?(in_array('BS',$_POST['servicosAdicionais'])?1:0):null,
+                ':EnTrOServAdicionalRadiologia' => isset($_POST['servicosAdicionais'])?(in_array('RA',$_POST['servicosAdicionais'])?1:0):null,
+                ':EnTrOServAdicionalLaboratorio' => isset($_POST['servicosAdicionais'])?(in_array('LA',$_POST['servicosAdicionais'])?1:0):null,
+                ':EnTrOServAdicionalAnatPatologica' => isset($_POST['servicosAdicionais'])?(in_array('AN',$_POST['servicosAdicionais'])?1:0):null,
+                ':EnTrOServAdicionalUsoContraste' => isset($_POST['servicosAdicionais'])?(in_array('UC',$_POST['servicosAdicionais'])?1:0):null,
+                ':EnTrOServAdicionalOutros' => isset($_POST['servicosAdicionais'])?(in_array('OU',$_POST['servicosAdicionais'])?1:0):null,
+
+                // usoPosCirurgia[]
+                ':EnTrOEmUsoCateterEpidural' => isset($_POST['usoPosCirurgia'])?(in_array('CE',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoDrenoTubular' => isset($_POST['usoPosCirurgia'])?(in_array('DT',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoEntubacaoTraqueal' => isset($_POST['usoPosCirurgia'])?(in_array('ET',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoIntracath' => isset($_POST['usoPosCirurgia'])?(in_array('IN',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoKehr' => isset($_POST['usoPosCirurgia'])?(in_array('KE',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoPecaCirurgica' => isset($_POST['usoPosCirurgia'])?(in_array('PC',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoPenrose' => isset($_POST['usoPosCirurgia'])?(in_array('PE',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoProntuario' => isset($_POST['usoPosCirurgia'])?(in_array('PR',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoPuncaoPeriferica' => isset($_POST['usoPosCirurgia'])?(in_array('PP',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoRadiografia' => isset($_POST['usoPosCirurgia'])?(in_array('RA',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoSistemaSuccao' => isset($_POST['usoPosCirurgia'])?(in_array('SS',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoSondaGastrica' => isset($_POST['usoPosCirurgia'])?(in_array('SG',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoSondaVesical' => isset($_POST['usoPosCirurgia'])?(in_array('SV',$_POST['usoPosCirurgia'])?1:0):null,
+
+                ':iAtendimentoAnotacao' => $iAtendimentoAnotacao 
+                ));
+
+                $_SESSION['iAtendimentoId'] = $iAtendimentoId;
+                $_SESSION['msg']['titulo'] = "Sucesso";
+                $_SESSION['msg']['mensagem'] = "Anotação alterada com sucesso!!!";
+                $_SESSION['msg']['tipo'] = "success";
+
+        } else {
+
+            $sql = "INSERT INTO EnfermagemTransOperatoria(EnTrOAtendimento,EnTrODataInicio,EnTrOHoraInicio,
+                EnTrOPrevisaoAlta,EnTrOTipoInternacao,EnTrOEspecialidadeLeito,EnTrOAla,EnTrOQuarto,EnTrOLeito,
+                EnTrOProfissional,EnTrOPas,EnTrOPad,EnTrOFreqCardiaca,EnTrOFreqRespiratoria,EnTrOTemperatura,
+                EnTrOSPO,EnTrOHGT,EnTrOPeso,EnTrOHoraEntrada,EnTrOHoraSaida,EnTrOSala,EnTrOProfiCirculante,
+                EnTrOInicioAnestesia,EnTrOTerminoAnestesia,EnTrOTipoAnestesia,EnTrOProfiAnestesista,
+                EnTrOProfiInstrumentador,EnTrOInicioCirurgia,EnTrOTerminoCirurgia,EnTrOProfiCirurgiao,
+                EnTrOProfiCirurgiaoAssistente,EnTrODescPosicaoOperatoria,EnTrOServAdicionalBancoSangue,
+                EnTrOServAdicionalRadiologia,EnTrOServAdicionalLaboratorio,EnTrOServAdicionalAnatPatologica,
+                EnTrOServAdicionalUsoContraste,EnTrOServAdicionalOutros,EnTrOEncaminhamentoPosCirurgia,
+                EnTrOEmUsoCateterEpidural,EnTrOEmUsoDrenoTubular,EnTrOEmUsoEntubacaoTraqueal,EnTrOEmUsoIntracath,
+                EnTrOEmUsoKehr,EnTrOEmUsoPecaCirurgica,EnTrOEmUsoPenrose,EnTrOEmUsoProntuario,
+                EnTrOEmUsoPuncaoPeriferica,EnTrOEmUsoRadiografia,EnTrOEmUsoSistemaSuccao,EnTrOEmUsoSondaGastrica,
+                EnTrOEmUsoSondaVesical,EnTrOProfiEnfermeiro,EnTrOProfiTecnico,EnTrOProfiEnfermeiroCCO,
+                EnTrOProfiTecnicoCCO,EnTrOProfiTecnicoRPA,EnTrOKitCME,EnTrOMedicacaoAdministrada,EnTrOObservacao)
+            VALUES(
+                :EnTrOAtendimento,
+                :EnTrODataInicio,
+                :EnTrOHoraInicio,
+                :EnTrOPrevisaoAlta,
+                :EnTrOTipoInternacao,
+                :EnTrOEspecialidadeLeito,
+                :EnTrOAla,
+                :EnTrOQuarto,
+                :EnTrOLeito,
+                :EnTrOProfissional,
+                :EnTrOPas,
+                :EnTrOPad,
+                :EnTrOFreqCardiaca,
+                :EnTrOFreqRespiratoria,
+                :EnTrOTemperatura,
+                :EnTrOSPO,
+                :EnTrOHGT,
+                :EnTrOPeso,
+                :EnTrOHoraEntrada,
+                :EnTrOHoraSaida,
+                :EnTrOSala,
+                :EnTrOProfiCirculante,
+                :EnTrOInicioAnestesia,
+                :EnTrOTerminoAnestesia,
+                :EnTrOTipoAnestesia,
+                :EnTrOProfiAnestesista,
+                :EnTrOProfiInstrumentador,
+                :EnTrOInicioCirurgia,
+                :EnTrOTerminoCirurgia,
+                :EnTrOProfiCirurgiao,
+                :EnTrOProfiCirurgiaoAssistente,
+                :EnTrODescPosicaoOperatoria,
+                :EnTrOServAdicionalBancoSangue,
+                :EnTrOServAdicionalRadiologia,
+                :EnTrOServAdicionalLaboratorio,
+                :EnTrOServAdicionalAnatPatologica,
+                :EnTrOServAdicionalUsoContraste,
+                :EnTrOServAdicionalOutros,
+                :EnTrOEncaminhamentoPosCirurgia,
+                :EnTrOEmUsoCateterEpidural,
+                :EnTrOEmUsoDrenoTubular,
+                :EnTrOEmUsoEntubacaoTraqueal,
+                :EnTrOEmUsoIntracath,
+                :EnTrOEmUsoKehr,
+                :EnTrOEmUsoPecaCirurgica,
+                :EnTrOEmUsoPenrose,
+                :EnTrOEmUsoProntuario,
+                :EnTrOEmUsoPuncaoPeriferica,
+                :EnTrOEmUsoRadiografia,
+                :EnTrOEmUsoSistemaSuccao,
+                :EnTrOEmUsoSondaGastrica,
+                :EnTrOEmUsoSondaVesical,
+                :EnTrOProfiEnfermeiro,
+                :EnTrOProfiTecnico,
+                :EnTrOProfiEnfermeiroCCO,
+                :EnTrOProfiTecnicoCCO,
+                :EnTrOProfiTecnicoRPA,
+                :EnTrOKitCME,
+                :EnTrOMedicacaoAdministrada,
+                :EnTrOObservacao)";
+            $result = $conn->prepare($sql);
+
+            $result->execute(array(
+                ':EnTrOAtendimento' => $iAtendimentoId,
+                ':EnTrODataInicio' => date('Y-m-d'),
+                ':EnTrOHoraInicio' => date('H:i'),
+                ':EnTrOPrevisaoAlta' => '',
+                ':EnTrOTipoInternacao' => $row['TpIntId'],
+                ':EnTrOEspecialidadeLeito' => $row['EsLeiId'],
+                ':EnTrOAla' => $row['AlaId'],
+                ':EnTrOQuarto' => $row['QuartId'],
+                ':EnTrOLeito' => $row['LeitoId'],
+                ':EnTrOProfissional' => $userId,
+                ':EnTrOPas' => $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'],
+                ':EnTrOPad' => $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'],
+                ':EnTrOFreqCardiaca' => $_POST['inputCardiaca'] == "" ? null : $_POST['inputCardiaca'],
+                ':EnTrOFreqRespiratoria' => $_POST['inputRespiratoria'] == "" ? null : $_POST['inputRespiratoria'],
+                ':EnTrOTemperatura' => $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'],
+                ':EnTrOSPO' => $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'],
+                ':EnTrOHGT' => $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'],
+                ':EnTrOPeso' => $_POST['inputPeso'] == "" ? null : $_POST['inputPeso'],
+                ':EnTrOHoraEntrada' => isset($_POST['entradaHora'])?$_POST['entradaHora']:null,
+                ':EnTrOHoraSaida' => isset($_POST['saidaHora'])?$_POST['saidaHora']:null,
+                ':EnTrOSala' => isset($_POST['sala'])?$_POST['sala']:null,
+                ':EnTrOProfiCirculante' => isset($_POST['profissional'])?$_POST['profissional']:null,
+                ':EnTrOInicioAnestesia' => isset($_POST['inicioAnestesia'])?$_POST['inicioAnestesia']:null,
+                ':EnTrOTerminoAnestesia' => isset($_POST['terminoAnestesia'])?$_POST['terminoAnestesia']:null,
+                ':EnTrOTipoAnestesia' => isset($_POST['tipoAnestesia'])?$_POST['tipoAnestesia']:null,
+                ':EnTrOProfiAnestesista' => isset($_POST['profissionalAnestesista'])?$_POST['profissionalAnestesista']:null,
+                ':EnTrOProfiInstrumentador' => isset($_POST['profissionalInstrumentador'])?$_POST['profissionalInstrumentador']:null,
+                ':EnTrOInicioCirurgia' => isset($_POST['inicioCirurgia'])?$_POST['inicioCirurgia']:null,
+                ':EnTrOTerminoCirurgia' => isset($_POST['terminoCirurgia'])?$_POST['terminoCirurgia']:null,
+                ':EnTrOProfiCirurgiao' => isset($_POST['profissionalCirurgiao'])?$_POST['profissionalCirurgiao']:null,
+                ':EnTrOProfiCirurgiaoAssistente' => isset($_POST['profissionalAssistente'])?$_POST['profissionalAssistente']:null,
+                ':EnTrODescPosicaoOperatoria' => isset($_POST['descricaoPosicao'])?$_POST['descricaoPosicao']:null,
+                ':EnTrOEncaminhamentoPosCirurgia' => isset($_POST['encaminhamento'])?$_POST['encaminhamento']:null,
+                ':EnTrOProfiEnfermeiro' => isset($_POST['profissionalEnfermeiro'])?$_POST['profissionalEnfermeiro']:null,
+                ':EnTrOProfiTecnico' => isset($_POST['profissionalTecnico'])?$_POST['profissionalTecnico']:null,
+                ':EnTrOProfiEnfermeiroCCO' => isset($_POST['profissionalEnfermeiroCCO'])?$_POST['profissionalEnfermeiroCCO']:null,
+                ':EnTrOProfiTecnicoCCO' => isset($_POST['profissionalTecnicoCCO'])?$_POST['profissionalTecnicoCCO']:null,
+                ':EnTrOProfiTecnicoRPA' => isset($_POST['profissionalTecnicoRPA'])?$_POST['profissionalTecnicoRPA']:null,
+                ':EnTrOKitCME' => isset($_POST['kitCME'])?$_POST['kitCME']:null,
+                ':EnTrOMedicacaoAdministrada' => isset($_POST['textMedicacao'])?$_POST['textMedicacao']:null,
+                ':EnTrOObservacao' => isset($_POST['textObservacao'])?$_POST['textObservacao']:null,
+
+                // servicosAdicionais[]
+                ':EnTrOServAdicionalBancoSangue' => isset($_POST['servicosAdicionais'])?(in_array('BS',$_POST['servicosAdicionais'])?1:0):null,
+                ':EnTrOServAdicionalRadiologia' => isset($_POST['servicosAdicionais'])?(in_array('RA',$_POST['servicosAdicionais'])?1:0):null,
+                ':EnTrOServAdicionalLaboratorio' => isset($_POST['servicosAdicionais'])?(in_array('LA',$_POST['servicosAdicionais'])?1:0):null,
+                ':EnTrOServAdicionalAnatPatologica' => isset($_POST['servicosAdicionais'])?(in_array('AN',$_POST['servicosAdicionais'])?1:0):null,
+                ':EnTrOServAdicionalUsoContraste' => isset($_POST['servicosAdicionais'])?(in_array('UC',$_POST['servicosAdicionais'])?1:0):null,
+                ':EnTrOServAdicionalOutros' => isset($_POST['servicosAdicionais'])?(in_array('OU',$_POST['servicosAdicionais'])?1:0):null,
+
+                // usoPosCirurgia[]
+                ':EnTrOEmUsoCateterEpidural' => isset($_POST['usoPosCirurgia'])?(in_array('CE',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoDrenoTubular' => isset($_POST['usoPosCirurgia'])?(in_array('DT',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoEntubacaoTraqueal' => isset($_POST['usoPosCirurgia'])?(in_array('ET',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoIntracath' => isset($_POST['usoPosCirurgia'])?(in_array('IN',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoKehr' => isset($_POST['usoPosCirurgia'])?(in_array('KE',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoPecaCirurgica' => isset($_POST['usoPosCirurgia'])?(in_array('PC',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoPenrose' => isset($_POST['usoPosCirurgia'])?(in_array('PE',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoProntuario' => isset($_POST['usoPosCirurgia'])?(in_array('PR',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoPuncaoPeriferica' => isset($_POST['usoPosCirurgia'])?(in_array('PP',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoRadiografia' => isset($_POST['usoPosCirurgia'])?(in_array('RA',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoSistemaSuccao' => isset($_POST['usoPosCirurgia'])?(in_array('SS',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoSondaGastrica' => isset($_POST['usoPosCirurgia'])?(in_array('SG',$_POST['usoPosCirurgia'])?1:0):null,
+                ':EnTrOEmUsoSondaVesical' => isset($_POST['usoPosCirurgia'])?(in_array('SV',$_POST['usoPosCirurgia'])?1:0):null
+            ));
+            
+            $_SESSION['iAtendimentoId'] = $iAtendimentoId;
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Anotação inserida com sucesso!!!";
+            $_SESSION['msg']['tipo'] = "success";	
+
+        }
+
+        irpara("anotacaoTransOperatoria.php");
+        
+        
     }
 ?>
 
@@ -454,7 +609,7 @@
                                     <div class="col-md-6" style="text-align: left;">
 
                                         <div class="card-header header-elements-inline">
-                                            <h3 class="card-title"><b>Admissão Cirúrgica Pré-Operatório</b></h3>
+                                            <h3 class="card-title font-weight-bold">REGISTRO TRANSOPERATÓRIO</h3>
                                         </div>
             
                                     </div>
@@ -481,8 +636,9 @@
 
                             <div class="box-exameFisico" style="display: block;">
                                 <div class="card">
+
                                     <div class="card-header header-elements-inline">
-                                        <h3 class="card-title">Histórico Pré-Operatório</h3>
+                                        <h3 class="card-title font-weight-bold">Entrada Sala Operatória</h3>
 
                                         <div class="header-elements">
                                             <div class="list-icons">
@@ -494,7 +650,7 @@
                                     <div class="card-body">
                                       
                                         <!-- linha 1 -->
-                                        <div class="col-lg-12 mb-3 row">
+                                        <div class="col-lg-12 mb-4 row">
                                             <!-- titulos -->
                                             <div class="col-lg-3">
                                                 <label>Entrada Hora</label>
@@ -511,20 +667,24 @@
                                             
                                             <!-- campos -->                                            
                                             <div class="col-lg-3">
-                                                <input id="entradaHora" class="form-control" type="time" name="entradaHora">
+                                                <input id="entradaHora" class="form-control" type="time" name="entradaHora" value="<?php echo isset($iAtendimentoAnotacao) ? explode(".", $rowAnotacao['EnTrOHoraEntrada'])[0] : ''; ?>" >
                                             </div>
                                             <div class="col-lg-3">
-                                                <input id="sala" class="form-control" type="text" name="sala">
+                                                <input id="sala" class="form-control" type="text" name="sala" value="<?php echo isset($iAtendimentoAnotacao) ? $rowAnotacao['EnTrOSala'] : ''; ?>" >
                                             </div>
                                             <div class="col-lg-3">
-                                                <input id="saidaHora" class="form-control" type="time" name="saidaHora">
+                                                <input id="saidaHora" class="form-control" type="time" name="saidaHora"value="<?php echo isset($iAtendimentoAnotacao) ? explode(".", $rowAnotacao['EnTrOHoraSaida'])[0] : ''; ?>" >
                                             </div>
                                             <div class="col-lg-3">
-                                                <select id="profissional" name="profissional" class="select-search">
+                                                <select id="profissional" name="profissional" class="select-search" >
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowProfissionais as $item){
-                                                            echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOProfiCirculante'] == $item['ProfiId'] ) {
+                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            }                                                          
                                                         }
                                                     ?>
                                                 </select>
@@ -532,7 +692,7 @@
                                         </div>
 
                                         <!-- linha 2 -->
-                                        <div class="col-lg-12 mb-3 row">
+                                        <div class="col-lg-12 mb-4 row">
                                             <!-- titulos -->
                                             <div class="col-lg-2">
                                                 <label>Início da anestesia</label>
@@ -553,19 +713,19 @@
                                             <!-- campos -->
 
                                             <div class="col-lg-2">
-                                                <input id="inicioAnestesia" class="form-control" type="time" name="inicioAnestesia">
+                                                <input id="inicioAnestesia" class="form-control" type="time" name="inicioAnestesia" value="<?php echo isset($iAtendimentoAnotacao) ? explode(".", $rowAnotacao['EnTrOInicioAnestesia'])[0] : ''; ?>">
                                             </div>
                                             <div class="col-lg-2">
-                                                <input id="terminoAnestesia" class="form-control" type="time" name="terminoAnestesia">
+                                                <input id="terminoAnestesia" class="form-control" type="time" name="terminoAnestesia" value="<?php echo isset($iAtendimentoAnotacao) ? explode(".", $rowAnotacao['EnTrOTerminoAnestesia'])[0] : ''; ?>">
                                             </div>
                                             <div class="col-lg-2">
                                                 <select id="tipoAnestesia" name="tipoAnestesia" class="select-search">
                                                     <option value=''>selecione</option>
-                                                    <option value='LO'>LOCAL</option>
-                                                    <option value='PL'>PLEXULAR</option>
-                                                    <option value='GV'>GERAL (VM)</option>
-                                                    <option value='GS'>GERAL (SEDAÇÃO)</option>
-                                                    <option value='BE'>BLOQUEIOS ESPINHAIS</option>
+                                                    <option value='LO' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOTipoAnestesia'] == 'LO' ? 'selected' : ''; ?> >LOCAL</option>
+                                                    <option value='PL' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOTipoAnestesia'] == 'PL' ? 'selected' : ''; ?> >PLEXULAR</option>
+                                                    <option value='GV' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOTipoAnestesia'] == 'GV' ? 'selected' : ''; ?> >GERAL (VM)</option>
+                                                    <option value='GS' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOTipoAnestesia'] == 'GS' ? 'selected' : ''; ?> >GERAL (SEDAÇÃO)</option>
+                                                    <option value='BE' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOTipoAnestesia'] == 'BE' ? 'selected' : ''; ?> >BLOQUEIOS ESPINHAIS</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-3">
@@ -573,7 +733,11 @@
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowProfissionais as $item){
-                                                            echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOProfiAnestesista'] == $item['ProfiId'] ) {
+                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            }               
                                                         }
                                                     ?>
                                                 </select>
@@ -583,7 +747,11 @@
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowProfissionais as $item){
-                                                            echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOProfiInstrumentador'] == $item['ProfiId'] ) {
+                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            }
                                                         }
                                                     ?>
                                                 </select>
@@ -591,7 +759,7 @@
                                         </div>
 
                                         <!-- linha 3 -->
-                                        <div class="col-lg-12 mb-3 row">
+                                        <div class="col-lg-12 mb-4 row">
                                             <!-- titulos -->
                                             <div class="col-lg-2">
                                                 <label>Início da cirurgia</label>
@@ -609,17 +777,21 @@
                                             <!-- campos -->
 
                                             <div class="col-lg-2">
-                                                <input id="inicioCirurgia" class="form-control" type="time" name="inicioCirurgia">
+                                                <input id="inicioCirurgia" class="form-control" type="time" name="inicioCirurgia" value="<?php echo isset($iAtendimentoAnotacao) ? explode(".", $rowAnotacao['EnTrOInicioCirurgia'])[0] : ''; ?>" >
                                             </div>
                                             <div class="col-lg-2">
-                                                <input id="terminoCirurgia" class="form-control" type="time" name="terminoCirurgia">
+                                                <input id="terminoCirurgia" class="form-control" type="time" name="terminoCirurgia" value="<?php echo isset($iAtendimentoAnotacao) ? explode(".", $rowAnotacao['EnTrOTerminoCirurgia'])[0] : ''; ?>" >
                                             </div>
                                             <div class="col-lg-4">
                                                 <select id="profissionalCirurgiao" name="profissionalCirurgiao" class="select-search">
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowProfissionais as $item){
-                                                            echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOProfiCirurgiao'] == $item['ProfiId'] ) {
+                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            }
                                                         }
                                                     ?>
                                                 </select>
@@ -629,7 +801,11 @@
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowProfissionais as $item){
-                                                            echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOProfiCirurgiaoAssistente'] == $item['ProfiId'] ) {
+                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            }
                                                         }
                                                     ?>
                                                 </select>
@@ -637,7 +813,7 @@
                                         </div>
 
                                         <!-- linha 4 -->
-                                        <div class="col-lg-12 mb-3 row">
+                                        <div class="col-lg-12 mb-4 row">
                                             <!-- titulos -->
                                             <div class="col-lg-3">
                                                 <label>Descrição da posição operatória</label>
@@ -657,56 +833,56 @@
                                             <div class="col-lg-3">
                                                 <select id="descricaoPosicao" name="descricaoPosicao" class="select-search">
                                                     <option value=''>selecione</option>
-                                                    <option value='VE'>VENTRAL</option>
-                                                    <option value='DO'>DORSAL</option>
-                                                    <option value='LA'>LATERAL</option>
-                                                    <option value='GI'>GINECOLÓGICA</option>
-                                                    <option value='SG'>SEMI-GINECOLÓGICA</option>
-                                                    <option value='TR'>TRENDELENBURG</option>
+                                                    <option value='VE' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'VE' ? 'selected' : ''; ?> >VENTRAL</option>
+                                                    <option value='DO' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'DO' ? 'selected' : ''; ?> >DORSAL</option>
+                                                    <option value='LA' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'LA' ? 'selected' : ''; ?> >LATERAL</option>
+                                                    <option value='GI' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'GI' ? 'selected' : ''; ?> >GINECOLÓGICA</option>
+                                                    <option value='SG' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'SG' ? 'selected' : ''; ?> >SEMI-GINECOLÓGICA</option>
+                                                    <option value='TR' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'TR' ? 'selected' : ''; ?> >TRENDELENBURG</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-3">
                                                 <select id="servicosAdicionais" name="servicosAdicionais[]" class="form-control multiselect-filtering" multiple="multiple">
-                                                    <option value='BS'>BANCO DE SANGUE</option>
-                                                    <option value='RA'>RADIOLOGIA</option>
-                                                    <option value='LA'>LABORATÓRIO</option>
-                                                    <option value='AN'>ANATOMIA PATOLÓGICA</option>
-                                                    <option value='UC'>USO DE CONTRASTE</option>
-                                                    <option value='OU'>OUTROS</option>
+                                                    <option value='BS' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOServAdicionalBancoSangue'] == 1 ? 'selected' : ''; ?> >BANCO DE SANGUE</option>
+                                                    <option value='RA' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOServAdicionalRadiologia'] == 1 ? 'selected' : ''; ?> >RADIOLOGIA</option>
+                                                    <option value='LA' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOServAdicionalLaboratorio'] == 1 ? 'selected' : ''; ?> >LABORATÓRIO</option>
+                                                    <option value='AN' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOServAdicionalAnatPatologica'] == 1 ? 'selected' : ''; ?> >ANATOMIA PATOLÓGICA</option>
+                                                    <option value='UC' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOServAdicionalUsoContraste'] == 1 ? 'selected' : ''; ?> >USO DE CONTRASTE</option>
+                                                    <option value='OU' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOServAdicionalOutros'] == 1 ? 'selected' : ''; ?> >OUTROS</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-3">
                                                 <select id="encaminhamento" name="encaminhamento" class="select-search">
                                                     <option value=''>selecione</option>
-                                                    <option value='SO'>SALA PÓS-OPERATÓRIA</option>
-                                                    <option value='LE'>LEITO</option>
-                                                    <option value='CTI'>CTI</option>
-                                                    <option value='UTI'>UTI</option>
-                                                    <option value='SU'>SEMI UTI</option>
-                                                    <option value='OB'>ÓBITO</option>
+                                                    <option value='SO' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'SO' ? 'selected' : ''; ?> >SALA PÓS-OPERATÓRIA</option>
+                                                    <option value='LE' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'LE' ? 'selected' : ''; ?> >LEITO</option>
+                                                    <option value='CT' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'CT' ? 'selected' : ''; ?> >CTI</option>
+                                                    <option value='UT' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'UT' ? 'selected' : ''; ?> >UTI</option>
+                                                    <option value='SU' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'SU' ? 'selected' : ''; ?> >SEMI UTI</option>
+                                                    <option value='OB' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrODescPosicaoOperatoria'] == 'OB' ? 'selected' : ''; ?> >ÓBITO</option>
                                                 </select>
                                             </div>
                                             <div class="col-lg-3">
                                                 <select id="usoPosCirurgia" name="usoPosCirurgia[]" class="form-control multiselect-filtering" multiple="multiple">
-                                                    <option value='CE'>Cateter Epidural</option>
-                                                    <option value='DT'>Drenos Tubulares</option>
-                                                    <option value='ET'>Entubação Traqueal</option>
-                                                    <option value='IN'>Intracath</option>
-                                                    <option value='KE'>Kehr</option>
-                                                    <option value='PC'>Peças Cirurgicas</option>
-                                                    <option value='PE'>Penrose</option>
-                                                    <option value='PR'>Prontuário</option>
-                                                    <option value='PP'>Punção Periférica</option>
-                                                    <option value='RA'>Radiografias</option>
-                                                    <option value='SS'>Sistema de Sucção</option>
-                                                    <option value='SG'>Sonda Gastrica</option>
-                                                    <option value='SV'>Sonda Vesical</option>
+                                                    <option value='CE' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoCateterEpidural'] == 1 ? 'selected' : ''; ?> >Cateter Epidural</option>
+                                                    <option value='DT' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoDrenoTubular'] == 1 ? 'selected' : ''; ?> >Drenos Tubulares</option>
+                                                    <option value='ET' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoEntubacaoTraqueal'] == 1 ? 'selected' : ''; ?> >Entubação Traqueal</option>
+                                                    <option value='IN' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoIntracath'] == 1 ? 'selected' : ''; ?> >Intracath</option>
+                                                    <option value='KE' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoKehr'] == 1 ? 'selected' : ''; ?> >Kehr</option>
+                                                    <option value='PC' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoPecaCirurgica'] == 1 ? 'selected' : ''; ?> >Peças Cirurgicas</option>
+                                                    <option value='PE' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoPenrose'] == 1 ? 'selected' : ''; ?> >Penrose</option>
+                                                    <option value='PR' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoProntuario'] == 1 ? 'selected' : ''; ?> >Prontuário</option>
+                                                    <option value='PP' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoPuncaoPeriferica'] == 1 ? 'selected' : ''; ?> >Punção Periférica</option>
+                                                    <option value='RA' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoRadiografia'] == 1 ? 'selected' : ''; ?> >Radiografias</option>
+                                                    <option value='SS' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoSistemaSuccao'] == 1 ? 'selected' : ''; ?> >Sistema de Sucção</option>
+                                                    <option value='SG' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoSondaGastrica'] == 1 ? 'selected' : ''; ?> >Sonda Gastrica</option>
+                                                    <option value='SV' <?php if (isset($iAtendimentoAnotacao )) echo $rowAnotacao['EnTrOEmUsoSondaVesical'] == 1 ? 'selected' : ''; ?> >Sonda Vesical</option>
                                                 </select>
                                             </div>
                                         </div>
 
                                         <!-- linha 5 -->
-                                        <div class="col-lg-12 mb-3 row">
+                                        <div class="col-lg-12 mb-4 row">
                                             <!-- titulos -->
                                             <div class="col-lg-3">
                                                 <label>Profissional Enfermeiro</label>
@@ -728,7 +904,11 @@
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowProfissionais as $item){
-                                                            echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOProfiEnfermeiro'] == $item['ProfiId'] ) {
+                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            }
                                                         }
                                                     ?>
                                                 </select>
@@ -738,7 +918,11 @@
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowProfissionais as $item){
-                                                            echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOProfiTecnico'] == $item['ProfiId'] ) {
+                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            }
                                                         }
                                                     ?>
                                                 </select>
@@ -748,7 +932,11 @@
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowProfissionais as $item){
-                                                            echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOProfiEnfermeiroCCO'] == $item['ProfiId'] ) {
+                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            }
                                                         }
                                                     ?>
                                                 </select>
@@ -758,7 +946,11 @@
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowProfissionais as $item){
-                                                            echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOProfiTecnicoCCO'] == $item['ProfiId'] ) {
+                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            }
                                                         }
                                                     ?>
                                                 </select>
@@ -766,7 +958,7 @@
                                         </div>
 
                                         <!-- linha 6 -->
-                                        <div class="col-lg-12 mb-3 row">
+                                        <div class="col-lg-12 mb-4 row">
                                             <!-- titulos -->
                                             <div class="col-lg-3">
                                                 <label>Profissional Técnico RPA</label>
@@ -785,7 +977,11 @@
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowProfissionais as $item){
-                                                            echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOProfiTecnicoRPA'] == $item['ProfiId'] ) {
+                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                            }
                                                         }
                                                     ?>
                                                 </select>
@@ -795,7 +991,12 @@
                                                     <option value=''>selecione</option>
                                                     <?php
                                                         foreach($rowKitCME as $item){
-                                                            echo "<option value='$item[KtCmeId]'>$item[KtCmeNome]</option>";
+                                                            if (isset($iAtendimentoAnotacao) && $rowAnotacao['EnTrOKitCME'] == $item['KtCmeId']) {
+                                                                echo "<option value='$item[KtCmeId]' selected>$item[KtCmeNome]</option>";
+                                                            } else {
+                                                                echo "<option value='$item[KtCmeId]'>$item[KtCmeNome]</option>";
+                                                            }
+                                                            
                                                         }
                                                     ?>
                                                 </select>
@@ -806,7 +1007,7 @@
                                         </div>
 
                                         <!-- linha 7 -->
-                                        <div class="col-lg-12 mb-3 row">
+                                        <div class="col-lg-12 mb-4 row">
                                             <!-- titulos -->
                                             <div class="col-lg-12">
                                                 <label>Medicação Administrada (digitação livre)</label>
@@ -814,7 +1015,7 @@
 
                                             <!-- campos -->
                                             <div class="col-lg-12">
-                                                <textarea id="textMedicacao" name="textMedicacao" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
+                                                <textarea id="textMedicacao" name="textMedicacao" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ><?php echo isset($iAtendimentoAnotacao) ? $rowAnotacao['EnTrOMedicacaoAdministrada'] : ''; ?></textarea>
                                                 <small class="text-muted form-text">
                                                     Máx. 150 caracteres<br>
                                                     <span id="caracteresInputMedicacao"></span>
@@ -825,13 +1026,14 @@
                                         <!-- linha 8 -->
                                         <div class="col-lg-12 mb-3 row">
                                             <!-- titulos -->
-                                            <div class="col-lg-12">
-                                                <label>Observações</label>
+
+                                            <div class="card-header header-elements-inline" style="margin-left: -20px">
+                                                <h3 class="card-title font-weight-bold">Observações</h3>
                                             </div>
 
                                             <!-- campos -->
                                             <div class="col-lg-12">
-                                                <textarea id="textObservacao" name="textObservacao" class="form-control" rows="4" cols="4" maxLength="800" placeholder="" ></textarea>
+                                                <textarea id="textObservacao" name="textObservacao" class="form-control" rows="4" cols="4" maxLength="800" placeholder="" ><?php echo isset($iAtendimentoAnotacao) ? $rowAnotacao['EnTrOObservacao'] : ''; ?></textarea>
                                                 <small class="text-muted form-text">
                                                     Máx. 800 caracteres<br>
                                                     <span id="caracteresInputObservacao"></span>
