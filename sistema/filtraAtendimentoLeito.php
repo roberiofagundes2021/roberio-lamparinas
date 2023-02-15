@@ -14,7 +14,7 @@ try{
     $internacao = isset($_POST['internacao'])?$_POST['internacao']:null;
     $especialidade = isset($_POST['especialidade'])?$_POST['especialidade']:null;
     $ala = isset($_POST['ala'])?$_POST['ala']:null;
-
+/*
     if($acomodacao){
       $sql = "SELECT TpIntId
         FROM TipoInternacao
@@ -31,7 +31,7 @@ try{
         $internacaoTipos = substr($internacaoTipos, 0, -1);
         $internacaoTipos .= ')';
       }
-    }
+    }*/
 
     $quartos = [];
 
@@ -104,8 +104,8 @@ try{
     $internacao= isset($_POST['internacao'])?$_POST['internacao']:null;
 
     $sql = "SELECT EsLeiId, EsLeiNome
-      FROM EspecialidadeLeito
-      WHERE EsLeiUnidade = $iUnidade";
+            FROM EspecialidadeLeito
+            WHERE EsLeiUnidade = $iUnidade";
 
     if($internacao){
       $sql .= " AND EsLeiTipoInternacao = $internacao";
@@ -116,15 +116,10 @@ try{
 
     echo json_encode($result);
   }elseif($typeRequest == "ALA"){
-    // $internacao= isset($_POST['internacao'])?$_POST['internacao']:null;
 
     $sql = "SELECT AlaId, AlaNome
-      FROM Ala
-      WHERE AlaUnidade = $iUnidade";
-
-    // if($internacao){
-    //   $sql .= " AND EsLeiTipoInternacao = $internacao";
-    // }
+            FROM Ala
+            WHERE AlaUnidade = $iUnidade";
     
     $result = $conn->query($sql);
     $result = $result->fetchAll(PDO::FETCH_ASSOC);

@@ -4,11 +4,15 @@ include_once("sessao.php");
 
 include('global_assets/php/conexao.php');
 
-
-$sql = "SELECT TpIntId
-        FROM TipoInternacao
-        WHERE TpIntUnidade = ".$_SESSION['UnidadeId']." and TpIntNome = '". $_POST['nome']."' and TpIntTipoAcomodacao = '". $_POST['tipoAcomodacao']."'";
-
+if (isset($_POST['nomeVelho'])){
+	$sql = "SELECT TpIntId
+			 FROM TipoInternacao
+			 WHERE TpIntUnidade = ".$_SESSION['UnidadeId']." and TpIntNome = '". $_POST['nomeNovo']."' and TpIntNome <> '". $_POST['nomeVelho']."'";
+} else{
+	$sql = "SELECT TpIntId
+			 FROM TipoInternacao
+			 WHERE TpIntUnidade = ".$_SESSION['UnidadeId']." and TpIntNome = '". $_POST['nomeNovo']."'";
+}
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
 $count = count($row);
@@ -24,3 +28,5 @@ if($count){
 		echo 0;
 	}
 }
+
+?>

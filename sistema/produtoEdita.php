@@ -702,17 +702,29 @@ if(isset($_POST['inputNome'])){
 											</div>
 										</div>
 										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="cmbFinalistico">Finalístico</label>
-												<select id="cmbFinalistico" name="cmbFinalistico" class="form-control select-search">
-													<option value="#">Selecione</option>
-													<option value="001" <?php if ($row['ProduFinalistico'] == '001') echo "selected"; ?> >001</option>
-													<option value="002" <?php if ($row['ProduFinalistico'] == '002') echo "selected"; ?> >002</option>
+									<div class="col-lg-2">
+										<div class="form-group">
+											<label for="cmbFinalistico">Finalístico</label>
+											<select id="cmbFinalistico" name="cmbFinalistico" class="form-control select-search">
+												<option value="">Selecione</option>
+												<?php 
+													$sql = "SELECT FinalId, FinalNome, FinalCodigo
+															FROM Finalistico
+															JOIN Situacao on SituaId = FinalStatus
+															WHERE FinalEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
+															ORDER BY FinalNome ASC";
+													$result = $conn->query($sql);
+													$rowFinalistico = $result->fetchAll(PDO::FETCH_ASSOC);
 
-												</select>
-											</div>
+													foreach ($rowFinalistico as $item){
+														$seleciona = $item['FinalId'] == $row['ProduFinalistico'] ? "selected" : "";
+														print('<option value="'.$item['FinalId'].'" '. $seleciona .'>'.$item['FinalCodigo'] . ' - ' . $item['FinalNome'] .'</option>');
+													}
+												
+												?>
+											</select>
 										</div>
+									</div>
 									</div>
 								</div>
 							</div>

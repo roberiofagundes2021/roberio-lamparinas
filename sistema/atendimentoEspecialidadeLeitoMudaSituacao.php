@@ -8,7 +8,7 @@ $_SESSION['msg'] = array();
 
 if(isset($_POST['inputEspecialidadeLeitoId'])){
 	
-	$iEspecialidadeLeitoId = $_POST['inputEspecialidadeLeitoId'];
+	$iEspecialidadeLeito = $_POST['inputEspecialidadeLeitoId'];
 	$sStatus = $_POST['inputEspecialidadeLeitoStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
         	
 	try{
@@ -24,17 +24,17 @@ if(isset($_POST['inputEspecialidadeLeitoId'])){
 				WHERE EsLeiId = :id";
 		$result = $conn->prepare($sql);
 		$result->bindParam(':iStatus', $iStatus); 
-		$result->bindParam(':id', $iEspecialidadeLeitoId); 
+		$result->bindParam(':id', $iEspecialidadeLeito); 
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação da Especialidade do Leito alterada!!!";
+		$_SESSION['msg']['mensagem'] = "Situação da especialidade do leito alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação da Especialidade do Leito!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao alterar situação da especialidade do leito!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
 		echo 'Error: ' . $e->getMessage();

@@ -6,10 +6,10 @@ include('global_assets/php/conexao.php');
 
 $_SESSION['msg'] = array();
 
-if(isset($_POST['inputTpIntId'])){
+if(isset($_POST['inputTipoInternacaoId'])){
 	
-	$iTipoInternacao = $_POST['inputTpIntId'];
-	$sStatus = $_POST['inputTpIntStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
+	$iTipoInternacao = $_POST['inputTipoInternacaoId'];
+	$sStatus = $_POST['inputTipoInternacaoStatus'] == 'ATIVO' ? 'INATIVO' : 'ATIVO';
         	
 	try{
 
@@ -28,7 +28,7 @@ if(isset($_POST['inputTpIntId'])){
 		$result->execute();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
-		$_SESSION['msg']['mensagem'] = "Situação do tipo de internação alterada!!!";
+		$_SESSION['msg']['mensagem'] = "Situação do tipo de internação alterado!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {

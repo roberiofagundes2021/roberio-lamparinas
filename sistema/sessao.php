@@ -254,3 +254,11 @@ $atendimentoSituaChave = array(
 if (array_key_exists('SituaChave', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $atendimentoSituaChave)) {
 	unset($_SESSION['SituaChave']);
 }
+
+$arquivosFornecedorSocio = array(
+	'fornecedorNovo.php', 'FornecedorEdita.php', 'filtraFornecedorSocio.php'
+);
+
+if (array_key_exists('fornecedorSocio', $_SESSION) && !in_array(basename($_SERVER['PHP_SELF']), $arquivosFornecedorSocio)) {
+	unset($_SESSION['fornecedorSocio']);
+}

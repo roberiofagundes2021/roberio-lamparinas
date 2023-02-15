@@ -14,7 +14,7 @@ $sql = "SELECT TpAcoId, TpAcoNome, TpAcoStatus, TpAcoUsuarioAtualizador, TpAcoUn
 		ORDER BY TpAcoNome ASC";
 $result = $conn->query($sql);
 $row = $result->fetchAll(PDO::FETCH_ASSOC);
-$count = count($row);
+//$count = count($row);
 
 //Se estiver editando
 if(isset($_POST['tipoAcomodacaoId']) && $_POST['tipoAcomodacaoId']){

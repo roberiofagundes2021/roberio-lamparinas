@@ -543,14 +543,24 @@ if(isset($_POST['inputNome'])){
 											<div class="form-group">
 												<label for="cmbFinalistico">Finalístico</label>
 												<select id="cmbFinalistico" name="cmbFinalistico" class="form-control select-search">
-													<option value="#">Selecione</option>
-													<option value='001'>001</option>
-                                                    <option value='002'>002</option>
+													<option value="">Selecione</option>
+													<?php 
+														$sql = "SELECT FinalId, FinalNome, FinalCodigo
+																FROM Finalistico
+																JOIN Situacao on SituaId = FinalStatus
+																WHERE FinalEmpresa = ".$_SESSION['EmpreId']." and SituaChave = 'ATIVO'
+																ORDER BY FinalNome ASC";
+														$result = $conn->query($sql);
+														$rowFinalistico = $result->fetchAll(PDO::FETCH_ASSOC);
 
+														foreach ($rowFinalistico as $item){
+															print('<option value="'.$item['FinalId'].'">'.$item['FinalCodigo'] . ' - ' .$item['FinalNome'].'</option>');
+														}
+													
+													?>
 												</select>
 											</div>
 										</div>
-
 									</div>
 								</div>
 							</div>
