@@ -348,11 +348,11 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
-										
+										$Classificacao = $item['TIXClClassificacao'] == 'A' ? 'Ambulátorial' : 'Hospitalar';
 										print('
 										<tr>
 											<td>'.$item['TpIntNome'].'</td>
-											<td>'.$item['TIXClClassificacao'].'</td>
+											<td>'.$Classificacao.'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaTipoInternacao(1,'.$item['TpIntId'].', \''.$item['TpIntNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');

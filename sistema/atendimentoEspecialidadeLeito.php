@@ -329,11 +329,12 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
+										$Classificacao = $item['ELXClClassificacao'] == 'A' ? 'Ambulátorial' : 'Hospitalar';
 										
 										print('
 										<tr>
 											<td>'.$item['EsLeiNome'].'</td>
-											<td>'.$item['ELXClClassificacao'].'</td>
+											<td>'.$Classificacao.'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaEspecialidadeLeito(1,'.$item['EsLeiId'].', \''.$item['EsLeiNome'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
