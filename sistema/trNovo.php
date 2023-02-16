@@ -57,7 +57,8 @@ if (isset($_POST['inputData'])) {
 							TrRefUnidade, 
 							TrRefTabelaProduto,
 							TrRefTabelaServico,
-							TrRefLiberaParcial
+							TrRefLiberaParcial,
+							TrRefEmpresa
 						)
 			VALUES (
 				:sNumero, 
@@ -71,7 +72,8 @@ if (isset($_POST['inputData'])) {
 				:iUnidade, 
 				:sTabelaProduto, 
 				:sTabelaServico,
-				:bLiberaParcial
+				:bLiberaParcial,
+				:iEmpresa
 			)
 		";
 		$result = $conn->prepare($sql);
@@ -89,6 +91,7 @@ if (isset($_POST['inputData'])) {
 			':sTabelaProduto' => $parametroProduto,
 			':sTabelaServico' => $parametroServico,
 			':bLiberaParcial' => 0,
+			':iEmpresa' => $_SESSION['EmpreId']
 		));
 
 		// Começo do cadastro de subcategorias da TR
