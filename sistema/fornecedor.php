@@ -134,6 +134,8 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 						document.formFornecedor.action = "fornecedorMudaSituacao.php";
 					} else if (Tipo == 'anexo'){
 						document.formFornecedor.action = "fornecedorAnexo.php";
+					} else if (Tipo == 'socio'){
+						document.formFornecedor.action = "fornecedorSocio.php";
 					}else if (Tipo == 'exclui'){
 						if(Permission){
 							confirmaExclusao(document.formFornecedor, "Tem certeza que deseja excluir esse fornecedor?", "fornecedorExclui.php");
@@ -273,6 +275,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 															<div class="dropdown-menu dropdown-menu-right">
 															    <a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'anexo\');" class="dropdown-item"><i class="icon-attachment" title="Anexos"></i> Anexos</a>
+																<a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'socio\');" class="dropdown-item"><i class="icon-attachment" title="Anexos"></i> Sócio</a>
 															</div>
 														</div>
 													</div>
