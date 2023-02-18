@@ -37,6 +37,9 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 		//echo $_POST['inputEstadoAtual'];die;
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
+
+			$sCodigo = $_POST['inputCodigo'];
+			$sCodigos = str_pad($sCodigo,2,"0",STR_PAD_LEFT);
 			
 			$sql = "UPDATE SubCategoria SET SbCatCodigo = :sCodigo, SbCatNome = :sNome, SbCatCategoria = :iCategoria, SbCatUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE SbCatId = :iSubCategoria";
@@ -44,7 +47,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
-							':sCodigo' => $_POST['inputCodigo'] == '' ? '00' : $_POST['inputCodigo'],
+							':sCodigo' => $sCodigos,
 							':iCategoria' => $_POST['cmbCategoria'],
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iSubCategoria' => $_POST['inputSubCategoriaId']
@@ -53,6 +56,10 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			$_SESSION['msg']['mensagem'] = "SubCategoria alterada!!!";
 	
 		} else { //inclusão
+
+			
+			$sCodigo = $_POST['inputCodigo'];
+			$sCodigos = str_pad($sCodigo,2,"0",STR_PAD_LEFT);
 		
 			$sql = "INSERT INTO SubCategoria (SbCatCodigo, SbCatNome, SbCatCategoria, SbCatStatus, SbCatUsuarioAtualizador, SbCatEmpresa)
 					VALUES (:sCodigo, :sNome, :sCategoria, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
@@ -60,7 +67,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
-							':sCodigo' => $_POST['inputCodigo'] == '' ? '00' : $_POST['inputCodigo'],
+							':sCodigo' => $sCodigos,
 							':sCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
