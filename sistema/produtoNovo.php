@@ -17,7 +17,7 @@ if(isset($_POST['inputNome'])){
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
 		
 		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
-		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
+		$sCodigo = str_pad($sCodigo,9,"0",STR_PAD_LEFT);
 	} catch(PDOException $e) {	
 		echo 'Error1: ' . $e->getMessage();die;
 	}
