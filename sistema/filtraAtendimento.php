@@ -3882,6 +3882,172 @@ try{
 
 		echo json_encode($row);
 		
+	} elseif ($tipoRequest == 'ADICIONARORIENTACAOALTA') {
+
+	    
+		$ideEfetivacao = $_POST['ideEfetivacao'] == "" ? null : $_POST['ideEfetivacao'];
+		$tipoOrientacao = $_POST['tipoOrientacao'] == "" ? null : $_POST['tipoOrientacao'];
+		$profissionalOrientacao = $_POST['profissionalOrientacao'] == "" ? null : $_POST['profissionalOrientacao'];
+		$orientacaoAlta = $_POST['orientacaoAlta'] == "" ? null : $_POST['orientacaoAlta'];
+		$dataHora = date('Y-m-d H:i:s');
+
+		$sql = "INSERT INTO  EnfermagemEfetivacaoAltaOrientacao( EnEAOEfetivacaoAlta, EnEAODataHora, EnEAOTipoOrientacao, 
+			EnEAOProfissional, EnEAOOrientacao, EnEAOEditavel, EnEAOUnidade )
+		    VALUES ( '$ideEfetivacao', '$dataHora', '$tipoOrientacao', '$profissionalOrientacao', '$orientacaoAlta', 1, '$iUnidade')";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Orientação da Alta',
+			'menssagem' => 'Orientação inserida com sucesso!!!'
+		]);	
+
+	} elseif ($tipoRequest == 'EDITARORIENTACAOALTA') {
+
+		$idOrientacaoAlta = $_POST['idOrientacaoAlta'];
+
+		$tipoOrientacao = $_POST['tipoOrientacao'] == "" ? null : $_POST['tipoOrientacao'];
+		$profissionalOrientacao = $_POST['profissionalOrientacao'] == "" ? null : $_POST['profissionalOrientacao'];
+		$orientacaoAlta = $_POST['orientacaoAlta'] == "" ? null : $_POST['orientacaoAlta'];
+		$dataHora = date('Y-m-d H:i:s');
+
+
+		$sql = "UPDATE EnfermagemEfetivacaoAltaOrientacao SET
+			EnEAODataHora = '$dataHora', 
+			EnEAOTipoOrientacao = '$tipoOrientacao', 
+			EnEAOProfissional = '$profissionalOrientacao', 
+			EnEAOOrientacao = '$orientacaoAlta'
+			WHERE EnEAOId =  '$idOrientacaoAlta'";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Orientação da Alta',
+			'menssagem' => 'Orientação alterada com sucesso!!!'
+		]);		
+	} elseif ($tipoRequest == 'GETORIENTACOESALTA') {
+
+		$ideEfetivacao = $_POST['ideEfetivacao'] == "" ? null : $_POST['ideEfetivacao'];
+	
+		$sql = "SELECT * FROM EnfermagemEfetivacaoAltaOrientacao
+				WHERE EnEAOEfetivacaoAlta = $ideEfetivacao";
+
+		$result = $conn->query($sql);
+		$orientacoes = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($orientacoes as $key => $item){
+
+			$dataHora = explode(" ", $item['EnEAODataHora']);
+
+			array_push($array,[
+				'item' => ($key + 1),
+				'id'=>$item['EnEAOId'],
+				'dataHora'=> mostraData($dataHora[0]) . ' ' . mostraHora($dataHora[1]),
+				'orientacao' => $item['EnEAOOrientacao'],
+				'editavel' => $item['EnEAOEditavel']
+			]);
+		}
+		
+		echo json_encode($array);
+	} elseif ($tipoRequest == 'GETORIENTACAOALTA') {
+		
+		$id = $_POST['id'];
+
+		$sql = "SELECT *
+		FROM EnfermagemEfetivacaoAltaOrientacao
+		WHERE EnEAOId = $id
+		AND EnEAOUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode($row);
+		
+	} elseif ($tipoRequest == 'DELETEORIENTACAOALTA') {
+
+		$id = $_POST['id'];
+	
+		$sql = "DELETE FROM EnfermagemEfetivacaoAltaOrientacao
+		WHERE EnEAOId = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Orientação da Alta',
+			'menssagem' => 'Orientação excluída!!!',
+		]);
+			
+	} elseif ($tipoRequest == 'ADICIONARTERMOCONSENTIMENTO') {
+
+		$ideEfetivacao = $_POST['ideEfetivacao'] == "" ? null : $_POST['ideEfetivacao'];
+		$inputDataHoraTC = $_POST['inputDataHoraTC'] == "" ? null : str_replace('T', ' ', $_POST['inputDataHoraTC'] );
+		$inputDescricaoTC = $_POST['inputDescricaoTC'] == "" ? null : $_POST['inputDescricaoTC'];
+		$arquivoTermoConsentimento = $_POST['arquivoTermoConsentimento'] == "" ? null : $_POST['arquivoTermoConsentimento'];
+
+		$sql = "INSERT INTO  EnfermagemEfetivacaoAltaTermoConsentimento( EnEATEfetivacaoAlta, EnEATDataHora, EnEATDescricao, EnEATArquivo, EnEATUnidade )
+		    VALUES ( '$ideEfetivacao', '$inputDataHoraTC', '$inputDescricaoTC', '$arquivoTermoConsentimento', '$iUnidade')";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Termo de Consentimento',
+			'menssagem' => 'Termo inserida com sucesso!!!'
+		]);	
+			
+	} elseif ($tipoRequest == 'GETTERMOSCONSENTIMENTO') {
+
+		$ideEfetivacao = $_POST['ideEfetivacao'] == "" ? null : $_POST['ideEfetivacao'];
+	
+		$sql = "SELECT * FROM EnfermagemEfetivacaoAltaTermoConsentimento
+				WHERE EnEATEfetivacaoAlta = $ideEfetivacao";
+
+		$result = $conn->query($sql);
+		$orientacoes = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($orientacoes as $key => $item){
+
+			$dataHora = explode(" ", $item['EnEATDataHora']);
+
+			array_push($array,[
+				'item' => ($key + 1),
+				'id'=>$item['EnEATId'],
+				'dataHora'=> mostraData($dataHora[0]) . ' ' . mostraHora($dataHora[1]),
+				'descricao' => $item['EnEATDescricao']
+			]);
+		}
+		
+		echo json_encode($array);
+			
+	} elseif ($tipoRequest == 'GETTERMOCONSENTIMENTO') {
+
+		$id = $_POST['id'];
+
+		$sql = "SELECT *
+		FROM EnfermagemEfetivacaoAltaTermoConsentimento
+		WHERE EnEATId = $id
+		AND EnEATUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$row = $result->fetch(PDO::FETCH_ASSOC);
+
+		echo json_encode($row);
+			
+	} elseif ($tipoRequest == 'DELETETERMOCONSENTIMENTO') {
+
+		$id = $_POST['id'];
+	
+		$sql = "DELETE FROM EnfermagemEfetivacaoAltaTermoConsentimento
+		WHERE EnEATId = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Termo de Consentimento',
+			'menssagem' => 'Termo excluída!!!',
+		]);
+			
 	}
 
 }catch(PDOException $e) {
