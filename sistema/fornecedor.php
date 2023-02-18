@@ -274,8 +274,15 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 															</a>
 														
 															<div class="dropdown-menu dropdown-menu-right">
-															    <a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'anexo\');" class="dropdown-item"><i class="icon-attachment" title="Anexos"></i> Anexos</a>
-																<a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'socio\');" class="dropdown-item"><i class="icon-users4" title="Sócios"></i> Sócios</a>
+															    <a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'anexo\');" class="dropdown-item"><i class="icon-attachment" title="Anexos"></i> Anexos</a>');
+
+																if ($item['ForneCpf'] == null)  {
+
+																	print('<a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'socio\');" class="dropdown-item"><i class="icon-users4" title="Sócios"></i> Sócios</a> ');
+																}
+		
+															print('
+																
 															</div>
 														</div>
 													</div>

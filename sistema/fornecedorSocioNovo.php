@@ -16,10 +16,10 @@ if(isset($_POST['inputNome'])){
 
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
-						':sCpf' => $_POST['inputCpf'],
-						':sRg' => $_POST['inputRg'],
-						':sCelular' => $_POST['inputCelular'],
-						':sEmail' => $_POST['inputEmail'],
+						':sCpf' => limpaCPF_CNPJ($_POST['inputCpf']), 
+						':sRg' => $_POST['inputRg'] == '' ? null : $_POST['inputRg'],
+						':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
+						':sEmail' => $_POST['inputEmail'] == '' ? null : $_POST['inputEmail'], 
 						':iFornecedor' => $_SESSION['idFornecedor'],
 						':iEmpresa' => $_SESSION['EmpreId']
 						));
@@ -54,7 +54,7 @@ if(isset($_POST['inputNome'])){
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<!-- /theme JS files -->
@@ -63,6 +63,7 @@ if(isset($_POST['inputNome'])){
 	<script src="global_assets/js/plugins/forms/validation/validate.min.js"></script>
 	<script src="global_assets/js/plugins/forms/validation/localization/messages_pt_BR.js"></script>
 	<script src="global_assets/js/demo_pages/form_validation.js"></script>
+	
 
 	<script type="text/javascript" >
 
@@ -116,8 +117,8 @@ if(isset($_POST['inputNome'])){
 								</div>
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputCpf">CPF</span></label>
-										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" >
+										<label for="inputCpf">CPF</label>
+										<input type="text" id="inputCpf" name="inputCpf" class="form-control" data-mask="999.999.999-99">
 									</div>
 								</div>
 								<div class="col-lg-2">
@@ -127,11 +128,11 @@ if(isset($_POST['inputNome'])){
 									</div>
 								</div>
 								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputCelular">Celular</span></label>
-										<input type="text" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" >
-									</div>
-								</div>
+											<div class="form-group">
+												<label for="inputCelular">Celular</label>
+												<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999">
+											</div>
+										</div>
 								<div class="col-lg-3">
 									<div class="form-group">
 										<label for="inputEmail">E-Mail</span></label>

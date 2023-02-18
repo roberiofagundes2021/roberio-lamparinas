@@ -26,16 +26,16 @@ if(isset($_POST['inputNome'])){
 	
 	try{
 		
-		$sql = "UPDATE FornecedorXSocio SET FrXSoNome = :sNome, FrXSoCpf = :iCpf, FrXSoRg = :iRg, FrXSoCelular = :iCelular, FrXSoEmail = :sEmail
+		$sql = "UPDATE FornecedorXSocio SET FrXSoNome = :sNome, FrXSoCpf = :sCpf, FrXSoRg = :sRg, FrXSoCelular = :sCelular, FrXSoEmail = :sEmail
 				WHERE FrXSoId = :iFornecedorXSocio";
 		$result = $conn->prepare($sql);
 				
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
-						':iCpf' => $_POST['inputCpf'],
-						':iRg' => $_POST['inputRg'],
-						':iCelular' => $_POST['inputCelular'],
-						':sEmail' => $_POST['inputEmail'],
+						':sCpf' => limpaCPF_CNPJ($_POST['inputCpf']), 
+						':sRg' => $_POST['inputRg'] == '' ? null : $_POST['inputRg'],
+						':sCelular' => $_POST['inputCelular'] == '(__) _____-____' ? null : $_POST['inputCelular'],
+						':sEmail' => $_POST['inputEmail'] == '' ? null : $_POST['inputEmail'], 
 						':iFornecedorXSocio' => $_POST['inputFornecedorXSocioId']
 						));
 
@@ -71,7 +71,7 @@ if(isset($_POST['inputNome'])){
 	
 	<!-- Theme JS files -->
 	<script src="global_assets/js/plugins/forms/selects/select2.min.js"></script>
-	
+	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<script src="global_assets/js/demo_pages/form_layouts.js"></script>
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>	
 	<!-- /theme JS files -->	
@@ -134,27 +134,27 @@ if(isset($_POST['inputNome'])){
 										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome" value="<?php echo $row['FrXSoNome']; ?>" required autofocus>
 									</div>
 								</div>
+								<div class="col-lg-2" id="CPF">
+												<div class="form-group">
+													<label for="inputCpf">CPF</label>
+													<input required type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" value="<?php echo formatarCPF_Cnpj($row['FrXSoCpf']); ?>">
+												</div>
+											</div>
 								<div class="col-lg-2">
 									<div class="form-group">
-										<label for="inputCpf">CPF<span class="text-danger"> *</span></label>
-										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" value="<?php echo $row['FrXSoCpf']; ?>" >
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputRg">RG<span class="text-danger"> *</span></label>
+										<label for="inputRg">RG</label>
 										<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG" value="<?php echo $row['FrXSoRg']; ?>" >
 									</div>
 								</div>
 								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputCelular">Celular<span class="text-danger"> *</span></label>
-										<input type="text" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" value="<?php echo $row['FrXSoCelular']; ?>">
-									</div>
-								</div>
+												<div class="form-group">
+													<label for="inputCelular">Celular</label>
+													<input type="tel" id="inputCelular" name="inputCelular" class="form-control" placeholder="Celular" data-mask="(99) 99999-9999" value="<?php echo $row['FrXSoCelular']; ?>">
+												</div>
+											</div>
 								<div class="col-lg-3">
 									<div class="form-group">
-										<label for="inputEmail">E-Mail<span class="text-danger"> *</span></label>
+										<label for="inputEmail">E-Mail</label>
 										<input type="text" id="inputEmail" name="inputEmail" class="form-control" placeholder="E-Mail" value="<?php echo $row['FrXSoEmail']; ?>">
 									</div>
 								</div>
