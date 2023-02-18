@@ -539,7 +539,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputFamilia">Família</label>
-												<input type="text" id="inputFamilia" name="inputFamilia" class="form-control" placeholder="Família" readOnly>
+												<input type="text" id="inputFamilia" name="inputFamilia" class="form-control" placeholder="Família">
 											</div>
 										</div>
 
