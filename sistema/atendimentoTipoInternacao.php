@@ -7,9 +7,9 @@ $_SESSION['PaginaAtual'] = 'Tipo de Internação';
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT TpIntId, TpIntNome, TpIntStatus, TIXClClassificacao, SituaNome, SituaCor, SituaChave
+$sql = "SELECT TpIntId, TpIntNome, TpIntStatus, SituaNome, SituaCor, SituaChave, 
+		dbo.fnClassificacaoAtendimento(TpIntId, TpIntUnidade, 'TipoInternacao') as Classificacao
 		FROM TipoInternacao
-		LEFT JOIN TipoInternacaoXClassificacao on TIXClTipoInternacao = TpIntId
 		JOIN Situacao on SituaId = TpIntStatus
 	    WHERE TpIntUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY TpIntNome ASC";
@@ -21,13 +21,18 @@ $count = count($row);
 //Se estiver editando
 if(isset($_POST['inputTipoInternacaoId']) && $_POST['inputTipoInternacaoId']){
 
-	//Essa consulta é para preencher o campo Nome com o tipo de internação a ser editar
+	//Essa consulta é para preencher o campo Nome com o tipo de internação a ser editado
 	$sql = "SELECT TpIntId, TpIntNome, TIXClClassificacao
 			FROM TipoInternacao
 			LEFT JOIN TipoInternacaoXClassificacao on TIXClTipoInternacao = TpIntId
-			WHERE TpIntId = " . $_POST['inputTipoInternacaoId'];
+			WHERE TpIntId = " . $_POST['inputTipoInternacaoId'] ." and TpIntUnidade = ".$_SESSION['UnidadeId'];
 	$result = $conn->query($sql);
-	$rowTipoInternacao = $result->fetch(PDO::FETCH_ASSOC);
+	$rowTipoInternacao = $result->fetchAll(PDO::FETCH_ASSOC);
+
+	foreach ($rowTipoInternacao as $item) {
+		$aClassificacao[] = $item['TIXClClassificacao'];
+		$TipoInternacaoNome = $item['TpIntNome'];
+	}
 		
 	$_SESSION['msg'] = array();
 } 
@@ -75,15 +80,24 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iUnidade' => $_SESSION['UnidadeId'],
 							));
 
-			/*$sql = "INSERT INTO TipoInternacaoXClassificacao (TIXClTipoInternacao, TIXClClassificacao, TIXClUnidade)
-					VALUES (:iTipoInternacao, :iClassificacao, :iUnidade)";
-			$result = $conn->prepare($sql);
-					
-			$result->execute(array(
-							':iTipoInternacao' =>  $_POST['inputTipoInternacaoId'],
-							':iClassificacao' => $_POST['cmbClassificacao'],
-							':iUnidade' => $_SESSION['UnidadeId'],
-							));*/
+			$insertId = $conn->lastInsertId();
+			
+			//Grava as Classificações
+			if ($_POST['cmbClassificacao']) {
+
+				$sql = "INSERT INTO TipoInternacaoXClassificacao (TIXClTipoInternacao, TIXClClassificacao, TIXClUnidade)
+						VALUES (:iTipoInternacao, :iClassificacao, :iUnidade)";
+				$result = $conn->prepare($sql);
+	
+				foreach ($_POST['cmbClassificacao'] as $key => $value) {
+	
+					$result->execute(array(
+						':iTipoInternacao' =>  $insertId,
+						':iClassificacao' => $value,
+						':iUnidade' => $_SESSION['UnidadeId']			
+					));
+				}
+			}
 	
 			$_SESSION['msg']['mensagem'] = "Tipo de Internação incluído!!!";
 					
@@ -299,15 +313,15 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										<div class="col-lg-5">
 											<div class="form-group">
 												<label for="inputNome">Nome do Tipo de Internação <span class="text-danger"> *</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="TipoInternacao" value="<?php if (isset($_POST['inputTipoInternacaoId'])) echo $rowTipoInternacao['TpIntNome']; ?>" required autofocus>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="TipoInternacao" value="<?php if (isset($_POST['inputTipoInternacaoId'])) echo $TipoInternacaoNome; ?>" required autofocus>
 											</div>
 										</div>
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbClassificacao">Classificação<span class="text-danger"> *</span></label>
 												<select id="cmbClassificacao" name="cmbClassificacao[]" class="form-control multiselect-filtering" multiple="multiple">
-													<option value="H" <?php if (isset($_POST['inputTipoInternacaoId'])) if ($rowTipoInternacao['TIXClClassificacao'] == 'H') echo "selected"; ?>>Hospitalar</option>
-													<option value="A" <?php if (isset($_POST['inputTipoInternacaoId'])) if ($rowTipoInternacao['TIXClClassificacao'] == 'A') echo "selected"; ?>>Ambulátorial</option>
+													<option value="H" <?php if (isset($_POST['inputTipoInternacaoId'])) if (in_array('H', $aClassificacao)) echo "selected"; ?>>Hospitalar</option>
+													<option value="A" <?php if (isset($_POST['inputTipoInternacaoId'])) if (in_array('A', $aClassificacao)) echo "selected"; ?>>Ambulátorial</option>
 												</select>
 											</div>
 										</div>
@@ -348,7 +362,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
-										$Classificacao = $item['TIXClClassificacao'] == 'A' ? 'Ambulátorial' : 'Hospitalar';
+										$Classificacao = $item['Classificacao'];
 										print('
 										<tr>
 											<td>'.$item['TpIntNome'].'</td>

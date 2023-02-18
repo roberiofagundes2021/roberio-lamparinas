@@ -23,7 +23,7 @@ include('global_assets/php/conexao.php');
 	<script src="global_assets/js/plugins/forms/styling/uniform.min.js"></script>
 
 	<script src="global_assets/js/plugins/media/fancybox.min.js"></script>
-	<script src="../../../../global_assets/js/demo_pages/components_popups.js"></script>
+	<script src="global_assets/js/demo_pages/components_popups.js"></script>
 
 	<script src="global_assets/js/plugins/forms/inputs/inputmask.js"></script>
 	<!-- /theme JS files -->
@@ -371,6 +371,9 @@ include('global_assets/php/conexao.php');
 										</div>
 									</div>
 								</div>
+								<div class="col-lg-8">
+									
+								</div>	
 							</div>
 
 							<div class="row">
@@ -404,225 +407,228 @@ include('global_assets/php/conexao.php');
 										<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT">
 									</div>
 								</div>
-							</div>
-							<br>
+							</div>							
 
-							<div id="foto" style="text-align:center;width:235px; height:310px; overflow:hidden; justify-content: flex-start; display:flex; flex-direction:column; position:absolute; z-index:1; margin-left:77%">
-								<div id="visualizar">
-									<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" width="195px" alt="Fornecedores" style="border:2px solid #ccc;">
-								</div>
-								<br>
-								<button id="addFoto" type="button" onclick="adicionaFoto()" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>
-							</div>
-
+							<!-- Pessoa Física -->
 							<div class="row">
+								<div class="col-lg-10">
+									<div class="row">
+										<div class="col-lg-8">
+											<div class="form-group">
+												<label for="inputRazaoSocial">Razão Social</label>
+												<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social">
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label for="inputNome">Nome<span class="text-danger">*</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Fantasia" required autofocus>
+											</div>
+										</div>
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputRg">RG</label>
+												<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG">
+											</div>
+										</div>
 
-								<div class="col-lg-8">
-									<div class="form-group">
-										<label for="inputRazaoSocial">Razão Social</label>
-										<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputEmissor">Emissor</label>
+												<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="cmbUf">UF</label>
+												<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<option value="AC">Acre</option>
+													<option value="AL">Alagoas</option>
+													<option value="AP">Amapá</option>
+													<option value="AM">Amazonas</option>
+													<option value="BA">Bahia</option>
+													<option value="CE">Ceará</option>
+													<option value="DF">Distrito Federal</option>
+													<option value="ES">Espírito Santo</option>
+													<option value="GO">Goiás</option>
+													<option value="MA">Maranhão</option>
+													<option value="MT">Mato Grosso</option>
+													<option value="MS">Mato Grosso do Sul</option>
+													<option value="MG">Minas Gerais</option>
+													<option value="PA">Pará</option>
+													<option value="PB">Paraíba</option>
+													<option value="PR">Paraná</option>
+													<option value="PE">Pernambuco</option>
+													<option value="PI">Piauí</option>
+													<option value="RJ">Rio de Janeiro</option>
+													<option value="RN">Rio Grande do Norte</option>
+													<option value="RS">Rio Grande do Sul</option>
+													<option value="RO">Rondônia</option>
+													<option value="RR">Roraima</option>
+													<option value="SC">Santa Catarina</option>
+													<option value="SP">São Paulo</option>
+													<option value="SE">Sergipe</option>
+													<option value="TO">Tocantins</option>
+													<option value="ES">Estrangeiro</option>
+												</select>
+											</div>
+										</div>
 									</div>
-								</div>
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="inputNome">Nome<span class="text-danger">*</span></label>
-										<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Fantasia" required autofocus>
+
+									<div class="row">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputCarteiraTrabalho">Carteira de Trabalho</label>
+												<input type="text" id="inputCarteiraTrabalho" name="inputCarteiraTrabalho" class="form-control" placeholder="Carteira de Trabalho">
+											</div>
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputNumSerie">Numero de Série</label>
+												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Numero de Série">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputAniversario">Data Nascimento</label>
+												<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" onblur="formataCampoDataNascimento()">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="cmbSexo">Sexo</label>
+												<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<option value="F">Feminino</option>
+													<option value="M">Masculino</option>
+												</select>
+											</div>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputNaturalidade">Naturalidade</label>
+												<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
+											</div>
+										</div>
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputNaturalidadeUf">UF da Naturalidade</label>
+												<select id="inputNaturalidadeUf" name="inputNaturalidadeUf" class="form-control form-control-select2">
+													<option value="#">Selecione</option>
+													<option value="AC">Acre</option>
+													<option value="AL">Alagoas</option>
+													<option value="AP">Amapá</option>
+													<option value="AM">Amazonas</option>
+													<option value="BA">Bahia</option>
+													<option value="CE">Ceará</option>
+													<option value="DF">Distrito Federal</option>
+													<option value="ES">Espírito Santo</option>
+													<option value="GO">Goiás</option>
+													<option value="MA">Maranhão</option>
+													<option value="MT">Mato Grosso</option>
+													<option value="MS">Mato Grosso do Sul</option>
+													<option value="MG">Minas Gerais</option>
+													<option value="PA">Pará</option>
+													<option value="PB">Paraíba</option>
+													<option value="PR">Paraná</option>
+													<option value="PE">Pernambuco</option>
+													<option value="PI">Piauí</option>
+													<option value="RJ">Rio de Janeiro</option>
+													<option value="RN">Rio Grande do Norte</option>
+													<option value="RS">Rio Grande do Sul</option>
+													<option value="RO">Rondônia</option>
+													<option value="RR">Roraima</option>
+													<option value="SC">Santa Catarina</option>
+													<option value="SP">São Paulo</option>
+													<option value="SE">Sergipe</option>
+													<option value="TO">Tocantins</option>
+													<option value="ES">Estrangeiro</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-3">
+											<div class="form-group">
+												<label for="inputNacionalidade">Nacionalidade</label>
+												<input type="text" id="inputNacionalidade" name="inputNacionalidade" class="form-control" placeholder="Nacionalidade">
+											</div>
+										</div>
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputAno">Ano &nbsp<i style="color:#375b82;" class="icon-question4" data-popup="tooltip" data-original-title="Entrada no Brasil (se estrangeiro)" data-placement="right"></i></label>
+												<input type="text" id="inputAno" name="inputAno" class="form-control" placeholder="Ano">
+											</div>
+										</div>
+									</div>
+
+									<div class="row">
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
+												<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal">
+											</div>
+										</div>
+
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputInscricaoEstadual">Inscrição Estadual</label>
+												<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Ins. Estadual">
+											</div>
+										</div>
+
+										<div class="col-lg-4">
+											<div class="form-group">
+												<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
+												<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
+													<option value="#">Selecione </option>
+													<?php
+													$sql = "SELECT CategId, CategNome
+															FROM Categoria
+															JOIN Situacao on SituaId = CategStatus
+															WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
+															ORDER BY CategNome ASC";
+													$result = $conn->query($sql);
+													$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+
+													foreach ($rowCategoria as $item) {
+														print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
+													}
+
+													?>
+												</select>
+											</div>
+										</div>
+
+										<div class="col-lg-4">
+											<div class="form-group" style="border-bottom:1px solid #ddd;">
+												<label for="cmbSubCategoria">SubCategoria</label>
+												<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
+													<option value="#">Selecione </option>
+												</select>
+											</div>
+										</div>
 									</div>
 								</div>
 								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputRg">RG</label>
-										<input type="text" id="inputRg" name="inputRg" class="form-control" placeholder="RG">
+									<div id="foto">
+										<div id="visualizar">
+											<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" width="195px" alt="Fornecedores" style="border:2px solid #ccc;">
+										</div>
+										<br>
+										<button id="addFoto" type="button" onclick="adicionaFoto()" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>
 									</div>
-								</div>
-
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputEmissor">Emissor</label>
-										<input type="text" id="inputEmissor" name="inputEmissor" class="form-control" placeholder="Órgão Emissor">
-									</div>
-								</div>
-
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="cmbUf">UF</label>
-										<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<option value="AC">Acre</option>
-											<option value="AL">Alagoas</option>
-											<option value="AP">Amapá</option>
-											<option value="AM">Amazonas</option>
-											<option value="BA">Bahia</option>
-											<option value="CE">Ceará</option>
-											<option value="DF">Distrito Federal</option>
-											<option value="ES">Espírito Santo</option>
-											<option value="GO">Goiás</option>
-											<option value="MA">Maranhão</option>
-											<option value="MT">Mato Grosso</option>
-											<option value="MS">Mato Grosso do Sul</option>
-											<option value="MG">Minas Gerais</option>
-											<option value="PA">Pará</option>
-											<option value="PB">Paraíba</option>
-											<option value="PR">Paraná</option>
-											<option value="PE">Pernambuco</option>
-											<option value="PI">Piauí</option>
-											<option value="RJ">Rio de Janeiro</option>
-											<option value="RN">Rio Grande do Norte</option>
-											<option value="RS">Rio Grande do Sul</option>
-											<option value="RO">Rondônia</option>
-											<option value="RR">Roraima</option>
-											<option value="SC">Santa Catarina</option>
-											<option value="SP">São Paulo</option>
-											<option value="SE">Sergipe</option>
-											<option value="TO">Tocantins</option>
-											<option value="ES">Estrangeiro</option>
-										</select>
-									</div>
-								</div>
+								</div>									
 							</div>
 
-							<div class="row">
-								<div class="col-lg-3">
-									<div class="form-group">
-										<label for="inputCarteiraTrabalho">Carteira de Trabalho</label>
-										<input type="text" id="inputCarteiraTrabalho" name="inputCarteiraTrabalho" class="form-control" placeholder="Carteira de Trabalho">
-									</div>
-								</div>
-								<div class="col-lg-3">
-									<div class="form-group">
-										<label for="inputNumSerie">Numero de Série</label>
-										<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Numero de Série">
-									</div>
-								</div>
 
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputAniversario">Data Nascimento</label>
-										<input type="date" id="inputAniversario" name="inputAniversario" class="form-control" placeholder="Aniversário" onblur="formataCampoDataNascimento()">
-									</div>
-								</div>
 
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="cmbSexo">Sexo</label>
-										<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<option value="F">Feminino</option>
-											<option value="M">Masculino</option>
-										</select>
-									</div>
-								</div>
-
-							</div>
-
-							<div class="row">
-								<div class="col-lg-3">
-									<div class="form-group">
-										<label for="inputNaturalidade">Naturalidade</label>
-										<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
-									</div>
-								</div>
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputNaturalidadeUf">UF da Naturalidade</label>
-										<select id="inputNaturalidadeUf" name="inputNaturalidadeUf" class="form-control form-control-select2">
-											<option value="#">Selecione</option>
-											<option value="AC">Acre</option>
-											<option value="AL">Alagoas</option>
-											<option value="AP">Amapá</option>
-											<option value="AM">Amazonas</option>
-											<option value="BA">Bahia</option>
-											<option value="CE">Ceará</option>
-											<option value="DF">Distrito Federal</option>
-											<option value="ES">Espírito Santo</option>
-											<option value="GO">Goiás</option>
-											<option value="MA">Maranhão</option>
-											<option value="MT">Mato Grosso</option>
-											<option value="MS">Mato Grosso do Sul</option>
-											<option value="MG">Minas Gerais</option>
-											<option value="PA">Pará</option>
-											<option value="PB">Paraíba</option>
-											<option value="PR">Paraná</option>
-											<option value="PE">Pernambuco</option>
-											<option value="PI">Piauí</option>
-											<option value="RJ">Rio de Janeiro</option>
-											<option value="RN">Rio Grande do Norte</option>
-											<option value="RS">Rio Grande do Sul</option>
-											<option value="RO">Rondônia</option>
-											<option value="RR">Roraima</option>
-											<option value="SC">Santa Catarina</option>
-											<option value="SP">São Paulo</option>
-											<option value="SE">Sergipe</option>
-											<option value="TO">Tocantins</option>
-											<option value="ES">Estrangeiro</option>
-										</select>
-									</div>
-								</div>
-
-								<div class="col-lg-3">
-									<div class="form-group">
-										<label for="inputNacionalidade">Nacionalidade</label>
-										<input type="text" id="inputNacionalidade" name="inputNacionalidade" class="form-control" placeholder="Nacionalidade">
-									</div>
-								</div>
-
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputAno">Ano &nbsp<i style="color:#375b82;" class="icon-question4" data-popup="tooltip" data-original-title="Entrada no Brasil (se estrangeiro)" data-placement="right"></i></label>
-										<input type="text" id="inputAno" name="inputAno" class="form-control" placeholder="Ano">
-									</div>
-								</div>
-							</div>
-
-							<div class="row">
-
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
-										<input type="text" id="inputInscricaoMunicipal" name="inputInscricaoMunicipal" class="form-control" placeholder="Inscrição Municipal">
-									</div>
-								</div>
-
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputInscricaoEstadual">Inscrição Estadual</label>
-										<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Ins. Estadual">
-									</div>
-								</div>
-
-								<div class="col-lg-4">
-									<div class="form-group">
-										<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
-										<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-											<option value="#">Selecione </option>
-											<?php
-											$sql = "SELECT CategId, CategNome
-													FROM Categoria
-													JOIN Situacao on SituaId = CategStatus
-													WHERE CategEmpresa = " . $_SESSION['EmpreId'] . " and SituaChave = 'ATIVO'
-													ORDER BY CategNome ASC";
-											$result = $conn->query($sql);
-											$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
-
-											foreach ($rowCategoria as $item) {
-												print('<option value="' . $item['CategId'] . '">' . $item['CategNome'] . '</option>');
-											}
-
-											?>
-										</select>
-									</div>
-								</div>
-
-								<div class="col-lg-4">
-									<div class="form-group" style="border-bottom:1px solid #ddd;">
-										<label for="cmbSubCategoria">SubCategoria</label>
-										<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
-											<option value="#">Selecione </option>
-										</select>
-									</div>
-								</div>
-
-							</div>
 
 							<div class="row">
 								<div class="col-lg-12">

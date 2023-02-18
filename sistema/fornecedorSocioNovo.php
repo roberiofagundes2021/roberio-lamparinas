@@ -11,14 +11,14 @@ if(isset($_POST['inputNome'])){
 	try{	
 		 
 		$sql = "INSERT INTO FornecedorXSocio (FrXSoNome, FrXSoCpf, FrXSoRg, FrXSoCelular, FrXSoEmail, FrXSoFornecedor, FrXSoEmpresa)
-				VALUES (:sNome, :iCpf, :iRg, :iCelular,:sEmail, iFornecedor, :iEmpresa)";
+				VALUES (:sNome, :sCpf, :sRg, :sCelular, :sEmail, :iFornecedor, :iEmpresa)";
 		$result = $conn->prepare($sql);
-				
+
 		$result->execute(array(
 						':sNome' => $_POST['inputNome'],
-						':iCpf' => $_POST['inputCpf'],
-						':iRg' => $_POST['inputRg'],
-						':iCelular' => $_POST['inputCelular'],
+						':sCpf' => $_POST['inputCpf'],
+						':sRg' => $_POST['inputRg'],
+						':sCelular' => $_POST['inputCelular'],
 						':sEmail' => $_POST['inputEmail'],
 						':iFornecedor' => $_SESSION['idFornecedor'],
 						':iEmpresa' => $_SESSION['EmpreId']
@@ -34,7 +34,7 @@ if(isset($_POST['inputNome'])){
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Erro ao incluir Sócio!!!";
 		$_SESSION['msg']['tipo'] = "error";	
-		echo 'Error: ' . $e->getMessage();
+		echo 'Error: ' . $e->getMessage();die;
 	}
 	
 	irpara("fornecedorSocio.php");

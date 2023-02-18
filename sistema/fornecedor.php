@@ -275,7 +275,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 														
 															<div class="dropdown-menu dropdown-menu-right">
 															    <a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'anexo\');" class="dropdown-item"><i class="icon-attachment" title="Anexos"></i> Anexos</a>
-																<a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'socio\');" class="dropdown-item"><i class="icon-add-to-list" title="Sócios"></i> Sócios</a>
+																<a href="#" onclick="atualizaFornecedor(1,'.$item['ForneId'].', \''.$item['ForneNome'].'\','.$item['ForneStatus'].', \'socio\');" class="dropdown-item"><i class="icon-users4" title="Sócios"></i> Sócios</a>
 															</div>
 														</div>
 													</div>
