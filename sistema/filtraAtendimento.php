@@ -3980,20 +3980,49 @@ try{
 			
 	} elseif ($tipoRequest == 'ADICIONARTERMOCONSENTIMENTO') {
 
-		$ideEfetivacao = $_POST['ideEfetivacao'] == "" ? null : $_POST['ideEfetivacao'];
-		$inputDataHoraTC = $_POST['inputDataHoraTC'] == "" ? null : str_replace('T', ' ', $_POST['inputDataHoraTC'] );
-		$inputDescricaoTC = $_POST['inputDescricaoTC'] == "" ? null : $_POST['inputDescricaoTC'];
-		$arquivoTermoConsentimento = $_POST['arquivoTermoConsentimento'] == "" ? null : $_POST['arquivoTermoConsentimento'];
+		try {
+			$nome_final = '';
 
-		$sql = "INSERT INTO  EnfermagemEfetivacaoAltaTermoConsentimento( EnEATEfetivacaoAlta, EnEATDataHora, EnEATDescricao, EnEATArquivo, EnEATUnidade )
-		    VALUES ( '$ideEfetivacao', '$inputDataHoraTC', '$inputDescricaoTC', '$arquivoTermoConsentimento', '$iUnidade')";
-		$conn->query($sql);
+			if ( isset($_FILES['file']) ) {
 
-		echo json_encode([
-			'status' => 'success',
-			'titulo' => 'Termo de Consentimento',
-			'menssagem' => 'Termo inserida com sucesso!!!'
-		]);	
+				$_UP['pasta'] = 'global_assets/anexos/termoConsentimento/';
+				// Renomeia o arquivo? (Se true, o arquivo será salvo como .csv e um nome único)
+				$_UP['renomeia'] = false;
+				// Primeiro verifica se deve trocar o nome do arquivo
+				if ($_UP['renomeia'] == true) {			
+					// Cria um nome baseado no UNIX TIMESTAMP atual e com extensão .csv
+					$nome_final = date('d-m-Y')."-".date('H-i-s')."-".$_FILES['file']['name'];			
+				} else {			
+					// Mantém o nome original do arquivo
+					$nome_final = $_FILES['file']['name'];
+				}
+				move_uploaded_file( $_FILES['file']['tmp_name'], $_UP['pasta'] . $nome_final);
+			}
+
+			$ideEfetivacao = $_POST['ideEfetivacao'] == "" ? null : $_POST['ideEfetivacao'];
+			$inputDataHoraTC = $_POST['inputDataHoraTC'] == "" ? null : str_replace('T', ' ', $_POST['inputDataHoraTC'] );
+			$inputDescricaoTC = $_POST['inputDescricaoTC'] == "" ? null : $_POST['inputDescricaoTC'];
+			$arquivoTermoConsentimento = $nome_final;
+
+			$sql = "INSERT INTO  EnfermagemEfetivacaoAltaTermoConsentimento( EnEATEfetivacaoAlta, EnEATDataHora, EnEATDescricao, EnEATArquivo, EnEATUnidade )
+				VALUES ( '$ideEfetivacao', '$inputDataHoraTC', '$inputDescricaoTC', '$arquivoTermoConsentimento', '$iUnidade')";
+			$conn->query($sql);
+
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Termo de Consentimento',
+				'menssagem' => 'Termo inserida com sucesso!!!'
+			]);	
+
+		} catch (\Throwable $th) {
+
+			echo json_encode([
+					'status' => 'error',
+					'titulo' => 'Erro',
+					'menssagem' => 'Erro ao adicionar Termo de Consentimento!!!' 
+			]);
+
+		}
 			
 	} elseif ($tipoRequest == 'GETTERMOSCONSENTIMENTO') {
 
@@ -4015,7 +4044,8 @@ try{
 				'item' => ($key + 1),
 				'id'=>$item['EnEATId'],
 				'dataHora'=> mostraData($dataHora[0]) . ' ' . mostraHora($dataHora[1]),
-				'descricao' => $item['EnEATDescricao']
+				'descricao' => $item['EnEATDescricao'],
+				'arquivo' => $item['EnEATArquivo']
 			]);
 		}
 		

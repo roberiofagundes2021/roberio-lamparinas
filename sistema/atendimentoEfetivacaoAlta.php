@@ -226,8 +226,14 @@ if (isset($_POST['inputInicio'])) {
                 ':iAtendimentoEfetivacaoAlta' => $iAtendimentoEfetivacaoAlta
             ));
 
+            $sql = "UPDATE EnfermagemEfetivacaoAltaOrientacao SET EnEAOEditavel = 0
+			WHERE EnEAOEfetivacaoAlta =  '$iAtendimentoEfetivacaoAlta'";
+		    $conn->query($sql);
+
+            $_SESSION['msg']['titulo'] = "Sucesso";
             $_SESSION['msg']['mensagem'] = "Efetivação de Alta alterada!!!";
-        
+            $_SESSION['msg']['tipo'] = "success";
+
         } else {
 
             $sql = "INSERT INTO EnfermagemEfetivacaoAlta 
@@ -387,6 +393,11 @@ if (isset($_POST['inputInicio'])) {
                 ':EnEfAUnidade' => $iUnidade
 
             ));
+
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Efetivação de Alta inserida com sucesso!!!";
+            $_SESSION['msg']['tipo'] = "success";
+
         }
     } catch (PDOException $e) {
 
@@ -623,23 +634,55 @@ if (isset($_POST['inputInicio'])) {
             $('.adicionarTermoConsentimento').on('click', function (e) {
 
                 e.preventDefault();
+                let menssageError = ''
 
+                let fileTC = $('#arquivoTermoConsentimento').prop('files')[0]
                 let inputDataHoraTC = $('#inputDataHoraTC').val()
                 let inputDescricaoTC = $('#inputDescricaoTC').val()
-                let arquivoTermoConsentimento = $('#arquivoTermoConsentimento').val()
+                let arquivoTermoConsentimento = $('#arquivoTermoConsentimento').val();
+
+                switch(menssageError){
+                    case inputDataHoraTC: menssageError = 'informe a data e hora do Termo de Consentimento'; $('#inputDataHoraTC').focus();break;
+					case inputDescricaoTC: menssageError = 'informe o subgrupo'; $('#inputDescricaoTC').focus();break;
+                    case arquivoTermoConsentimento : menssageError = 'infomrme o arquivo do Termo Consentimento'; $('#arquivoTermoConsentimento').focus();break;	
+					default: menssageError = ''; break;
+				}
+
+				if(menssageError){
+					alerta('Campo Obrigatório!', menssageError, 'error')
+					return
+				}
+
+                //Verifica se a extensão é  diferente de PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!
+				if (ext(arquivoTermoConsentimento) != 'pdf' && ext(arquivoTermoConsentimento) != 'doc' && ext(arquivoTermoConsentimento) != 'docx' && ext(arquivoTermoConsentimento) != 'odt' && ext(arquivoTermoConsentimento) != 'jpg' && ext(arquivoTermoConsentimento) != 'jpeg' && ext(arquivoTermoConsentimento) != 'png'){
+					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!','error');
+					$('#arquivoTermoConsentimento').focus();
+					return ;	
+				}
+
+                let tamanho =  1024 * 1024 * 32; //32MB
+				//Verifica o tamanho do arquivo
+				if (fileTC.size > tamanho){
+					alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 32MB.','error');
+					$('#arquivoTermoConsentimento').focus();
+					return ;
+				}	
+
+                let form_data = new FormData();
+                form_data.append('file', $('#arquivoTermoConsentimento').prop('files')[0]);                  
+                form_data.append('inputDataHoraTC', $("#inputDataHoraTC").val());
+                form_data.append('inputDescricaoTC', $("#inputDescricaoTC").val());
+                form_data.append('tipoRequest', 'ADICIONARTERMOCONSENTIMENTO');
+                form_data.append('ideEfetivacao', <?php echo $iAtendimentoEfetivacaoAlta; ?>);
 
                 $.ajax({
                     type: 'POST',
                     url: 'filtraAtendimento.php',
                     dataType: 'json',
-
-                    data: {
-                        'tipoRequest': 'ADICIONARTERMOCONSENTIMENTO',
-                        'ideEfetivacao' : <?php echo $iAtendimentoEfetivacaoAlta; ?>,
-                        'inputDataHoraTC' : inputDataHoraTC,				
-                        'inputDescricaoTC' : inputDescricaoTC,	
-                        'arquivoTermoConsentimento' : arquivoTermoConsentimento
-                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
                     success: function(response) {
                         if(response.status == 'success'){
                             alerta(response.titulo, response.menssagem, response.status)
@@ -652,8 +695,13 @@ if (isset($_POST['inputInicio'])) {
                 }); 
             });
 
-
         }); //document.ready
+
+        function ext(path) {
+			var final = path.substr(path.lastIndexOf('/')+1);
+			var separador = final.lastIndexOf('.');
+			return separador <= 0 ? '' : final.substr(separador + 1);
+		}
 
         function getTermosConsentimento(){
 
@@ -673,11 +721,13 @@ if (isset($_POST['inputInicio'])) {
                     response.forEach(item => {
 
                         let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarTermoConsentimento(\"${item.id}\")'><i class='icon-files-empty' title='Copiar Termo'></i></a>`;
+                        let visualizarArquivo = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' href="global_assets/anexos/termoConsentimento/${item.arquivo}" target="_blank" > <i class='icon-file-eye' title='Visualizar Termo'></i> </a>`;
                         let exc = `<a style='color: black; cursor:pointer' onclick='excluirTermoConsentimento(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Termo'></i></a>`;
                         let acoes = ``;                                              
                    
                         acoes = `<div class='list-icons'>
                             ${copiar}
+                            ${visualizarArquivo}
                             ${exc}
                         </div>`;
                                             
