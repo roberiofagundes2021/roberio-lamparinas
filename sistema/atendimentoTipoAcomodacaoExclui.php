@@ -23,10 +23,10 @@ if(isset($_POST['tipoAcomodacaoId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir Tipo de Acomodação!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir Tipo de Acomodação!!! O registro está sendo usado em outro local.";
 		$_SESSION['msg']['tipo'] = "error";			
 		
-		echo 'Error: ' . $e->getMessage();
+		//echo 'Error: ' . $e->getMessage();
 	}
 }
 

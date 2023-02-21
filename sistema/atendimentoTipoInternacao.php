@@ -55,15 +55,30 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iTipoInternacao' => $_POST['inputTipoInternacaoId']
 							));
 
-			/*$sql = "UPDATE TipoInternacaoXClassificacao  SET TIXClClassificacao = :iClassificacao
+			$sql = "DELETE FROM TipoInternacaoXClassificacao 
 					WHERE TIXClTipoInternacao = :iTipoInternacao";
 			$result = $conn->prepare($sql);
-					
-			$result->execute(array(
+		
+			$result->execute(array(':iTipoInternacao' => $_POST['inputTipoInternacaoId']));
 
-							':iTipoInternacao' => $_POST['inputTipoInternacaoId'],
-							':iClassificacao' => $_POST['cmbClassificacao'],
-							));*/
+			$insertId = $conn->lastInsertId();
+			
+			//Grava as Classificações
+			if ($_POST['cmbClassificacao']) {
+
+				$sql = "INSERT INTO TipoInternacaoXClassificacao (TIXClTipoInternacao, TIXClClassificacao, TIXClUnidade)
+						VALUES (:iTipoInternacao, :iClassificacao, :iUnidade)";
+				$result = $conn->prepare($sql);
+	
+				foreach ($_POST['cmbClassificacao'] as $key => $value) {
+	
+					$result->execute(array(
+						':iTipoInternacao' => $_POST['inputTipoInternacaoId'],
+						':iClassificacao' => $value,
+						':iUnidade' => $_SESSION['UnidadeId']			
+					));
+				}
+			}
 	
 			$_SESSION['msg']['mensagem'] = "Tipo de Internação alterado!!!";
 	
@@ -313,7 +328,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										<div class="col-lg-5">
 											<div class="form-group">
 												<label for="inputNome">Nome do Tipo de Internação <span class="text-danger"> *</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="TipoInternacao" value="<?php if (isset($_POST['inputTipoInternacaoId'])) echo $TipoInternacaoNome; ?>" required autofocus>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Tipo de Internacao" value="<?php if (isset($_POST['inputTipoInternacaoId'])) echo $TipoInternacaoNome; ?>" required autofocus>
 											</div>
 										</div>
 										<div class="col-lg-4">

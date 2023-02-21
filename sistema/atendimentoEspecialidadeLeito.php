@@ -2,14 +2,14 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Especialidade do Leito';
+$_SESSION['PaginaAtual'] = 'Tipo da Especilalidade do Leito';
 
 include('global_assets/php/conexao.php');
 
 //Essa consulta é para preencher a grid
-$sql = "SELECT EsLeiId, EsLeiNome, EsLeiStatus, ELXClClassificacao, SituaNome, SituaCor, SituaChave
+$sql = "SELECT EsLeiId, EsLeiNome, EsLeiStatus, SituaNome, SituaCor, SituaChave, 
+		dbo.fnClassificacaoAtendimento(EsLeiId, EsLeiUnidade, 'EspecialidadeLeito') as Classificacao
 		FROM EspecialidadeLeito
-		LEFT JOIN EspecialidadeLeitoXClassificacao on ELXClTipoInternacao = EsLeiId
 		JOIN Situacao on SituaId = EsLeiStatus
 	    WHERE EsLeiUnidade = ". $_SESSION['UnidadeId'] ."
 		ORDER BY EsLeiNome ASC";
@@ -21,13 +21,18 @@ $count = count($row);
 //Se estiver editando
 if(isset($_POST['inputEspecialidadeLeitoId']) && $_POST['inputEspecialidadeLeitoId']){
 
-	//Essa consulta é para preencher o campo Nome com a Especialidade do Leito a ser editar
+	//Essa consulta é para preencher o campo Nome com o tipo da Especilalidade do Leito a ser editado
 	$sql = "SELECT EsLeiId, EsLeiNome, ELXClClassificacao
 			FROM EspecialidadeLeito
-			LEFT JOIN EspecialidadeLeitoXClassificacao on ELXClTipoInternacao = EsLeiId
-			WHERE EsLeiId = " . $_POST['inputEspecialidadeLeitoId'];
+			LEFT JOIN EspecialidadeLeitoXClassificacao on ELXClEspecialidadeLeito = EsLeiId
+			WHERE EsLeiId = " . $_POST['inputEspecialidadeLeitoId'] ." and EsLeiUnidade = ".$_SESSION['UnidadeId'];
 	$result = $conn->query($sql);
-	$rowEspecialidadeLeito = $result->fetch(PDO::FETCH_ASSOC);
+	$rowEspecialidadeLeito = $result->fetchAll(PDO::FETCH_ASSOC);
+
+	foreach ($rowEspecialidadeLeito as $item) {
+		$aClassificacao[] = $item['ELXClClassificacao'];
+		$EspecialidadeLeitoNome = $item['EsLeiNome'];
+	}
 		
 	$_SESSION['msg'] = array();
 } 
@@ -49,8 +54,33 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iEspecialidadeLeito' => $_POST['inputEspecialidadeLeitoId']
 							));
+
+			$sql = "DELETE FROM EspecialidadeLeitoXClassificacao 
+					WHERE ELXClEspecialidadeLeito = :iEspecialidadeLeito";
+			$result = $conn->prepare($sql);
+		
+			$result->execute(array(':iEspecialidadeLeito' => $_POST['inputEspecialidadeLeitoId']));
+
+			$insertId = $conn->lastInsertId();
+			
+			//Grava as Classificações
+			if ($_POST['cmbClassificacao']) {
+
+				$sql = "INSERT INTO EspecialidadeLeitoXClassificacao (ELXClEspecialidadeLeito, ELXClClassificacao, ELXClUnidade)
+						VALUES (:iEspecialidadeLeito, :iClassificacao, :iUnidade)";
+				$result = $conn->prepare($sql);
 	
-			$_SESSION['msg']['mensagem'] = "Especialidade do Leito alterado!!!";
+				foreach ($_POST['cmbClassificacao'] as $key => $value) {
+	
+					$result->execute(array(
+						':iEspecialidadeLeito' =>   $_POST['inputEspecialidadeLeitoId'],
+						':iClassificacao' => $value,
+						':iUnidade' => $_SESSION['UnidadeId']			
+					));
+				}
+			}
+	
+			$_SESSION['msg']['mensagem'] = "Tipo da especilalidade do leito alterado!!!";
 	
 		} else { //inclusão
 		
@@ -64,8 +94,27 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iUnidade' => $_SESSION['UnidadeId'],
 							));
+
+			$insertId = $conn->lastInsertId();
+			
+			//Grava as Classificações
+			if ($_POST['cmbClassificacao']) {
+
+				$sql = "INSERT INTO EspecialidadeLeitoXClassificacao (ELXClEspecialidadeLeito, ELXClClassificacao, ELXClUnidade)
+						VALUES (:iEspecialidadeLeito, :iClassificacao, :iUnidade)";
+				$result = $conn->prepare($sql);
 	
-			$_SESSION['msg']['mensagem'] = "Especialidade do Leito incluído!!!";
+				foreach ($_POST['cmbClassificacao'] as $key => $value) {
+	
+					$result->execute(array(
+						':iEspecialidadeLeito' =>  $insertId,
+						':iClassificacao' => $value,
+						':iUnidade' => $_SESSION['UnidadeId']			
+					));
+				}
+			}
+	
+			$_SESSION['msg']['mensagem'] = "Tipo da especilalidade do leito incluído!!!";
 					
 		}
 	
@@ -75,7 +124,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro reportado com a especialidade do leito!!!";
+		$_SESSION['msg']['mensagem'] = "Erro reportado com o tipo da Especilalidade do Leito!!!";
 		$_SESSION['msg']['tipo'] = "error";	
 		
 		echo 'Error: ' . $e->getMessage();
@@ -92,7 +141,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Lamparinas | Especialidade do Leito</title>
+	<title>Lamparinas | Tipo da Especilalidade do leito</title>
 
 	<?php include_once("head.php"); ?>
 	
@@ -104,7 +153,6 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 	<script src="global_assets/js/demo_pages/form_select2.js"></script>
 	<script src="global_assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
 	<script src="global_assets/js/demo_pages/form_multiselect.js"></script>
-
 
 	
 	<script src="global_assets/js/demo_pages/datatables_responsive.js"></script>
@@ -125,7 +173,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 				responsive: true,
 			    columnDefs: [
 				{
-					orderable: true,   //Especialidade do Leito
+					orderable: true,   //Tipo da especilalidade do leito
 					width: "45%",
 					targets: [0]
 				},
@@ -227,7 +275,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					document.getElementById('inputEstadoAtual').value = "EDITA";
 					document.formEspecialidadeLeito.action = "atendimentoEspecialidadeLeito.php";		
 				} else if (Tipo == 'exclui'){
-					confirmaExclusao(document.formEspecialidadeLeito, "Tem certeza que deseja excluir essa especialidade do leito?", "atendimentoEspecialidadeLeitoExclui.php");
+					confirmaExclusao(document.formEspecialidadeLeito, "Tem certeza que deseja excluir esse tipo da especilalidade do leito?", "atendimentoEspecialidadeLeitoExclui.php");
 				} else if (Tipo == 'mudaStatus'){
 					document.formEspecialidadeLeito.action = "atendimentoEspecialidadeLeitoMudaSituacao.php";
 				} 
@@ -265,7 +313,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 						<!-- Basic responsive configuration -->
 						<div class="card">
 							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação da Especialidade do Leito</h3>
+								<h3 class="card-title">Relação da Especilalidade do Leito</h3>
 							</div>
 
 							<div class="card-body">
@@ -279,16 +327,16 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 									<div class="row">
 										<div class="col-lg-5">
 											<div class="form-group">
-												<label for="inputNome">Nome da Especialidade do Leito <span class="text-danger"> *</span></label>
-												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="EspecialidadeLeito" value="<?php if (isset($_POST['inputEspecialidadeLeitoId'])) echo $rowEspecialidadeLeito['EsLeiNome']; ?>" required autofocus>
+												<label for="inputNome">Nome do Tipo da Especilalidade do Leito <span class="text-danger"> *</span></label>
+												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Tipo da Especilalidade do Leito" value="<?php if (isset($_POST['inputEspecialidadeLeitoId'])) echo $EspecialidadeLeitoNome; ?>" required autofocus>
 											</div>
 										</div>
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbClassificacao">Classificação<span class="text-danger"> *</span></label>
 												<select id="cmbClassificacao" name="cmbClassificacao[]" class="form-control multiselect-filtering" multiple="multiple">
-													<option value="H" <?php if (isset($_POST['inputEspecialidadeLeitoId'])) if ($rowEspecialidadeLeito['ELXClClassificacao'] == 'H') echo "selected"; ?>>Hospitalar</option>
-													<option value="A" <?php if (isset($_POST['inputEspecialidadeLeitoId'])) if ($rowEspecialidadeLeito['ELXClClassificacao'] == 'A') echo "selected"; ?>>Ambulátorial</option>
+													<option value="H" <?php if (isset($_POST['inputEspecialidadeLeitoId'])) if (in_array('H', $aClassificacao)) echo "selected"; ?>>Hospitalar</option>
+													<option value="A" <?php if (isset($_POST['inputEspecialidadeLeitoId'])) if (in_array('A', $aClassificacao)) echo "selected"; ?>>Ambulátorial</option>
 												</select>
 											</div>
 										</div>
@@ -316,7 +364,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							<table id="tblEspecialidadeLeito" class="table">
 								<thead>
 									<tr class="bg-slate">
-										<th data-filter>Especialidade do Leito</th>
+										<th data-filter>Tipo da Especilalidade do Leito</th>
 										<th data-filter>Classificação</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
@@ -329,8 +377,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
-										$Classificacao = $item['ELXClClassificacao'] == 'A' ? 'Ambulátorial' : 'Hospitalar';
-										
+										$Classificacao = $item['Classificacao'];
 										print('
 										<tr>
 											<td>'.$item['EsLeiNome'].'</td>
