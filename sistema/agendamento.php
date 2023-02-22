@@ -652,7 +652,9 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 		}
 
 		function getAgenda(filtro){
-			if($('div.fc-agendaWeek-view').length){
+			if($('div.fc-agendaDay-view').length){
+				viwerCalendar = 'agendaDay'
+			} else if($('div.fc-agendaWeek-view').length){
 				viwerCalendar = 'agendaWeek'
 			} else if($('div.fc-month-view').length){
 				viwerCalendar = 'month'
@@ -710,7 +712,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						header: {
 							left: 'prev,next today',
 							center: 'title',
-							right: 'month,agendaWeek'
+							right: 'month,agendaWeek,agendaDay'
 						},
 						editable: true,
 						defaultDate: updateDateTime().dataAtual,
