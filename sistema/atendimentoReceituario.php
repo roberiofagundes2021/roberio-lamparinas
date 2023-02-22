@@ -364,7 +364,7 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 												<?php 
 													if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
 														echo "<button class='btn btn-lg btn-success mr-1' id='enviar'>Salvar</button>";
-														}
+													}
 												?>
 												<?php
 													if($rowReceituario && !$rowReceituario['AtRecDataFim']){

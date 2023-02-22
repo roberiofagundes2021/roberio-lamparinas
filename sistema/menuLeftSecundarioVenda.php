@@ -38,6 +38,7 @@
 					case 'atestadoMedico': URL = 'atendimentoAtestadoMedico.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'historicoPaciente': URL = 'atendimentoHistoricoPaciente.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'receituarioMedico': URL = 'atendimentoReceituario.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'observacaoHospitalar': URL = 'atendimentoObservacaoHospitalar.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'solicitacaoProcedimento': URL = 'atendimentoSolicitacaoProcedimento.php'; $('#dadosPost').attr('target', '_self'); break;
