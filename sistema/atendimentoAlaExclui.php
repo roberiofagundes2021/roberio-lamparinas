@@ -23,10 +23,10 @@ if(isset($_POST['inputAlaId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir ala!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir ala!!! O registro está sendo usado em outro local.";
 		$_SESSION['msg']['tipo'] = "error";			
 		
-		echo 'Error: ' . $e->getMessage();
+		//echo 'Error: ' . $e->getMessage();
 	}
 }
 

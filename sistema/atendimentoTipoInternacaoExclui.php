@@ -9,6 +9,12 @@ if(isset($_POST['inputTipoInternacaoId'])){
 	$iTipoInternacao = $_POST['inputTipoInternacaoId'];
         	
 	try{
+
+		$sql = "DELETE FROM TipoInternacaoXClassificacao
+				WHERE TIXClTipoInternacao = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iTipoInternacao); 
+		$result->execute();
 		
 		$sql = "DELETE FROM TipoInternacao
 				WHERE TpIntId = :id";
@@ -23,7 +29,7 @@ if(isset($_POST['inputTipoInternacaoId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir tipo de internação!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir tipo de internação!!! O registro está sendo usado em outro local.";
 		$_SESSION['msg']['tipo'] = "error";			
 		
 		//echo 'Error: ' . $e->getMessage();die;

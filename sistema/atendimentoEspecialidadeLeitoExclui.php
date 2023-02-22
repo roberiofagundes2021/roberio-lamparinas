@@ -10,6 +10,12 @@ if(isset($_POST['inputEspecialidadeLeitoId'])){
         	
 	try{
 		
+		$sql = "DELETE FROM EspecialidadeLeitoXClassificacao
+				WHERE ELXClEspecialidadeLeito = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iEspecialidadeLeito); 
+		$result->execute();
+
 		$sql = "DELETE FROM EspecialidadeLeito
 				WHERE EsLeiId = :id";
 		$result = $conn->prepare($sql);
@@ -23,7 +29,7 @@ if(isset($_POST['inputEspecialidadeLeitoId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir especialidade do leito!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir especialidade do leito!!! O registro está sendo usado em outro local.";
 		$_SESSION['msg']['tipo'] = "error";			
 		
 		//echo 'Error: ' . $e->getMessage();die;

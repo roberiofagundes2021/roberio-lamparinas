@@ -10,10 +10,11 @@ if (isset($_SESSION['fotoAtual'])) {
 }
 
 $sql = "SELECT ProduId, ProduCodigo, ProduNome, ProduFamilia, ProduFinalistico, ProduDetalhamento, CategNome, SbCatNome, ProduValorVenda, ProduStatus, 
-			   ProduCustoFinal, ProduValorCusto, ProduValorVenda, SituaNome, SituaChave, SituaCor
+			   ProduCustoFinal, ProduValorCusto, ProduValorVenda, FinalCodigo, SituaNome, SituaChave, SituaCor
 		FROM Produto
 		JOIN Categoria on CategId = ProduCategoria
 		LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+		LEFT JOIN Finalistico on FinalId = ProduFinalistico
 		JOIN Situacao on SituaId = ProduStatus
 	    WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . "
 		ORDER BY ProduCodigo ASC";
@@ -364,7 +365,7 @@ $rowParametro = $result->fetch(PDO::FETCH_ASSOC);
 
 										print('
 										<tr>
-											<td>' . $item['ProduFamilia'] . '.' . $item['ProduFinalistico'] . '.' . $item['ProduCodigo'] . '</td>
+											<td>' . $item['ProduFamilia'] . '.' . $item['FinalCodigo'] . '.' . $item['ProduCodigo'] . '</td>
 											<td data-popup="tooltip" title="'. substr($item['ProduDetalhamento'],0,380).'...">' . $item['ProduNome'] . '</td>
 											<td>' . $item['CategNome'] . '</td>
 											<td>' . $item['SbCatNome'] . '</td>

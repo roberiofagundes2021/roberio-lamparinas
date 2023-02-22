@@ -265,7 +265,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 								<form name="formQuarto" id="formQuarto" method="post" class="form-validate-jquery">
 
-									<input type="hidden" id="inputQuartoId" name="inputQuartoId" value="<?php if (isset($_POST['inputoQuartId'])) echo $_POST['inputQuartoId']; ?>" >
+									<input type="hidden" id="inputQuartoId" name="inputQuartoId" value="<?php if (isset($_POST['inputQuartoId'])) echo $_POST['inputQuartoId']; ?>" >
 									<input type="hidden" id="inputQuartoNome" name="inputQuartoNome" value="<?php if (isset($_POST['inputQuartoNome'])) echo $_POST['inputQuartoNome']; ?>" >
 									<input type="hidden" id="inputQuartoStatus" name="inputQuartoStatus" >
 									<input type="hidden" id="inputEstadoAtual" name="inputEstadoAtual" value="<?php if (isset($_POST['inputEstadoAtual'])) echo $_POST['inputEstadoAtual']; ?>" >
@@ -299,7 +299,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 							<table id="tblQuarto" class="table">
 								<thead>
 									<tr class="bg-slate">
-										<th>Quarto Nº</th>
+										<th>Quarto</th>
 										<th>Situação</th>
 										<th class="text-center">Ações</th>
 									</tr>

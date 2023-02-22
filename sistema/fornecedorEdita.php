@@ -83,60 +83,6 @@ if (isset($_POST['inputFornecedorId'])) {
 
 		$(document).ready(function() {
 
-			 /* Início: Tabela Personalizada */
-			/* $('#tblDadoSocietarios').DataTable( {
-				"order": [[ 0, "asc" ]],
-			    autoWidth: false,
-				responsive: true,
-				searching: false,
-				ordering: false, 
-				paging: false,
-			    columnDefs: [
-				{ 
-					orderable: true, 
-					width: "5%", 
-					targets: [0]
-				},
-				{ 
-					orderable: true,   
-					width: "25%", 
-					targets: [1]
-				},
-				{ 
-					orderable: true,
-					width: "20%", 
-					targets: [2]
-				},				
-				{ 
-					orderable: true,  
-					width: "20%", 
-					targets: [3]
-				},				
-				{ 
-					orderable: true,  
-					width: "10%", 
-					targets: [4]
-				},
-				{ 
-					orderable: true,  
-					width: "10%", 
-					targets: [5]
-				},				
-				{ 
-					orderable: true,  
-					width: "10%", 
-					targets: [6]
-				}],
-				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
-				language: {
-					search: '<span>Filtro:</span> _INPUT_',
-					searchPlaceholder: 'filtra qualquer coluna...',
-					lengthMenu: '<span>Mostrar:</span> _MENU_',
-					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
-				}
-                
-			});*/
-
 			$('#imagem').on('change', function() {
 				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
 
@@ -545,9 +491,9 @@ if (isset($_POST['inputFornecedorId'])) {
 								</div>
 								<br>
 
-								<div id="foto" style="text-align:center;width:237px; height:310px; overflow:hidden; justify-content: flex-start; display:flex; flex-direction:column; position:absolute; z-index:1; margin-left:81%">
+								<div id="foto" style="text-align:center;width:235px; height:310px; overflow:hidden; justify-content: flex-start; display:flex; flex-direction:column; position:absolute; z-index:1; margin-left:77%">
 									<div id="visualizar">
-										<img class="ml-3" src="<?php echo $sFoto; ?>" width="200px" alt="Fornecedores" style="border:2px solid #ccc;">
+										<img class="ml-3" src="<?php echo $sFoto; ?>" width="195px" alt="Fornecedores" style="border:2px solid #ccc;">
 									</div>
 									<br>
 									<button id="addFoto" type="button" onclick="adicionaFoto()" class="ml-3 btn btn-lg btn-principal" style="width:90%"><?php echo $sButtonFoto; ?></button>
@@ -584,7 +530,7 @@ if (isset($_POST['inputFornecedorId'])) {
 										<div class="form-group">
 											<label for="cmbUf">UF</label>
 											<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
-												<option value="#">Selecione um estado</option>
+												<option value="#">Selecione </option>
 												<option value="AC" <?php if ($row['ForneUf'] == 'AC') echo "selected"; ?>>Acre</option>
 												<option value="AL" <?php if ($row['ForneUf'] == 'AL') echo "selected"; ?>>Alagoas</option>
 												<option value="AP" <?php if ($row['ForneUf'] == 'AP') echo "selected"; ?>>Amapá</option>
@@ -643,7 +589,7 @@ if (isset($_POST['inputFornecedorId'])) {
 										<div class="form-group">
 											<label for="cmbSexo">Sexo</label>
 											<select id="cmbSexo" name="cmbSexo" class="form-control form-control-select2">
-												<option value="#">Selecione o sexo</option>
+												<option value="#">Selecione </option>
 												<option value="F" <?php if ($row['ForneSexo'] == 'F') echo "selected"; ?>>Feminino</option>
 												<option value="M" <?php if ($row['ForneSexo'] == 'M') echo "selected"; ?>>Masculino</option>
 											</select>
@@ -662,7 +608,7 @@ if (isset($_POST['inputFornecedorId'])) {
 										<div class="form-group">
 											<label for="inputNaturalidadeUf">UF da Naturalidade</label>
 											<select id="inputNaturalidadeUf" name="inputNaturalidadeUf" class="form-control form-control-select2">
-												<option value="#">Selecione um estado</option>
+												<option value="#">Selecione </option>
 												<option value="AC" <?php if ($row['ForneNaturalidadeUf'] == 'AC') echo "selected"; ?>>Acre</option>
 												<option value="AL" <?php if ($row['ForneNaturalidadeUf'] == 'AL') echo "selected"; ?>>Alagoas</option>
 												<option value="AP" <?php if ($row['ForneNaturalidadeUf'] == 'AP') echo "selected"; ?>>Amapá</option>
@@ -729,7 +675,7 @@ if (isset($_POST['inputFornecedorId'])) {
 										<div class="form-group">
 											<label for="cmbCategoria">Categoria<span class="text-danger"> *</span></label>
 											<select id="cmbCategoria" name="cmbCategoria" class="form-control form-control-select2">
-												<option value="#">Selecione uma categoria</option>
+												<option value="#">Selecione </option>
 												<?php
 												$sql = "SELECT CategId, CategNome
 														FROM Categoria
@@ -753,7 +699,7 @@ if (isset($_POST['inputFornecedorId'])) {
 										<div class="form-group" style="border-bottom:1px solid #ddd;">
 											<label for="cmbSubCategoria">SubCategoria</label>
 											<select id="cmbSubCategoria" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
-												<!--<option value="#">Selecione uma subcategoria</option>-->
+												<!--<option value="#">Selecione </option>-->
 												<?php
 
 												if (isset($row['ForneCategoria'])) {
@@ -835,7 +781,7 @@ if (isset($_POST['inputFornecedorId'])) {
 												<div class="form-group">
 													<label for="cmbEstado">Estado</label>
 													<select id="cmbEstado" name="cmbEstado" class="form-control">
-														<option value="#">Selecione um estado</option>
+														<option value="#">Selecione </option>
 														<option value="AC" <?php if ($row['ForneEstado'] == 'AC') echo "selected"; ?>>Acre</option>
 														<option value="AL" <?php if ($row['ForneEstado'] == 'AL') echo "selected"; ?>>Alagoas</option>
 														<option value="AP" <?php if ($row['ForneEstado'] == 'AP') echo "selected"; ?>>Amapá</option>
@@ -932,97 +878,8 @@ if (isset($_POST['inputFornecedorId'])) {
 										</div>
 									</div>
 								</div>
-							</div>
-						</div>
 
-						<div class="card">
 
-						<div class="card-header header-elements-inline">
-							<h5 class="card-title font-weight-bold">Dados Societários</h5>
-						</div>
-
-						<div class="card-body">
-
-							<form id="formDadoSocietarios" name="formDadoSocietarios" method="post" class="form-validate-jquery">
-								<input type="hidden" name="idDadoSocietarios" id="idDadoSocietarios">
-					
-								<div class="col-lg-12 mb-2 row" style='margin-left: -20px;'>
-									<!-- titulos -->
-									<div class="col-lg-4">
-										<label>Nome <span class="text-danger">*</span></label>
-									</div>
-									<div class="col-lg-2">
-										<label>CPF</label>
-									</div>
-									<div class="col-lg-2">
-										<label>RG</label>
-									</div>
-									<div class="col-lg-2">
-										<label>Celular</label>
-									</div>
-									<div class="col-lg-2">
-										<label>E-mail</label>
-									</div>
-									
-									<!-- campos -->										
-									<div class="col-lg-4">
-										<input type="text" class="form-control" name="dadoSocietariosNome" id="dadoSocietariosNome" value="">	
-									
-									</div>
-									<div class="col-lg-2">
-										<input type="text" class="form-control" name="dadoSocietariosCPF" id="dadoSocietariosCPF" value="">	
-									
-									</div>
-									<div class="col-lg-2">
-										<input type="text" class="form-control" name="dadoSocietariosRG" id="dadoSocietariosRG" value="">	
-									
-									</div>
-									<div class="col-lg-2">
-										<input type="text" class="form-control" name="dadoSocietariosCelular" id="dadoSocietariosCelular" value="">	
-									
-									</div>
-									<div class="col-lg-2">
-										<input type="text" class="form-control" name="dadoSocietariosEmail" id="dadoSocietariosEmail" value="">	
-									
-									</div>
-									
-								</div>
-								
-							</form>
-
-							<div class="row">
-								<div class="col-lg-12">
-									<div class="form-group" style="padding-top:15px;">	
-										<button class="btn btn-lg btn-success" id="incluirDadoSocietarios" style="display: block;"  >Adicionar</button>		
-									</div>
-								</div>
-							</div> 
-						</div>
-
-						<div class="row">
-							<div class="col-lg-12">
-								<table class="table" id="tblDadoSocietarios">
-									<thead>
-										<tr class="bg-slate">
-											<th class="text-left">Item</th>
-											<th class="text-left">Nome</th>
-											<th class="text-left">CPF</th>
-											<th class="text-left">RG</th>
-											<th class="text-left">Celular</th>
-											<th class="text-left">Email</th>
-											<th class="text-center">Ações</th>
-										</tr>
-									</thead>
-									<tbody id="dataDadoSocietarios">
-									</tbody>
-								</table>
-							</div>		
-						</div>							
-
-					</div>
-						
-						<div class="card">	
-							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-12">
 
@@ -1033,7 +890,7 @@ if (isset($_POST['inputFornecedorId'])) {
 											<div class="col-lg-5">
 												<label for="cmbBanco">Banco</label>
 												<select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2">
-													<option value="#">Selecione um banco</option>
+													<option value="#">Selecione </option>
 													<?php
 													$sql = "SELECT BancoId, BancoCodigo, BancoNome
 																FROM Banco
@@ -1114,11 +971,8 @@ if (isset($_POST['inputFornecedorId'])) {
 										</div>
 									</div>
 								</div>
-							</div>
-						</div>
-						
-						<div class="card">
-							<div class="card-body">
+								<br>
+								
 								<div class="row" style="margin-top: 40px;">
 									<div class="col-lg-12">
 										<div class="form-group">
@@ -1131,8 +985,10 @@ if (isset($_POST['inputFornecedorId'])) {
 										</div>
 									</div>
 								</div>
-							</div><!-- /card-body -->
+
+							</div>
 						</div>
+
 					</form>
 
 					<form id="formFoto" method="post" enctype="multipart/form-data" action="upload.php">

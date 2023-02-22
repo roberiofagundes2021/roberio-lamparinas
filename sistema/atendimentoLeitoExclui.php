@@ -23,7 +23,7 @@ if(isset($_POST['inputLeitoId'])){
 	} catch(PDOException $e) {
 		
 		$_SESSION['msg']['titulo'] = "Erro";
-		$_SESSION['msg']['mensagem'] = "Erro ao excluir Leito!!!";
+		$_SESSION['msg']['mensagem'] = "Erro ao excluir Leito!!! O registro está sendo usado em outro local.";
 		$_SESSION['msg']['tipo'] = "error";			
 		
 		//echo 'Error: ' . $e->getMessage();die;

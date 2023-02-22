@@ -17,7 +17,11 @@ if(isset($_POST['inputNome'])){
 		$rowCodigo = $result->fetch(PDO::FETCH_ASSOC);	
 		
 		$sCodigo = (int)$rowCodigo['Codigo'] + 1;
-		$sCodigo = str_pad($sCodigo,6,"0",STR_PAD_LEFT);
+		//Acrescenta zeros a esquerda (deixando com 9 caracteres)
+		$sCodigo = str_pad($sCodigo,9,"0",STR_PAD_LEFT);
+		//Formata o texto com o traço (dígito verificador)
+		$sCodigoComDigito = substr_replace($sCodigo, '-', -1, 0);
+
 	} catch(PDOException $e) {	
 		echo 'Error1: ' . $e->getMessage();die;
 	}
@@ -34,7 +38,7 @@ if(isset($_POST['inputNome'])){
 		$result = $conn->prepare($sql);
 
 		$result->execute(array(
-						':sCodigo' => $sCodigo,
+						':sCodigo' => $sCodigoComDigito,
 						':sCodigoBarras' => $_POST['inputCodigoBarras'],
 						':sNome' => $_POST['inputNome'],
 						':sDetalhamento' => $_POST['txtDetalhamento'],
@@ -535,7 +539,7 @@ if(isset($_POST['inputNome'])){
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputFamilia">Família</label>
-												<input type="text" id="inputFamilia" name="inputFamilia" class="form-control" placeholder="Família" readOnly>
+												<input type="text" id="inputFamilia" name="inputFamilia" class="form-control" placeholder="Família"readOnly>
 											</div>
 										</div>
 

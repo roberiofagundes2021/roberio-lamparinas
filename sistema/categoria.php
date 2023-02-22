@@ -28,6 +28,7 @@ if(isset($_POST['inputCategoriaId']) && $_POST['inputCategoriaId']){
 	$result = $conn->query($sql);
 	$rowCategoria = $result->fetch(PDO::FETCH_ASSOC);
 		
+		
 	$_SESSION['msg'] = array();
 } 
 
@@ -38,6 +39,9 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 
 		//Edição
 		if (isset($_POST['inputEstadoAtual']) && $_POST['inputEstadoAtual'] == 'GRAVA_EDITA'){
+
+			$sCodigo = $_POST['inputCodigo'];
+			$sCodigos = str_pad($sCodigo,2,"0",STR_PAD_LEFT);
 			
 			$sql = "UPDATE Categoria SET CategCodigo = :sCodigo, CategNome = :sNome, CategUsuarioAtualizador = :iUsuarioAtualizador
 					WHERE CategId = :iCategoria";
@@ -45,7 +49,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
-							':sCodigo' => $_POST['inputCodigo'] == '' ? '00' : $_POST['inputCodigo'],
+							':sCodigo' => $sCodigos,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iCategoria' => $_POST['inputCategoriaId']
 							));
@@ -53,6 +57,10 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 			$_SESSION['msg']['mensagem'] = "Categoria alterada!!!";
 	
 		} else { //inclusão
+
+			
+			$sCodigo = $_POST['inputCodigo'];
+			$sCodigos = str_pad($sCodigo,2,"0",STR_PAD_LEFT);
 		
 			$sql = "INSERT INTO Categoria (CategCodigo, CategNome, CategStatus, CategUsuarioAtualizador, CategEmpresa)
 					VALUES (:sCodigo,:sNome, :bStatus, :iUsuarioAtualizador, :iEmpresa)";
@@ -60,7 +68,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 					
 			$result->execute(array(
 							':sNome' => $_POST['inputNome'],
-							':sCodigo' => $_POST['inputCodigo'] == '' ? '00' : $_POST['inputCodigo'],
+							':sCodigo' => $sCodigos,
 							':bStatus' => 1,
 							':iUsuarioAtualizador' => $_SESSION['UsuarId'],
 							':iEmpresa' => $_SESSION['EmpreId'],
