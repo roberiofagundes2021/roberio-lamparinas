@@ -477,6 +477,34 @@ try{
 			'status' => 'success',
 			'menssagem' => 'Evento agendado com sucesso!!!'
 		]);
+	} elseif ($tipoRequest == 'ADDCONFIGUNIDADE'){
+		$horaAbertura = $_POST['inputHoraAberturaUnidade'];
+		$horaFechamento = $_POST['inputHoraFechamentoUnidade'];
+		$horaInicio = $_POST['inputHoraInicioUnidade'];
+		$horaFim = $_POST['inputHoraFimUnidade'];
+		$intervalo = $_POST['inputHoraIntervaloUnidade'];
+		$observacao = $_POST['observacaoUnidade'];
+
+		$segunda = $_POST['segunda'];
+		$terca = $_POST['terca'];
+		$quarta = $_POST['quarta'];
+		$quinta = $_POST['quinta'];
+		$sexta = $_POST['sexta'];
+		$sabado = $_POST['sabado'];
+		$domingo = $_POST['domingo'];
+
+		$sql = "INSERT INTO AgendamentoFuncionamentoUnidade(AgFUnSegunda,AgFUnTerca,AgFUnQuarta,AgFUnQuinta,
+		AgFUnSexta,AgFUnSabado,AgFUnDomingo,AgFUnObservacao,AgFUnHorarioAbertura,AgFUnHorarioFechamento,
+		AgFUnHorarioAlmocoInicio,AgFUnHorarioAlmocoFim,AgFUnIntervaloAgenda,AgFUnUnidade)
+		VALUES($segunda,$terca,$quarta,$quinta,$sexta,$sabado,$domingo,'$observacao','$horaAbertura','$horaFechamento',
+		'$horaInicio','$horaFim',$intervalo,$iUnidade)";
+		$conn->query($sql);
+
+		echo json_encode([
+			'titulo' => 'Configuração de Unidade',
+			'status' => 'success',
+			'menssagem' => 'Configuração de Unidade salva com sucesso!!!'
+		]);
 	}
 }catch(PDOException $e) {
 	$msg = '';
