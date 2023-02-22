@@ -361,10 +361,8 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-												<?php 
-													if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
-														echo "<button class='btn btn-lg btn-success mr-1' id='enviar'>Adicionar Receita</button>";
-													}
+												<?php
+													echo "<button class='btn btn-lg btn-success mr-1' id='enviar'>Adicionar Receita</button>";
 												?>
 												<?php
 													if($rowReceituario && !$rowReceituario['AtRecDataFim']){
@@ -402,7 +400,7 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 														$sql = "SELECT  AtRecId,AtRecDataFim,AtRecDataInicio,AtRecTipoReceituario, ProfiNome, ProfiCodigo,AtRecReceituario
 																FROM AtendimentoReceituario
 																JOIN Profissional ON ProfiId = AtRecProfissional
-																WHERE AtRecAtendimento = $iAtendimentoId and AtRecDataFim IS NOT NULL";
+																WHERE AtRecAtendimento = $iAtendimentoId";
 														$result = $conn->query($sql);
 														$rowReceituarioHistorico = $result->fetchAll(PDO::FETCH_ASSOC);
 
