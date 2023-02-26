@@ -490,8 +490,8 @@ if(isset($_POST['inputNome'])){
 								</div> <!-- media-body -->
 								
 								<div style="text-align:center;">
-									<div id="visualizar">										
-										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:250px; border:2px solid #ccc;">
+									<div id="visualizar" class="ml-3">
+										<img src="global_assets/images/lamparinas/sem_foto.gif" alt="Produto" style="max-height:230px; border:2px solid #ccc;">
 									</div>
 									<br>
 									<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>	

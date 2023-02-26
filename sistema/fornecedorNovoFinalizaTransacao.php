@@ -12,7 +12,12 @@ try{
 		if(isset($_POST['inputFoto'])){
 			$input_foto = $_POST['inputFoto'];
 		}
-	} 
+
+		$subCategoria = isset($_POST['cmbSubCategoriaPF']) ? $_POST['cmbSubCategoriaPF'] : 0;
+	} else{
+		$subCategoria = isset($_POST['cmbSubCategoriaPJ']) ? $_POST['cmbSubCategoriaPJ'] : 0;
+	}
+
 	$sql = "INSERT INTO Fornecedor (ForneTipo, ForneNome, ForneRazaoSocial, ForneCnpj, ForneInscricaoMunicipal, ForneInscricaoEstadual, ForneCategoria,
 									ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, ForneAniversario, ForneNaturalidade, ForneNaturalidadeUf,
 									ForneNacionalidade, ForneAno, ForneCarteiraTrabalho, ForneNumSerie, ForneNit, ForneNire, ForneFoto, ForneCep, ForneEndereco,
@@ -36,7 +41,7 @@ try{
 						':sCnpj' => $_POST['inputTipo'] == 'J' ? limpaCPF_CNPJ($_POST['inputCnpj']) : null,
 						':sInscricaoMunicipal' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null,
 						':sInscricaoEstadual' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoEstadual'] : null,
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
+						':iCategoria' => $_POST['cmbCategoria'] == '' ? null : $_POST['cmbCategoria'],
 						//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
 						':sCpf' => $_POST['inputTipo'] == 'F' ? limpaCPF_CNPJ($_POST['inputCpf']) : null,
 						':sRg' => $_POST['inputTipo'] == 'F' ? $_POST['inputRg'] : null,
@@ -82,7 +87,7 @@ try{
 
 		$insertId = $conn->lastInsertId(); 
 		
-		if (isset($_POST['cmbSubCategoria'])){
+		if ($subCategoria){
 			
 			try{
 				$sql = "INSERT INTO FornecedorXSubCategoria 
@@ -91,7 +96,7 @@ try{
 							(:iFornecedor, :iSubCategoria, :iUnidade)";
 				$result = $conn->prepare($sql);
 
-				foreach ($_POST['cmbSubCategoria'] as $key => $value){
+				foreach ($subCategoria as $key => $value){
 
 					$result->execute(array(
 									':iFornecedor' => $insertId,

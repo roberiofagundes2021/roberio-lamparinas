@@ -35,12 +35,15 @@ include('global_assets/php/conexao.php');
 
 	<!-- Adicionando Javascript -->
 	<script type="text/javascript">
-		//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
-		function adicionaFoto() {
-			$('#imagem').trigger("click");
-		};
 
 		$(document).ready(function() {
+
+			//Ao clicar no botão Adicionar Foto aciona o click do file que está hidden
+			$('#addFoto').on('click', function(e){	
+				e.preventDefault(); // Isso aqui não deixa o formulário "formProduto" ser submetido ao clicar no INcluir Foto, ou seja, ao executar o método ajax
+			
+				$('#imagem').trigger("click");
+			});	
 
 			$('#imagem').on('change', function() {
 				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
@@ -142,11 +145,11 @@ include('global_assets/php/conexao.php');
 			});
 
 			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
-			$('#cmbCategoria').on('change', function(e) {
+			$('#cmbCategoriaPF').on('change', function(e) {
 
-				Filtrando();
+				FiltrandoPF();
 
-				var cmbCategoria = $('#cmbCategoria').val();
+				var cmbCategoria = $('#cmbCategoriaPF').val();
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
 
@@ -158,12 +161,36 @@ include('global_assets/php/conexao.php');
 							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
 						});
 
-						$('#cmbSubCategoria').html(option).show();
+						$('#cmbSubCategoriaPF').html(option).show();
 					} else {
-						Reset();
+						ResetPF();
 					}
 				});
 			});
+
+			//Ao mudar a categoria, filtra a subcategoria via ajax (retorno via JSON)
+			$('#cmbCategoriaPJ').on('change', function(e) {
+
+				FiltrandoPJ();
+
+				var cmbCategoria = $('#cmbCategoriaPJ').val();
+
+				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
+
+					var option = '<option>Selecione </option>';
+
+					if (dados.length) {
+
+						$.each(dados, function(i, obj) {
+							option += '<option value="' + obj.SbCatId + '">' + obj.SbCatNome + '</option>';
+						});
+
+						$('#cmbSubCategoriaPJ').html(option).show();
+					} else {
+						ResetPJ();
+					}
+				});
+			});			
 
 			//Valida Registro Duplicado
 			$('#enviar').on('click', function(e) {
@@ -171,20 +198,31 @@ include('global_assets/php/conexao.php');
 				e.preventDefault();
 
 				// subistitui qualquer espaço em branco no campo "CEP" antes de enviar para o banco
-				var cep = $("#inputCep").val()
-				cep = cep.replace(' ', '')
-				$("#inputCep").val(cep)
+				let cep = $("#inputCep").val();
+				cep = cep.replace(' ', '');
+				$("#inputCep").val(cep);
 
 				var inputTipo = $('input[name="inputTipo"]:checked').val();
 				var inputNome = $('#inputNome').val();
-				var inputCpf = $('#inputCpf').val().replace(/[^\d]+/g, '');
-				var inputCnpj = $('#inputCnpj').val();
-				var cmbSubCategoria = $('#cmbSubCategoria').val();
+				if (inputTipo == "F"){
+					var documento = $('#inputCpf').val().replace(/[^\d]+/g, '');
+					$("#inputCpf").prop('required', true);
+					$("#inputNome").prop('required', true);
+					$("#inputNomeFantasia").prop('required', false);
+				} else{
+					var documento = $('#inputCnpj').val();
+					$("#inputCpf").prop('required', false);
+					$("#inputNome").prop('required', false);
+					$("#inputNomeFantasia").prop('required', true);
+				}				
+
+				let cmbSubCategoriaPF = $('#cmbSubCategoriaPF').val();
+				let cmbSubCategoriaPJ = $('#cmbSubCategoriaPJ').val();
 
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
 
-				if (cmbSubCategoria[0] == 'Filtrando') {
+				if (cmbSubCategoriaPF[0] == 'Filtrando' || cmbSubCategoriaPJ[0] == 'Filtrando') {
 					alerta('Atenção', 'Por algum problema na sua conexão o campo SubCategoria parece não conseguindo ser filtrado! Favor cancelar a edição e tentar novamente.', 'error');
 					return false;
 				}
@@ -196,11 +234,10 @@ include('global_assets/php/conexao.php');
 					data: {
 						tipo: inputTipo,
 						nome: inputNome,
-						cpf: inputCpf,
-						cnpj: inputCnpj
+						documento: documento
 					},
 					success: function(resposta) {
-
+						alert(resposta)
 						if (resposta == 1) {
 							alerta('Atenção', 'Esse registro já existe!', 'error');
 							return false;
@@ -212,12 +249,20 @@ include('global_assets/php/conexao.php');
 
 			}); // enviar
 
-			function Filtrando() {
-				$('#cmbSubCategoria').empty().append('<option value="Filtrando">Filtrando...</option>');
+			function FiltrandoPF() {
+				$('#cmbSubCategoriaPF').empty().append('<option value="Filtrando">Filtrando...</option>');
 			}
 
-			function Reset() {
-				$('#cmbSubCategoria').empty().append('<option>Sem Subcategoria</option>');
+			function FiltrandoPJ() {
+				$('#cmbSubCategoriaPJ').empty().append('<option value="Filtrando">Filtrando...</option>');
+			}
+
+			function ResetPF() {
+				$('#cmbSubCategoriaPF').empty().append('<option>Sem Subcategoria</option>');
+			}
+
+			function ResetPJ() {
+				$('#cmbSubCategoriaPJ').empty().append('<option>Sem Subcategoria</option>');
 			}
 
 		}); // document.ready
@@ -239,7 +284,9 @@ include('global_assets/php/conexao.php');
 				'cmbSexo',
 				'inputAniversario',
 				'cmbCategoriaPF',
-				'cmbSubCategoriaPF'
+				'cmbSubCategoriaPF',
+				'foto',
+				'addFoto'
 			]
 			var camposPJVisiveis = [
 				'inputNomeFantasia',
@@ -254,12 +301,9 @@ include('global_assets/php/conexao.php');
 			if (tipo == 'PF') {
 				camposPFVisiveis.forEach(element => $("#" + element).parent().parent().css("display", "block"));
 				camposPJVisiveis.forEach(element => $("#" + element).parent().parent().css("display", "none"));
-				document.getElementById('foto').style.display = 'flex';
-
 			} else {
 				camposPJVisiveis.forEach(element => $("#" + element).parent().parent().css("display", "block"));
 				camposPFVisiveis.forEach(element => $("#" + element).parent().parent().css("display", "none"));
-				document.getElementById('foto').style.display = 'none';
 			}
 
 			marcaCamposObrigatorios(tipo);
@@ -283,7 +327,6 @@ include('global_assets/php/conexao.php');
 				camposPFObrigatorios.forEach(element => $("#" + element).attr('required', false));
 			}
 		}
-
 
 		function validaEFormataCnpj() {
 			let cnpj = $('#inputCnpj').val();
@@ -328,6 +371,11 @@ include('global_assets/php/conexao.php');
 				$('#inputAniversario').val("");
 			}
 		}
+
+		// Efetua o Upload sem dar refresh na pagina
+		$('#formFoto').ajaxForm({
+			target:'#visualizar' // o callback será no elemento com o id #visualizar
+		}).submit();		
 	</script>
 
 </head>
@@ -353,55 +401,70 @@ include('global_assets/php/conexao.php');
 				
 					<form name="formFornecedor" action="fornecedorNovoFinalizaTransacao.php" id="formFornecedor" method="post" class="form-validate-jquery">
 					<div class="card">
-						<div class="card-header header-elements-inline">
-							<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Fornecedor</h5>
-						</div>
-
 						<div class="card-body">
 							<div class="row">
-								<div class="col-lg-4">
-									<div class="form-group">
-										<div class="form-check form-check-inline">
-											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" value="F" class="form-input-styled" data-fouc onclick="selecionaPessoa('PF')" checked>
-												Pessoa Física
-											</label>
-										</div>
-										<div class="form-check form-check-inline">
-											<label class="form-check-label">
-												<input type="radio" id="inputTipo" name="inputTipo" value="J" class="form-input-styled" data-fouc onclick="selecionaPessoa('PJ')">
-												Pessoa Jurídica
-											</label>
+								<div class="col-lg-9">
+									<div class="row">
+										<div class="card-header header-elements-inline" style="padding-left: 10px;">
+											<h5 class="text-uppercase font-weight-bold">Cadastrar Novo Fornecedor</h5>
 										</div>
 									</div>
-								</div>
-								<div class="col-lg-2" id="CPF">
-									<div class="form-group">
-										<label for="inputCpf">CPF<span class="text-danger">*</span></label>
-										<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" onblur="validaEFormataCpf()">
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<div class="form-check form-check-inline">
+													<label class="form-check-label">
+														<input type="radio" id="inputTipo" name="inputTipo" value="F" class="form-input-styled" data-fouc onclick="selecionaPessoa('PF')" checked>
+														Pessoa Física
+													</label>
+												</div>
+												<div class="form-check form-check-inline">
+													<label class="form-check-label">
+														<input type="radio" id="inputTipo" name="inputTipo" value="J" class="form-input-styled" data-fouc onclick="selecionaPessoa('PJ')">
+														Pessoa Jurídica
+													</label>
+												</div>
+											</div>
+										</div>
 									</div>
-								</div>
+									<div class="row">
+										<div class="col-lg-2" id="CPF">
+											<div class="form-group">
+												<label for="inputCpf">CPF <span class="text-danger">*</span></label>
+												<input type="text" id="inputCpf" name="inputCpf" class="form-control" placeholder="CPF" data-mask="999.999.999-99" onblur="validaEFormataCpf()">
+											</div>
+										</div>
 
-								<div class="col-lg-2" id="CNPJ">
-									<div class="form-group">
-										<label for="inputCnpj">CNPJ<span class="text-danger">*</span></label>
-										<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" onblur="validaEFormataCnpj()">
-									</div>
-								</div>
+										<div class="col-lg-2" id="CNPJ">
+											<div class="form-group">
+												<label for="inputCnpj">CNPJ <span class="text-danger">*</span></label>
+												<input type="text" id="inputCnpj" name="inputCnpj" class="form-control" placeholder="CNPJ" data-mask="99.999.999/9999-99" onblur="validaEFormataCnpj()">
+											</div>
+										</div>
 
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputNire">NIRE</label>
-										<input type="text" id="inputNire" name="inputNire" class="form-control" placeholder="NIRE">
-									</div>
-								</div>
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputNire">NIRE</label>
+												<input type="text" id="inputNire" name="inputNire" class="form-control" placeholder="NIRE">
+											</div>
+										</div>
 
-								<div class="col-lg-2">
-									<div class="form-group">
-										<label for="inputNit">NIT</label>
-										<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT">
+										<div class="col-lg-2">
+											<div class="form-group">
+												<label for="inputNit">NIT</label>
+												<input type="text" id="inputNit" name="inputNit" class="form-control" placeholder="NIT">
+											</div>
+										</div>
 									</div>
 								</div>
+								<div class="col-lg-3">
+									<div style="width:80%; float:right">
+										<div id="visualizar" style="">
+											<img id="foto" src="global_assets/images/lamparinas/sem_foto.gif" width="230px" alt="Fornecedores" style="max-width: 230px; border:2px solid #ccc;">
+										</div>
+										<button id="addFoto" type="button" onclick="adicionaFoto()" class="btn btn-lg btn-principal" style="min-width: 230px; margin-top: 17px;">Adicionar Foto...</button>
+									</div>
+								</div>									
 							</div>
 
 							<!-- Dados Pessoais -->
@@ -414,15 +477,17 @@ include('global_assets/php/conexao.php');
 
 							<!-- Pessoa Física -->
 							<div class="row">
-								<div class="col-lg-10">
+								<div class="col-lg-12">
 									<div class="row">
-										<div class="col-lg-6">
+										<!-- Nome -->
+										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="inputNome">Nome<span class="text-danger">*</span></label>
+												<label for="inputNome">Nome <span class="text-danger">*</span></label>
 												<input type="text" id="inputNome" name="inputNome" class="form-control" placeholder="Nome Completo" required autofocus>
 											</div>
 										</div>
 
+										<!-- RG -->
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputRg">RG</label>
@@ -430,6 +495,7 @@ include('global_assets/php/conexao.php');
 											</div>
 										</div>
 
+										<!-- Emissor -->
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputEmissor">Emissor</label>
@@ -437,59 +503,64 @@ include('global_assets/php/conexao.php');
 											</div>
 										</div>
 
-										<div class="col-lg-2">
+										<!-- UF -->
+										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="cmbUf">UF</label>
 												<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
-													<option value="#">Selecione</option>
-													<option value="AC">Acre</option>
-													<option value="AL">Alagoas</option>
-													<option value="AP">Amapá</option>
-													<option value="AM">Amazonas</option>
-													<option value="BA">Bahia</option>
-													<option value="CE">Ceará</option>
-													<option value="DF">Distrito Federal</option>
-													<option value="ES">Espírito Santo</option>
-													<option value="GO">Goiás</option>
-													<option value="MA">Maranhão</option>
-													<option value="MT">Mato Grosso</option>
-													<option value="MS">Mato Grosso do Sul</option>
-													<option value="MG">Minas Gerais</option>
-													<option value="PA">Pará</option>
-													<option value="PB">Paraíba</option>
-													<option value="PR">Paraná</option>
-													<option value="PE">Pernambuco</option>
-													<option value="PI">Piauí</option>
-													<option value="RJ">Rio de Janeiro</option>
-													<option value="RN">Rio Grande do Norte</option>
-													<option value="RS">Rio Grande do Sul</option>
-													<option value="RO">Rondônia</option>
-													<option value="RR">Roraima</option>
-													<option value="SC">Santa Catarina</option>
-													<option value="SP">São Paulo</option>
-													<option value="SE">Sergipe</option>
-													<option value="TO">Tocantins</option>
-													<option value="ES">Estrangeiro</option>
+												<option value="#">Selecione</option>
+													<option value="AC">AC</option>
+													<option value="AL">AL</option>
+													<option value="AP">AP</option>
+													<option value="AM">AM</option>
+													<option value="BA">BA</option>
+													<option value="CE">CE</option>
+													<option value="DF">DF</option>
+													<option value="ES">ES</option>
+													<option value="GO">GO</option>
+													<option value="MA">MA</option>
+													<option value="MT">MT</option>
+													<option value="MS">MS</option>
+													<option value="MG">MG</option>
+													<option value="PA">PA</option>
+													<option value="PB">PB</option>
+													<option value="PR">PR</option>
+													<option value="PE">PE</option>
+													<option value="PI">PI</option>
+													<option value="RJ">RJ</option>
+													<option value="RN">RN</option>
+													<option value="RS">RS</option>
+													<option value="RO">RO</option>
+													<option value="RR">RR</option>
+													<option value="SC">SC</option>
+													<option value="SP">SP</option>
+													<option value="SE">SE</option>
+													<option value="TO">TO</option>
+													<option value="EE">Estrangeiro</option>
 												</select>
 											</div>
 										</div>
-									</div>
 
-									<div class="row">
+										<!-- Carteira de Trabalho -->
 										<div class="col-lg-3">
 											<div class="form-group">
 												<label for="inputCarteiraTrabalho">Carteira de Trabalho</label>
 												<input type="text" id="inputCarteiraTrabalho" name="inputCarteiraTrabalho" class="form-control" placeholder="Carteira de Trabalho">
 											</div>
 										</div>
+									</div>
 
-										<div class="col-lg-3">
+									<div class="row">
+										
+										<!-- Num Serie -->
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputNumSerie">Numero de Série</label>
 												<input type="text" id="inputNumSerie" name="inputNumSerie" class="form-control" placeholder="Numero de Série">
 											</div>
 										</div>
 
+										<!-- Data Nascimento -->
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputAniversario">Data Nascimento</label>
@@ -497,6 +568,7 @@ include('global_assets/php/conexao.php');
 											</div>
 										</div>
 
+										<!-- Sexo -->
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="cmbSexo">Sexo</label>
@@ -507,75 +579,78 @@ include('global_assets/php/conexao.php');
 												</select>
 											</div>
 										</div>
-									</div>
 
-									<div class="row">
-										<div class="col-lg-3">
+										<!-- Naturalidade -->
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputNaturalidade">Naturalidade</label>
 												<input type="text" id="inputNaturalidade" name="inputNaturalidade" class="form-control" placeholder="Naturalidade">
 											</div>
-										</div>
-
-										<div class="col-lg-2">
+										</div>		
+										
+										<!-- UF Naturalidade -->
+										<div class="col-lg-1">
 											<div class="form-group">
-												<label for="inputNaturalidadeUf">UF da Naturalidade</label>
+												<label for="inputNaturalidadeUf">UF</label>
 												<select id="inputNaturalidadeUf" name="inputNaturalidadeUf" class="form-control form-control-select2">
 													<option value="#">Selecione</option>
-													<option value="AC">Acre</option>
-													<option value="AL">Alagoas</option>
-													<option value="AP">Amapá</option>
-													<option value="AM">Amazonas</option>
-													<option value="BA">Bahia</option>
-													<option value="CE">Ceará</option>
-													<option value="DF">Distrito Federal</option>
-													<option value="ES">Espírito Santo</option>
-													<option value="GO">Goiás</option>
-													<option value="MA">Maranhão</option>
-													<option value="MT">Mato Grosso</option>
-													<option value="MS">Mato Grosso do Sul</option>
-													<option value="MG">Minas Gerais</option>
-													<option value="PA">Pará</option>
-													<option value="PB">Paraíba</option>
-													<option value="PR">Paraná</option>
-													<option value="PE">Pernambuco</option>
-													<option value="PI">Piauí</option>
-													<option value="RJ">Rio de Janeiro</option>
-													<option value="RN">Rio Grande do Norte</option>
-													<option value="RS">Rio Grande do Sul</option>
-													<option value="RO">Rondônia</option>
-													<option value="RR">Roraima</option>
-													<option value="SC">Santa Catarina</option>
-													<option value="SP">São Paulo</option>
-													<option value="SE">Sergipe</option>
-													<option value="TO">Tocantins</option>
-													<option value="ES">Estrangeiro</option>
+													<option value="AC">AC</option>
+													<option value="AL">AL</option>
+													<option value="AP">AP</option>
+													<option value="AM">AM</option>
+													<option value="BA">BA</option>
+													<option value="CE">CE</option>
+													<option value="DF">DF</option>
+													<option value="ES">ES</option>
+													<option value="GO">GO</option>
+													<option value="MA">MA</option>
+													<option value="MT">MT</option>
+													<option value="MS">MS</option>
+													<option value="MG">MG</option>
+													<option value="PA">PA</option>
+													<option value="PB">PB</option>
+													<option value="PR">PR</option>
+													<option value="PE">PE</option>
+													<option value="PI">PI</option>
+													<option value="RJ">RJ</option>
+													<option value="RN">RN</option>
+													<option value="RS">RS</option>
+													<option value="RO">RO</option>
+													<option value="RR">RR</option>
+													<option value="SC">SC</option>
+													<option value="SP">SP</option>
+													<option value="SE">SE</option>
+													<option value="TO">TO</option>
+													<option value="EE">Estrangeiro</option>
 												</select>
 											</div>
 										</div>
 
-										<div class="col-lg-3">
+										<!-- Nacionalidade -->
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputNacionalidade">Nacionalidade</label>
 												<input type="text" id="inputNacionalidade" name="inputNacionalidade" class="form-control" placeholder="Nacionalidade">
 											</div>
 										</div>
 
-										<div class="col-lg-2">
+										<!-- Ano -->
+										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputAno">Ano &nbsp<i style="color:#375b82;" class="icon-question4" data-popup="tooltip" data-original-title="Entrada no Brasil (se estrangeiro)" data-placement="right"></i></label>
 												<input type="text" id="inputAno" name="inputAno" class="form-control" placeholder="Ano">
 											</div>
-										</div>
+										</div>																		
 									</div>
 
 									<div class="row">
 
+										<!-- Categoria -->
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoriaPF">Categoria<span class="text-danger"> *</span></label>
-												<select id="cmbCategoriaPF" name="cmbCategoria" class="form-control form-control-select2">
-													<option value="#">Selecione </option>
+												<select id="cmbCategoriaPF" name="cmbCategoria" class="form-control form-control-select2" required>
+													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT CategId, CategNome
 															FROM Categoria
@@ -594,7 +669,8 @@ include('global_assets/php/conexao.php');
 											</div>
 										</div>
 
-										<div class="col-lg-4">
+										<!-- SubCategoria -->
+										<div class="col-lg-8">
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoriaPF">SubCategoria</label>
 												<select id="cmbSubCategoriaPF" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
@@ -603,37 +679,30 @@ include('global_assets/php/conexao.php');
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="col-lg-2">
-									<div id="foto">
-										<div id="visualizar">
-											<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" width="195px" alt="Fornecedores" style="border:2px solid #ccc;">
-										</div>
-										<br>
-										<button id="addFoto" type="button" onclick="adicionaFoto()" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>
-									</div>
-								</div>									
+								</div>								
 							</div>
 
 							<!-- Pessoa Jurídica -->
 							<div class="row">
 								<div class="col-lg-12">
 									<div class="row">
-										<div class="col-lg-6">
+										<!-- Razão Social -->
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputRazaoSocial">Razão Social</label>
 												<input type="text" id="inputRazaoSocial" name="inputRazaoSocial" class="form-control" placeholder="Razão Social">
 											</div>
 										</div>
-										<div class="col-lg-6">
+
+										<!-- Nome Fantasia -->
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputNome">Nome Fantasia <span class="text-danger">*</span></label>
 												<input type="text" id="inputNomeFantasia" name="inputNomeFantasia" class="form-control" placeholder="Nome Fantasia" required autofocus>
 											</div>
 										</div>
-									</div>
 
-									<div class="row">
+										<!-- Inscrição Municipal -->
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputInscricaoMunicipal">Inscrição Municipal</label>
@@ -641,13 +710,16 @@ include('global_assets/php/conexao.php');
 											</div>
 										</div>
 
+										<!-- Inscrição Estadual -->
 										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputInscricaoEstadual">Inscrição Estadual</label>
 												<input type="text" id="inputInscricaoEstadual" name="inputInscricaoEstadual" class="form-control" placeholder="Ins. Estadual">
 											</div>
-										</div>
+										</div>																		
+									</div>
 
+									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoriaPJ">Categoria<span class="text-danger"> *</span></label>
@@ -671,7 +743,7 @@ include('global_assets/php/conexao.php');
 											</div>
 										</div>
 
-										<div class="col-lg-4">
+										<div class="col-lg-8">
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoriaPJ">SubCategoria</label>
 												<select id="cmbSubCategoriaPJ" name="cmbSubCategoriaPJ[]" class="form-control select" multiple="multiple" data-fouc>

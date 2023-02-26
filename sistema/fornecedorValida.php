@@ -9,22 +9,22 @@ if ($_POST['tipo'] == 'F'){
 	if(isset($_POST['nomeVelho'])){
 		$sql = "SELECT ForneId
 				FROM Fornecedor
-				WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nomeNovo']."' and ForneNome <> '". $_POST['nomeVelho']."' and ForneCpf = '". limpaCPF_CNPJ($_POST['cpf'])."'";
+				WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nomeNovo']."' and ForneNome <> '". $_POST['nomeVelho']."' and ForneCpf = '". limpaCPF_CNPJ($_POST['documento'])."'";
 	} else{
 		$sql = "SELECT ForneId
 				FROM Fornecedor
-				WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nome']."' and ForneCpf = '". limpaCPF_CNPJ($_POST['cpf'])."'";
+				WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nome']."' and ForneCpf = '". limpaCPF_CNPJ($_POST['documento'])."'";
 	}
 } else{
 
 	if(isset($_POST['nomeVelho'])){
 		$sql = "SELECT ForneId
 				FROM Fornecedor
-				WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nomeNovo']."' and ForneNome <> '". $_POST['nomeVelho']."' and ForneCnpj = '". limpaCPF_CNPJ($_POST['cnpj'])."'";
+				WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nomeNovo']."' and ForneNome <> '". $_POST['nomeVelho']."' and ForneCnpj = '". limpaCPF_CNPJ($_POST['documento'])."'";
 	} else{
 		$sql = "SELECT ForneId
 				FROM Fornecedor
-				WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nome']."' and ForneCnpj = '". limpaCPF_CNPJ($_POST['cnpj'])."'";
+				WHERE ForneEmpresa = ".$_SESSION['EmpreId']." and ForneNome = '". $_POST['nome']."' and ForneCnpj = '". limpaCPF_CNPJ($_POST['documento'])."'";
 	}
 }
 

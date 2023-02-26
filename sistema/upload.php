@@ -57,7 +57,7 @@
 					}                    
                     
                     print('<a href="'.$pasta.$nome_atual.'" class="fancybox">
-							 <img src="'.$pasta.$nome_atual.'" class="ml-3" style="max-width: 260px; max-height:250px; border:2px solid #ccc;">
+							 <img src="'.$pasta.$nome_atual.'" style="max-width: 230px; max-height:250px; border:2px solid #ccc;">
 						   </a>
 						   <input type="hidden" id="inputFoto" name="inputFoto" value="'.$nome_atual.'" >
 						   '); //imprime a foto na tela
