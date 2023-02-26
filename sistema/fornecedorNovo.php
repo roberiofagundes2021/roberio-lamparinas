@@ -153,7 +153,7 @@ include('global_assets/php/conexao.php');
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
 
-					var option = '<option>Selecione </option>';
+					var option = '<option value="">Selecione</option>';
 
 					if (dados.length) {
 
@@ -177,7 +177,7 @@ include('global_assets/php/conexao.php');
 
 				$.getJSON('filtraSubCategoria.php?idCategoria=' + cmbCategoria, function(dados) {
 
-					var option = '<option>Selecione </option>';
+					var option = '<option value="">Selecione</option>';
 
 					if (dados.length) {
 
@@ -206,14 +206,8 @@ include('global_assets/php/conexao.php');
 				var inputNome = $('#inputNome').val();
 				if (inputTipo == "F"){
 					var documento = $('#inputCpf').val().replace(/[^\d]+/g, '');
-					$("#inputCpf").prop('required', true);
-					$("#inputNome").prop('required', true);
-					$("#inputNomeFantasia").prop('required', false);
 				} else{
 					var documento = $('#inputCnpj').val();
-					$("#inputCpf").prop('required', false);
-					$("#inputNome").prop('required', false);
-					$("#inputNomeFantasia").prop('required', true);
 				}				
 
 				let cmbSubCategoriaPF = $('#cmbSubCategoriaPF').val();
@@ -237,7 +231,7 @@ include('global_assets/php/conexao.php');
 						documento: documento
 					},
 					success: function(resposta) {
-						alert(resposta)
+
 						if (resposta == 1) {
 							alerta('Atenção', 'Esse registro já existe!', 'error');
 							return false;
@@ -312,11 +306,13 @@ include('global_assets/php/conexao.php');
 		function marcaCamposObrigatorios(tipo) {
 			var camposPFObrigatorios = [
 				'inputCpf',
-
+				'inputNome',
+				'cmbCategoriaPF'
 			]
 			var camposPJObrigatorios = [
 				'inputCnpj',
-
+				'inputNomeFantasia',
+				'cmbCategoriaPJ'
 			]
 			if (tipo == 'PF') {
 				camposPFObrigatorios.forEach(element => $("#" + element).attr('required', true));
@@ -507,7 +503,7 @@ include('global_assets/php/conexao.php');
 										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="cmbUf">UF</label>
-												<select id="cmbUf" name="cmbUf" class="form-control form-control-select2">
+												<select id="cmbUf" name="cmbUf" class="form-control select-search">
 												<option value="#">Selecione</option>
 													<option value="AC">AC</option>
 													<option value="AL">AL</option>
@@ -592,7 +588,7 @@ include('global_assets/php/conexao.php');
 										<div class="col-lg-1">
 											<div class="form-group">
 												<label for="inputNaturalidadeUf">UF</label>
-												<select id="inputNaturalidadeUf" name="inputNaturalidadeUf" class="form-control form-control-select2">
+												<select id="inputNaturalidadeUf" name="inputNaturalidadeUf" class="form-control select-search">
 													<option value="#">Selecione</option>
 													<option value="AC">AC</option>
 													<option value="AL">AL</option>
@@ -649,7 +645,7 @@ include('global_assets/php/conexao.php');
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoriaPF">Categoria<span class="text-danger"> *</span></label>
-												<select id="cmbCategoriaPF" name="cmbCategoria" class="form-control form-control-select2" required>
+												<select id="cmbCategoriaPF" name="cmbCategoria" class="form-control select-search">
 													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT CategId, CategNome
@@ -674,7 +670,7 @@ include('global_assets/php/conexao.php');
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoriaPF">SubCategoria</label>
 												<select id="cmbSubCategoriaPF" name="cmbSubCategoria[]" class="form-control select" multiple="multiple" data-fouc>
-													<option value="#">Selecione </option>
+													<option value="">Selecione</option>
 												</select>
 											</div>
 										</div>
@@ -722,9 +718,9 @@ include('global_assets/php/conexao.php');
 									<div class="row">
 										<div class="col-lg-4">
 											<div class="form-group">
-												<label for="cmbCategoriaPJ">Categoria<span class="text-danger"> *</span></label>
-												<select id="cmbCategoriaPJ" name="cmbCategoriaPJ" class="form-control form-control-select2">
-													<option value="#">Selecione </option>
+												<label for="cmbCategoriaPJ">Categoria <span class="text-danger"> *</span></label>
+												<select id="cmbCategoriaPJ" name="cmbCategoriaPJ" class="form-control select-search">
+													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT CategId, CategNome
 															FROM Categoria
@@ -747,7 +743,7 @@ include('global_assets/php/conexao.php');
 											<div class="form-group" style="border-bottom:1px solid #ddd;">
 												<label for="cmbSubCategoriaPJ">SubCategoria</label>
 												<select id="cmbSubCategoriaPJ" name="cmbSubCategoriaPJ[]" class="form-control select" multiple="multiple" data-fouc>
-													<option value="#">Selecione </option>
+													<option value="">Selecione</option>
 												</select>
 											</div>
 										</div>
@@ -922,7 +918,7 @@ include('global_assets/php/conexao.php');
 									<div class="row">
 										<div class="col-lg-5">
 											<label for="cmbBanco">Banco</label>
-											<select id="cmbBanco" name="cmbBanco" class="form-control form-control-select2">
+											<select id="cmbBanco" name="cmbBanco" class="form-control select-search">
 												<option value="#">Selecione </option>
 												<?php
 												$sql = "SELECT BancoId, BancoCodigo, BancoNome
@@ -965,10 +961,10 @@ include('global_assets/php/conexao.php');
 								</div>
 							</div>
 							<br>
-
+							
+							<!-- Tributos -->
 							<div class="row">
 								<div class="col-lg-12">
-
 									<h5 class="mb-0 font-weight-semibold">Tributos</h5>
 									<br>
 
