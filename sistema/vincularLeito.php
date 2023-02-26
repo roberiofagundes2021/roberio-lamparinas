@@ -7,7 +7,8 @@ $_SESSION['PaginaAtual'] = 'Vincular Leito';
 include('global_assets/php/conexao.php');
 
 $sql = "SELECT VnLeiId, VnLeiTipoAcomodacao, VnLeiTipoInternacao, VnLeiEspecialidadeLeito, VnLeiAla,
-				VnLeiQuarto, VnLeiObservacao, VnLeiStatus, VnLeiUsuarioAtualizador, TpAcoNome, TpIntNome, EsLeiNome, QuartNome, AlaNome, SituaNome, SituaChave, SituaCor
+				VnLeiQuarto, VnLeiObservacao, VnLeiStatus, VnLeiUsuarioAtualizador, TpAcoNome, TpIntNome, 
+				EsLeiNome, QuartNome, AlaNome, SituaNome, SituaChave, SituaCor, dbo.fnLeitos(VnLeiUnidade, VnLeiId) as Leitos
 		FROM VincularLeito
 		JOIN Situacao on SituaId = VnLeiStatus
 		LEFT JOIN TipoAcomodacao on TpAcoId = VnLeiTipoAcomodacao
@@ -55,7 +56,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 			    columnDefs: [
 				{
 					orderable: true,   // Ala
-					width: "15%",
+					width: "12%",
 					targets: [0]
 				},
 				{
@@ -70,7 +71,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 				},	
 				{
 					orderable: true,   // Especialidade do Leito
-					width: "15%",
+					width: "18%",
 					targets: [3]
 				},
 				{
@@ -206,6 +207,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 										$situacao = $item['SituaNome'];
 										$situacaoClasse = 'badge badge-flat border-'.$item['SituaCor'].' text-'.$item['SituaCor'];
 										$situacaoChave ='\''.$item['SituaChave'].'\'';
+										$leitos = strlen($item['Leitos']) > 40 ? substr($item['Leitos'], 0, 40)."..." : $item['Leitos'];
 
 										print('
 										<tr>
@@ -214,7 +216,7 @@ $row = $result->fetchAll(PDO::FETCH_ASSOC);
 											<td>'.$item['TpIntNome'].'</td>
 											<td>'.$item['EsLeiNome'].'</td>
 											<td>'.$item['QuartNome'].'</td>
-											<td>'.$item['QuartNome'].'</td>
+											<td data-popup="tooltip" title="'.$item['Leitos'].'">'.$leitos.'</td>
 											');
 										
 										print('<td><a href="#" onclick="atualizaVincularLeito(1,'.$item['VnLeiId'].', \''.$item['VnLeiTipoAcomodacao'].'\','.$situacaoChave.', \'mudaStatus\');"><span class="badge '.$situacaoClasse.'">'.$situacao.'</span></a></td>');
