@@ -216,7 +216,7 @@ if(isset($_POST['cmbTipoAcomodacao'])){
                                                 $sql = "SELECT TpAcoId, TpAcoNome
 														FROM TipoAcomodacao
 														JOIN Situacao on SituaId = TpAcoStatus
-														WHERE SituaChave = 'ATIVO'
+														WHERE TpAcoUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														ORDER BY TpAcoNome ASC";
 												$result = $conn->query($sql);
 												$rowTipoAcomodacao = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -242,7 +242,7 @@ if(isset($_POST['cmbTipoAcomodacao'])){
 												$sql = "SELECT TpIntId, TpIntNome
 														FROM TipoInternacao
 														JOIN Situacao on SituaId = TpIntStatus
-														WHERE SituaChave = 'ATIVO'
+														WHERE TpIntUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														ORDER BY TpIntNome ASC";
 												$result = $conn->query($sql);
 												$rowTipoInternacao = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -268,7 +268,7 @@ if(isset($_POST['cmbTipoAcomodacao'])){
 												$sql = "SELECT EsLeiId, EsLeiNome
 													FROM EspecialidadeLeito
 													JOIN Situacao on SituaId = EsLeiStatus
-													WHERE SituaChave = 'ATIVO'
+													WHERE EsLeiUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 													ORDER BY EsLeiNome ASC";
 												$result = $conn->query($sql);
 												$rowEspecialidadeLeito = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -297,7 +297,7 @@ if(isset($_POST['cmbTipoAcomodacao'])){
 												$sql = "SELECT AlaId, AlaNome
 														FROM Ala
 														JOIN Situacao on SituaId = AlaStatus
-														WHERE SituaChave = 'ATIVO'
+														WHERE AlaUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														ORDER BY AlaNome ASC";
 												$result = $conn->query($sql);
 												$rowAla = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -323,7 +323,7 @@ if(isset($_POST['cmbTipoAcomodacao'])){
 												$sql = "SELECT QuartId, QuartNome
 														FROM Quarto
 														JOIN Situacao on SituaId = QuartStatus
-														WHERE SituaChave = 'ATIVO'
+														WHERE QuartUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 														ORDER BY QuartNome ASC";
 												$result = $conn->query($sql);
 												$rowQuarto = $result->fetchAll(PDO::FETCH_ASSOC);
@@ -342,12 +342,12 @@ if(isset($_POST['cmbTipoAcomodacao'])){
                                 </div>
 								<div class="col-lg-4">
 									<label for="cmbLeito">Nº Leito<span class="text-danger"> *</span></label>
-									<select id="cmbLeito" name="cmbLeito[]" class="form-control multiselect-filtering" multiple="multiple">
+									<select id="cmbLeito" name="cmbLeito[]" class="form-control multiselect-filtering" multiple="multiple" required>
 										<?php
 											$sql = "SELECT LeitoId, LeitoNome
 													FROM Leito
 													JOIN Situacao on SituaId = LeitoStatus
-													WHERE SituaChave = 'ATIVO'
+													WHERE LeitoUnidade = " . $_SESSION['UnidadeId'] . " and SituaChave = 'ATIVO'
 													ORDER BY LeitoNome ASC";
 											$result = $conn->query($sql);
 											$rowLeito = $result->fetchAll(PDO::FETCH_ASSOC);
