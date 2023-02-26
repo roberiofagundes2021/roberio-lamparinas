@@ -17,15 +17,17 @@
         irpara("atendimentoHospitalarListagem.php");	
     }
 
-    //exame físico
-    $sql = "SELECT TOP(1) EnAdPId
-    FROM EnfermagemAdmissaoPediatrica
-    WHERE EnAdPAtendimento = $iAtendimentoId
-    ORDER BY EnAdPId DESC";
-    $result = $conn->query($sql);
-    $rowExameFisico= $result->fetch(PDO::FETCH_ASSOC);
+    $iUnidade = $_SESSION['UnidadeId'];
 
-    $iAtendimentoAdmissaoPediatrica = $rowExameFisico?$rowExameFisico['EnAdPId']:null;
+    //exame físico
+    $sql = "SELECT TOP(1) *
+    FROM EnfermagemAdmissaoCirurgicaPreOperatorio
+    WHERE EnAdCAtendimento = $iAtendimentoId
+    ORDER BY EnAdCId DESC";
+    $result = $conn->query($sql);
+    $rowAdmissao= $result->fetch(PDO::FETCH_ASSOC);
+
+    $iAtendimentoCirurgicoPreOperatorio = $rowAdmissao?$rowAdmissao['EnAdCId']:null;
 
     $ClaChave = isset($_POST['ClaChave'])?$_POST['ClaChave']:'';
     $ClaNome = isset($_POST['ClaNome'])?$_POST['ClaNome']:'';
@@ -76,127 +78,252 @@
         $sexo = 'Masculino';
     }
 
-if(isset($_POST['alergias'])){
-    // $sql = "SELECT ";
-    // $result = $conn->query($sql);
-    // $row = $result->fetch(PDO::FETCH_ASSOC);
-    $sql = "INSERT INTO EnfermagemTransOperatoria(
-        EnTrOAtendimento,EnTrODataInicio,EnTrOHoraInicio,EnTrOPrevisaoAlta,
-        EnTrOTipoInternacao,EnTrOEspecialidadeLeito,EnTrOAla,EnTrOQuarto,EnTrOLeito,EnTrOProfissional,EnTrOPas,
-        EnTrOPad,EnTrOFreqCardiaca,EnTrOFreqRespiratoria,EnTrOTemperatura,EnTrOSPO,EnTrOHGT,EnTrOPeso,
-        EnTrOHoraEntrada,EnTrOHoraSaida,EnTrOSala,EnTrOProfiCirculante,EnTrOInicioAnestesia,EnTrOTerminoAnestesia,
-        EnTrOTipoAnestesia,EnTrOProfiAnestesista,EnTrOProfiInstrumentador,EnTrOInicioCirurgia,EnTrOTerminoCirurgia,
-        EnTrOProfiCirurgiao,EnTrOProfiCirurgiaoAssistente,EnTrODescPosicaoOperatoria,EnTrOServAdicionalBancoSangue,
-        EnTrOServAdicionalRadiologia,EnTrOServAdicionalLaboratorio,EnTrOServAdicionalAnatPatologica,
-        EnTrOServAdicionalUsoContraste,EnTrOServAdicionalOutros,EnTrOEncaminhamentoPosCirurgia,
-        EnTrOEmUsoCateterEpidural,EnTrOEmUsoDrenoTubular,EnTrOEmUsoEntubacaoTraqueal,EnTrOEmUsoIntracath,
-        EnTrOEmUsoKehr,EnTrOEmUsoPecaCirurgica,EnTrOEmUsoPenrose,EnTrOEmUsoProntuario,EnTrOEmUsoPuncaoPeriferica,
-        EnTrOEmUsoRadiografia,EnTrOEmUsoSistemaSuccao,EnTrOEmUsoSondaGastrica,EnTrOEmUsoSondaVesical,
-        EnTrOProfiEnfermeiro,EnTrOProfiTecnico,EnTrOProfiEnfermeiroCCO,EnTrOProfiTecnicoCCO,EnTrOProfiTecnicoRPA,
-        EnTrOKitCME,EnTrOMedicacaoAdministrada,EnTrOObservacao)
-        VALUES(:EnTrOAtendimento,:EnTrODataInicio,:EnTrOHoraInicio,:EnTrODataFim,:EnTrOHoraFim,
-        :EnTrOPrevisaoAlta,:EnTrOTipoInternacao,:EnTrOEspecialidadeLeito,:EnTrOAla,:EnTrOQuarto,
-        :EnTrOLeito,:EnTrOProfissional,:EnTrOPas,:EnTrOPad,:EnTrOFreqCardiaca,:EnTrOFreqRespiratoria,
-        :EnTrOTemperatura,:EnTrOSPO,:EnTrOHGT,:EnTrOPeso,:EnTrOHoraEntrada,:EnTrOHoraSaida,:EnTrOSala,
-        :EnTrOProfiCirculante,:EnTrOInicioAnestesia,:EnTrOTerminoAnestesia,:EnTrOTipoAnestesia,
-        :EnTrOProfiAnestesista,:EnTrOProfiInstrumentador,:EnTrOInicioCirurgia,:EnTrOTerminoCirurgia,
-        :EnTrOProfiCirurgiao,:EnTrOProfiCirurgiaoAssistente,:EnTrODescPosicaoOperatoria,
-        :EnTrOServAdicionalBancoSangue,:EnTrOServAdicionalRadiologia,:EnTrOServAdicionalLaboratorio,
-        :EnTrOServAdicionalAnatPatologica,:EnTrOServAdicionalUsoContraste,:EnTrOServAdicionalOutros,
-        :EnTrOEncaminhamentoPosCirurgia,:EnTrOEmUsoCateterEpidural,:EnTrOEmUsoDrenoTubular,
-        :EnTrOEmUsoEntubacaoTraqueal,:EnTrOEmUsoIntracath,:EnTrOEmUsoKehr,:EnTrOEmUsoPecaCirurgica,
-        :EnTrOEmUsoPenrose,:EnTrOEmUsoProntuario,:EnTrOEmUsoPuncaoPeriferica,:EnTrOEmUsoRadiografia,
-        :EnTrOEmUsoSistemaSuccao,:EnTrOEmUsoSondaGastrica,:EnTrOEmUsoSondaVesical,:EnTrOProfiEnfermeiro,
-        :EnTrOProfiTecnico,:EnTrOProfiEnfermeiroCCO,:EnTrOProfiTecnicoCCO,:EnTrOProfiTecnicoRPA,:EnTrOKitCME,
-        :EnTrOMedicacaoAdministrada,:EnTrOObservacao)";
-    $result = $conn->prepare($sql);
+if(isset($_POST['inputInicio'])){
 
-    $result->execute(array(
-        ":EnTrOAtendimento" => $iAtendimentoId,
-        ":EnTrODataInicio" => date('Y-m-d'),
-        ":EnTrOHoraInicio" => date('H:i'),
-        ":EnTrOPrevisaoAlta" => '',
-        ":EnTrOTipoInternacao" => $row['TpIntId'],
-        ":EnTrOEspecialidadeLeito" => $row['EsLeiId'],
-        ":EnTrOAla" => $row['AlaId'],
-        ":EnTrOQuarto" => $row['EsLeiId'],
-        ":EnTrOLeito" => $row['LeitoId'],
-        ":EnTrOProfissional" => $userId,
-        ":EnTrOPas" => $_POST[''],
-        ":EnTrOPad" => $_POST[''],
-        ":EnTrOFreqCardiaca" => $_POST[''],
-        ":EnTrOFreqRespiratoria" => $_POST[''],
-        ":EnTrOTemperatura" => $_POST[''],
-        ":EnTrOSPO" => $_POST[''],
-        ":EnTrOHGT" => $_POST[''],
-        ":EnTrOPeso" => $_POST[''],
-        ":EnTrOHoraEntrada" => $_POST[''],
-        ":EnTrOHoraSaida" => $_POST[''],
-        ":EnTrOSala" => $_POST[''],
-        ":EnTrOProfiCirculante" => $_POST[''],
-        ":EnTrOInicioAnestesia" => $_POST[''],
-        ":EnTrOTerminoAnestesia" => $_POST[''],
-        ":EnTrOTipoAnestesia" => $_POST[''],
-        ":EnTrOProfiAnestesista" => $_POST[''],
-        ":EnTrOProfiInstrumentador" => $_POST[''],
-        ":EnTrOInicioCirurgia" => $_POST[''],
-        ":EnTrOTerminoCirurgia" => $_POST[''],
-        ":EnTrOProfiCirurgiao" => $_POST[''],
-        ":EnTrOProfiCirurgiaoAssistente" => $_POST[''],
-        ":EnTrODescPosicaoOperatoria" => $_POST[''],
-        ":EnTrOServAdicionalBancoSangue" => $_POST[''],
-        ":EnTrOServAdicionalRadiologia" => $_POST[''],
-        ":EnTrOServAdicionalLaboratorio" => $_POST[''],
-        ":EnTrOServAdicionalAnatPatologica" => $_POST[''],
-        ":EnTrOServAdicionalUsoContraste" => $_POST[''],
-        ":EnTrOServAdicionalOutros" => $_POST[''],
-        ":EnTrOEncaminhamentoPosCirurgia" => $_POST['textCirurgiaAnterior'],
-        ":EnTrOEmUsoCateterEpidural" => $_POST[''],
-        ":EnTrOEmUsoDrenoTubular" => $_POST[''],
-        ":EnTrOEmUsoEntubacaoTraqueal" => $_POST[''],
-        ":EnTrOEmUsoIntracath" => $_POST[''],
-        ":EnTrOEmUsoKehr" => $_POST[''],
-        ":EnTrOEmUsoPecaCirurgica" => $_POST[''],
-        ":EnTrOEmUsoPenrose" => $_POST[''],
-        ":EnTrOEmUsoProntuario" => $_POST[''],
-        ":EnTrOEmUsoPuncaoPeriferica" => $_POST[''],
-        ":EnTrOEmUsoRadiografia" => $_POST[''],
-        ":EnTrOEmUsoSistemaSuccao" => $_POST[''],
-        ":EnTrOEmUsoSondaGastrica" => $_POST[''],
-        ":EnTrOEmUsoSondaVesical" => $_POST[''],
-        ":EnTrOProfiEnfermeiro" => $_POST[''],
-        ":EnTrOProfiTecnico" => $_POST[''],
-        ":EnTrOProfiEnfermeiroCCO" => $_POST[''],
-        ":EnTrOProfiTecnicoCCO" => $_POST[''],
-        ":EnTrOProfiTecnicoRPA" => $_POST[''],
-        ":EnTrOKitCME" => $_POST[''],
-        ":EnTrOMedicacaoAdministrada" => $_POST['textMedicamentos'],
-        ":EnTrOObservacao" => $_POST[''],
-    ));
+    try {
+
+        if ($iAtendimentoCirurgicoPreOperatorio) { 
+
+            $sql = "UPDATE EnfermagemAdmissaoCirurgicaPreOperatorio SET
+                EnAdCDataInicio = :EnAdCDataInicio ,
+                EnAdCHoraInicio = :EnAdCHoraInicio ,
+                EnAdCDataFim = :EnAdCDataFim ,
+                EnAdCHoraFim = :EnAdCHoraFim ,
+                EnAdCPrevisaoAlta = :EnAdCPrevisaoAlta ,
+                EnAdCTipoInternacao = :EnAdCTipoInternacao ,
+                EnAdCEspecialidadeLeito = :EnAdCEspecialidadeLeito ,
+                EnAdCAla = :EnAdCAla ,
+                EnAdCQuarto = :EnAdCQuarto ,
+                EnAdCLeito = :EnAdCLeito ,
+                EnAdCProfissional = :EnAdCProfissional ,
+                EnAdCPas = :EnAdCPas ,
+                EnAdCPad = :EnAdCPad ,
+                EnAdCFreqCardiaca = :EnAdCFreqCardiaca ,
+                EnAdCFreqRespiratoria = :EnAdCFreqRespiratoria ,
+                EnAdCTemperatura = :EnAdCTemperatura ,
+                EnAdCSPO = :EnAdCSPO ,
+                EnAdCHGT = :EnAdCHGT ,
+                EnAdCPeso = :EnAdCPeso ,
+                EnAdCAlergia = :EnAdCAlergia ,
+                EnAdCAlergiaDescricao = :EnAdCAlergiaDescricao ,
+                EnAdCUsoMedicamento = :EnAdCUsoMedicamento ,
+                EnAdCUsoMedicamentoDescricao = :EnAdCUsoMedicamentoDescricao ,
+                EnAdCHistCirurgiaAnterior = :EnAdCHistCirurgiaAnterior ,
+                EnAdCHistCirurgiaAnteriorDescricao = :EnAdCHistCirurgiaAnteriorDescricao ,
+                EnAdCJejumMinimo = :EnAdCJejumMinimo ,
+                EnAdCJejumMinimoDescricao = :EnAdCJejumMinimoDescricao ,
+                EnAdCUsoProtese = :EnAdCUsoProtese ,
+                EnAdCUsoProteseDescricao = :EnAdCUsoProteseDescricao ,
+                EnAdCRemocaoJoia = :EnAdCRemocaoJoia ,
+                EnAdCRemocaoJoiaDescricao = :EnAdCRemocaoJoiaDescricao ,
+                EnAdCDoencaPrevia = :EnAdCDoencaPrevia ,
+                EnAdCDoencaPreviaDescricao = :EnAdCDoencaPreviaDescricao ,
+                EnAdCAreaOperatoria = :EnAdCAreaOperatoria ,
+                EnAdCAreaOperatoriaDescricao = :EnAdCAreaOperatoriaDescricao ,
+                EnAdCLocalCirurgia = :EnAdCLocalCirurgia ,
+                EnAdCLado = :EnAdCLado ,
+                EnAdCEsvaziamentoVesical = :EnAdCEsvaziamentoVesical ,
+                EnAdCEsvaziamentoVesicalDescricao = :EnAdCEsvaziamentoVesicalDescricao ,
+                EnAdCUnidade = :EnAdCUnidade
+            WHERE EnAdCId = :sAtendimentoCirurgicoPreOp";
+
+            $result->execute(array(
+                ":EnAdCDataInicio" => date('Y-m-d') ,
+                ":EnAdCHoraInicio" => date('H:i') ,
+                ":EnAdCDataFim" => date('Y-m-d') ,
+                ":EnAdCHoraFim" => date('H:i') ,
+                ":EnAdCPrevisaoAlta" => $_POST['inputPrevisaoAlta'] == "" ? null : $_POST['inputPrevisaoAlta'], 
+                ":EnAdCTipoInternacao" => $_POST['inputTipoInternacao'] == "" ? null : $_POST['inputTipoInternacao'], 
+                ":EnAdCEspecialidadeLeito" => $_POST['inputEspLeito'] == "" ? null : $_POST['inputEspLeito'],
+                ":EnAdCAla" => $_POST['inputAla'] == "" ? null : $_POST['inputAla'], 
+                ":EnAdCQuarto" => $_POST['inputQuarto'] == "" ? null : $_POST['inputQuarto'], 
+                ":EnAdCLeito" => $_POST['inputLeito'] == "" ? null : $_POST['inputLeito'], 
+                ":EnAdCProfissional" => $userId,
+                ":EnAdCPas" => $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'],
+                ":EnAdCPad" => $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'],
+                ":EnAdCFreqCardiaca" =>  $_POST['inputCardiaca'] == "" ? null : $_POST['inputCardiaca'],
+                ":EnAdCFreqRespiratoria" =>  $_POST['inputRespiratoria'] == "" ? null : $_POST['inputRespiratoria'],
+                ":EnAdCTemperatura" =>  $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'],
+                ":EnAdCSPO" => $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'],
+                ":EnAdCHGT" =>  $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'],
+                ":EnAdCPeso" => $_POST['inputPeso'] == "" ? null : $_POST['inputPeso'],
+                ":EnAdCAlergia" => isset($_POST['alergias']) ? $_POST['alergias'] == "" ? null : $_POST['alergias'] : null,
+                ":EnAdCAlergiaDescricao" => $_POST['textAlergias'] == "" ? null : $_POST['textAlergias'],
+                ":EnAdCUsoMedicamento" => isset($_POST['medicamentos']) ? $_POST['medicamentos'] == "" ? null : $_POST['medicamentos'] : null,
+                ":EnAdCUsoMedicamentoDescricao" => $_POST['textMedicamentos'] == "" ? null : $_POST['textMedicamentos'],
+                ":EnAdCHistCirurgiaAnterior" => isset($_POST['cirurgiaAnterior']) ? $_POST['cirurgiaAnterior'] == "" ? null : $_POST['cirurgiaAnterior'] : null ,
+                ":EnAdCHistCirurgiaAnteriorDescricao" =>  $_POST['textCirurgiaAnterior'] == "" ? null : $_POST['textCirurgiaAnterior'] ,                
+                ":EnAdCJejumMinimo" => isset($_POST['jejum']) ? $_POST['jejum'] == "" ? null : $_POST['jejum'] : null ,
+                ":EnAdCJejumMinimoDescricao" =>  $_POST['textJejum'] == "" ? null : $_POST['textJejum'] ,                
+                ":EnAdCUsoProtese" => isset($_POST['proteses']) ? $_POST['proteses'] == "" ? null : $_POST['proteses'] : null ,
+                ":EnAdCUsoProteseDescricao" =>  $_POST['textProteses'] == "" ? null : $_POST['textProteses'] ,                
+                ":EnAdCRemocaoJoia" => isset($_POST['acessorios']) ? $_POST['acessorios'] == "" ? null : $_POST['acessorios'] : null,
+                ":EnAdCRemocaoJoiaDescricao" =>  $_POST['textAcessorios'] == "" ? null : $_POST['textAcessorios'] ,                
+                ":EnAdCDoencaPrevia" =>  $_POST['doencas'] == "" ? null : $_POST['doencas'] ,
+                ":EnAdCDoencaPreviaDescricao" =>  $_POST['textDoencas'] == "" ? null : $_POST['textDoencas'] ,                
+                ":EnAdCAreaOperatoria" => isset($_POST['tricotomia']) ? $_POST['tricotomia'] == "" ? null : $_POST['tricotomia'] : null ,
+                ":EnAdCAreaOperatoriaDescricao" =>  $_POST['textTricotomia'] == "" ? null : $_POST['textTricotomia'] ,                
+                ":EnAdCLocalCirurgia" =>  $_POST['local'] == "" ? null : $_POST['local'] ,
+                ":EnAdCLado" =>  $_POST['lado'] == "" ? null : $_POST['lado'] , 
+                ":EnAdCEsvaziamentoVesical" => isset($_POST['esvaziamento']) ? $_POST['esvaziamento'] == "" ? null : $_POST['esvaziamento'] : null,
+                ":EnAdCEsvaziamentoVesicalDescricao" =>  $_POST['textEsvaziamento'] == "" ? null : $_POST['textEsvaziamento'] ,                
+                ":EnAdCUnidade" =>  $iUnidade,
+                ":sAtendimentoCirurgicoPreOp" => $iAtendimentoCirurgicoPreOperatorio
+            ));
+
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Admissão alterada com sucesso!!!";
+            $_SESSION['msg']['tipo'] = "success";
+
+        }else {
+            
+            $sql = "INSERT INTO EnfermagemAdmissaoCirurgicaPreOperatorio( 
+                EnAdCAtendimento,
+                EnAdCDataInicio,
+                EnAdCHoraInicio,
+                EnAdCDataFim,
+                EnAdCHoraFim,
+                EnAdCPrevisaoAlta,
+                EnAdCTipoInternacao,
+                EnAdCEspecialidadeLeito,
+                EnAdCAla,
+                EnAdCQuarto,
+                EnAdCLeito,
+                EnAdCProfissional,
+                EnAdCPas,
+                EnAdCPad,
+                EnAdCFreqCardiaca,
+                EnAdCFreqRespiratoria,
+                EnAdCTemperatura,
+                EnAdCSPO,
+                EnAdCHGT,
+                EnAdCPeso,
+                EnAdCAlergia,
+                EnAdCAlergiaDescricao,
+                EnAdCUsoMedicamento,
+                EnAdCUsoMedicamentoDescricao,
+                EnAdCHistCirurgiaAnterior,
+                EnAdCHistCirurgiaAnteriorDescricao,
+                EnAdCJejumMinimo,
+                EnAdCJejumMinimoDescricao,
+                EnAdCUsoProtese,
+                EnAdCUsoProteseDescricao,
+                EnAdCRemocaoJoia,
+                EnAdCRemocaoJoiaDescricao,
+                EnAdCDoencaPrevia,
+                EnAdCDoencaPreviaDescricao,
+                EnAdCAreaOperatoria,
+                EnAdCAreaOperatoriaDescricao,
+                EnAdCLocalCirurgia,
+                EnAdCLado,
+                EnAdCEsvaziamentoVesical,
+                EnAdCEsvaziamentoVesicalDescricao,
+                EnAdCUnidade
+            ) VALUES( 
+                :EnAdCAtendimento,
+                :EnAdCDataInicio,
+                :EnAdCHoraInicio,
+                :EnAdCDataFim,
+                :EnAdCHoraFim,
+                :EnAdCPrevisaoAlta,
+                :EnAdCTipoInternacao,
+                :EnAdCEspecialidadeLeito,
+                :EnAdCAla,
+                :EnAdCQuarto,
+                :EnAdCLeito,
+                :EnAdCProfissional,
+                :EnAdCPas,
+                :EnAdCPad,
+                :EnAdCFreqCardiaca,
+                :EnAdCFreqRespiratoria,
+                :EnAdCTemperatura,
+                :EnAdCSPO,
+                :EnAdCHGT,
+                :EnAdCPeso,
+                :EnAdCAlergia,
+                :EnAdCAlergiaDescricao,
+                :EnAdCUsoMedicamento,
+                :EnAdCUsoMedicamentoDescricao,
+                :EnAdCHistCirurgiaAnterior,
+                :EnAdCHistCirurgiaAnteriorDescricao,
+                :EnAdCJejumMinimo,
+                :EnAdCJejumMinimoDescricao,
+                :EnAdCUsoProtese,
+                :EnAdCUsoProteseDescricao,
+                :EnAdCRemocaoJoia,
+                :EnAdCRemocaoJoiaDescricao,
+                :EnAdCDoencaPrevia,
+                :EnAdCDoencaPreviaDescricao,
+                :EnAdCAreaOperatoria,
+                :EnAdCAreaOperatoriaDescricao,
+                :EnAdCLocalCirurgia,
+                :EnAdCLado,
+                :EnAdCEsvaziamentoVesical,
+                :EnAdCEsvaziamentoVesicalDescricao,
+                :EnAdCUnidade
+            )";
+            $result = $conn->prepare($sql);
+        
+            $result->execute(array(
+                ":EnAdCAtendimento" => $iAtendimentoId ,
+                ":EnAdCDataInicio" => date('Y-m-d') ,
+                ":EnAdCHoraInicio" => date('H:i') ,
+                ":EnAdCDataFim" => date('Y-m-d') ,
+                ":EnAdCHoraFim" => date('H:i') ,
+                ":EnAdCPrevisaoAlta" => $_POST['inputPrevisaoAlta'] == "" ? null : $_POST['inputPrevisaoAlta'], 
+                ":EnAdCTipoInternacao" => $_POST['inputTipoInternacao'] == "" ? null : $_POST['inputTipoInternacao'], 
+                ":EnAdCEspecialidadeLeito" => $_POST['inputEspLeito'] == "" ? null : $_POST['inputEspLeito'],
+                ":EnAdCAla" => $_POST['inputAla'] == "" ? null : $_POST['inputAla'], 
+                ":EnAdCQuarto" => $_POST['inputQuarto'] == "" ? null : $_POST['inputQuarto'], 
+                ":EnAdCLeito" => $_POST['inputLeito'] == "" ? null : $_POST['inputLeito'], 
+                ":EnAdCProfissional" => $userId,
+                ":EnAdCPas" => $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'],
+                ":EnAdCPad" => $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'],
+                ":EnAdCFreqCardiaca" =>  $_POST['inputCardiaca'] == "" ? null : $_POST['inputCardiaca'],
+                ":EnAdCFreqRespiratoria" =>  $_POST['inputRespiratoria'] == "" ? null : $_POST['inputRespiratoria'],
+                ":EnAdCTemperatura" =>  $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'],
+                ":EnAdCSPO" => $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'],
+                ":EnAdCHGT" =>  $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'],
+                ":EnAdCPeso" => $_POST['inputPeso'] == "" ? null : $_POST['inputPeso'],
+                ":EnAdCAlergia" => isset($_POST['alergias']) ? $_POST['alergias'] == "" ? null : $_POST['alergias'] : null,
+                ":EnAdCAlergiaDescricao" => $_POST['textAlergias'] == "" ? null : $_POST['textAlergias'],
+                ":EnAdCUsoMedicamento" => isset($_POST['medicamentos']) ? $_POST['medicamentos'] == "" ? null : $_POST['medicamentos'] : null,
+                ":EnAdCUsoMedicamentoDescricao" => $_POST['textMedicamentos'] == "" ? null : $_POST['textMedicamentos'],
+                ":EnAdCHistCirurgiaAnterior" => isset($_POST['cirurgiaAnterior']) ? $_POST['cirurgiaAnterior'] == "" ? null : $_POST['cirurgiaAnterior'] : null ,
+                ":EnAdCHistCirurgiaAnteriorDescricao" =>  $_POST['textCirurgiaAnterior'] == "" ? null : $_POST['textCirurgiaAnterior'] ,                
+                ":EnAdCJejumMinimo" => isset($_POST['jejum']) ? $_POST['jejum'] == "" ? null : $_POST['jejum'] : null ,
+                ":EnAdCJejumMinimoDescricao" =>  $_POST['textJejum'] == "" ? null : $_POST['textJejum'] ,                
+                ":EnAdCUsoProtese" => isset($_POST['proteses']) ? $_POST['proteses'] == "" ? null : $_POST['proteses'] : null ,
+                ":EnAdCUsoProteseDescricao" =>  $_POST['textProteses'] == "" ? null : $_POST['textProteses'] ,                
+                ":EnAdCRemocaoJoia" => isset($_POST['acessorios']) ? $_POST['acessorios'] == "" ? null : $_POST['acessorios'] : null,
+                ":EnAdCRemocaoJoiaDescricao" =>  $_POST['textAcessorios'] == "" ? null : $_POST['textAcessorios'] ,                
+                ":EnAdCDoencaPrevia" =>  $_POST['doencas'] == "" ? null : $_POST['doencas'] ,
+                ":EnAdCDoencaPreviaDescricao" =>  $_POST['textDoencas'] == "" ? null : $_POST['textDoencas'] ,                
+                ":EnAdCAreaOperatoria" => isset($_POST['tricotomia']) ? $_POST['tricotomia'] == "" ? null : $_POST['tricotomia'] : null ,
+                ":EnAdCAreaOperatoriaDescricao" =>  $_POST['textTricotomia'] == "" ? null : $_POST['textTricotomia'] ,                
+                ":EnAdCLocalCirurgia" =>  $_POST['local'] == "" ? null : $_POST['local'] ,
+                ":EnAdCLado" =>  $_POST['lado'] == "" ? null : $_POST['lado'] , 
+                ":EnAdCEsvaziamentoVesical" => isset($_POST['esvaziamento']) ? $_POST['esvaziamento'] == "" ? null : $_POST['esvaziamento'] : null,
+                ":EnAdCEsvaziamentoVesicalDescricao" =>  $_POST['textEsvaziamento'] == "" ? null : $_POST['textEsvaziamento'] ,                
+                ":EnAdCUnidade" =>  $iUnidade
+            ));
+
+            $_SESSION['msg']['titulo'] = "Sucesso";
+            $_SESSION['msg']['mensagem'] = "Admissão inserida com sucesso!!!";
+            $_SESSION['msg']['tipo'] = "success";
+
+        }
+
+        
+    } catch (PDOException $e) {
+
+        $_SESSION['msg']['titulo'] = "Erro";
+        $_SESSION['msg']['mensagem'] = "Erro reportado com a Admissão Cirurgica Pre Operatoria!!!";
+        $_SESSION['msg']['tipo'] = "error";
+
+        echo 'Error: ' . $e->getMessage();
+    }
 }
-// campos ID/Name inputs
-// alergias
-// textAlergias
-// medicamentos
-// textMedicamentos
-// cirurgiaAnterior
-// textCirurgiaAnterior
-// jejum
-// textJejum
-
-// proteses
-// textProteses
-// acessorios
-// textAcessorios
-// doencas
-// textDoencas
-// tricotomia
-// textTricotomia
-
-// local
-// lado
-// esvaziamento
-// textEsvaziamento
 
 ?>
 
@@ -235,11 +362,23 @@ if(isset($_POST['alergias'])){
 	
 	<script type="text/javascript">
 
+        let idAtendimentoCirurgicoPreOperatorio = <?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $iAtendimentoCirurgicoPreOperatorio : 'null'; ?>
+
 		$(document).ready(function() {
+
+            console.log(idAtendimentoCirurgicoPreOperatorio);
+
+            getAcessosVenosos();
+            getTermosConsentimento();
+            getExamesComplementares();
+
             $('#tblAcessoVenoso').DataTable({
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
+                searching: false,
+				ordering: false, 
+				paging: false,
 			    columnDefs: [{ 
 					orderable: false,   //item
 					width: "1%",
@@ -282,6 +421,9 @@ if(isset($_POST['alergias'])){
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
+                searching: false,
+				ordering: false, 
+				paging: false,
 			    columnDefs: [{ 
 					orderable: false,   //item
 					width: "1%",
@@ -314,6 +456,9 @@ if(isset($_POST['alergias'])){
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
+                searching: false,
+				ordering: false, 
+				paging: false,
 			    columnDefs: [{ 
 					orderable: false,   //item
 					width: "1%",
@@ -347,7 +492,7 @@ if(isset($_POST['alergias'])){
 
             $(".alergias").each(function(){
                 $(this).on('click',function(e){
-                    if($(this).val() == 'SIM'){
+                    if($(this).val() == '1'){
                         $('#textAlergiasViwer').removeClass('d-none')
                     }else{
                         $('#textAlergias').val('');
@@ -358,7 +503,7 @@ if(isset($_POST['alergias'])){
             })
             $(".medicamentos").each(function(){
                 $(this).on('click',function(e){
-                    if($(this).val() == 'SIM'){
+                    if($(this).val() == '1'){
                         $('#textMedicamentosViwer').removeClass('d-none');
                     }else{
                         $('#textMedicamentos').val('');
@@ -369,7 +514,7 @@ if(isset($_POST['alergias'])){
             })
             $(".cirurgiaAnterior").each(function(){
                 $(this).on('click',function(e){
-                    if($(this).val() == 'SIM'){
+                    if($(this).val() == '1'){
                         $('#textCirurgiaAnteriorViwer').removeClass('d-none');
                     }else{
                         $('#textCirurgiaAnterior').val('');
@@ -380,7 +525,7 @@ if(isset($_POST['alergias'])){
             })
             $(".jejum").each(function(){
                 $(this).on('click',function(e){
-                    if($(this).val() == 'SIM'){
+                    if($(this).val() == '1'){
                         $('#textJejumViwer').removeClass('d-none');
                     }else{
                         $('#textJejum').val('');
@@ -391,7 +536,7 @@ if(isset($_POST['alergias'])){
             })
             $(".proteses").each(function(){
                 $(this).on('click',function(e){
-                    if($(this).val() == 'SIM'){
+                    if($(this).val() == '1'){
                         $('#textProtesesViwer').removeClass('d-none')
                     }else{
                         $('#textProteses').val('');
@@ -402,7 +547,7 @@ if(isset($_POST['alergias'])){
             })
             $(".acessorios").each(function(){
                 $(this).on('click',function(e){
-                    if($(this).val() == 'SIM'){
+                    if($(this).val() == '1'){
                         $('#textAcessoriosViwer').removeClass('d-none');
                     }else{
                         $('#textAcessorios').val('');
@@ -422,7 +567,7 @@ if(isset($_POST['alergias'])){
             })
             $(".tricotomia").each(function(){
                 $(this).on('click',function(e){
-                    if($(this).val() == 'SIM'){
+                    if($(this).val() == '1'){
                         $('#textTricotomiaViwer').removeClass('d-none');
                     }else{
                         $('#textTricotomia').val('');
@@ -433,7 +578,7 @@ if(isset($_POST['alergias'])){
             })
             $(".esvaziamento").each(function(){
                 $(this).on('click',function(e){
-                    if($(this).val() == 'SIM'){
+                    if($(this).val() == '1'){
                         $('#textEsvaziamentoViwer').removeClass('d-none');
                     }else{
                         $('#textEsvaziamento').val('');
@@ -471,248 +616,409 @@ if(isset($_POST['alergias'])){
                 cantaCaracteres('textEsvaziamento', 150, 'caracteresInputEsvaziamento')
             })
 
-            $('#salvarAcessoModal').on('click',function(e){
-                e.preventDefault()
-            })
-            $('#salvarConcentimentoModal').on('click',function(e){
-                e.preventDefault()
-
-            })
-             $('#salvarExameModal').on('click',function(e){
-                e.preventDefault()
-
-             })
-
             $('#venosoBTN').on('click',function(e){
                 e.preventDefault()
+                if (idAtendimentoCirurgicoPreOperatorio == null) {
+                    alerta('Erro', 'Salve a Admissão antes de inserir um Acesso Venoso', 'error')
+                    return
+                }
                 $('#page-modal-acesso').fadeIn(200)
             })
 
             $('#termoBTN').on('click',function(e){
                 e.preventDefault()
+                if (idAtendimentoCirurgicoPreOperatorio == null) {
+                    alerta('Erro', 'Salve a Admissão antes de inserir um Termo de Consentimento', 'error')
+                    return
+                }
                 $('#page-modal-concentimento').fadeIn(200)
             })
 
             $('#examesBTN').on('click',function(e){
                 e.preventDefault()
+                if (idAtendimentoCirurgicoPreOperatorio == null) {
+                    alerta('Erro', 'Salve a Admissão antes de inserir um Exame Complementar', 'error')
+                    return
+                }
                 $('#page-modal-exames').fadeIn(200)
             })
 
             $('#addAcesso').on('click',function(e){
                 e.preventDefault()
+                let menssageError = ''
+
+                let dataHoraAcessoVenoso = $('#dataHoraAcessoVenoso').val()
+                let localPuncaoAcessoVenoso = $('#localPuncaoAcessoVenoso').val()
+                let calibreAcessoVenoso = $('#calibreAcessoVenoso').val()
+                let responsavelAcessoVenoso = $('#responsavelAcessoVenoso').val()
+
+                switch(menssageError){
+                    case dataHoraAcessoVenoso: menssageError = 'informe a data e hora do Acesso Venoso'; $('#dataHoraAcessoVenoso').focus();break;
+					case localPuncaoAcessoVenoso: menssageError = 'informe o local de punção do Acesso Venoso'; $('#localPuncaoAcessoVenoso').focus();break;
+                    case responsavelAcessoVenoso : menssageError = 'infomrme o responsãvel do Acesso Venoso'; $('#responsavelAcessoVenoso').focus();break;	
+					default: menssageError = ''; break;
+				}
+
+                if(menssageError){
+					alerta('Campo Obrigatório!', menssageError, 'error')
+					return
+				}
+
+                $('#addAcesso').prop('disabled', true);
+
                 $.ajax({
 					type: 'POST',
 					url: 'filtraAdmissaoCirurgicaPreOperatorio.php',
 					dataType: 'json',
 					data:{
-						'tipoRequest': 'ACESSOVENOSO',
-                        'data': $('#dataAcessoVenoso').val(),
-                        'hora': $('#horaAcessoVenoso').val(),
-                        'lado': $('#ladoAcessoVenoso').val(),
-                        'calibre': $('#calibreAcessoVenoso').val(),
-                        'responsavel': $('#responsavelAcessoVenoso').val(),
-
+						'tipoRequest': 'ADDACESSOVENOSO',
+                        'iAtendimentoCirurgicoPreOperatorio' : <?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $iAtendimentoCirurgicoPreOperatorio : 'null'; ?>,
+                        'idTemporaria' : <?php echo $iAtendimentoId; ?> ,
+                        'dataHoraAcessoVenoso' : dataHoraAcessoVenoso,
+                        'localPuncaoAcessoVenoso' : localPuncaoAcessoVenoso,
+                        'calibreAcessoVenoso' : calibreAcessoVenoso,
+                        'responsavelAcessoVenoso' : responsavelAcessoVenoso
 					},
 					success: function(response) {
-                        $('#dataAcessoVenoso').val('')
-                        $('#horaAcessoVenoso').val('')
-                        $('#ladoAcessoVenoso').val('')
-                        $('#calibreAcessoVenoso').val('')
-                        $('#responsavelAcessoVenoso').val('')
 
-                        cheackList()
+                        if(response.status == 'success'){
+
+                            alerta(response.titulo, response.menssagem, response.status)
+                            getAcessosVenosos();
+
+                            $('#addAcesso').prop('disabled', true);  
+
+                            $('#dataHoraAcessoVenoso').val('')
+                            $('#localPuncaoAcessoVenoso').val('')
+                            $('#calibreAcessoVenoso').val('')
+                            $('#responsavelAcessoVenoso').val('')  
+
+                        }else{
+                            alerta(response.titulo, response.menssagem, response.status)
+                            $('#addAcesso').prop('disabled', true);
+                        }
+
+
+                        //cheackList()
 					}
 				});
             })
-            $('#addConcentimento').on('click',function(e){
+            $('#addConsentimento').on('click',function(e){
+
                 e.preventDefault()
+                let menssageError = ''
+
+                let dataHoraConsentimento = $('#dataHoraConsentimento').val()
+                let descricaoConsentimento = $('#descricaoConsentimento').val()
+                let arquivoTermoConsentimento = $('#arquivoTermoConsentimento').val()
+                let fileTC = $('#arquivoTermoConsentimento').prop('files')[0]
+
+                switch(menssageError){
+                    case dataHoraConsentimento: menssageError = 'informe a data e hora do Termo de Consentimento'; $('#dataHoraConsentimento').focus();break;
+					case descricaoConsentimento: menssageError = 'informe a descrição do Termo de Consentimento'; $('#descricaoConsentimento').focus();break;
+                    case arquivoTermoConsentimento : menssageError = 'infomrme o arquivo do Termo de Consentimento'; $('#arquivoTermoConsentimento').focus();break;	
+					default: menssageError = ''; break;
+				}
+
+                if(menssageError){
+					alerta('Campo Obrigatório!', menssageError, 'error')
+					return
+				}
+
+                //Verifica se a extensão é  diferente de PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!
+				if (ext(arquivoTermoConsentimento) != 'pdf' && ext(arquivoTermoConsentimento) != 'doc' && ext(arquivoTermoConsentimento) != 'docx' && ext(arquivoTermoConsentimento) != 'odt' && ext(arquivoTermoConsentimento) != 'jpg' && ext(arquivoTermoConsentimento) != 'jpeg' && ext(arquivoTermoConsentimento) != 'png'){
+					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!','error');
+					$('#arquivoTermoConsentimento').focus();
+					return ;	
+				}
+
+                let tamanho =  1024 * 1024 * 32; //32MB
+				//Verifica o tamanho do arquivo
+				if (fileTC.size > tamanho){
+					alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 32MB.','error');
+					$('#arquivoTermoConsentimento').focus();
+					return ;
+				}
+
+                let form_data = new FormData();
+                
+                form_data.append('tipoRequest', 'ADDTERMOCONSENTIMENTO');
+                form_data.append('arquivoTermoConsentimento', $('#arquivoTermoConsentimento').prop('files')[0]);                  
+                form_data.append('dataHoraConsentimento', $("#dataHoraConsentimento").val());
+                form_data.append('descricaoConsentimento', $("#descricaoConsentimento").val());
+                form_data.append('iAtendimentoCirurgicoPreOperatorio', <?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $iAtendimentoCirurgicoPreOperatorio : 'null'; ?>);
+                form_data.append('idTemporaria', <?php echo $iAtendimentoId; ?>);
+
+                $('#addConsentimento').prop('disabled', true);
+
                 $.ajax({
 					type: 'POST',
 					url: 'filtraAdmissaoCirurgicaPreOperatorio.php',
 					dataType: 'json',
-					data:{
-						'tipoRequest': 'CONCENTIMENTO',
-                        'data': $('#dataConcentimento').val(),
-                        'hora': $('#horaConcentimento').val(),
-                        'descricao': $('#descricaoConcentimento').val()
-					},
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+					data: form_data ,
 					success: function(response) {
-                        $('#dataConcentimento').val('')
-                        $('#horaConcentimento').val('')
-                        $('#descricaoConcentimento').val('')
 
-                        cheackList()
+                        if(response.status == 'success'){
+
+                            alerta(response.titulo, response.menssagem, response.status)
+                            getTermosConsentimento();
+                            $('#addConsentimento').prop('disabled', false); 
+
+                        }else{
+                            alerta(response.titulo, response.menssagem, response.status)
+                            $('#addConsentimento').prop('disabled', false);
+                        }
+
+
+                        //cheackList()
 					}
 				});
             })
+
+
             $('#addExame').on('click',function(e){
+
                 e.preventDefault()
+                let menssageError = ''
+
+                let dataHoraExame = $('#dataHoraExame').val()
+                let descricaoExame = $('#descricaoExame').val()
+                let arquivoExame = $('#arquivoExame').val()
+                let fileExame = $('#arquivoExame').prop('files')[0]
+
+                switch(menssageError){
+                    case dataHoraExame: menssageError = 'informe a data e hora do Termo de Consentimento'; $('#dataHoraExame').focus();break;
+					case descricaoExame: menssageError = 'informe a descrição do Termo de Consentimento'; $('#descricaoExame').focus();break;
+                    case arquivoExame : menssageError = 'infomrme o arquivo do Termo de Consentimento'; $('#arquivoExame').focus();break;	
+					default: menssageError = ''; break;
+				}
+
+                if(menssageError){
+					alerta('Campo Obrigatório!', menssageError, 'error')
+					return
+				}
+
+                //Verifica se a extensão é  diferente de PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!
+				if (ext(arquivoExame) != 'pdf' && ext(arquivoExame) != 'doc' && ext(arquivoExame) != 'docx' && ext(arquivoExame) != 'odt' && ext(arquivoExame) != 'jpg' && ext(arquivoExame) != 'jpeg' && ext(arquivoExame) != 'png'){
+					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!','error');
+					$('#arquivoExame').focus();
+					return ;	
+				}
+
+                let tamanho =  1024 * 1024 * 32; //32MB
+				//Verifica o tamanho do arquivo
+				if (fileExame.size > tamanho){
+					alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 32MB.','error');
+					$('#arquivoExame').focus();
+					return ;
+				}
+
+                let form_data = new FormData();
+                
+                form_data.append('tipoRequest', 'ADDEXAMESCOMPLEMENTARES');
+                form_data.append('arquivoExame', $('#arquivoExame').prop('files')[0]);                  
+                form_data.append('dataHoraExame', $("#dataHoraExame").val());
+                form_data.append('descricaoExame', $("#descricaoExame").val());
+                form_data.append('iAtendimentoCirurgicoPreOperatorio', <?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $iAtendimentoCirurgicoPreOperatorio : 'null'; ?>);
+                form_data.append('idTemporaria', <?php echo $iAtendimentoId; ?>);
+
+                $('#addExame').prop('disabled', true);
+
                 $.ajax({
 					type: 'POST',
 					url: 'filtraAdmissaoCirurgicaPreOperatorio.php',
 					dataType: 'json',
-					data:{
-						'tipoRequest': 'EXAMES',
-                        'data': $('#dataExame').val(),
-                        'hora': $('#horaExame').val(),
-                        'descricao': $('#descricaoExame').val()
-					},
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+					data: form_data ,
 					success: function(response) {
-                        $('#dataExame').val('')
-                        $('#horaExame').val('')
-                        $('#descricaoExame').val('')
 
-                        cheackList()
+                        if(response.status == 'success'){
+
+                            alerta(response.titulo, response.menssagem, response.status) 
+                            getExamesComplementares();
+                            $('#addExame').prop('disabled', false);
+
+
+                        }else{
+                            alerta(response.titulo, response.menssagem, response.status)
+                            $('#addExame').prop('disabled', false);
+
+                        }
+
 					}
 				});
             })
 
             $('#salvarAdmissao').on('click', function(e){
                 e.preventDefault()
-                $.ajax({
-                    type: 'POST',
-                    url: 'filtraAdmissaoCirurgicaPreOperatorio.php',
-                    dataType: 'json',
-                    data:{
-                        'tipoRequest': 'SALVARADMISSAO',
-                    },
-                    success: function(response) {
-
-                    }
-                });
+                $("#formAdmissaoCirurgicaPreOperatorio").submit();
             })
 
             $('#modal-acesso-close-x').on('click', function(e){
                 e.preventDefault()
-                $('#tblAcessoVenosoViwer').addClass('d-none')
+                //$('#tblAcessoVenosoViwer').addClass('d-none')
                 $('#page-modal-acesso').fadeOut(200)
             })
             $('#modal-concentimento-close-x').on('click', function(e){
                 e.preventDefault()
-                $('#tblConcentimentoViwer').addClass('d-none')
+                //$('#tblConcentimentoViwer').addClass('d-none')
                 $('#page-modal-concentimento').fadeOut(200)
             })
             $('#modal-exames-close-x').on('click', function(e){
                 e.preventDefault()
-                $('#tblExameViwer').addClass('d-none')
+                //$('#tblExameViwer').addClass('d-none')
                 $('#page-modal-exames').fadeOut(200)
             })
             
 		}); //document.ready
 
-        function exclui(element){
+        function ext(path) {
+			var final = path.substr(path.lastIndexOf('/')+1);
+			var separador = final.lastIndexOf('.');
+			return separador <= 0 ? '' : final.substr(separador + 1);
+		}
+
+        function getAcessosVenosos(){
+
             $.ajax({
                 type: 'POST',
                 url: 'filtraAdmissaoCirurgicaPreOperatorio.php',
                 dataType: 'json',
                 data:{
-                    'tipoRequest': 'EXCLUIR',
-                    'id': $(element).data('id'),
-                    'tipo': $(element).data('tipo')
+                    'tipoRequest': 'GETACESSOSVENOSOS',
+                    'iAtendimentoCirurgicoPreOperatorio' : <?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $iAtendimentoCirurgicoPreOperatorio : 'null'; ?>,
                 },
                 success: function(response) {
-                    cheackList()
+
+                    $('#dataAcessoVenoso').html('');
+                    let HTML = ''
+                    
+                    response.forEach(item => {
+
+                        /*let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarTermoConsentimento(\"${item.id}\")'><i class='icon-files-empty' title='Copiar Termo'></i></a>`;
+                        let visualizarArquivo = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' href="global_assets/anexos/termoConsentimento/${item.arquivo}" target="_blank" > <i class='icon-file-eye' title='Visualizar Termo'></i> </a>`;*/
+                        let exc = `<a style='color: black; cursor:pointer' onclick='excluirAcessoVenoso(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Acesso Venoso'></i></a>`;
+                        let acoes = ``;                                              
+                   
+                        acoes = `<div class='list-icons'>
+                            ${exc}
+                        </div>`;
+                                            
+                        HTML += `
+                        <tr class='orientacaoItem'>
+                            <td class="text-left">${item.item}</td> 
+                            <td class="text-left">${item.dataHora}</td>
+                            <td class="text-left">${item.localPuncao}</td>
+                            <td class="text-left">${item.tipoCalibre}</td>                            
+                            <td class="text-left">${item.responsavelTecnico}</td>
+                            <td class="text-center">${acoes}</td>
+                        </tr>`
+
+                    })
+                    $('#dataAcessoVenoso').html(HTML).show();
                 }
             });
+
         }
-        function cheackList(){
+
+        function getTermosConsentimento(){
+
             $.ajax({
                 type: 'POST',
                 url: 'filtraAdmissaoCirurgicaPreOperatorio.php',
                 dataType: 'json',
                 data:{
-                    'tipoRequest': 'CHECKLIST'
+                    'tipoRequest': 'GETTERMOSCONSENTIMENTO',
+                    'iAtendimentoCirurgicoPreOperatorio' : <?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $iAtendimentoCirurgicoPreOperatorio : 'null'; ?>,
                 },
                 success: function(response) {
-                    // Acesso venoso listagem
-                        $('#tblAcessoVenoso').DataTable().clear().draw()
-                        let tableAcesso = $('#tblAcessoVenoso').DataTable()
-                        let rowNodeAcesso
-                        let rowsAcesso = [];
-                        if(response.acesso.length){
-                            $('#tblAcessoVenosoViwer').removeClass('d-none')
-                            response.acesso.forEach((item, index) => {
-                                rowsAcesso.push([
-                                    index+1,
-                                    item.dataHora,
-                                    item.lado == 'DI'?'Direito':'Esquerdo',
-                                    item.calibre,
-                                    item.responsavel,
-                                    item.acoes
-                                ])
-                            })
-                            rowsAcesso.forEach((item, index) => {
-                                rowNodeAcesso = tableAcesso.row.add(item).draw().node()
-                                // $(rowNodeAcesso).attr('class', 'text-left')
-                                // $(rowNodeAcesso).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
-                            })
-                        }else{
-                            $('#tblAcessoVenosoViwer').addClass('d-none')
-                        }
-                    //
-                    // Concentimento listagem
-                        $('#tblConcentimento').DataTable().clear().draw()
-                        let tableConcentimento = $('#tblConcentimento').DataTable()
-                        let rowNodeConcentimento
-                        let rowsConcentimento = [];
 
-                        if(response.concentimento.length){
-                            $('#tblConcentimentoViwer').removeClass('d-none')
-                            response.concentimento.forEach((item, index) => {
-                                rowsConcentimento.push([
-                                    index+1,
-                                    item.dataHora,
-                                    item.descricao,
-                                    item.acoes
-                                ])
-                            })
-                            rowsConcentimento.forEach((item, index) => {
-                                rowNodeConcentimento = tableConcentimento.row.add(item).draw().node()
-                                // $(rowNodeConcentimento).attr('class', 'text-left')
-                                // $(rowNodeConcentimento).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
-                            })
-                        }else{
-                            $('#tblConcentimentoViwer').addClass('d-none')
-                        }
-                    //
-                    // Exames listagem
-                        $('#tblExame').DataTable().clear().draw()
-                        let tableExame = $('#tblExame').DataTable()
-                        let rowNodeExame
-                        let rowsExame = [];
+                    $('#dataTermoConsentimento').html('');
+                    let HTML = ''
+                    
+                    response.forEach(item => {
 
-                        if(response.exames.length){
-                            $('#tblExameViwer').removeClass('d-none')
-                            response.exames.forEach((item, index) => {
-                                rowsExame.push([
-                                    index+1,
-                                    item.dataHora,
-                                    item.descricao,
-                                    item.acoes
-                                ])
-                            })
-                            rowsExame.forEach((item, index) => {
-                                rowNodeExame = tableExame.row.add(item).draw().node()
-                                // $(rowNodeConcentimento).attr('class', 'text-left')
-                                // $(rowNodeConcentimento).find('td:eq(3)').attr('title', `Prontuário: ${item.identify.prontuario}`)
-                            })
-                        }else{
-                            $('#tblExameViwer').addClass('d-none')
-                        }
-                    //
+                        /*let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarTermoConsentimento(\"${item.id}\")'><i class='icon-files-empty' title='Copiar Termo'></i></a>`;*/
+                        let visualizarArquivo = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' href="global_assets/anexos/termoConsentimentoAdCirPreOperatorio/${item.arquivo}" target="_blank" > <i class='icon-file-eye' title='Visualizar Termo'></i> </a>`;
+                        let exc = `<a style='color: black; cursor:pointer' onclick='excluirTermo(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Termo'></i></a>`;
+                        let acoes = ``;                                              
+                   
+                        acoes = `<div class='list-icons'>
+                            ${visualizarArquivo}
+                            ${exc}
+                        </div>`;
+                                            
+                        HTML += `
+                        <tr class='orientacaoItem'>
+                            <td class="text-left">${item.item}</td> 
+                            <td class="text-left">${item.dataHora}</td>                          
+                            <td class="text-left">${item.descricao}</td>
+                            <td class="text-center">${acoes}</td>
+                        </tr>`
+
+                    })
+                    $('#dataTermoConsentimento').html(HTML).show();
                 }
             });
+
         }
 
-        // $.ajax({
-        //     type: 'POST',
-        //     url: 'filtraAdmissaoCirurgicaPreOperatorio.php',
-        //     dataType: 'json',
-        //     data:{
-        //         'tipoRequest': 'ACESSOVENOSO',
-        //     },
-        //     success: function(response) {}
-        // });
+        function getExamesComplementares(){
+
+            $.ajax({
+                type: 'POST',
+                url: 'filtraAdmissaoCirurgicaPreOperatorio.php',
+                dataType: 'json',
+                data:{
+                    'tipoRequest': 'GETEXAMESCOMPLEMENTARES',
+                    'iAtendimentoCirurgicoPreOperatorio' : <?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $iAtendimentoCirurgicoPreOperatorio : 'null'; ?>,
+                },
+                success: function(response) {
+
+                    $('#dataExame').html('');
+                    let HTML = ''
+                    
+                    response.forEach(item => {
+
+                        /*let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarTermoConsentimento(\"${item.id}\")'><i class='icon-files-empty' title='Copiar Termo'></i></a>`;*/
+                        let visualizarArquivo = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' href="global_assets/anexos/examesComplementaresImagensAdCirPreOperatorio/${item.arquivo}" target="_blank" > <i class='icon-file-eye' title='Visualizar Exame'></i> </a>`;
+                        let exc = `<a style='color: black; cursor:pointer' onclick='excluirExame(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Exame'></i></a>`;
+                        let acoes = ``;                                              
+                   
+                        acoes = `<div class='list-icons'>
+                            ${visualizarArquivo}
+                            ${exc}
+                        </div>`;
+                                            
+                        HTML += `
+                        <tr class='orientacaoItem'>
+                            <td class="text-left">${item.item}</td> 
+                            <td class="text-left">${item.dataHora}</td>                          
+                            <td class="text-left">${item.descricao}</td>
+                            <td class="text-center">${acoes}</td>
+                        </tr>`
+
+                    })
+                    $('#dataExame').html(HTML).show();
+                }
+            });
+
+        }
+
+        function excluirAcessoVenoso(id){
+            confirmaExclusaoAjax('filtraAdmissaoCirurgicaPreOperatorio.php', 'Excluir Acesso Venoso?', 'DELETEACESSOVENOSO', id, getAcessosVenosos)
+        }
+        function excluirTermo(id){
+            confirmaExclusaoAjax('filtraAdmissaoCirurgicaPreOperatorio.php', 'Excluir Termo de Consentimento?', 'DELETETERMO', id, getTermosConsentimento)           
+        }
+        function excluirExame(id){
+            confirmaExclusaoAjax('filtraAdmissaoCirurgicaPreOperatorio.php', 'Excluir Exame?', 'DELETEEXAME', id, getExamesComplementares)          
+        }        
 
 	</script>
 
@@ -757,7 +1063,7 @@ if(isset($_POST['alergias'])){
 							?>
 						</form>
 						<!-- Basic responsive configuration -->
-						<form name="formAtendimentoAdmissaoPediatrica" id="formAtendimentoAdmissaoPediatrica" method="post">
+						<form name="formAdmissaoCirurgicaPreOperatorio" id="formAdmissaoCirurgicaPreOperatorio" method="post">
 							<?php
 								echo "<input type='hidden' id='iAtendimentoId' name='iAtendimentoId' value='$iAtendimentoId' />";
 							?>
@@ -810,34 +1116,25 @@ if(isset($_POST['alergias'])){
                                       
                                         <!-- linha 1 -->
                                         <div class="col-lg-12 mb-3 row">
-                                            <!-- titulos -->
+                                                                              
                                             <div class="col-lg-3">
                                                 <label>Alergias</label>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label>Uso de medicamentos</label>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label>História de Cirurgia Anterior</label>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label>Jejum Mínimo (8 horas)</label>
-                                            </div>
-                                            
-                                            <!-- campos -->                                            
-                                            <div class="col-lg-3">
-                                                <div class="col-lag-12 row options">
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="alergias" class="alergias" placeholder="" value="SIM">
-                                                        <label>SIM</label>
+                                                <div class="col-lg-12 row options">
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="alergias" class="alergias form-input-styled" placeholder="" value="1" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCAlergia'] == '1' ? 'checked' : ''; ?> >
+                                                            SIM
+                                                        </label>
                                                     </div>
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="alergias" class="alergias" placeholder="" value="NÃO">
-                                                        <label>NÃO</label>
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="alergias" class="alergias form-input-styled" placeholder="" value="0" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCAlergia'] == '0' ? 'checked' : ''; ?> >
+                                                            NÃO
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div id="textAlergiasViwer" class="d-none">
-                                                    <textarea id="textAlergias" name="textAlergias" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
+                                                <div id="textAlergiasViwer" class="<?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCAlergia'] == '1' ? '' : 'd-none'; ?>">
+                                                    <textarea id="textAlergias" name="textAlergias" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ><?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCAlergiaDescricao'] : ''; ?></textarea>
                                                     <small class="text-muted form-text">
                                                         Máx. 150 caracteres<br>
                                                         <span id="caracteresInputAlergias"></span>
@@ -846,18 +1143,23 @@ if(isset($_POST['alergias'])){
                                             </div>
 
                                             <div class="col-lg-3">
-                                                <div class="col-lag-12 row options">
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="medicamentos" class="medicamentos" placeholder="" value="SIM">
-                                                        <label>SIM</label>
+                                                <label>Uso de medicamentos</label>
+                                                <div class="col-lg-12 row options">
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="medicamentos" class="medicamentos form-input-styled" placeholder="" value="1" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCUsoMedicamento'] == '1' ? 'checked' : ''; ?> >
+                                                            SIM
+                                                        </label>
                                                     </div>
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="medicamentos" class="medicamentos" placeholder="" value="NÃO">
-                                                        <label>NÃO</label>
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="medicamentos" class="medicamentos form-input-styled" placeholder="" value="0" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCUsoMedicamento'] == '0' ? 'checked' : ''; ?> >
+                                                            NÃO
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div id="textMedicamentosViwer" class="d-none">
-                                                    <textarea id="textMedicamentos" name="textMedicamentos" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
+                                                <div id="textMedicamentosViwer" class="<?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCUsoMedicamento'] == '1' ? '' : 'd-none'; ?>">
+                                                    <textarea id="textMedicamentos" name="textMedicamentos" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ><?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCUsoMedicamentoDescricao'] : ''; ?></textarea>
                                                     <small class="text-muted form-text">
                                                         Máx. 150 caracteres<br>
                                                         <span id="caracteresInputMedicamentos"></span>
@@ -866,18 +1168,23 @@ if(isset($_POST['alergias'])){
                                             </div>
 
                                             <div class="col-lg-3">
-                                                <div class="col-lag-12 row options">
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="cirurgiaAnterior" class="cirurgiaAnterior" placeholder="" value="SIM">
-                                                        <label>SIM</label>
+                                                <label>História de Cirurgia Anterior</label>
+                                                <div class="col-lg-12 row options">
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="cirurgiaAnterior" class="cirurgiaAnterior form-input-styled" placeholder="" value="1" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCHistCirurgiaAnterior'] == '1' ? 'checked' : ''; ?> >
+                                                            SIM
+                                                        </label>
                                                     </div>
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="cirurgiaAnterior" class="cirurgiaAnterior" placeholder="" value="NÃO">
-                                                        <label>NÃO</label>
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="cirurgiaAnterior" class="cirurgiaAnterior form-input-styled" placeholder="" value="0" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCHistCirurgiaAnterior'] == '0' ? 'checked' : ''; ?> >
+                                                            NÃO
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div id="textCirurgiaAnteriorViwer" class="d-none">
-                                                    <textarea id="textCirurgiaAnterior" name="textCirurgiaAnterior" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
+                                                <div id="textCirurgiaAnteriorViwer" class="<?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCHistCirurgiaAnterior'] == '1' ? '' : 'd-none'; ?>">
+                                                    <textarea id="textCirurgiaAnterior" name="textCirurgiaAnterior" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ><?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCHistCirurgiaAnteriorDescricao'] : ''; ?></textarea>
                                                     <small class="text-muted form-text">
                                                         Máx. 150 caracteres<br>
                                                         <span id="caracteresInputCirurgiaAnterior"></span>
@@ -886,18 +1193,23 @@ if(isset($_POST['alergias'])){
                                             </div>
 
                                             <div class="col-lg-3">
-                                                <div class="col-lag-12 row options">
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="jejum" class="jejum" placeholder="" value="SIM">
-                                                        <label>SIM</label>
+                                                <label>Jejum Mínimo (8 horas)</label>
+                                                <div class="col-lg-12 row options">
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="jejum" class="jejum form-input-styled" placeholder="" value="1" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCJejumMinimo'] == '1' ? 'checked' : ''; ?> >
+                                                            SIM
+                                                        </label>
                                                     </div>
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="jejum" class="jejum" placeholder="" value="NÃO">
-                                                        <label>NÃO</label>
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="jejum" class="jejum form-input-styled" placeholder="" value="0" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCJejumMinimo'] == '0' ? 'checked' : ''; ?> >
+                                                            NÃO
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div id="textJejumViwer" class="d-none">
-                                                    <textarea id="textJejum" name="textJejum" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
+                                                <div id="textJejumViwer" class="<?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCJejumMinimo'] == '1' ? '' : 'd-none'; ?>">
+                                                    <textarea id="textJejum" name="textJejum" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ><?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCJejumMinimoDescricao'] : ''; ?></textarea>
                                                     <small class="text-muted form-text">
                                                         Máx. 150 caracteres<br>
                                                         <span id="caracteresInputJejum"></span>
@@ -908,34 +1220,25 @@ if(isset($_POST['alergias'])){
 
                                         <!-- linha 2 -->
                                         <div class="col-lg-12 mb-3 row">
-                                            <!-- titulos -->
+                                                                                       
                                             <div class="col-lg-3">
                                                 <label>Uso de Próteses</label>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label>Remoção de Jóias e Acessórios</label>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label>Doenças Prévias</label>
-                                            </div>
-                                            <div class="col-lg-3">
-                                                <label>Área Operatória Tricotomia</label>
-                                            </div>
-                                            
-                                            <!-- campos -->                                            
-                                            <div class="col-lg-3">
-                                                <div class="col-lag-12 row options">
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="proteses" class="proteses" placeholder="" value="SIM">
-                                                        <label>SIM</label>
+                                                <div class="col-lg-12 row options">
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="proteses" class="proteses form-input-styled" placeholder="" value="1" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCUsoProtese'] == '1' ? 'checked' : ''; ?> >
+                                                            SIM
+                                                        </label>
                                                     </div>
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="proteses" class="proteses" placeholder="" value="NÃO">
-                                                        <label>NÃO</label>
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="proteses" class="proteses form-input-styled" placeholder="" value="0" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCUsoProtese'] == '0' ? 'checked' : ''; ?> >
+                                                            NÃO
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div id="textProtesesViwer" class="d-none">
-                                                    <textarea id="textProteses" name="textProteses" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
+                                                <div id="textProtesesViwer" class="<?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCUsoProtese'] == '1' ? '' : 'd-none'; ?>">
+                                                    <textarea id="textProteses" name="textProteses" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ><?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCUsoProteseDescricao'] : ''; ?></textarea>
                                                     <small class="text-muted form-text">
                                                         Máx. 150 caracteres<br>
                                                         <span id="caracteresInputProteses"></span>
@@ -944,18 +1247,23 @@ if(isset($_POST['alergias'])){
                                             </div>
 
                                             <div class="col-lg-3">
-                                                <div class="col-lag-12 row options">
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="acessorios" class="acessorios" placeholder="" value="SIM">
-                                                        <label>SIM</label>
+                                                <label>Remoção de Jóias e Acessórios</label>
+                                                <div class="col-lg-12 row options">
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="acessorios" class="acessorios form-input-styled" placeholder="" value="1" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCRemocaoJoia'] == '1' ? 'checked' : ''; ?> >
+                                                            SIM
+                                                        </label>
                                                     </div>
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="acessorios" class="acessorios" placeholder="" value="NÃO">
-                                                        <label>NÃO</label>
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="acessorios" class="acessorios form-input-styled" placeholder="" value="0" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCRemocaoJoia'] == '0' ? 'checked' : ''; ?> >
+                                                            NÃO
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div id="textAcessoriosViwer" class="d-none">
-                                                    <textarea id="textAcessorios" name="textAcessorios" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
+                                                <div id="textAcessoriosViwer" class="<?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCRemocaoJoia'] == '1' ? '' : 'd-none'; ?>">
+                                                    <textarea id="textAcessorios" name="textAcessorios" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ><?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCRemocaoJoiaDescricao'] : ''; ?></textarea>
                                                     <small class="text-muted form-text">
                                                         Máx. 150 caracteres<br>
                                                         <span id="caracteresInputAcessorios"></span>
@@ -964,15 +1272,23 @@ if(isset($_POST['alergias'])){
                                             </div>
 
                                             <div class="col-lg-3">
-                                                <div class="col-lag-12 row options">
+                                                <label>Doenças Prévias</label>
+                                                <div class="col-lg-12 row options">
                                                     <select id="doencas" name="doencas" class="select-search">
                                                         <option value=''>selecione</option>
-                                                        <option value='1'>teste</option>
-                                                        <option value='2'>teste2</option>
+                                                        <option value='RC' <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCDoencaPrevia'] == 'RC' ? 'selected' : ''; ?> >Doenças respiratórias crônicas</option>
+                                                        <option value='CC' <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCDoencaPrevia'] == 'CC' ? 'selected' : ''; ?> >Doenças cardíacas crônicas</option>
+                                                        <option value='DI' <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCDoencaPrevia'] == 'DI' ? 'selected' : ''; ?> >Diabetes</option>
+                                                        <option value='DC' <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCDoencaPrevia'] == 'DC' ? 'selected' : ''; ?> >Portador de doenças cromossônicas</option>
+                                                        <option value='DF' <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCDoencaPrevia'] == 'DF' ? 'selected' : ''; ?> >Portador de doenças de fragilidade imunológicas</option>
+                                                        <option value='IM' <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCDoencaPrevia'] == 'IM' ? 'selected' : ''; ?> >Imunossupressão</option>
+                                                        <option value='DR' <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCDoencaPrevia'] == 'DR' ? 'selected' : ''; ?> >Doenças renais crônicas em estágio avançado (3, 4 e 5)</option>
+                                                        <option value='HA' <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCDoencaPrevia'] == 'HA' ? 'selected' : ''; ?> >HAS</option>
+                                                        <option value='OU' <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCDoencaPrevia'] == 'OU' ? 'selected' : ''; ?> >Outros</option>
                                                     </select>
                                                 </div>
-                                                <div id="textDoencasViwer" class="d-none">
-                                                    <textarea id="textDoencas" name="textDoencas" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
+                                                <div id="textDoencasViwer" class="<?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCDoencaPrevia'] == 'OU' ? '' : 'd-none'; ?> ">
+                                                    <textarea id="textDoencas" name="textDoencas" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ><?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCDoencaPreviaDescricao'] : ''; ?></textarea>
                                                     <small class="text-muted form-text">
                                                         Máx. 150 caracteres<br>
                                                         <span id="caracteresInputDoencas"></span>
@@ -981,18 +1297,23 @@ if(isset($_POST['alergias'])){
                                             </div>
 
                                             <div class="col-lg-3">
-                                                <div class="col-lag-12 row options">
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="tricotomia" class="tricotomia" placeholder="" value="SIM">
-                                                        <label>SIM</label>
+                                                <label>Área Operatória Tricotomia</label>
+                                                <div class="col-lg-12 row options">
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="tricotomia" class="tricotomia form-input-styled" placeholder="" value="1" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCAreaOperatoria'] == '1' ? 'checked' : ''; ?> >
+                                                            SIM
+                                                        </label>
                                                     </div>
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="tricotomia" class="tricotomia" placeholder="" value="NÃO">
-                                                        <label>NÃO</label>
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="tricotomia" class="tricotomia form-input-styled" placeholder="" value="0" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCAreaOperatoria'] == '0' ? 'checked' : ''; ?> >
+                                                            NÃO
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div id="textTricotomiaViwer" class="d-none">
-                                                    <textarea id="textTricotomia" name="textTricotomia" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
+                                                <div id="textTricotomiaViwer" class="<?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCAreaOperatoria'] == '1' ? '' : 'd-none'; ?>">
+                                                    <textarea id="textTricotomia" name="textTricotomia" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ><?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCAreaOperatoriaDescricao'] : ''; ?></textarea>
                                                     <small class="text-muted form-text">
                                                         Máx. 150 caracteres<br>
                                                         <span id="caracteresInputTricotomia"></span>
@@ -1019,19 +1340,11 @@ if(isset($_POST['alergias'])){
                                             
                                             <!-- campos -->                                            
                                             <div class="col-lg-3">
-                                                <select id="local" name="local" class="select-search">
-                                                    <option value=''>selecione</option>
-                                                    <option value='1'>teste</option>
-                                                    <option value='2'>teste2</option>
-                                                </select>
+                                                <input type="text" name="local" id="local" class="form-control" maxLength="100" value="<?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCLocalCirurgia'] : ''; ?>">
                                             </div>
 
                                             <div class="col-lg-3">
-                                                <select id="lado" name="lado" class="select-search">
-                                                    <option value=''>selecione</option>
-                                                    <option value='1'>teste</option>
-                                                    <option value='2'>teste2</option>
-                                                </select>
+                                                <input type="text" name="lado" id="lado" class="form-control" maxLength="60" value="<?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCLado'] : ''; ?>">
                                             </div>
 
                                             <div class="col-lg-3">
@@ -1041,18 +1354,22 @@ if(isset($_POST['alergias'])){
                                             </div>
 
                                             <div class="col-lg-3">
-                                                <div class="col-lag-12 row options">
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="esvaziamento" class="esvaziamento" placeholder="" value="SIM">
-                                                        <label>SIM</label>
+                                                <div class="col-lg-12 row options">
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="esvaziamento" class="esvaziamento form-input-styled" placeholder="" value="1" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCEsvaziamentoVesical'] == '1' ? 'checked' : ''; ?> >
+                                                            SIM
+                                                        </label>
                                                     </div>
-                                                    <div class="col-lg-3">
-                                                        <input type="radio" name="esvaziamento" class="esvaziamento" placeholder="" value="NÃO">
-                                                        <label>NÃO</label>
+                                                    <div class="col-lg-3 form-check form-check-inline">
+                                                        <label class="form-check-label">
+                                                            <input type="radio" name="esvaziamento" class="esvaziamento form-input-styled" placeholder="" value="0" <?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCEsvaziamentoVesical'] == '0' ? 'checked' : ''; ?> >
+                                                            NÃO
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div id="textEsvaziamentoViwer" class="d-none position-absolute" style="width:100%;">
-                                                    <textarea id="textEsvaziamento" name="textEsvaziamento" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ></textarea>
+                                                <div id="textEsvaziamentoViwer" class="<?php if (isset($iAtendimentoCirurgicoPreOperatorio )) echo $rowAdmissao['EnAdCEsvaziamentoVesical'] == '1' ? '' : 'd-none'; ?> position-absolute" style="width:100%;">
+                                                    <textarea id="textEsvaziamento" name="textEsvaziamento" class="form-control" rows="4" cols="4" maxLength="150" placeholder="" ><?php echo isset($iAtendimentoCirurgicoPreOperatorio) ? $rowAdmissao['EnAdCEsvaziamentoVesicalDescricao'] : ''; ?></textarea>
                                                     <small class="text-muted form-text">
                                                         Máx. 150 caracteres<br>
                                                         <span id="caracteresInputEsvaziamento"></span>
@@ -1125,11 +1442,8 @@ if(isset($_POST['alergias'])){
                                                         <!-- linha 1 -->
                                                         <div class="col-lg-12 m-0 p-0 mb-3 row">
                                                             <!-- titulos -->
-                                                            <div class="col-lg-2">
-                                                                <label>Data</label>
-                                                            </div>
-                                                            <div class="col-lg-2">
-                                                                <label>Hora</label>
+                                                            <div class="col-lg-3">
+                                                                <label>Data / Hora</label>
                                                             </div>
                                                             <div class="col-lg-3">
                                                                 <label>Local de punção</label>
@@ -1137,33 +1451,26 @@ if(isset($_POST['alergias'])){
                                                             <div class="col-lg-2">
                                                                 <label>Tipo/Calibre</label>
                                                             </div>
-                                                            <div class="col-lg-2">
+                                                            <div class="col-lg-3">
                                                                 <label>Responsável Técnico</label>
                                                             </div>
                                                             <div class="col-lg-1">
                                                             </div>
                                                             
                                                             <!-- campos -->
-                                                            <div class="col-lg-2">
-                                                                <input id="dataAcessoVenoso" class="form-control" type="date" name="dataAcessoVenoso">
-                                                            </div>
-                                                            <div class="col-lg-2">
-                                                                <input id="horaAcessoVenoso" class="form-control" type="time" name="horaAcessoVenoso">
+                                                            <div class="col-lg-3">
+                                                                <input id="dataHoraAcessoVenoso" class="form-control" type="datetime-local" name="dataHoraAcessoVenoso">
                                                             </div>
 
                                                             <div class="col-lg-3">
-                                                                <select id="ladoAcessoVenoso" name="ladoAcessoVenoso" class="select-search">
-                                                                    <option value=''>selecione</option>
-                                                                    <option value='ES'>Esquerdo</option>
-                                                                    <option value='DI'>Direito</option>
-                                                                </select>
+                                                                <input id="localPuncaoAcessoVenoso" class="form-control" type="text" name="localPuncaoAcessoVenoso">
                                                             </div>
 
                                                             <div class="col-lg-2">
                                                                 <input id="calibreAcessoVenoso" class="form-control" type="text" name="calibreAcessoVenoso">
                                                             </div>
 
-                                                            <div class="col-lg-2">
+                                                            <div class="col-lg-3">
                                                                 <input id="responsavelAcessoVenoso" class="form-control" type="text" name="responsavelAcessoVenoso">
                                                             </div>
                                                             <div class="col-lg-1">
@@ -1174,29 +1481,26 @@ if(isset($_POST['alergias'])){
                                                         </div>
                                                     </form>
 
-                                                    <div id="tblAcessoVenosoViwer" class="d-none">
-                                                        <table class="table" id="tblAcessoVenoso">
-                                                            <thead>
-                                                                <tr class="bg-slate">
-                                                                    <th>Item</th>
-                                                                    <th>Data/Hora</th>
-                                                                    <th>Local</th>
-                                                                    <th>Tipo</th>										
-                                                                    <th>Responsável</th>
-                                                                    <th class="text-center">Ações</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-    
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
+                                                    
+                                                    <table class="table" id="tblAcessoVenoso">
+                                                        <thead>
+                                                            <tr class="bg-slate">
+                                                                <th>Item</th>
+                                                                <th>Data/Hora</th>
+                                                                <th>Local</th>
+                                                                <th>Tipo</th>										
+                                                                <th>Responsável</th>
+                                                                <th class="text-center">Ações</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="dataAcessoVenoso">
+
+                                                        </tbody>
+                                                    </table>
+                                                    
                                                 </div>
                                             </div>
 
-                                            <div class="text-left m-2">
-                                                <button id="salvarAcessoModal" class="btn btn-success" role="button">Confirmar</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1212,64 +1516,60 @@ if(isset($_POST['alergias'])){
                                         <div class="px-0" style="overflow-y: scroll;">
                                             <div class="d-flex flex-row">
                                                 <div class="col-lg-12">
-                                                    <form id="novoConcentimento" name="novoConcentimento" method="POST" class="form-validate-jquery">
+                                                    <form id="novoConsentimento" name="novoConsentimento" method="POST" class="form-validate-jquery">
                                                         <!-- linha 1 -->
                                                         <div class="col-lg-12 m-0 p-0 mb-3 row">
                                                             <!-- titulos -->
-                                                            <div class="col-lg-2">
-                                                                <label>Data</label>
+                                                            <div class="col-lg-3">
+                                                                <label>Data/Hora</label>
                                                             </div>
-                                                            <div class="col-lg-2">
-                                                                <label>Hora</label>
-                                                            </div>
-                                                            <div class="col-lg-7">
+                                                            <div class="col-lg-5">
                                                                 <label>Desclição</label>
+                                                            </div>
+                                                            <div class="col-lg-3">
+                                                                <label>Arquivo</label>
                                                             </div>
                                                             <div class="col-lg-1">
                                                                 <!-- btn -->
                                                             </div>
                                                             
                                                             <!-- campos -->
-                                                            <div class="col-lg-2">
-                                                                <input id="dataConcentimento" class="form-control" type="date" name="dataConcentimento">
+                                                            <div class="col-lg-3">
+                                                                <input id="dataHoraConsentimento" class="form-control" type="datetime-local" name="dataHoraConsentimento">
                                                             </div>
-                                                            <div class="col-lg-2">
-                                                                <input id="horaConcentimento" class="form-control" type="time" name="horaConcentimento">
+                                                            <div class="col-lg-5">
+                                                                <input id="descricaoConsentimento" class="form-control" type="text" name="descricaoConsentimento">
                                                             </div>
-
-                                                            <div class="col-lg-7">
-                                                                <input id="descricaoConcentimento" class="form-control" type="text" name="descricaoConcentimento">
+                                                            <div class="col-lg-3">
+                                                                <input id="arquivoTermoConsentimento" class="form-control" type="file" name="arquivoTermoConsentimento">
                                                             </div>
 
                                                             <div class="col-lg-1">
-                                                                <button id="addConcentimento" class="btn btn-lg btn-principal p-0 m-0" style="width:50px; height:35px;">
+                                                                <button id="addConsentimento" class="btn btn-lg btn-principal p-0 m-0" style="width:50px; height:35px;">
                                                                     <i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
                                                                 </button>
                                                             </div>
                                                         </div>
                                                     </form>
 
-                                                    <div id="tblConcentimentoViwer" class="d-none">
-                                                        <table class="table" id="tblConcentimento">
-                                                            <thead>
-                                                                <tr class="bg-slate">
-                                                                    <th>Item</th>
-                                                                    <th>Data/Hora</th>
-                                                                    <th>Descrição</th>
-                                                                    <th class="text-center">Ações</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-    
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
+                                                    
+                                                    <table class="table" id="tblConcentimento">
+                                                        <thead>
+                                                            <tr class="bg-slate">
+                                                                <th>Item</th>
+                                                                <th>Data/Hora</th>
+                                                                <th>Descrição</th>
+                                                                <th class="text-center">Ações</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="dataTermoConsentimento">
+
+                                                        </tbody>
+                                                    </table>
+                                                    
                                                 </div>
                                             </div>
 
-                                            <div class="text-left m-2">
-                                                <button id="salvarConcentimentoModal" class="btn btn-success" role="button">Confirmar</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1289,29 +1589,30 @@ if(isset($_POST['alergias'])){
                                                         <!-- linha 1 -->
                                                         <div class="col-lg-12 m-0 p-0 mb-3 row">
                                                             <!-- titulos -->
-                                                            <div class="col-lg-2">
-                                                                <label>Data</label>
+                                                            <div class="col-lg-3">
+                                                                <label>Data/Hora</label>
                                                             </div>
-                                                            <div class="col-lg-2">
-                                                                <label>Hora</label>
+                                                            <div class="col-lg-5">
+                                                                <label>Descrição</label>
                                                             </div>
-                                                            <div class="col-lg-7">
-                                                                <label>Desclição</label>
+                                                            <div class="col-lg-3">
+                                                                <label>Arquivo</label>
                                                             </div>
                                                             <div class="col-lg-1">
                                                                 <!-- btn -->
                                                             </div>
                                                             
                                                             <!-- campos -->
-                                                            <div class="col-lg-2">
-                                                                <input id="dataExame" class="form-control" type="date" name="dataExame">
-                                                            </div>
-                                                            <div class="col-lg-2">
-                                                                <input id="horaExame" class="form-control" type="time" name="horaExame">
+                                                            <div class="col-lg-3">
+                                                                <input id="dataHoraExame" class="form-control" type="datetime-local" name="dataHoraExame">
                                                             </div>
 
-                                                            <div class="col-lg-7">
+                                                            <div class="col-lg-5">
                                                                 <input id="descricaoExame" class="form-control" type="text" name="descricaoExame">
+                                                            </div>
+
+                                                            <div class="col-lg-3">
+                                                                <input id="arquivoExame" class="form-control" type="file" name="arquivoExame">
                                                             </div>
 
                                                             <div class="col-lg-1">
@@ -1322,27 +1623,24 @@ if(isset($_POST['alergias'])){
                                                         </div>
                                                     </form>
 
-                                                    <div id="tblExameViwer" class="d-none">
-                                                        <table class="table" id="tblExame">
-                                                            <thead>
-                                                                <tr class="bg-slate">
-                                                                    <th>Item</th>
-                                                                    <th>Data/Hora</th>
-                                                                    <th>Descrição</th>
-                                                                    <th class="text-center">Ações</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-    
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
+                                                    
+                                                    <table class="table" id="tblExame">
+                                                        <thead>
+                                                            <tr class="bg-slate">
+                                                                <th>Item</th>
+                                                                <th>Data/Hora</th>
+                                                                <th>Descrição</th>
+                                                                <th class="text-center">Ações</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="dataExame">
+
+                                                        </tbody>
+                                                    </table>
+                                                    
                                                 </div>
                                             </div>
 
-                                            <div class="text-left m-2">
-                                                <button id="salvarExameModal" class="btn btn-success" role="button">Confirmar</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
