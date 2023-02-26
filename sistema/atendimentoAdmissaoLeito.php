@@ -55,8 +55,10 @@ if ($row['ClienSexo'] == 'F'){
 
 //Se estiver inserindo
 if(isset($_POST['caraterInternaacao']) && isset($_POST['iLeitoId'])){
-	$sql = "SELECT LeitoEspecialidade
+	$sql = "SELECT VnLeiEspecialidadeLeito
       FROM Leito
+	  JOIN VincularLeitoXLeito ON VLXLeLeito = LeitoId
+      JOIN VincularLeito ON VnLeiId = VLXLeVinculaLeito
       WHERE LeitoUnidade = $iUnidade and LeitoId = $_POST[iLeitoId]";
 	$result = $conn->query($sql);
 	$result = $result->fetch(PDO::FETCH_ASSOC);
@@ -65,7 +67,7 @@ if(isset($_POST['caraterInternaacao']) && isset($_POST['iLeitoId'])){
 
 	$sql = "INSERT INTO AtendimentoXLeito(AtXLeAtendimento,AtXLeCaraterInternacao,AtXLeLeito,
 		AtXLeEspecialidadeLeito,AtXLeDataHoraInicio,AtXLeUsuarioAtualizador,AtXLeUnidade)
-		VALUES($iAtendimentoId,$_POST[caraterInternaacao],$_POST[iLeitoId],$result[LeitoEspecialidade],'$inicio',$_SESSION[UsuarId],$iUnidade)";
+		VALUES($iAtendimentoId,$_POST[caraterInternaacao],$_POST[iLeitoId],$result[VnLeiEspecialidadeLeito],'$inicio',$_SESSION[UsuarId],$iUnidade)";
 	$result = $conn->query($sql);
 
 	irpara('atendimento.php');

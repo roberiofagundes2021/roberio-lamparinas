@@ -49,11 +49,14 @@ try{
     $result = $conn->query($sql);
     $resultQuartos = $result->fetchAll(PDO::FETCH_ASSOC);
 
-    $sql = "SELECT LeitoId,QuartId,LeitoNome,QuartNome,TpIntNome,EsLeiNome,LeitoStatus,LeitoUsuarioAtualizador,LeitoUnidade,AtXLeId
+    $sql = "SELECT LeitoId,QuartId,LeitoNome,QuartNome,TpIntNome,
+      EsLeiNome,LeitoStatus,LeitoUsuarioAtualizador,LeitoUnidade,AtXLeId
       FROM Leito
-      JOIN EspecialidadeLeito ON EsLeiId = LeitoEspecialidade
-      JOIN Quarto ON QuartId = LeitoQuarto
-      JOIN TipoInternacao ON TpIntId = EsLeiTipoInternacao
+      JOIN VincularLeitoXLeito ON VLXLeLeito = LeitoId
+      JOIN VincularLeito ON VnLeiId = VLXLeVinculaLeito
+      JOIN Quarto ON QuartId = VnLeiQuarto
+      JOIN TipoInternacao ON TpIntId = VnLeiTipoInternacao
+      JOIN EspecialidadeLeito ON EsLeiId = VnLeiEspecialidadeLeito
       LEFT JOIN AtendimentoXLeito ON AtXLeLeito = LeitoId
       WHERE LeitoUnidade = $iUnidade";
 
@@ -135,6 +138,6 @@ try{
   echo json_encode([
     'type' => $typeRequest,
     'err' => $e
-  ]);
+  ]);die;
 }
 ?>
