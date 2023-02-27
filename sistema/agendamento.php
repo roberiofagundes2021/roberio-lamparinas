@@ -1234,8 +1234,18 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 					<div class="card-header header-elements-inline">
 						<div class="col-lg-12 row p-0 m-0">
 							<!-- titulo -->
-							<div class="col-lg-4"><h3 class="card-title">Agendamentos</h3></div>
-							<div class="col-lg-4">Filtrar Profissionais</div>
+							<div class="col-lg-2"><h3 class="card-title">Agendamentos</h3></div>
+							<div class="col-lg-6">
+								Filtrar Profissionais
+								<select id="profissional" name="profissional[]" class="form-control multiselect-filtering" multiple="multiple">
+									<?php
+										foreach($rowProfissionais as $item){
+											echo "<option value='$item[id]' selected>$item[nome] - $item[cbo] - $item[profissao]</option>";
+										}
+									?>
+								</select>
+							</div>
+							
 							<div class="col-lg-4 p-0 m-0 text-right">
 								<?php
 									$arrayPerfisAcesso = [
@@ -1254,19 +1264,6 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 									<i class="icon-printer2"></i>																						
 								</a>
 							</div>
-							
-							<!-- campos -->
-							<div class="col-lg-4"></div>
-							<div class="col-lg-4">
-								<select id="profissional" name="profissional[]" class="form-control multiselect-filtering" multiple="multiple">
-									<?php
-										foreach($rowProfissionais as $item){
-											echo "<option value='$item[id]' selected>$item[nome] - $item[cbo] - $item[profissao]</option>";
-										}
-									?>
-								</select>
-							</div>
-							<div class="col-lg-4"></div>
 						</div>						
 					</div>
 					
