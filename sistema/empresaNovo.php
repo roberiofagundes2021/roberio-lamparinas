@@ -195,7 +195,7 @@ if(isset($_POST['inputCnpj'])){
 			// #imagem é o id do input, ao alterar o conteudo do input execurará a função abaixo
 			$('#imagem').on('change',function(){
 
-				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..."/>');
+				$('#visualizar').html('<img src="global_assets/images/lamparinas/ajax-loader.gif" alt="Enviando..." />');
 								
 				// Get form
 				var form = $('#formFoto')[0];
@@ -427,7 +427,7 @@ if(isset($_POST['inputCnpj'])){
 
 								<div style="text-align:center;">
 									<div id="visualizar">										
-										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Empresa" style="max-height:200px; border:2px solid #ccc;">
+										<img class="ml-3" src="global_assets/images/lamparinas/sem_foto.gif" alt="Sem Foto" style="max-height:200px; border:2px solid #ccc;">
 									</div>
 									<br>
 									<button id="addFoto" class="ml-3 btn btn-lg btn-principal" style="width:90%">Adicionar Foto...</button>	

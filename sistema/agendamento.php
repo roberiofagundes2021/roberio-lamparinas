@@ -108,7 +108,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			getCmbs()
 
 			$('#salvarAgenda').on('click', ()=>{
-				$('#salvarAgenda').html("<img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px'>");
+				$('#salvarAgenda').html("<img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px' alt='loader'>");
 				$("#salvarAgenda").prop('disabled', true);
 				$.ajax({
 					type: 'POST',

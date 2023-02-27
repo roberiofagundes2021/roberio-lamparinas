@@ -156,7 +156,7 @@ if(isset($iAtendimentoTriagemId ) && $iAtendimentoTriagemId ){
                     <div class="input-group">
                     <input type="number" id="inputTemperatura" name="inputTemperatura" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriTempAXI']; ?>">
                         <span class="input-group-prepend">
-                            <span class="input-group-text"><img src="global_assets/images/lamparinas/thermometro.png" width="32" style="margin-top: -13px;" /></span>
+                            <span class="input-group-text"><img src="global_assets/images/lamparinas/thermometro.png" width="32" style="margin-top: -13px;" alt="Termometro" /></span>
                         </span>
                         
                     </div>

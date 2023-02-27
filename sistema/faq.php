@@ -653,7 +653,7 @@ $_SESSION['PaginaAtual'] = 'Suporte - FAQ';
 									<ul class="media-list">
 										<li class="media">
 											<a href="#" class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
+												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="Placeholder" />
 											</a>
 											<div class="media-body">
 												<a href="#" class="media-title font-weight-semibold text-default">Will Jankins</a>
@@ -668,7 +668,7 @@ $_SESSION['PaginaAtual'] = 'Suporte - FAQ';
 
 										<li class="media">
 											<a href="#" class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
+												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="Placeholder" />
 											</a>
 											<div class="media-body">
 												<a href="#" class="media-title font-weight-semibold text-default">Margo Baker</a>
@@ -698,7 +698,7 @@ $_SESSION['PaginaAtual'] = 'Suporte - FAQ';
 
 										<li class="media">
 											<a href="#" class="mr-3">
-												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="">
+												<img src="global_assets/images/placeholders/placeholder.jpg" class="rounded-circle" width="36" height="36" alt="Placeholder" />
 											</a>
 											<div class="media-body">
 												<a href="#" class="media-title font-weight-semibold text-default">Richard Vango</a>
@@ -948,7 +948,7 @@ $_SESSION['PaginaAtual'] = 'Suporte - FAQ';
 					<div class="col-lg-3 col-md-6">
 						<div class="card">
 							<div class="card-img-actions">
-								<img class="card-img-top img-fluid" src="global_assets/images/placeholders/placeholder.jpg" alt="">
+								<img class="card-img-top img-fluid" src="global_assets/images/placeholders/placeholder.jpg" alt="Placeholder" />
 								<div class="card-img-actions-overlay card-img-top">
 									<a href="#" class="btn btn-outline btn-icon bg-white text-white border-white border-2 rounded-round">
 										<i class="icon-download4"></i>
@@ -981,7 +981,7 @@ $_SESSION['PaginaAtual'] = 'Suporte - FAQ';
 					<div class="col-lg-3 col-md-6">
 						<div class="card">
 							<div class="card-img-actions">
-								<img class="card-img-top img-fluid" src="global_assets/images/placeholders/placeholder.jpg" alt="">
+								<img class="card-img-top img-fluid" src="global_assets/images/placeholders/placeholder.jpg" alt="Placeholder" />
 								<div class="card-img-actions-overlay card-img-top">
 									<a href="#" class="btn btn-outline btn-icon bg-white text-white border-white border-2 rounded-round">
 										<i class="icon-download4"></i>
@@ -1014,7 +1014,7 @@ $_SESSION['PaginaAtual'] = 'Suporte - FAQ';
 					<div class="col-lg-3 col-md-6">
 						<div class="card">
 							<div class="card-img-actions">
-								<img class="card-img-top img-fluid" src="global_assets/images/placeholders/placeholder.jpg" alt="">
+								<img class="card-img-top img-fluid" src="global_assets/images/placeholders/placeholder.jpg" alt="Placeholder" />
 								<div class="card-img-actions-overlay card-img-top">
 									<a href="#" class="btn btn-outline btn-icon bg-white text-white border-white border-2 rounded-round">
 										<i class="icon-download4"></i>
@@ -1047,7 +1047,7 @@ $_SESSION['PaginaAtual'] = 'Suporte - FAQ';
 					<div class="col-lg-3 col-md-6">
 						<div class="card">
 							<div class="card-img-actions">
-								<img class="card-img-top img-fluid" src="global_assets/images/placeholders/placeholder.jpg" alt="">
+								<img class="card-img-top img-fluid" src="global_assets/images/placeholders/placeholder.jpg" alt="Placeholder" />
 								<div class="card-img-actions-overlay card-img-top">
 									<a href="#" class="btn btn-outline btn-icon bg-white text-white border-white border-2 rounded-round">
 										<i class="icon-download4"></i>

@@ -765,7 +765,7 @@ if(isset($_SESSION['aberturaCaixaId'])) {
                                     </div>
                                     <div class="row" style="background-color: #466d96;">
                                         <div class="col-4 mt-3">
-                                            <img src="https://lamparinas.com.br/wp-content/uploads/2021/10/Logo_Novo_Site-1536x491.png" style="max-width: 300px;" />
+                                            <img src="https://lamparinas.com.br/wp-content/uploads/2021/10/Logo_Novo_Site-1536x491.png" style="max-width: 300px;" alt="Logo Lamparinas" />
                                         </div>
 
                                         <div class="col-lg-8 mt-3 text-right">

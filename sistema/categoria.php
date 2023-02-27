@@ -276,8 +276,7 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 								<h3 class="card-title">Relação de Categorias</h3>
 							</div>
 
-							<div class="card-body">
-												
+							<div class="card-body">												
 								
 								<form name="formCategoria" id="formCategoria" method="post" class="form-validate-jquery">
 
@@ -325,12 +324,12 @@ if (isset($_POST['inputEstadoAtual']) && substr($_POST['inputEstadoAtual'], 0, 5
 											</div>
 										</div>
 									</div>
-								</form>
-		
+								</form>		
 							</div>					
 							
 							<!-- A table só filtra se colocar 6 colunas. Onde mudar isso? -->
 							<table id="tblCategoria" class="table">
+								<caption>Categorias</caption>
 								<thead>
 									<tr class="bg-slate">
 										<th data-filter>Código</th>

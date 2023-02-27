@@ -1241,7 +1241,7 @@ if ($row['ClienSexo'] == 'F'){
                                                 <div class="input-group">
                                                 <input type="number" id="inputTemperaturaM" name="inputTemperaturaM" class="form-control" placeholder="" value="">
                                                     <span class="input-group-prepend">
-                                                        <span class="input-group-text"><img src="global_assets/images/lamparinas/thermometro.png" width="32" style="margin-top: -13px;" /></span>
+                                                        <span class="input-group-text"><img src="global_assets/images/lamparinas/thermometro.png" width="32" style="margin-top: -13px;" alt="termometro" /></span>
                                                     </span>
                                                     
                                                 </div>

@@ -144,7 +144,7 @@ $visibilidadeResumoCaixa = isset($_SESSION['ResumoFinanceiro']) && $_SESSION['Re
 
             function filtrar() {
                 const msg = $(
-                    '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>'
+                    '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px" alt="Loader"></td></tr>'
                 )
 
                 $('tbody').html(msg)

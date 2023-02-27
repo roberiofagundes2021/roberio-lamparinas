@@ -179,28 +179,28 @@ if(isset($_POST['inputNomePersonalizado'])){
 										<div class="col-lg-3" style="text-align:center;">
 											<div>										
 												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">
-													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;" alt="Logo Lamparinas">
 												</a>
 											</div>
 										</div>
 										<div class="col-lg-3" style="text-align:center;">
 											<div>	
 												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">									
-													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;" alt="Logo Lamparinas">
 												</a>
 											</div>
 										</div>
 										<div class="col-lg-3" style="text-align:center;">
 											<div>		
 												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">								
-													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;" alt="Logo Lamparinas">
 												</a>
 											</div>		
 										</div>
 										<div class="col-lg-3" style="text-align:center;">
 											<div>		
 												<a href="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" class="fancybox">								
-													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;">
+													<img class="ml-3" src="global_assets/images/atendimentoClassificacao/logo-lamparinas.jpg" style="max-height:250px; border:2px solid #ccc;" alt="Logo Lamparinas">
 												</a>
 											</div>		
 										</div>

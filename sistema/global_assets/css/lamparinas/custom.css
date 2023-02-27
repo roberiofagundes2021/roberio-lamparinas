@@ -326,3 +326,14 @@ Copyright (c) 2018 Carlos Victor
 .datatable-scroll-wrap{
     overflow-x: unset;
 }
+ 
+/* Caption das Tabelas */
+caption {
+    color: #ccc;
+    text-align: right;
+    caption-side: bottom;
+    font-size: xx-small;
+    padding-right: 5px;
+    border-top: 1px solid #eee;
+    padding-bottom: 5px;
+}
