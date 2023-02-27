@@ -18,8 +18,9 @@
 	//Situação do Atendimento na Sessão
 	if (isset($_POST['SituaChave'])){
 		$_SESSION['SituaChave'] = $_POST['SituaChave'];
+	} else {
+		$_SESSION['SituaChave'] = null;
 	}
-
 	$SituaChave = $_SESSION['SituaChave'];
 	$desfechoChave = $rowClassificacao['AtendDesfechoChave'];
 ?>
