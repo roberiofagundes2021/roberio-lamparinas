@@ -12,7 +12,15 @@ try{
 		if(isset($_POST['inputFoto'])){
 			$input_foto = $_POST['inputFoto'];
 		}
-	} 
+		$nome = $_POST['inputNome'];
+		$categoria = $_POST['cmbCategoriaPF'];
+		$subCategoria = isset($_POST['cmbSubCategoriaPF']) ? $_POST['cmbSubCategoriaPF'] : 0;
+	} else{
+		$nome = $_POST['inputNomeFantasia'];
+		$categoria = $_POST['cmbCategoriaPJ'];
+		$subCategoria = isset($_POST['cmbSubCategoriaPJ']) ? $_POST['cmbSubCategoriaPJ'] : 0;
+	}
+
 	$sql = "INSERT INTO Fornecedor (ForneTipo, ForneNome, ForneRazaoSocial, ForneCnpj, ForneInscricaoMunicipal, ForneInscricaoEstadual, ForneCategoria,
 									ForneCpf, ForneRg, ForneOrgaoEmissor, ForneUf, ForneSexo, ForneAniversario, ForneNaturalidade, ForneNaturalidadeUf,
 									ForneNacionalidade, ForneAno, ForneCarteiraTrabalho, ForneNumSerie, ForneNit, ForneNire, ForneFoto, ForneCep, ForneEndereco,
@@ -31,13 +39,12 @@ try{
 		
 		$result->execute(array(
 						':sTipo' => $_POST['inputTipo'],
-						':sNome' => $_POST['inputNome'],
+						':sNome' => $nome,
 						':sRazaoSocial' => $_POST['inputTipo'] == 'J' ? $_POST['inputRazaoSocial'] : null,
 						':sCnpj' => $_POST['inputTipo'] == 'J' ? limpaCPF_CNPJ($_POST['inputCnpj']) : null,
 						':sInscricaoMunicipal' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoMunicipal'] : null,
 						':sInscricaoEstadual' => $_POST['inputTipo'] == 'J' ? $_POST['inputInscricaoEstadual'] : null,
-						':iCategoria' => $_POST['cmbCategoria'] == '#' ? null : $_POST['cmbCategoria'],
-						//':iSubCategoria' => $_POST['cmbSubCategoria'] == '#' ? null : $_POST['cmbSubCategoria'],
+						':iCategoria' => $categoria,
 						':sCpf' => $_POST['inputTipo'] == 'F' ? limpaCPF_CNPJ($_POST['inputCpf']) : null,
 						':sRg' => $_POST['inputTipo'] == 'F' ? $_POST['inputRg'] : null,
 						':sOrgaoEmissor' => $_POST['inputTipo'] == 'F' ? $_POST['inputEmissor'] : null,
@@ -82,7 +89,7 @@ try{
 
 		$insertId = $conn->lastInsertId(); 
 		
-		if (isset($_POST['cmbSubCategoria'])){
+		if ($subCategoria){
 			
 			try{
 				$sql = "INSERT INTO FornecedorXSubCategoria 
@@ -91,7 +98,7 @@ try{
 							(:iFornecedor, :iSubCategoria, :iUnidade)";
 				$result = $conn->prepare($sql);
 
-				foreach ($_POST['cmbSubCategoria'] as $key => $value){
+				foreach ($subCategoria as $key => $value){
 
 					$result->execute(array(
 									':iFornecedor' => $insertId,

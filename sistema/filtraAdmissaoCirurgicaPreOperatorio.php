@@ -18,161 +18,239 @@ if(!isset($_SESSION['admissaoCirurgica'])){
 }
 
 try{  
-  if($typeRequest == "ACESSOVENOSO"){
-    $acessos = $_SESSION['admissaoCirurgica']['acesso'];
-    if($_POST['data'] && $_POST['hora'] && $_POST['lado'] && $_POST['calibre'] && $_POST['responsavel']){
-      
-      $data = $_POST['data'];
-      $data = explode('-',$data);
-      $data = $data[2].'/'.$data[1].'/'.$data[0];
 
+  if($typeRequest == "ADDACESSOVENOSO"){
 
-      $hora = $_POST['hora'];
-      $lado = $_POST['lado'];
-      $calibre = $_POST['calibre'];
-      $responsavel = $_POST['responsavel'];
+    
+    $admissaoCirurgicaPreOperatorio = $_POST['iAtendimentoCirurgicoPreOperatorio'] == '' ? $_POST['idTemporaria'] : $_POST['iAtendimentoCirurgicoPreOperatorio'];
 
-      $id = uniqid("$hora$lado$calibre$responsavel");
+    $dataHoraAcessoVenoso = $_POST['dataHoraAcessoVenoso'] == "" ? null : str_replace('T', ' ', $_POST['dataHoraAcessoVenoso']);
+    $localPuncaoAcessoVenoso = $_POST['localPuncaoAcessoVenoso'] == "" ? null : $_POST['localPuncaoAcessoVenoso'];
+    $calibreAcessoVenoso = $_POST['calibreAcessoVenoso'] == "" ? null : $_POST['calibreAcessoVenoso'];
+    $responsavelAcessoVenoso = $_POST['responsavelAcessoVenoso'] == "" ? null : $_POST['responsavelAcessoVenoso'];
 
-      foreach($acessos as $item){
-        if($item['dataHora'] == $data.' '.$hora && $item['lado'] == $lado){
-          echo json_encode($acessos);
-          exit;
-        }
-      }
-  
-      $exc = "<a style='color: black' href='#' onclick='exclui(this)'
-      class='list-icons-item' data-id='$id' data-tipo='ACESSO'><i class='icon-bin' title='Excluir Acesso'></i></a>";
-  
-      $acoes = "<div class='list-icons'>
-        $exc
-      </div>";
-  
-      array_push($acessos,[
-        'dataHora' =>$data.' '.$hora,
-        'lado' =>$lado,
-        'calibre' =>$calibre,
-        'responsavel' =>$responsavel,
-        'acoes' =>$acoes,
-        'id' => $id,
-      ]);
-  
-      $_SESSION['admissaoCirurgica']['acesso'] = $acessos;
-    }
+		$sql = "INSERT INTO  EnfermagemAdmissaoCirurgicaPreOperatorioAcessoVenoso( EnACAAdmissaoCirurgicaPreOperatorio, EnACADataHora, EnACALocalPuncao, 
+        EnACATipoCalibre, EnACAResponsavelTecnico, EnACAUnidade )
+        VALUES ( '$admissaoCirurgicaPreOperatorio', '$dataHoraAcessoVenoso', '$localPuncaoAcessoVenoso', '$calibreAcessoVenoso', '$responsavelAcessoVenoso', '$iUnidade')";
+    $conn->query($sql);
 
-    echo json_encode($acessos);
-  }if($typeRequest == "CONCENTIMENTO"){
-    $concentimentos = $_SESSION['admissaoCirurgica']['concentimento'];
+    echo json_encode([
+      'status' => 'success',
+      'titulo' => 'Acesso Venoso',
+      'menssagem' => 'Acesso Venoso inserido com sucesso!!!'
+    ]);	
 
-    if($_POST['data'] && $_POST['hora'] && $_POST['descricao']){
-      
-      $data = $_POST['data'];
-      $data = explode('-',$data);
-      $data = $data[2].'/'.$data[1].'/'.$data[0];
+  }elseif ($typeRequest == "ADDTERMOCONSENTIMENTO") {
 
+    try {
+			$nome_final = '';
 
-      $hora = $_POST['hora'];
-      $descricao = $_POST['descricao'];
+			if ( isset($_FILES['arquivoTermoConsentimento']) ) {
 
-      $id = uniqid("$data$hora$descricao");
+				$_UP['pasta'] = 'global_assets/anexos/termoConsentimentoAdCirPreOperatorio/';
+				// Renomeia o arquivo? (Se true, o arquivo será salvo como .csv e um nome único)
+				$_UP['renomeia'] = false;
+				// Primeiro verifica se deve trocar o nome do arquivo
+				if ($_UP['renomeia'] == true) {			
+					// Cria um nome baseado no UNIX TIMESTAMP atual e com extensão .csv
+					$nome_final = date('d-m-Y')."-".date('H-i-s')."-".$_FILES['arquivoTermoConsentimento']['name'];			
+				} else {			
+					// Mantém o nome original do arquivo
+					$nome_final = $_FILES['arquivoTermoConsentimento']['name'];
+				}
+				move_uploaded_file( $_FILES['arquivoTermoConsentimento']['tmp_name'], $_UP['pasta'] . $nome_final);
+			}
 
-      foreach($concentimentos as $item){
-        if($item['dataHora'] == $data.' '.$hora && $item['descricao'] == $descricao){
-          echo json_encode($concentimentos);
-          exit;
-        }
-      }
-  
-      $exc = "<a style='color: black' href='#' onclick='exclui(this)'
-      class='list-icons-item' data-id='$id' data-tipo='CONCENTIMENTO'><i class='icon-bin' title='Excluir Concentimento'></i></a>";
-  
-      $acoes = "<div class='list-icons'>
-        $exc
-      </div>";
-  
-      array_push($concentimentos,[
-        'dataHora' =>$data.' '.$hora,
-        'descricao' =>$descricao,
-        'acoes' =>$acoes,
-        'id' => $id,
-      ]);
-  
-      $_SESSION['admissaoCirurgica']['concentimento'] = $concentimentos;
-    }
+      $admissaoCirurgicaPreOperatorio = $_POST['iAtendimentoCirurgicoPreOperatorio'] == 'null' ? $_POST['idTemporaria'] : $_POST['iAtendimentoCirurgicoPreOperatorio'];
+			$dataHoraConsentimento = $_POST['dataHoraConsentimento'] == "" ? null : str_replace('T', ' ', $_POST['dataHoraConsentimento'] );
+			$descricaoConsentimento = $_POST['descricaoConsentimento'] == "" ? null : $_POST['descricaoConsentimento'];
+			$arquivoTermoConsentimento = $nome_final;
 
-    echo json_encode($concentimentos);
-  }if($typeRequest == "EXAMES"){
-    $exames = $_SESSION['admissaoCirurgica']['exames'];
+			$sql = "INSERT INTO  EnfermagemAdmissaoCirurgicaPreOperatorioTermoConsentimento( EnACTAdmissaoCirurgicaPreOperatorio, EnACTDataHora, EnACTDescricao, EnACTArquivo, EnACTUnidade )
+				VALUES ( '$admissaoCirurgicaPreOperatorio', '$dataHoraConsentimento', '$descricaoConsentimento', '$arquivoTermoConsentimento', '$iUnidade')";
+			$conn->query($sql);
 
-    if($_POST['data'] && $_POST['hora'] && $_POST['descricao']){
-      
-      $data = $_POST['data'];
-      $data = explode('-',$data);
-      $data = $data[2].'/'.$data[1].'/'.$data[0];
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Termo de Consentimento',
+				'menssagem' => 'Termo inserido com sucesso!!!'
+			]);	
 
+		} catch (\Throwable $th) {
 
-      $hora = $_POST['hora'];
-      $descricao = $_POST['descricao'];
+			echo json_encode([
+					'status' => 'error',
+					'titulo' => 'Erro',
+					'menssagem' => 'Erro ao adicionar Termo de Consentimento!!!' 
+			]);
 
-      $id = uniqid("$data$hora$descricao");
+		}
 
-      foreach($exames as $item){
-        if($item['dataHora'] == $data.' '.$hora && $item['descricao'] == $descricao){
-          echo json_encode($exames);
-          exit;
-        }
-      }
-  
-      $exc = "<a style='color: black' href='#' onclick='exclui(this)'
-      class='list-icons-item' data-id='$id' data-tipo='EXAMES'><i class='icon-bin' title='Excluir Exame'></i></a>";
-  
-      $acoes = "<div class='list-icons'>
-        $exc
-      </div>";
-  
-      array_push($exames,[
-        'dataHora' =>$data.' '.$hora,
-        'descricao' =>$descricao,
-        'acoes' =>$acoes,
-        'id' => $id,
-      ]);
-  
-      $_SESSION['admissaoCirurgica']['exames'] = $exames;
-    }
+    
+  }elseif ($typeRequest == 'ADDEXAMESCOMPLEMENTARES') {
 
-    echo json_encode($exames);
-  }elseif($typeRequest == "EXCLUIR"){
-    $tipo = $_POST['tipo'];
+    //var_dump($_FILES);die;
+
+    try {
+			$nome_final = '';
+
+			if ( isset($_FILES['arquivoExame']) ) {
+
+				$_UP['pasta'] = 'global_assets/anexos/examesComplementaresImagensAdCirPreOperatorio/';
+				// Renomeia o arquivo? (Se true, o arquivo será salvo como .csv e um nome único)
+				$_UP['renomeia'] = false;
+				// Primeiro verifica se deve trocar o nome do arquivo
+				if ($_UP['renomeia'] == true) {			
+					// Cria um nome baseado no UNIX TIMESTAMP atual e com extensão .csv
+					$nome_final = date('d-m-Y')."-".date('H-i-s')."-".$_FILES['arquivoExame']['name'];			
+				} else {			
+					// Mantém o nome original do arquivo
+					$nome_final = $_FILES['arquivoExame']['name'];
+				}
+				move_uploaded_file( $_FILES['arquivoExame']['tmp_name'], $_UP['pasta'] . $nome_final);
+			}
+
+      $admissaoCirurgicaPreOperatorio = $_POST['iAtendimentoCirurgicoPreOperatorio'] == 'null' ? $_POST['idTemporaria'] : $_POST['iAtendimentoCirurgicoPreOperatorio'];
+			$dataHoraExame = $_POST['dataHoraExame'] == "" ? null : str_replace('T', ' ', $_POST['dataHoraExame'] );
+			$descricaoExame = $_POST['descricaoExame'] == "" ? null : $_POST['descricaoExame'];
+			$arquivoExame = $nome_final;
+
+			$sql = "INSERT INTO  EnfermagemAdmissaoCirurgicaPreOperatorioExameComplementar( EnACEAdmissaoCirurgicaPreOperatorio, EnACEDataHora, EnACEDescricao, EnACEArquivo, EnACEUnidade )
+				VALUES ( '$admissaoCirurgicaPreOperatorio', '$dataHoraExame', '$descricaoExame', '$arquivoExame', '$iUnidade')";
+			$conn->query($sql);
+
+			echo json_encode([
+				'status' => 'success',
+				'titulo' => 'Exames Complementares de Imagens',
+				'menssagem' => 'Exame inserido com sucesso!!!'
+			]);	
+
+		} catch (\Throwable $th) {
+
+			echo json_encode([
+					'status' => 'error',
+					'titulo' => 'Erro',
+					'menssagem' => 'Erro ao adicionar Termo de Consentimento!!!' 
+			]);
+		}
+    
+  }elseif ($typeRequest == 'GETACESSOSVENOSOS') {
+
+    $iAtendimentoCirurgicoPreOperatorio = $_POST['iAtendimentoCirurgicoPreOperatorio'] == "" ? null : $_POST['iAtendimentoCirurgicoPreOperatorio'];
+	
+		$sql = "SELECT * FROM EnfermagemAdmissaoCirurgicaPreOperatorioAcessoVenoso
+				WHERE EnACAAdmissaoCirurgicaPreOperatorio = $iAtendimentoCirurgicoPreOperatorio";
+
+		$result = $conn->query($sql);
+		$acessosVenosos = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($acessosVenosos as $key => $item){
+
+			$dataHora = explode(" ", $item['EnACADataHora']);
+			array_push($array,[
+				'item' => ($key + 1),
+				'id'=>$item['EnACAId'],
+				'dataHora'=> mostraData($dataHora[0]) . ' ' . mostraHora($dataHora[1]),
+        'localPuncao' => $item['EnACALocalPuncao'],
+        'tipoCalibre' => $item['EnACATipoCalibre'],
+        'responsavelTecnico' => $item['EnACAResponsavelTecnico']
+			]);
+		}		
+		echo json_encode($array);
+
+  }elseif ($typeRequest == 'GETTERMOSCONSENTIMENTO') {
+
+    $iAtendimentoCirurgicoPreOperatorio = $_POST['iAtendimentoCirurgicoPreOperatorio'] == "" ? null : $_POST['iAtendimentoCirurgicoPreOperatorio'];
+	
+		$sql = "SELECT * FROM EnfermagemAdmissaoCirurgicaPreOperatorioTermoConsentimento
+				WHERE EnACTAdmissaoCirurgicaPreOperatorio = $iAtendimentoCirurgicoPreOperatorio";
+
+		$result = $conn->query($sql);
+		$termos = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($termos as $key => $item){
+
+			$dataHora = explode(" ", $item['EnACTDataHora']);
+			array_push($array,[
+				'item' => ($key + 1),
+				'id'=>$item['EnACTId'],
+				'dataHora'=> mostraData($dataHora[0]) . ' ' . mostraHora($dataHora[1]),
+				'descricao' => $item['EnACTDescricao'],
+				'arquivo' => $item['EnACTArquivo']
+			]);
+		}
+		echo json_encode($array);
+    
+  }elseif ($typeRequest == 'GETEXAMESCOMPLEMENTARES') {
+
+    $iAtendimentoCirurgicoPreOperatorio = $_POST['iAtendimentoCirurgicoPreOperatorio'] == "" ? null : $_POST['iAtendimentoCirurgicoPreOperatorio'];
+	
+		$sql = "SELECT * FROM EnfermagemAdmissaoCirurgicaPreOperatorioExameComplementar
+				WHERE EnACEAdmissaoCirurgicaPreOperatorio = $iAtendimentoCirurgicoPreOperatorio";
+
+		$result = $conn->query($sql);
+		$exames = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($exames as $key => $item){
+
+			$dataHora = explode(" ", $item['EnACEDataHora']);
+			array_push($array,[
+				'item' => ($key + 1),
+				'id'=>$item['EnACEId'],
+				'dataHora'=> mostraData($dataHora[0]) . ' ' . mostraHora($dataHora[1]),
+				'descricao' => $item['EnACEDescricao'],
+				'arquivo' => $item['EnACEArquivo']
+			]);
+		}
+		echo json_encode($array);
+    
+  } elseif ($typeRequest == "DELETEACESSOVENOSO") {
+    
     $id = $_POST['id'];
-    $list = $_SESSION['admissaoCirurgica'];
+	
+		$sql = "DELETE FROM EnfermagemAdmissaoCirurgicaPreOperatorioAcessoVenoso
+		WHERE EnACAId = $id";
+		$conn->query($sql);
 
-    if($tipo == 'ACESSO'){
-      foreach($list['acesso'] as $key=>$item){
-        if($item['id'] == $id){
-          array_splice($list['acesso'],$key,1);
-        }
-      }
-    }elseif($tipo == 'CONCENTIMENTO'){
-      foreach($list['concentimento'] as $key=>$item){
-        if($item['id'] == $id){
-          array_splice($list['concentimento'],$key,1);
-        }
-      }
-    }elseif($tipo == 'EXAMES'){
-      foreach($list['exames'] as $key=>$item){
-        if($item['id'] == $id){
-          array_splice($list['exames'],$key,1);
-        }
-      }
-    }
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Acesso Venoso',
+			'menssagem' => 'Acesso excluído!!!',
+		]);
 
-    $_SESSION['admissaoCirurgica'] = $list;
+  } elseif ($typeRequest == "DELETETERMO") {
+    
+    $id = $_POST['id'];
+	
+		$sql = "DELETE FROM EnfermagemAdmissaoCirurgicaPreOperatorioTermoConsentimento
+		WHERE EnACTId = $id";
+		$conn->query($sql);
 
-    echo json_encode($list);
-  }elseif($typeRequest == "CHECKLIST"){
-    $list = $_SESSION['admissaoCirurgica'];
-    echo json_encode($list);
-  }elseif($typeRequest == "SALVARADMISSAO"){
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Termo de Consentimento',
+			'menssagem' => 'Termo excluído!!!',
+		]);
+
+  } elseif ($typeRequest == "DELETEEXAME") {
+    
+    $id = $_POST['id'];
+	
+		$sql = "DELETE FROM EnfermagemAdmissaoCirurgicaPreOperatorioExameComplementar
+		WHERE EnACEId = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'status' => 'success',
+			'titulo' => 'Exames Complementares',
+			'menssagem' => 'Exame excluído!!!',
+		]);
 
   }
 

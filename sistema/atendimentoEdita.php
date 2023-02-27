@@ -381,9 +381,9 @@ if ($tipo == 'ATENDIMENTO') {
 			$('#informacoes').show()
 
 			$('.actions').addClass('col-lg-12 row pt-2')
-			$('.actions ul').addClass('col-lg-10 actionContent')
-			$('.actions').append(`<a class='col-lg-2 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>`)
-			$('#cancelar').insertBefore('.actionContent')
+			$('.actions ul').addClass('col-lg-12 actionContent')
+			//$('.actions').append(`<a class='col-lg-2 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>`)
+			//$('#cancelar').insertBefore('.actionContent')
 
 			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
 			dataAtual = dataAtual.split(' ')[0]
@@ -1509,7 +1509,7 @@ if ($tipo == 'ATENDIMENTO') {
 			<!-- Content area -->
 			<div class="content">
 				<div class="row">
-					<div class="col-lg-12">
+					<div class="col-lg-3">
 						<div class="card">
 							<div class="card-header header-elements-inline" style="margin-left:10px;">
 								<h5 class="text-uppercase font-weight-bold">Cadastro de Atendimento</h5>
@@ -1532,6 +1532,12 @@ if ($tipo == 'ATENDIMENTO') {
 								</fieldset>
 							</form>
 						</div>
+						
+						<div class="card">
+							<a class='col-lg-12 btn btn-lg' href='atendimento.php' id='cancelar'>cancelar</a>
+						</div>
+					</div>
+					<div class="col-lg-9">						
 
 						<!-- 
 							esse card a seguir vai apresentar o conteudo para que o usuário possa selecionar,
@@ -1540,11 +1546,11 @@ if ($tipo == 'ATENDIMENTO') {
 							todo o efeito de fadeIn e fadeOut dos componentes e páginas são feitos em JavaScript de 
 							acordo com a seleção do usuário
 						-->
-						<div class="card">
+						<div class="card" style="min-height: 270px;">
 							<div id="dados">
 								<form id="dadosPaciente" class="form-validate-jquery" action="#" data-fouc>
 									<div class="card-header header-elements-inline" style="margin-left:10px;">
-										<h5 class="text-uppercase font-weight-bold">Cadastro de Paciente</h5>
+										<h5 class="text-uppercase font-weight-bold">Dados do Paciente</h5>
 									</div>
 									<div class="col-12 row text-center justify-content-center mb-5" id="selectPaciente">
 										<div class="col-lg-12 my-3 text-black-50">
@@ -1586,7 +1592,7 @@ if ($tipo == 'ATENDIMENTO') {
 										<h5 class="text-uppercase font-weight-bold">Cadastro de Atendimento</h5>
 									</div>
 									<div class="card-body">
-									<div class="col-lg-12 mb-4 row mt-4">
+									<div class="col-lg-12 mb-4 row mt-2">
 											<!-- titulos -->
 											<div class='col-lg-3'>
 												<label>Data do Registro</label>
