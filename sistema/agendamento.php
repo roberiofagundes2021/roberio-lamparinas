@@ -205,13 +205,51 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			$('#addPaciente').submit(function(e){
 				e.preventDefault()
 			})
-
+			$('#inputData').on('input',function(e){
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAgendamento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'CHECKAGENDAUNIDADE',
+						'data': $('#inputData').val()
+					},
+					success: function(response) {
+						if(response.tipo == 'error'){
+							alerta(response.titulo,response.menssagem,response.tipo)
+							$('#inputData').val('')
+						}else{
+							getCmbs()
+						}
+					}
+				})
+			})
+			$('#inputHora').on('input',function(e){
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAgendamento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'CHECKAGENDAUNIDADE',
+						'data': $('#inputData').val(),
+						'hora': $('#inputHora').val(),
+					},
+					success: function(response) {
+						if(response.tipo == 'error'){
+							alerta(response.titulo,response.menssagem,response.tipo)
+							$('#inputHora').val('')
+						}else{
+							getCmbs()
+						}
+					}
+				})
+			})
 			$('#servico').on('change', function(e){
 				// vai preencher cmbMedico
 				if($(this).val()){
 					$.ajax({
 						type: 'POST',
-						url: 'filtraProfissionalAgenda_2.php',
+						url: 'filtraAgendamento.php',
 						dataType: 'json',
 						data:{
 							'tipoRequest': 'MEDICOS',
@@ -219,10 +257,24 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 							'data': $('#inputData').val(),
 							'hora': $('#inputHora').val()
 						},
-						success: function(response) {
+						success: async function(response) {
 							$('#medico').empty()
 							$('#medico').append(`<option value=''>Selecione</option>`)
-							response.forEach(item => {
+							await response.forEach(async item => {
+								if(item.datasRecorrente.length && item.datasRecorrente.includes($('#inputData').val())){
+									return
+								}
+
+								// vai verificar se a data e horário selecionados estão dentro de um bloqueio pre estabelecido
+								let inInterval = false
+								await item.datasIntervalo.forEach(data => {
+									inInterval = data.dataI <= $('#inputData').val() && data.horaI <= $('#inputHora').val() && data.dataF >= $('#inputData').val() && data.horaF >= $('#inputHora').val()?true:inInterval
+								})
+
+								if(inInterval){
+									return
+								}
+
 								let opt = `<option value="${item.id}">${item.nome}</option>`
 								$('#medico').append(opt)
 							})
@@ -239,7 +291,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				if($(this).val()){
 					$.ajax({
 						type: 'POST',
-						url: 'filtraProfissionalAgenda_2.php',
+						url: 'filtraAgendamento.php',
 						dataType: 'json',
 						data:{
 							'tipoRequest': 'LOCALATENDIMENTO',
@@ -312,7 +364,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				$.ajax({
 					type: 'POST',
-					url: 'filtraProfissionalAgenda_2.php',
+					url: 'filtraAgendamento.php',
 					dataType: 'json',
 					data: {
 						'tipoRequest': 'ADDAGENDAMENTO',
@@ -438,6 +490,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				e.preventDefault()
 				getFilters()
 				$('#inputDataInicioBloqueio').val('')
+				$('#bloqueio').val('')
 				$('#inputHoraInicioBloqueio').val('')
 				$('#inputDataFimBloqueio').val('')
 				$('#inputHoraFimBloqueio').val('')
@@ -463,35 +516,70 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			$('#configUnidade').on('click', function(e){
 				e.preventDefault()
 
-				let hora = new Date();
-				hora = `${hora.getHours()>9?hora.getHours():'0'+hora.getHours()}:${hora.getMinutes()>9?hora.getMinutes():'0'+hora.getMinutes()}`
-				$('#inputHoraAberturaUnidade').val(hora)
-				$('#inputHoraFechamentoUnidade').val(hora)
-				$('#inputHoraInicioUnidade').val(hora)
-				$('#inputHoraFimUnidade').val(hora)
-				$('#inputHoraIntervaloUnidade').val('')
-				$('#observacaoUnidade').val('')
-				
-				$('#segundaUnidade').prop('checked', true)
-				$('#tercaUnidade').prop('checked', true)
-				$('#quartaUnidade').prop('checked', true)
-				$('#quintaUnidade').prop('checked', true)
-				$('#sextaUnidade').prop('checked', true)
-				$('#sabadoUnidade').prop('checked', false)
-				$('#domingoUnidade').prop('checked', false)
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAgendamento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'GETCONFIG'
+					},
+					success: function(response) {
+						if(response.id){
+							$('#inputHoraAberturaUnidade').val(response.abertura)
+							$('#inputHoraFechamentoUnidade').val(response.fechamento)
+							$('#inputHoraInicioUnidade').val(response.almocoInicio)
+							$('#inputHoraFimUnidade').val(response.almocoFim)
+							$('#inputHoraIntervaloUnidade').val(response.intervalo)
+							$('#observacaoUnidade').val(response.observacao)
+							
+							$('#segundaUnidade').prop('checked', parseInt(response.segunda)?true:false)
+							$('#tercaUnidade').prop('checked', parseInt(response.terca)?true:false)
+							$('#quartaUnidade').prop('checked', parseInt(response.quarta)?true:false)
+							$('#quintaUnidade').prop('checked', parseInt(response.quinta)?true:false)
+							$('#sextaUnidade').prop('checked', parseInt(response.sexta)?true:false)
+							$('#sabadoUnidade').prop('checked', parseInt(response.sabado)?true:false)
+							$('#domingoUnidade').prop('checked', parseInt(response.domingo)?true:false)
 
-				$('#page-modal-configUnidade').fadeIn(200)
+							$('#inputHoraIntervaloUnidade').children("option").each(function(index, item){
+								if($(item).val() == response.intervalo){
+									$(item).change()
+								}
+							})
+						}else{
+							let hora = new Date();
+							hora = `${hora.getHours()>9?hora.getHours():'0'+hora.getHours()}:${hora.getMinutes()>9?hora.getMinutes():'0'+hora.getMinutes()}`
+							$('#inputHoraAberturaUnidade').val(hora)
+							$('#inputHoraFechamentoUnidade').val(hora)
+							$('#inputHoraInicioUnidade').val(hora)
+							$('#inputHoraFimUnidade').val(hora)
+							$('#inputHoraIntervaloUnidade').val('')
+							$('#observacaoUnidade').val('')
+							
+							$('#segundaUnidade').prop('checked', true)
+							$('#tercaUnidade').prop('checked', true)
+							$('#quartaUnidade').prop('checked', true)
+							$('#quintaUnidade').prop('checked', true)
+							$('#sextaUnidade').prop('checked', true)
+							$('#sabadoUnidade').prop('checked', false)
+							$('#domingoUnidade').prop('checked', false)
+						}
+						$('#page-modal-configUnidade').fadeIn(200)
+					}
+				});
 			})
 			$('#modalConfigUnidade-close-x').on('click', function(e){
 				e.preventDefault()
 				$('#page-modal-configUnidade').fadeOut(200)
 			})
-
 			$('#recorrente').on('change', function(e){
 				if($('#recorrente').is(':checked')){
 					$('#cardRecorrend').removeClass('d-none')
+					$('#inputDataFimBloqueio').attr('readonly', true)
+					$('#inputHoraFimBloqueio').attr('readonly', true)
 				}else{
 					$('#cardRecorrend').addClass('d-none')
+					$('#inputDataFimBloqueio').attr('readonly', false)
+					$('#inputHoraFimBloqueio').attr('readonly', false)
 				}
 			})
 
@@ -532,7 +620,6 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			$('#salvarEvento').on('click', function(e){
 				e.preventDefault()
-				console.log($('#recorrente').is(':checked'))
 
 				let msg = ''
 				switch(msg){
@@ -550,6 +637,9 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						case $('#repeticao').val():msg="Informe a quantidade de repetiçoes";break;
 						default:msg = '';break;
 					}
+					if(!$('#segunda').is(':checked') && !$('#terca').is(':checked') && !$('#quarta').is(':checked') && !$('#quinta').is(':checked') && !$('#sexta').is(':checked') && !$('#sabado').is(':checked') && !$('#domingo').is(':checked')){
+						msg="Informe pelo menos um dia"
+					}
 				}
 
 				if(msg){
@@ -559,7 +649,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				$.ajax({
 					type: 'POST',
-					url: 'filtraProfissionalAgenda_2.php',
+					url: 'filtraAgendamento.php',
 					dataType: 'json',
 					data:{
 						'tipoRequest': 'ADDEVENTO',
@@ -570,6 +660,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						'inputHoraInicioBloqueio':$('#inputHoraInicioBloqueio').val(),
 						'inputDataFimBloqueio':$('#inputDataFimBloqueio').val(),
 						'inputHoraFimBloqueio':$('#inputHoraFimBloqueio').val(),
+						'recorrente': $('#recorrente').is(':checked')?1:0,
 						'repeticao':$('#repeticao').val(),
 						'segunda':$('#segunda').is(':checked')?1:0,
 						'terca':$('#terca').is(':checked')?1:0,
@@ -608,7 +699,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 
 				$.ajax({
 					type: 'POST',
-					url: 'filtraProfissionalAgenda_2.php',
+					url: 'filtraAgendamento.php',
 					dataType: 'json',
 					data:{
 						'tipoRequest': 'ADDCONFIGUNIDADE',
@@ -629,20 +720,48 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 					},
 					success: async function(response) {
 						alerta(response.titulo, response.menssagem, response.status)
-						$('#page-modal-config').fadeOut(200)
+						$('#page-modal-configUnidade').fadeOut(200)
 					}
 				});
+			})
+
+			$('#quantidadeRecorrencia').on('input', function(e){
+				let date = new Date($('#inputDataInicioBloqueio').val())
+
+				if($('#repeticao').val()[1] == 'S'){
+					let count = parseInt($('#repeticao').val()[0])*7
+
+					for(x=0; x < $(this).val(); x++){
+						date.setDate(date.getDate() + count);
+					}
+				}
+
+				date = `${date.getFullYear()}-${date.getMonth()>9?date.getMonth()+1:'0'+(date.getMonth()+1)}-${date.getDate()>9?date.getDate():'0'+date.getDate()}`
+				$('#dataRecorrencia').val(date)
+			})
+			$('#dataRecorrencia').on('input', function(e){
+				let dateI = new Date($('#inputDataInicioBloqueio').val())
+				let dateF = new Date($(this).val())
+
+				let diffTime = Math.abs(dateI - dateF);
+				let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));				
+
+				if($('#repeticao').val()[1] == 'S'){
+					$('#quantidadeRecorrencia').val(Math.round(diffDays/7))
+				}else if($('#repeticao').val()[1] == 'M'){
+					$('#quantidadeRecorrencia').val(Math.round(diffDays/30))
+				}
 			})
 		})
 
 		function updateDateTime(){
 			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"});
-			let horaAtual = dataAtual.split(' ')[1];
+			let horaAtual = dataAtual.split(', ')[1];
 
 			horaAtual = horaAtual.split(':');
 			horaAtual = `${horaAtual[0]}:${horaAtual[1]}`
 			
-			dataAtual = dataAtual.split(' ')[0];
+			dataAtual = dataAtual.split(', ')[0];
 			dataAtual = dataAtual.split('/')[2]+'-'+dataAtual.split('/')[1]+'-'+dataAtual.split('/')[0];
 
 			return {
@@ -663,7 +782,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			// iniciar o calendário
 			$.ajax({
 				type: 'POST',
-				url: 'filtraProfissionalAgenda_2.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'AGENDAMENTOS',
@@ -705,10 +824,10 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						})
 					})
 					// reseta o calendário
-					$('#fullcalendar-external').fullCalendar('destroy')
+					$('#calendarioagendamento').fullCalendar('destroy')
 					
 					// Initialize the calendar
-					$('#fullcalendar-external').fullCalendar({
+					$('#calendarioagendamento').fullCalendar({
 						header: {
 							left: 'prev,next today',
 							center: 'title',
@@ -727,7 +846,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						eventClick: function(event, jsEvent, view) {
 							$.ajax({
 								type: 'POST',
-								url: 'filtraProfissionalAgenda_2.php',
+								url: 'filtraAgendamento.php',
 								dataType: 'json',
 								data:{
 									'tipoRequest': 'GETAGENDAMENTO',
@@ -782,7 +901,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 
 							$.ajax({
 								type: 'POST',
-								url: 'filtraProfissionalAgenda_2.php',
+								url: 'filtraAgendamento.php',
 								dataType: 'json',
 								data:{
 									'tipoRequest': 'UPDATEDATA',
@@ -817,24 +936,41 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 								}
 								$('#page-modal-config').fadeIn(200)
 							}else{
-								getCmbs()
-								$('#inputData').val(inicio[0])
-								if(inicio[1]){
-									$('#inputHora').val(inicio[1])
-								}
+								$.ajax({
+									type: 'POST',
+									url: 'filtraAgendamento.php',
+									dataType: 'json',
+									data: {
+										'tipoRequest': 'CHECKAGENDAUNIDADE',
+										'data': inicio[0],
+										'hora': inicio[1],
+									},
+									success: function(response) {
+										if(response.tipo == 'error'){
+											alerta(response.titulo,response.menssagem,response.tipo)
+											$(this).val('')
+										}else{
+											getCmbs()
+											$('#inputData').val(inicio[0])
+											if(inicio[1]){
+												$('#inputHora').val(inicio[1])
+											}
 
-								$('#inputData').attr('readonly', false)
-								$('#inputHora').attr('readonly', false)
-								$('#textObservacao').attr('readonly', false)
-								$('#paciente').attr('disabled', false)
-								$('#modalidade').attr('disabled', false)
-								$('#servico').attr('disabled', false)
-								$('#localAtendimento').attr('disabled', false)
-								$('#medico').attr('disabled', false)
-								$('#addPaciente').removeClass('d-none')
-								$('#textObservacao').val('')
+											$('#inputData').attr('readonly', false)
+											$('#inputHora').attr('readonly', false)
+											$('#textObservacao').attr('readonly', false)
+											$('#paciente').attr('disabled', false)
+											$('#modalidade').attr('disabled', false)
+											$('#servico').attr('disabled', false)
+											$('#localAtendimento').attr('disabled', false)
+											$('#medico').attr('disabled', false)
+											$('#addPaciente').removeClass('d-none')
+											$('#textObservacao').val('')
 
-								$('#page-modal-agendamento').fadeIn(200)
+											$('#page-modal-agendamento').fadeIn(200)
+										}
+									}
+								})
 							}
 						},
 						isRTL: false
@@ -891,7 +1027,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			// vai preencher cmbPaciente
 			$.ajax({
 				type: 'POST',
-				url: 'filtraProfissionalAgenda_2.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data: {
 					'tipoRequest': 'PACIENTES'
@@ -910,7 +1046,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			// vai preencher cmbModalidade
 			$.ajax({
 				type: 'POST',
-				url: 'filtraProfissionalAgenda_2.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'MODALIDADES'
@@ -930,7 +1066,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			// vai preencher cmbServicos
 			$.ajax({
 				type: 'POST',
-				url: 'filtraProfissionalAgenda_2.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'SERVICOS'
@@ -949,7 +1085,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			// vai preencher cmbSituacao
 			$.ajax({
 				type: 'POST',
-				url: 'filtraProfissionalAgenda_2.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'SITUACAO'
@@ -968,7 +1104,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			// vai preencher cmbLocalAtendimento
 			$.ajax({
 				type: 'POST',
-				url: 'filtraProfissionalAgenda_2.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'LOCALATENDIMENTO'
@@ -988,7 +1124,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				// vai preencher cmbMedico
 				$.ajax({
 					type: 'POST',
-					url: 'filtraProfissionalAgenda_2.php',
+					url: 'filtraAgendamento.php',
 					dataType: 'json',
 					data:{
 						'tipoRequest': 'MEDICOS',
@@ -1011,7 +1147,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				// 	// vai preencher cmbLocalAtendimento
 				// 	$.ajax({
 				// 		type: 'POST',
-				// 		url: 'filtraProfissionalAgenda_2.php',
+				// 		url: 'filtraAgendamento.php',
 				// 		dataType: 'json',
 				// 		data:{
 				// 			'tipoRequest': 'LOCALATENDIMENTO',
@@ -1042,7 +1178,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 		function getFilters(){
 			$.ajax({
 				type: 'POST',
-				url: 'filtraProfissionalAgenda_2.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'MEDICOS'
@@ -1058,7 +1194,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			});
 			$.ajax({
 				type: 'POST',
-				url: 'filtraProfissionalAgenda_2.php',
+				url: 'filtraAgendamento.php',
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'SITUACAO'
@@ -1137,7 +1273,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 					<div class="card-body">
 						<div class="row">
 							<div class="col-md-12">
-								<div id="fullcalendar-external"></div>
+								<div id="calendarioagendamento"></div>
 							</div>
 						</div>
 					</div>
@@ -1830,10 +1966,10 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 											<div class="col-lg-6">
 												<select id="repeticao" name="repeticao" class="select-search" required>
 													<option value=''>Selecione</option>
-													<option value='1'>1 Semana</option>
-													<option value='2'>2 Semanas</option>
-													<option value='3'>3 Semanas</option>
-													<option value='4'>4 Semanas</option>
+													<option value='1S'>1 Semana</option>
+													<option value='2S'>2 Semanas</option>
+													<option value='3S'>3 Semanas</option>
+													<option value='4S'>4 Semanas</option>
 												</select>
 											</div>
 											<div class="col-lg-3">
