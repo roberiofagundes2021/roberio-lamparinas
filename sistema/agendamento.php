@@ -313,77 +313,94 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			})
 
 			$('#inserirAgendamento').on('click', function(e){
-				let menssageError = ''
-				switch (menssageError) {
-					case $('#data').val():
-						menssageError = 'Informe a data!!';
-						$('#data').focus();
-						break;
-					case $('#hora').val():
-						menssageError = 'Informe o horário!!';
-						$('#hora').focus();
-						break;
-					case $('#paciente').val():
-						menssageError = 'Informe o paciente!!';
-						$('#paciente').focus();
-						break;
-					case $('#modalidade').val():
-						menssageError = 'Informe a modalidade!!';
-						$('#modalidade').focus();
-						break;
-					case $('#servico').val():
-						menssageError = 'Informe o serviço!!';
-						$('#servico').focus();
-						break;
-					case $('#profissional').val():
-						menssageError = 'Informe o profissional!!';
-						$('#profissional').focus();
-						break;
-					case $('#localAtendimento').val():
-						menssageError = 'Informe o local!!';
-						$('#localAtendimento').focus();
-						break;
-					case $('#situacao').val():
-						menssageError = 'Informe a Situação!!';
-						$('#situacao').focus();
-						break;
-					default:
-						menssageError = '';
-						break;
-				}
-
-				if (menssageError) {
-					alerta('Campo Obrigatório!', menssageError, 'error')
-					return
-				}
-
-				if(!$('#idAgendamento').val() && $('#inputData').val() < updateDateTime().dataAtual || ($('#inputData').val() == updateDateTime().dataAtual && $('#inputHora').val() < updateDateTime().horaAtual)){
-					alerta('Data e Hora inválida!', 'Data e hora do registro não pode ser retroativa', 'error')
-					return
-				}
-
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAgendamento.php',
 					dataType: 'json',
 					data: {
-						'tipoRequest': 'ADDAGENDAMENTO',
-						'data':$('#inputData').val(),
-						'hora':$('#inputHora').val(),
-						'paciente':$('#paciente').val(),
-						'modalidade':$('#modalidade').val(),
-						'servico':$('#servico').val(),
-						'profissional':$('#medico').val(),
-						'local':$('#localAtendimento').val(),
-						'situacao':$('#situacao').val(),
-						'observacao':$('#textObservacao').val(),
-						'idAgendamento': $('#idAgendamento').val()
+						'tipoRequest': 'CHECKAGENDAUNIDADE',
+						'data': $('#inputData').val(),
+						'hora': $('#inputHora').val(),
 					},
 					success: function(response) {
-						$('#page-modal-agendamento').fadeOut(200)
-						getAgenda()
+						if(response.tipo == 'error'){
+							alerta(response.titulo,response.menssagem,response.tipo)
+							$('#inputData').val('')
+							$('#inputHora').val('')
+						}else{
+							let menssageError = ''
+							switch (menssageError) {
+								case $('#data').val():
+									menssageError = 'Informe a data!!';
+									$('#data').focus();
+									break;
+								case $('#hora').val():
+									menssageError = 'Informe o horário!!';
+									$('#hora').focus();
+									break;
+								case $('#paciente').val():
+									menssageError = 'Informe o paciente!!';
+									$('#paciente').focus();
+									break;
+								case $('#modalidade').val():
+									menssageError = 'Informe a modalidade!!';
+									$('#modalidade').focus();
+									break;
+								case $('#servico').val():
+									menssageError = 'Informe o serviço!!';
+									$('#servico').focus();
+									break;
+								case $('#profissional').val():
+									menssageError = 'Informe o profissional!!';
+									$('#profissional').focus();
+									break;
+								case $('#localAtendimento').val():
+									menssageError = 'Informe o local!!';
+									$('#localAtendimento').focus();
+									break;
+								case $('#situacao').val():
+									menssageError = 'Informe a Situação!!';
+									$('#situacao').focus();
+									break;
+								default:
+									menssageError = '';
+									break;
+							}
+
+							if (menssageError) {
+								alerta('Campo Obrigatório!', menssageError, 'error')
+								return
+							}
+
+							if(!$('#idAgendamento').val() && $('#inputData').val() < updateDateTime().dataAtual || ($('#inputData').val() == updateDateTime().dataAtual && $('#inputHora').val() < updateDateTime().horaAtual)){
+								alerta('Data e Hora inválida!', 'Data e hora do registro não pode ser retroativa', 'error')
+								return
+							}
+							$.ajax({
+								type: 'POST',
+								url: 'filtraAgendamento.php',
+								dataType: 'json',
+								data: {
+									'tipoRequest': 'ADDAGENDAMENTO',
+									'data':$('#inputData').val(),
+									'hora':$('#inputHora').val(),
+									'paciente':$('#paciente').val(),
+									'modalidade':$('#modalidade').val(),
+									'servico':$('#servico').val(),
+									'profissional':$('#medico').val(),
+									'local':$('#localAtendimento').val(),
+									'situacao':$('#situacao').val(),
+									'observacao':$('#textObservacao').val(),
+									'idAgendamento': $('#idAgendamento').val()
+								},
+								success: function(response) {
+									$('#page-modal-agendamento').fadeOut(200)
+									getAgenda()
+								}
+							});
+						}
 					}
-				});
+				})
 			})
 
 			$('#addPaciente').on('click', function(e){
