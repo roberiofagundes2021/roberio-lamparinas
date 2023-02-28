@@ -82,12 +82,12 @@ try {
 	<div style='text-align:center; margin-top: 20px;'><h1>ENTRADA DE PRODUTOS/SERVIÇOS</h1></div>
 	";
 	
-    $sql = "SELECT ProduId, ProduNome, MvXPrDetalhamento, UnMedSigla, MvXPrQuantidade, MvXPrValorUnitario,
+    $sql = "SELECT DISTINCT ProduId, ProduNome, MvXPrDetalhamento, UnMedSigla, MvXPrQuantidade, MvXPrValorUnitario,
 			MarcaNome as Marca, MvXPrLote, MvXPrValidade
             FROM Produto
             JOIN MovimentacaoXProduto on MvXPrProduto = ProduId
             JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-            JOIN Movimentacao on MovimId = $iMovimentacao
+            JOIN Movimentacao on MovimId = MvXPrMovimentacao
             JOIN OrdemCompra on OrComId = MovimOrdemCompra
             JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
             JOIN ProdutoXFabricante on PrXFaFluxoOperacional = FlOpeId
@@ -97,11 +97,11 @@ try {
     $rowProdutos = $result->fetchAll(PDO::FETCH_ASSOC);
     $totalProdutos = count($rowProdutos);
 
-    $sql = "SELECT ServiId, ServiNome, MvXSrDetalhamento, MvXSrQuantidade, MvXSrValorUnitario,
+    $sql = "SELECT DISTINCT ServiId, ServiNome, MvXSrDetalhamento, MvXSrQuantidade, MvXSrValorUnitario,
 			MarcaNome as Marca
             FROM Servico
             JOIN MovimentacaoXServico on MvXSrServico = ServiId
-			JOIN Movimentacao on MovimId = $iMovimentacao
+			JOIN Movimentacao on MovimId = MvXSrMovimentacao
             JOIN OrdemCompra on OrComId = MovimOrdemCompra
             JOIN FluxoOperacional on FlOpeId = OrComFluxoOperacional
             JOIN ServicoXFabricante on SrXFaFluxoOperacional = FlOpeId
