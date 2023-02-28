@@ -18,9 +18,8 @@
 	//Situação do Atendimento na Sessão
 	if (isset($_POST['SituaChave'])){
 		$_SESSION['SituaChave'] = $_POST['SituaChave'];
-	} else {
-		$_SESSION['SituaChave'] = null;
-	}
+	} 
+	
 	$SituaChave = $_SESSION['SituaChave'];
 	$desfechoChave = $rowClassificacao['AtendDesfechoChave'];
 ?>
@@ -40,7 +39,9 @@
 					case 'historicoPaciente': URL = 'atendimentoHistoricoPaciente.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'encaminhamentoMedico': URL = 'atendimentoEncaminhamentoMedico.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'receituarioMedico': URL = 'atendimentoReceituario.php'; $('#dadosPost').attr('target', '_self'); break;
-					case 'observacaoHospitalar': URL = 'atendimentoObservacaoHospitalar.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'observacaoHospitalarEntrada': URL = 'atendimentoObservacaoHospitalar.php'; $('#dadosPost').append(`<input type='hidden' name='screen' value='activeEntrada' />`); $('#dadosPost').attr('target', '_self'); break;
+					case 'observacaoHospitalarPrescricaoMedica': URL = 'atendimentoObservacaoHospitalar.php'; $('#dadosPost').append(`<input type='hidden' name='screen' value='activePrescricao' />`); $('#dadosPost').attr('target', '_self'); break;
+					case 'observacaoHospitalarEvolucaoMedica': URL = 'atendimentoObservacaoHospitalar.php'; $('#dadosPost').append(`<input type='hidden' name='screen' value='activeEvolucaoMedica' />`); $('#dadosPost').attr('target', '_self'); break;
 					case 'solicitacaoExame': URL = 'atendimentoSolicitacaoExame.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'solicitacaoProcedimento': URL = 'atendimentoSolicitacaoProcedimento.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'triagem': URL = 'atendimentoTriagem.php'; $('#dadosPost').attr('target', '_self'); break;
@@ -191,15 +192,19 @@
 							<a href="#" class="nav-link legitRipple">Observação Hospitalar</a>
 							<ul class="nav nav-group-sub">
 								<li class="nav-item">
-									<a href="#" class="nav-link itemLink" data-tipo='observacaoHospitalar'><i class="icon-file-eye"></i> Entrada</a>
+									<a href="#" class="nav-link itemLink" data-tipo='observacaoHospitalarEntrada'><i class="icon-file-eye"></i> Entrada</a>
 								</li>
 
 								<li class="nav-item">
-									<a href="#" class="nav-link itemLink" data-tipo='prescricaoMedica'><i class="icon-file-text2"></i> Prescrição Médica</a>
+									<a href="#" class="nav-link itemLink" data-tipo='observacaoHospitalarPrescricaoMedica'><i class="icon-file-text2"></i> Prescrição Médica</a>
 								</li>	
 
 								<li class="nav-item">
-									<a href="#" class="nav-link itemLink" data-tipo='prescricaoMedica'><i class="icon-file-text2"></i> Evolução</a>
+									<a href="#" class="nav-link itemLink" data-tipo='observacaoHospitalarEvolucaoMedica'><i class="icon-file-text2"></i> Evolução Médica</a>
+								</li>
+
+								<li class="nav-item">
+									<a href="#" class="nav-link itemLink" data-tipo='evolucaoEnfermagem'><i class="icon-file-text2"></i> Evolução de Enfermagem</a>
 								</li>
 							</ul>	
 						</li>

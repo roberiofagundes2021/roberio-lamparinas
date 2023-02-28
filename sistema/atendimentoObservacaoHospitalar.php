@@ -1131,6 +1131,48 @@ if ($row['ClienSexo'] == 'F'){
 
 			})
 
+			$('#salvarObservacaoEntrada').on('click', function (e) {
+				e.preventDefault();
+
+				let msg = ''
+				let historiaEntrada = $('#historiaEntrada').val()
+				let cid10 = $('#cid10').val()				
+				let servico = $('#servico').val()
+
+				switch(msg){
+					case historiaEntrada: msg = 'Informe o texto da História de entrada!';$('#historiaEntrada').focus();break
+					case cid10: msg = 'Informe o CID-10!';$('#cid10').focus();break
+					case servico: msg = 'Informe o Procedimento!';$('#servico').focus();break
+				}
+				if(msg){
+					alerta('Campo Obrigatório!', msg, 'error')
+					return
+				}
+
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+
+					data: {
+						'tipoRequest': 'SALVAROBSERVACAOENTRADA',
+						'iAtendimentoId' : <?php echo $iAtendimentoId; ?>,
+						'profissional' : <?php echo $userId; ?> ,
+						'historiaEntrada' : historiaEntrada,				
+						'cid10' : cid10,						
+						'servico' : servico						
+					},
+					success: function(response) {
+						if(response.status == 'success'){							
+							alerta(response.titulo, response.menssagem, response.status)
+						}else{
+							alerta(response.titulo, response.menssagem, response.status)
+						}
+					}
+				});
+				
+			})
+
 		}); //document.ready
 
 		function contarCaracteres(params) {
@@ -1566,10 +1608,16 @@ if ($row['ClienSexo'] == 'F'){
 		});
 
 		function mudarGrid(grid){
-			if (grid == 'evolucao') {				
+			if (grid == 'entradaPaciente') {
+				$(".box-entradaPaciente").css('display', 'block');
+				$(".box-evolucao").css('display', 'none');
+				$(".box-prescricao").css('display', 'none');				
+			} else if (grid == 'evolucao') {	
+				$(".box-entradaPaciente").css('display', 'none');			
 				$(".box-evolucao").css('display', 'block');
 				$(".box-prescricao").css('display', 'none');
 			} else if (grid == 'prescricao') {
+				$(".box-entradaPaciente").css('display', 'none');
 				$(".box-prescricao").css('display', 'block');
 				$(".box-evolucao").css('display', 'none');
 			}
@@ -2013,16 +2061,22 @@ if ($row['ClienSexo'] == 'F'){
 						<div class="card">
 							<div class="card-header header-elements-inline">
 								<div class="col-lg-11">	
-									<button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg active mr-2 " onclick="mudarGrid('prescricao')" style="margin-left: -10px;" >Prescrição</button>
-									<button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg " onclick="mudarGrid('evolucao')" >Evolução</button>
+									<button type="button" id="entradaPaciente-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activeEntrada' ? 'active' : '' ) : ''; ?> " onclick="mudarGrid('entradaPaciente')" style="margin-left: -10px;" >Entrada do Paciente</button>
+									<button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activePrescricao' ? 'active' : '' ) : ''; ?> " onclick="mudarGrid('prescricao')"  >Prescrição</button>
+									<button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activeEvolucaoMedica' ? 'active' : '' ) : ''; ?> " onclick="mudarGrid('evolucao')" >Evolução Médica</button>
+									<button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg itemLink " data-tipo='evolucaoEnfermagem' >Evolução de Enfermagem</button>
 								</div>
 							</div>								
 						</div>
+
+						<div class="box-entradaPaciente" style="display: <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activeEntrada' ? 'block' : 'none' ) : 'none'; ?>;">
+							<?php include_once("boxEntradaPaciente.php"); ?>
+						</div>
 						
-						<div class="box-prescricao" style="display: block;">
+						<div class="box-prescricao" style="display: <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activePrescricao' ? 'block' : 'none' ) : 'none'; ?>;">
 							<?php include_once("boxPrescricaoObservacao.php"); ?>					
 						</div>
-						<div class="box-evolucao" style="display: none;">
+						<div class="box-evolucao" style="display : <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activeEvolucaoMedica' ? 'block' : 'none' ) : 'none'; ?>;">
 							<?php include_once("boxEvolucaoObservacao.php"); ?>
 						</div>   
 
