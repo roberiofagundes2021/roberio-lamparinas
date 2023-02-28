@@ -45,10 +45,12 @@ $sql = "SELECT AtendId, AtendCliente, AtendNumRegistro, AtModNome, AtendClassifi
 		LEFT JOIN AtendimentoClassificacaoRisco ON AtClRId = AtendClassificacaoRisco
         LEFT JOIN AtendimentoXLeito ON AtXLeAtendimento = AtendId
         LEFT JOIN EspecialidadeLeito ON AtXLeEspecialidadeLeito = EsLeiId
-        LEFT JOIN TipoInternacao ON EsLeiTipoInternacao = TpIntId
         LEFT JOIN Leito ON AtXLeLeito = LeitoId
-        LEFT JOIN Quarto ON LeitoQuarto = QuartId
-        LEFT JOIN Ala ON QuartAla = AlaId
+		LEFT JOIN VincularLeitoXLeito ON VLXLeLeito = LeitoId
+        LEFT JOIN VincularLeito ON VnLeiId = VLXLeVinculaLeito
+        LEFT JOIN Quarto ON QuartId = VnLeiQuarto
+		LEFT JOIN TipoInternacao ON TpIntId = VnLeiTipoInternacao
+        LEFT JOIN Ala ON AlaId = VnLeiAla
 		JOIN Situacao ON SituaId = AtendSituacao
 	    WHERE  AtendId = $iAtendimentoId 
 		ORDER BY AtendNumRegistro ASC";
