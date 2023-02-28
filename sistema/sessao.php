@@ -58,7 +58,7 @@ $arquivosEmpresa = array(
 	'parametro.php', 'menuLeftSecundarioAjax.php', 'filtraLocalEstoque.php', 'localEstoque.php', 'localEstoqueNovo.php', 
 	'localEstoqueEdita.php', 'localEstoqueExclui.php', 'localEstoqueValida.php', 'localEstoqueMudaSituacao.php', 
 	'usuarioLotacao.php', 'usuarioLotacaoNovo.php', 'usuarioLotacaoValida.php', 'usuarioLotacaoExclui.php',
-	'unidadeGravaPasso1.php'
+	'unidadeGravaPasso1.php', 'filtraUnidadeNovo.php'
 );
 
 //Se existe a sessão $_SESSION['EmpresaId'] e a página que está sendo acessada não é nenhuma das sitadas acima, limpa essa sessão.	  

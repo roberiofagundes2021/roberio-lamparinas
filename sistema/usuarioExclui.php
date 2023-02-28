@@ -65,7 +65,7 @@ if(isset($_POST['inputUsuarioId'])){
 		$_SESSION['msg']['mensagem'] ="Erro ao excluir usuário!!! O registro a ser excluído está sendo usado em outro local.";
 		$_SESSION['msg']['tipo'] = "error";	
 		
-		//echo 'Error: ' . $e->getMessage();die;
+		echo 'Error: ' . $e->getMessage();die;
 	}
 }
 

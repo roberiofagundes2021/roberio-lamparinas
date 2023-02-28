@@ -664,6 +664,6 @@ try{
     'type' => $typeRequest,
     'err' => $e,
     'sql' => $sql
-  ]);
+  ]);die;
 }
 ?>

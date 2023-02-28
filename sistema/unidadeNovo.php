@@ -246,7 +246,7 @@ include('global_assets/php/conexao.php');
                 
                 for(key in itensRequest){
                   $('#infoCard').append(`
-                  <div class='row col-lg-10 text-center mt-4'>
+                  <div class='row col-lg-6 text-center mt-3 ml-3' style="background-color: #f8f8f8; border: 1px solid #eee; padding: 10px;">
                     <span id='textProgress'>Incluindo ${itensRequest[key]}</span>
                     <div id="imgLoading-${key}" class="ml-2">
                       <img src='global_assets/images/lamparinas/loader.gif' style='width: 80px; height: 40px;'>
@@ -263,11 +263,11 @@ include('global_assets/php/conexao.php');
                       'unidadeIdNovo': iUnidadeNovo
                     },
                     success: function(response) {
-                      $(`#imgLoading-${key}`).html('<i class="icon-checkmark3 text-green" style="font-size:30px;"></i>')
+                      $(`#imgLoading-${key}`).html('<i class="icon-checkmark3 text-green" style="font-size:22px;"></i>')
                       porcentagem += increment
                     },
                     error: function(response){
-                      $(`#imgLoading-${key}`).html('<i class="icon-x text-danger" style="font-size:30px;"></i>')
+                      $(`#imgLoading-${key}`).html('<i class="icon-x text-danger" style="font-size:22px;"></i>')
                       porcentagem += increment
                       erros.push(key)
                     }
@@ -278,7 +278,7 @@ include('global_assets/php/conexao.php');
                   // colocar uma menssagem falando que houve erro ao cadastrar alguns itens e apresentar
                   // botão de nova tentativa
                 }else{
-                  window.location.href='empresa.php'
+                  window.location.href='unidade.php'
                 }
               }
             })
@@ -730,7 +730,7 @@ include('global_assets/php/conexao.php');
                           <option value="SP">São Paulo</option>
                           <option value="SE">Sergipe</option>
                           <option value="TO">Tocantins</option>
-                          <option value="ES">Estrangeiro</option>
+                          <option value="SS">Estrangeiro</option>
                         </select>
                       </div>
                     </div>
