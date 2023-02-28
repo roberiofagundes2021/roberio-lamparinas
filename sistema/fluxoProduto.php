@@ -645,7 +645,7 @@ try{
 														FROM Produto
 														JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
 														JOIN Situacao on SituaId = ProduStatus
-														LEFT  JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = $iFluxoOperacional
+														LEFT JOIN FluxoOperacionalXProduto on FOXPrProduto = ProduId and FOXPrFluxoOperacional = $iFluxoOperacional
 														LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
 														WHERE ProduEmpresa = ".$_SESSION['EmpreId']." and ProduCategoria = ".$iCategoria." and SituaChave = 'ATIVO'";
 														if ($sSubCategorias <> ""){
@@ -665,8 +665,9 @@ try{
 													$sql = "SELECT ProduId, ProduNome, TRXPrDetalhamento as Detalhamento, UnMedSigla, SbCatNome
 															FROM Produto															
 															JOIN TermoReferenciaXProduto on TRXPrProduto = ProduId
+															JOIN TRXSubCategoria ON TRXSCTermoReferencia = TRXPrTermoReferencia
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+															LEFT JOIN SubCategoria on SbCatId = TRXSCSubCategoria
 															WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia'];
 															if ($sSubCategorias <> ""){
 																$sql .= " and SbCatId in (".$sSubCategorias.")";
@@ -677,8 +678,9 @@ try{
 															FROM Produto
 															JOIN ProdutoOrcamento on PrOrcProduto = ProduId
 															JOIN TermoReferenciaXProduto on TRXPrProduto = PrOrcId
+															JOIN TRXSubCategoria ON TRXSCTermoReferencia = TRXPrTermoReferencia
 															JOIN UnidadeMedida on UnMedId = ProduUnidadeMedida
-															LEFT JOIN SubCategoria on SbCatId = ProduSubCategoria
+															LEFT JOIN SubCategoria on SbCatId = TRXSCSubCategoria
 															WHERE ProduEmpresa = " . $_SESSION['EmpreId'] . " and TRXPrTermoReferencia = ".$row['FlOpeTermoReferencia'];
 															if ($sSubCategorias <> ""){
 																$sql .= " and SbCatId in (".$sSubCategorias.")";
