@@ -522,6 +522,24 @@ if ($row['ClienSexo'] == 'F'){
             document.formAnexo.submit();
         }
 
+        function mudarTela(next){
+
+            let HTML = '';
+
+            if ( next === 'entradaPaciente' ) {
+                HTML += `<input type='hidden' id='screen' name='screen' value='activeEntrada' />`; 
+            } else if( next === 'prescricao' ) {
+                HTML += `<input type='hidden' id='screen' name='screen' value='activePrescricao' />`;
+            } else if( next === 'evolucaoMedica' ) {
+                HTML += `<input type='hidden' id='screen' name='screen' value='activeEvolucaoMedica' />`;
+            }
+    
+            $('#dadosPost').attr('action', 'atendimentoObservacaoHospitalar.php')
+            $('#dadosPost').append(HTML)
+            $('#dadosPost').attr('method', 'POST')
+            $('#dadosPost').submit()
+        }
+
 	</script>
 
     <style>
@@ -596,6 +614,19 @@ if ($row['ClienSexo'] == 'F'){
                                 <?php include ('atendimentoDadosPacienteHospitalar.php'); ?>
                                 <?php include ('atendimentoDadosSinaisVitais.php'); ?>
                             </div>
+
+                            <?php if ($_SESSION['UltimaPagina'] != 'HOSPITALAR') { ?>                          
+                                <div class="card">
+                                    <div class="card-header header-elements-inline">
+                                        <div class="col-lg-11">	
+                                        <button type="button" id="entradaPaciente-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2" onclick="mudarTela('entradaPaciente')" style="margin-left: -10px;" >Entrada do Paciente</button>
+                                            <button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 " onclick="mudarTela('prescricao')"  >Prescrição</button>
+                                            <button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 " onclick="mudarTela('evolucaoMedica')" >Evolução Médica</button>
+                                            <button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg active " >Evolução de Enfermagem</button>
+                                        </div>
+                                    </div>								
+                                </div>
+                            <?php } ?>
                         
                             <div class="card">
 

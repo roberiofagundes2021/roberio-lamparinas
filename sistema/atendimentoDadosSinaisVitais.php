@@ -46,7 +46,7 @@ if(isset($iAtendimentoTriagemId ) && $iAtendimentoTriagemId ){
             dataType: 'json',
             data:{
                 'tipoRequest': 'GETSINAISVITAIS',
-                'id' : <?php echo $iAtendimentoTriagemId; ?>
+                'id' : <?php echo isset($iAtendimentoTriagemId) ? $iAtendimentoTriagemId : 'null'; ?>
             },
             success: function(response) {    
 
