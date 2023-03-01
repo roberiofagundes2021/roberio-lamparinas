@@ -101,19 +101,29 @@ if(isset($_POST['cmbTipoAcomodacao'])){
 				e.preventDefault();
 				
 				var cmbTipoAcomodacao = $('#cmbTipoAcomodacao').val();
+				var cmbAla = $('#cmbAla ').val();
+				var cmbEspecialidadeLeito = $('#cmbEspecialidadeLeito ').val();
+				var cmbTipoInternacao = $('#cmbTipoInternacao ').val();
+				var cmbQuarto = $('#cmbQuarto ').val();
 				
 				//remove os espaços desnecessários antes e depois
 				cmbTipoAcomodacao = cmbTipoAcomodacao.trim();
+				cmbAla = cmbAla.trim();
+				cmbEspecialidadeLeito = cmbEspecialidadeLeito.trim();
+				cmbTipoInternacao = cmbTipoInternacao.trim();
+				cmbQuarto = cmbQuarto.trim();
+				
 
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
 					type: "POST",
 					url: "vincularLeitoValida.php",
 					data: ('acomodacao='+cmbTipoAcomodacao),
+					//data: ('acomodacao='+cmbTipoAcomodacao+'&ala='+cmbAla+'&especialidadeLeito='+cmbEspecialidadeLeito+'&tipoInternacao='+cmbTipoInternacao+'&quarto='+cmbQuarto),
 					success: function(resposta){
 						
 						if(resposta == 1){
-							alerta('Atenção','Esse registro já existe!','error');
+							alerta('Atenção','Esse tipo de acomodação já existe! Editar o existente.','error');
 							return false;
 						}
 

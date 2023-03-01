@@ -132,9 +132,25 @@ if(isset($_POST['cmbTipoAcomodacao'])){
 
 				var cmbTipoAcomodacaoNovo  = $('#cmbTipoAcomodacao').val();
 				var cmbTipoAcomodacaoVelho = $('#cmbTipoAcomodacaoNome').val();
+				
+				var cmbAlaNovo  = $('#cmbAla').val();
+				var cmbAlaVelho = $('#cmbAlaNome').val();
+
+				var cmbEspecialidadeLeitoNovo  = $('#cmbEspecialidadeLeito').val();
+				var cmbEspecialidadeLeitoVelho = $('#cmbEspecialidadeLeitoNome').val();
+
+				var cmbTipoInternacaoNovo  = $('#cmbTipoInternacao').val();
+				var cmbTipoInternacaoVelho = $('#cmbTipoInternacaoNome').val();
+
+				var cmbQuartoNovo  = $('#cmbQuarto').val();
+				var cmbQuartoVelho = $('#cmbQuartoNome').val();
 
 				//remove os espaços desnecessários antes e depois
 				cmbTipoAcomodacaoNovo = cmbTipoAcomodacaoNovo.trim();
+				cmbAlaNovo = cmbAlaNovo.trim();
+				cmbEspecialidadeLeitoNovo = cmbEspecialidadeLeitoNovo.trim();
+				cmbTipoInternacaoNovo = cmbTipoInternacaoNovo.trim();
+				cmbQuartoNovo = cmbQuartoNovo.trim();
 
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 
@@ -142,6 +158,13 @@ if(isset($_POST['cmbTipoAcomodacao'])){
 					type: "POST",
 					url: "vincularLeitoValida.php",
 					data: ('acomodacaoNovo='+cmbTipoAcomodacaoNovo+'&acomodacaoVelho='+cmbTipoAcomodacaoVelho),
+
+					/*data: (	'acomodacaoNovo='+cmbTipoAcomodacaoNovo+'&acomodacaoVelho='+cmbTipoAcomodacaoVelho+
+							'alaNovo='+cmbAlaNovo+'&alaVelho='+cmbAlaVelho+
+							'especialidadeLeitoNovo='+cmbEspecialidadeLeitoNovo+'&especialidadeLeitoVelho='+cmbEspecialidadeLeitoVelho+
+							'tipoInternacaoNovo='+cmbTipoInternacaoNovo+'&tipoInternacaoVelho='+cmbTipoInternacaoVelho+
+							'quartoNovo='+cmbQuartoNovo+'&quartoVelho='+cmbQuartoVelho),*/
+
 					success: function(resposta){
 						
 						if(resposta == 1){
@@ -204,6 +227,10 @@ if(isset($_POST['cmbTipoAcomodacao'])){
 						
 						<input type="hidden" id="inputVincularLeitoId" name="inputVincularLeitoId" value="<?php echo $row['VnLeiId']; ?>">
 						<input type="hidden" id="cmbTipoAcomodacaoNome" name="cmbTipoAcomodacaoNome" value="<?php echo $row['VnLeiTipoAcomodacao']; ?>" >
+						<input type="hidden" id="cmbAlaNome" name="cmbAlaNome" value="<?php echo $row['VnLeiAla']; ?>" >
+						<input type="hidden" id="cmbEspecialidadeLeitoNome" name="cmbEspecialidadeLeitoNome" value="<?php echo $row['VnLeiEspecialidadeLeito']; ?>" >
+						<input type="hidden" id="cmbTipoInternacaoNome" name="cmbTipoInternacaoNome" value="<?php echo $row['VnLeiTipoInternacao']; ?>" >
+						<input type="hidden" id="cmbQuartoNome" name="cmbQuartoNome" value="<?php echo $row['VnLeiQuarto']; ?>" >
 						
 						<div class="card-body">								
 							<div class="row">						
