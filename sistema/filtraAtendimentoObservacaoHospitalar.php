@@ -181,8 +181,11 @@ try {
 
 		$iAtendimento = $_POST['id'];
 	
-		$sql = "SELECT *
+		$sql = "SELECT AtEDiId, AtEDiDataInicio, AtEDiHoraInicio, AtEDiEvolucaoDiaria, AtEDiEditavel , Profissional.ProfiNome, Profissao.ProfiCbo
 			FROM AtendimentoEvolucaoDiaria
+			LEFT JOIN Usuario ON AtEDiProfissional = UsuarId
+			LEFT JOIN Profissional ON ProfiUsuario = UsuarId
+			JOIN Profissao ON ProfiProfissao = Profissao.ProfiId
 			WHERE AtEDiAtendimento = $iAtendimento";
 
 		$result = $conn->query($sql);
@@ -198,7 +201,8 @@ try {
 				'editavel' => $item['AtEDiEditavel'],
 				'dataHora'=> mostraData($item['AtEDiDataInicio']) . ' ' . mostraHora($item['AtEDiHoraInicio']),
 				'evolucao'=> substr($item['AtEDiEvolucaoDiaria'], 0, 100) . '...',
-				'evolucaoCompl' => $item['AtEDiEvolucaoDiaria']
+				'evolucaoCompl' => $item['AtEDiEvolucaoDiaria'],
+				'profissionalCbo' => $item['ProfiNome'] . ' / ' . $item['ProfiCbo']
 			]);
 		}
 		

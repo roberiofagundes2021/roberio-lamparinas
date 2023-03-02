@@ -1252,6 +1252,7 @@ if ($row['ClienSexo'] == 'F'){
 							<td class="text-left">${item.item}</td>
 							<td class="text-left">${item.dataHora}</td>
 							<td class="text-left" title="${item.evolucaoCompl}">${item.evolucao}</td>
+							<td class="text-left">${item.profissionalCbo}</td>
 							<td class="text-center">${acoes}</td>
 						</tr>`
 

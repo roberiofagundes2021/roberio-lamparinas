@@ -3472,8 +3472,11 @@ try{
 
 		$iAtendimento = $_POST['id'];
 	
-		$sql = "SELECT *
+		$sql = "SELECT EnEvoId , EnEvoDataInicio,EnEvoHoraInicio, EnEvoJustificativaLancRetroativo, EnEvoEvolucao, EnEvoEditavel, Profissional.ProfiNome, Profissao.ProfiCbo
 			FROM EnfermagemEvolucao
+			LEFT JOIN Usuario ON EnEvoProfissional = UsuarId
+			LEFT JOIN Profissional ON ProfiUsuario = UsuarId
+			JOIN Profissao ON ProfiProfissao = Profissao.ProfiId
 			WHERE EnEvoAtendimento = $iAtendimento";
 
 		$result = $conn->query($sql);
@@ -3491,6 +3494,7 @@ try{
 				'evolucao'=> substr($item['EnEvoEvolucao'], 0, 100) . '...',
 				'justificativaCompleta' => $item['EnEvoJustificativaLancRetroativo'],
 				'evolucaoCompleta' => $item['EnEvoEvolucao'],
+				'profissionalCbo' => $item['ProfiNome'] . ' / ' . $item['ProfiCbo'],
 				'editavel' => $item['EnEvoEditavel']
 			]);
 		}

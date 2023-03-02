@@ -131,18 +131,23 @@ if ($row['ClienSexo'] == 'F'){
 				},
 				{ 
 					orderable: true,
-					width: "30%", 
+					width: "25%", 
 					targets: [2]
 				},				
 				{ 
 					orderable: true,  
-					width: "30%", 
+					width: "25%", 
 					targets: [3]
 				},				
 				{ 
 					orderable: true,  
-					width: "10%", 
+					width: "15%", 
 					targets: [4]
+				},				
+				{ 
+					orderable: true,  
+					width: "10%", 
+					targets: [5]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
 				language: {
@@ -458,6 +463,7 @@ if ($row['ClienSexo'] == 'F'){
                             <td class="text-left">${item.dataHora}</td>
                             <td class="text-left" title="${item.justificativaCompleta}">${item.justificativa}</td>
                             <td class="text-left" title="${item.evolucaoCompleta}">${item.evolucao}</td>
+                            <td class="text-left" >${item.profissionalCbo}</td>
                             <td class="text-center">${acoes}</td>
                         </tr>`
 
@@ -695,6 +701,7 @@ if ($row['ClienSexo'] == 'F'){
                                                     <th class="text-left">Data/ Hora</th>
                                                     <th class="text-left">Justificativa de Lançamento Retroativo</th>
                                                     <th class="text-left">Evolução Diária</th>
+                                                    <th class="text-left">Profissional/ CBO</th>
                                                     <th class="text-center">Ações</th>
                                                 </tr>
                                             </thead>

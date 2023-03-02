@@ -52,6 +52,7 @@
                         <th class="text-left">Item</th>
                         <th class="text-left">Data/ Hora</th>
                         <th class="text-left">Evolução Diária</th>
+                        <th class="text-left">Profissional/ CBO</th>
                         <th class="text-center">Ações</th>
                     </tr>
                 </thead>
