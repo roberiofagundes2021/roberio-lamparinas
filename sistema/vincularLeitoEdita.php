@@ -145,28 +145,22 @@ if(isset($_POST['cmbTipoAcomodacao'])){
 				var cmbQuartoNovo  = $('#cmbQuarto').val();
 				var cmbQuartoVelho = $('#cmbQuartoNome').val();
 
-				//remove os espaços desnecessários antes e depois
-				cmbTipoAcomodacaoNovo = cmbTipoAcomodacaoNovo.trim();
-				cmbAlaNovo = cmbAlaNovo.trim();
-				cmbEspecialidadeLeitoNovo = cmbEspecialidadeLeitoNovo.trim();
-				cmbTipoInternacaoNovo = cmbTipoInternacaoNovo.trim();
-				cmbQuartoNovo = cmbQuartoNovo.trim();
-
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 
 				$.ajax({
 					type: "POST",
 					url: "vincularLeitoValida.php",
-					data: ('acomodacaoNovo='+cmbTipoAcomodacaoNovo+'&acomodacaoVelho='+cmbTipoAcomodacaoVelho),
+					/*data: ('acomodacaoNovo='+cmbTipoAcomodacaoNovo+'&acomodacaoVelho='+cmbTipoAcomodacaoVelho),*/
 
-					/*data: (	'acomodacaoNovo='+cmbTipoAcomodacaoNovo+'&acomodacaoVelho='+cmbTipoAcomodacaoVelho+
-							'alaNovo='+cmbAlaNovo+'&alaVelho='+cmbAlaVelho+
-							'especialidadeLeitoNovo='+cmbEspecialidadeLeitoNovo+'&especialidadeLeitoVelho='+cmbEspecialidadeLeitoVelho+
-							'tipoInternacaoNovo='+cmbTipoInternacaoNovo+'&tipoInternacaoVelho='+cmbTipoInternacaoVelho+
-							'quartoNovo='+cmbQuartoNovo+'&quartoVelho='+cmbQuartoVelho),*/
+					data: (	'acomodacaoNovo='+cmbTipoAcomodacaoNovo+'&acomodacaoVelho='+cmbTipoAcomodacaoVelho+
+							'&alaNovo='+cmbAlaNovo+'&alaVelho='+cmbAlaVelho+
+							'&especialidadeLeitoNovo='+cmbEspecialidadeLeitoNovo+'&especialidadeLeitoVelho='+cmbEspecialidadeLeitoVelho+
+							'&tipoInternacaoNovo='+cmbTipoInternacaoNovo+'&tipoInternacaoVelho='+cmbTipoInternacaoVelho+
+							'&quartoNovo='+cmbQuartoNovo+'&quartoVelho='+cmbQuartoVelho),
 
 					success: function(resposta){
-						
+						//console.log(resposta)
+						//return false
 						if(resposta == 1){
 							alerta('Atenção','Esse tipo de acomodação já existe! Editar o existente.','error');
 							return false;								
