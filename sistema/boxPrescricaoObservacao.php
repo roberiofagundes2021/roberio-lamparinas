@@ -274,12 +274,26 @@
             </div>				
             
             <div class="row" style="margin-top: 20px">
-                <div class="col-lg-12">
+                <div class="col-lg-7">
                     <div class="form-group">
                         <label for="justificativa">Descrição da Posologia <span class="text-danger">*</span></label>
                         <textarea rows="5" cols="5" maxLength="350" id="descricaoPosologiaMedicamentos" name="descricaoPosologiaMedicamentos" onInput="contarCaracteres(this);" onChange="contarCaracteres(this);" class="form-control" placeholder="Digite aqui o texto da Posologia." ></textarea>
                         <small class="text-muted form-text">Max. 350 caracteres <span class="caracteresdescricaoPosologiaMedicamentos"></span></small>
                     </div>
+                </div>
+
+                <div class=" row col-lg-5">
+
+                    <div class="col-lg-6">
+                        <label>Validade de Prescrição:</label>
+                        <input type="datetime-local" class="form-control" name="validadeInicioMedicamentos" id="validadeInicioMedicamentos" min="<?php echo date('Y-m-d') ?>">
+                    </div>
+
+                    <div class="col-lg-6">
+                        <label>&nbsp;</label>
+                        <input type="datetime-local" class="form-control" name="validadeFimMedicamentos" id="validadeFimMedicamentos" min="<?php echo date('Y-m-d') ?>">
+                    </div>
+
                 </div>
             </div>
             
@@ -499,13 +513,28 @@
             </div>				
             
             <div class="row" style="margin-top: 20px">
-                <div class="col-lg-12">
+                <div class="col-lg-7">
                     <div class="form-group">
                         <label for="justificativa">Descrição da Posologia <span class="text-danger">*</span></label>
                         <textarea rows="5" cols="5" maxLength="350" id="descricaoPosologiaSolucoes" name="descricaoPosologiaSolucoes" onInput="contarCaracteres(this);" class="form-control" placeholder="Digite aqui o texto da Posologia." ></textarea>
                         <small class="text-muted form-text">Max. 350 caracteres <span class="caracteresdescricaoPosologiaSolucoes"></span></small>
                     </div>
                 </div>
+
+                <div class=" row col-lg-5">
+
+                    <div class="col-lg-6">
+                        <label>Validade de Prescrição:</label>
+                        <input type="datetime-local" class="form-control" name="validadeInicioSolucoes" id="validadeInicioSolucoes" min="<?php echo date('Y-m-d') ?>">
+                    </div>
+
+                    <div class="col-lg-6">
+                        <label>&nbsp;</label>
+                        <input type="datetime-local" class="form-control" name="validadeFimSolucoes" id="validadeFimSolucoes" min="<?php echo date('Y-m-d') ?>">
+                    </div>
+
+                </div>
+
             </div>
         </form>
 

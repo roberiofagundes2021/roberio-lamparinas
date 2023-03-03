@@ -12,6 +12,7 @@ if (isset($_SESSION['iAtendimentoId']) && $iAtendimentoId == null) {
 	$iAtendimentoId = $_SESSION['iAtendimentoId'];
 }
 $_SESSION['iAtendimentoId'] = null;
+$iUnidade = $_SESSION['UnidadeId'];
 
 $uTipoAtendimento = $_SESSION['UltimaPagina'];
 if(!$iAtendimentoId){
@@ -178,10 +179,15 @@ if ($row['ClienSexo'] == 'F'){
 					width: "30%", 
 					targets: [2]
 				},				
+				{
+					orderable: true,  
+					width: "20%", 
+					targets: [3]
+				},		
 				{ 
 					orderable: true,  
 					width: "10%", 
-					targets: [3]
+					targets: [4]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
 				language: {
@@ -336,6 +342,25 @@ if ($row['ClienSexo'] == 'F'){
 				let msg = ''
 				let evolucaoDiaria = $('#evolucaoDiaria').val()
 
+				let inputSistolica = $('#inputSistolica').val()
+				let inputDiatolica = $('#inputDiatolica').val()
+				let inputCardiaca = $('#inputCardiaca').val()
+				let inputRespiratoria = $('#inputRespiratoria').val()
+				let inputTemperatura = $('#inputTemperatura').val()
+				let inputSPO = $('#inputSPO').val()
+				let inputHGT = $('#inputHGT').val()
+				let peso = $('#inputPeso').val()
+                let inputAlergia = $('#inputAlergia').val()
+                let inputDiabetes = $('#inputDiabetes').val()
+                let inputHipertensao = $('#inputHipertensao').val()
+                let inputNeoplasia = $('#inputNeoplasia').val()
+                let inputUsoMedicamento = $('#inputUsoMedicamento').val()
+                let inputAlergiaDescricao = $('#inputAlergiaDescricao').val()
+                let inputDiabetesDescricao = $('#inputDiabetesDescricao').val()
+                let inputHipertensaoDescricao = $('#inputHipertensaoDescricao').val()
+                let inputNeoplasiaDescricao = $('#inputNeoplasiaDescricao').val()
+                let inputUsoMedicamentoDescricao = $('#inputUsoMedicamentoDescricao').val()
+
 				switch(msg){
 					case evolucaoDiaria: msg = 'Informe o texto da Evolução!';$('#evolucaoDiaria').focus();break
 				}
@@ -352,7 +377,25 @@ if ($row['ClienSexo'] == 'F'){
 					data: {
 						'tipoRequest': 'INCLUIREVOLUCAODIARIA',
 						'iAtendimentoId' : <?php echo $iAtendimentoId; ?>,
-						'evolucaoDiaria' : evolucaoDiaria						
+						'evolucaoDiaria' : evolucaoDiaria,
+						'inputSistolica' : inputSistolica,		
+						'inputDiatolica' : inputDiatolica,		
+						'inputCardiaca' : inputCardiaca,		
+						'inputRespiratoria' : inputRespiratoria,		
+						'inputTemperatura' : inputTemperatura,		
+						'inputSPO' : inputSPO,		
+						'inputHGT' : inputHGT,
+						'inputAlergia' : inputAlergia,
+						'inputDiabetes' : inputDiabetes,
+						'inputHipertensao' : inputHipertensao,
+						'inputNeoplasia' : inputNeoplasia,
+						'inputUsoMedicamento' : inputUsoMedicamento,
+						'inputAlergiaDescricao' : inputAlergiaDescricao,
+						'inputDiabetesDescricao' : inputDiabetesDescricao,
+						'inputHipertensaoDescricao' : inputHipertensaoDescricao,
+						'inputNeoplasiaDescricao' : inputNeoplasiaDescricao,
+						'inputUsoMedicamentoDescricao' : inputUsoMedicamentoDescricao,
+						'peso' : peso						
 					},
 					success: function(response) {
 						if(response.status == 'success'){
@@ -386,6 +429,8 @@ if ($row['ClienSexo'] == 'F'){
 				let horaInicioAdmMedicamentos = $('#horaInicioAdmMedicamentos').val()
 				let complementoMedicamentos = $('#complementoMedicamentos').val()
 				let descricaoPosologiaMedicamentos = $('#descricaoPosologiaMedicamentos').val()
+				let validadeInicioMedicamentos = $('#validadeInicioMedicamentos').val()
+				let validadeFimMedicamentos = $('#validadeFimMedicamentos').val()
 
 				checkBombaInfusaoMedicamentos = checkBombaInfusaoMedicamentos == true ? 1 : 0;
 				checkInicioAdmMedicamentos = checkInicioAdmMedicamentos == true ? 1 : 0;
@@ -440,6 +485,8 @@ if ($row['ClienSexo'] == 'F'){
 						'horaInicioAdmMedicamentos' : horaInicioAdmMedicamentos,
 						'complementoMedicamentos' : complementoMedicamentos,
 						'descricaoPosologiaMedicamentos' : descricaoPosologiaMedicamentos,		
+						'validadeInicioMedicamentos' : validadeInicioMedicamentos,
+						'validadeFimMedicamentos' : validadeFimMedicamentos
 					},
 					success: function(response) {
 						if(response.status == 'success'){
@@ -478,6 +525,8 @@ if ($row['ClienSexo'] == 'F'){
 				let horaInicioAdmSolucoes = $('#horaInicioAdmSolucoes').val()
 				let complementoSolucoes = $('#complementoSolucoes').val()
 				let descricaoPosologiaSolucoes = $('#descricaoPosologiaSolucoes').val()
+				let validadeInicioSolucoes = $('#validadeInicioSolucoes').val()
+				let validadeFimSolucoes = $('#validadeFimSolucoes').val()
 
 				checkBombaInfusaoSolucoes = checkBombaInfusaoSolucoes == true ? 1 : 0;
 				checkInicioAdmSolucoes = checkInicioAdmSolucoes == true ? 1 : 0;
@@ -539,6 +588,8 @@ if ($row['ClienSexo'] == 'F'){
 						'horaInicioAdmSolucoes' : horaInicioAdmSolucoes,
 						'complementoSolucoes' : complementoSolucoes,
 						'descricaoPosologiaSolucoes' : descricaoPosologiaSolucoes,
+						'validadeInicioSolucoes' : validadeInicioSolucoes,
+						'validadeFimSolucoes' : validadeFimSolucoes
 						
 					},
 					success: function(response) {
@@ -685,6 +736,25 @@ if ($row['ClienSexo'] == 'F'){
 				let idEvolucao = $('#idEvolucao').val()
 				let evolucaoDiaria = $('#evolucaoDiaria').val()
 
+				let inputSistolica = $('#inputSistolica').val()
+				let inputDiatolica = $('#inputDiatolica').val()
+				let inputCardiaca = $('#inputCardiaca').val()
+				let inputRespiratoria = $('#inputRespiratoria').val()
+				let inputTemperatura = $('#inputTemperatura').val()
+				let inputSPO = $('#inputSPO').val()
+				let inputHGT = $('#inputHGT').val()
+				let peso = $('#inputPeso').val()                
+                let inputAlergia = $('#inputAlergia').val()
+                let inputDiabetes = $('#inputDiabetes').val()
+                let inputHipertensao = $('#inputHipertensao').val()
+                let inputNeoplasia = $('#inputNeoplasia').val()
+                let inputUsoMedicamento = $('#inputUsoMedicamento').val()
+                let inputAlergiaDescricao = $('#inputAlergiaDescricao').val()
+                let inputDiabetesDescricao = $('#inputDiabetesDescricao').val()
+                let inputHipertensaoDescricao = $('#inputHipertensaoDescricao').val()
+                let inputNeoplasiaDescricao = $('#inputNeoplasiaDescricao').val()
+                let inputUsoMedicamentoDescricao = $('#inputUsoMedicamentoDescricao').val()
+
 				switch(msg){
 					case evolucaoDiaria: msg = 'Informe o texto da Evolução!';$('#evolucaoDiaria').focus();break
 				}
@@ -701,7 +771,25 @@ if ($row['ClienSexo'] == 'F'){
 					data: {
 						'tipoRequest': 'EDITAREVOLUCAO',
 						'idEvolucao' : idEvolucao,
-						'evolucaoDiaria' : evolucaoDiaria						
+						'evolucaoDiaria' : evolucaoDiaria,
+						'inputSistolica' : inputSistolica,		
+						'inputDiatolica' : inputDiatolica,		
+						'inputCardiaca' : inputCardiaca,		
+						'inputRespiratoria' : inputRespiratoria,		
+						'inputTemperatura' : inputTemperatura,		
+						'inputSPO' : inputSPO,		
+						'inputHGT' : inputHGT,
+						'inputAlergia' : inputAlergia,
+						'inputDiabetes' : inputDiabetes,
+						'inputHipertensao' : inputHipertensao,
+						'inputNeoplasia' : inputNeoplasia,
+						'inputUsoMedicamento' : inputUsoMedicamento,
+						'inputAlergiaDescricao' : inputAlergiaDescricao,
+						'inputDiabetesDescricao' : inputDiabetesDescricao,
+						'inputHipertensaoDescricao' : inputHipertensaoDescricao,
+						'inputNeoplasiaDescricao' : inputNeoplasiaDescricao,
+						'inputUsoMedicamentoDescricao' : inputUsoMedicamentoDescricao,
+						'peso' : peso					
 					},
 					success: function(response) {
 						if(response.status == 'success'){
@@ -738,6 +826,8 @@ if ($row['ClienSexo'] == 'F'){
 				let horaInicioAdmMedicamentos = $('#horaInicioAdmMedicamentos').val()
 				let complementoMedicamentos = $('#complementoMedicamentos').val()
 				let descricaoPosologiaMedicamentos = $('#descricaoPosologiaMedicamentos').val()
+				let validadeInicioMedicamentos = $('#validadeInicioMedicamentos').val()
+				let validadeFimMedicamentos = $('#validadeFimMedicamentos').val()
 
 				checkBombaInfusaoMedicamentos = checkBombaInfusaoMedicamentos == true ? 1 : 0;
 				checkInicioAdmMedicamentos = checkInicioAdmMedicamentos == true ? 1 : 0;
@@ -792,7 +882,9 @@ if ($row['ClienSexo'] == 'F'){
 						'checkInicioAdmMedicamentos' : checkInicioAdmMedicamentos,
 						'horaInicioAdmMedicamentos' : horaInicioAdmMedicamentos,
 						'complementoMedicamentos' : complementoMedicamentos,
-						'descricaoPosologiaMedicamentos' : descricaoPosologiaMedicamentos,		
+						'descricaoPosologiaMedicamentos' : descricaoPosologiaMedicamentos,	
+						'validadeInicioMedicamentos' : validadeInicioMedicamentos,
+						'validadeFimMedicamentos' : validadeFimMedicamentos	
 					},
 					success: function(response) {
 						if(response.status == 'success'){
@@ -834,6 +926,8 @@ if ($row['ClienSexo'] == 'F'){
 				let horaInicioAdmSolucoes = $('#horaInicioAdmSolucoes').val()
 				let complementoSolucoes = $('#complementoSolucoes').val()
 				let descricaoPosologiaSolucoes = $('#descricaoPosologiaSolucoes').val()
+				let validadeInicioSolucoes = $('#validadeInicioSolucoes').val()
+				let validadeFimSolucoes = $('#validadeFimSolucoes').val()
 
 				checkBombaInfusaoSolucoes = checkBombaInfusaoSolucoes == true ? 1 : 0;
 				checkInicioAdmSolucoes = checkInicioAdmSolucoes == true ? 1 : 0;
@@ -896,6 +990,8 @@ if ($row['ClienSexo'] == 'F'){
 						'horaInicioAdmSolucoes' : horaInicioAdmSolucoes,
 						'complementoSolucoes' : complementoSolucoes,
 						'descricaoPosologiaSolucoes' : descricaoPosologiaSolucoes,
+						'validadeInicioSolucoes' : validadeInicioSolucoes,
+						'validadeFimSolucoes' : validadeFimSolucoes
 						
 					},
 					success: function(response) {
@@ -1136,11 +1232,18 @@ if ($row['ClienSexo'] == 'F'){
 
 				let msg = ''
 				let historiaEntrada = $('#historiaEntrada').val()
+				let exameFisico = $('#exameFisico').val()
+				let hipoteseDiagnostica = $('#hipoteseDiagnostica').val()
+				let anamnese = $('#anamnese').val()
+				let caraterInternacao = $('#caraterInternacao').val()
 				let cid10 = $('#cid10').val()				
 				let servico = $('#servico').val()
 
 				switch(msg){
 					case historiaEntrada: msg = 'Informe o texto da História de entrada!';$('#historiaEntrada').focus();break
+					case historiaEntrada: msg = 'Informe o texto da História de Moléstia Atual!';$('#historiaEntrada').focus();break
+					case exameFisico: msg = 'Informe o texto do Exame Físico!';$('#exameFisico').focus();break
+					case hipoteseDiagnostica: msg = 'Informe o texto da Hipótese Diagnóstica!';$('#hipoteseDiagnostica').focus();break
 					case cid10: msg = 'Informe o CID-10!';$('#cid10').focus();break
 					case servico: msg = 'Informe o Procedimento!';$('#servico').focus();break
 				}
@@ -1158,7 +1261,11 @@ if ($row['ClienSexo'] == 'F'){
 						'tipoRequest': 'SALVAROBSERVACAOENTRADA',
 						'iAtendimentoId' : <?php echo $iAtendimentoId; ?>,
 						'profissional' : <?php echo $userId; ?> ,
-						'historiaEntrada' : historiaEntrada,				
+						'historiaEntrada' : historiaEntrada,
+						'exameFisico' : exameFisico,				
+						'hipoteseDiagnostica' : hipoteseDiagnostica,				
+						'anamnese' : anamnese,				
+						'caraterInternacao' : caraterInternacao,				
 						'cid10' : cid10,						
 						'servico' : servico						
 					},
@@ -1808,6 +1915,8 @@ if ($row['ClienSexo'] == 'F'){
 						$('#descricaoPosologiaMedicamentos').val(response[0].AtPMePosologia)
 						$('#checkBombaInfusaoMedicamentos').prop('checked', response[0].AtPMeBombaInfusao == 1 ? true : false);
 						$('#checkInicioAdmMedicamentos').prop('checked', response[0].AtPMeInicioAdm == 1 ? true : false);
+						$('#validadeInicioMedicamentos').val(response[0].AtPMeValidadeInicio)
+						$('#validadeFimMedicamentos').val(response[0].AtPMeValidadeFim)
 
 						$("#adicionarMedicamento").css('display', 'none');
 						$("#salvarEdMedicamento").css('display', 'block');
@@ -1837,6 +1946,8 @@ if ($row['ClienSexo'] == 'F'){
 						$('#descricaoPosologiaSolucoes').val(response[0].AtPMePosologia)						
 						$('#checkBombaInfusaoSolucoes').prop('checked', response[0].AtPMeBombaInfusao == 1 ? true : false);
 						$('#checkInicioAdmSolucoes').prop('checked', response[0].AtPMeInicioAdm == 1 ? true : false);
+						$('#validadeInicioSolucoes').val(response[0].AtPMeValidadeInicio)
+						$('#validadeFimSolucoes').val(response[0].AtPMeValidadeFim)
 						
 						$("#adicionarSolucao").css('display', 'none');
 						$("#salvarEdSolucao").css('display', 'block');
@@ -1954,6 +2065,8 @@ if ($row['ClienSexo'] == 'F'){
 			$('#checkInicioAdmMedicamentos').prop('checked', false)
 			$('#snMedicamentos').prop('checked', false)	
 			$('#complementoMedicamentos').prop("disabled", true);
+			$('#validadeInicioMedicamentos').val("")
+			$('#validadeFimMedicamentos').val("")
 		}
 
 		function zerarSolucao() {
@@ -1981,6 +2094,8 @@ if ($row['ClienSexo'] == 'F'){
 			$('#checkInicioAdmSolucoes').prop('checked', false);
 			$('#snSolucoes').prop('checked', false)	
 			$('#complementoSolucoes').prop("disabled", true);
+			$('#validadeInicioSolucoes').val("")
+			$('#validadeFimSolucoes').val("")
 			
 		}
 
@@ -2058,6 +2173,10 @@ if ($row['ClienSexo'] == 'F'){
 						</div>
 
 						<div> <?php include ('atendimentoDadosPaciente.php'); ?> </div>
+
+						<div class="box-evolucao" style="display : <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activeEvolucaoMedica' ? 'block' : 'none' ) : 'none'; ?>;" >  
+							<?php include ('atendimentoDadosSinaisVitais.php'); ?> 
+						</div>
 
 						<div class="card">
 							<div class="card-header header-elements-inline">

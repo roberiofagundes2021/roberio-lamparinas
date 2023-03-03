@@ -23,8 +23,77 @@ try {
 		$dataInicio = date('Y-m-d'); 
 		$horaInicio =date('H:i:s');
 
-		$sql = "INSERT INTO  AtendimentoEvolucaoDiaria(AtEDiAtendimento, AtEDiDataInicio, AtEDiHoraInicio, AtEDiProfissional,AtEDiDataHora,AtEDiEvolucaoDiaria,AtEDiUnidade)
-		VALUES ('$iAtendimentoId', '$dataInicio', '$horaInicio','$usuarioId','$dataHoraAtual','$evolucaoDiaria','$iUnidade')";
+		$inputSistolica = $_POST['inputSistolica'] == "" ? null : $_POST['inputSistolica'];
+		$inputDiatolica = $_POST['inputDiatolica'] == "" ? null : $_POST['inputDiatolica'];
+		$inputCardiaca = $_POST['inputCardiaca'] == "" ? null : $_POST['inputCardiaca'];
+		$inputRespiratoria = $_POST['inputRespiratoria'] == "" ? null : $_POST['inputRespiratoria'];
+		$inputTemperatura = $_POST['inputTemperatura'] == "" ? null : $_POST['inputTemperatura'];
+		$inputSPO = $_POST['inputSPO'] == "" ? null : $_POST['inputSPO'];
+		$inputHGT = $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'];
+		$inputAlergia = $_POST['inputAlergia'];
+		$inputAlergiaDescricao = $_POST['inputAlergiaDescricao'];
+		$inputDiabetes = $_POST['inputDiabetes'];
+		$inputDiabetesDescricao = $_POST['inputDiabetesDescricao'];
+		$inputHipertensao = $_POST['inputHipertensao'];
+		$inputHipertensaoDescricao = $_POST['inputHipertensaoDescricao'];
+		$inputNeoplasia = $_POST['inputNeoplasia'];
+		$inputNeoplasiaDescricao = $_POST['inputNeoplasiaDescricao'];
+		$inputUsoMedicamento = $_POST['inputUsoMedicamento'];
+		$inputUsoMedicamentoDescricao = $_POST['inputUsoMedicamentoDescricao'];
+		$peso = $_POST['peso'] == "" ? 0 : gravaValor($_POST['peso']);
+
+		$sql = "INSERT INTO  AtendimentoEvolucaoDiaria(
+			AtEDiAtendimento, 
+			AtEDiDataInicio, 
+			AtEDiHoraInicio,
+			AtEDiPas,
+			AtEDiPad,
+			AtEDiFreqCardiaca,
+			AtEDiFreqRespiratoria,
+			AtEDiTemperatura,
+			AtEDiSPO,
+			AtEDiHGT,
+			AtEDiPeso,
+			AtEDiAlergia,
+			AtEDiAlergiaDescricao,
+			AtEDiDiabetes,
+			AtEDiDiabetesDescricao,
+			AtEDiHipertensao,
+			AtEDiHipertensaoDescricao,
+			AtEDiNeoplasia,
+			AtEDiNeoplasiaDescricao,
+			AtEDiUsoMedicamento,
+			AtEDiUsoMedicamentoDescricao,
+			AtEDiProfissional,
+			AtEDiDataHora,
+			AtEDiEvolucaoDiaria,
+			AtEDiUnidade)
+		VALUES (
+			'$iAtendimentoId',
+			'$dataInicio',
+			'$horaInicio',
+			'$inputSistolica',
+			'$inputDiatolica',
+			'$inputCardiaca',
+			'$inputRespiratoria',
+			'$inputTemperatura',
+			'$inputSPO',
+			'$inputHGT',
+			'$peso',
+			'$inputAlergia',
+			'$inputAlergiaDescricao',
+			'$inputDiabetes',
+			'$inputDiabetesDescricao',
+			'$inputHipertensao',
+			'$inputHipertensaoDescricao',
+			'$inputNeoplasia',
+			'$inputNeoplasiaDescricao',
+			'$inputUsoMedicamento',
+			'$inputUsoMedicamentoDescricao',
+			'$usuarioId',
+			'$dataHoraAtual',
+			'$evolucaoDiaria',
+			'$iUnidade')";
 		$conn->query($sql);
 
 		echo json_encode([
@@ -51,6 +120,8 @@ try {
 		$horaInicioAdmMedicamentos = $_POST['horaInicioAdmMedicamentos'];
 		$complementoMedicamentos = $_POST['complementoMedicamentos'];
 		$descricaoPosologiaMedicamentos = $_POST['descricaoPosologiaMedicamentos'];
+		$validadeInicioMedicamentos = $_POST['validadeInicioMedicamentos'] == "" ? null : str_replace('T', ' ', $_POST['validadeInicioMedicamentos']);
+		$validadeFimMedicamentos = $_POST['validadeFimMedicamentos'] == "" ? null : str_replace('T', ' ', $_POST['validadeFimMedicamentos']);
 
 		$dataInicio = date('Y-m-d'); 
 		$horaInicio =date('H:i:s');
@@ -58,11 +129,11 @@ try {
 		$sql = "INSERT INTO  AtendimentoPrescricaoMedicamento
 			(AtPMeAtendimento,AtPMeDataInicio, AtPMeHoraInicio, AtPMeProfissional, AtPMeTipo, AtPMeProdutoEmEstoque, AtPMeProdutoLivre, 
 			AtPMeVia, AtPMeDose, AtPMeUnidadeMedida, AtPMeFrequencia, AtPMeTipoAprazamento, AtPMeDtInicioTratamento, AtPMeBombaInfusao,
-			AtPMeInicioAdm, AtPMeHoraInicioAdm, AtPMeComplemento, AtPMePosologia, AtPMeUnidade)
+			AtPMeInicioAdm, AtPMeHoraInicioAdm, AtPMeComplemento, AtPMePosologia, AtPMeValidadeInicio, AtPMeValidadeFim, AtPMeUnidade)
 		VALUES 
 			('$iAtendimentoId', '$dataInicio', '$horaInicio', '$profissional', '$tipo', '$medicamentoEstoqueMedicamentos', '$medicamentoDlMedicamentos',
 			'$selViaMedicamentos', '$doseMedicamentos', '$selUnidadeMedicamentos', '$frequenciaMedicamentos', '$selTipoAprazamentoMedicamentos', '$dataInicioMedicamentos',
-			'$checkBombaInfusaoMedicamentos', '$checkInicioAdmMedicamentos', '$horaInicioAdmMedicamentos', '$complementoMedicamentos', '$descricaoPosologiaMedicamentos', '$iUnidade')";
+			'$checkBombaInfusaoMedicamentos', '$checkInicioAdmMedicamentos', '$horaInicioAdmMedicamentos', '$complementoMedicamentos', '$descricaoPosologiaMedicamentos', '$validadeInicioMedicamentos', '$validadeFimMedicamentos', '$iUnidade')";
 		$conn->query($sql);
 
 		echo json_encode([
@@ -96,6 +167,8 @@ try {
 		$horaInicioAdmSolucoes = $_POST['horaInicioAdmSolucoes'];
 		$complementoSolucoes = $_POST['complementoSolucoes'];
 		$descricaoPosologiaSolucoes = $_POST['descricaoPosologiaSolucoes'];
+		$validadeInicioSolucoes = $_POST['validadeInicioSolucoes'] == "" ? null : str_replace('T', ' ', $_POST['validadeInicioSolucoes']);
+		$validadeFimSolucoes = $_POST['validadeFimSolucoes'] == "" ? null : str_replace('T', ' ', $_POST['validadeFimSolucoes']);
 
 		$dataInicio = date('Y-m-d'); 
 		$horaInicio =date('H:i:s');
@@ -104,12 +177,12 @@ try {
 			(AtPMeAtendimento,AtPMeDataInicio, AtPMeHoraInicio, AtPMeProfissional, AtPMeTipo, AtPMeProdutoEmEstoque, AtPMeProdutoLivre, 
 			AtPMeVia, AtPMeDose, AtPMeUnidadeMedida, AtPMeFrequencia, AtPMeTipoAprazamento, AtPMeDtInicioTratamento,
 			AtPMeDiluente, AtPMeVolume, AtPMeCorrerEm, AtPMeUnidadeTempo, AtPMeVelocidadeInfusao,
-			AtPMeBombaInfusao,	AtPMeInicioAdm, AtPMeHoraInicioAdm, AtPMeComplemento, AtPMePosologia, AtPMeUnidade)
+			AtPMeBombaInfusao,	AtPMeInicioAdm, AtPMeHoraInicioAdm, AtPMeComplemento, AtPMePosologia, AtPMeValidadeInicio, AtPMeValidadeFim, AtPMeUnidade)
 		VALUES 
 			('$iAtendimentoId', '$dataInicio', '$horaInicio', '$profissional', '$tipo', $medicamentoEstoqueSolucoes, '$medicamentoDlSolucoes',
 			'$selViaSolucoes', '$doseSolucoes', '$selUnidadeSolucoes', '$frequenciaSolucoes', '$selTipoAprazamentoSolucoes', '$dataInicioSolucoes', 
 			$diluenteSolucoes, $volumeSolucoes, $correrEmSolucoes, $selUnTempoSolucoes, $velocidadeInfusaoSolucoes, 
-			'$checkBombaInfusaoSolucoes', '$checkInicioAdmSolucoes', '$horaInicioAdmSolucoes', '$complementoSolucoes', '$descricaoPosologiaSolucoes', '$iUnidade')";	
+			'$checkBombaInfusaoSolucoes', '$checkInicioAdmSolucoes', '$horaInicioAdmSolucoes', '$complementoSolucoes', '$descricaoPosologiaSolucoes', '$validadeInicioSolucoes', '$validadeFimSolucoes', '$iUnidade')";	
 		$conn->query($sql);
 
 		echo json_encode([
@@ -615,7 +688,7 @@ try {
 		$sql = "SELECT AtPMeAtendimento,AtPMeDataInicio, AtPMeHoraInicio, AtPMeProfissional, AtPMeTipo, AtPMeProdutoEmEstoque, AtPMeProdutoLivre, 
 		AtPMeVia, AtPMeDose, AtPMeUnidadeMedida, AtPMeFrequencia, AtPMeTipoAprazamento, AtPMeDtInicioTratamento,
 		AtPMeDiluente, AtPMeVolume, AtPMeCorrerEm, AtPMeUnidadeTempo, AtPMeVelocidadeInfusao,
-		AtPMeBombaInfusao,	AtPMeInicioAdm, AtPMeHoraInicioAdm, AtPMeComplemento, AtPMePosologia, AtPMeUnidade, ProduNome
+		AtPMeBombaInfusao,	AtPMeInicioAdm, AtPMeHoraInicioAdm, AtPMeComplemento, AtPMePosologia, AtPMeValidadeInicio, AtPMeValidadeFim, AtPMeUnidade, ProduNome
 		FROM AtendimentoPrescricaoMedicamento
 		JOIN Produto ON AtPMeProdutoEmEstoque = ProduId
 		WHERE AtPMeId = $id

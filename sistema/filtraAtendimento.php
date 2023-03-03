@@ -3053,6 +3053,10 @@ try{
 		$iAtendimentoId = $_POST['iAtendimentoId'];
 		$profissional = $_POST['profissional'];
 		$historiaEntrada = $_POST['historiaEntrada'];
+		$exameFisico = $_POST['exameFisico'];
+		$hipoteseDiagnostica = $_POST['hipoteseDiagnostica'];
+		$anamnese = $_POST['anamnese'] == "" ? null : $_POST['anamnese'];
+		$caraterInternacao = $_POST['caraterInternacao'] == "" ? null : $_POST['caraterInternacao'];
 		$cid10 = $_POST['cid10'];
 		$servico = $_POST['servico'];
 	
@@ -3070,15 +3074,21 @@ try{
 	
 		if ($resultadoBusca == false) {
 			$sql = "INSERT INTO AtendimentoObservacaoEntrada
-			(AtOEnAtendimento, AtOEnDataInicio, AtOEnHoraInicio, AtOEnProfissional, AtOEnHistoria, AtOEnCid10, AtOEnProcedimento, AtOEnUnidade)
-			VALUES('$iAtendimentoId', '$dataInicio', '$horaInicio', '$profissional', '$historiaEntrada', '$cid10', '$servico', '$iUnidade' )";	
+				(AtOEnAtendimento, AtOEnDataInicio, AtOEnHoraInicio, AtOEnProfissional, AtOEnHistoriaMolestiaAtual,
+				AtOEnExameFisico, AtOEnHipoteseDiagnostica, AtOEnAnamnese, AtOEnCaraterInternacao, AtOEnCid10, AtOEnProcedimento, AtOEnUnidade)
+			VALUES('$iAtendimentoId', '$dataInicio', '$horaInicio', '$profissional', '$historiaEntrada' ,'$exameFisico' ,'$hipoteseDiagnostica' ,
+				'$anamnese' , '$caraterInternacao', '$cid10', '$servico', '$iUnidade' )";	
 			
 		} else {
 			$sql = "UPDATE AtendimentoObservacaoEntrada SET
 			AtOEnDataInicio = '$dataInicio', 
 			AtOEnHoraInicio = '$horaInicio', 
 			AtOEnProfissional = '$profissional', 
-			AtOEnHistoria = '$historiaEntrada', 
+			AtOEnHistoriaMolestiaAtual = '$historiaEntrada',
+			AtOEnExameFisico = '$exameFisico',
+			AtOEnHipoteseDiagnostica = '$hipoteseDiagnostica',
+			AtOEnAnamnese = '$anamnese',
+			AtOEnCaraterInternacao  = '$caraterInternacao',
 			AtOEnCid10 = '$cid10', 
 			AtOEnProcedimento = '$servico', 
 			AtOEnUnidade = '$iUnidade'
