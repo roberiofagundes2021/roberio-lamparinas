@@ -455,88 +455,87 @@ if ($row['ClienSexo'] == 'F'){
 							<div class="card">
 
 								<div class="card-body">	
-									<?php 
-										if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
-											echo "<div class='row'  style='margin-top:25px;'>									
-												<form id='formTabelaGastos' name='formTabelaGastos' method='post' class='form-validate-jquery'>
-													<div class='col-lg-12 row'>
-														<!-- titulos -->
-														<div class='col-lg-2'>
-															<label>Grupo <span class='text-danger'>*</span></label>
-														</div>
-														<div class='col-lg-3'>
-															<label>SubGrupo <span class='text-danger'>*</span></label>
-														</div>
-														<div class='col-lg-4'>
-															<label>Procedimento <span class='text-danger'>*</span></label>
-														</div>
-														<div class='col-lg-3'>
-															<label>Cid-10 <span class='text-danger'>*</span></label>
-														</div>
-														
-														<!-- campos -->										
-														<div class='col-lg-2'>
-															<select id='grupo' name='grupo' class='select-search' required>
-																<option value=''>Selecione</option>
-															</select>
-														</div>
-														<div class='col-lg-3'>
-															<select id='subgrupo' name='subgrupo' class='select-search' required>
-																<option value=''>Selecione</option>
-															</select>											
-														</div>
-														<div class='col-lg-4'>
-															<select id='procedimento' name='procedimento' class='select-search' required>
-																<option value=''>Selecione</option>
-															</select>
-														</div>
-														<div class='col-lg-3'>
-															<select id='cid10' name='cid10' class='select-search' required>
-																<option value=''>Selecione</option>
-															</select>											
-														</div>										
+									<div class="row"  style="margin-top:25px;">									
+										<form id="formTabelaGastos" name="formTabelaGastos" method="post" class="form-validate-jquery">
+											<div class="col-lg-12 row">
+												<!-- titulos -->
+												<div class="col-lg-2">
+													<label>Grupo <span class="text-danger">*</span></label>
+												</div>
+												<div class="col-lg-3">
+													<label>SubGrupo <span class="text-danger">*</span></label>
+												</div>
+												<div class="col-lg-4">
+													<label>Procedimento <span class="text-danger">*</span></label>
+												</div>
+												<div class="col-lg-3">
+													<label>Cid-10 <span class="text-danger">*</span></label>
+												</div>
 												
-													</div>
-												</form>
-											</div>";
-											echo "<div class='row' style='margin-top: 20px'>
-												<div class='col-lg-12'>
-													<div class='form-group'>
-														<label for='justificativa'>Justificativa <span class='text-danger'>*</span></label>
-														<textarea rows='5' cols='5' maxLength='500' id='justificativa' name='justificativa' onInput='contarCaracteres(this);' class='form-control' placeholder='Corpo da solicitacao do procedimento (informe aqui o texto que você queira que apareça na solicitacao do procedimento)' ></textarea>
-														<small class='text-muted form-text'>Max. 500 caracteres - <span class='caracteresjustificativa'></span></small>
-													</div>
+												<!-- campos -->										
+												<div class="col-lg-2">
+													<select id="grupo" name="grupo" class="select-search" required>
+														<option value=''>Selecione</option>
+													</select>
 												</div>
-											</div>";
-											echo "<div class='row'>
-												<div class='col-lg-12'>
-													<div class='form-group form-inline'>
-														<label class='d-block font-weight-semibold' style=' margin-right: 20px' >Urgente:</label>
-														<div class='form-check form-check-inline'>
-															<label class='form-check-label'>
-																<input type='radio' class='form-check-input' id='urgente' name='urgente' value='1' checked>
-																Sim
-															</label>
-														</div>
+												<div class="col-lg-3">
+													<select id="subgrupo" name="subgrupo" class="select-search" required>
+														<option value=''>Selecione</option>
+													</select>											
+												</div>
+												<div class="col-lg-4">
+													<select id="procedimento" name="procedimento" class="select-search" required>
+														<option value=''>Selecione</option>
+													</select>
+												</div>
+												<div class="col-lg-3">
+													<select id="cid10" name="cid10" class="select-search" required>
+														<option value=''>Selecione</option>
+													</select>											
+												</div>										
+										
+											</div>
+										</form>
+									</div>
 
-														<div class='form-check form-check-inline'>
-															<label class='form-check-label'>
-																<input type='radio' class='form-check-input' id='urgente' name='urgente' value='0'>
-																Não
-															</label>
-														</div>
-													</div>
+									<div class="row" style="margin-top: 20px">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label for="justificativa">Justificativa <span class="text-danger">*</span></label>
+												<textarea rows="5" cols="5" maxLength="500" id="justificativa" name="justificativa" onInput="contarCaracteres(this);" class="form-control" placeholder="Corpo da solicitacao do procedimento (informe aqui o texto que você queira que apareça na solicitacao do procedimento)" ></textarea>
+												<small class="text-muted form-text">Max. 500 caracteres - <span class="caracteresjustificativa"></span></small>
+											</div>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group form-inline">
+												<label class="d-block font-weight-semibold" style=" margin-right: 20px" >Urgente:</label>
+												<div class="form-check form-check-inline">
+													<label class="form-check-label">
+														<input type="radio" class="form-check-input" id="urgente" name="urgente" value="1" checked>
+														Sim
+													</label>
 												</div>
-											</div>";
-											echo "<div class='row'>
-												<div class='col-lg-12'>
-													<div class='form-group' style='padding-top:15px;'>
-														<button class='btn btn-lg btn-success' id='adicionarProcedimento' data-tipo='ADICIONARPROCEDIMENTO' >Adicionar</button>
-													</div>
+
+												<div class="form-check form-check-inline">
+													<label class="form-check-label">
+														<input type="radio" class="form-check-input" id="urgente" name="urgente" value="0">
+														Não
+													</label>
 												</div>
-											</div>";
-										}
-									?>	  
+											</div>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group" style="padding-top:15px;">
+												<button class="btn btn-lg btn-success" id="adicionarProcedimento" data-tipo="ADICIONARPROCEDIMENTO" >Adicionar</button>
+											</div>
+										</div>
+									</div> 	  
 
 									<div class="card-header header-elements-inline" style="margin-left: -20px">
 										<h4 class="card-title font-weight-bold">Procedimentos Solicitados</h4>

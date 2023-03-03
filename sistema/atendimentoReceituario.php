@@ -8,6 +8,8 @@ include('global_assets/php/conexao.php');
 
 $iAtendimentoId = isset($_POST['iAtendimentoId'])?$_POST['iAtendimentoId']:null;
 
+$SituaChave = $_SESSION['SituaChave'];
+
 if (isset($_SESSION['iAtendimentoId']) && !$iAtendimentoId) {
 	$iAtendimentoId = $_SESSION['iAtendimentoId'];
 }else if($iAtendimentoId){
@@ -367,7 +369,9 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 												<?php
 													if($rowReceituario && !$rowReceituario['AtRecDataFim']){
 														echo "<a id='imprimirBTN' href='#' class='btn btn-basic' role='button'>Imprimir</a>";
-														echo "<a id='finalizarBTN' href='#' class='btn btn-basic' role='button'>Finalizar Atendimento</a>";
+														if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+															echo "<a id='finalizarBTN' href='#' class='btn btn-basic' role='button'>Finalizar Atendimento</a>";
+														}	
 													}
 
 													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
