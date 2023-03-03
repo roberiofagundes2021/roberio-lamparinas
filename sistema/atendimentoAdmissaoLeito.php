@@ -141,36 +141,6 @@ if(isset($_POST['caraterInternaacao']) && isset($_POST['iLeitoId'])){
 				getLeitos()
 			})
 
-			$('#acomodacao').on('change', function(e){
-				e.preventDefault()
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimentoLeito.php',
-					dataType: 'json',
-					data: {
-						'tipoRequest': 'INTERNACAO',
-						'acomodacao': $(this).val(),
-					},
-					success: function(response) {
-						$('#internacao').html(`<option value=''>selecione</option>`)
-						response.forEach(item => {
-							$('#internacao').append(`<option value='${item.TpIntId}'>${item.TpIntNome}</option>`)
-						})
-					}
-				})
-			})
-			$('#internacao').on('change', function(e){
-				e.preventDefault()
-
-			})
-			$('#especialidade').on('change', function(e){
-				e.preventDefault()
-
-			})
-			$('#ala').on('change', function(e){
-				e.preventDefault()
-
-			})
 		}); //document.ready
 
 		function contarCaracteres(params) {
@@ -262,8 +232,6 @@ if(isset($_POST['caraterInternaacao']) && isset($_POST['iLeitoId'])){
 				dataType: 'json',
 				data: {
 					'tipoRequest': 'LEITOS',
-					'acomodacao': $('#acomodacao').val()?$('#acomodacao').val():null,
-					'internacao': $('#internacao').val()?$('#internacao').val():null,
 					'especialidade': $('#especialidade').val()?$('#especialidade').val():null,
 					'ala': $('#ala').val()?$('#ala').val():null,
 				},

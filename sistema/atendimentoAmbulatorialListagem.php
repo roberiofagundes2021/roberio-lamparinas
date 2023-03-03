@@ -931,8 +931,9 @@ $acesso = 'ATENDIMENTO';
 									
 									foreach ($result as $key => $item) {
 							
-										$sql = "SELECT *
+										$sql = "SELECT DISTINCT QuartId, QuartNome
 										FROM Quarto
+										JOIN VincularLeito ON VnLeiQuarto = QuartId
 										JOIN Situacao on SituaId = QuartStatus
 										WHERE  SituaChave = 'ATIVO'	AND QuartUnidade = $iUnidade
 										ORDER BY QuartNome ASC" ;
@@ -943,32 +944,32 @@ $acesso = 'ATENDIMENTO';
 										echo "<div class='box-especialidade' id='boxEspecialidade" . $item['EsLeiId'] . "' style='display: " . $display . ";'>";
 											
 											foreach($resultQuarto as $itemQuarto){											
-												if($item['EsLeiTipoInternacao'] == $itemQuarto['QuartTipoInternacao']) {
-													echo "<div class='card-header header-elements-inline ' style='margin-bottom: -30px' >
-															<h3 class='card-title' >" . $itemQuarto['QuartNome'] . "</h3>
-															<hr />
-														</div >";
+												
+												echo "<div class='card-header header-elements-inline ' style='margin-bottom: -30px' >
+														<h3 class='card-title' >" . $itemQuarto['QuartNome'] . "</h3>
+														<hr />
+													</div >";
 
-													echo "<hr style='border-color:#aaa;box-sizing:border-box;width:97%;'/>";
+												echo "<hr style='border-color:#aaa;box-sizing:border-box;width:97%;'/>";
 
-													echo "
-													<div class='card-body'>							
-														<div class='card cardLeitos text-center ' style='width: 18rem; '>											
-															<div class='card-header' style='color: white; background-color: #466D96; padding: 5px'>
-																<h3 class=' m-0'>Leito X</h3>
-																<p class='m-0'>Previsão de alta: 10/10/2010</p>
-															</div>
-
-															<div class='card-body'>
-																<div class='m-3'><img src='global_assets/images/lamparinas/leito-ocupado.png' alt='Leito ocupado' width='80' height='80'></div>
-																<h4 class='card-title'>ALDO DA SILVA BARBOSA</h4>
-																<p class='card-text mb-1'>Nrº do Registro: 4465</p>
-																<p class='card-text'>Data da Internação: 10/10/2010</p>
-																<button onclick='entrar(88)' type='button' class='btn btn-success btn-sm'>Atender</button>
-															</div>
+												echo "
+												<div class='card-body'>							
+													<div class='card cardLeitos text-center ' style='width: 18rem; '>											
+														<div class='card-header' style='color: white; background-color: #466D96; padding: 5px'>
+															<h3 class=' m-0'>Leito X</h3>
+															<p class='m-0'>Previsão de alta: 10/10/2010</p>
 														</div>
-													</div>";
-												}	
+
+														<div class='card-body'>
+															<div class='m-3'><img src='global_assets/images/lamparinas/leito-ocupado.png' alt='Leito ocupado' width='80' height='80'></div>
+															<h4 class='card-title'>ALDO DA SILVA BARBOSA</h4>
+															<p class='card-text mb-1'>Nrº do Registro: 4465</p>
+															<p class='card-text'>Data da Internação: 10/10/2010</p>
+															<button onclick='entrar(88)' type='button' class='btn btn-success btn-sm'>Atender</button>
+														</div>
+													</div>
+												</div>";
+												
 											}
 
 										echo "</div>";
