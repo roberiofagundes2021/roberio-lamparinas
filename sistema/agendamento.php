@@ -102,6 +102,10 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 	<script type="text/javascript">
 		var viewerCalendar = 'agendaWeek'
 		var selectCalendar = false
+		var filtro = {
+			status: null,
+			recepcao: null,
+		}
 		// const socket = WebSocketConnect(iUnidade,iEmpresa)
 		// socket.onmessage = function (event) {
 		// 	menssage = JSON.parse(event.data)
@@ -112,6 +116,12 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 		$(document).ready(function(){
 			getAgenda()
 			getCmbs()
+
+			if(filtro.status || filtro.recepcao){
+				$('#filtro').attr('style','cursor: pointer; font-size:20px;color: #388E3C;')
+			}else{
+				$('#filtro').attr('style','cursor: pointer; font-size:20px;color: #000;')
+			}
 
 			$('#relacaoBloqueiosTable').DataTable({
 				"order": [[ 0, "desc" ]],
@@ -686,7 +696,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			$('#filtro').on('click', function(e){
 				e.preventDefault()
-				getFilters()
+				getFilters(filtro)
 				$('#page-modal-filtro').fadeIn(200)
 			})
 			$('#modalFiltro-close-x').on('click', function(e){
@@ -696,17 +706,16 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 
 			$('#filtrarAgendamento').on('click', function(e){
 				e.preventDefault()
-				let obj = {
-					'status':null,
-					'recepcao':null,
-				}
+				filtro.status = null
+				filtro.recepcao = null
+
 				if($('#statusFiltro').val()){
-					obj.status = $('#statusFiltro').val()
+					filtro.status = $('#statusFiltro').val()
 				}
 				if($('#recepcaoFiltro').val()){
-					obj.recepcao = $('#recepcaoFiltro').val()
+					filtro.recepcao = $('#recepcaoFiltro').val()
 				}
-				getAgenda(obj)
+				getAgenda(filtro)
 				$('#page-modal-filtro').fadeOut(200)
 			})
 
@@ -888,7 +897,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 		}
 
 		function deletBloqueio(id){
-			confirmaExclusaoAjax('filtraAgendamento.php','Deseja excluir esse bloqueio?', 'DELBLOQUEIO',id,getBloqueios())
+			confirmaExclusaoAjax('filtraAgendamento.php','Deseja excluir esse bloqueio?', 'DELBLOQUEIO', id, getBloqueios)
 		}
 
 		function updateDateTime(){
@@ -914,6 +923,12 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				viewerCalendar = 'agendaWeek'
 			} else if($('div.fc-month-view').length){
 				viewerCalendar = 'month'
+			}
+
+			if(filtro && (filtro.status || filtro.recepcao)){
+				$('#filtro').attr('style','cursor: pointer; font-size:20px;color: #388E3C;')
+			}else{
+				$('#filtro').attr('style','cursor: pointer; font-size:20px;color: #000;')
 			}
 
 			// iniciar o calendário
@@ -1423,7 +1438,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 					$('#statusFiltro').empty()
 					$('#statusFiltro').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
+						let opt = obj && obj.status?(obj.status == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`):`<option value="${item.id}">${item.nome}</option>`
 						$('#statusFiltro').append(opt)
 					})
 				}
@@ -1456,7 +1471,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 							<!-- titulo -->
 							<div class="col-lg-2"><h3 class="card-title">Agendamentos</h3></div>
 							<div class="col-lg-6">
-								<select id="profissional" name="profissional[]" class="form-control multiselect-filtering" multiple="multiple">
+								<select id="profissional" name="profissional[]" class="form-control multiselect-select-all-filtering" multiple="multiple">
 									<?php
 										foreach($rowProfissionais as $item){
 											echo "<option value='$item[id]' selected>$item[nome] - $item[cbo] - $item[profissao]</option>";
@@ -1480,7 +1495,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 								<i id="filtro" class="fab-icon-open icon-filter3 pr-2" style="cursor: pointer; font-size:20px;"></i>
 								<button id="novoAgendamento" class='btn btn-principal'>Novo Agendamento</button>
 								<a href="#collapse-imprimir-relacao" class="btn bg-slate-700 btn-icon" role="button" data-toggle="collapse" data-placement="bottom" data-container="body">
-									<i class="icon-printer2"></i>																						
+									<i class="icon-printer2"></i>
 								</a>
 							</div>
 						</div>						

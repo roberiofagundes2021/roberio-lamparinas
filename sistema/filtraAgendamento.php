@@ -855,7 +855,7 @@ try{
 				$recorrente = "NÃO";
 				$repeticao = '';
 			}
-			$acoes = "<a style='color: black' href='#' onclick='deletBloqueio($bloqueio[AgBloId])' class='list-icons-item'><i class='icon-bin' title='Excluir Bloqueio'></i></a>";
+			$acoes = "<i onclick='deletBloqueio($bloqueio[AgBloId])' style='cursor:pointer' class='icon-bin' title='Excluir Bloqueio'></i>";
 
 			array_push($array,[
 				"$DI $HI",
