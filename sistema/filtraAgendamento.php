@@ -106,34 +106,67 @@ try{
 		echo json_encode($array);
 	} elseif($tipoRequest == 'GETAGENDAMENTO'){
 		$id = $_POST['id'];
+		$type = $_POST['type'];
 
-		$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendProfissional,AgendHorario,AgendModalidade,
-			AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,AgendCliente, AgendObservacao,AgendSituacao
-			FROM Agendamento
-			WHERE AgendId = $id AND AgendUnidade = $iUnidade";
-		$result = $conn->query($sql);
-		$rowAgendamento = $result->fetch(PDO::FETCH_ASSOC);
-
-		$hora = explode(':',$rowAgendamento['AgendHorario']);
-		
-		echo json_encode([
-			'id' => $rowAgendamento['AgendId'],
-			'registro' => $rowAgendamento['AgendDataRegistro'],
-			'data' => $rowAgendamento['AgendData'],
-			'hora' => "$hora[0]:$hora[1]",
-			'servico' => $rowAgendamento['AgendServico'],
-			'observacao' => $rowAgendamento['AgendObservacao'],
-			'status' => 'ATT',
-
-			'servico' => $rowAgendamento['AgendServico'],
-			'cliente' => $rowAgendamento['AgendCliente'],
-			'profissional' => $rowAgendamento['AgendProfissional'],
-			'responsavel' => isset($rowAgendamento['RespoId']) && $rowAgendamento['RespoId']?$rowAgendamento['RespoId']:null,
-			'local' => $rowAgendamento['AgendAtendimentoLocal'],
-			'modalidade' => $rowAgendamento['AgendModalidade'],
-			'situacao' => $rowAgendamento['AgendSituacao']
-		]);
-	} elseif ($tipoRequest == 'PACIENTES'){
+		if($type == 'AGENDAMENTO'){
+			$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendProfissional,AgendHorario,AgendModalidade,
+				AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,AgendCliente, AgendObservacao,AgendSituacao
+				FROM Agendamento
+				WHERE AgendId = $id AND AgendUnidade = $iUnidade";
+			$result = $conn->query($sql);
+			$rowAgendamento = $result->fetch(PDO::FETCH_ASSOC);
+	
+			$hora = explode(':',$rowAgendamento['AgendHorario']);
+			
+			echo json_encode([
+				'id' => $rowAgendamento['AgendId'],
+				'registro' => $rowAgendamento['AgendDataRegistro'],
+				'data' => $rowAgendamento['AgendData'],
+				'hora' => "$hora[0]:$hora[1]",
+				'servico' => $rowAgendamento['AgendServico'],
+				'observacao' => $rowAgendamento['AgendObservacao'],
+				'status' => 'ATT',
+	
+				'servico' => $rowAgendamento['AgendServico'],
+				'cliente' => $rowAgendamento['AgendCliente'],
+				'profissional' => $rowAgendamento['AgendProfissional'],
+				'responsavel' => isset($rowAgendamento['RespoId']) && $rowAgendamento['RespoId']?$rowAgendamento['RespoId']:null,
+				'local' => $rowAgendamento['AgendAtendimentoLocal'],
+				'modalidade' => $rowAgendamento['AgendModalidade'],
+				'situacao' => $rowAgendamento['AgendSituacao']
+			]);
+		}elseif($type == 'BLOQUEIO'){
+			$sql = "SELECT AgBloId,AgBloDataHoraInicio,AgBloDataHoraFim,AgBloRecorrenteSegunda,AgBloRecorrenteTerca,
+				AgBloRecorrenteQuarta,AgBloRecorrenteQuinta,AgBloRecorrenteSexta,AgBloRecorrenteSabado,
+				AgBloRecorrenteDomingo,AgBloRecorrenteQuantidade,AgBloRecorrenteDataFinal,
+				AgBloRecorrenteRepeticao,AgBloDescricao,AgBloJustificativa,AgBloProfissional
+				FROM AgendamentoBloqueio
+				WHERE AgBloId = $id AND AgBloUnidade = $iUnidade";
+			$resultBloqueio = $conn->query($sql);
+			$resultBloqueio = $resultBloqueio->fetch(PDO::FETCH_ASSOC);
+			
+			echo json_encode([
+				'id' => $resultBloqueio['AgBloId'],
+				'descricao' => $resultBloqueio['AgBloDescricao'],
+				'justificativa' => $resultBloqueio['AgBloJustificativa'],
+				'profissional' => $resultBloqueio['AgBloProfissional'],
+				'dataI' => explode(' ',$resultBloqueio['AgBloDataHoraInicio'])[0],
+				'dataF' => explode(' ',$resultBloqueio['AgBloDataHoraFim'])[0],
+				'horaI' => explode(' ',$resultBloqueio['AgBloDataHoraInicio'])[1],
+				'horaF' => explode(' ',$resultBloqueio['AgBloDataHoraFim'])[1],
+				'segunda' => $resultBloqueio['AgBloRecorrenteSegunda'],
+				'terca' => $resultBloqueio['AgBloRecorrenteTerca'],
+				'quarta' => $resultBloqueio['AgBloRecorrenteQuarta'],
+				'quinta' => $resultBloqueio['AgBloRecorrenteQuinta'],
+				'sexta' => $resultBloqueio['AgBloRecorrenteSexta'],
+				'sabado' => $resultBloqueio['AgBloRecorrenteSabado'],
+				'domingo' => $resultBloqueio['AgBloRecorrenteDomingo'],
+				'quantidade' => $resultBloqueio['AgBloRecorrenteQuantidade'],
+				'dataFinal' => $resultBloqueio['AgBloRecorrenteDataFinal'],
+				'repeticao' => $resultBloqueio['AgBloRecorrenteRepeticao'],
+			]);
+		}
+	} elseif($tipoRequest == 'PACIENTES'){
 	
 		$sql = "SELECT ClienId,ClienCodigo,ClienNome
 		,ClienCpf,ClienRg,ClienOrgaoEmissor,ClienUf,ClienSexo,
@@ -152,7 +185,7 @@ try{
 		}
 
 		echo json_encode($array);
-	} elseif ($tipoRequest == 'MODALIDADES'){
+	} elseif($tipoRequest == 'MODALIDADES'){
 	
 		$sql = "SELECT AtModId,AtModNome,AtModChave,AtModSituacao,AtModUsuarioAtualizador
 		FROM AtendimentoModalidade
@@ -168,7 +201,7 @@ try{
 		}
 
 		echo json_encode($array);
-	} elseif ($tipoRequest == 'SERVICOS'){
+	} elseif($tipoRequest == 'SERVICOS'){
 		// $sql = "SELECT SrVenId,SrVenNome,SrVenPlanoConta,SrVenDetalhamento,SrVenValorCusto,
 		// SrVenOutrasDespesas,SrVenCustoFinal,SrVenMargemLucro,SrVenValorVenda,SrVenStatus,
 		// SrVenUsuarioAtualizador,SrVenUnidade
@@ -188,10 +221,8 @@ try{
 		}
 
 		echo json_encode($array);
-	} elseif ($tipoRequest == 'MEDICOS'){
+	} elseif($tipoRequest == 'MEDICOS'){
 		$servico = isset($_POST['servico'])?$_POST['servico']:null;
-		$data = isset($_POST['data'])?$_POST['data']:null;
-		$hora = isset($_POST['hora'])?$_POST['hora']:null;
 
 		$sql = "SELECT DISTINCT ProfiId,ProfiNome
 		FROM ProfissionalXServicoVenda
@@ -210,10 +241,9 @@ try{
 			$arrayDatasRecorrente = [];
 			$arrayDatasIntervalo = [];
 
-			$sql = "SELECT AgBloDataHoraInicio,AgBloDataHoraFim,AgBloRecorrenteSegunda,AgBloRecorrenteTerca,
+			$sql = "SELECT DISTINCT AgBloId,AgBloDataHoraInicio,AgBloDataHoraFim,AgBloRecorrenteSegunda,AgBloRecorrenteTerca,
 				AgBloRecorrenteQuarta,AgBloRecorrenteQuinta,AgBloRecorrenteSexta,AgBloRecorrenteSabado,
-				AgBloRecorrenteDomingo,AgBloRecorrenteQuantidade,AgBloRecorrenteDataFinal,
-				AgBloRecorrenteRepeticao
+				AgBloRecorrenteDomingo,AgBloRecorrenteQuantidade,AgBloRecorrenteDataFinal,AgBloRecorrenteRepeticao
 				FROM AgendamentoBloqueio
 				WHERE AgBloProfissional = $item[ProfiId] AND AgBloUnidade = $iUnidade";
 			$resultBloqueio = $conn->query($sql);
@@ -224,25 +254,23 @@ try{
 
 				// vai montar um array com os dias da semana que estão marcados para bloqueio
 				if($bloqueio['AgBloRecorrenteSegunda']){
-					array_push($arrayDays,'Mon');
+					array_push($arrayDays,'Mon'); //Segunda
 				}if($bloqueio['AgBloRecorrenteTerca']){
-					array_push($arrayDays,'Tue');
+					array_push($arrayDays,'Tue'); //Terça
 				}if($bloqueio['AgBloRecorrenteQuarta']){
-					array_push($arrayDays,'Wed');
+					array_push($arrayDays,'Wed'); //Quarta
 				}if($bloqueio['AgBloRecorrenteQuinta']){
-					array_push($arrayDays,'Thu');
+					array_push($arrayDays,'Thu'); //Quinta
 				}if($bloqueio['AgBloRecorrenteSexta']){
-					array_push($arrayDays,'Fri');
+					array_push($arrayDays,'Fri'); //Sexta
 				}if($bloqueio['AgBloRecorrenteSabado']){
-					array_push($arrayDays,'Sat');
+					array_push($arrayDays,'Sat'); //Sábado
 				}if($bloqueio['AgBloRecorrenteDomingo']){
-					array_push($arrayDays,'Sun');
+					array_push($arrayDays,'Sun'); //Domingo
 				}
 
 				$dt = explode(' ',$bloqueio['AgBloDataHoraInicio'])[0];
 				$hr = explode(' ',$bloqueio['AgBloDataHoraInicio'])[1];
-				// var_dump($arrayDays);
-				// exit;
 
 				// se o bloqueio for recorrente...
 				if($bloqueio['AgBloRecorrenteQuantidade']){
@@ -250,25 +278,46 @@ try{
 
 					// define as datas de acordo à repetição
 					if($bloqueio['AgBloRecorrenteRepeticao'][1]=="S"){// se for semanal "S"...
-						for($x=0; $x <= intval($bloqueio['AgBloRecorrenteQuantidade'])-1; $x++){
+						$firstWeeK = true;
+						for($x=0; $x < intval($bloqueio['AgBloRecorrenteQuantidade']); $x++){
 							$dateLoop = date_create(date_format($data,"Y-m-d"));
-							// pegando o "Domingo => Sun" como ultimo dia da semana no loop while
-							do{
+							$first = true;
+							$notfound = true;
+
+							while(date_format($dateLoop,"D") != 'Sun' || $first){
+								$first = false;
 								if(in_array(date_format($dateLoop,"D"),$arrayDays)){
-									array_push($arrayDatasRecorrente, date_format($dateLoop,"Y-m-d"));
+									array_push($arrayDatasRecorrente, [
+										'id' => $bloqueio['AgBloId'],
+										'data' => date_format($dateLoop,"Y-m-d")
+									]);
+									$notfound = false;
 								}
 								$dateLoop = $dateLoop->modify("+1 Day");
-							}while(date_format($dateLoop,"D") != 'Sun');
+							}
 
-							$days = (intval($bloqueio['AgBloRecorrenteRepeticao'][0])*7);
+							$x = $notfound?$x-1:$x;
+
+							$days = $firstWeeK?0:((intval($bloqueio['AgBloRecorrenteRepeticao'][0]))*7);
+							// $days = intval($bloqueio['AgBloRecorrenteRepeticao'][0])*7;
+
+							// faz com que $data chegue até o sábado para iniciar a verificação em outra semana
+
+							while(date_format($data,"D") != 'Sun'){
+								$data = $data->modify("+1 Day");
+							}
 							$data = $data->modify("+$days Day");
+							$firstWeeK = false;
 						}
+						// echo json_encode($arrayDebug);
+						// exit;
 					}
 				}else{
 					$dtF = explode(' ',$bloqueio['AgBloDataHoraFim'])[0];
 					$hrF = explode(' ',$bloqueio['AgBloDataHoraFim'])[1];
 
 					array_push($arrayDatasIntervalo, [
+						'id' => $bloqueio['AgBloId'],
 						'dataI' => $dt,
 						'dataF' => $dtF,
 						'horaI' => $hr,
@@ -276,7 +325,7 @@ try{
 					]);
 				}
 			}
-
+			
 			array_push($array,[
 				'id' => $item['ProfiId'],
 				'nome' => $item['ProfiNome'],
@@ -286,7 +335,7 @@ try{
 		}
 
 		echo json_encode($array);
-	} elseif ($tipoRequest == 'LOCALATENDIMENTO'){
+	} elseif($tipoRequest == 'LOCALATENDIMENTO'){
 		// $iMedico = $_POST['iMedico'];
 		$hoje = date('Y-m-d');
 
@@ -310,7 +359,7 @@ try{
 		}
 
 		echo json_encode($array);
-	} elseif ($tipoRequest == 'ADDAGENDAMENTO'){
+	} elseif($tipoRequest == 'ADDAGENDAMENTO'){
 		$registro = date('Y-m-d');
 		$data = $_POST['data'];
 		$hora = $_POST['hora'];
@@ -374,7 +423,7 @@ try{
 				'sql' => $result
 			]);
 		}
-	} elseif ($tipoRequest == 'ATTAGENDAMENTO'){
+	} elseif($tipoRequest == 'ATTAGENDAMENTO'){
 		$cmbSituacao = $_POST['situacao'];
 
 		if($isUpdate){
@@ -404,7 +453,7 @@ try{
 				'sql' => $result
 			]);
 		}
-	} elseif ($tipoRequest == 'ADDPACIENTENOVO'){
+	} elseif($tipoRequest == 'ADDPACIENTENOVO'){
 		$tipoRequest = isset($_POST['tipoRequest'])?$_POST['tipoRequest']:null;
 		$prontuario = isset($_POST['prontuario'])?$_POST['prontuario']:null;
 		$nome = isset($_POST['nome'])?$_POST['nome']:null;
@@ -484,7 +533,7 @@ try{
 			'menssagem' => 'Paciente inserido com sucesso!!!',
 			'id' => $lestIdCliente,
 		]);
-	} elseif ($tipoRequest == 'SITUACAO'){
+	} elseif($tipoRequest == 'SITUACAO'){
 		$sql = "SELECT SituaId, SituaNome
 			FROM Situacao
 			WHERE SituaChave in ('AGENDADO','CONFIRMADO','FILAESPERA','ATENDIDO','CANCELADO')";
@@ -500,7 +549,7 @@ try{
 		}
 
 		echo json_encode($array);
-	} elseif ($tipoRequest == 'UPDATEDATA'){
+	} elseif($tipoRequest == 'UPDATEDATA'){
 		$id = $_POST['id'];
 		$data = $_POST['data'];
 		$hora = $_POST['hora'];
@@ -512,10 +561,12 @@ try{
 		$conn->query($sql);
 
 		echo json_encode($data);
-	} elseif ($tipoRequest == 'ADDEVENTO'){
+	} elseif($tipoRequest == 'ADDEVENTO'){
 		$dataHoraInicio = '';
 		$dataHoraFim = '';
 
+		$type = $_POST['type'];
+		$recorrente = $_POST['recorrente'];
 		$medicoConfig = $_POST['medicoConfig'];
 		$bloqueio = $_POST['bloqueio'];
 		$justificativa = $_POST['justificativa'];
@@ -523,39 +574,67 @@ try{
 		$inputHoraInicioBloqueio = $_POST['inputHoraInicioBloqueio'];
 		$inputDataFimBloqueio = $_POST['inputDataFimBloqueio'];
 		$inputHoraFimBloqueio = $_POST['inputHoraFimBloqueio'];
-		$segunda = $_POST['segunda'];
-		$terca = $_POST['terca'];
-		$quarta = $_POST['quarta'];
-		$quinta = $_POST['quinta'];
-		$sexta = $_POST['sexta'];
-		$sabado = $_POST['sabado'];
-		$domingo = $_POST['domingo'];
-		$recorrente = $_POST['recorrente'];
-		$repeticao = $_POST['repeticao'];
-		$quantidadeRecorrencia = $_POST['quantidadeRecorrencia']?($_POST['quantidadeRecorrencia']>99?99:$_POST['quantidadeRecorrencia']):0;
-		$dataRecorrencia = $_POST['dataRecorrencia'];
+
+		$segunda = $recorrente?$_POST['segunda']:0;
+		$terca = $recorrente?$_POST['terca']:0;
+		$quarta = $recorrente?$_POST['quarta']:0;
+		$quinta = $recorrente?$_POST['quinta']:0;
+		$sexta = $recorrente?$_POST['sexta']:0;
+		$sabado = $recorrente?$_POST['sabado']:0;
+		$domingo = $recorrente?$_POST['domingo']:0;
+		$repeticao = $recorrente?$_POST['repeticao']:'';
+
+		$quantidadeRecorrencia = $recorrente && $_POST['quantidadeRecorrencia']?($_POST['quantidadeRecorrencia']>99?99:$_POST['quantidadeRecorrencia']):0;
+		$dataRecorrencia = $recorrente?$_POST['dataRecorrencia']:'';
 		$dataHoraInicio = $inputDataInicioBloqueio.' '.$inputHoraInicioBloqueio;
 
 		if(!$recorrente){
 			$dataHoraFim = $inputDataFimBloqueio.' '.$inputHoraFimBloqueio;
 		}
 
-		$sql = "INSERT INTO AgendamentoBloqueio(AgBloProfissional,AgBloDescricao,AgBloJustificativa,
-		AgBloDataHoraInicio,AgBloDataHoraFim,AgBloRecorrenteRepeticao,AgBloRecorrenteSegunda,
-		AgBloRecorrenteTerca,AgBloRecorrenteQuarta,AgBloRecorrenteQuinta,AgBloRecorrenteSexta,
-		AgBloRecorrenteSabado,AgBloRecorrenteDomingo,AgBloRecorrenteQuantidade,AgBloRecorrenteDataFinal,
-		AgBloUnidade)
-		VALUES($medicoConfig,'$bloqueio','$justificativa','$dataHoraInicio','$dataHoraFim',
-		'$repeticao',$segunda,$terca,$quarta,$quinta,$sexta,$sabado,$domingo,$quantidadeRecorrencia,
-		'$dataRecorrencia',$iUnidade)";
-		$conn->query($sql);
+		if($type == 'NEW'){
+			$sql = "INSERT INTO AgendamentoBloqueio(AgBloProfissional,AgBloDescricao,AgBloJustificativa,
+			AgBloDataHoraInicio,AgBloDataHoraFim,AgBloRecorrenteRepeticao,AgBloRecorrenteSegunda,
+			AgBloRecorrenteTerca,AgBloRecorrenteQuarta,AgBloRecorrenteQuinta,AgBloRecorrenteSexta,
+			AgBloRecorrenteSabado,AgBloRecorrenteDomingo,AgBloRecorrenteQuantidade,AgBloRecorrenteDataFinal,
+			AgBloUnidade)
+			VALUES($medicoConfig,'$bloqueio','$justificativa','$dataHoraInicio','$dataHoraFim',
+			'$repeticao',$segunda,$terca,$quarta,$quinta,$sexta,$sabado,$domingo,$quantidadeRecorrencia,
+			'$dataRecorrencia',$iUnidade)";
+			$conn->query($sql);
+	
+			echo json_encode([
+				'titulo' => 'Evento',
+				'status' => 'success',
+				'menssagem' => 'Evento agendado com sucesso!!!'
+			]);
+		}else{
+			$sql = "UPDATE AgendamentoBloqueio SET
+				AgBloProfissional = $medicoConfig,
+				AgBloDescricao = '$bloqueio',
+				AgBloJustificativa = '$justificativa',
+				AgBloDataHoraInicio = '$dataHoraInicio',
+				AgBloDataHoraFim = '$dataHoraFim',
+				AgBloRecorrenteRepeticao = '$repeticao',
+				AgBloRecorrenteSegunda = $segunda,
+				AgBloRecorrenteTerca = $terca,
+				AgBloRecorrenteQuarta = $quarta,
+				AgBloRecorrenteQuinta = $quinta,
+				AgBloRecorrenteSexta = $sexta,
+				AgBloRecorrenteSabado = $sabado,
+				AgBloRecorrenteDomingo = $domingo,
+				AgBloRecorrenteQuantidade = $quantidadeRecorrencia,
+				AgBloRecorrenteDataFinal = '$dataRecorrencia'
+				WHERE AgBloId = $type";
+			$conn->query($sql);
+			echo json_encode([
+				'titulo' => 'Evento',
+				'status' => 'success',
+				'menssagem' => 'Evento atualizado com sucesso!!!'
+			]);
+		}
 
-		echo json_encode([
-			'titulo' => 'Evento',
-			'status' => 'success',
-			'menssagem' => 'Evento agendado com sucesso!!!'
-		]);
-	} elseif ($tipoRequest == 'ADDCONFIGUNIDADE'){
+	} elseif($tipoRequest == 'ADDCONFIGUNIDADE'){
 		$horaAbertura = $_POST['inputHoraAberturaUnidade'];
 		$horaFechamento = $_POST['inputHoraFechamentoUnidade'];
 		$horaInicio = $_POST['inputHoraInicioUnidade'];
@@ -609,7 +688,7 @@ try{
 			'status' => 'success',
 			'menssagem' => 'Configuração de Unidade salva com sucesso!!!'
 		]);
-	} elseif ($tipoRequest == 'EXCLUI'){
+	} elseif($tipoRequest == 'EXCLUI'){
 		$iAgendamento = $_POST['id'];
 	
 		$sql = "DELETE FROM AgendamentoXServico WHERE AgXSeAgendamento = $iAgendamento
@@ -689,7 +768,7 @@ try{
 						echo json_encode([
 							'titulo' => 'Agendamento',
 							'tipo' => 'error',
-							'menssagem' => 'A o horário selecionado está reservado para almoço na unidade!!',
+							'menssagem' => 'O horário selecionado está reservado para almoço na unidade!!',
 						]);
 					}else{
 						echo json_encode([
@@ -705,6 +784,12 @@ try{
 						'menssagem' => 'O horário não condiz com o de funcionamento da unidade!!',
 					]);
 				}
+			}else{
+				echo json_encode([
+					'titulo' => 'Agendamento',
+					'tipo' => 'success',
+					'menssagem' => 'data válida',
+				]);
 			}
 		}else{
 			echo json_encode([
@@ -714,6 +799,86 @@ try{
 			]);
 		}
 		
+	} elseif($tipoRequest == 'GETBLOQUEIOS'){
+		$sql = "SELECT AgBloId,AgBloDataHoraInicio,AgBloDataHoraFim,ProfiNome,AgBloDescricao,AgBloRecorrenteQuantidade,
+			AgBloRecorrenteDataFinal,AgBloRecorrenteRepeticao
+			FROM AgendamentoBloqueio
+			JOIN Profissional ON ProfiId = AgBloProfissional
+			WHERE AgBloUnidade = $iUnidade";
+		$resultBloqueio = $conn->query($sql);
+		$resultBloqueio = $resultBloqueio->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+		foreach($resultBloqueio as $bloqueio){
+			if($bloqueio['AgBloRecorrenteQuantidade'] && $bloqueio['AgBloRecorrenteQuantidade']>0){
+				$DI = explode('.',$bloqueio['AgBloDataHoraInicio'])[0]; // "yyyy-mm-dd hh:ii:ss.000000" => "yyyy-mm-dd hh:ii:ss"
+				$DF = explode('-',$bloqueio['AgBloRecorrenteDataFinal']); // "yyyy-mm-dd" => ['yyyy','mm','dd']
+	
+				$HI = '';
+	
+				$DI = explode(' ',$DI)[0]; // "yyyy-mm-dd" => ['yyyy-mm-dd', 'hh:ii:ss']
+				$DI = explode('-',$DI); // "yyyy-mm-dd" => ['yyyy','mm','dd']
+				$DI = "$DI[2]/$DI[1]/$DI[0]"; // ['yyyy','mm','dd'] => dd/mm/yyyy
+	
+				$HF = '';
+
+				$DF = "$DF[2]/$DF[1]/$DF[0]"; // ['yyyy','mm','dd'] => dd/mm/yyyy
+
+				$recorrente = "SIM";
+
+				if($bloqueio['AgBloRecorrenteRepeticao'][1]=="S"){
+					$repeticao = $bloqueio['AgBloRecorrenteRepeticao'][0]==0?'Semanal':"{$bloqueio['AgBloRecorrenteRepeticao'][0]} Semanas";
+				}else{
+					$repeticao = $bloqueio['AgBloRecorrenteRepeticao'][0]==0?'Mensal':"{$bloqueio['AgBloRecorrenteRepeticao'][0]} Meses";
+				}
+				$repeticao = "$repeticao ($bloqueio[AgBloRecorrenteQuantidade] X)";
+			}else{
+				$DI = explode('.',$bloqueio['AgBloDataHoraInicio'])[0]; // yyyy-mm-dd hh:ii:ss.000000 => yyyy-mm-dd hh:ii:ss
+				$DF = explode('.',$bloqueio['AgBloDataHoraFim'])[0]; // yyyy-mm-dd hh:ii:ss.000000 => yyyy-mm-dd hh:ii:ss
+	
+				$HI = explode(' ',$DI)[1]; // "yyyy-mm-dd hh:ii:ss" => ['yyyy-mm-dd', 'hh:ii:ss']
+				$HI = explode(':',$HI); // "hh:ii:ss" => ['hh','ii','ss']
+				$HI = "$HI[0]:$HI[1]"; // ['hh','ii','ss'] => "hh:ii"
+	
+				$DI = explode(' ',$DI)[0]; // "yyyy-mm-dd hh:ii:ss" => yyyy-mm-dd'
+				$DI = explode('-',$DI); // 'yyyy-mm-dd' => ['yyyy','mm','dd']
+				$DI = "$DI[2]/$DI[1]/$DI[0]"; // ['yyyy','mm','dd'] => dd/mm/yyyy
+				
+				$HF = explode(' ',$DF)[1]; // "yyyy-mm-dd hh:ii:ss" => ['yyyy-mm-dd', 'hh:ii:ss']
+				$HF = explode(':',$HF); // "hh:ii:ss" => ['hh','ii','ss']
+				$HF = "$HF[0]:$HF[1]"; // ['hh','ii','ss'] => "hh:ii"
+				
+				$DF = explode(' ',$DF)[0]; // yyyy-mm-dd hh:ii:ss => ['yyyy-mm-dd', 'hh:ii:ss']
+				$DF = explode('-',$DF); // yyyy-mm-dd => ['yyyy','mm','dd']
+				$DF = "$DF[2]/$DF[1]/$DF[0]"; // ['yyyy','mm','dd'] => dd/mm/yyyy
+
+				$recorrente = "NÃO";
+				$repeticao = '';
+			}
+			$acoes = "<a style='color: black' href='#' onclick='deletBloqueio($bloqueio[AgBloId])' class='list-icons-item'><i class='icon-bin' title='Excluir Bloqueio'></i></a>";
+
+			array_push($array,[
+				"$DI $HI",
+				"$DF $HF",
+				$bloqueio['AgBloDescricao'],
+				$bloqueio['ProfiNome'],
+				$recorrente,
+				$repeticao,
+				$acoes
+			]);
+		}
+
+		echo json_encode($array);
+	} elseif($tipoRequest == 'DELBLOQUEIO'){
+		$id = $_POST['id'];
+		$sql = "DELETE FROM AgendamentoBloqueio WHERE AgBloId = $id";
+		$conn->query($sql);
+
+		echo json_encode([
+			'titulo' => 'Excluir Bloqueio',
+			'status' => 'success',
+			'menssagem' => 'Bloqueio excluido com sucesso!!!'
+		]);
 	}
 }catch(PDOException $e) {
 	$msg = '';

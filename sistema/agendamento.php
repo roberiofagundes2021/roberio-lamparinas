@@ -85,6 +85,12 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			border-radius: 0.25rem;
 			border: 0px;
 		}
+
+		/* cabeçalhor do FullCalendar*/
+		.fc-widget-header{
+			background-color: #466d96;
+			color: #FFF;
+		}
 	</style>
 	<?php
 		echo "<script>
@@ -94,7 +100,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 	?>
 
 	<script type="text/javascript">
-		var viwerCalendar = 'agendaWeek'
+		var viewerCalendar = 'agendaWeek'
 		var selectCalendar = false
 		// const socket = WebSocketConnect(iUnidade,iEmpresa)
 		// socket.onmessage = function (event) {
@@ -106,6 +112,60 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 		$(document).ready(function(){
 			getAgenda()
 			getCmbs()
+
+			$('#relacaoBloqueiosTable').DataTable({
+				"order": [[ 0, "desc" ]],
+			    autoWidth: false,
+				responsive: true,
+			    columnDefs: [
+				{
+					orderable: true,   //DataI - HoraI
+					width: "15%",
+					targets: [0]
+				},
+				{ 
+					orderable: true,   //DataF - HoraF
+					width: "15%",
+					targets: [1]
+				},
+				{ 
+					orderable: true,   //titulo
+					width: "20%",
+					targets: [2]
+				},
+				{ 
+					orderable: true,   //profissional
+					width: "20%",
+					targets: [3]
+				},
+				{ 
+					orderable: true,   //recorrente
+					width: "10%",
+					targets: [4]
+				},				
+				{ 
+					orderable: true,   //repeticao
+					width: "15%",
+					targets: [5]
+				},
+				{ 
+					orderable: true,   //acoes
+					width: "5%",
+					targets: [6]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer"ip>',
+                language: {
+                    search: '<span>Filtro:</span> _INPUT_',
+                    searchPlaceholder: 'filtra qualquer coluna...',
+                    lengthMenu: '<span>Mostrar:</span> _MENU_',
+                    paginate: {
+                        'first': 'Primeira',
+                        'last': 'Última',
+                        'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+                        'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+                    }
+                }
+			});
 
 			$('#salvarAgenda').on('click', ()=>{
 				$('#salvarAgenda').html("<img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px' alt='loader'>");
@@ -183,8 +243,19 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				$('#inputHora').val(`${hora}:${minuto}`)
 				$('#textObservacao').val('')
 				$('#idAgendamento').val('')
-				getCmbs()
+				$('#tituloModal').html('Novo Agendamento')
 
+				$('#inputData').attr('readonly', false)
+				$('#inputHora').attr('readonly', false)
+				$('#textObservacao').attr('readonly', false)
+				$('#paciente').attr('disabled', false)
+				$('#modalidade').attr('disabled', false)
+				$('#servico').attr('disabled', false)
+				$('#localAtendimento').attr('disabled', false)
+				$('#medico').attr('disabled', false)
+				$('#addPaciente').removeClass('d-none')
+
+				getCmbs()
 				$('#page-modal-agendamento').fadeIn(200)
 			})
 			$('#modal-close-x').on('click', function(e){
@@ -257,18 +328,19 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 							'data': $('#inputData').val(),
 							'hora': $('#inputHora').val()
 						},
-						success: async function(response) {
+						success: function(response) {
 							$('#medico').empty()
 							$('#medico').append(`<option value=''>Selecione</option>`)
-							await response.forEach(async item => {
-								if(item.datasRecorrente.length && item.datasRecorrente.includes($('#inputData').val())){
+							
+							response.forEach(async item => {
+								if(item.datasRecorrente.length && item.datasRecorrente.filter(obj => obj.data.includes($('#inputData').val())).length){
 									return
 								}
 
 								// vai verificar se a data e horário selecionados estão dentro de um bloqueio pre estabelecido
 								let inInterval = false
 								await item.datasIntervalo.forEach(data => {
-									inInterval = data.dataI <= $('#inputData').val() && data.horaI <= $('#inputHora').val() && data.dataF >= $('#inputData').val() && data.horaF >= $('#inputHora').val()?true:inInterval
+									inInterval = data.dataI <= $('#inputData').val() && data.horaI <= $('#inputHora').val() && (data.dataF > $('#inputData').val() || (data.dataF == $('#inputData').val() && data.horaF >= $('#inputHora').val()))?true:inInterval
 								})
 
 								if(inInterval){
@@ -411,6 +483,9 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				$('#iAtendimento').val('')
 				$('#page-modal-paciente').fadeOut(200)
 			})
+			$('#configRelacao-close-x').on('click', () => {
+				$('#page-modal-configRelacao').fadeOut(200)
+			})
 			$('#salvarPacienteModal').on('click', function(e) {
 				e.preventDefault()
 
@@ -491,7 +566,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						'email': $('#emailNew').val(),
 						'observacao': $('#observacaoNew').val()
 					},
-					success: async function(response) {
+					success: function(response) {
 						if (response.status == 'success') {
 							alerta(response.titulo, response.menssagem, response.status)
 							getCmbs({'pacienteID': response.id})
@@ -503,11 +578,15 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				});
 			})
 
-			$('#config').on('click', function(e){
+			$('#novoBloqueio').on('click', function(e){
 				e.preventDefault()
 				getFilters()
+				$('#page-modal-configRelacao').fadeOut(200)
+				$('#typeInsert').val('NEW')
+				$('#salvarEvento').html('Inserir')
 				$('#inputDataInicioBloqueio').val('')
 				$('#bloqueio').val('')
+				$('#justificativa').val('')
 				$('#inputHoraInicioBloqueio').val('')
 				$('#inputDataFimBloqueio').val('')
 				$('#inputHoraFimBloqueio').val('')
@@ -525,6 +604,11 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				$('#dataRecorrencia').val('')
 				$('#cardRecorrend').addClass('d-none')
 				$('#page-modal-config').fadeIn(200)
+			})
+			$('#config').on('click', function(e){
+				e.preventDefault()
+				getBloqueios()
+				$('#page-modal-configRelacao').fadeIn(200)
 			})
 			$('#modalConfig-close-x').on('click', function(e){
 				e.preventDefault()
@@ -630,9 +714,9 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				e.preventDefault()
 				selectCalendar = true
 				$('#page-modal-config').fadeOut(200)
-				setTimeout(() => {
-					selectCalendar = false
-				}, 5000)
+				// setTimeout(() => {
+				// 	selectCalendar = false
+				// }, 2000)
 			})
 
 			$('#salvarEvento').on('click', function(e){
@@ -651,13 +735,19 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				// caso seja recorrente...
 				if($('#recorrente').is(':checked')){
 					switch(msg){
-						case $('#repeticao').val():msg="Informe a quantidade de repetiçoes";break;
+						case $('#repeticao').val():msg="Informe a frequência de repetiçoes";break;
+						case $('#quantidadeRecorrencia').val():msg="Informe a quantidade de repetiçoes";break;
 						default:msg = '';break;
 					}
 					if(!$('#segunda').is(':checked') && !$('#terca').is(':checked') && !$('#quarta').is(':checked') && !$('#quinta').is(':checked') && !$('#sexta').is(':checked') && !$('#sabado').is(':checked') && !$('#domingo').is(':checked')){
 						msg="Informe pelo menos um dia"
 					}
+				}else{
+					if($('#inputDataInicioBloqueio').val() > $('#inputDataFimBloqueio').val() || $('#inputDataFimBloqueio').val() < updateDateTime().dataAtual || $('#inputDataInicioBloqueio').val() < updateDateTime().dataAtual){
+						msg="Data inválida!!"
+					}
 				}
+
 
 				if(msg){
 					alerta('Campo Obrigatório', msg,'error')
@@ -670,6 +760,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 					dataType: 'json',
 					data:{
 						'tipoRequest': 'ADDEVENTO',
+						'type': $('#typeInsert').val(),
 						'medicoConfig':$('#medicoConfig').val(),
 						'bloqueio':$('#bloqueio').val(),
 						'justificativa':$('#justificativa').val(),
@@ -690,8 +781,9 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						'quantidadeRecorrencia':$('#quantidadeRecorrencia').val(),
 						'dataRecorrencia':$('#dataRecorrencia').val(),
 					},
-					success: async function(response) {
+					success: function(response) {
 						alerta(response.titulo, response.menssagem, response.status)
+						getAgenda()
 						$('#page-modal-config').fadeOut(200)
 					}
 				});
@@ -735,7 +827,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						'sabado':$('#sabadoUnidade').is(':checked')?1:0,
 						'domingo':$('#domingoUnidade').is(':checked')?1:0
 					},
-					success: async function(response) {
+					success: function(response) {
 						alerta(response.titulo, response.menssagem, response.status)
 						$('#page-modal-configUnidade').fadeOut(200)
 					}
@@ -746,15 +838,17 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				let date = new Date($('#inputDataInicioBloqueio').val())
 
 				if($('#repeticao').val()[1] == 'S'){
-					let count = parseInt($('#repeticao').val()[0])*7
+					let days = parseInt($('#repeticao').val()[0])>1?parseInt($('#repeticao').val()[0])*7:7
+					days = days*$(this).val()
+					date.setDate(date.getDate() + days)
 
-					for(x=0; x < $(this).val(); x++){
-						date.setDate(date.getDate() + count);
+					while(date.toString().split(' ')[0] != 'Sat'){
+						date.setDate(date.getDate() + 1)
 					}
 				}
 
-				date = `${date.getFullYear()}-${date.getMonth()>9?date.getMonth()+1:'0'+(date.getMonth()+1)}-${date.getDate()>9?date.getDate():'0'+date.getDate()}`
-				$('#dataRecorrencia').val(date)
+				let finalDate = `${date.getFullYear()}-${date.getMonth()>9?date.getMonth()+1:'0'+(date.getMonth()+1)}-${date.getDate()>9?date.getDate():'0'+date.getDate()}`
+				$('#dataRecorrencia').val(finalDate)
 			})
 			$('#dataRecorrencia').on('input', function(e){
 				let dateI = new Date($('#inputDataInicioBloqueio').val())
@@ -770,6 +864,32 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				}
 			})
 		})
+
+		function getBloqueios(){
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAgendamento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest':'GETBLOQUEIOS'
+				},
+				success: function(response) {
+					let table = $('#relacaoBloqueiosTable').DataTable().clear().draw()
+
+					table = $('#relacaoBloqueiosTable').DataTable()
+					let rowNode
+
+					response.forEach(item => {
+						rowNode = table.row.add(item).draw().node()
+						$(rowNode).find('td:eq(6)').attr('class', 'text-center')
+					})
+				}
+			})
+		}
+
+		function deletBloqueio(id){
+			confirmaExclusaoAjax('filtraAgendamento.php','Deseja excluir esse bloqueio?', 'DELBLOQUEIO',id,getBloqueios())
+		}
 
 		function updateDateTime(){
 			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"});
@@ -789,11 +909,11 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		function getAgenda(filtro){
 			if($('div.fc-agendaDay-view').length){
-				viwerCalendar = 'agendaDay'
+				viewerCalendar = 'agendaDay'
 			} else if($('div.fc-agendaWeek-view').length){
-				viwerCalendar = 'agendaWeek'
+				viewerCalendar = 'agendaWeek'
 			} else if($('div.fc-month-view').length){
-				viwerCalendar = 'month'
+				viewerCalendar = 'month'
 			}
 
 			// iniciar o calendário
@@ -807,11 +927,11 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 					'status':filtro && filtro.status?filtro.status:null,
 					'recepcao':filtro && filtro.recepcao?filtro.recepcao:null
 				},
-				success: async function(response) {
+				success: function(response) {
 					clearModal()
 
 					let events = []
-					await response.forEach(item =>{
+					response.forEach(item =>{
 						let cor = ''
 						switch(item.situacao.cor){
 							case 'primary':cor = '#2196F3';break;
@@ -833,6 +953,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						}
 						events.push({
 							id: item.id,
+							type: 'AGENDAMENTO',
 							title: item.cliente.nome,
 							status: item.status,
 							start: `${item.data} ${item.hora.split('.')[0]}`,
@@ -840,157 +961,238 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 							color: cor,
 						})
 					})
-					// reseta o calendário
-					$('#calendarioagendamento').fullCalendar('destroy')
-					
-					// Initialize the calendar
-					$('#calendarioagendamento').fullCalendar({
-						header: {
-							left: 'prev,next today',
-							center: 'title',
-							right: 'month,agendaWeek,agendaDay'
-						},
-						editable: true,
-						defaultDate: updateDateTime().dataAtual,
-						events: events,
-						timeZone: 'America/Bahia',
-						locale: 'pt-br',
-						droppable: true,
-						defaultView: viwerCalendar,
-						selectable: true,
-						eventDurationEditable:false,
-						disableResizing: true,
-						eventClick: function(event, jsEvent, view) {
-							$.ajax({
-								type: 'POST',
-								url: 'filtraAgendamento.php',
-								dataType: 'json',
-								data:{
-									'tipoRequest': 'GETAGENDAMENTO',
-									'id': event.id
-								},
-								success: function(response){
-									let readOnlyOption = response.data < updateDateTime().dataAtual || (response.data == updateDateTime().dataAtual && response.hora < updateDateTime().horaAtual)?true:false
-									
-									$('#idAgendamento').val(event.id)
-									$('#inputData').val(response.data)
-									$('#inputHora').val(response.hora)
-									$('#textObservacao').val(response.observacao)
-									$('#tituloModal').html('Editar Agendamento')
 
-									getCmbs({
-										'pacienteID':response.cliente,
-										'modalidadeID':response.modalidade,
-										'servicoID':response.servico,
-										'medicoID':response.profissional,
-										'localAtendimentoID':response.local,
-										'situacaoID':response.situacao,
+					$.ajax({
+						type: 'POST',
+						url: 'filtraAgendamento.php',
+						dataType: 'json',
+						data:{
+							'tipoRequest': 'MEDICOS',
+							// 'servico': $(this).val(),
+							// 'data': $('#inputData').val(),
+							// 'hora': $('#inputHora').val()
+						},
+						success: function(response) {
+							response.forEach(profissional => {
+								profissional.datasRecorrente.forEach(item => {
+									events.push({
+										id: item.id,
+										type: 'BLOQUEIO',
+										title: `Bloqueio ${profissional.nome}`,
+										start: `${item.data}`,
+										end: null,
+										color: '#20272F',
+										borderColor: '#D50000',
+										editable: false
 									})
-
-									$('#inputData').attr('readonly', readOnlyOption)
-									$('#inputHora').attr('readonly', readOnlyOption)
-									$('#textObservacao').attr('readonly', readOnlyOption)
-									$('#paciente').attr('disabled', readOnlyOption)
-									$('#modalidade').attr('disabled', readOnlyOption)
-									$('#servico').attr('disabled', readOnlyOption)
-									$('#localAtendimento').attr('disabled', readOnlyOption)
-									$('#medico').attr('disabled', readOnlyOption)
-									// $('#situacao').attr('disabled', readOnlyOption)
-									if(readOnlyOption){
-										$('#addPaciente').addClass('d-none')
-									}else{
-										$('#addPaciente').removeClass('d-none')
-									}
-
-									$('#page-modal-agendamento').fadeIn(200)
-								}
-							})
-						},
-						eventDrop: function(event, jsEvent, ui, view) {
-							let data = event.start.format()
-							data = data.split('T')
-							
-							if(data[0] < updateDateTime().dataAtual || (data[0] == updateDateTime().dataAtual && data[1] < updateDateTime().horaAtual)){
-								alerta('Data e Hora inválida!', 'Data e hora do registro não pode ser retroativa', 'error')
-								getAgenda()
-								return
-							}
-
-							$.ajax({
-								type: 'POST',
-								url: 'filtraAgendamento.php',
-								dataType: 'json',
-								data:{
-									'tipoRequest': 'UPDATEDATA',
-									'id': event.id,
-									'data': data[0],
-									'hora': data[1],
-								},
-								success: function(response){}
-							})
-						},
-						select: function(start, end, jsEvent, view) {
-							let inicio = start.format().split('T')
-							let fim = end.format().split('T')
-							$('#idAgendamento').val('')
-
-							$('#tituloModal').html('Novo Agendamento')
-							
-							if(inicio[0] < updateDateTime().dataAtual || (inicio[0] == updateDateTime().dataAtual && inicio[1] < updateDateTime().horaAtual)){
-								alerta('Data e Hora inválida!', 'Data e hora do registro não pode ser retroativa', 'error')
-								getAgenda()
-								return
-							}
-
-							if(selectCalendar){
-								selectCalendar = false
-								// getFilters()
-								$('#inputDataInicioBloqueio').val(inicio[0])
-								$('#inputDataFimBloqueio').val(fim[0])
-								if(inicio[1]){
-									$('#inputHoraInicioBloqueio').val(inicio[1])
-									$('#inputHoraFimBloqueio').val(fim[1])
-								}
-								$('#page-modal-config').fadeIn(200)
-							}else{
-								$.ajax({
-									type: 'POST',
-									url: 'filtraAgendamento.php',
-									dataType: 'json',
-									data: {
-										'tipoRequest': 'CHECKAGENDAUNIDADE',
-										'data': inicio[0],
-										'hora': inicio[1],
-									},
-									success: function(response) {
-										if(response.tipo == 'error'){
-											alerta(response.titulo,response.menssagem,response.tipo)
-											$(this).val('')
-										}else{
-											getCmbs()
-											$('#inputData').val(inicio[0])
-											if(inicio[1]){
-												$('#inputHora').val(inicio[1])
-											}
-
-											$('#inputData').attr('readonly', false)
-											$('#inputHora').attr('readonly', false)
-											$('#textObservacao').attr('readonly', false)
-											$('#paciente').attr('disabled', false)
-											$('#modalidade').attr('disabled', false)
-											$('#servico').attr('disabled', false)
-											$('#localAtendimento').attr('disabled', false)
-											$('#medico').attr('disabled', false)
-											$('#addPaciente').removeClass('d-none')
-											$('#textObservacao').val('')
-
-											$('#page-modal-agendamento').fadeIn(200)
-										}
-									}
 								})
-							}
-						},
-						isRTL: false
+								profissional.datasIntervalo.forEach(item => {
+									events.push({
+										id: item.id,
+										type: 'BLOQUEIO',
+										title: `Bloqueio ${profissional.nome}`,
+										start: `${item.dataI} ${item.horaI.split('.')[0]}`,
+										end: `${item.dataF} ${item.horaF.split('.')[0]}`,
+										color: '#20272F',
+										borderColor: '#D50000',
+										editable: false
+									})
+								})
+							})
+							// reseta o calendário
+							$('#calendarioagendamento').fullCalendar('destroy')
+								
+							// Initialize the calendar
+							$('#calendarioagendamento').fullCalendar({
+								header: {
+									left: 'prev,next today',
+									center: 'title',
+									right: 'month,agendaWeek,agendaDay'
+								},
+								editable: true,
+								defaultDate: updateDateTime().dataAtual,
+								events: events,
+								timeZone: 'America/Bahia',
+								locale: 'pt-br',
+								droppable: true,
+								defaultView: viewerCalendar,
+								selectable: true,
+								eventDurationEditable:false,
+								disableResizing: true,
+								eventClick: function(event, jsEvent, view) {
+									$.ajax({
+										type: 'POST',
+										url: 'filtraAgendamento.php',
+										dataType: 'json',
+										data:{
+											'tipoRequest': 'GETAGENDAMENTO',
+											'id': event.id,
+											'type': event.type,
+										},
+										success: function(response){
+											if(event.type == 'AGENDAMENTO'){
+												let readOnlyOption = response.data < updateDateTime().dataAtual || (response.data == updateDateTime().dataAtual && response.hora < updateDateTime().horaAtual)?true:false
+												
+												$('#idAgendamento').val(event.id)
+												$('#inputData').val(response.data)
+												$('#inputHora').val(response.hora)
+												$('#textObservacao').val(response.observacao)
+												$('#tituloModal').html('Editar Agendamento')
+
+												getCmbs({
+													'pacienteID':response.cliente,
+													'modalidadeID':response.modalidade,
+													'servicoID':response.servico,
+													'medicoID':response.profissional,
+													'localAtendimentoID':response.local,
+													'situacaoID':response.situacao,
+												})
+
+												$('#inputData').attr('readonly', readOnlyOption)
+												$('#inputHora').attr('readonly', readOnlyOption)
+												$('#textObservacao').attr('readonly', readOnlyOption)
+												$('#paciente').attr('disabled', readOnlyOption)
+												$('#modalidade').attr('disabled', readOnlyOption)
+												$('#servico').attr('disabled', readOnlyOption)
+												$('#localAtendimento').attr('disabled', readOnlyOption)
+												$('#medico').attr('disabled', readOnlyOption)
+												// $('#situacao').attr('disabled', readOnlyOption)
+												if(readOnlyOption){
+													$('#addPaciente').addClass('d-none')
+												}else{
+													$('#addPaciente').removeClass('d-none')
+												}
+
+												$('#page-modal-agendamento').fadeIn(200)
+											}else if(event.type == 'BLOQUEIO'){
+												getFilters({
+													'profissional': response.profissional
+												})
+
+												if(response.dataFinal >= updateDateTime().dataAtual || response.dataF >= updateDateTime().dataAtual){
+													$('#inputDataInicioBloqueio').val(response.dataI)
+													$('#inputHoraInicioBloqueio').val(response.horaI)
+													$('#inputDataFimBloqueio').val(response.dataF)
+													$('#inputHoraFimBloqueio').val(response.horaF)
+													$('#bloqueio').val(response.descricao)
+													$('#justificativa').val(response.justificativa)
+													$('#recorrente').prop('checked', parseInt(response.quantidade)?true:false)
+													$('#segunda').prop('checked', parseInt(response.segunda)?true:false)
+													$('#terca').prop('checked', parseInt(response.terca)?true:false)
+													$('#quarta').prop('checked', parseInt(response.quarta)?true:false)
+													$('#quinta').prop('checked', parseInt(response.quinta)?true:false)
+													$('#sexta').prop('checked', parseInt(response.sexta)?true:false)
+													$('#sabado').prop('checked', parseInt(response.sabado)?true:false)
+													$('#domingo').prop('checked', parseInt(response.domingo)?true:false)
+													$('#repeticao').val(response.repeticao)
+													$('#quantidadeRecorrencia').val(response.quantidade)
+													$('#typeInsert').val(event.id)
+													$('#salvarEvento').html('Atualizar')
+
+													if(parseInt(response.quantidade)){
+														$('#cardRecorrend').removeClass('d-none')
+														$('#dataRecorrencia').val(response.dataFinal)
+													}else{
+														$('#cardRecorrend').addClass('d-none')
+														$('#dataRecorrencia').val('')
+													}
+													$('#page-modal-config').fadeIn(200)
+												}else{
+													alerta('Bloqueio', 'O bloqueio não pode mais ser editado!!', 'error')
+												}
+												
+											}
+										}
+									})
+								},
+								eventDrop: function(event, jsEvent, ui, view) {
+									let data = event.start.format()
+									data = data.split('T')
+									
+									if(data[0] < updateDateTime().dataAtual || (data[0] == updateDateTime().dataAtual && data[1] < updateDateTime().horaAtual)){
+										alerta('Data e Hora inválida!', 'Data e hora do registro não pode ser retroativa', 'error')
+										getAgenda()
+										return
+									}
+
+									$.ajax({
+										type: 'POST',
+										url: 'filtraAgendamento.php',
+										dataType: 'json',
+										data:{
+											'tipoRequest': 'UPDATEDATA',
+											'id': event.id,
+											'data': data[0],
+											'hora': data[1],
+										},
+										success: function(response){}
+									})
+								},
+								select: function(start, end, jsEvent, view) {
+									let inicio = start.format().split('T')
+									let fim = end.format().split('T')
+									$('#idAgendamento').val('')
+
+									$('#tituloModal').html('Novo Agendamento')
+									
+									if(inicio[0] < updateDateTime().dataAtual || (inicio[0] == updateDateTime().dataAtual && inicio[1] < updateDateTime().horaAtual)){
+										alerta('Data e Hora inválida!', 'Data e hora do registro não pode ser retroativa', 'error')
+										getAgenda()
+										return
+									}
+									if(selectCalendar){
+										// getFilters()
+										$('#inputDataInicioBloqueio').val(inicio[0])
+										$('#inputDataFimBloqueio').val(fim[0])
+										if(inicio[1]){
+											$('#inputHoraInicioBloqueio').val(inicio[1])
+											$('#inputHoraFimBloqueio').val(fim[1])
+										}
+										selectCalendar = false
+										$('#page-modal-config').fadeIn(200)
+									}else{
+										$.ajax({
+											type: 'POST',
+											url: 'filtraAgendamento.php',
+											dataType: 'json',
+											data: {
+												'tipoRequest': 'CHECKAGENDAUNIDADE',
+												'data': inicio[0],
+												'hora': inicio[1],
+											},
+											success: function(response) {
+												if(response.tipo == 'error'){
+													alerta(response.titulo,response.menssagem,response.tipo)
+													$(this).val('')
+												}else{
+													getCmbs()
+													$('#inputData').val(inicio[0])
+													if(inicio[1]){
+														$('#inputHora').val(inicio[1])
+													}else{
+														$('#inputHora').val('')
+													}
+
+													$('#inputData').attr('readonly', false)
+													$('#inputHora').attr('readonly', false)
+													$('#textObservacao').attr('readonly', false)
+													$('#paciente').attr('disabled', false)
+													$('#modalidade').attr('disabled', false)
+													$('#servico').attr('disabled', false)
+													$('#localAtendimento').attr('disabled', false)
+													$('#medico').attr('disabled', false)
+													$('#addPaciente').removeClass('d-none')
+													$('#textObservacao').val('')
+
+													$('#page-modal-agendamento').fadeIn(200)
+												}
+											}
+										})
+									}
+								},
+								isRTL: false
+							});
+						}
 					});
 				}
 			});
@@ -1192,7 +1394,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			}
 		}
 
-		function getFilters(){
+		function getFilters(obj){
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAgendamento.php',
@@ -1204,7 +1406,8 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 					$('#medicoConfig').empty()
 					$('#medicoConfig').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
+						let opt = obj && obj.profissional?(obj.profissional == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`):
+						`<option value="${item.id}">${item.nome}</option>`
 						$('#medicoConfig').append(opt)
 					})
 				}
@@ -1253,7 +1456,6 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 							<!-- titulo -->
 							<div class="col-lg-2"><h3 class="card-title">Agendamentos</h3></div>
 							<div class="col-lg-6">
-								Filtrar Profissionais
 								<select id="profissional" name="profissional[]" class="form-control multiselect-filtering" multiple="multiple">
 									<?php
 										foreach($rowProfissionais as $item){
@@ -1901,6 +2103,42 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				</div>
 			</div>
 
+			<div id="page-modal-configRelacao" class="custon-modal">
+				<div class="custon-modal-container" style="width: 90%;">
+					<div class="card custon-modal-content">
+						<div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+							<p id="tituloModal" class="h5">Bloqueios</p>
+							<i id="configRelacao-close-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+						</div>
+						<div class="px-0">
+							<div class="col-lg-12 p-0">
+								<table class="table" id="relacaoBloqueiosTable">
+									<thead>
+										<tr class="bg-slate text-left">
+											<th>Início</th>
+											<th>Fim</th>
+											<th>Título</th>
+											<th>Profissional</th>
+											<th>Recorrente</th>
+											<th>Repetição</th>
+											<th class="text-center">Ações</th>
+										</tr>
+									</thead>
+									<tbody>
+
+									</tbody>
+								</table>
+							</div>
+							<div class="col-lg-12 py-3" style="margin-top: -5px;">
+								<div class="col-lg-4">
+									<button id="novoBloqueio" class='btn btn-principal'>Novo Bloqueio</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<div id="page-modal-config" class="custon-modal">
 				<div class="custon-modal-container" style="max-width: 900px;">
 					<div class="card custon-modal-content">
@@ -1910,6 +2148,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						</div>
 						<div class="px-0">
 							<form id="formConfig" class="form-validate-jquery">
+								<input id="typeInsert" type='hidden' type="text" value="NEW">
 								<div class="col-lg-12 p-0">
 									<!-- linha 1 -->
 									<div class="col-lg-12 row p-2 m-0">

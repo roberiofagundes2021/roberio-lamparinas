@@ -79,7 +79,7 @@ function confirmaExclusao(form, texto, acao, acaoComplete) {
 		});
 }
 
-function confirmaExclusaoAjax(url, texto, tipoRequest, id, acaoSucces) {
+function confirmaExclusaoAjax(url, texto, tipoRequest, id, acaoSuccess) {
 	new PNotify({
 		title: 'Confirmação',
 		text: texto,
@@ -103,7 +103,7 @@ function confirmaExclusaoAjax(url, texto, tipoRequest, id, acaoSucces) {
 							success: function(response) {
 								if(response.status  == 'success'){
 									alerta(response.titulo, response.menssagem, response.status)
-									acaoSucces()
+									acaoSuccess()
 								} else {
 									alerta(response.titulo, response.menssagem, response.status)
 								}
