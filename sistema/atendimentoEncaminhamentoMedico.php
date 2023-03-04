@@ -525,66 +525,60 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 							<div class="card">
 
 								<div class="card-body">
-									<?php 
-										if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
-											echo "<div class='col-lg-12 row'>
-												<div class='col-lg-6'>
-													<label>Profissional <span class='text-danger'>*</span></label>
-												</div>
-												<div class='col-lg-6'>
-													<label>Especialidade <span class='text-danger'>*</span></label>
-												</div>
+									<div class="col-lg-12 row">
+										<div class="col-lg-6">
+											<label>Profissional <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-6">
+											<label>Especialidade <span class="text-danger">*</span></label>
+										</div>
 
-												<div class='col-lg-6 input-group'>
-													<select id='profissional' name='profissional' class='form-control select-search'>
-														<option value=''>Selecione</option>
-													</select>
-												</div>
-												<div class='col-lg-6 input-group'>
-													<select id='especialidade' name='especialidade' class='form-control select-search'>
-														<option value=''>Selecione</option>
-													</select>
-												</div>
-											</div>";
+										<div class="col-lg-6 input-group">
+											<select id="profissional" name="profissional" class="form-control select-search">
+												<option value="">Selecione</option>
+											</select>
+										</div>
+										<div class="col-lg-6 input-group">
+											<select id="especialidade" name="especialidade" class="form-control select-search">
+												<option value="">Selecione</option>
+											</select>
+										</div>
+									</div>
 
-											echo "<br/>";
+									<br/>
 
-											echo "<div class='col-lg-12 row'>
-												<div class='col-lg-6'>
-													<label>Tipo de encaminhamento <span class='text-danger'>*</span></label>
-												</div>
-												<div class='col-lg-6'>
-													<label>CID-10</label>
-												</div>
+									<div class="col-lg-12 row">
+										<div class="col-lg-6">
+											<label>Tipo de encaminhamento <span class="text-danger">*</span></label>
+										</div>
+										<div class="col-lg-6">
+											<label>CID-10</label>
+										</div>
 
-												<div class='col-lg-6 input-group'>
-													<select id='modelo' name='modelo' class='form-control select-search'>
-														<option value=''>Selecione</option>
-													</select>
-												</div>
-												<div class='col-lg-6 input-group'>
-													<select id='cid' name='cid' class='form-control select-search'>
-														<option value=''>Selecione</option>
-													</select>
-												</div>
-											</div>";
-										
+										<div class="col-lg-6 input-group">
+											<select id="modelo" name="modelo" class="form-control select-search">
+												<option value="">Selecione</option>
+											</select>
+										</div>
+										<div class="col-lg-6 input-group">
+											<select id="cid" name="cid" class="form-control select-search">
+												<option value="">Selecione</option>
+											</select>
+										</div>
+									</div>
 
-											echo "<br/>";
+									<br/>
 
-											echo "<div class='col-lg-12'>
-												<div class='form-group'>
-													<label>Encaminhamento Médico <span class='text-danger'>*</span></label>
-													<textarea rows='5' cols='5'  id='summernote' name='txtareaConteudo' class='form-control'></textarea>
-													<small class='text-muted form-text'>
-														Máx. 2000 caracteres<br>
-														<span id='caracteresInputEncaminhamentoMedico'></span>
-													</small>
-												</div>
-											</div>";
-										}
-									?>	 
-
+									<div class="col-lg-12">
+										<div class="form-group">
+											<label>Encaminhamento Médico <span class="text-danger">*</span></label>
+											<textarea rows="5" cols="5"  id="summernote" name="txtareaConteudo" class="form-control"></textarea>
+											<small class="text-muted form-text">
+												Máx. 2000 caracteres<br>
+												<span id="caracteresInputEncaminhamentoMedico"></span>
+											</small>
+										</div>
+									</div>	 
 
 									<div class="col-lg-12 mt-2">
 										<div class="col-lg-12 card-header p-0">
@@ -610,11 +604,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 									<div class="row">
 										<div class="col-lg-12">
 											<div class="form-group" style="padding-top:25px;">
-											<?php 
-												if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
-													echo "	<button class='btn btn-lg btn-principal' id='enviar'>Incluir</button>";
-												}
-											?>
+												<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
 												<?php 
 													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
