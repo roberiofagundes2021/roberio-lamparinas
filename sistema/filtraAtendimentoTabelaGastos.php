@@ -101,11 +101,14 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 	$resultSubGrupo = $conn->query($sql);
 	$resultSubGrupo = $resultSubGrupo->fetch(PDO::FETCH_ASSOC);
 	
-	$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SrVenValorVenda,SrVenUnidade
-	FROM ServicoVenda WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
+	$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SVXMoValorVenda,SrVenUnidade
+	FROM ServicoVenda
+	LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
+	WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
 	$resultServico = $conn->query($sql);
 	$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
 
+	
 	$sql = "SELECT ProfiId,ProfiNome,ProfiCpf,ProfiSexo,ProfiEndereco,ProfiCelular,ProfiTelefone
 	FROM Profissional WHERE ProfiId = $iMedico and ProfiUnidade = $iUnidade";
 	$resultMedico = $conn->query($sql);
@@ -127,7 +130,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 		'sData' => mostraData($sData),
 		'data' => $sData,
 		'hora' => mostraHora($sHora),
-		'valor' => $resultServico['SrVenValorVenda'],
+		'valor' => $resultServico['SVXMoValorVenda'],
 		'desconto' => 0
 	]);
 	$_SESSION['atendimentoTabelaServicos'] = $atendimentoTabelaServicos;
@@ -189,7 +192,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 			,AtTGaDataAtendimento,AtTGaValor,AtTGaDesconto, AtTGaGrupo, AtTGaSubGrupo,
 			AtGruNome, AtGruId, AtSubNome, AtSubId,
 			Profissional.ProfiId,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-			SituaCor,ProfiNome,SrVenNome,SrVenValorVenda,SrVenId
+			SituaCor,ProfiNome,SrVenNome,SVXMoValorVenda,SrVenId
 			FROM AtendimentoTabelaGastoProcedimento
 			JOIN Atendimento ON AtendId = AtTGaAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -199,6 +202,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 			JOIN ServicoVenda ON SrVenId = AtTGaServico
 			JOIN AtendimentoGrupo ON AtGruId = AtTGaGrupo
 			JOIN AtendimentoSubGrupo ON AtSubId = AtTGaSubGrupo
+			LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 			WHERE AtTGaUnidade = $iUnidade and AtTGaAtendimento = $iAtendimento";
 		$result = $conn->query($sql);
 		$rowAtendimento = $result->fetchAll(PDO::FETCH_ASSOC);

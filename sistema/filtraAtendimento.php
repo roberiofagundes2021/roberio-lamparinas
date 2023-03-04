@@ -2968,19 +2968,23 @@ try{
 		]);
 	} elseif ($tipoRequest == 'SETTIPOBUSCAMEDICAMENTO') {
 
+		$_SESSION['StChave'] = $_SESSION['SituaChave'];
+
 		if ( $_POST['tipoBusca'] == 'MEDICAMENTO') {
 			$_SESSION['tipoPesquisa'] = 'MEDICAMENTO' ;
 		} elseif ($_POST['tipoBusca'] == 'SOLUCAO') {
 			$_SESSION['tipoPesquisa'] = 'SOLUCAO' ;
 		} elseif ($_POST['tipoBusca'] == 'SOLUCAODILUENTE') {
 			$_SESSION['tipoPesquisa'] = 'SOLUCAODILUENTE' ;
+		} elseif ($_POST['tipoBusca'] == 'PRODUTOTABELAGASTO') {
+			$_SESSION['tipoPesquisa'] = 'PRODUTOTABELAGASTO' ;
 		}
 		
 		echo json_encode([
 			'status' =>'success'
 		]);
 		
-		} elseif ($tipoRequest == 'PESQUISARPRODUTOS') {
+	} elseif ($tipoRequest == 'PESQUISARPRODUTOS') {
 		
 		$categoria = $_POST['categoria'];
 		$subCategoria = $_POST['subCategoria'];
@@ -3043,6 +3047,70 @@ try{
 				'unidade'=>$item['UnMedNome'],
 				'unidadeId' => $item['UnMedId'],
 				'classificacao'=>$item['TpFisNome'],
+			]);
+		
+		}
+		
+		echo json_encode($array);
+	}  elseif ($tipoRequest == 'PESQUISARPROCEDIMENTOS') {
+		
+		$grupo = $_POST['grupo'];
+		$subGrupo = $_POST['subGrupo'];
+		$nomeProcedimento = $_POST['nomeProcedimento'];
+		
+		if(!$grupo && $subGrupo){
+			$sql = "SELECT SrVenId, SrVenCodigo, SrVenNome, SrVenGrupo, SrVenSubGrupo, AtGruNome, AtSubNome, PlConNome
+			FROM ServicoVenda	
+			JOIN AtendimentoGrupo ON SrVenGrupo = AtGruId
+			JOIN AtendimentoSubGrupo ON SrVenSubGrupo = AtSubId
+			JOIN PlanoConta ON SrVenPlanoConta = PlConId
+			WHERE SrVenSubGrupo = $subGrupo
+			AND SrVenNome like '%$nomeProcedimento%'
+			AND AtSubUnidade = $iUnidade";
+		}elseif(!$subGrupo && $grupo){
+			$sql = "SELECT SrVenId, SrVenCodigo, SrVenNome, SrVenGrupo, SrVenSubGrupo, AtGruNome, AtSubNome, PlConNome 
+			FROM ServicoVenda
+			JOIN AtendimentoGrupo ON SrVenGrupo = AtGruId
+			JOIN AtendimentoSubGrupo ON SrVenSubGrupo = AtSubId
+			JOIN PlanoConta ON SrVenPlanoConta = PlConId
+			WHERE SrVenGrupo = $grupo
+			AND SrVenNome like '%$nomeProcedimento%'
+			AND AtSubUnidade = $iUnidade";
+		}elseif ((!$grupo) && (!$subGrupo)) {
+			$sql = "SELECT SrVenId, SrVenCodigo, SrVenNome, SrVenGrupo, SrVenSubGrupo, AtGruNome, AtSubNome, PlConNome 
+			FROM ServicoVenda
+			JOIN AtendimentoGrupo ON SrVenGrupo = AtGruId
+			JOIN AtendimentoSubGrupo ON SrVenSubGrupo = AtSubId
+			JOIN PlanoConta ON SrVenPlanoConta = PlConId
+			WHERE SrVenNome like '%$nomeProcedimento%'
+			AND AtSubUnidade = $iUnidade";
+		}else{
+			$sql = "SELECT SrVenId, SrVenCodigo, SrVenNome, SrVenGrupo, SrVenSubGrupo, AtGruNome, AtSubNome, PlConNome
+			FROM ServicoVenda
+			JOIN AtendimentoGrupo ON SrVenGrupo = AtGruId
+			JOIN AtendimentoSubGrupo ON SrVenSubGrupo = AtSubId
+			JOIN PlanoConta ON SrVenPlanoConta = PlConId
+			WHERE (SrVenGrupo = $grupo OR SrVenSubGrupo = $subGrupo)
+			AND SrVenNome like '%$nomeProcedimento%'
+			AND AtSubUnidade = $iUnidade";			
+		}
+		$result = $conn->query($sql);
+		$rowProcedimentos = $result->fetchAll(PDO::FETCH_ASSOC);
+		
+		$array = [];
+		
+		foreach ($rowProcedimentos as $key => $item ) {
+			
+			array_push($array,[
+				'item' => $key + 1,
+				'id' => $item['SrVenId'],
+				'procedimentoCodigo'=>$item['SrVenCodigo'],
+				'descricao'=> $item['SrVenNome'],
+				'grupo' => $item['AtGruNome'],
+				'grupoId' => $item['SrVenGrupo'],
+				'subGrupo'=>$item['AtSubNome'],
+				'subGrupoId'=>$item['SrVenSubGrupo'],
+				'planoConta'=>$item['PlConNome'],
 			]);
 		
 		}

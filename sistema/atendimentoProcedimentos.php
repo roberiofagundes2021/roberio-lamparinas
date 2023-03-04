@@ -7,19 +7,21 @@ $_SESSION['PaginaAtual'] = 'Busca de Produtos';
 include('global_assets/php/conexao.php');
 
 $iEmpresa = $_SESSION['EmpreId'];
+$iUnidade = $_SESSION['UnidadeId'];
+
 $_SESSION['SituaChave'] = $_SESSION['StChave'];
 
-$sql = "SELECT * FROM Categoria
-	    WHERE  CategStatus = 1
-		AND CategEmpresa = $iEmpresa";
+$sql = "SELECT * FROM AtendimentoGrupo
+	    WHERE  AtGruStatus  = 1
+		AND AtGruUnidade = $iUnidade";
 $result = $conn->query($sql);
-$rowCategoria = $result->fetchAll(PDO::FETCH_ASSOC);
+$rowGrupo = $result->fetchAll(PDO::FETCH_ASSOC);
 
-$sql = "SELECT * FROM SubCategoria
-	    WHERE  SbCatStatus = 1
-		AND SbCatEmpresa = $iEmpresa";
+$sql = "SELECT * FROM AtendimentoSubGrupo
+	    WHERE  AtSubStatus = 1
+		AND AtSubUnidade = $iUnidade";
 $resultS = $conn->query($sql);
-$rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
+$rowSubgrupo = $resultS->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -60,7 +62,7 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 
         $(document).ready(function() {
 
-            $('#tblSearchProdutos').DataTable( {
+            $('#tblSearchProcedimentos').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
@@ -102,11 +104,6 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 					orderable: true,  
 					width: "10%", 
 					targets: [6]
-				},				
-				{ 
-					orderable: true,  
-					width: "10%", 
-					targets: [7]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
 				language: {
@@ -122,9 +119,9 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 				e.preventDefault();
 
 				let menssageError = '';
-				let categoria = $('#categoria').val();
-				let subCategoria = $('#subcategoria').val();
-				let nomeProduto = $('#nomeproduto').val();
+				let grupo = $('#grupo').val();
+				let subGrupo = $('#subGrupo').val();
+				let nomeProcedimento = $('#nomeProcedimento').val();
 
 				//chamar requisicao
 				$.ajax({
@@ -132,49 +129,48 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 					url: 'filtraAtendimento.php',
 					dataType: 'json',
 					data: {
-						'tipoRequest': 'PESQUISARPRODUTOS',
-						'categoria': categoria,
-						'subCategoria': subCategoria,
-						'nomeProduto': nomeProduto
+						'tipoRequest': 'PESQUISARPROCEDIMENTOS',
+						'grupo': grupo,
+						'subGrupo': subGrupo,
+						'nomeProcedimento': nomeProcedimento
 					},
 					success: function(response) {
 
 						statusProduto = response.length ? true : false;
 						if (statusProduto) { 
 
-							$('#categoria').val('').change();
-							$('#subcategoria').val('').change();
-							$('#nomeproduto').val('');
+							$('#grupo').val('').change();
+							$('#subGrupo').val('').change();
+							$('#nomeProcedimento').val('');
 
-							$('#dataSearchProdutos').html('');
+							$('#dataSearchProcedimentos').html('');
 
 							let HTML = '';
 
 							response.forEach(item => {
 
 								let acoes = `<div class='list-icons'>
-									<button type="button" class="btn btn-sm btn-info" onclick='selecionarProduto(${JSON.stringify(item)})'>Selecionar</button>
+									<button type="button" class="btn btn-sm btn-info" onclick='selecionarProcedimento(${JSON.stringify(item)})'>Selecionar</button>
 								</div>`;
 								
 								HTML += `
 								<tr class='produtoItem'>
 									<td class="text-left"> ${item.item}</td>
-									<td class="text-left"> ${item.produCodigo}</td>
+									<td class="text-left"> ${item.procedimentoCodigo}</td>
 									<td class="text-left">${item.descricao}</td>
-									<td class="text-left">${item.categoria}</td>
-									<td class="text-left">${item.subCategoria}</td>
-									<td class="text-left">${item.unidade}</td>
-									<td class="text-left">${item.classificacao}</td>
+									<td class="text-left">${item.grupo}</td>
+									<td class="text-left">${item.subGrupo   }</td>
+									<td class="text-left">${item.planoConta}</td>
 									<td class="text-left">${acoes}</td>
 								</tr>`;
 
 							});
 
-							$('#dataSearchProdutos').html(HTML).show();
+							$('#dataSearchProcedimentos').html(HTML).show();
 
 						}else{
 
-							alerta('Busca de Produto', 'Não foi encontrado nenhum produto com as informações cedidas! Tente novamente com outros dados!', 'error');
+							alerta('Busca de Procedimento', 'Não foi encontrado nenhum procedimento com as informações cedidas! Tente novamente com outros dados!', 'error');
 
 						}
 						
@@ -187,70 +183,49 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 			});
 
 
-			$('#categoria').on('change', function (e) {
+			$('#grupo').on('change', function (e) {
 
-				let categoriaId = $('#categoria').val();
+				let grupoId = $('#grupo').val();
 
 				$.ajax({
 					type: 'POST',
 					url: 'filtraAtendimentoObservacaoHospitalar.php',
 					dataType: 'json',
 					data: {
-						'tipoRequest': 'FILTRARSUBCATEGORIA',
-						'categoriaId' : categoriaId
+						'tipoRequest': 'FILTRARSUBGRUPO',
+						'grupoId' : grupoId
 					},
 					success: function(response) {
 
-						$('#subcategoria').empty();
-						$('#subcategoria').append(`<option value=''>Selecione</option>`)
+						$('#subGrupo').empty();
+						$('#subGrupo').append(`<option value=''>Selecione</option>`)
 						let opt = ''
 						response.forEach(item => {
 					
 							opt = `<option value="${item.id}">${item.nome}</option>`
-							$('#subcategoria').append(opt)
+							$('#subGrupo').append(opt)
 
 						})
 					}
 				});
 
-				$('#subcategoria').focus();
+				$('#subGrupo').focus();
 
 			})
 
         });//ready
 
-		function selecionarProduto(item) {
+		function selecionarProcedimento(item) {
 
-			<?php if($_SESSION['tipoPesquisa'] == 'MEDICAMENTO') { ?>
-
-				window.opener.$('#nomeMedicamentoEstoqueMedicamentos').val(item.descricao);
-				window.opener.document.getElementById('medicamentoEstoqueMedicamentos').value = item.id;
-				fecharJanela()
-
-			<?php } elseif ($_SESSION['tipoPesquisa'] == 'SOLUCAO') { ?>
-
-				window.opener.$('#nomeMedicamentoEstoqueSolucoes').val(item.descricao);
-				window.opener.document.getElementById('medicamentoEstoqueSolucoes').value = item.id;
-				fecharJanela()
-
-			<?php } elseif ($_SESSION['tipoPesquisa'] == 'SOLUCAODILUENTE') { ?>
-
-				window.opener.$('#nomeDiluenteSolucoes').val(item.descricao);
-				window.opener.document.getElementById('diluenteSolucoes').value = item.id;
-				fecharJanela()
-
-			<?php } elseif ($_SESSION['tipoPesquisa'] == 'PRODUTOTABELAGASTO') { ?>
-
-				window.opener.$('#nomeProdutos').val(item.descricao);
-				window.opener.document.getElementById('produtos').value = item.id;
-				fecharJanela()
-
-			<?php }
-				$_SESSION['tipoPesquisa'] = '';
-			 ?>
-
+            window.opener.$('#nomeProcedimento').val(item.descricao);
+            window.opener.document.getElementById('grupo').value = item.grupoId;
+            window.opener.document.getElementById('subgrupo').value = item.subGrupoId;
+            window.opener.document.getElementById('procedimentos').value = item.id;
+            fecharJanela()		
 
 		}
+
+
 
         function fecharJanela() {            
             window.open('', '_self', ''); window.close();
@@ -278,7 +253,7 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 							<div class="card">								
 
 								<div class="card-header header-elements-inline">
-									<h2 class="card-title font-weight-bold">Produtos em Estoque</h2>
+									<h2 class="card-title font-weight-bold">Procedimentos Cadastrados</h2>
 								</div>
 
                                 <div class="card-body">
@@ -287,25 +262,25 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 										<div class="col-md-12 mb-2 row">
 											<!-- titulos -->
 											<div class="col-md-6">
-												<label>Categoria</label>
+												<label>Grupo</label>
 											</div>
 											<div class="col-md-6">
-												<label>SubCategoria</label>
+												<label>Subgrupo</label>
 											</div>
 											<!-- campos -->										
 											<div class="col-md-6">
-                                                <select id="categoria" name="categoria" class="select-search" >
+                                                <select id="grupo" name="grupo" class="select-search" >
 													<option value=''>Selecione</option>
-													<?php foreach ($rowCategoria as $item) {
-														echo "<option value='" . $item['CategId'] .  "'>" . $item['CategNome'] . "</option>";													}
+													<?php foreach ($rowGrupo as $item) {
+														echo "<option value='" . $item['AtGruId'] .  "'>" . $item['AtGruNome'] . "</option>";													}
 													 ?>
 												</select>	
 											</div>
 											<div class="col-md-6">
-												<select id="subcategoria" name="subcategoria" class="select-search" >
+												<select id="subGrupo" name="subGrupo" class="select-search" >
 													<option value=''>Selecione</option>
-													<?php foreach ($rowSubCategoria as $item) {
-														echo "<option value='" . $item['SbCatId'] .  "'>" . $item['SbCatNome'] . "</option>";													}
+													<?php foreach ($rowSubgrupo as $item) {
+														echo "<option value='" . $item['AtSubId'] .  "'>" . $item['AtSubNome'] . "</option>";													}
 													 ?>
 												</select>											
 											</div>
@@ -314,11 +289,11 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
                                         <div class="col-md-12 mb-2 row">
 											<!-- titulos -->
 											<div class="col-md-10">
-												<label>Produto</label>
+												<label>Serviço</label>
 											</div>
 											<!-- campos -->										
 											<div class="col-md-8">
-                                                <input type="text" class="form-control" name="nomeproduto" id="nomeproduto">
+                                                <input type="text" class="form-control" name="nomeProcedimento" id="nomeProcedimento">
 											</div>
 											<div class="col-md-4">
 
@@ -334,20 +309,19 @@ $rowSubCategoria = $resultS->fetchAll(PDO::FETCH_ASSOC);
 
                                     <div class="row">
                                         <div class="col-lg-12">
-                                            <table class="table" id="tblSearchProdutos">
+                                            <table class="table" id="tblSearchProcedimentos">
                                                 <thead>
                                                     <tr class="bg-slate">
                                                         <th class="text-left">Item</th>
                                                         <th class="text-left">Código</th>
                                                         <th class="text-left">Descrição</th>
-                                                        <th class="text-left">Categoria</th>
-                                                        <th class="text-left">SubCategoria</th>
-                                                        <th class="text-left">Unidade</th>
-                                                        <th class="text-left">Classificação</th>
+                                                        <th class="text-left">Grupo</th>
+                                                        <th class="text-left">SubGrupo</th>
+                                                        <th class="text-left">Plano Conta</th>
                                                         <th class="text-center">Ações</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody id="dataSearchProdutos">
+                                                <tbody id="dataSearchProcedimentos">
                                                 </tbody>
                                             </table>
                                         </div>		
