@@ -17,7 +17,7 @@
 
 	//Situação do Atendimento na Sessão
 	if (isset($_POST['SituaChave'])){
-		$_SESSION['SituaChave'] = $_POST['SituaChave'];
+		$_SESSION['SituaChave'] = isset($_POST['SituaChave'])?$_POST['SituaChave']:'';
 	} 
 	
 	$SituaChave = $_SESSION['SituaChave'];
