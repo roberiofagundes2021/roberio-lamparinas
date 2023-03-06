@@ -58,376 +58,389 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
   <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/plug-ins/1.10.10/sorting/datetime-moment.js"></script>
 
   <script type="text/javascript">
-  $(document).ready(function() {
+    $(document).ready(function() {
 
-    let resultadosConsulta = '';
-    let inputsValues = {};
+      let resultadosConsulta = '';
+      let inputsValues = {};
 
-    $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
+      $.fn.dataTable.moment('DD/MM/YYYY'); //Para corrigir a ordenação por data			
 
-    /* Início: Tabela Personalizada */
-    $('#tblMovimentacaoFinanceira').DataTable({
-      "order": [
-        [0, "asc"]
-      ],
-      autoWidth: false,
-      responsive: true,
-      paginate: false,
-      columnDefs: [{
-          orderable: true, //Data
-          width: "10%",
-          targets: [0]
-        },
-        {
-          orderable: true, //Histórico
-          width: "22%",
-          targets: [1]
-        },
-        {
-          orderable: true, //Nª doc
-          width: "8%",
-          targets: [2]
-        },
-        {
-          orderable: true, //Entrada
-          width: "13%",
-          targets: [3]
-        },
-        {
-          orderable: true, //Saída
-          width: "13%",
-          targets: [4]
-        },
-        {
-          orderable: true, //Saldo
-          width: "13%",
-          targets: [5]
-        },
-        {
-          orderable: true, //Saldo Conciliado
-          width: "13%",
-          targets: [6]
-        },
-        {
-          orderable: true, //Situação
-          width: "5%",
-          targets: [7]
+      /* Início: Tabela Personalizada */
+      $('#tblMovimentacaoFinanceira').DataTable({
+        "order": [
+          [0, "asc"]
+        ],
+        autoWidth: false,
+        responsive: true,
+        paginate: false,
+        columnDefs: [{
+            orderable: true, //Data
+            width: "10%",
+            targets: [0]
+          },
+          {
+            orderable: true, //Histórico
+            width: "22%",
+            targets: [1]
+          },
+          {
+            orderable: true, //Nª doc
+            width: "8%",
+            targets: [2]
+          },
+          {
+            orderable: true, //Entrada
+            width: "13%",
+            targets: [3]
+          },
+          {
+            orderable: true, //Saída
+            width: "13%",
+            targets: [4]
+          },
+          {
+            orderable: true, //Saldo
+            width: "13%",
+            targets: [5]
+          },
+          {
+            orderable: true, //Saldo Conciliado
+            width: "13%",
+            targets: [6]
+          },
+          {
+            orderable: true, //Situação
+            width: "5%",
+            targets: [7]
+          }
+          ,{
+            orderable: true, //Conciliado
+            width: "3%",
+            targets: [8]
+          }  
+        ],
+        dom: '<"datatable-header"fl><"datatable-scroll-wrap"t>',
+        language: {
+          decimal: ",",
+          thousands: ".",
+          search: '<span>Filtro:</span> _INPUT_',
+          searchPlaceholder: 'filtra qualquer coluna...',
+          lengthMenu: '<span>Mostrar:</span> _MENU_',
+          paginate: {
+            'first': 'Primeira',
+            'last': 'Última',
+            'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+            'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
+          }
         }
-        ,{
-          orderable: true, //Conciliado
-          width: "3%",
-          targets: [8]
-        }  
-      ],
-      dom: '<"datatable-header"fl><"datatable-scroll-wrap"t>',
-      language: {
-        decimal: ",",
-        thousands: ".",
-        search: '<span>Filtro:</span> _INPUT_',
-        searchPlaceholder: 'filtra qualquer coluna...',
-        lengthMenu: '<span>Mostrar:</span> _MENU_',
-        paginate: {
-          'first': 'Primeira',
-          'last': 'Última',
-          'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
-          'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;'
-        }
+      });
+
+      /*
+      function atualizaTotal() {
+        let childres = $('tbody').children();
+        let totalEntrada = 0;
+        let totalSaida = 0; 
+        let totalSaldo = 0;
+        let totalSaldoConciliado = 0;
+        let linhas = childres.splice(1, childres.length);
+
+        linhas.forEach(elem => {
+          let valorFormFloatEntrada = 0;
+          let listaTds = $(elem).children();
+          let valorEntrada = $(listaTds[3]).html();
+          valorFormFloatEntrada = isNaN(valorEntrada) ? parseFloat(valorEntrada.replace(".", "").replace(",", ".")) : 0;
+          totalEntrada += valorFormFloatEntrada;
+        });
+
+        linhas.forEach(elem => {
+          let valorFormFloatSaida = 0;
+          let listaTds = $(elem).children();
+          let valorSaida = $(listaTds[4]).html();
+          valorFormFloatSaida = isNaN(valorSaida) ?  parseFloat(valorSaida.replace(".", "").replace(",", ".")) : 0;
+          totalSaida += valorFormFloatSaida;
+        });
+
+        linhas.forEach(elem => {
+          let valorFormFloatSaldo = 0;
+          let listaTds = $(elem).children();
+          let valorSaldo = $(listaTds[5]).html();
+          valorFormFloatSaldo = isNaN(valorSaldo) ? parseFloat(valorSaldo.replace(".", "").replace(",", ".")) : 0;
+          totalSaldo += valorFormFloatSaldo;
+        });
+
+        linhas.forEach(elem => {
+          let valorFormFloatSaldoConciliado = 0;
+          let listaTds = $(elem).children();
+          let valorSaldoConciliado = $(listaTds[6]).html();
+          let conciliado = $(listaTds[7]).html().split(' ');
+          conciliado = conciliado[48].split('=');
+          conciliado = conciliado[1].replace(/[^\d]+/g,'');
+          
+          if (parseInt(conciliado) > 0) {
+            valorFormFloatSaldoConciliado = isNaN(valorSaldoConciliado) ? parseFloat(valorSaldoConciliado.replace(".", "").replace(",", ".")) : 0;
+          } 
+          totalSaldoConciliado += valorFormFloatSaldoConciliado;
+        });
+
+        $('#footer-total').remove();
+        totalEntrada < 0 ? divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 51%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalEntrada)}</div>` : divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 51%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalEntrada)}</div>`;
+
+        $('#footer-total').remove();
+        totalSaida < 0 ? divTotalSaida = `<div id='footer-total' style='position:absolute; left: 61%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaida)}</div>` : divTotalSaida = `<div id='footer-total' style='position:absolute; left: 61%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaida)}</div>`;
+
+        $('#footer-total').remove();
+        totalSaldo < 0 ? divTotalSaldo = `<div id='footer-total' style='position:absolute; left: 71%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaldo)}</div>` : divTotalSaldo = `<div id='footer-total' style='position:absolute; left: 71%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaldo)}</div>`;
+
+        $('#footer-total').remove();
+        totalSaldoConciliado < 0 ? divTotalSaldoConciliado = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaldoConciliado)}</div>` : divTotalSaldoConciliado = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaldoConciliado)}</div>`;
+
+        $('.datatable-footer').append(divTotalEntrada);
+        $('.datatable-footer').append(divTotalSaida);
+        $('.datatable-footer').append(divTotalSaldo);
+        $('.datatable-footer').append(divTotalSaldoConciliado);
       }
+      */
+
+
+      function Filtrar() {
+        let cont = false;
+
+        const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
+
+        $('tbody').html(msg);
+
+        const periodoDe = $('#inputPeriodoDe').val();
+        const ate = $('#inputAte').val();
+        const contaBanco = $('#cmbContaBanco').val();
+        const centroDeCustos = $('#cmbCentroDeCustos').val();
+        const planoContas = $('#cmbPlanoContas').val();
+        const FormaPagamento = $('#cmbFormaDeRecebimento').val();
+        const statusArray = $('#cmbStatus').val().split('|');
+        const status = statusArray[0];
+        const statusTipo = statusArray[1];
+        const urlFiltraGrid = "movimentacaoFinanceiraConciliacaoFiltra.php";
+        const urlConsultaSaldoInicial = "consultaSaldoInicial.php";
+
+        var inputsValuesConsulta = {
+          inputData: periodoDe
+        };
+
+        //Consulta saldo anterior
+        $.ajax({
+          type: "POST",
+          url: urlConsultaSaldoInicial,
+          dataType: "json",
+          data: inputsValuesConsulta,
+          success: function(resposta) {
+            $("#saldoAnterior").html('<span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">Saldo Anterior: R$ '+resposta+'</span>')
+          }
+        })
+
+        var inputsValues = {
+          inputPeriodoDe: periodoDe,
+          inputAte: ate,
+          cmbContaBanco: contaBanco,
+          cmbCentroDeCustos: centroDeCustos,
+          cmbPlanoContas: planoContas,
+          cmbFormaDeRecebimento: FormaPagamento,
+          cmbStatus: status,
+          statusTipo: statusTipo
+        };
+
+        //Carrega dados da grid
+        $.ajax({
+          type: "POST",
+          url: urlFiltraGrid,
+          dataType: "json",
+          data: inputsValues,
+          success: function(resposta) {
+            //|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
+            let table 
+            table = $('#tblMovimentacaoFinanceira').DataTable()
+            table = $('#tblMovimentacaoFinanceira').DataTable().clear().draw()
+            //--|
+
+            table = $('#tblMovimentacaoFinanceira').DataTable()
+
+            let contador = 0
+            let rowNode
+            let entrada = 0
+            let entradaTotal = 0
+            let saida = 0
+            let saidaTotal = 0
+            let saldo = 0
+            let saldoTotal = 0
+            let saldoConciliacao = 0
+            let saldoConciliacaoTotal = 0
+
+            resposta.forEach(item => {
+              rowNode = table.row.add(item.data).draw().node()
+
+              saldo = parseFloat(item.data[5].replace(",", "."))
+              saldoConciliado = parseFloat(item.data[6].replace(",", "."))
+
+              // adiciona os atributos nas tags <td>
+              $(rowNode).find('td').eq(3).attr('style', 'text-align: right; color: green;')
+              $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: red;')
+              
+              if(saldo >= 0) {
+                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;')
+              }else {
+                $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;')
+              }
+
+              if(saldoConciliado >= 0) {
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;')
+              }else {
+                $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
+              }
+
+              $(rowNode).find('td').eq(8).attr('style', 'text-align: center;')
+
+              entrada = (item.data[3] != null) ? item.data[3] : '0,00'
+              entrada = entrada.replace(".", "").replace(",", ".")
+              entradaTotal += parseFloat(entrada)
+
+              saida = (item.data[4] != null) ? item.data[4] : '0,00'
+              saida = saida.replace(".", "").replace(",", ".")
+              saidaTotal += parseFloat(saida)
+
+              saldo = (item.data[5] != null) ? item.data[5] : '0,00'
+              saldo = saldo.replace(".", "").replace(",", ".")
+              saldoTotal += parseFloat(saldo)
+
+              saldoConciliacao = (item.data[6] != null) ? item.data[6] : '0,00'
+              saldoConciliacao = saldoConciliacao.replace(".", "").replace(",", ".")
+              saldoConciliacaoTotal += parseFloat(saldoConciliacao)
+
+              contador++
+            })
+
+            $('#legenda').remove() //Para evitar que os valores se sobreescreva
+            let legenda = document.querySelector(".datatable-header");
+            legenda.insertAdjacentHTML('beforeend', `<div id='legenda' style='text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`);
+
+            sinalNegativo = (saidaTotal == 0) ? '' : '-'
+            corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
+            corConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? 'green' : 'red'
+            epsSaldoTotal = (saldoTotal >= 0) ? ' ' : '' //Apenas uma codificação estética para evitar espaçamento duplo nos números negativos
+            epsConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? ' ' : ''
+            
+            // total = `
+            // <tr id="total" role="row" class="even" position='relative'>
+            //   <td></td>
+            //   <td></td>
+            //   <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
+            //   <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: green;">${float2moeda(entradaTotal)}</td>
+            //   <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
+            //   <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corSaldoTotal};">${epsSaldoTotal}${float2moeda(saldoTotal)}
+            //   <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corConciliacaoTotal};">${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
+            //   <td></td>
+            //   <td></td>
+            // </tr>`
+
+            total = `
+            <tr id="total" role="row" class="even" position='relative'>
+              <td></td>
+              <td></td>
+              <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
+              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: green;">${float2moeda(entradaTotal)}</td>
+              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
+              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corSaldoTotal};">${float2moeda(saldo)}
+              <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corConciliacaoTotal};">${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
+              <td></td>
+              <td></td>
+            </tr>`
+            
+            $('#total').remove()
+
+            $('#tblMovimentacaoFinanceira tfoot').prepend(total)
+          },
+          error: function(e) { 
+            $('#legenda').remove()      
+            let legenda = document.querySelector(".datatable-header");
+            legenda.insertAdjacentHTML('beforeend', `<div id='legenda' style='text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`);
+
+            $('#total').remove() 
+            let tabelaVazia = $(
+              '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
+            )
+
+            $('tbody').html(tabelaVazia)
+          }
+        })
+      }
+
+      $('#submitPesquisar').on('click', (e) => {
+        e.preventDefault();
+        Filtrar();
+      })
+
+      Filtrar();
+
+      $('#novaTransferencia').on('click', (e) => {
+        location.href = "movimentacaoFinanceiraTransferencia.php";
+        return false;
+      })
+
+      function imprime() {
+        let url = 'movimentacaoFinanceiraImprime.php';
+
+        $('#imprimir').on('click', (e) => {
+          console.log(resultadosConsulta);
+          e.preventDefault()
+          if (resultadosConsulta) {
+            $('#inputResultado').val(resultadosConsulta)
+            $('#inputDataDe_imp').val(inputsValues.inputPeriodoDe)
+            $('#inputDataAte_imp').val(inputsValues.inputAte)
+            $('#cmbContaBanco_imp').val(inputsValues.cmbContaBanco)
+            $('#cmbCentroDeCustos_imp').val(inputsValues.cmbCentroDeCustos)
+            $('#cmbPlanoContas_imp').val(inputsValues.cmbPlanoContas)
+            $('#cmbFormaDeRecebimento_imp').val(inputsValues.cmbFormaDeRecebimento)
+            $('#inputStatus_imp').val(inputsValues.cmbStatus)
+            $('#inputStatusTipo_imp').val(inputsValues.statusTipo)
+
+
+            $('#formImprime').attr('action', url)
+
+            $('#formImprime').submit()
+          }
+        })
+      }
+      imprime()  
     });
 
-    /*
-    function atualizaTotal() {
-      let childres = $('tbody').children();
-      let totalEntrada = 0;
-      let totalSaida = 0; 
-      let totalSaldo = 0;
-      let totalSaldoConciliado = 0;
-      let linhas = childres.splice(1, childres.length);
+    function atualizaMovimentacaoFinanceira(Permission, MovimentacaoFinanceiraId, Tipo) {
 
-      linhas.forEach(elem => {
-        let valorFormFloatEntrada = 0;
-        let listaTds = $(elem).children();
-        let valorEntrada = $(listaTds[3]).html();
-        valorFormFloatEntrada = isNaN(valorEntrada) ? parseFloat(valorEntrada.replace(".", "").replace(",", ".")) : 0;
-        totalEntrada += valorFormFloatEntrada;
-      });
+      document.getElementById('inputMovimentacaoFinanceiraId').value = MovimentacaoFinanceiraId;
+      document.getElementById('inputPermissionAtualiza').value = Permission; 
 
-      linhas.forEach(elem => {
-        let valorFormFloatSaida = 0;
-        let listaTds = $(elem).children();
-        let valorSaida = $(listaTds[4]).html();
-        valorFormFloatSaida = isNaN(valorSaida) ?  parseFloat(valorSaida.replace(".", "").replace(",", ".")) : 0;
-        totalSaida += valorFormFloatSaida;
-      });
+      if (Tipo == 'novo' || Tipo == 'edita') {
+            document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraTransferencia.php";
+      } else if (Tipo == 'exclui') {
+          if(Permission){
+              confirmaExclusao(document.formMovimentacaoFinanceira, "Tem certeza que deseja excluir essa Movimentação ?", "movimentacaoFinanceiraExclui.php");
+          } else{
+              alerta('Permissão Negada!','');
+              return false;
+          }
+      }            
 
-      linhas.forEach(elem => {
-        let valorFormFloatSaldo = 0;
-        let listaTds = $(elem).children();
-        let valorSaldo = $(listaTds[5]).html();
-        valorFormFloatSaldo = isNaN(valorSaldo) ? parseFloat(valorSaldo.replace(".", "").replace(",", ".")) : 0;
-        totalSaldo += valorFormFloatSaldo;
-      });
+      document.formMovimentacaoFinanceira.submit();
+    }  
 
-      linhas.forEach(elem => {
-        let valorFormFloatSaldoConciliado = 0;
-        let listaTds = $(elem).children();
-        let valorSaldoConciliado = $(listaTds[6]).html();
-        let conciliado = $(listaTds[7]).html().split(' ');
-        conciliado = conciliado[48].split('=');
-        conciliado = conciliado[1].replace(/[^\d]+/g,'');
-        
-        if (parseInt(conciliado) > 0) {
-          valorFormFloatSaldoConciliado = isNaN(valorSaldoConciliado) ? parseFloat(valorSaldoConciliado.replace(".", "").replace(",", ".")) : 0;
-        } 
-        totalSaldoConciliado += valorFormFloatSaldoConciliado;
-      });
-
-      $('#footer-total').remove();
-      totalEntrada < 0 ? divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 51%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalEntrada)}</div>` : divTotalEntrada = `<div id='footer-total' style='position:absolute; left: 51%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalEntrada)}</div>`;
-
-      $('#footer-total').remove();
-      totalSaida < 0 ? divTotalSaida = `<div id='footer-total' style='position:absolute; left: 61%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaida)}</div>` : divTotalSaida = `<div id='footer-total' style='position:absolute; left: 61%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaida)}</div>`;
-
-      $('#footer-total').remove();
-      totalSaldo < 0 ? divTotalSaldo = `<div id='footer-total' style='position:absolute; left: 71%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaldo)}</div>` : divTotalSaldo = `<div id='footer-total' style='position:absolute; left: 71%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaldo)}</div>`;
-
-      $('#footer-total').remove();
-      totalSaldoConciliado < 0 ? divTotalSaldoConciliado = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:red;'>Total: ${float2moeda(totalSaldoConciliado)}</div>` : divTotalSaldoConciliado = `<div id='footer-total' style='position:absolute; left: 86.8%; font-weight: bold; width: 200px; color:green;'>Total: ${float2moeda(totalSaldoConciliado)}</div>`;
-
-      $('.datatable-footer').append(divTotalEntrada);
-      $('.datatable-footer').append(divTotalSaida);
-      $('.datatable-footer').append(divTotalSaldo);
-      $('.datatable-footer').append(divTotalSaldoConciliado);
+    function atualizaConciliacao(idConciliacao, tipoConta) {
+      document.getElementById('inputConciliacaoId').value = idConciliacao;
+      document.getElementById('inputPermissionAtualiza').value = 1;
+      
+      if(tipoConta == 'ContaAReceber') {
+        document.formMovimentacaoFinanceira.action = "contasAReceberNovoLancamento.php";
+      }else if(tipoConta == 'ContaAPagar') {
+        document.formMovimentacaoFinanceira.action = "contasAPagarNovoLancamento.php";
+      }
+      
+      document.formMovimentacaoFinanceira.submit();
     }
-    */
-
-
-    function Filtrar() {
-      let cont = false;
-
-      const msg = $('<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty"><img src="global_assets/images/lamparinas/loader.gif" style="width: 120px"></td></tr>');
-
-      $('tbody').html(msg);
-
-      const periodoDe = $('#inputPeriodoDe').val();
-      const ate = $('#inputAte').val();
-      const contaBanco = $('#cmbContaBanco').val();
-      const centroDeCustos = $('#cmbCentroDeCustos').val();
-      const planoContas = $('#cmbPlanoContas').val();
-      const FormaPagamento = $('#cmbFormaDeRecebimento').val();
-      const statusArray = $('#cmbStatus').val().split('|');
-      const status = statusArray[0];
-      const statusTipo = statusArray[1];
-      const urlFiltraGrid = "movimentacaoFinanceiraConciliacaoFiltra.php";
-      const urlConsultaSaldoInicial = "consultaSaldoInicial.php";
-
-      var inputsValuesConsulta = {
-        inputData: periodoDe
-      };
-
-      //Consulta saldo anterior
-      $.ajax({
-        type: "POST",
-        url: urlConsultaSaldoInicial,
-        dataType: "json",
-        data: inputsValuesConsulta,
-        success: function(resposta) {
-          $("#saldoAnterior").html('<span class="badge bg-secondary badge-pill p-2" style="font-size: 100%;">Saldo Anterior: R$ '+resposta+'</span>')
-        }
-      })
-
-      var inputsValues = {
-        inputPeriodoDe: periodoDe,
-        inputAte: ate,
-        cmbContaBanco: contaBanco,
-        cmbCentroDeCustos: centroDeCustos,
-        cmbPlanoContas: planoContas,
-        cmbFormaDeRecebimento: FormaPagamento,
-        cmbStatus: status,
-        statusTipo: statusTipo
-      };
-
-      //Carrega dados da grid
-      $.ajax({
-        type: "POST",
-        url: urlFiltraGrid,
-        dataType: "json",
-        data: inputsValues,
-        success: function(resposta) {
-          //|--Aqui é criado o DataTable caso seja a primeira vez q é executado e o clear é para evitar duplicação na tabela depois da primeira pesquisa
-          let table 
-          table = $('#tblMovimentacaoFinanceira').DataTable()
-          table = $('#tblMovimentacaoFinanceira').DataTable().clear().draw()
-          //--|
-
-          table = $('#tblMovimentacaoFinanceira').DataTable()
-
-          let contador = 0
-          let rowNode
-          let entrada = 0
-          let entradaTotal = 0
-          let saida = 0
-          let saidaTotal = 0
-          let saldo = 0
-          let saldoTotal = 0
-          let saldoConciliacao = 0
-          let saldoConciliacaoTotal = 0
-
-          resposta.forEach(item => {
-            rowNode = table.row.add(item.data).draw().node()
-
-            saldo = parseFloat(item.data[5].replace(",", "."))
-            saldoConciliado = parseFloat(item.data[6].replace(",", "."))
-
-            // adiciona os atributos nas tags <td>
-            $(rowNode).find('td').eq(3).attr('style', 'text-align: right; color: green;')
-            $(rowNode).find('td').eq(4).attr('style', 'text-align: right; color: red;')
-            
-            if(saldo >= 0) {
-              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: green;')
-            }else {
-              $(rowNode).find('td').eq(5).attr('style', 'text-align: right; color: red;')
-            }
-
-            if(saldoConciliado >= 0) {
-              $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: green;')
-            }else {
-              $(rowNode).find('td').eq(6).attr('style', 'text-align: right; color: red;')
-            }
-
-            $(rowNode).find('td').eq(8).attr('style', 'text-align: center;')
-
-            entrada = (item.data[3] != null) ? item.data[3] : '0,00'
-            entrada = entrada.replace(".", "").replace(",", ".")
-            entradaTotal += parseFloat(entrada)
-
-            saida = (item.data[4] != null) ? item.data[4] : '0,00'
-            saida = saida.replace(".", "").replace(",", ".")
-            saidaTotal += parseFloat(saida)
-
-            saldo = (item.data[5] != null) ? item.data[5] : '0,00'
-            saldo = saldo.replace(".", "").replace(",", ".")
-            saldoTotal += parseFloat(saldo)
-
-            saldoConciliacao = (item.data[6] != null) ? item.data[6] : '0,00'
-            saldoConciliacao = saldoConciliacao.replace(".", "").replace(",", ".")
-            saldoConciliacaoTotal += parseFloat(saldoConciliacao)
-
-            contador++
-          })
-
-          $('#legenda').remove() //Para evitar que os valores se sobreescreva
-          let legenda = document.querySelector(".datatable-header");
-          legenda.insertAdjacentHTML('beforeend', `<div id='legenda' style='text-align: right; padding-top: 2%; width: 100%;'> Mostrando 1 a ${contador} de ${contador} registros</div>`);
-
-          sinalNegativo = (saidaTotal == 0) ? '' : '-'
-          corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
-          corConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? 'green' : 'red'
-          epsSaldoTotal = (saldoTotal >= 0) ? ' ' : '' //Apenas uma codificação estética para evitar espaçamento duplo nos números negativos
-          epsConciliacaoTotal = (saldoConciliacaoTotal >= 0) ? ' ' : ''
-          
-          total = `
-          <tr id="total" role="row" class="even" position='relative'>
-            <td></td>
-            <td></td>
-            <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
-            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: green;">${float2moeda(entradaTotal)}</td>
-            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
-            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corSaldoTotal};">${epsSaldoTotal}${float2moeda(saldoTotal)}
-            <td style="text-align: right; font-weight: bold; font-size: .8125rem; white-space: nowrap; color: ${corConciliacaoTotal};">${epsConciliacaoTotal}${float2moeda(saldoConciliacaoTotal)}</td>
-            <td></td>
-            <td></td>
-          </tr>`
-          
-          $('#total').remove()
-
-          $('#tblMovimentacaoFinanceira tfoot').prepend(total)
-        },
-        error: function(e) { 
-          $('#legenda').remove()      
-          let legenda = document.querySelector(".datatable-header");
-          legenda.insertAdjacentHTML('beforeend', `<div id='legenda' style='text-align: right; padding-top: 2%; width: 100%;'> Mostrando 0 a 0 de 0 registros</div>`);
-
-          $('#total').remove() 
-          let tabelaVazia = $(
-            '<tr class="odd"><td valign="top" colspan="7" class="dataTables_empty">Sem resultados...</td></tr>'
-          )
-
-          $('tbody').html(tabelaVazia)
-        }
-      })
-    }
-
-    $('#submitPesquisar').on('click', (e) => {
-      e.preventDefault();
-      Filtrar();
-    })
-
-    Filtrar();
-
-    $('#novaTransferencia').on('click', (e) => {
-      location.href = "movimentacaoFinanceiraTransferencia.php";
-      return false;
-    })
-
-    function imprime() {
-      let url = 'movimentacaoFinanceiraImprime.php';
-
-      $('#imprimir').on('click', (e) => {
-        console.log(resultadosConsulta);
-        e.preventDefault()
-        if (resultadosConsulta) {
-          $('#inputResultado').val(resultadosConsulta)
-          $('#inputDataDe_imp').val(inputsValues.inputPeriodoDe)
-          $('#inputDataAte_imp').val(inputsValues.inputAte)
-          $('#cmbContaBanco_imp').val(inputsValues.cmbContaBanco)
-          $('#cmbCentroDeCustos_imp').val(inputsValues.cmbCentroDeCustos)
-          $('#cmbPlanoContas_imp').val(inputsValues.cmbPlanoContas)
-          $('#cmbFormaDeRecebimento_imp').val(inputsValues.cmbFormaDeRecebimento)
-          $('#inputStatus_imp').val(inputsValues.cmbStatus)
-          $('#inputStatusTipo_imp').val(inputsValues.statusTipo)
-
-
-          $('#formImprime').attr('action', url)
-
-          $('#formImprime').submit()
-        }
-      })
-    }
-    imprime()  
-  });
-
-  function atualizaMovimentacaoFinanceira(Permission, MovimentacaoFinanceiraId, Tipo) {
-
-    document.getElementById('inputMovimentacaoFinanceiraId').value = MovimentacaoFinanceiraId;
-    document.getElementById('inputPermissionAtualiza').value = Permission; 
-
-    if (Tipo == 'novo' || Tipo == 'edita') {
-          document.formMovimentacaoFinanceira.action = "movimentacaoFinanceiraTransferencia.php";
-    } else if (Tipo == 'exclui') {
-        if(Permission){
-            confirmaExclusao(document.formMovimentacaoFinanceira, "Tem certeza que deseja excluir essa Movimentação ?", "movimentacaoFinanceiraExclui.php");
-        } else{
-            alerta('Permissão Negada!','');
-            return false;
-        }
-    }            
-
-    document.formMovimentacaoFinanceira.submit();
-  }  
-
-  function atualizaConciliacao(idConciliacao, tipoConta) {
-    document.getElementById('inputConciliacaoId').value = idConciliacao;
-    document.getElementById('inputPermissionAtualiza').value = 1;
-    
-    if(tipoConta == 'ContaAReceber') {
-      document.formMovimentacaoFinanceira.action = "contasAReceberNovoLancamento.php";
-    }else if(tipoConta == 'ContaAPagar') {
-      document.formMovimentacaoFinanceira.action = "contasAPagarNovoLancamento.php";
-    }
-    
-    document.formMovimentacaoFinanceira.submit();
-  }
   </script>
 
 </head>
