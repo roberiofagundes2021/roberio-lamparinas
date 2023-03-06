@@ -288,8 +288,19 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
             
             sinalNegativo = (saidaTotal == 0) ? '' : '-'
             corSaldoTotal = (saldoTotal >= 0) ? 'green' : 'red'
-            console.log(saldoTotal);
 
+            // total = `
+            // <tr id="total" role="row" class="even">
+            //   <td></td>
+            //   <td></td>
+            //   <td></td>
+            //   <td></td>
+            //   <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
+            //   <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: green;">${float2moeda(entradaTotal)}</td>
+            //   <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
+            //   <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: ${corSaldoTotal};">${(saldoTfoot)}</td>
+            //   <td></td>
+            // </tr>`
             total = `
             <tr id="total" role="row" class="even">
               <td></td>
@@ -299,7 +310,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
               <td style="text-align: right; font-size: .8125rem; font-weight: bold;">Total:</td>
               <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: green;">${float2moeda(entradaTotal)}</td>
               <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: red;">${sinalNegativo} ${float2moeda(saidaTotal)}</td>
-              <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: ${corSaldoTotal};">${(saldoTfoot)}</td>
+              <td style="text-align: right; font-size: .8125rem; white-space: nowrap; font-weight: bold; color: ${corSaldoTotal};">${(saldo)}</td>
               <td></td>
             </tr>`
             
@@ -518,14 +529,11 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
                         <select id="cmbContaBanco" name="cmbContaBanco" class="form-control form-control-select2">
                           <option value="">Todos</option>
                           <?php
-                            $sql = "SELECT CnBanId,
-                                            CnBanNome
-                                      FROM ContaBanco
-                                      JOIN Situacao 
-                                        ON SituaId = CnBanStatus
-                                      WHERE CnBanUnidade = " . $_SESSION['UnidadeId'] . " 
-                                        and SituaChave = 'ATIVO'
-                                  ORDER BY CnBanNome ASC";
+                            $sql = "SELECT CnBanId,CnBanNome
+                                    FROM ContaBanco
+                                    JOIN Situacao ON SituaId = CnBanStatus
+                                    WHERE CnBanUnidade = $_SESSION[UnidadeId] and SituaChave = 'ATIVO'
+                                    ORDER BY CnBanNome ASC";
                             $result = $conn->query($sql);
                             $rowContaBanco = $result->fetchAll(PDO::FETCH_ASSOC);
                
