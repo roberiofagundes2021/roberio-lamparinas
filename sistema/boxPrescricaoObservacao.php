@@ -175,7 +175,7 @@
                 </div>
                 <!-- campos -->										
                 <div class="col-lg-11">
-                    <select id="selViaMedicamentos" name="selViaMedicamentos" class="select-search" >
+                    <select id="selViaMedicamentos" name="selViaMedicamentos" class="select-search" onChange="setDescricaoPosologiaMed()">
                         <option value=''>Selecione</option>
                     </select>
                 </div>
