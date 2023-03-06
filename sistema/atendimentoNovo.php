@@ -53,7 +53,7 @@ $_SESSION['atendimento'] = [
 			</script>"
 	?>
 	<script>
-		const socket = WebSocketConnect(iUnidade,iEmpresa)
+		// const socket = WebSocketConnect(iUnidade,iEmpresa)
 		// socket.onmessage = function (event) {
         //     if(event.data == 'AGENDA'){
         //         getAgenda()
@@ -134,10 +134,6 @@ $_SESSION['atendimento'] = [
 					let menssageError = ''
 
 					switch (menssageError) {
-						case $('#dataRegistro').val():
-							menssageError = 'informe a data de registro';
-							$('#dataRegistro').focus();
-							break;
 						case $('#modalidade').val():
 							menssageError = 'informe a modalidade';
 							$('#modalidade').focus();
@@ -150,11 +146,26 @@ $_SESSION['atendimento'] = [
 							menssageError = 'informe a classificação de risco';
 							$('#classificacaoRisco').focus();
 							break;
+						case $('#servico').val():
+							menssageError = 'informe o serviço';
+							$('#servico').focus();
+							break;
+						case $('#medicos').val():
+							menssageError = 'informe o profissional';
+							$('#medicos').focus();
+							break;
+						case $('#localAtendimento').val():
+							menssageError = 'informe o local de atendimento';
+							$('#localAtendimento').focus();
+							break;
+						case $('#horaAtendimento').val():
+							menssageError = 'informe um horário';
+							$('#horaAtendimento').focus();
+							break;
 						default:
 							menssageError = '';
 							break;
 					}
-
 					if (menssageError) {
 						alerta('Campo Obrigatório!', menssageError, 'error')
 						return
@@ -214,23 +225,28 @@ $_SESSION['atendimento'] = [
 						dataType: 'json',
 						data: {
 							'tipoRequest': 'SALVARATENDIMENTO',
+							'status': 'NOVO',
+							'tipo': 'ATENDIMENTO',
 							'cliente': paciente,
 							'responsavel': responsavel,
-							'dataRegistro': $('#dataRegistro').val(),
+							'dataRegistro': $('#dataAtendimento').val(),
 							'classificacaoRisco': $('#classificacaoRisco').val(),
 							'grupo': $('#grupo').val(),
 							'subgrupo': $('#subgrupo').val(),
 							'modalidade': $('#modalidade').val(),
 							'classificacao': $('#classificacao').val(),
 							'observacao': $('#observacaoAtendimento').val(),
-							'situacao': $('#situacao').val()
+							'servico':$('#servico').val(),
+							'medico':$('#medicos').val(),
+							'localAtendimento':$('#localAtendimento').val(),
+							'horaAtendimento':$('#horaAtendimento').val()
 						},
 						success: function(response) {
 							if (response.status == 'success') {
 								alerta(response.titulo, response.menssagem, response.status)
-								socket.sendMenssage({
-									'type':'ATENDIMENTO'
-								});
+								// socket.sendMenssage({
+								// 	'type':'ATENDIMENTO'
+								// });
 								window.location.href = 'atendimento.php'
 							} else {
 								alerta(response.titulo, response.menssagem, response.status);
@@ -367,9 +383,10 @@ $_SESSION['atendimento'] = [
 			//$('#cancelar').insertAfter('.actionContent')
 
 			let dataAtual = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
-			dataAtual = dataAtual.split(' ')[0]
-			dataAtual = dataAtual.split('/')[2] + '-' + dataAtual.split('/')[1] + '-' + dataAtual.split('/')[0]
-			$('#dataRegistro').val(dataAtual)
+			dataAtual = dataAtual.split(',')[0]
+			// dataAtual = dataAtual.split('/')[2] + '-' + dataAtual.split('/')[1] + '-' + dataAtual.split('/')[0]
+			
+			$('#dataAtendimento').val(dataAtual)
 
 			getCmbs()
 			checkServicos()
@@ -465,12 +482,8 @@ $_SESSION['atendimento'] = [
 						'servico': $(this).val()
 					},
 					success: function(response) {
-						$('#dataAtendimento').val('');
-						setHoraProfissional()
 						$('#medicos').empty();
-						$('#localAtendimento').empty();
-						$('#medicos').append(`<option value=''>Selecione</option>`)
-						$('#localAtendimento').append(`<option value=''>Selecione</option>`)			
+						$('#medicos').append(`<option value=''>Selecione</option>`)		
 
 						response.forEach(item => {
 							let opt = `<option value="${item.id}">${item.nome}</option>`
@@ -484,98 +497,6 @@ $_SESSION['atendimento'] = [
 			$('#parentescoCadatrado').on('change', function() {
 				let iResponsavel = $(this).val();
 				setResponsavelAtribut(iResponsavel)
-			});
-
-			$('#medicos').on('change', function() {
-				let iMedico = $(this).val()
-
-				if (!iMedico) {
-					setHoraProfissional()
-					$('#dataAtendimento').val('');
-					return
-				}
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimento.php',
-					dataType: 'json',
-					data: {
-						'tipoRequest' : 'LOCALATENDIMENTO',
-						'iMedico' : iMedico
-					},
-					success: function(response) {
-
-						$('#localAtendimento').empty();
-						if (response.length !== 0 ) {
-							$('#localAtendimento').append(`<option value=''>Selecione</option>`);			
-							response.forEach(item => {
-								let opt = `<option value="${item.id}">${item.nome}</option>`
-								$('#localAtendimento').append(opt)
-							})
-
-							$('#localAtendimento').focus()
-						}else{
-							alerta('Sem Locais Disponíveis', 'Não existe agenda disponível para esse serviço nos próximos dias para o profissional selecionado.','error')
-							$('#localAtendimento').append(`<option value=''>Sem Locais Disponíveis</option>`)	
-						}
-					}
-				})
-			});
-
-			$('#localAtendimento').on('change', function() {
-
-				let localAtend = $(this).val();
-				let iMedico = $('#medicos').val();
-
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimento.php',
-					dataType: 'json',
-					data: {
-						'tipoRequest': 'SETDATAPROFISSIONAL',
-						'iMedico': iMedico,
-						'localAtend' : localAtend
-					},
-					success: async function(response) {
-						if (response.status == 'success') {
-							let dataHoje = new Date().toLocaleString("pt-BR", {timeZone: "America/Bahia"})
-							dataHoje = dataHoje.split(' ')[0]
-
-							$('#dataAtendimento').val(
-								await response.arrayData.filter((item, index, array) => {
-									if (item == dataHoje) {
-										return item
-									}
-								})
-							)
-
-							// caso exista algo no campo de data...
-							if($('#dataAtendimento').val()){
-								$.ajax({
-									type: 'POST',
-									url: 'filtraAtendimento.php',
-									dataType: 'json',
-									data: {
-										'tipoRequest': 'SETHORAPROFISSIONAL',
-										'data': $('#dataAtendimento').val(),
-										'iMedico': iMedico
-									},
-									success: function(response) {
-										if (response.status == 'success') {
-											setHoraProfissional(response.arrayHora, response.intervalo)
-											$('#horaAtendimento').focus()
-										} else {
-											alerta(response.titulo, response.menssagem, response.status)
-										}
-									}
-								});
-							}else{
-								alerta('Data do atendimento', 'A data atual não é válida para atendimento do profissional selecionado', 'error')
-							}
-						} else {
-							alerta(response.titulo, response.menssagem, response.status)
-						}
-					}
-				});
 			});
 
 			$('#salvarPacienteModal').on('click', function(e) {
@@ -898,6 +819,21 @@ $_SESSION['atendimento'] = [
 					}
 				});
 			})
+			$('#medicos').on('change',function(e){
+				// vai preencher cmbServicos
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'MEDICOS',
+						'id':$(this).val()
+					},
+					success: function(response) {
+						setHoraProfissional(response)
+					}
+				});
+			})
 
 			resetServicoCmb()
 		});
@@ -1048,6 +984,24 @@ $_SESSION['atendimento'] = [
 					})
 				}
 			});
+
+			//  vai preencher cmbLocalAtendimento
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest' : 'LOCALATENDIMENTO'
+				},
+				success: function(response) {
+					$('#localAtendimento').empty();
+					$('#localAtendimento').append(`<option value=''>Selecione</option>`);			
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.nome}</option>`
+						$('#localAtendimento').append(opt)
+					})
+				}
+			})
 		}
 
 		// essa função vai setar os atributos nos campos quando for selecionado o paciente
@@ -1396,59 +1350,65 @@ $_SESSION['atendimento'] = [
 					})
 				}
 			});
-			$('#dataAtendimento').val('')
 			$('#horaAtendimento').val('')
 		}
 
-		function setHoraProfissional(array, interv) {
-			$('#modalHora').html('');
-			$('#modalHora').html('<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">');
-			hInicio = array ? array[1].from : undefined;
-			hFim = array ? array[1].to : undefined;
-			let intervalo = interv ? interv : 30
-			// doc: https://amsul.ca/pickadate.js/time/
-			$('#horaAtendimento').pickatime({
-				// Regras
-				interval: intervalo,
-				disable: array ? array : undefined,
-
-				// Formats
-				format: 'HH:i',
-				formatLabel: undefined,
-				formatSubmit: undefined,
-				hiddenPrefix: undefined,
-				hiddenSuffix: '_submit',
-
-				// Time limits
-				min: hInicio,
-				max: hFim,
-
-				// Close on a user action
-				closeOnSelect: true,
-				closeOnClear: true,
-
-				// eventos
-				onSet: function(context) {
-					// let hora = context.select
-					let data = $('#dataAtendimento').val()
-					let hora = $('#horaAtendimento').val()
-
-					// data: DD/MM/YYYY => MM/DD/YYYY
-					data = `${data.split('/')[1]}/${data.split('/')[0]}/${data.split('/')[2]}`
-
-					// dataHora: MM/DD/YYYY HH:MM:SS
-					let dataHora = `${data} ${hora}`
-
-					// somente para atribuir à variável "dataHora" um valor do tipo DataTime
-					dataHora = new Date(dataHora).toLocaleString("pt-BR", {
-						timeZone: "America/Bahia"
-					});
+		function setHoraProfissional(range) {
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest': 'GETFUNCIONAMENTOUNIDADE'
 				},
-				onStart: undefined,
-				onRender: undefined,
-				onOpen: undefined,
-				onClose: undefined,
-				onStop: undefined,
+				success: function(response) {
+					$('#modalHora').html('');
+					$('#modalHora').html('<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">');
+					let hInicio = response? response.inicio : undefined
+					let hFim = response ? response.fim : undefined
+					let intervalo = 30
+					let block = range.length?range[0].bloqueio:null
+
+					if(block && !block.from){
+						block.from = hInicio
+					}
+					if(block && !block.to){
+						block.to = hFim
+					}
+
+					// doc: https://amsul.ca/pickadate.js/time/
+					$('#horaAtendimento').pickatime({
+						// Regras
+						interval: intervalo,
+						disable: block? block : undefined,
+						// disable: [{from:[9,30], to:[18,00]}],
+
+						// Formats
+						format: 'HH:i',
+						formatLabel: undefined,
+						formatSubmit: undefined,
+						hiddenPrefix: undefined,
+						hiddenSuffix: '_submit',
+
+						// Time limits
+						min: hInicio,
+						max: hFim,
+
+						// Close on a user action
+						closeOnSelect: true,
+						closeOnClear: true,
+
+						// eventos
+						onSet: function(context) {
+							
+						},
+						onStart: undefined,
+						onRender: undefined,
+						onOpen: undefined,
+						onClose: undefined,
+						onStop: undefined,
+					});
+				}
 			});
 		}
 	</script>
@@ -1556,8 +1516,8 @@ $_SESSION['atendimento'] = [
 									<div class="card-body">
 										<div class="col-lg-12 mb-4 row mt-2">
 											<!-- titulos -->
-											<div class='col-lg-3'>
-												<label>Data do Registro</label>
+											<div class="col-lg-3">
+												<label>Data do Atendimento</label>
 											</div>
 											<div class='col-lg-3'>
 												<label>Modalidade <span class='text-danger'>*</span></label>
@@ -1570,8 +1530,8 @@ $_SESSION['atendimento'] = [
 											</div>
 
 											<!-- campos -->
-											<div class='col-lg-3'>
-												<input id='dataRegistro' name='dataRegistro' type='date' class='form-control' placeholder='Nome' readOnly>
+											<div class="col-lg-3">
+												<input id="dataAtendimento" name="dataAtendimento" type="text" readonly class="form-control">
 											</div>
 											<div class='col-lg-3'>
 												<select id='modalidade' name='modalidade' class='select-search' required>
@@ -1626,84 +1586,30 @@ $_SESSION['atendimento'] = [
 
 										<div class="col-lg-12 mb-4 row">
 											<!-- titulos -->
-											<div class="col-lg-3">
+											<div class="col-lg-5">
 												<label>Profissional</label>
 											</div>
-											<div class="col-lg-2">
+											<div class="col-lg-5">
 												<label>Local do Atendimento</label>
 											</div>
-											<div class="col-lg-3">
-												<label>Data do Atendimento</label>
-											</div>
-											<div class="col-lg-3">
+											<div class="col-lg-2">
 												<label>Horário</label>
 											</div>
 
 											<!-- campos -->
-											<div class="col-lg-3">
+											<div class="col-lg-5">
 												<select id="medicos" name="medicos" class="select-search">
 													<option value="" selected>selecione</option>
 												</select>
 											</div>
-											<div class="col-lg-2">
+											<div class="col-lg-5">
 												<select id="localAtendimento" name="localAtendimento" class="form-control form-control-select2">
 													<option value="" selected>Selecione</option>
 												</select>
 											</div>
-											<div id="dataAgenda" class="col-lg-3 input-group">
-												<input id="dataAtendimento" name="dataAtendimento" type="text" readonly value="" class="form-control">
-											</div>
-											<div id="modalHora" class="col-lg-3">
+											<div id="modalHora" class="col-lg-2">
 												<input id="horaAtendimento" name="horaAtendimento" type="text" class="form-control pickatime-disabled">
 											</div>
-											<!-- btnAddServico -->
-											<div class="col-lg-1 text-right">
-												<button id="incluirServico" class="btn btn-lg btn-principal" data-tipo="INCLUIRSERVICO">
-													<i class="fab-icon-open icon-add-to-list p-0" style="cursor: pointer; color: black"></i>
-												</button>
-											</div>
-										</div>
-
-										<div class="col-lg-12">
-											<table class="table d-none" id="servicoTable">
-												<thead>
-													<tr class="bg-slate text-left">
-														<th style="width: 15rem;">Serviço</th>
-														<th style="width: 15rem;">Profissional</th>
-														<th style="width: 11rem;">Data do Atendimento</th>
-														<th style="width: 6rem;">Horário</th>
-														<th style="width: 18rem;">Local</th>
-														<th class="text-right" style="width: 7rem;">Valor</th>
-														<th class="text-center" style="width: 5rem;">Ações</th>
-													</tr>
-												</thead>
-												<tbody id="dataServico">
-
-												</tbody>
-												<tfoot>
-													<tr>
-														<th colspan="6" class="font-weight-bold text-right" style="width: 72rem;">
-															<div style="float: right;">
-																<div class="text-right" style="font-size: 16px;">
-																	<div style="text-align: right; padding-right:55px; float: left">Desconto (R$):</div>
-																	<div id="servicoValorDescontoTotal" class="font-weight-bold text-right" style="display:table-cell;">R$ 0,00</div>
-																</div>
-
-																<br>
-
-																<div class="text-right" style="font-size: 16px;">
-																	<div style="text-align: right; padding-right:55px; float: left">Valor (R$):</div>
-																	<div id="servicoValorTotal" class="font-weight-bold text-right">R$ 0,00</div>
-																</div>
-															</div>
-														</th>
-
-														<th style="width: 5rem;">
-
-														</th>
-													</tr>
-												</tfoot>
-											</table>
 										</div>
 
 										<div class="col-lg-12 mb-4 row">

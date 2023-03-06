@@ -20,12 +20,6 @@ $sql = "SELECT P.ProfiId as id,P.ProfiNome as nome,PF.ProfiCbo as cbo,PF.ProfiNo
 	WHERE P.ProfiUnidade = $iUnidade";
 $result = $conn->query($sql);
 $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
-
-// $sql = "SELECT UnidaId,UnidaNome
-// 	FROM Unidade
-// 	WHERE UnidaId = $iUnidade";
-// $result = $conn->query($sql);
-// $Unidade = $result->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -176,30 +170,6 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
                     }
                 }
 			});
-
-			$('#salvarAgenda').on('click', ()=>{
-				$('#salvarAgenda').html("<img src='global_assets/images/lamparinas/loader-transparente2.gif' style='width: 17px' alt='loader'>");
-				$("#salvarAgenda").prop('disabled', true);
-				$.ajax({
-					type: 'POST',
-					url: 'filtraProfissionalAgenda.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'SALVAAGENDA',
-						'iProfissional': $('#iProfissional').val()
-					},
-					success: function(response) {
-						alerta(response.titulo, response.menssagem, response.status)
-						// window.location.href = "profissional.php"
-						getAgenda()
-						$('#salvarAgenda').html('Salvar');
-						$("#salvarAgenda").prop('disabled', false);
-						socket.sendMenssage({
-							'type':'AGENDA'
-						});
-					}
-				});
-			})
 			$('#modal-close-x').on('click', function(){
 				$('#page-modal-horario').fadeOut(200);
 			})
@@ -478,6 +448,9 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 								success: function(response) {
 									$('#page-modal-agendamento').fadeOut(200)
 									getAgenda()
+									socket.sendMenssage({
+										'type':'AGENDA'
+									});
 								}
 							});
 						}
@@ -875,6 +848,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 		})
 
 		function getBloqueios(){
+			getAgenda()
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAgendamento.php',
@@ -1140,7 +1114,11 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 											'data': data[0],
 											'hora': data[1],
 										},
-										success: function(response){}
+										success: function(response){
+											socket.sendMenssage({
+												'type':'AGENDA'
+											});
+										}
 									})
 								},
 								select: function(start, end, jsEvent, view) {

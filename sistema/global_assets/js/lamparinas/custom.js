@@ -385,9 +385,10 @@ function WebSocketConnect(unidade, empresa){
 		->menssage: esse campo pode ser nulo, serve para, caso queira exibir uma menssagem em tempo real, seja possivel customisar essa menssagem;
 	
 	*/
+	return
 	if(unidade && empresa){
-		var socket = new WebSocket('wss://lamparinasws.herokuapp.com');
-		// var socket = new WebSocket('ws://localhost:8080');
+		// var socket = new WebSocket('wss://lamparinasws.herokuapp.com');
+		var socket = new WebSocket('ws://54.243.225.202:8080')
 	
 		// socket.onmessage = function (event){
 		// 	console.log('implementação padrão')
@@ -420,6 +421,7 @@ function WebSocketConnect(unidade, empresa){
 		socket.onopen = function(event){
 			socket.sendMenssage({'type':'SETPARAMETERS','empresa':empresa,
 			'unidade':unidade});
+			console.log('connected')
 		}
 		socket.sendMenssage = function(json){
 			if(json.type){
