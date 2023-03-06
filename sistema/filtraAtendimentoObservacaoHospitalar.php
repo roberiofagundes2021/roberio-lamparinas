@@ -379,6 +379,38 @@ try {
 		
 		echo json_encode($array);	
 		
+	}elseif ($tipoRequest == 'FILTRARSUBGRUPO') {
+
+		$grupoId = $_POST['grupoId'];
+
+		if ($grupoId) {
+			$sql = "SELECT * FROM AtendimentoSubGrupo
+			JOIN Situacao ON AtSubStatus = SituaId
+			WHERE  SituaChave = 'ATIVO'
+			AND AtSubGrupo = $grupoId
+			AND AtSubUnidade = $iUnidade";
+		} else {
+			$sql = "SELECT * FROM AtendimentoSubGrupo
+			JOIN Situacao ON AtSubStatus = SituaId 
+			WHERE  SituaChave = 'ATIVO'
+			AND AtSubUnidade = $iUnidade";
+		}
+	
+		$resultS = $conn->query($sql);
+		$rowSubgrupo = $resultS->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($rowSubgrupo as $item){
+
+			array_push($array,[
+				'id'=>$item['AtSubId'],
+				'nome' => $item['AtSubNome'],
+			]);
+		}
+		
+		echo json_encode($array);	
+		
 	}elseif ($tipoRequest == 'CUIDADOS') {
 
 		$iAtendimentoId = $_POST['iAtendimentoId'];

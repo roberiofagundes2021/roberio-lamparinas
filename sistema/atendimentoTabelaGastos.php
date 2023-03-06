@@ -311,12 +311,8 @@ if ($row['ClienSexo'] == 'F'){
 				let procedimentos  = $('#procedimentos').val()
 				let profissional = <?php echo $userId; ?>
 
-				switch(menssageError){
-					case grupo: menssageError = 'informe o grupo'; $('#grupo').focus();break;
-					case subgrupo: menssageError = 'informe o subgrupo'; $('#subgrupo').focus();break;
-					case procedimentos: menssageError = 'informe o procedimento'; $('#procedimentos').focus();break;
-					
-					default: menssageError = ''; break;
+				if (grupo == '' || subgrupo === '' || procedimentos === '') {
+					menssageError = 'Adicione o Procedimento utilizando a lupa';					
 				}
 
 				if(menssageError){
@@ -359,7 +355,7 @@ if ($row['ClienSexo'] == 'F'){
 				let profissional = <?php echo $userId; ?>
 
 				switch(menssageError){
-					case produtos: menssageError = 'informe o Produto'; $('#procedimentos').focus();break;					
+					case produtos: menssageError = 'Adicione o Produto utilizando a lupa';break;					
 					default: menssageError = ''; break;
 				}
 
@@ -523,49 +519,7 @@ if ($row['ClienSexo'] == 'F'){
 		}); //document.ready
 
 		function getCmbs(){
-			// vai preencher PRODUTOS
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoTabelaGastos.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'PRODUTOS'
-				},
-				success: function(response) {
-					$('#produtos').empty();
-					$('#produtos').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
-						let opt = ''
-						// caso exista algo na variável atendimento significa que o usuário esta alterando um valor
-						// logo esses valores deveram vir preenchido com os dados desse atendimento
-						if(atendimento){
-							 opt = atendimento.AtendModalidade == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
-						} else {
-							opt = `<option value="${item.id}">${item.nome}</option>`
-						}
-						$('#produtos').append(opt)
-					})
-				}
-			});
-			// vai preencher GRUPOS
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoTabelaGastos.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'GRUPOS'
-				},
-				success: function(response) {
-					$('#grupo').empty();
-					$('#grupo').append(`<option value=''>Selecione</option>`)
-				
-					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
-						$('#grupo').append(opt)
-					})
-					
-				}
-			});
+			
 		}
 
 		function checkServicos(){
@@ -813,6 +767,52 @@ if ($row['ClienSexo'] == 'F'){
 			}
 		}
 
+		function pesquisarProcedimento(tipo) {
+
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'SETTIPOBUSCAMEDICAMENTO',
+					'tipoBusca': tipo,
+				},
+				success: function(response) {
+					if (response.status == 'success') {						
+						if (window.location.host == 'localhost' || window.location.host == '127.0.0.1' ) {							
+							window.open('/lamparinas/sistema/atendimentoProcedimentos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1100,height=450,left=25,top=25'); 							
+						} else {
+							window.open('/sistema/atendimentoProcedimentos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1100,height=450,left=25,top=25'); 							
+						}
+					}
+				}
+			});
+
+		}
+
+		function pesquisarMedicamento(tipo) {
+
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'SETTIPOBUSCAMEDICAMENTO',
+					'tipoBusca': tipo,
+				},
+				success: function(response) {
+					if (response.status == 'success') {						
+						if (window.location.host == 'localhost' || window.location.host == '127.0.0.1' ) {							
+							window.open('/lamparinas/sistema/atendimentoProdutos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1100,height=450,left=25,top=25'); 							
+						} else {
+							window.open('/sistema/atendimentoProdutos.php',	'Janela','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=1100,height=450,left=25,top=25'); 							
+						}
+					}
+				}
+			});
+
+		}
+
 	</script>
 
 	<style>
@@ -882,40 +882,35 @@ if ($row['ClienSexo'] == 'F'){
 
 								<div class="card-body">
 									<form id="formTabelaGastos" name="formTabelaGastos" method="post" class="form-validate-jquery">
-
+				
 										<?php 
 											if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {	
-												echo "<div class='col-lg-10 mb-2 row'>
+												echo "<div class='col-lg-7 mb-2 row'>
 													<!-- titulos -->
-													<div class='col-lg-3'>
-														<label>Grupo <span class='text-danger'>*</span></label>
-													</div>
-													<div class='col-lg-3'>
-														<label>Subgrupo <span class='text-danger'>*</span></label>
-													</div>
-													<div class='col-lg-4'>
-														<label>Procedimentos <span class='text-danger'>*</span></label>
+
+													<input type='hidden' name='grupo' id='grupo'>
+													<input type='hidden' name='subgrupo' id='subgrupo'>
+													<input type='hidden' name='procedimentos' id='procedimentos'>
+													
+													<div class='col-lg-9'>
+														<label>Procedimento <span class='text-danger'>*</span></label>
 													</div>
 													
 													<!-- campos -->										
-													<div class='col-lg-3'>
-														<select id='grupo' name='grupo' class='select-search' >
-															<option value=''>Selecione</option>
-														</select>
+													<div class='col-lg-9'>
+														<input type='text' name='nomeProcedimento' id='nomeProcedimento' class='form-control' readonly>
 													</div>
-													<div class='col-lg-3'>
-														<select id='subgrupo' name='subgrupo' class='select-search' >
-															<option value=''>Selecione</option>
-														</select>											
-													</div>
-													<div class='col-lg-4'>
-														<select id='procedimentos' name='procedimentos' class='select-search' >
-															<option value=''>Selecione</option>
-														</select>
+
+													<div class='col-lg-1' style='margin-top: -5px; margin-right: 10px;'>
+														<button class='btn btn-lg btn-principal' onClick='pesquisarProcedimento(`PROCEDIMENTOTABELAGASTO`); return false;'>
+															<i class='icon-search4' title='Pesquisar Medicamento'></i>
+														</button>
 													</div>
 													
 													<div class='col-lg-1' style='margin-top: -5px;'>
-														<a id='inserirServico' class='btn btn-lg btn-principal'>Incluir</a>
+														<a id='inserirServico' class='btn btn-lg btn-success'>
+															<i class='icon-plus3' style='color: white;' title='Incluir Serviço'></i>
+														</a>
 													</div>
 												</div>";
 											}
@@ -951,11 +946,13 @@ if ($row['ClienSexo'] == 'F'){
 									<form id="formTabelaGastosProduto" name="formTabelaGastosProduto" method="post" class="form-validate-jquery">
 										<?php 
 											if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
-												echo "<div class='col-lg-10 mb-2' style='margin-top: -20px'>
+												echo "<div class='col-lg-7 mb-2' style='margin-top: -20px'>
 													<!-- titulos -->
 
+													<input type='hidden' name='produtos' id='produtos'>
+
 													<div class='row'>
-														<div class='col-lg-10'>
+														<div class='col-lg-9'>
 															<label>Produtos em Estoque <span class='text-danger'>*</span></label>
 														</div>
 													</div>
@@ -964,12 +961,19 @@ if ($row['ClienSexo'] == 'F'){
 													<br>
 													<div class='row' style='margin-top: -20px'>												
 														<div class='col-lg-9'>
-															<select id='produtos' name='produtos' class='select-search' >
-																<!--  -->
-															</select>
+															<input type='text' id='nomeProdutos' name='nomeProdutos' class='form-control' readonly>
 														</div>
+
+														<div class='col-lg-1' style='margin-top: -5px; margin-right: 10px; '>
+															<button class='btn btn-lg btn-principal' onClick='pesquisarMedicamento(`PRODUTOTABELAGASTO`); return false;'>
+																<i class='icon-search4' title='Pesquisar Medicamento'></i>
+															</button>
+														</div>
+
 														<div class='col-lg-1' style='margin-top: -5px;'>
-															<a id='inserirProduto' class='btn btn-lg btn-principal'>Incluir</a>
+															<a id='inserirProduto' class='btn btn-lg btn-success'>
+																<i class='icon-plus3' style='color: white;' title='Incluir Produto'></i>
+															</a>
 														</div>
 													</div>
 													
