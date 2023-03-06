@@ -2039,7 +2039,7 @@ $visibilidadeResumoFinanceiro = isset($_SESSION['ResumoFinanceiro']) && $_SESSIO
 
                     if(keyNome != ''){
                         if(valor == '0,00' || valor == '') {
-                            var menssagem = 'Há uma centro de conta vazio ou igual a R$ 0,00!'
+                            var menssagem = 'Há um centro de custo vazio ou igual a R$ 0,00!'
                             alerta('Atenção', menssagem, 'error')
 
                             return false
