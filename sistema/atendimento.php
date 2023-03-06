@@ -217,7 +217,7 @@ $acesso = 'ATENDIMENTO';
 					targets: [4]
 				},
 				{ 
-					orderable: true,   //Condulta
+					orderable: true,   //conduta
 					width: "15%",
 					targets: [5]
 				},

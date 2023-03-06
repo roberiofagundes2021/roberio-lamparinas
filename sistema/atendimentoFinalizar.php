@@ -68,10 +68,10 @@ if ($row['ClienSexo'] == 'F'){
     $sexo = 'Masculino';
 }
 
-if(isset($_POST['condulta'])){	
+if(isset($_POST['conduta'])){	
 	// essa parte vai pegar os dados do atendimento para criar outro atendimento baseado no antigo
 	$creatNew = false;
-	switch($_POST['condulta']){
+	switch($_POST['conduta']){
 		case "AMBULATORIAL":$creatNew = true;break;
 		case "HOSPITALAR":$creatNew = true;break;
 		default: $creatNew = false;
@@ -95,7 +95,7 @@ if(isset($_POST['condulta'])){
 		}
 	} else{
 		// busca a classificação
-		$sql = "SELECT AtClaId FROM AtendimentoClassificacao WHERE AtClaChave = '$_POST[condulta]'
+		$sql = "SELECT AtClaId FROM AtendimentoClassificacao WHERE AtClaChave = '$_POST[conduta]'
 		AND AtClaUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$classificacao = $result->fetch(PDO::FETCH_ASSOC);
@@ -151,11 +151,11 @@ if(isset($_POST['condulta'])){
 		$situacao = $result->fetch(PDO::FETCH_ASSOC);
 
 		$sql = "UPDATE Atendimento SET AtendSituacao = $situacao[SituaId],
-		AtendDesfechoChave = '$_POST[condulta]'
+		AtendDesfechoChave = '$_POST[conduta]'
 		WHERE AtendId = '$iAtendimentoId'";
 		$conn->query($sql);
 
-		switch($_POST['condulta']){
+		switch($_POST['conduta']){
 			case "AMBULATORIAL":irpara("atendimentoObservacaoEntrada.php");break;
 			case "HOSPITALAR":irpara("atendimentoInternacaoEntrada.php");break;
 			default: irpara("atendimentoAmbulatorialListagem.php");break;
@@ -198,7 +198,7 @@ if(isset($_POST['condulta'])){
 			$('#encerrar').on('click', function(e){
 				e.preventDefault()
 				let URL
-				switch($('#condulta').val()){
+				switch($('#conduta').val()){
 					case 'COMRECEITA': URL = 'atendimentoReceituario.php';break;
 					case 'SEMRECEITA': URL = 'atendimentoFinalizar.php';break;
 					case 'LIBERADO': URL = 'atendimentoFinalizar.php';break;
@@ -260,10 +260,10 @@ if(isset($_POST['condulta'])){
 
 									<div class="col-lg-12 row mb-3">
 										<div class="col-lg-12">
-											<label>Condulta <span class="text-danger">*</span></label>
+											<label>conduta <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-6">
-											<select id="condulta" name="condulta" class="select-search" required>
+											<select id="conduta" name="conduta" class="select-search" required>
 												<option value=''>Selecione</option>
 												<option value='COMRECEITA'>Residência com Receita</option>
 												<option value='SEMRECEITA'>Residência sem Receita</option>
