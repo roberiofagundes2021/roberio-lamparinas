@@ -637,9 +637,8 @@ if (isset($_POST['inputAlergia']) ){
 								</div>
 
 								<div class="card-body">
-
 									<div class="row" >
-										<div class="col-lg-3">
+										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="inputPressaoArterial">Pressão Arterial</label>
 												<div class="input-group">
@@ -655,7 +654,7 @@ if (isset($_POST['inputAlergia']) ){
 											</div>
 										</div>
 										
-										<div class="col-lg-2" style="margin-right: 10px;">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputCardiaca">Frequência Cardíaca </label>
 												<div class="input-group">
@@ -667,7 +666,7 @@ if (isset($_POST['inputAlergia']) ){
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-2" style="margin-right: 20px;">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputRespiratoria">Frequência Respiratória </label>
 												<div class="input-group">												
@@ -679,7 +678,7 @@ if (isset($_POST['inputAlergia']) ){
 											</div>
 										</div>
 										
-										<div class="col-lg-2" style="margin-right: 10px;">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputTemperatura">Temperatura AXI </label>
 												<div class="input-group">
@@ -691,7 +690,7 @@ if (isset($_POST['inputAlergia']) ){
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-1" style="margin-right: 20px;">
+										<div class="col-lg-2">
 											<div class="form-group">
 												<label for="inputSPO">SPO<sub>2</sub> </label>
 												<div class="input-group">
@@ -702,14 +701,13 @@ if (isset($_POST['inputAlergia']) ){
 												</div>
 											</div>
 										</div>
-										<div class="col-lg-1">
+										<!-- <div class="col-lg-1">
 											<div class="form-group">
 											<label for="inputHGT">HGT </label>
 												<input type="number" id="inputHGT" name="inputHGT" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriHGT']; ?>">
 											</div>
-										</div>
+										</div> -->
 									</div>
-
 								</div>
 
 								<div class="card-header header-elements-inline">
@@ -765,7 +763,7 @@ if (isset($_POST['inputAlergia']) ){
 									<div class="row">
 										<div class="col-lg-2"  style="margin-right: 20px;">
 											<div class="form-group">
-												<label for="inputGlicemiaCapilar">Glicemia Capilar </label>
+												<label for="inputGlicemiaCapilar">HGT: mg/dl</label>
 												<div class="input-group">
 												<input type="text" onKeyUp="" maxLength="3" id="inputGlicemiaCapilar" name="inputGlicemiaCapilar" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriGuicemiaCapilar']; ?>">
 													<span class="input-group-prepend">
