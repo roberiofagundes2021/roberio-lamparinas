@@ -1837,6 +1837,9 @@ try{
 		$observacao = $_POST['observacao'];
 		$cliente = $_POST['cliente'];
 		$responsavel = $_POST['responsavel'];
+		$idResponsavel = isset($responsavel['id'])?$responsavel['id']:null;
+		$desconto = 0;
+		$valor = 0;
 
 		$tipo = isset($_POST['tipo'])?$_POST['tipo']:null;
 
@@ -1867,14 +1870,12 @@ try{
 			$intaValCodigo = COUNT($rowCodigo)?intval(explode('-',$rowCodigo[0]['AtendNumRegistro'])[1])+1:1;
 	
 			$numRegistro = "A$mes-$intaValCodigo";
-			$desconto = 0;
-			$valor = 0;
 			
 			$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,
 			AtendCliente,AtendModalidade,AtendResponsavel,AtendClassificacao,AtendClassificacaoRisco,
 			AtendServico,AtendProfissional,AtendHorario,AtendLocal,AtendValor,AtendDesconto,AtendObservacao,
 			AtendSituacao,AtendUsuarioAtualizador,AtendUnidade)
-				VALUES('$numRegistro','$dataRegistro',$cliente[id],$modalidade,'$responsavel[id]',$classificacao,
+				VALUES('$numRegistro','$dataRegistro',$cliente[id],$modalidade,'$idResponsavel',$classificacao,
 				$classificacaoRisco,$servico,$medico,'$horaAtendimento',$localAtendimento,$valor,$desconto,
 				'$observacao',$situacao,$usuarioId,$iUnidade)";
 			$conn->query($sql);
@@ -1884,17 +1885,17 @@ try{
 				AtendCliente = '$cliente[id]',
 				AtendModalidade = $modalidade,
 				AtendClassificacaoRisco = '$classificacaoRisco',
-				AtendResponsavel = '$responsavel[id]',
+				AtendResponsavel = '$idResponsavel',
 				AtendClassificacao = '$classificacao',
 				AtendObservacao = '$observacao',
 				AtendSituacao = $situacao,
 				AtendUsuarioAtualizador = '$usuarioId',
 				AtendServico = $servico,
 				AtendProfissional = $medico,
-				AtendHorario = $horaAtendimento,
+				AtendHorario = '$horaAtendimento',
 				AtendLocal = $localAtendimento,
-				AtendValor = $valor,
-				AtendDesconto = $desconto
+				AtendValor = '$valor',
+				AtendDesconto = '$desconto'
 				WHERE AtendId = $id";
 			$conn->query($sql);
 		}
