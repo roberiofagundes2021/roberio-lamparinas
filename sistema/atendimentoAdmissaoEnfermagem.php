@@ -628,7 +628,7 @@ if (isset($_POST['inputInicio'])) {
                 EnExFSubirEscada = :sSubirEscada ,
                 EnExFBanho = :sBanho ,
                 EnExFDeambular = :sDeambular ,
-                EnExFAndar = :sAndar ,
+                EnExFAndar = :sDormir ,
                 EnExFUnidade = :sUnidade
                 WHERE EnExFId = :iAtendimentoExameFisico";
 
@@ -897,7 +897,7 @@ if (isset($_POST['inputInicio'])) {
                 ':sSubirEscada' => $_POST['cmbSubirEscadas'] == "" ? null : $_POST['cmbSubirEscadas'] ,
                 ':sBanho' => $_POST['cmbBanho'] == "" ? null : $_POST['cmbBanho'] ,
                 ':sDeambular' => $_POST['cmbDeambular'] == "" ? null : $_POST['cmbDeambular'] ,
-                ':sAndar' => $_POST['cmbAndar'] == "" ? null : $_POST['cmbAndar'] ,
+                ':sDormir' => $_POST['cmbDormir'] == "" ? null : $_POST['cmbDormir'] ,
                 ':sUnidade' => $_SESSION['UnidadeId'],
                 ':iAtendimentoExameFisico' => $iAtendimentoExameFisicoId 
                 ));
@@ -1434,7 +1434,7 @@ if (isset($_POST['inputInicio'])) {
                 :sSubirEscada,
                 :sBanho,
                 :sDeambular,
-                :sAndar,
+                :sDormir,
                 :sUnidade
             )";
 			$result = $conn->prepare($sql);
@@ -1702,7 +1702,7 @@ if (isset($_POST['inputInicio'])) {
                 ':sSubirEscada' => $_POST['cmbSubirEscadas'] == "" ? null : $_POST['cmbSubirEscadas'] ,
                 ':sBanho' => $_POST['cmbBanho'] == "" ? null : $_POST['cmbBanho'] ,
                 ':sDeambular' => $_POST['cmbDeambular'] == "" ? null : $_POST['cmbDeambular'] ,
-                ':sAndar' => $_POST['cmbAndar'] == "" ? null : $_POST['cmbAndar'] ,
+                ':sDormir' => $_POST['cmbDormir'] == "" ? null : $_POST['cmbDormir'] ,
                 ':sUnidade' => $_SESSION['UnidadeId'],
             ));
             
@@ -2207,7 +2207,7 @@ if (isset($_POST['inputInicio'])) {
                                                     <div class="col-lg-12">
                                                         <div class="form-group"> 
                                                             <a href="#collapse1-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1. Queixa Principal (QP)</h5></a>   
-                                                            <div class="collapse" id="collapse1-link" style="">
+                                                            <div class="collapse" id="collapse1-link" >
                                                                 <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);"  id="summernote1" name="txtareaConteudo1" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na queixa principal)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaQueixaPrincipal']; ?></textarea>
                                                                     <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote1"></span></small>
@@ -2220,7 +2220,7 @@ if (isset($_POST['inputInicio'])) {
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
                                                             <a href="#collapse2-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.1. História da Moléstia Atual (HMA)</h5></a>   
-                                                            <div class="collapse" id="collapse2-link" style="">
+                                                            <div class="collapse" id="collapse2-link" >
                                                                 <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote2" name="txtareaConteudo2" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça nna história da moléstia atual)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaMolestiaAtual']; ?></textarea>
                                                                     <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote2"></span></small>
@@ -2234,7 +2234,7 @@ if (isset($_POST['inputInicio'])) {
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
                                                             <a href="#collapse3-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.2. História Patológica Pregressa</h5></a>   
-                                                            <div class="collapse" id="collapse3-link" style="">
+                                                            <div class="collapse" id="collapse3-link" >
                                                                 <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote3" name="txtareaConteudo3" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na história patológica pregressa)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaPatologicaPregressa']; ?></textarea>
                                                                     <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote3"></span></small>
@@ -2248,7 +2248,7 @@ if (isset($_POST['inputInicio'])) {
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
                                                             <a href="#collapse4-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.3. História Familiar</h5></a>   
-                                                            <div class="collapse" id="collapse4-link" style="">
+                                                            <div class="collapse" id="collapse4-link" >
                                                                 <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote4" name="txtareaConteudo4" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na história familiar)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaFamiliar']; ?></textarea>
                                                                     <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote4"></span></small>
@@ -2262,7 +2262,7 @@ if (isset($_POST['inputInicio'])) {
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
                                                             <a href="#collapse5-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.4. História Sócioeconômica</h5></a>   
-                                                            <div class="collapse" id="collapse5-link" style="">
+                                                            <div class="collapse" id="collapse5-link" >
                                                                 <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote5" name="txtareaConteudo5" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na história sócioeconômica)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHipoteseSocioEconomica']; ?></textarea>
                                                                     <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote5"></span></small>
@@ -2276,7 +2276,7 @@ if (isset($_POST['inputInicio'])) {
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
                                                             <a href="#collapse6-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 2. Anamnese (Digitação Livre)</h5></a>   
-                                                            <div class="collapse" id="collapse6-link" style="">
+                                                            <div class="collapse" id="collapse6-link" >
                                                                 <div class="mt-3">
                                                                     <textarea rows="5" cols="5" maxLength="1000" onInput="contarCaracteres(this);" id="summernote6" name="txtareaConteudo6" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na anamnese)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaDigitacaoLivre']; ?></textarea>
                                                                     <small class="text-muted form-text">Max. 1000 caracteres<span class="caracteressummernote6"></span></small>
@@ -3763,13 +3763,13 @@ if (isset($_POST['inputInicio'])) {
 
                                             <div class="col-lg-4">
                                                 <div class="form-group row">
-                                                    <label class="col-form-label col-lg-4">ANDAR</label>
+                                                    <label class="col-form-label col-lg-4">DORMIR</label>
                                                     <div class="col-lg-8">
-                                                        <select id="cmbAndar" name="cmbAndar" class="form-control form-control-select2">
+                                                        <select id="cmbDormir" name="cmbDormir" class="form-control form-control-select2">
                                                             <option value="">Selecione</option>                                                        
                                                             <?php
                                                                 foreach ($arrayGrauDependencia as $key => $item) {
-                                                                    if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFAndar'] ==  $key) ) {																
+                                                                    if ( (isset($iAtendimentoExameFisicoId )) && ($rowExameFisico['EnExFDormir'] ==  $key) ) {																
                                                                         print('<option value="' . $key . '" selected>' . $item . '</option>');
                                                                     } else {
                                                                         print('<option value="' . $key . '">' . $item . '</option>');
