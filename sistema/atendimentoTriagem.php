@@ -661,7 +661,7 @@ if (isset($_POST['inputAlergia']) ){
 												<div class="input-group">
 												<input type="number" id="inputCardiaca" name="inputCardiaca" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqCardiaca']; ?>">
 													<span class="input-group-prepend">
-														<span class="input-group-text">Bpm</span>	
+														<span class="input-group-text">irpm</span>	
 													</span>
 													
 												</div>
@@ -673,7 +673,7 @@ if (isset($_POST['inputAlergia']) ){
 												<div class="input-group">												
 													<input type="number" onKeyUp="" id="inputRespiratoria" name="inputRespiratoria" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqRespiratoria']; ?>">
 													<span class="input-group-prepend">
-														<span class="input-group-text">mpm</span>	
+														<span class="input-group-text">bpm</span>	
 													</span>
 												</div>
 											</div>
