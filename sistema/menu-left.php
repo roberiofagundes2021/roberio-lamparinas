@@ -223,25 +223,49 @@
                     <i class='$men[MenuIco]'></i>
                       <span>$men[MenuNome]</span>
                     </a>";
-                  }
 
-                  // caso seja o menu seja um submenu vai colocar tambem os itens desse submenu
-                  if($men['MenuSubMenu'] == 1) {
-                    echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
+                    // caso o menu seja um submenu vai colocar tambem os itens desse submenu
+                    if($men['MenuSubMenu'] == 1) {
+                      echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
+  
+                      foreach($menu as $men_f){
+                        $visualizar_f = (isset($men_f['UsXPeVisualizar'])?$men_f['UsXPeVisualizar']:$men_f['PrXPeVisualizar']);
+                    
+                        if($men_f['MenuPai'] == $men['MenuId'] && $visualizar_f == 1 && $men_f['MenuPosicao'] == 'PRINCIPAL'){
+                          // mostra todos os submenus e caso a rota destino(MenuUrl) seja "estoqueMinimoImprime.php"
+                          // ele abrirá em uma nova aba
 
-                    foreach($menu as $men_f){
-                      $visualizar_f = (isset($men_f['UsXPeVisualizar'])?$men_f['UsXPeVisualizar']:$men_f['PrXPeVisualizar']);
-                  
-                      if($men_f['MenuPai'] == $men['MenuId'] && $visualizar_f == 1 && $men_f['MenuPosicao'] == 'PRINCIPAL'){
-                        // mostra todos os submenus e caso a rota destino(MenuUrl) seja "estoqueMinimoImprime.php"
-                        // ele abrirá em uma nova aba
-                        echo  "<li class='nav-item'><a href='$men_f[MenuUrl]' class='nav-link'"
-                        .($men_f['MenuUrl'] == 'estoqueMinimoImprime.php' ? " target='_blank' >" : ">")."$men_f[MenuNome]</a></li>";
-                      } 
+                          if($men_f['MenuSubMenu'] == 1) {
+                            $classF = basename($_SERVER['PHP_SELF']) == $men_f['MenuUrl']?" class='nav-link active'":" class='nav-link'";
+                            echo (($men_f['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
+                            "<a href='$men_f[MenuUrl]' $class >
+                            <i class='$men_f[MenuIco]'></i>
+                              <span>$men_f[MenuNome]</span>
+                            </a>";
+                            
+                            echo '<ul class="nav nav-group-sub" data-submenu-title="Text editors">';
+        
+                            foreach($menu as $men_ff){
+                              $visualizar_f = (isset($men_ff['UsXPeVisualizar'])?$men_ff['UsXPeVisualizar']:$men_ff['PrXPeVisualizar']);
+                          
+                              if($men_ff['MenuPai'] == $men_f['MenuId'] && $visualizar_f == 1 && $men_ff['MenuPosicao'] == 'PRINCIPAL'){
+                                // mostra todos os submenus e caso a rota destino(MenuUrl) seja "estoqueMinimoImprime.php"
+                                // ele abrirá em uma nova aba
+                                echo  "<li class='nav-item'><a href='$men_ff[MenuUrl]' class='nav-link'"
+                                .($men_ff['MenuUrl'] == 'estoqueMinimoImprime.php' ? " target='_blank' >" : ">")."$men_ff[MenuNome]</a></li>";
+                              } 
+                            }
+                            echo '</ul>';
+                          }else{
+                            echo  "<li class='nav-item'><a href='$men_f[MenuUrl]' class='nav-link'"
+                            .($men_f['MenuUrl'] == 'estoqueMinimoImprime.php' ? " target='_blank' >" : ">")."$men_f[MenuNome]</a></li>";
+                          }
+                        } 
+                      }
+                      echo '</ul>';
                     }
-                    echo '</ul>';
+                    echo '</li>';
                   }
-                  echo '</li>';
                 }
               }
             }
