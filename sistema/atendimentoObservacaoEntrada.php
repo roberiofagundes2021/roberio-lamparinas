@@ -1751,32 +1751,24 @@ if ($row['ClienSexo'] == 'F'){
 		}
 
 		function setDescricaoPosologiaMed() {
-
-			let nomeMedicamento = $('#nomeMedicamentoEstoqueMedicamentos').val()
-			let medicamentoDl = $('#medicamentoDlMedicamentos').val()			
-			let doseMed = $('#doseMedicamentos').val()
-			let unidadeMed = $('#selUnidadeMedicamentos option:selected').text()
-			let frequenciaMed = $('#frequenciaMedicamentos').val()
-			let tipoAprazemtentoMed = $('#selTipoAprazamentoMedicamentos option:selected').text()
-			let bombaInfusaoMed = ''
-			let complementoMed = $('#complementoMedicamentos').val()
-
-			if (document.getElementById('checkBombaInfusaoMedicamentos').checked) {
-				bombaInfusaoMed = 'Bomba de Infusão';
-			}
-
-			$('#descricaoPosologiaMedicamentos').val(
-
-				(nomeMedicamento != '' ? nomeMedicamento : '') + 
-				(medicamentoDl != '' ? ' - ' + medicamentoDl : '') + 
-				(doseMed != '' ? ' - ' + doseMed : '') + 
-				(unidadeMed != 'Selecione' ? ' - ' + unidadeMed : '') +
-				(frequenciaMed != '' ? ' - ' + frequenciaMed : '') +
-				(tipoAprazemtentoMed != 'Selecione' ? ' - ' + tipoAprazemtentoMed : '') +				
-				(bombaInfusaoMed != '' ? ' - ' + bombaInfusaoMed : '') +			
-				(complementoMed != '' ? ' - ' + complementoMed : '')
-				
-			)
+			let newText = ''
+			let arrayCampos = [
+				$('#nomeMedicamentoEstoqueMedicamentos').val(),
+				$( "#selViaMedicamentos" ).val()?$( "#selViaMedicamentos option:selected" ).text():'',
+				$('#doseMedicamentos').val(),
+				$('#medicamentoDlMedicamentos').val(),
+				$('#selUnidadeMedicamentos').val()?$( "#selUnidadeMedicamentos option:selected" ).text():'',
+				$('#frequenciaMedicamentos').val(),
+				$( "#selTipoAprazamentoMedicamentos" ).val()?$('#selTipoAprazamentoMedicamentos option:selected').text():'',
+				$('#checkBombaInfusaoMedicamentos').is(':checked')?'Bomba de Infusão':'',
+				$('#complementoMedicamentos').val()
+			]
+			arrayCampos.forEach(function(item){
+				newText += item?` ${item} -`:''
+			})
+			newText = newText.slice(0, -1)
+			
+			$('#descricaoPosologiaMedicamentos').val(newText)
 			contarCaracteres($('#descricaoPosologiaMedicamentos')[0])
 			
 		}
