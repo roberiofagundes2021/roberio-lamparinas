@@ -637,76 +637,52 @@ if (isset($_POST['inputAlergia']) ){
 								</div>
 
 								<div class="card-body">
-									<div class="row" >
-										<div class="col-lg-4">
-											<div class="form-group">
-												<label for="inputPressaoArterial">Pressão Arterial</label>
-												<div class="input-group">
+									<div class="col-lg-12 row">
+										<div class="col-lg-4 row">
+											<div class="col-lg-5">
+												<label for="inputPressaoArterial">PAD (mmHg)</label>
+											</div>
+											<div class="col-lg-2"></div>
+											<div class="col-lg-5">
+												<label for="inputPressaoArterial">PAD (mmHg)</label>
+											</div>
+										</div>
+										<div class="col-lg-2">
+											<label>FC (bpm)</label>
+										</div>
+										<div class="col-lg-2">
+											<label>FR (irpm)</label>
+										</div>
+										<div class="col-lg-2">
+											<label>Temperatura</label>
+										</div>
+										<div class="col-lg-2">
+											<label>SPO<sub>2</sub> (%)</label>
+										</div>
+
+										<div class="col-lg-4 row">
+											<div class="col-lg-5">
 												<input type="number" id="inputSistolica" name="inputSistolica" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriPressaoSistolica']; ?>">
-													<span class="input-group-prepend">
-														<span class="input-group-text">X</span>	
-													</span>
-													<input type="number" id="inputDiatolica" name="inputDiatolica" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriPressaoDiatolica']; ?>">
-													<span class="input-group-prepend">
-														<span class="input-group-text">mmHg</span>	
-													</span>
-												</div>
 											</div>
-										</div>
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputCardiaca">Frequência Cardíaca </label>
-												<div class="input-group">
-												<input type="number" id="inputCardiaca" name="inputCardiaca" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqCardiaca']; ?>">
-													<span class="input-group-prepend">
-														<span class="input-group-text">irpm</span>	
-													</span>
-													
-												</div>
+											<div class="col-lg-2 text-center">
+												<label>X</label>
+											</div>
+											<div class="col-lg-5">
+												<input type="number" id="inputDiatolica" name="inputDiatolica" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriPressaoDiatolica']; ?>">
 											</div>
 										</div>
 										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputRespiratoria">Frequência Respiratória </label>
-												<div class="input-group">												
-													<input type="number" onKeyUp="" id="inputRespiratoria" name="inputRespiratoria" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqRespiratoria']; ?>">
-													<span class="input-group-prepend">
-														<span class="input-group-text">bpm</span>	
-													</span>
-												</div>
-											</div>
-										</div>
-										
-										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputTemperatura">Temperatura AXI </label>
-												<div class="input-group">
-												<input type="number" id="inputTemperatura" name="inputTemperatura" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriTempAXI']; ?>">
-													<span class="input-group-prepend">
-														<span class="input-group-text"><img src="global_assets/images/lamparinas/thermometro.png" width="32" style="margin-top: -13px;" alt="Termometro" /></span>
-													</span>
-													
-												</div>
-											</div>
+											<input type="number" id="inputCardiaca" name="inputCardiaca" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqCardiaca']; ?>">
 										</div>
 										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputSPO">SPO<sub>2</sub> </label>
-												<div class="input-group">
-													<input type="number" onKeyUp="" id="inputSPO" name="inputSPO" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriSPO']; ?>">
-													<span class="input-group-prepend">
-														<span class="input-group-text">%</span>	
-													</span>
-												</div>
-											</div>
+											<input type="number" onKeyUp="" id="inputRespiratoria" name="inputRespiratoria" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriFreqRespiratoria']; ?>">
 										</div>
-										<!-- <div class="col-lg-1">
-											<div class="form-group">
-											<label for="inputHGT">HGT </label>
-												<input type="number" id="inputHGT" name="inputHGT" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriHGT']; ?>">
-											</div>
-										</div> -->
+										<div class="col-lg-2">
+											<input type="number" id="inputTemperatura" name="inputTemperatura" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriTempAXI']; ?>">
+										</div>
+										<div class="col-lg-2">
+											<input type="number" onKeyUp="" id="inputSPO" name="inputSPO" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriSPO']; ?>">
+										</div>
 									</div>
 								</div>
 
@@ -715,7 +691,6 @@ if (isset($_POST['inputAlergia']) ){
 								</div>
 
 								<div class="card-body">
-
 									<div class="row">
 										<div class="col-lg-2"  style="margin-right: 20px;">
 											<div class="form-group">
@@ -751,7 +726,6 @@ if (isset($_POST['inputAlergia']) ){
 											</div>
 										</div>
 									</div>
-
 								</div>
 
 								<div class="card-header header-elements-inline">
@@ -759,29 +733,22 @@ if (isset($_POST['inputAlergia']) ){
 								</div>
 
 								<div class="card-body">
-
-									<div class="row">
-										<div class="col-lg-2"  style="margin-right: 20px;">
-											<div class="form-group">
-												<label for="inputGlicemiaCapilar">HGT: mg/dl</label>
-												<div class="input-group">
-												<input type="text" onKeyUp="" maxLength="3" id="inputGlicemiaCapilar" name="inputGlicemiaCapilar" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriGuicemiaCapilar']; ?>">
-													<span class="input-group-prepend">
-														<span class="input-group-text">mg/dL</span>		
-													</span>
-													
-												</div>
-											</div>
+									<div class="col-lg-12 row">
+										<div class="col-lg-2">
+											<label>HGT mg/dl</label>
 										</div>
 										<div class="col-lg-2">
-											<div class="form-group">
-												<label for="inputMomentoColeta">Momento da Coleta </label>
-												<div class="input-group">
-													<input type="time"  maxLength="6" id="inputMomentoColeta" name="inputMomentoColeta" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo mostraHora($rowTriagem['AtTriMomentoColeta']); ?>">																			
-												</div>
-											</div>
+											<label>Momento da Coleta</label>
 										</div>
+										<div class="col-lg-8"></div>
 
+										<div class="col-lg-2">
+											<input type="text" onKeyUp="" maxLength="3" id="inputGlicemiaCapilar" name="inputGlicemiaCapilar" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo $rowTriagem['AtTriGuicemiaCapilar']; ?>">
+										</div>
+										<div class="col-lg-2">
+											<input type="time"  maxLength="6" id="inputMomentoColeta" name="inputMomentoColeta" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoTriagemId )) echo mostraHora($rowTriagem['AtTriMomentoColeta']); ?>">
+										</div>
+										<div class="col-lg-8"></div>
 									</div>
 
 								</div>
