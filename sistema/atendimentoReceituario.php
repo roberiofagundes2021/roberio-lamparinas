@@ -334,7 +334,7 @@ if(isset($iAtendimentoReceituarioId) && $iAtendimentoReceituarioId){
 
 								<div class="card-body">
 									<div class="row mb-3">
-										<div class="col-lg-6">
+										<div class="col-lg-3">
 											<label>Tipo de Receituário <span class="text-danger">*</span></label>
 											<select id="receituario" name="receituario" class="select-search" required>
 												<option value=''>Selecione</option>
