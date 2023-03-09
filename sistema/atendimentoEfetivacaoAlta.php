@@ -19,10 +19,14 @@ $iUnidade = $_SESSION['UnidadeId'];
 
 $sql = "SELECT TOP(1) *
 FROM EnfermagemEfetivacaoAlta
+LEFT JOIN TipoAlta ON EnEfATipoAlta = TpAltId
+LEFT JOIN MotivoAlta ON EnEfAMotivoAlta = MtAltId
 WHERE EnEfAAtendimento = $iAtendimentoId
 ORDER BY EnEfAId DESC";
 $result = $conn->query($sql);
 $rowEfetivacao = $result->fetch(PDO::FETCH_ASSOC);
+
+//var_dump($rowEfetivacao);die;
 
 $iAtendimentoEfetivacaoAlta = $rowEfetivacao?$rowEfetivacao['EnEfAId']:null;
 
@@ -88,9 +92,71 @@ WHERE EstabUnidade = $_SESSION[UnidadeId]";
 $result = $conn->query($sql);
 $rowEstabelecimentos = $result->fetchAll(PDO::FETCH_ASSOC);
 
+$sql = "SELECT Cid10Id,Cid10Capitulo, Cid10Codigo, Cid10Descricao
+FROM Cid10
+JOIN Situacao on SituaId = Cid10Status
+WHERE SituaChave = 'ATIVO'
+ORDER BY Cid10Codigo ASC";
+$result = $conn->query($sql);
+$rowCid10 = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT SrVenId,SrVenCodigo, SrVenNome
+FROM ServicoVenda
+WHERE SrVenUnidade = " . $_SESSION['UnidadeId'] . "
+ORDER BY SrVenNome ASC";
+$result = $conn->query($sql);
+$rowProcedimentoDiagnostico = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT TpAltId, TpAltNome, TpAltChave
+FROM TipoAlta
+JOIN Situacao on SituaId = TpAltStatus
+WHERE SituaChave = 'ATIVO'";
+$result = $conn->query($sql);
+$rowTipoDeAlta = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT MtAltId, MtAltNome
+FROM MotivoAlta
+JOIN Situacao on SituaId = MtAltStatus
+WHERE SituaChave = 'ATIVO'";
+$result = $conn->query($sql);
+$rowMotivoAlta = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT EsLeiId, EsLeiNome
+FROM EspecialidadeLeito
+JOIN Situacao on SituaId = EsLeiStatus
+WHERE SituaChave = 'ATIVO'";
+$result = $conn->query($sql);
+$rowEspecialidadeLeito = $result->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT TOP(1) EnAnaId, EnAnaCid10, EnAnaProcedimento, EnAnaQueixaPrincipal, EnAnaHistoriaMolestiaAtual, 
+EnAnaHistoriaPatologicaPregressa, EnAnaHistoriaFamiliar, EnAnaHipoteseSocioEconomica, EnAnaDigitacaoLivre,
+Cid10Descricao, SrVenNome
+FROM EnfermagemAnamnese
+LEFT JOIN Cid10 ON EnAnaCid10 = Cid10Id
+LEFT JOIN ServicoVenda ON EnAnaProcedimento = SrVenId
+WHERE EnAnaAtendimento = $iAtendimentoId
+ORDER BY EnAnaId DESC";
+$result = $conn->query($sql);
+$rowAnamnese= $result->fetch(PDO::FETCH_ASSOC);
+$iAtendimentoAnamneseId = $rowAnamnese?$rowAnamnese['EnAnaId']:null;
+
+//var_dump($rowAnamnese);die;
+
 if (isset($_POST['inputInicio'])) {
 
     //var_dump($_POST);die;
+
+
+    $sql = "SELECT TpAltId
+    FROM TipoAlta
+    WHERE TpAltChave = '$_POST[cmbTipoDeAlta]'";
+    $result = $conn->query($sql);
+    $rowidTipoDeAlta = $result->fetch(PDO::FETCH_ASSOC);
+
+    $idTipoAlta = $rowidTipoDeAlta['TpAltId'];
+
+    //var_dump($idTipoAlta);die;
+
 
     try {
         $nome_final = '';
@@ -114,13 +180,10 @@ if (isset($_POST['inputInicio'])) {
                 $nome_final = $_FILES['copiaDeclaracaoObito']['name'];
             }
 
-            move_uploaded_file($_FILES['copiaDeclaracaoObito']['tmp_name'], $_UP['pasta'] . $nome_final);
-
-           
+            move_uploaded_file($_FILES['copiaDeclaracaoObito']['tmp_name'], $_UP['pasta'] . $nome_final);          
 
         }
         
-
         if ($iAtendimentoEfetivacaoAlta) {
 
             $sql = "UPDATE EnfermagemEfetivacaoAlta SET                 
@@ -146,9 +209,14 @@ if (isset($_POST['inputInicio'])) {
                 EnEfAPeso = :EnEfAPeso ,
                 EnEfADataHoraAlta = :EnEfADataHoraAlta ,
                 EnEfATipoAlta = :EnEfATipoAlta ,
+                EnEfAMotivoAlta = :EnEfAMotivoAlta,
+                EnEfARetornoAlta = :EnEfARetornoAlta,
+                EnEfASumarioAltaMedica = :EnEfASumarioAltaMedica,
                 EnEfACondicaoPaciente = :EnEfACondicaoPaciente ,
+                EnEfAOutros = :EnEfAOutros,
                 EnEfATipoTransporte = :EnEfATipoTransporte ,
                 EnEfAProfissionalResponsavel = :EnEfAProfissionalResponsavel ,
+                EnEfAClinica = :EnEfAClinica,
                 EnEfATransferencia = :EnEfATransferencia ,
                 EnEfALocalTransferencia = :EnEfALocalTransferencia ,
                 EnEfAAcompanhante = :EnEfAAcompanhante ,
@@ -198,10 +266,15 @@ if (isset($_POST['inputInicio'])) {
                 ':EnEfAHGT' => $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'],
                 ':EnEfAPeso' => $_POST['inputPeso'] == "" ? null : $_POST['inputPeso'],
                 ':EnEfADataHoraAlta' => $_POST['inputDataHora'] == "" ? null :  str_replace('T', ' ', $_POST['inputDataHora'] ),
-                ':EnEfATipoAlta' => $_POST['cmbTipoDeAlta'] == "" ? null : $_POST['cmbTipoDeAlta'],
+                ':EnEfATipoAlta' => $idTipoAlta,
+                ':EnEfAMotivoAlta' => $_POST['cmbMotivoAlta'] == "" ? null : $_POST['cmbMotivoAlta'],
+                ':EnEfARetornoAlta' => $_POST['inputDataRetornoAlta'] == "" ? null : $_POST['inputDataRetornoAlta'],
+                ':EnEfASumarioAltaMedica' => $_POST['inputSumarioAltaMedica'] == "" ? null : $_POST['inputSumarioAltaMedica'],
                 ':EnEfACondicaoPaciente' => $_POST['cmbCondicoesPaciente'] == "" ? null : $_POST['cmbCondicoesPaciente'],
+                ':EnEfAOutros' => $_POST['inputCondicoesPacienteOutros'] == "" ? null : $_POST['inputCondicoesPacienteOutros'],
                 ':EnEfATipoTransporte' => $_POST['cmbTipoTransporte'] == "" ? null : $_POST['cmbTipoTransporte'],
                 ':EnEfAProfissionalResponsavel' => $_POST['cmbDadosProfResponsavel'] == "" ? null : $_POST['cmbDadosProfResponsavel'],
+                ':EnEfAClinica' => $_POST['cmbClinica'] == "" ? null : $_POST['cmbClinica'],
                 ':EnEfATransferencia' => $_POST['cmbTransferencia'] == "" ? null : $_POST['cmbTransferencia'],
                 ':EnEfALocalTransferencia' => $_POST['cmbLocalTransferencia'] == "" ? null : $_POST['cmbLocalTransferencia'],
                 ':EnEfAAcompanhante' => $_POST['cmbAcompanhante'] == "" ? null : $_POST['cmbAcompanhante'],
@@ -261,9 +334,14 @@ if (isset($_POST['inputInicio'])) {
                 EnEfAPeso,
                 EnEfADataHoraAlta,
                 EnEfATipoAlta,
+                EnEfAMotivoAlta,
+                EnEfARetornoAlta,
+                EnEfASumarioAltaMedica,
                 EnEfACondicaoPaciente,
+                EnEfAOutros,
                 EnEfATipoTransporte,
                 EnEfAProfissionalResponsavel,
+                EnEfAClinica,
                 EnEfATransferencia,
                 EnEfALocalTransferencia,
                 EnEfAAcompanhante,
@@ -313,9 +391,14 @@ if (isset($_POST['inputInicio'])) {
                 :EnEfAPeso,
                 :EnEfADataHoraAlta,
                 :EnEfATipoAlta,
+                :EnEfAMotivoAlta ,
+                :EnEfARetornoAlta ,
+                :EnEfASumarioAltaMedica ,
                 :EnEfACondicaoPaciente,
+                :EnEfAOutros ,
                 :EnEfATipoTransporte,
                 :EnEfAProfissionalResponsavel,
+                :EnEfAClinica,
                 :EnEfATransferencia,
                 :EnEfALocalTransferencia,
                 :EnEfAAcompanhante,
@@ -366,10 +449,15 @@ if (isset($_POST['inputInicio'])) {
                 ':EnEfAHGT' => $_POST['inputHGT'] == "" ? null : $_POST['inputHGT'],
                 ':EnEfAPeso' => $_POST['inputPeso'] == "" ? null : $_POST['inputPeso'],
                 ':EnEfADataHoraAlta' => $_POST['inputDataHora'] == "" ? null :  str_replace('T', ' ', $_POST['inputDataHora'] ),
-                ':EnEfATipoAlta' => $_POST['cmbTipoDeAlta'] == "" ? null : $_POST['cmbTipoDeAlta'],
+                ':EnEfATipoAlta' => $idTipoAlta,
+                ':EnEfAMotivoAlta' => $_POST['cmbMotivoAlta'] == "" ? null : $_POST['cmbMotivoAlta'],
+                ':EnEfARetornoAlta' => $_POST['inputDataRetornoAlta'] == "" ? null : $_POST['inputDataRetornoAlta'],
+                ':EnEfASumarioAltaMedica' => $_POST['inputSumarioAltaMedica'] == "" ? null : $_POST['inputSumarioAltaMedica'],
                 ':EnEfACondicaoPaciente' => $_POST['cmbCondicoesPaciente'] == "" ? null : $_POST['cmbCondicoesPaciente'],
+                ':EnEfAOutros' => $_POST['inputCondicoesPacienteOutros'] == "" ? null : $_POST['inputCondicoesPacienteOutros'],
                 ':EnEfATipoTransporte' => $_POST['cmbTipoTransporte'] == "" ? null : $_POST['cmbTipoTransporte'],
                 ':EnEfAProfissionalResponsavel' => $_POST['cmbDadosProfResponsavel'] == "" ? null : $_POST['cmbDadosProfResponsavel'],
+                ':EnEfAClinica' => $_POST['cmbClinica'] == "" ? null : $_POST['cmbClinica'],
                 ':EnEfATransferencia' => $_POST['cmbTransferencia'] == "" ? null : $_POST['cmbTransferencia'],
                 ':EnEfALocalTransferencia' => $_POST['cmbLocalTransferencia'] == "" ? null : $_POST['cmbLocalTransferencia'],
                 ':EnEfAAcompanhante' => $_POST['cmbAcompanhante'] == "" ? null : $_POST['cmbAcompanhante'],
@@ -453,7 +541,7 @@ if (isset($_POST['inputInicio'])) {
         $(document).ready(function() {
 
             getOrientacoesAlta();  
-            getTermosConsentimento()          
+            getEvolucoes()        
 
             $('#tblOrientacaoAlta').DataTable( {
 				"order": [[ 0, "asc" ]],
@@ -531,6 +619,49 @@ if (isset($_POST['inputInicio'])) {
                 
 			});
 
+			$('#tblEvolucao').DataTable( {
+				"order": [[ 0, "asc" ]],
+			    autoWidth: false,
+				responsive: true,
+				searching: false,
+				ordering: false, 
+				paging: false,
+			    columnDefs: [
+				{ 
+					orderable: true, 
+					width: "5%", 
+					targets: [0]
+				},
+				{ 
+					orderable: true,   
+					width: "10%", 
+					targets: [1]
+				},
+				{ 
+					orderable: true,
+					width: "25%", 
+					targets: [2]
+				},				
+				{ 
+					orderable: true,  
+					width: "25%", 
+					targets: [3]
+				},				
+				{ 
+					orderable: true,  
+					width: "15%", 
+					targets: [4]
+				}],
+				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
+				language: {
+					search: '<span>Filtro:</span> _INPUT_',
+					searchPlaceholder: 'filtra qualquer coluna...',
+					lengthMenu: '<span>Mostrar:</span> _MENU_',
+					paginate: { 'first': 'Primeira', 'last': 'Última', 'next': $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;', 'previous': $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;' }
+				}
+                
+			});
+
             $('.salvarEfetivacaoAlta').on('click', function(e) {
                 e.preventDefault();
 
@@ -542,26 +673,72 @@ if (isset($_POST['inputInicio'])) {
                 e.preventDefault();
 
                 let valorSelecionado = $("#cmbTipoDeAlta").val();
+                
+                $.ajax({
+                    type: 'POST',
+                    url: 'filtraAtendimento.php',
+                    dataType: 'json',
+                    data: {
+                        'tipoRequest': 'GETMOTIVOALTA',
+                        'valorSelecionado' : valorSelecionado,				
+				
+                    },
+                    success: function(response) {                        
+                        
+                        response.forEach(item => {
+                            $('#cmbMotivoAlta').empty();
+                            $('#cmbMotivoAlta').append(`<option value=''>Selecione</option>`)
+                    
+                            response.forEach(item => {
+                                let opt = `<option value="${item.id}">${item.nomeMotivo}</option>`
+                                $('#cmbMotivoAlta').append(opt)
+                            })                       
+                        })
+                        $('#cmbMotivoAlta').focus();
+                    }
+                }); 
 
                 if (valorSelecionado === "") {
 
                     $(".box-obito").css('display', 'none');
 				    $(".box-alta").css('display', 'none');
 
-                } else if (valorSelecionado === "AO") {
+                } else if (valorSelecionado === "POROBITO") {
 
                     $(".box-obito").css('display', 'block');
 				    $(".box-alta").css('display', 'none');
                     
                 } else {
 
-                    if (valorSelecionado === "AH") {
-                       $('.titulo-box-alta').text("Alta Hospitalar");                       
-                    } else if (valorSelecionado === "AP") {
-                        $('.titulo-box-alta').text("Alta a Pedido");
-                    } else if (valorSelecionado === "AC") {
-                        $('.titulo-box-alta').text("Alta Condicional");
-                    }
+                    if (valorSelecionado === "PORTRANSFERENCIA") {
+
+                        $('.titulo-box-alta').text("ALTA POR TRANSFERÊNCIA");
+                        $(".box-transferencia").css('display', 'block');
+                        
+                    } else {
+
+                        $(".box-transferencia").css('display', 'none');
+
+                        if (valorSelecionado === "PORALTAMEDICA") {
+
+                            $('.titulo-box-alta').text("ALTA MÉDICA");  
+
+                        } else if (valorSelecionado === "PORPERMANENCIA") {
+
+                            $('.titulo-box-alta').text("ALTA POR PERMANÊNCIA");
+
+                        } else if (valorSelecionado === "PORALTAADMINISTRATIVA") {
+
+                            $('.titulo-box-alta').text("ALTA ADMINISTRATIVA");
+
+                        } else if (valorSelecionado === "PORPROCEDIMENTOSDEPARTO") {
+
+                            $('.titulo-box-alta').text("ALTA POR PORCEDIMENTOS DE PARTO");
+
+                        }
+                        
+                    }     
+
                     $(".box-alta").css('display', 'block');
 			    	$(".box-obito").css('display', 'none');
 
@@ -583,7 +760,7 @@ if (isset($_POST['inputInicio'])) {
 
                     data: {
                         'tipoRequest': 'ADICIONARORIENTACAOALTA',
-                        'ideEfetivacao' : <?php echo $iAtendimentoEfetivacaoAlta; ?>,				
+                        'ideEfetivacao' : <?php echo isset($iAtendimentoEfetivacaoAlta) ? $iAtendimentoEfetivacaoAlta : 'null'; ?>,				
                         'tipoOrientacao' : tipoOrientacao,				
                         'profissionalOrientacao' : profissionalOrientacao,				
                         'orientacaoAlta' : orientacaoAlta				
@@ -633,69 +810,39 @@ if (isset($_POST['inputInicio'])) {
                 }); 
             });
 
-            $('.adicionarTermoConsentimento').on('click', function (e) {
-
+            $('#cmbCondicoesPaciente').on('change', function(e) {
                 e.preventDefault();
-                let menssageError = ''
 
-                let fileTC = $('#arquivoTermoConsentimento').prop('files')[0]
-                let inputDataHoraTC = $('#inputDataHoraTC').val()
-                let inputDescricaoTC = $('#inputDescricaoTC').val()
-                let arquivoTermoConsentimento = $('#arquivoTermoConsentimento').val();
+                let cmbCondicoesPaciente = $("#cmbCondicoesPaciente").val();
 
-                switch(menssageError){
-                    case inputDataHoraTC: menssageError = 'informe a data e hora do Termo de Consentimento'; $('#inputDataHoraTC').focus();break;
-					case inputDescricaoTC: menssageError = 'informe o subgrupo'; $('#inputDescricaoTC').focus();break;
-                    case arquivoTermoConsentimento : menssageError = 'infomrme o arquivo do Termo Consentimento'; $('#arquivoTermoConsentimento').focus();break;	
-					default: menssageError = ''; break;
-				}
+                if (cmbCondicoesPaciente === "OU") {
+                    $(".box-inputCondicoesPacienteOutros").css('display', 'block');
+                } else {
+                    $(".box-inputCondicoesPacienteOutros").css('display', 'none');
+                }              
+            })
 
-				if(menssageError){
-					alerta('Campo Obrigatório!', menssageError, 'error')
-					return
-				}
+            $('#diagnosticoDeEntradaBTN').on('click',function(e){
+                e.preventDefault()
+                
+                $('#page-modal-diagnosticoDeEntrada').fadeIn(200)
 
-                //Verifica se a extensão é  diferente de PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!
-				if (ext(arquivoTermoConsentimento) != 'pdf' && ext(arquivoTermoConsentimento) != 'doc' && ext(arquivoTermoConsentimento) != 'docx' && ext(arquivoTermoConsentimento) != 'odt' && ext(arquivoTermoConsentimento) != 'jpg' && ext(arquivoTermoConsentimento) != 'jpeg' && ext(arquivoTermoConsentimento) != 'png'){
-					alerta('Atenção','Por favor, envie arquivos com a seguinte extensão: PDF, DOC, DOCX, ODT, JPG, JPEG, PNG!','error');
-					$('#arquivoTermoConsentimento').focus();
-					return ;	
-				}
+            })
+            $('#evolucaoMedicaBTN').on('click',function(e){
+                e.preventDefault()
+                
+                $('#page-modal-evolucaoMedica').fadeIn(200)
+            })
 
-                let tamanho =  1024 * 1024 * 32; //32MB
-				//Verifica o tamanho do arquivo
-				if (fileTC.size > tamanho){
-					alerta('Atenção','O arquivo enviado é muito grande, envie arquivos de até 32MB.','error');
-					$('#arquivoTermoConsentimento').focus();
-					return ;
-				}	
 
-                let form_data = new FormData();
-                form_data.append('file', $('#arquivoTermoConsentimento').prop('files')[0]);                  
-                form_data.append('inputDataHoraTC', $("#inputDataHoraTC").val());
-                form_data.append('inputDescricaoTC', $("#inputDescricaoTC").val());
-                form_data.append('tipoRequest', 'ADICIONARTERMOCONSENTIMENTO');
-                form_data.append('ideEfetivacao', <?php echo $iAtendimentoEfetivacaoAlta; ?>);
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'filtraAtendimento.php',
-                    dataType: 'json',
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    data: form_data,
-                    success: function(response) {
-                        if(response.status == 'success'){
-                            alerta(response.titulo, response.menssagem, response.status)
-                            zerarTermoConsentimento()
-                            getTermosConsentimento()                           
-                        }else{
-                            alerta(response.titulo, response.menssagem, response.status)
-                        }
-                    }
-                }); 
-            });
+            $('#modal-diagnosticoDeEntrada-x').on('click', function(e){
+                e.preventDefault()
+                $('#page-modal-diagnosticoDeEntrada').fadeOut(200)
+            })
+            $('#modal-evolucaoMedica-x').on('click', function(e){
+                e.preventDefault()
+                $('#page-modal-evolucaoMedica').fadeOut(200)
+            })
 
         }); //document.ready
 
@@ -705,46 +852,55 @@ if (isset($_POST['inputInicio'])) {
 			return separador <= 0 ? '' : final.substr(separador + 1);
 		}
 
-        function getTermosConsentimento(){
+        function getEvolucoes() {
 
             $.ajax({
                 type: 'POST',
                 url: 'filtraAtendimento.php',
                 dataType: 'json',
                 data:{
-                    'tipoRequest': 'GETTERMOSCONSENTIMENTO',
-                    'ideEfetivacao' : <?php echo $iAtendimentoEfetivacaoAlta; ?>
+                    'tipoRequest': 'GETEVOLUCOESENFERMAGEM',
+                    'id' : <?php echo $iAtendimentoId; ?>
                 },
                 success: function(response) {
 
-                    $('#dataTermoConsentimento').html('');
+                    $('#dataEvolucao').html('');
                     let HTML = ''
                     
                     response.forEach(item => {
 
-                        let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarTermoConsentimento(\"${item.id}\")'><i class='icon-files-empty' title='Copiar Termo'></i></a>`;
-                        let visualizarArquivo = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' href="global_assets/anexos/termoConsentimento/${item.arquivo}" target="_blank" > <i class='icon-file-eye' title='Visualizar Termo'></i> </a>`;
-                        let exc = `<a style='color: black; cursor:pointer' onclick='excluirTermoConsentimento(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Termo'></i></a>`;
-                        let acoes = ``;                                              
-                   
+                        let anexos = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer'  onclick='anexosEvolucao(\"${item.id}\")' class='list-icons-item' ><i class='icon-attachment' title='Anexos da Evolução'></i></a>`;
+                        let acoes = ``;
+
+                      
                         acoes = `<div class='list-icons'>
-                            ${copiar}
-                            ${visualizarArquivo}
-                            ${exc}
+                            ${anexos}                                
                         </div>`;
-                                            
+                   
+                        
                         HTML += `
-                        <tr class='orientacaoItem'>
+                        <tr class='evolucaoItem'>
                             <td class="text-left">${item.item}</td>
                             <td class="text-left">${item.dataHora}</td>
-                            <td class="text-left">${item.descricao}</td>
+                            <td class="text-left" title="${item.justificativaCompleta}">${item.justificativa}</td>
+                            <td class="text-left" title="${item.evolucaoCompleta}">${item.evolucao}</td>
+                            <td class="text-left" >${item.profissionalCbo}</td>
                             <td class="text-center">${acoes}</td>
                         </tr>`
 
                     })
-                    $('#dataTermoConsentimento').html(HTML).show();
+                    $('#dataEvolucao').html(HTML).show();
                 }
             });	
+
+        }
+
+        function anexosEvolucao(idEvolucao) {
+            $('#idEvolucaoAnexo').val(idEvolucao);
+            $('#inputClienteEvolucao').val('<?php echo $row['ClienNome']; ?>');
+            $('#inputAtendimento').val('<?php echo $row['AtendNumRegistro']; ?>');
+            document.formAnexo.action = "evolucaoAnexo.php";
+            document.formAnexo.submit();
         }
 
         function getOrientacoesAlta() {
@@ -755,13 +911,13 @@ if (isset($_POST['inputInicio'])) {
                 dataType: 'json',
                 data:{
                     'tipoRequest': 'GETORIENTACOESALTA',
-                    'ideEfetivacao' : <?php echo $iAtendimentoEfetivacaoAlta; ?>
+                    'ideEfetivacao' : <?php echo isset($iAtendimentoEfetivacaoAlta) ? $iAtendimentoEfetivacaoAlta : 'null'; ?>
                 },
                 success: function(response) {
-
+                                        
                     $('#dataOrientacao').html('');
                     let HTML = ''
-                    
+
                     response.forEach(item => {
 
                         let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarOrientacaoAlta(\"${item.id}\")'><i class='icon-files-empty' title='Copiar Orientação'></i></a>`; 
@@ -776,15 +932,15 @@ if (isset($_POST['inputInicio'])) {
                                 ${editar}
                                 ${exc}
                             </div>`;
-							
+                            
                         } else {                           
                             
                             acoes = `<div class='list-icons'>
                                 ${copiar}
                             </div>`;
-													
+                                                    
                         }
-                        
+
                         HTML += `
                         <tr class='orientacaoItem'>
                             <td class="text-left">${item.item}</td>
@@ -794,7 +950,9 @@ if (isset($_POST['inputInicio'])) {
                         </tr>`
 
                     })
+                    
                     $('#dataOrientacao').html(HTML).show();
+                           
                 }
             });	
             
@@ -842,30 +1000,8 @@ if (isset($_POST['inputInicio'])) {
             });
         }
 
-        function copiarTermoConsentimento(id) {
-            zerarOrientacaoAlta()
-            $.ajax({
-                type: 'POST',
-                url: 'filtraAtendimento.php',
-                dataType: 'json',
-                data:{
-                    'tipoRequest': 'GETTERMOCONSENTIMENTO',
-                    'id' : id
-                },
-                success: function(response) {
-                    
-                    $('#inputDataHoraTC').val(response.EnEATDataHora)
-                    $('#inputDescricaoTC').val(response.EnEATDescricao)
-                }
-            });
-        }
-
         function excluirOrientacaoAlta(id) {
             confirmaExclusaoAjax('filtraAtendimento.php', 'Excluir Orientação?', 'DELETEORIENTACAOALTA', id, getOrientacoesAlta)
-        }
-
-        function excluirTermoConsentimento(id) {
-            confirmaExclusaoAjax('filtraAtendimento.php', 'Excluir Orientação?', 'DELETETERMOCONSENTIMENTO', id, getTermosConsentimento)
         }
         
         function zerarOrientacaoAlta() {
@@ -877,11 +1013,21 @@ if (isset($_POST['inputInicio'])) {
             $(".editarOrientacao").css('display', 'none');
         }
 
-        function zerarTermoConsentimento() {                
-            $('#inputDataHoraTC').val('')
-            $('#inputDescricaoTC').val('')
-            $('#arquivoTermoConsentimento').val('')
+        function contarCaracteres(params) {
+            var limite = params.maxLength;
+            var informativo = " restantes.";
+            var caracteresDigitados = params.value.length;
+            var caracteresRestantes = limite - caracteresDigitados;
+
+            if (caracteresRestantes <= 0) {
+                var texto = $(`textarea[id=${params.id}]`).val();
+                $(`textarea[id=${params.id}]`).val(texto.substr(0, limite));
+                $(".caracteres" + params.id).text("0 " + informativo);
+            } else {
+                $(".caracteres" + params.id).text(" - " + caracteresRestantes + " " + informativo);
+            }  
         }
+
 
     </script>
 
@@ -983,44 +1129,70 @@ if (isset($_POST['inputInicio'])) {
 
                                 <div class="card-body">
 
-                                    <div class="col-lg-6 mb-2 row">
-                                        
-                                        <div class="col-lg-4">
+                                    <div class="col-lg-12 mb-2 row">                                                                                                                
+                                                                               
+                                        <div class="col-lg-2">
                                             <label>Data/ Hora</label>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <label>Tipo de Alta</label>
-                                        </div>                                        
-                                                                                
-                                        <div class="col-lg-4">
                                             <input type="datetime-local" class="form-control" name="inputDataHora" id="inputDataHora" value="<?php echo isset($iAtendimentoEfetivacaoAlta) ? $rowEfetivacao['EnEfADataHoraAlta'] : ''; ?>" >
                                         </div>
-                                        <div class="col-lg-6">
+
+                                        <div class="col-lg-4">
+                                            <label>Tipo de Alta</label>
                                             <select id="cmbTipoDeAlta" name="cmbTipoDeAlta" class="select-search" >
                                                 <option value="" >Selecione</option>
-                                                <option value="AH" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATipoAlta'] == 'AH' ? 'selected' : '' ) : ''; ?> >Alta Hospitalar</option>
-                                                <option value="AP" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATipoAlta'] == 'AP' ? 'selected' : '' ) : ''; ?> >Alta a Pedido</option>
-                                                <option value="AC" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATipoAlta'] == 'AC' ? 'selected' : '' ) : ''; ?> >Alta Condicional</option>
-                                                <option value="AO" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATipoAlta'] == 'AO' ? 'selected' : '' ) : ''; ?> >Óbito</option>                                                
+                                                <?php                                                   
+                                                    foreach ($rowTipoDeAlta as $item){
+
+                                                        $seleciona = $item['TpAltId'] == $rowEfetivacao['EnEfATipoAlta'] ? "selected" : "";    
+
+                                                        print('<option value="'.$item['TpAltChave'].'" '. $seleciona .'>' . $item['TpAltNome'] .'</option>');
+                                                    }
+                                                ?>
+
                                             </select>											
+                                        </div>
+
+                                        <div class="col-lg-4">
+                                            <label>Motivo da Alta</label>
+                                            <select id="cmbMotivoAlta" name="cmbMotivoAlta" class="select-search" >
+                                                <option value="" >Selecione</option>
+                                                <?php                                                   
+                                                    foreach ($rowMotivoAlta as $item){
+
+                                                        $seleciona = $item['MtAltId'] == $rowEfetivacao['EnEfAMotivoAlta'] ? "selected" : "";
+
+                                                        print('<option value="'.$item['MtAltId'].'" '. $seleciona .'>' . $item['MtAltNome'] .'</option>');
+                                                    }
+                                                ?>
+                                                                                              
+                                            </select>											
+                                        </div>
+
+                                        <div class="col-lg-2">
+                                            <label>Retorno da Alta Data</label>
+                                            <input type="date" class="form-control" name="inputDataRetornoAlta" id="inputDataRetornoAlta" value="<?php echo isset($iAtendimentoEfetivacaoAlta) ? $rowEfetivacao['EnEfARetornoAlta'] : ''; ?>" >
                                         </div>
 
                                     </div>
                                     
                                 </div>                                 
 
-                                <div class="box-alta" style="display: <?php echo isset($iAtendimentoEfetivacaoAlta) ? (( $rowEfetivacao['EnEfATipoAlta'] == 'AH' || $rowEfetivacao['EnEfATipoAlta'] == 'AP' || $rowEfetivacao['EnEfATipoAlta'] == 'AC' ) ? 'block' : 'none') : 'none'; ?>; ">
+                                <div class="box-alta" style="display: block <?php echo isset($iAtendimentoEfetivacaoAlta) ? (( $rowEfetivacao['TpAltChave'] == 'PORALTAMEDICA' || $rowEfetivacao['TpAltChave'] == 'PORPERMANENCIA' || $rowEfetivacao['TpAltChave'] == 'PORALTAADMINISTRATIVA' || $rowEfetivacao['TpAltChave'] == 'PORTRANSFERENCIA' || $rowEfetivacao['TpAltChave'] == 'PORPROCEDIMENTOSDEPARTO' ) ? 'block' : 'none') : 'none'; ?>; ">
 
                                     <!-- titulo box -->
                                     <div class="card-header header-elements-inline">
                                         <h3 class="card-title font-weight-bold titulo-box-alta">
                                             <?php 
-                                                if (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['EnEfATipoAlta'] == 'AH') {
-                                                    echo 'Alta Hospitalar';
-                                                } elseif (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['EnEfATipoAlta'] == 'AP') {
-                                                    echo 'Alta a Pedido';
-                                                }   elseif (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['EnEfATipoAlta'] == 'AC') {
-                                                    echo 'Alta Condicional';
+                                                if (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['TpAltChave'] == 'PORALTAMEDICA') {
+                                                    echo 'ALTA MÉDICA';
+                                                } elseif (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['TpAltChave'] == 'PORPERMANENCIA') {
+                                                    echo 'ALTA POR PERMANÊNCIA';
+                                                } elseif (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['TpAltChave'] == 'PORALTAADMINISTRATIVA') {
+                                                    echo 'ALTA ADMINISTRATIVA';
+                                                } elseif (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['TpAltChave'] == 'PORTRANSFERENCIA') {
+                                                    echo 'ALTA POR TRANSFERÊNCIA';
+                                                } elseif (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['TpAltChave'] == 'PORPROCEDIMENTOSDEPARTO') {
+                                                    echo 'ALTA POR PORCEDIMENTOS DE PARTO';
                                                 }                                                                            
                                             ?>
                                         </h3>  
@@ -1028,96 +1200,147 @@ if (isset($_POST['inputInicio'])) {
 
                                     <div class="card-body row"> 
 
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label for="cmbCondicoesPaciente">Condições do Paciente</label>   
-                                                <select id="cmbCondicoesPaciente" name="cmbCondicoesPaciente" class="select-search" >
-                                                    <option value="">Selecione</option>
-                                                    <option value="1" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfACondicaoPaciente'] == '1' ? 'selected' : '' ) : ''; ?> >Deambulado</option>
-                                                    <option value="2" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfACondicaoPaciente'] == '2' ? 'selected' : '' ) : ''; ?> >Em cadeira de rodas</option>
-                                                
-                                                </select>                                            
-                                            </div>
-                                        </div>
+                                        <div class="col-lg-12 ">
 
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label for="cmbTipoTransporte">Tipo de Transporte</label>    
-                                                <select id="cmbTipoTransporte" name="cmbTipoTransporte" class="select-search" >
-                                                    <option value="">Selecione</option>
-                                                    <option value="AM" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATipoTransporte'] == 'AM' ? 'selected' : '' ) : ''; ?> >Ambulância</option>
-                                                    <option value="CP" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATipoTransporte'] == 'CP' ? 'selected' : '' ) : ''; ?> >Carro Próprio</option>
-                                                    <option value="OU" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATipoTransporte'] == 'OU' ? 'selected' : '' ) : ''; ?> >Outros</option>
-                                                    
-                                                </select>                                           
+                                            <div class="col-lg-12 row" style="justify-content: space-between;">
+                                                <label for="inputSumarioAltaMedica">Sumário de Alta Médica</label>
+                                                <label f><a href='' class='' id="diagnosticoDeEntradaBTN" role='button'>Diagnóstico de Entrada</a> | <a href='' class='' id="evolucaoMedicaBTN" role='button'>Evolução Médica</a></label>                                            
                                             </div>
-                                        </div>
 
-                                        <div class="col-lg-5 ">
-                                            <div class="form-group">
-                                                <label for="cmbDadosProfResponsavel">Dados do Profissional Responsável</label>
-                                                <select id="cmbDadosProfResponsavel" name="cmbDadosProfResponsavel" class="select-search" >
-                                                    <option value="">Selecione</option>
-                                                    <?php
-                                                        foreach($rowProfissionais as $item){
-                                                            if (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['EnEfAProfissionalResponsavel'] == $item['ProfiId'] ) {
-                                                                echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
-                                                            } else {
-                                                                echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
-                                                            }                                                          
-                                                        }
-                                                    ?>
-                                                </select>                                               
-                                            </div>
+                                            <textarea rows="3"  maxLength="2000" onInput="contarCaracteres(this);"  id="inputSumarioAltaMedica" name="inputSumarioAltaMedica" class="form-control" placeholder="" ><?php  if (isset($iAtendimentoEfetivacaoAlta )) echo $rowEfetivacao['EnEfASumarioAltaMedica']; ?></textarea>
+                                            <small class="text-muted form-text">Max. 2000 caracteres<span class="caracteresinputSumarioAltaMedica"></span></small>      
                                             
                                         </div>
 
+                                        <div class="col-lg-12 row mt-2">                                     
+                                            <div class="col-lg-3">
+                                                <div class="form-group">
+                                                    <label for="cmbCondicoesPaciente">Condições do Paciente</label>   
+                                                    <select id="cmbCondicoesPaciente" name="cmbCondicoesPaciente" class="select-search" >
+                                                        <option value="">Selecione</option>
+                                                        <option value="DE" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfACondicaoPaciente'] == 'DE' ? 'selected' : '' ) : ''; ?> >Deambulado</option>
+                                                        <option value="CR" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfACondicaoPaciente'] == 'CR' ? 'selected' : '' ) : ''; ?> >Em cadeira de rodas</option>
+                                                        <option value="OU" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfACondicaoPaciente'] == 'OU' ? 'selected' : '' ) : ''; ?> >Outros</option>
+                                                    
+                                                    </select>                                            
+                                                </div>
+                                            </div>                                            
 
-                                        <div class="col-lg-2">
-                                            <div class="form-group">
-                                                <label for="cmbTransferencia">Transferência</label>
-                                                <select id="cmbTransferencia" name="cmbTransferencia" class="select-search" >
-                                                    <option value="">Selecione</option>
-                                                    <option value="I" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATransferencia'] == 'I' ? 'selected' : '' ) : ''; ?> >Interna</option>
-                                                    <option value="E" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATransferencia'] == 'E' ? 'selected' : '' ) : ''; ?> >Externa</option>
-                                                </select>                                               
+                                            <div class="col-lg-5 ">
+                                                <div class="form-group">
+                                                    <label for="cmbDadosProfResponsavel">Dados do Profissional Responsável</label>
+                                                    <select id="cmbDadosProfResponsavel" name="cmbDadosProfResponsavel" class="select-search" >
+                                                        <option value="">Selecione</option>
+                                                        <?php
+                                                            foreach($rowProfissionais as $item){
+                                                                if (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['EnEfAProfissionalResponsavel'] == $item['ProfiId'] ) {
+                                                                    echo "<option value='$item[ProfiId]' selected>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                                } else {
+                                                                    echo "<option value='$item[ProfiId]'>$item[ProfiNome] - $item[profissao] - $item[ProfiCbo]</option>";
+                                                                }                                                          
+                                                            }
+                                                        ?>
+                                                    </select>                                               
+                                                </div>                                                
                                             </div>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label for="cmbLocalTransferencia">Local da Transferência</label>
-                                                <select id="cmbLocalTransferencia" name="cmbLocalTransferencia" class="select-search" >
-                                                    <option value="">Selecione</option>
-                                                    <?php
-                                                        foreach($rowEstabelecimentos as $item){
-                                                            if (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['EnEfALocalTransferencia'] == $item['EstabId'] ) {
-                                                                echo "<option value='$item[EstabId]' selected> $item[EstabNome] </option>";
-                                                            } else {
-                                                                echo "<option value='$item[EstabId]'> $item[EstabNome] </option>";
-                                                            }                                                          
-                                                        }
-                                                    ?>
-                                                </select>                                               
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <div class="form-group">
-                                                <label for="cmbAcompanhante">Acompanhante</label>
-                                                <select id="cmbAcompanhante" name="cmbAcompanhante" class="select-search" >
-                                                    <option value="">Selecione</option>
-                                                    <option value="1" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfAAcompanhante'] == '1' ? 'selected' : '' ) : ''; ?> >Sim</option>
-                                                    <option value="0" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfAAcompanhante'] == '0' ? 'selected' : '' ) : ''; ?> >Não</option>
-                                                </select>                                               
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-5">
-                                            <div class="form-group">
-                                                <label for="inputNomeAcompanhante">Nome do Acompanhante</label>
-                                                <input type="text" class="form-control" name="inputNomeAcompanhante" id="inputNomeAcompanhante" value="<?php echo isset($iAtendimentoEfetivacaoAlta) ? $rowEfetivacao['EnEfAAcompanhanteNome'] : ''; ?>" >                                                                                      
-                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <div class="form-group">
+                                                    <label for="cmbClinica">Clínica</label>    
+                                                    <select id="cmbClinica" name="cmbClinica" class="select-search" >
+                                                        <option value="">Selecione</option>
+                                                        <?php
+                                                            foreach($rowEspecialidadeLeito as $item){
+                                                                if (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['EnEfAClinica'] == $item['EsLeiId'] ) {
+                                                                    echo "<option value='$item[EsLeiId]' selected> $item[EsLeiNome] </option>";
+                                                                } else {
+                                                                    echo "<option value='$item[EsLeiId]'> $item[EsLeiNome] </option>";
+                                                                }                                                          
+                                                            }
+                                                        ?>
+                                                    </select>                                           
+                                                </div>
+                                            </div>                                        
                                         </div>
 
+                                        <div class="col-lg-6 box-inputCondicoesPacienteOutros " style="display: <?php echo isset($iAtendimentoEfetivacaoAlta) ? (( $rowEfetivacao['EnEfACondicaoPaciente'] == 'OU') ? 'block' : 'none') : 'none'; ?>; ">
 
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" name="inputCondicoesPacienteOutros" id="inputCondicoesPacienteOutros" value="<?php echo isset($iAtendimentoEfetivacaoAlta) ? $rowEfetivacao['EnEfAOutros'] : ''; ?>" maxLength="100" placeholder="Descrição Condições do Paciente (Outros)." >                                                                                      
+                                            </div>
+                                    
+                                        </div>
+                                        
+                                        <div class="col-lg-12 row mt-2">
+
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label for="cmbTipoTransporte">Tipo de Transporte</label>    
+                                                    <select id="cmbTipoTransporte" name="cmbTipoTransporte" class="select-search" >
+                                                        <option value="">Selecione</option>
+                                                        <option value="AM" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATipoTransporte'] == 'AM' ? 'selected' : '' ) : ''; ?> >Ambulância</option>
+                                                        <option value="CP" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATipoTransporte'] == 'CP' ? 'selected' : '' ) : ''; ?> >Carro Próprio</option>
+                                                        <option value="OU" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATipoTransporte'] == 'OU' ? 'selected' : '' ) : ''; ?> >Outros</option>            
+                                                    </select>                                           
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-2">
+                                                <div class="form-group">
+                                                    <label for="cmbAcompanhante">Acompanhante</label>
+                                                    <select id="cmbAcompanhante" name="cmbAcompanhante" class="select-search" >
+                                                        <option value="">Selecione</option>
+                                                        <option value="1" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfAAcompanhante'] == '1' ? 'selected' : '' ) : ''; ?> >Sim</option>
+                                                        <option value="0" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfAAcompanhante'] == '0' ? 'selected' : '' ) : ''; ?> >Não</option>
+                                                    </select>                                               
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-5">
+                                                <div class="form-group">
+                                                    <label for="inputNomeAcompanhante">Nome do Acompanhante</label>
+                                                    <input type="text" class="form-control" name="inputNomeAcompanhante" id="inputNomeAcompanhante" value="<?php echo isset($iAtendimentoEfetivacaoAlta) ? $rowEfetivacao['EnEfAAcompanhanteNome'] : ''; ?>" >                                                                                      
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-lg-12 mt-2 box-transferencia" style="display: <?php echo isset($iAtendimentoEfetivacaoAlta) ? (( $rowEfetivacao['TpAltChave'] == 'PORTRANSFERENCIA') ? 'block' : 'none') : 'none'; ?>; ">
+                                            
+                                            <div class="row">
+                                            
+                                                <div class="col-lg-2">
+                                                    <div class="form-group">
+                                                        <label for="cmbTransferencia">Transferência</label>
+                                                        <select id="cmbTransferencia" name="cmbTransferencia" class="select-search" >
+                                                            <option value="">Selecione</option>
+                                                            <option value="I" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATransferencia'] == 'I' ? 'selected' : '' ) : ''; ?> >Interna</option>
+                                                            <option value="E" <?php echo isset($iAtendimentoEfetivacaoAlta) ? ($rowEfetivacao['EnEfATransferencia'] == 'E' ? 'selected' : '' ) : ''; ?> >Externa</option>
+                                                        </select>                                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3">
+                                                    <div class="form-group">
+                                                        <label for="cmbLocalTransferencia">Local da Transferência</label>
+                                                        <select id="cmbLocalTransferencia" name="cmbLocalTransferencia" class="select-search" >
+                                                            <option value="">Selecione</option>
+                                                            <?php
+                                                                foreach($rowEstabelecimentos as $item){
+                                                                    if (isset($iAtendimentoEfetivacaoAlta) && $rowEfetivacao['EnEfALocalTransferencia'] == $item['EstabId'] ) {
+                                                                        echo "<option value='$item[EstabId]' selected> $item[EstabNome] </option>";
+                                                                    } else {
+                                                                        echo "<option value='$item[EstabId]'> $item[EstabNome] </option>";
+                                                                    }                                                          
+                                                                }
+                                                            ?>
+                                                        </select>                                               
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>                                   
+                                        
                                         <div class="col-lg-6">                                              
                                             <label for="inputJustificativaAlta">Justificativa da Alta</label>
                                             <textarea rows="3"  maxLength="500" onInput="contarCaracteres(this);"  id="inputJustificativaAlta" name="inputJustificativaAlta" class="form-control" placeholder="" ><?php  if (isset($iAtendimentoEfetivacaoAlta )) echo $rowEfetivacao['EnEfAJustificativaAlta']; ?></textarea>
@@ -1142,43 +1365,27 @@ if (isset($_POST['inputInicio'])) {
                                         </div>
                                         <div class="col-lg-6">
                                             <label>Procedimento <span class="text-danger">*</span></label>
-                                        </div>
-                                        
+                                        </div>                                        
                                                                                 
                                         <div class="col-lg-6">
                                             <select id="cmbCId10" name="cmbCId10" class="select-search" >
                                                 <option value="">Selecione</option>
-                                                <?php
-                                                $sql = "SELECT Cid10Id,Cid10Capitulo, Cid10Codigo, Cid10Descricao
-                                                            FROM Cid10
-                                                            JOIN Situacao on SituaId = Cid10Status
-                                                            WHERE SituaChave = 'ATIVO'
-                                                            ORDER BY Cid10Codigo ASC";
-                                                $result = $conn->query($sql);
-                                                $rowCid10 = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                foreach ($rowCid10 as $item) {
-                                                    $seleciona = $item['Cid10Id'] == $rowEfetivacao['EnEfACid10'] ? "selected" : "";
-                                                    print('<option value="' . $item['Cid10Id'] . '" ' . $seleciona . '>' . $item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' . '</option>');
-                                                }
+                                                <?php                                               
+                                                    foreach ($rowCid10 as $item) {
+                                                        $seleciona = $item['Cid10Id'] == $rowEfetivacao['EnEfACid10'] ? "selected" : "";
+                                                        print('<option value="' . $item['Cid10Id'] . '" ' . $seleciona . '>' . $item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' . '</option>');
+                                                    }
                                                 ?>
                                             </select>
                                         </div>
                                         <div class="col-lg-6">
                                             <select id="cmbProcedimentoDiagnostico" name="cmbProcedimentoDiagnostico" class="select-search" >
                                                 <option value="">Selecione</option>
-                                                <?php
-                                                $sql = "SELECT SrVenId,SrVenCodigo, SrVenNome
-                                                            FROM ServicoVenda
-                                                            WHERE SrVenUnidade = " . $_SESSION['UnidadeId'] . "
-                                                            ORDER BY SrVenNome ASC";
-                                                $result = $conn->query($sql);
-                                                $row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                foreach ($row as $item) {
-                                                    $seleciona = $item['SrVenId'] == $rowEfetivacao['EnEfAProcedimentoRealizado'] ? "selected" : "";
-                                                    print('<option value="' . $item['SrVenId'] . '" ' . $seleciona . '>' . $item['SrVenCodigo'] . ' - ' . $item['SrVenNome'] . '</option>');
-                                                }
+                                                <?php                                               
+                                                    foreach ($rowProcedimentoDiagnostico as $item) {
+                                                        $seleciona = $item['SrVenId'] == $rowEfetivacao['EnEfAProcedimentoRealizado'] ? "selected" : "";
+                                                        print('<option value="' . $item['SrVenId'] . '" ' . $seleciona . '>' . $item['SrVenCodigo'] . ' - ' . $item['SrVenNome'] . '</option>');
+                                                    }
                                                 ?>
                                             </select>											
                                         </div>
@@ -1187,7 +1394,7 @@ if (isset($_POST['inputInicio'])) {
 
                                 </div>
 
-                                <div class="box-obito" style="display: <?php echo isset($iAtendimentoEfetivacaoAlta) ? (( $rowEfetivacao['EnEfATipoAlta'] == 'AO') ? 'block' : 'none') : 'none'; ?>; " >
+                                <div class="box-obito" style="display: <?php echo isset($iAtendimentoEfetivacaoAlta) ? (( $rowEfetivacao['TpAltChave'] == 'POROBITO') ? 'block' : 'none') : 'none'; ?>; " >
 
                                     <div class="card-header header-elements-inline">
                                         <h3 class="card-title font-weight-bold ">Óbito</h3>  
@@ -1350,7 +1557,7 @@ if (isset($_POST['inputInicio'])) {
                                 </div>
                             </div>
 
-                            <?php if ( isset($iAtendimentoEfetivacaoAlta) && ( $rowEfetivacao['EnEfATipoAlta'] != 'AO' )) { ?>
+                            <?php if ( isset($iAtendimentoEfetivacaoAlta) && ( $rowEfetivacao['TpAltChave'] != 'POROBITO' ) ) { ?>
 
                                 <div class="card">
 
@@ -1430,69 +1637,194 @@ if (isset($_POST['inputInicio'])) {
                                 </div>
 
                             <?php } ?>
+                          
+
                             
-                            <?php if ( isset($iAtendimentoEfetivacaoAlta) && ( $rowEfetivacao['EnEfATipoAlta'] == 'AP' || $rowEfetivacao['EnEfATipoAlta'] == 'AC' )) { ?>
+                            <!--Modal-->
+                            <div id="page-modal-diagnosticoDeEntrada" class="custon-modal">
+                                <div class="custon-modal-container" style="max-width: 1000px">
+                                    <div class="card custon-modal-content">
+                                        <div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+                                            <p class="h5">Diagnóstico de Entrada</p>
+                                            <i id="modal-diagnosticoDeEntrada-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+                                        </div>
+                                        <div class="px-0" style="overflow-y: scroll;">
+                                            <div class="d-flex flex-row">
+                                                <div class="col-lg-12">
+                                                    
+                                                    <div class="card-header header-elements-inline">
+                                                        <h3 class="card-title font-weight-bold ">DIAGNÓSTICO PRINCIPAL</h3>  
+                                                    </div>
 
-                                <div class="card">
+                                                    <div class="card-body">
 
-                                    <div class="card-header header-elements-inline">
-                                        <h3 class="card-title font-weight-bold ">Termo de Consentimento</h3>  
+                                                        <div class="col-lg-12 mb-2 row">
+                                                            <!-- titulos -->
+                                                            <div class="col-lg-6">
+                                                                <label>CID</label>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <label>Procedimento</label>
+                                                            </div>
+                                                            
+                                                            <!-- campos -->										
+                                                            <div class="col-lg-6">
+                                                                <input type="text" class="form-control" value="<?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['Cid10Descricao']; ?>" readonly>
+                                                            </div>
+                                                            <div class="col-lg-6">
+                                                                <input type="text" class="form-control" value="<?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['SrVenNome']; ?>" readonly>									
+                                                            </div>
+
+                                                        </div>
+                                                        
+                                                    </div>
+
+                                                    <div class="card-header header-elements-inline">
+                                                        <h3 class="card-title font-weight-bold ">Anamnese</h3>  
+                                                    </div>
+
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-lg-9">
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group"> 
+                                                                            <a href="#collapse1-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1. Queixa Principal (QP)</h5></a>   
+                                                                            <div class="collapse" id="collapse1-link" >
+                                                                                <div class="mt-3">
+                                                                                    <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);"  id="summernote1" name="txtareaConteudo1" class="form-control" placeholder="" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaQueixaPrincipal']; ?></textarea>
+                                                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote1"></span></small>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group">
+                                                                            <a href="#collapse2-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.1. História da Moléstia Atual (HMA)</h5></a>   
+                                                                            <div class="collapse" id="collapse2-link" >
+                                                                                <div class="mt-3">
+                                                                                    <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote2" name="txtareaConteudo2" class="form-control" placeholder="" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaMolestiaAtual']; ?></textarea>
+                                                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote2"></span></small>
+                                                                                
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group">
+                                                                            <a href="#collapse3-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.2. História Patológica Pregressa</h5></a>   
+                                                                            <div class="collapse" id="collapse3-link" >
+                                                                                <div class="mt-3">
+                                                                                    <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote3" name="txtareaConteudo3" class="form-control" placeholder="" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaPatologicaPregressa']; ?></textarea>
+                                                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote3"></span></small>
+                                                                                
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group">
+                                                                            <a href="#collapse4-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.3. História Familiar</h5></a>   
+                                                                            <div class="collapse" id="collapse4-link" >
+                                                                                <div class="mt-3">
+                                                                                    <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote4" name="txtareaConteudo4" class="form-control" placeholder="" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaFamiliar']; ?></textarea>
+                                                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote4"></span></small>
+                                                                                
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group">
+                                                                            <a href="#collapse5-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1.4. História Sócioeconômica</h5></a>   
+                                                                            <div class="collapse" id="collapse5-link" >
+                                                                                <div class="mt-3">
+                                                                                    <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);" id="summernote5" name="txtareaConteudo5" class="form-control" placeholder="" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHipoteseSocioEconomica']; ?></textarea>
+                                                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote5"></span></small>
+                                                                                
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="form-group">
+                                                                            <a href="#collapse6-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 2. Anamnese (Digitação Livre)</h5></a>   
+                                                                            <div class="collapse" id="collapse6-link" >
+                                                                                <div class="mt-3">
+                                                                                    <textarea rows="5" cols="5" maxLength="1000" onInput="contarCaracteres(this);" id="summernote6" name="txtareaConteudo6" class="form-control" placeholder="" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaDigitacaoLivre']; ?></textarea>
+                                                                                    <small class="text-muted form-text">Max. 1000 caracteres<span class="caracteressummernote6"></span></small>
+                                                                                
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>                                                
+                                                            </div>                                            
+                                                        </div>                                         
+                                                    </div>                                                                                                   
+                                                                                                                                                        
+                                                </div>
+                                            </div>
+
+                                        </div>
                                     </div>
-
-                                    <div class="card-body row"> 
-
-                                        <div class="col-lg-2">
-                                            <div class="form-group">
-                                                <label for="inputDataHoraTC">Data/ Hora</label>
-                                                <input type="datetime-local" class="form-control" name="inputDataHoraTC" id="inputDataHoraTC" >    
-                                            </div>
-                                        </div>
-
-
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label for="inputDescricaoTC">Descrição</label>   
-                                                <input id="inputDescricaoTC" name="inputDescricaoTC" class="form-control" >                                          
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                            <label for=""></label>   
-                                                <input type="file" class="form-control" name="arquivoTermoConsentimento" id="arquivoTermoConsentimento" >
-                                            </div>
-                                        </div>
-
-                                        
-
-                                        <div class="col-lg-1" style="margin-top: 15px;">
-                                            <a class="btn btn-lg btn-principal adicionarTermoConsentimento">
-                                                <i class='icon-plus3' title='Adicionar'></i>
-                                            </a>
-                                        </div>           
-
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <table class="table" id="tblTermoConsentimento">
-                                                <thead>
-                                                    <tr class="bg-slate">
-                                                        <th class="text-left">Item</th>
-                                                        <th class="text-left">Data/ Hora</th>
-                                                        <th class="text-left">Descrição</th>
-                                                        <th class="text-center">Ações</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="dataTermoConsentimento">
-                                                </tbody>
-                                            </table>
-                                        </div>		
-                                    </div>			
-
                                 </div>
+                            </div>
 
-                            <?php } ?>
+                            <!--Modal-->
+                            <div id="page-modal-evolucaoMedica" class="custon-modal">
+                                <div class="custon-modal-container" style="max-width: 1000px">
+                                    <div class="card custon-modal-content">
+                                        <div class="custon-modal-title mb-2" style="background-color: #466d96; color: #ffffff">
+                                            <p class="h5">Evolução Médica</p>
+                                            <i id="modal-evolucaoMedica-x" class="fab-icon-open icon-cross2 p-3" style="cursor: pointer"></i>
+                                        </div>
+                                        <div class="px-0" style="overflow-y: scroll;">
+                                            <div class="d-flex flex-row">
+                                                <div class="col-lg-12">
+                                                                                                        
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <table class="table" id="tblEvolucao">
+                                                                <thead>
+                                                                    <tr class="bg-slate">
+                                                                        <th class="text-left">Item</th>
+                                                                        <th class="text-left">Data/ Hora</th>
+                                                                        <th class="text-left">Justificativa de Lançamento Retroativo</th>
+                                                                        <th class="text-left">Evolução Diária</th>
+                                                                        <th class="text-left">Profissional/ CBO</th>
+                                                                        <th class="text-center">Ações</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="dataEvolucao">
+                                                                </tbody>
+                                                            </table>
+                                                        </div>		
+                                                    </div>
+
+                                                    <form method="post" name="formAnexo" target="print_popup">
+                                                        <input type="hidden" id="idEvolucaoAnexo" name="idEvolucaoAnexo">
+                                                        <input type="hidden" id="inputClienteEvolucao" name="inputClienteEvolucao">
+                                                        <input type="hidden" id="inputAtendimento" name="inputAtendimento">
+                                                    </form> 
+                                                    
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                         </form>
                         <!-- /basic responsive configuration -->
