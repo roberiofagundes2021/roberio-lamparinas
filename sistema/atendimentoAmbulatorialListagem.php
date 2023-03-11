@@ -887,7 +887,7 @@ $acesso = 'ATENDIMENTO';
 											<div class="" style="float: left">
 												Leitos Ocupados:	
 											</div>
-											<div class="form-group text-white text-bold" style="float: left; margin-left: 5px; margin-Top: -5px; height: 30px; width: 30px; background-color:blue; border-radius: 50px; display: flex;justify-content: center;align-items: center;" >
+											<div class="form-group text-white text-bold leitosOcupados" style="float: left; margin-left: 5px; margin-Top: -5px; height: 30px; width: 30px; background-color:blue; border-radius: 50px; display: flex;justify-content: center;align-items: center;" >
 												10
 											</div>
 
@@ -896,7 +896,7 @@ $acesso = 'ATENDIMENTO';
 											<div class="" style="float: left;">
 												Leitos Livres:
 											</div>
-											<div class="form-group text-white text-bold " style="float: right; margin-left: 5px; margin-Top: -5px; height: 30px; width: 30px; background-color:green; border-radius: 50px; display: flex;justify-content: center;align-items: center;" >
+											<div class="form-group text-white text-bold leitosLivres " style="float: right; margin-left: 5px; margin-Top: -5px; height: 30px; width: 30px; background-color:green; border-radius: 50px; display: flex;justify-content: center;align-items: center;" >
 												10
 											</div>
 										</div>
@@ -907,13 +907,15 @@ $acesso = 'ATENDIMENTO';
 											$sql = "SELECT *
 											FROM EspecialidadeLeito
 											JOIN Situacao on SituaId = EsLeiStatus
+											LEFT JOIN EspecialidadeLeitoXClassificacao ON EsLeiId = ELXClEspecialidadeLeito
 											WHERE SituaChave = 'ATIVO' AND EsLeiUnidade = $iUnidade
+											AND ELXClClassificacao = 'A'
 											ORDER BY EsLeiNome ASC" ;
 											$result = $conn->query($sql);
 
 											foreach ($result as $key => $item) {
 												$active = $key == 0 ? 'active' : '';
-												echo "<button type='button' id='pacientes-espera-btn' class=' mr-2 btn-grid2 btn btn-outline-secondary btn-lg " . $active . " ' onclick='mudarGridEspecialidade(`boxEspecialidade". $item['EsLeiId'] . "`)'  >" . $item['EsLeiNome'] . "</button>";
+												echo "<button type='button' id='pacientes-espera-btn' class=' m-1 btn-grid2 btn btn-outline-secondary btn-lg " . $active . " ' onclick='mudarGridEspecialidade(`boxEspecialidade". $item['EsLeiId'] . "`)'  >" . $item['EsLeiNome'] . "</button>";
 											}
 										?>
 									</div>
@@ -922,10 +924,15 @@ $acesso = 'ATENDIMENTO';
 
 								<?php
 
+									$leitosOcupados = 0;
+									$leitosTotais = 0;
+
 									$sql = "SELECT *
 									FROM EspecialidadeLeito
 									JOIN Situacao on SituaId = EsLeiStatus
+									LEFT JOIN EspecialidadeLeitoXClassificacao ON EsLeiId = ELXClEspecialidadeLeito
 									WHERE SituaChave = 'ATIVO' AND EsLeiUnidade = $iUnidade
+									AND ELXClClassificacao = 'A'
 									ORDER BY EsLeiNome ASC" ;
 									$result = $conn->query($sql);
 									
@@ -933,9 +940,13 @@ $acesso = 'ATENDIMENTO';
 							
 										$sql = "SELECT DISTINCT QuartId, QuartNome
 										FROM Quarto
-										JOIN VincularLeito ON VnLeiQuarto = QuartId
-										JOIN Situacao on SituaId = QuartStatus
+										left JOIN VincularLeito ON VnLeiQuarto = QuartId
+										left JOIN Situacao on SituaId = QuartStatus
+										LEFT JOIN EspecialidadeLeito ON EsLeiId = VnLeiEspecialidadeLeito
+										LEFT JOIN EspecialidadeLeitoXClassificacao ON EsLeiId = ELXClEspecialidadeLeito
 										WHERE  SituaChave = 'ATIVO'	AND QuartUnidade = $iUnidade
+										AND ELXClClassificacao = 'A'
+										AND EsLeiId = $item[EsLeiId]
 										ORDER BY QuartNome ASC" ;
 										$resultQuarto = $conn->query($sql);
 
@@ -943,37 +954,89 @@ $acesso = 'ATENDIMENTO';
 
 										echo "<div class='box-especialidade' id='boxEspecialidade" . $item['EsLeiId'] . "' style='display: " . $display . ";'>";
 											
-											foreach($resultQuarto as $itemQuarto){											
+											foreach($resultQuarto as $itemQuarto){	
+								
+												$sql = "SELECT * FROM Leito 
+												LEFT JOIN AtendimentoXLEito ON LeitoId = AtXLeLeito
+												LEFT JOIN Atendimento ON AtendId = AtXLeAtendimento
+												LEFT JOIN Cliente ON ClienId = AtendCliente
+												LEFT JOIN Situacao ON SituaId = AtendSituacao
+												where LeitoQuarto = $itemQuarto[QuartId]";
+												$resultLeitos = $conn->query($sql);
 												
 												echo "<div class='card-header header-elements-inline ' style='margin-bottom: -30px' >
-														<h3 class='card-title' >" . $itemQuarto['QuartNome'] . "</h3>
-														<hr />
-													</div >";
+													<h3 class='card-title' >" . $itemQuarto['QuartNome'] . "</h3>
+													<hr />
+												</div >";
 
 												echo "<hr style='border-color:#aaa;box-sizing:border-box;width:97%;'/>";
 
-												echo "
-												<div class='card-body'>							
-													<div class='card cardLeitos text-center ' style='width: 18rem; '>											
-														<div class='card-header' style='color: white; background-color: #466D96; padding: 5px'>
-															<h3 class=' m-0'>Leito X</h3>
-															<p class='m-0'>Previsão de alta: 10/10/2010</p>
-														</div>
+												echo "<div class='row' >";
 
-														<div class='card-body'>
-															<div class='m-3'><img src='global_assets/images/lamparinas/leito-ocupado.png' alt='Leito ocupado' width='80' height='80'></div>
-															<h4 class='card-title'>ALDO DA SILVA BARBOSA</h4>
-															<p class='card-text mb-1'>Nrº do Registro: 4465</p>
-															<p class='card-text'>Data da Internação: 10/10/2010</p>
-															<button onclick='entrar(88)' type='button' class='btn btn-success btn-sm'>Atender</button>
-														</div>
-													</div>
-												</div>";
+													foreach ($resultLeitos as $key => $item) {
+
+														$leitosTotais += 1;
+														
+														if ($item['SituaChave'] == 'EMOBSERVACAO') {
+
+															$leitosOcupados += 1;
+
+															$data = explode(" ", $item['AtXLeDataHoraInicio'])[0];
+
+															echo " <div class='col-lg-3 col-md-6 col-sm-12' >
+																<div class='card-body'>							
+																	<div class='card cardLeitos text-center ' style='width: 18rem; '>											
+																		<div class='card-header' style='color: white; background-color: #466D96; padding: 5px'>
+																			<h3 class=' m-0'> " . $item['LeitoNome'] . "</h3>
+																			<p class='m-0'>Previsão de alta: --/--/----</p>
+																		</div>
+
+																		<div class='card-body'>
+																			<div class='m-3'><img src='global_assets/images/lamparinas/leito-ocupado.png' alt='Leito ocupado' width='80' height='80'></div>
+																			<h4 class='card-title'>" . $item['ClienNome'] . "</h4>
+																			<p class='card-text mb-1'>Nrº do Registro: " . $item['AtendNumRegistro'] . "</p>
+																			<p class='card-text'>Data da Internação: " . mostraData($data) . "</p>
+																			<button onclick='entrar(" . $item['AtendId'] . ")' type='button' class='btn btn-principal btn-sm'>Entrar</button>
+																		</div>
+																	</div>
+																</div>
+															</div> ";
+
+														} else {
+
+															echo "<div class='col-lg-3 col-md-6 col-sm-12' >
+																<div class='card-body'>							
+																	<div class='card cardLeitos text-center ' style='width: 18rem; '>											
+																		<div class='card-header' style='color: white; background-color: #466D96; padding: 5px'>
+																			<h3 class=' m-0'> " . $item['LeitoNome'] . "</h3>
+																			<p class='m-0'>Previsão de alta: --/--/----</p>
+																		</div>
+
+																		<div class='card-body'>
+																			<div class='m-3'><img src='global_assets/images/lamparinas/leito-vazio.png' alt='Leito vazio' width='80' height='80'></div>
+																			<h4 class='card-title'>LEITO VAZIO</h4>
+																			<p class='card-text mb-1'>Nrº do Registro: ----</p>
+																			<p class='card-text'>Data da Internação: --/--/----</p>
+																			<button type='button' class='btn btn-sm' disabled >Entrar</button>
+																		</div>
+																	</div>
+																</div>
+															</div> ";
+														}
+
+													}
+
+												echo "</div>";												
 												
 											}
 
 										echo "</div>";
 									}
+
+									echo "<script>
+										$('.leitosOcupados').html(" . $leitosOcupados . ");
+										$('.leitosLivres').html(" . ( $leitosTotais - $leitosOcupados) . ");
+									</script>";
 
 								?>
 
