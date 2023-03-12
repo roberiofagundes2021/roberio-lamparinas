@@ -1872,13 +1872,19 @@ try{
 			$numRegistro = "A$mes-$intaValCodigo";
 			
 			$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,
-			AtendCliente,AtendModalidade,AtendResponsavel,AtendClassificacao,AtendClassificacaoRisco,
-			AtendServico,AtendProfissional,AtendHorario,AtendLocal,AtendValor,AtendDesconto,AtendObservacao,
-			AtendSituacao,AtendUsuarioAtualizador,AtendUnidade)
+				AtendCliente,AtendModalidade,AtendResponsavel,AtendClassificacao,AtendClassificacaoRisco,
+				AtendServico,AtendProfissional,AtendHorario,AtendLocal,AtendValor,AtendDesconto,AtendObservacao,
+				AtendSituacao,AtendUsuarioAtualizador,AtendUnidade)
 				VALUES('$numRegistro','$dataRegistro',$cliente[id],$modalidade,'$idResponsavel',$classificacao,
 				$classificacaoRisco,$servico,$medico,'$horaAtendimento',$localAtendimento,$valor,$desconto,
 				'$observacao',$situacao,$usuarioId,$iUnidade)";
 			$conn->query($sql);
+
+			if($tipo == 'AGENDAMENTO'){
+				$lestAtendimentoId = $conn->lastInsertId();
+				$sql = "UPDATE Agendamento SET AgendAtendimento = $lestAtendimentoId WHERE AgendId = $id";
+				$conn->query($sql);
+			}
 		}elseif($tipo == 'ATENDIMENTO' && $status == 'EDITA'){
 			$sql = "UPDATE Atendimento SET
 				AtendDataRegistro = '$dataRegistro',
