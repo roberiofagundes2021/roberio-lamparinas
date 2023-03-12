@@ -27,9 +27,9 @@ if(isset($_POST['inputData'])){
 		$sNumero = str_pad($sNumero,6,"0",STR_PAD_LEFT);
 			
 		$sql = "INSERT INTO Orcamento (OrcamNumero, OrcamTipo, OrcamData, OrcamCategoria, OrcamConteudo, OrcamFornecedor,
-									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamUnidade)
+									   OrcamSolicitante, OrcamStatus, OrcamUsuarioAtualizador, OrcamUnidade, OrcamEmpresa)
 				VALUES (:sNumero, :sTipo, :dData, :iCategoria,:sConteudo, :iFornecedor, :iSolicitante, 
-						:bStatus, :iUsuarioAtualizador, :iUnidade)";
+						:bStatus, :iUsuarioAtualizador, :iUnidade, :iEmpresa)";
 		$result = $conn->prepare($sql);
 		
 		$aFornecedor = explode("#",$_POST['cmbFornecedor']);
@@ -46,7 +46,8 @@ if(isset($_POST['inputData'])){
 						':iSolicitante' => $_SESSION['UsuarId'],
 						':bStatus' => 1,
 						':iUsuarioAtualizador' => $_SESSION['UsuarId'],
-						':iUnidade' => $_SESSION['UnidadeId']
+						':iUnidade' => $_SESSION['UnidadeId'],
+						':iEmpresa' => $_SESSION['EmpreId']
 						));
 		$insertId = $conn->lastInsertId(); 
 
