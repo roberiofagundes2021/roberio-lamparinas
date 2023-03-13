@@ -117,7 +117,13 @@
   
   // $empresa = $parametro['ParamEmpresaPublica'] ? 'Publica' : 'Privada';
 ?>
-
+<head>
+  <style>
+		.recuar{
+			padding-left: 36px !important;
+		}
+	</style>
+</head>
 <!-- Main sidebar -->
 <div class="sidebar sidebar-dark sidebar-main sidebar-expand-md">
 
@@ -236,9 +242,9 @@
                           // ele abrirá em uma nova aba
 
                           if($men_f['MenuSubMenu'] == 1) {
-                            $classF = basename($_SERVER['PHP_SELF']) == $men_f['MenuUrl']?" class='nav-link active'":" class='nav-link'";
+                            $classF = basename($_SERVER['PHP_SELF']) == $men_f['MenuUrl']?" class='nav-link active recuar'":" class='nav-link recuar'";
                             echo (($men_f['MenuSubMenu'] == 1) ? '<li class="nav-item nav-item-submenu">':'<li class="nav-item">').
-                            "<a href='$men_f[MenuUrl]' $class >
+                            "<a href='$men_f[MenuUrl]' $classF >
                             <i class='$men_f[MenuIco]'></i>
                               <span>$men_f[MenuNome]</span>
                             </a>";

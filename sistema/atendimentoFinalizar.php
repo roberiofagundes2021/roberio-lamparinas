@@ -260,7 +260,7 @@ if(isset($_POST['conduta'])){
 
 									<div class="col-lg-12 row mb-3">
 										<div class="col-lg-12">
-											<label>conduta <span class="text-danger">*</span></label>
+											<label>Conduta <span class="text-danger">*</span></label>
 										</div>
 										<div class="col-lg-6">
 											<select id="conduta" name="conduta" class="select-search" required>

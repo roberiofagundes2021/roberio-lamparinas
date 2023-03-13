@@ -1872,13 +1872,19 @@ try{
 			$numRegistro = "A$mes-$intaValCodigo";
 			
 			$sql = "INSERT INTO Atendimento(AtendNumRegistro,AtendDataRegistro,
-			AtendCliente,AtendModalidade,AtendResponsavel,AtendClassificacao,AtendClassificacaoRisco,
-			AtendServico,AtendProfissional,AtendHorario,AtendLocal,AtendValor,AtendDesconto,AtendObservacao,
-			AtendSituacao,AtendUsuarioAtualizador,AtendUnidade)
+				AtendCliente,AtendModalidade,AtendResponsavel,AtendClassificacao,AtendClassificacaoRisco,
+				AtendServico,AtendProfissional,AtendHorario,AtendLocal,AtendValor,AtendDesconto,AtendObservacao,
+				AtendSituacao,AtendUsuarioAtualizador,AtendUnidade)
 				VALUES('$numRegistro','$dataRegistro',$cliente[id],$modalidade,'$idResponsavel',$classificacao,
 				$classificacaoRisco,$servico,$medico,'$horaAtendimento',$localAtendimento,$valor,$desconto,
 				'$observacao',$situacao,$usuarioId,$iUnidade)";
 			$conn->query($sql);
+
+			if($tipo == 'AGENDAMENTO'){
+				$lestAtendimentoId = $conn->lastInsertId();
+				$sql = "UPDATE Agendamento SET AgendAtendimento = $lestAtendimentoId WHERE AgendId = $id";
+				$conn->query($sql);
+			}
 		}elseif($tipo == 'ATENDIMENTO' && $status == 'EDITA'){
 			$sql = "UPDATE Atendimento SET
 				AtendDataRegistro = '$dataRegistro',
@@ -3785,28 +3791,32 @@ try{
 	} elseif ($tipoRequest == 'GETORIENTACOESALTA') {
 
 		$ideEfetivacao = $_POST['ideEfetivacao'] == "" ? null : $_POST['ideEfetivacao'];
-	
-		$sql = "SELECT * FROM EnfermagemEfetivacaoAltaOrientacao
-				WHERE EnEAOEfetivacaoAlta = $ideEfetivacao";
-
-		$result = $conn->query($sql);
-		$orientacoes = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$array = [];
 
-		foreach($orientacoes as $key => $item){
+		if ($ideEfetivacao) {
 
-			$dataHora = explode(" ", $item['EnEAODataHora']);
+			$sql = "SELECT * FROM EnfermagemEfetivacaoAltaOrientacao
+				WHERE EnEAOEfetivacaoAlta = $ideEfetivacao";
 
-			array_push($array,[
-				'item' => ($key + 1),
-				'id'=>$item['EnEAOId'],
-				'dataHora'=> mostraData($dataHora[0]) . ' ' . mostraHora($dataHora[1]),
-				'orientacao' => $item['EnEAOOrientacao'],
-				'editavel' => $item['EnEAOEditavel']
-			]);
+			$result = $conn->query($sql);
+			$orientacoes = $result->fetchAll(PDO::FETCH_ASSOC);
+
+			foreach($orientacoes as $key => $item){
+
+				$dataHora = explode(" ", $item['EnEAODataHora']);
+
+				array_push($array,[
+					'item' => ($key + 1),
+					'id'=>$item['EnEAOId'],
+					'dataHora'=> mostraData($dataHora[0]) . ' ' . mostraHora($dataHora[1]),
+					'orientacao' => $item['EnEAOOrientacao'],
+					'editavel' => $item['EnEAOEditavel']
+				]);
+			}
+			
 		}
-		
+	
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'GETORIENTACAOALTA') {
 		
@@ -3956,6 +3966,36 @@ try{
 			echo false;
 		}
 		
+	} elseif ($tipoRequest == 'GETMOTIVOALTA') {
+
+		$valorSelecionado = $_POST['valorSelecionado'];
+
+		$sql = "SELECT TpAltId 
+		FROM TipoAlta
+		JOIN Situacao on SituaId = TpAltStatus
+		WHERE TpAltChave = '$valorSelecionado'
+		AND SituaChave = 'ATIVO'";
+		$result = $conn->query($sql);
+		$idTipoAlta = $result->fetch(PDO::FETCH_ASSOC);
+
+		$sql = "SELECT MtAltId, MtAltNome
+		FROM MotivoAlta
+		JOIN Situacao on SituaId = MtAltStatus
+		WHERE MtAltTipoAlta = '$idTipoAlta[TpAltId]'
+		AND SituaChave = 'ATIVO'";
+		$result = $conn->query($sql);
+		$row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+		$array = [];
+
+		foreach($row as $key => $item){
+			array_push($array,[
+				'id' => $item['MtAltId'],
+				'nomeMotivo' => $item['MtAltNome'],				
+			]);
+		}
+		
+		echo json_encode($array);
 	}
 
 }catch(PDOException $e) {

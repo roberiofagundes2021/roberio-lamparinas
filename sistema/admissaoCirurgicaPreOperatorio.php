@@ -1520,13 +1520,13 @@ if(isset($_POST['inputInicio'])){
                                                 <div class="col-lg-12">
                                                     <form id="novoConsentimento" name="novoConsentimento" method="POST" class="form-validate-jquery">
                                                         <!-- linha 1 -->
-                                                        <div class="col-lg-12 m-0 p-0 mb-3 row">
+                                                        <div class="col-lg-12 mt-2 m-0 p-0 mb-3 row">
                                                             <!-- titulos -->
                                                             <div class="col-lg-3">
                                                                 <label>Data/Hora</label>
                                                             </div>
                                                             <div class="col-lg-5">
-                                                                <label>Desclição</label>
+                                                                <label>Descrição</label>
                                                             </div>
                                                             <div class="col-lg-3">
                                                                 <label>Arquivo</label>
@@ -1589,7 +1589,7 @@ if(isset($_POST['inputInicio'])){
                                                 <div class="col-lg-12">
                                                     <form id="novoExamesComplementares" name="novoExamesComplementares" method="POST" class="form-validate-jquery">
                                                         <!-- linha 1 -->
-                                                        <div class="col-lg-12 m-0 p-0 mb-3 row">
+                                                        <div class="col-lg-12 mt-2 p-0 mb-3 row">
                                                             <!-- titulos -->
                                                             <div class="col-lg-3">
                                                                 <label>Data/Hora</label>
