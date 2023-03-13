@@ -60,6 +60,7 @@
 					case 'anotacaoTransOperatoria': URL = 'anotacaoTransOperatoria.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'admissaoRN': URL = 'admissaoRecemNascido.php'; $('#dadosPost').attr('target', '_self'); break;
 					case 'admissaoPreParto': URL = 'atendimentoAdmissaoPreParto.php'; $('#dadosPost').attr('target', '_self'); break;
+					case 'provisaoAlta': URL = 'atendimentoProvisaoAlta.php'; $('#dadosPost').attr('target', '_self'); break;
 					default: URL = ''; console.log(tipo); return; break;
 				}
 				$('#dadosPost').attr('action', URL)
@@ -138,6 +139,9 @@
 									</li>
 									<li class="nav-item">
 										<a href="#" class="nav-link itemLink" data-tipo='admissaoRN'><i class="icon-certificate"></i> Admissão de RN</a>
+									</li>
+									<li class="nav-item">
+										<a href="#" class="nav-link itemLink" data-tipo='provisaoAlta'><i class="icon-certificate"></i> Provisão de Alta</a>
 									</li>
 								</ul>
 							</li>
@@ -341,6 +345,9 @@
 								</li>
 								<li class="nav-item">
 									<a href="#" class="nav-link itemLink" data-tipo='admissaoRN'><i class="icon-certificate"></i> Admissão de RN</a>
+								</li>
+								<li class="nav-item">
+									<a href="#" class="nav-link itemLink" data-tipo='provisaoAlta'><i class="icon-certificate"></i> Provisão de Alta</a>
 								</li>
 							</ul>
 						</li>
