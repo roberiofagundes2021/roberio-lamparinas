@@ -254,7 +254,7 @@ try {
 
 		$iAtendimento = $_POST['id'];
 	
-		$sql = "SELECT AtEDiId, AtEDiDataInicio, AtEDiHoraInicio, AtEDiEvolucaoDiaria, AtEDiEditavel , Profissional.ProfiNome, Profissao.ProfiCbo
+		$sql = "SELECT AtEDiId, AtEDiDataInicio, AtEDiHoraInicio, AtEDiEvolucaoDiaria, AtEDiEditavel , Profissional.ProfiNome as ProfissionalNome, Profissao.ProfiCbo, Profissao.ProfiNome as ProfissaoNome
 			FROM AtendimentoEvolucaoDiaria
 			LEFT JOIN Usuario ON AtEDiProfissional = UsuarId
 			LEFT JOIN Profissional ON ProfiUsuario = UsuarId
@@ -275,7 +275,7 @@ try {
 				'dataHora'=> mostraData($item['AtEDiDataInicio']) . ' ' . mostraHora($item['AtEDiHoraInicio']),
 				'evolucao'=> substr($item['AtEDiEvolucaoDiaria'], 0, 100) . '...',
 				'evolucaoCompl' => $item['AtEDiEvolucaoDiaria'],
-				'profissionalCbo' => $item['ProfiNome'] . ' / ' . $item['ProfiCbo']
+				'profissionalCbo' => $item['ProfissionalNome'] . ' / ' . $item['ProfissaoNome']
 			]);
 		}
 		

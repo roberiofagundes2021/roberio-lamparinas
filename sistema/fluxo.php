@@ -6,11 +6,11 @@ include_once("sessao.php");
 
 $_SESSION['PaginaAtual'] = 'Fluxo Operacional';
 
-include('global_assets/php/conexao.php');
+include('global_assets/php/conexao.php'); 
 
 $sql = "SELECT DISTINCT FlOpeId, ForneRazaoSocial, FlOpeCategoria, FlOpeDataInicio, FlOpeDataFim, 
 		FlOpeNumContrato, FlOpeValor, FlOpeStatus, CategNome, SituaChave, 
-		SituaNome, SituaCor, dbo.fnSubCategoriasFluxo(FlOpeUnidade, FlOpeId) as SubCategorias, 
+		SituaNome, SituaCor, dbo.fnSubCategoriasFluxo(FlOpeEmpresa, FlOpeId) as SubCategorias, 
 		dbo.fnFluxoFechado(FlOpeId, FlOpeUnidade) as FluxoFechado, BandeMotivo,
 		dbo.fnFimContrato(FlOpeId) as FimContrato
 		FROM FluxoOperacional
