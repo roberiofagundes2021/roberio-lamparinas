@@ -2,8 +2,6 @@
 
 include_once("sessao.php"); 
 
-$_SESSION['PaginaAtual'] = 'Ordem de Compra';
-
 include('global_assets/php/conexao.php');
 
 $tipoRequest = isset($_POST['tipoRequest'])?$_POST['tipoRequest']:'';
@@ -13,7 +11,7 @@ try{
 	$usuarioId = $_SESSION['UsuarId'];
 
 	if($tipoRequest == 'AGENDAMENTOS'){
-		$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,AgendModalidade,
+		$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHoraInicio,AgendHoraFim,AtModNome,AgendModalidade,
 		AgendClienteResponsavel,AgendAtendimentoLocal,AtLocId,AgendServico,AgendObservacao,
 		C.ClienNome as ClienNome,C.ClienId as ClienId,C.ClienCelular as ClienCelular,C.ClienTelefone as ClienTelefone,C.ClienEmail as ClienEmail,C.ClienDtNascimento as ClienDtNascimento,C.ClienCodigo as ClienCodigo,
 		CR.ClienNome as RespoNome,CR.ClienId as RespoId,CR.ClienCelular as RespoCelular,CR.ClienTelefone as RespoTelefone,CR.ClienEmail as RespoEmail,CR.ClienDtNascimento as RespoDtNascimento,CR.ClienCodigo as RespoCodigo,
@@ -33,8 +31,8 @@ try{
 		if(isset($_POST['status']) && $_POST['status']){
 			$sql .= " AND SituaId = $_POST[status]";
 		}
-		if(isset($_POST['recepcao']) && $_POST['recepcao']){
-			// $sql .= " AND SituaId = $_POST[recepcao]";
+		if(isset($_POST['local']) && $_POST['local']){
+			$sql .= " AND AtLocId = $_POST[local]";
 		}
 
 		$prof = "(null)";
@@ -60,8 +58,9 @@ try{
 				'status' => 'ATT',
 				'registro' => $item['AgendDataRegistro'],
 				'data' => $item['AgendData'],
-				'hora' => $item['AgendHorario'],
-				'servico' => $item['AgendServico'],
+				'horaInicio' => $item['AgendHoraInicio'],
+				'horaFim' => $item['AgendHoraFim']?$item['AgendHoraFim']:'',
+				'servico' => $item['AgendServico']?$item['AgendServico']:'',
 				'observacao' => $item['AgendObservacao'],
 
 				'servico' => [
@@ -109,20 +108,23 @@ try{
 		$type = $_POST['type'];
 
 		if($type == 'AGENDAMENTO'){
-			$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendProfissional,AgendHorario,AgendModalidade,
-				AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,AgendCliente, AgendObservacao,AgendSituacao
+			$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendProfissional,AgendHoraInicio,AgendHoraFim,
+				AgendModalidade,AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,AgendCliente,
+				AgendObservacao,AgendSituacao
 				FROM Agendamento
 				WHERE AgendId = $id AND AgendUnidade = $iUnidade";
 			$result = $conn->query($sql);
 			$rowAgendamento = $result->fetch(PDO::FETCH_ASSOC);
 	
-			$hora = explode(':',$rowAgendamento['AgendHorario']);
+			$horaI = explode(':',$rowAgendamento['AgendHoraInicio']);
+			$horaF = $rowAgendamento['AgendHoraFim']?explode(':',$rowAgendamento['AgendHoraFim']):'';
 			
 			echo json_encode([
 				'id' => $rowAgendamento['AgendId'],
 				'registro' => $rowAgendamento['AgendDataRegistro'],
 				'data' => $rowAgendamento['AgendData'],
-				'hora' => "$hora[0]:$hora[1]",
+				'horaInicio' => "$horaI[0]:$horaI[1]",
+				'horaFim' => $horaF?"$horaF[0]:$horaF[1]":'',
 				'servico' => $rowAgendamento['AgendServico'],
 				'observacao' => $rowAgendamento['AgendObservacao'],
 				'status' => 'ATT',
@@ -271,20 +273,22 @@ try{
 
 				$dt = explode(' ',$bloqueio['AgBloDataHoraInicio'])[0];
 				$hr = explode(' ',$bloqueio['AgBloDataHoraInicio'])[1];
+				$quantidade = $bloqueio['AgBloRecorrenteQuantidade']?intval($bloqueio['AgBloRecorrenteQuantidade']):0;
 
 				// se o bloqueio for recorrente...
-				if($bloqueio['AgBloRecorrenteQuantidade']){
+				if($quantidade){
 					$data = date_create($dt); // pegando a data de início como objeto date...
+					$repeticao = $bloqueio['AgBloRecorrenteRepeticao']; // 1S/2S/3S...
 
 					// define as datas de acordo à repetição
-					if($bloqueio['AgBloRecorrenteRepeticao'][1]=="S"){// se for semanal "S"...
+					if($repeticao[1]=="S"){// se for semanal "S"...
 						$firstWeeK = true;
-						for($x=0; $x < intval($bloqueio['AgBloRecorrenteQuantidade']); $x++){
+						for($x=0; $x < $quantidade; $x++){
 							$dateLoop = date_create(date_format($data,"Y-m-d"));
 							$first = true;
 							$notfound = true;
 
-							while(date_format($dateLoop,"D") != 'Sun' || $first){
+							while(date_format($dateLoop,"D") != 'Sat' || $first){
 								$first = false;
 								if(in_array(date_format($dateLoop,"D"),$arrayDays)){
 									array_push($arrayDatasRecorrente, [
@@ -298,19 +302,15 @@ try{
 
 							$x = $notfound?$x-1:$x;
 
-							$days = $firstWeeK?0:((intval($bloqueio['AgBloRecorrenteRepeticao'][0]))*7);
-							// $days = intval($bloqueio['AgBloRecorrenteRepeticao'][0])*7;
-
-							// faz com que $data chegue até o sábado para iniciar a verificação em outra semana
-
-							while(date_format($data,"D") != 'Sun'){
-								$data = $data->modify("+1 Day");
+							$d = intval($repeticao[0]);
+							for($y=0; $y < $d; $y++){
+								while($data->format('D') != 'Sat' || $firstWeeK){
+									$data = $data->modify("+1 day");
+									$firstWeeK = false;
+								}
+								$data = $data->modify("+1 day");
 							}
-							$data = $data->modify("+$days Day");
-							$firstWeeK = false;
 						}
-						// echo json_encode($arrayDebug);
-						// exit;
 					}
 				}else{
 					$dtF = explode(' ',$bloqueio['AgBloDataHoraFim'])[0];
@@ -362,7 +362,8 @@ try{
 	} elseif($tipoRequest == 'ADDAGENDAMENTO'){
 		$registro = date('Y-m-d');
 		$data = $_POST['data'];
-		$hora = $_POST['hora'];
+		$horaI = $_POST['horaI'];
+		$horaF = $_POST['horaF'];
 		$paciente = $_POST['paciente'];
 		$modalidade = $_POST['modalidade'];
 		$servico = $_POST['servico'];
@@ -372,8 +373,10 @@ try{
 		$cmbSituacao = $_POST['situacao'];
 		$isUpdate = $_POST['idAgendamento'];
 
-		if($isUpdate){
+		// $lembrete = $recorrente?$_POST['lembrete']:'';
+		// $dias = $recorrente?$_POST['dias']:1;
 
+		if($isUpdate){
 			if($data < date('Y-m-d') || ($data == date('Y-m-d') && $hora < date('H:i'))){
 				$sql = "UPDATE Agendamento SET
 					AgendSituacao = $cmbSituacao,
@@ -386,7 +389,8 @@ try{
 					AgendServico = $servico, 
 					AgendProfissional = $profissional,
 					AgendData = '$data',
-					AgendHorario = '$hora',
+					AgendHoraInicio = '$horaI',
+					AgendHoraFim = '$horaF',
 					AgendAtendimentoLocal = $local,
 					AgendObservacao = '$observacao',
 					AgendSituacao = $cmbSituacao,
@@ -409,12 +413,16 @@ try{
 					'menssagem' => 'Agendamento com data retroativa!!!'
 				]);
 			}
-			$sql = "INSERT INTO Agendamento(AgendDataRegistro,AgendCliente,AgendModalidade,
-			AgendServico,AgendProfissional,AgendData,AgendHorario,AgendAtendimentoLocal,
-			AgendObservacao,AgendSituacao,AgendUnidade,AgendUsuarioAtualizador)
-			VALUES ('$registro','$paciente','$modalidade','$servico','$profissional','$data','$hora',
-			'$local','$observacao','$cmbSituacao','$iUnidade','$usuarioId')";
-			$result = $conn->query($sql);
+
+			foreach($data as $dt){
+				$sql = "INSERT INTO Agendamento(AgendDataRegistro,AgendCliente,AgendModalidade,
+					AgendServico,AgendProfissional,AgendData,AgendHoraInicio,AgendHoraFim,AgendAtendimentoLocal,
+					AgendObservacao,AgendSituacao,AgendUnidade,AgendUsuarioAtualizador)
+					VALUES ('$registro','$paciente','$modalidade','$servico','$profissional','$dt','$horaI','$horaF',
+					'$local','$observacao','$cmbSituacao','$iUnidade','$usuarioId')";
+				$result = $conn->query($sql);
+			}
+
 
 			echo json_encode([
 				'titulo' => 'Incluir agendamento',
@@ -440,9 +448,9 @@ try{
 			]);
 		}else{
 			$sql = "INSERT INTO Agendamento(AgendDataRegistro,AgendCliente,AgendModalidade,
-			AgendServico,AgendProfissional,AgendData,AgendHorario,AgendAtendimentoLocal,
+			AgendServico,AgendProfissional,AgendData,AgendHoraInicio,AgendHoraFim,AgendAtendimentoLocal,
 			AgendObservacao,AgendSituacao,AgendUnidade,AgendUsuarioAtualizador)
-			VALUES ('$registro','$paciente','$modalidade','$servico','$profissional','$data','$hora',
+			VALUES ('$registro','$paciente','$modalidade','$servico','$profissional','$data','$horaI','$horaF',
 			'$local','$observacao','$cmbSituacao','$iUnidade','$usuarioId')";
 			$result = $conn->query($sql);
 
@@ -552,11 +560,13 @@ try{
 	} elseif($tipoRequest == 'UPDATEDATA'){
 		$id = $_POST['id'];
 		$data = $_POST['data'];
-		$hora = $_POST['hora'];
+		$horaI = $_POST['horaI'];
+		$horaF = isset($_POST['horaF'])?$_POST['horaF']:'';
 
 		$sql = "UPDATE Agendamento SET
 			AgendData = '$data',
-			AgendHorario = '$hora'
+			AgendHoraInicio = '$horaI',
+			AgendHoraFim = '$horaF'
 			WHERE AgendId = $id";
 		$conn->query($sql);
 
@@ -704,7 +714,7 @@ try{
 			'menssagem' => 'Agendamento excluido com sucesso!!!',
 		]);
 	} elseif($tipoRequest == 'GETCONFIG'){
-		$array = [];
+		$obj = [];
 
 		$sql = "SELECT AgFUnId,AgFUnSegunda,AgFUnTerca,AgFUnQuarta,AgFUnQuinta,AgFUnSexta,AgFUnSabado,AgFUnDomingo,AgFUnObservacao,
 		AgFUnHorarioAbertura,AgFUnHorarioFechamento,AgFUnHorarioAlmocoInicio,AgFUnHorarioAlmocoFim,AgFUnIntervaloAgenda
@@ -713,7 +723,7 @@ try{
 		$rowConfig = $result->fetch(PDO::FETCH_ASSOC);
 
 		if($rowConfig){
-			$array = [
+			$obj = [
 				'id' => $rowConfig['AgFUnId'],
 				'segunda' => $rowConfig['AgFUnSegunda'],
 				'terca' => $rowConfig['AgFUnTerca'],
@@ -731,10 +741,11 @@ try{
 			];
 		}
 
-		echo json_encode($array);
+		echo json_encode($obj);
 	} elseif($tipoRequest == 'CHECKAGENDAUNIDADE'){
 		$data = $_POST['data'];
-		$hora = isset($_POST['hora'])?$_POST['hora']:false;
+		$horaI = isset($_POST['horaI'])?$_POST['horaI']:false;
+		$horaF = isset($_POST['horaF'])?$_POST['horaF']:false;
 
 		$diaAtual = date_create($data);
 		$diaAtual = date_format($diaAtual,"D");
@@ -757,14 +768,14 @@ try{
 		$config = $result->fetch(PDO::FETCH_ASSOC);
 
 		if(($config[$diaAtual])){
-			if($hora){
+			if($horaI && $horaF){
 				$abertura = explode('.',$config['AgFUnHorarioAbertura'])[0];
 				$fechamento = explode('.',$config['AgFUnHorarioFechamento'])[0];
 				$almoçoI = explode('.',$config['AgFUnHorarioAlmocoInicio'])[0];
 				$almoçoF = explode('.',$config['AgFUnHorarioAlmocoFim'])[0];
 	
-				if($hora >= $abertura && $hora < $fechamento){
-					if($hora >= $almoçoI && $hora < $almoçoF){
+				if($horaI >= $abertura && $horaI < $fechamento && $horaI >= $abertura && $horaI < $fechamento){
+					if($horaI >= $almoçoI && $horaI < $almoçoF && $horaF >= $almoçoI && $horaF < $almoçoF){
 						echo json_encode([
 							'titulo' => 'Agendamento',
 							'tipo' => 'error',
@@ -878,6 +889,147 @@ try{
 			'titulo' => 'Excluir Bloqueio',
 			'status' => 'success',
 			'menssagem' => 'Bloqueio excluido com sucesso!!!'
+		]);
+	} elseif($tipoRequest == 'GETRECORRENCIA'){
+		if(!intval($_POST['recorrente'])){
+			$dateBase = date_create($data);
+			echo json_encode([
+				'status' => 'success',
+				'datas' => [$dateBase->format('Y-m-d')]
+			]);
+			exit;
+		}
+		$data = $_POST['data'];
+		$horaI = $_POST['horaI'];
+		$horaF = $_POST['horaF'];
+
+		$repeticao = $_POST['repeticaoAgendamento'];
+		$quantidade = $_POST['quantidadeRecorrenciaAgendamento'];
+		$segunda = $_POST['segunda'];
+		$terca = $_POST['terca'];
+		$quarta = $_POST['quarta'];
+		$quinta = $_POST['quinta'];
+		$sexta = $_POST['sexta'];
+		$sabado = $_POST['sabado'];
+		$domingo = $_POST['domingo'];
+		$quantidade = $quantidade<=0?1:$quantidade;
+		$profissional = $_POST['profissional'];
+
+		$datasSelect = [];
+		{
+			if($segunda){
+				array_push($datasSelect,'Mon'); //Segunda
+			}if($terca){
+				array_push($datasSelect,'Tue'); //Terça
+			}if($quarta){
+				array_push($datasSelect,'Wed'); //Quarta
+			}if($quinta){
+				array_push($datasSelect,'Thu'); //Quinta
+			}if($sexta){
+				array_push($datasSelect,'Fri'); //Sexta
+			}if($sabado){
+				array_push($datasSelect,'Sat'); //Sábado
+			}if($domingo){
+				array_push($datasSelect,'Sun'); //Domingo
+			}
+		}
+
+		if(!COUNT($datasSelect)){
+			echo json_encode([
+				'titulo' => 'Campo obrigatório',
+				'status' => 'error',
+				'menssagem' => "Informe pelo menos 1 dia da semana!!"
+			]);
+			exit;
+		}
+
+		// vai servir para verificar se a data é válida
+		$sql = "SELECT AgFUnId,AgFUnSegunda,AgFUnTerca,AgFUnQuarta,AgFUnQuinta,AgFUnSexta,AgFUnSabado,AgFUnDomingo,AgFUnObservacao,
+		AgFUnHorarioAbertura,AgFUnHorarioFechamento,AgFUnHorarioAlmocoInicio,AgFUnHorarioAlmocoFim,AgFUnIntervaloAgenda
+		FROM AgendamentoFuncionamentoUnidade WHERE AgFUnUnidade = $iUnidade";
+		$result = $conn->query($sql);
+		$rowConfig = $result->fetch(PDO::FETCH_ASSOC);
+
+		$arrayDays = [];
+		{
+			if(!$rowConfig['AgFUnSegunda']){
+				array_push($arrayDays,'Mon'); //Segunda
+			}if(!$rowConfig['AgFUnTerca']){
+				array_push($arrayDays,'Tue'); //Terça
+			}if(!$rowConfig['AgFUnQuarta']){
+				array_push($arrayDays,'Wed'); //Quarta
+			}if(!$rowConfig['AgFUnQuinta']){
+				array_push($arrayDays,'Thu'); //Quinta
+			}if(!$rowConfig['AgFUnSexta']){
+				array_push($arrayDays,'Fri'); //Sexta
+			}if(!$rowConfig['AgFUnSabado']){
+				array_push($arrayDays,'Sat'); //Sábado
+			}if(!$rowConfig['AgFUnDomingo']){
+				array_push($arrayDays,'Sun'); //Domingo
+			}
+		}
+
+		// loop para verificar disponibilidade das datas de acordo funcionamento da unidade
+		$dateBase = date_create($data);
+		$datasRecorrentes = [];
+		$first = true;
+		$firstWeeK = true;
+
+		for($x=0; $x < intval($quantidade); $x++){
+			$dayCount = false;
+			$dateLoop = $dateBase;
+
+			while($dateLoop->format('D') != 'Sat'){
+				// se o dia em questão estiver sido marcado como dia para agendar...
+				if(in_array($dateLoop->format('D'), $datasSelect)){
+					$dateLoop = $dateLoop->format('Y-m-d');
+
+					$sql = "SELECT AgendId FROM Agendamento WHERE AgendData = '$dateLoop' and
+						AgendHoraInicio <= '$horaI' and AgendHoraFim >= '$horaF' and
+						AgendProfissional = $profissional";
+					$result = $conn->query($sql);
+					$result = $result->fetchAll(PDO::FETCH_ASSOC);
+					
+					if(COUNT($result)){
+						$dateLoop = date_create($dateLoop);
+						$dateLoop = $dateLoop->format('d/m/Y');
+						echo json_encode([
+							'titulo' => 'erro ao incluir agendamento',
+							'status' => 'error',
+							'menssagem' => "A data e horário ($dateLoop das $horaI às $horaF) já está reservada!!"
+						]);
+						exit;
+					}
+					array_push($datasRecorrentes, $dateLoop);
+					$dayCount = true;
+					$dateLoop = date_create($dateLoop);
+				}
+				$dateLoop = $dateLoop->modify("+1 day");
+			}
+
+			$x = $dayCount?$x:$x-1; //caso não encontre um dia para marcar ele decrementa o loop
+
+			if($repeticao[1] == 'S'){
+				$d = intval($repeticao[0]);
+				for($y=0; $y < $d; $y++){
+					while($dateBase->format('D') != 'Sun' || $firstWeeK){
+						$dateBase = $dateBase->modify("+1 day");
+						$firstWeeK = false;
+					}
+					$dateBase = $dateBase->modify("+1 day");
+				}
+			}
+
+			// evitar dias em que a unidade não funciona
+			while(in_array($dateBase->format('D'), $arrayDays)){
+				$dateBase = $dateBase->modify("+1 day");
+			}
+			$first = false;
+		}
+
+		echo json_encode([
+			'status' => 'success',
+			'datas' => $datasRecorrentes
 		]);
 	}
 }catch(PDOException $e) {
