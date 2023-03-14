@@ -52,11 +52,11 @@ if (isset($_POST['inputDataInicio'])) {
 			foreach ($_POST['cmbSubCategoria'] as $key => $value){
 
 				$result->execute(array(
-								':iFluxo' => $insertId,
-								':iSubCategoria' => $value,
-								':iUnidade' => $_SESSION['UnidadeId']
-								));
-			}
+					':iFluxo' => $insertId,
+					':iSubCategoria' => $value,
+					':iUnidade' => $_SESSION['UnidadeId']
+				));
+}
 		}
 		
 		$conn->commit();
