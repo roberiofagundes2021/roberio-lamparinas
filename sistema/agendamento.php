@@ -479,7 +479,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 										dataType: 'json',
 										data: {
 											'tipoRequest': 'ADDAGENDAMENTO',
-											'data':response,
+											'data':response.datas,
 											'horaI':$('#inputHora').val(),
 											'horaF':$('#inputHoraFim').val(),
 											'paciente':$('#paciente').val(),
@@ -938,20 +938,44 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 					}
 				})
 			})
-			// $('#dataRecorrenciaAgendamento').on('input', function(e){
-			// 	let dateI = new Date($('#inputDataInicioBloqueio').val())
-			// 	let dateF = new Date($(this).val())
-
-			// 	let diffTime = Math.abs(dateI - dateF);
-			// 	let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));				
-
-			// 	if($('#repeticao').val()[1] == 'S'){
-			// 		$('#quantidadeRecorrencia').val(Math.round(diffDays/7))
-			// 	}else if($('#repeticao').val()[1] == 'M'){
-			// 		$('#quantidadeRecorrencia').val(Math.round(diffDays/30))
-			// 	}
-			// })
-
+			$('#dataRecorrenciaAgendamento').on('input', function(e){
+				if(!$('#inputData').val() || !$('#inputHora').val() || !$('#medico').val()){
+					alerta('Campo necessário!!','Informe um profissional uma data e um horário!!', 'error')
+					return
+				}
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAgendamento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest':'GETRECORRENCIA',
+						'data': $('#inputData').val(),
+						'horaI': $('#inputHora').val(),
+						'horaF': $('#inputHoraFim').val(),
+						'repeticaoAgendamento': $('#repeticaoAgendamento').val()?$('#repeticaoAgendamento').val():'1S',
+						'quantidadeRecorrenciaAgendamento': $('#quantidadeRecorrenciaAgendamento').val(),
+						'segunda': $('#segundaAg').is(':checked')?1:0,
+						'terca': $('#tercaAg').is(':checked')?1:0,
+						'quarta': $('#quartaAg').is(':checked')?1:0,
+						'quinta': $('#quintaAg').is(':checked')?1:0,
+						'sexta': $('#sextaAg').is(':checked')?1:0,
+						'sabado': $('#sabadoAg').is(':checked')?1:0,
+						'domingo': $('#domingoAg').is(':checked')?1:0,
+						'recorrente': $('#agendaRecorrenteCheck').is(':checked')?1:0,
+						'dataFim': $('#dataRecorrenciaAgendamento').val(),
+						'profissional': $('#medico').val()
+					},
+					success: function(response) {
+						if(response.status == 'error'){
+							alerta(response.titulo, response.menssagem, response.status)
+							$('#dataRecorrenciaAgendamento').val('')
+							return
+						}
+						let data = response.datas[response.datas.length-1]
+						$('#quantidadeRecorrenciaAgendamento').val(response.counter)
+					}
+				})
+			})
 			$('#modalConfig-close-x').on('click', function(e){
 				e.preventDefault()
 				$('#page-modal-config').fadeOut(200)

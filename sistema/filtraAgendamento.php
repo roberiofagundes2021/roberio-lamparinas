@@ -304,7 +304,7 @@ try{
 
 							$d = intval($repeticao[0]);
 							for($y=0; $y < $d; $y++){
-								while($data->format('D') != 'Sat' || $firstWeeK){
+								while($data->format('D') != 'Sun' || $firstWeeK){
 									$data = $data->modify("+1 day");
 									$firstWeeK = false;
 								}
@@ -914,6 +914,7 @@ try{
 		$domingo = $_POST['domingo'];
 		$quantidade = $quantidade<=0?1:$quantidade;
 		$profissional = $_POST['profissional'];
+		$dataFim = isset($_POST['dataFim'])?date_create($_POST['dataFim']):false;
 
 		$datasSelect = [];
 		{
@@ -974,62 +975,119 @@ try{
 		$datasRecorrentes = [];
 		$first = true;
 		$firstWeeK = true;
+		$countWeek = 0;
 
-		for($x=0; $x < intval($quantidade); $x++){
-			$dayCount = false;
-			$dateLoop = $dateBase;
-
-			while($dateLoop->format('D') != 'Sat'){
-				// se o dia em questão estiver sido marcado como dia para agendar...
-				if(in_array($dateLoop->format('D'), $datasSelect)){
-					$dateLoop = $dateLoop->format('Y-m-d');
-
-					$sql = "SELECT AgendId FROM Agendamento WHERE AgendData = '$dateLoop' and
-						AgendHoraInicio <= '$horaI' and AgendHoraFim >= '$horaF' and
-						AgendProfissional = $profissional";
-					$result = $conn->query($sql);
-					$result = $result->fetchAll(PDO::FETCH_ASSOC);
-					
-					if(COUNT($result)){
-						$dateLoop = date_create($dateLoop);
-						$dateLoop = $dateLoop->format('d/m/Y');
-						echo json_encode([
-							'titulo' => 'erro ao incluir agendamento',
-							'status' => 'error',
-							'menssagem' => "A data e horário ($dateLoop das $horaI às $horaF) já está reservada!!"
-						]);
-						exit;
+		if($dataFim){
+			while($dateBase->format('Y-m-d') <= $dataFim->format('Y-m-d')){
+				$dateLoop = $dateBase;
+				$dayCount = false;
+	
+				if($dateLoop->format('Y-m-d') <= $dataFim){
+					while($dateLoop->format('D') != 'Sat'){
+						// se o dia em questão estiver sido marcado como dia para agendar...
+						if(in_array($dateLoop->format('D'), $datasSelect)){
+							$dateLoop = $dateLoop->format('Y-m-d');
+		
+							$sql = "SELECT AgendId FROM Agendamento WHERE AgendData = '$dateLoop' and
+								AgendHoraInicio <= '$horaI' and AgendHoraFim >= '$horaF' and
+								AgendProfissional = $profissional";
+							$result = $conn->query($sql);
+							$result = $result->fetchAll(PDO::FETCH_ASSOC);
+							
+							if(COUNT($result)){
+								$dateLoop = date_create($dateLoop);
+								$dateLoop = $dateLoop->format('d/m/Y');
+								echo json_encode([
+									'titulo' => 'erro ao incluir agendamento',
+									'status' => 'error',
+									'menssagem' => "A data e horário ($dateLoop das $horaI às $horaF) já está reservada!!"
+								]);
+								exit;
+							}
+							array_push($datasRecorrentes, $dateLoop);
+							$dayCount = true;
+							$dateLoop = date_create($dateLoop);
+						}
+						$dateLoop = $dateLoop->modify("+1 day");
 					}
-					array_push($datasRecorrentes, $dateLoop);
-					$dayCount = true;
-					$dateLoop = date_create($dateLoop);
 				}
-				$dateLoop = $dateLoop->modify("+1 day");
-			}
-
-			$x = $dayCount?$x:$x-1; //caso não encontre um dia para marcar ele decrementa o loop
-
-			if($repeticao[1] == 'S'){
-				$d = intval($repeticao[0]);
-				for($y=0; $y < $d; $y++){
-					while($dateBase->format('D') != 'Sun' || $firstWeeK){
+				$countWeek = $dayCount? $countWeek+1:$countWeek;
+	
+				if($repeticao[1] == 'S'){
+					$d = intval($repeticao[0]);
+					for($y=0; $y < $d; $y++){
+						while($dateBase->format('D') != 'Sun' || $firstWeeK){
+							$dateBase = $dateBase->modify("+1 day");
+							$firstWeeK = false;
+						}
 						$dateBase = $dateBase->modify("+1 day");
-						$firstWeeK = false;
 					}
+				}
+	
+				// evitar dias em que a unidade não funciona
+				while(in_array($dateBase->format('D'), $arrayDays)){
 					$dateBase = $dateBase->modify("+1 day");
 				}
+				$first = false;
 			}
-
-			// evitar dias em que a unidade não funciona
-			while(in_array($dateBase->format('D'), $arrayDays)){
-				$dateBase = $dateBase->modify("+1 day");
+		}else{
+			for($x=0; $x < intval($quantidade); $x++){
+				$dayCount = false;
+				$dateLoop = $dateBase;
+	
+				while($dateLoop->format('D') != 'Sat'){
+					// se o dia em questão estiver sido marcado como dia para agendar...
+					if(in_array($dateLoop->format('D'), $datasSelect)){
+						$dateLoop = $dateLoop->format('Y-m-d');
+	
+						$sql = "SELECT AgendId FROM Agendamento WHERE AgendData = '$dateLoop' and
+							AgendHoraInicio <= '$horaI' and AgendHoraFim >= '$horaF' and
+							AgendProfissional = $profissional";
+						$result = $conn->query($sql);
+						$result = $result->fetchAll(PDO::FETCH_ASSOC);
+						
+						if(COUNT($result)){
+							$dateLoop = date_create($dateLoop);
+							$dateLoop = $dateLoop->format('d/m/Y');
+							echo json_encode([
+								'titulo' => 'erro ao incluir agendamento',
+								'status' => 'error',
+								'menssagem' => "A data e horário ($dateLoop das $horaI às $horaF) já está reservada!!"
+							]);
+							exit;
+						}
+						array_push($datasRecorrentes, $dateLoop);
+						$dayCount = true;
+						$dateLoop = date_create($dateLoop);
+					}
+					$dateLoop = $dateLoop->modify("+1 day");
+				}
+	
+				$x = $dayCount?$x:$x-1; //caso não encontre um dia para marcar ele decrementa o loop
+	
+				if($repeticao[1] == 'S'){
+					$d = intval($repeticao[0]);
+					for($y=0; $y < $d; $y++){
+						while($dateBase->format('D') != 'Sun' || $firstWeeK){
+							$dateBase = $dateBase->modify("+1 day");
+							$firstWeeK = false;
+						}
+						$dateBase = $dateBase->modify("+1 day");
+					}
+				}
+	
+				// evitar dias em que a unidade não funciona
+				while(in_array($dateBase->format('D'), $arrayDays)){
+					$dateBase = $dateBase->modify("+1 day");
+				}
+				$first = false;
 			}
-			$first = false;
 		}
 
 		echo json_encode([
 			'status' => 'success',
-			'datas' => $datasRecorrentes
+			'datas' => $datasRecorrentes,
+			'counter' =>$countWeek
 		]);
 	}
 }catch(PDOException $e) {
