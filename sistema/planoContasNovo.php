@@ -80,6 +80,10 @@ if(isset($_POST['inputNome'])){
 				e.preventDefault();
 				
 				var inputNome = $('#inputNome').val();
+
+				/*caso precise validar
+				let cmbTipo =  $('#cmbTipo').val();
+				let cmbPlanoContaPai = $('#cmbPlanoContaPai').val();*/
 				
 				//remove os espaços desnecessários antes e depois
 				inputNome = inputNome.trim();
@@ -96,6 +100,13 @@ if(isset($_POST['inputNome'])){
 							return false;
 						}
 						console.log(resposta)
+
+						/*caso precise validar
+						if (cmbTipo == 'A' && cmbPlanoContaPai == '') {
+							alerta('Atenção','É preciso informar o Plano de Conta quando o tipo é Analítico!','error');
+							$('#cmbPlanoContaPai').focus();
+							return;
+						}*/
 						
 						$( "#formPlanoContas" ).submit();
 					}

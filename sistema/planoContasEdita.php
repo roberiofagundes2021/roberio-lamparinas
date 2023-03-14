@@ -101,6 +101,10 @@ if(isset($_POST['inputNome'])){
 				
 				//remove os espaços desnecessários antes e depois
 				inputNomeNovo = inputNomeNovo.trim();
+
+				/*caso precise validar
+				let cmbTipo =  $('#cmbTipo').val();
+				let cmbPlanoContaPai = $('#cmbPlanoContaPai').val();*/
 				
 				//Esse ajax está sendo usado para verificar no banco se o registro já existe
 				$.ajax({
@@ -113,6 +117,13 @@ if(isset($_POST['inputNome'])){
 							alerta('Atenção','Já exite Centro de Custo ligado a um Plano de Contas com este nome!!','error');
 							return false;
 						}
+
+						/*caso precise validar
+						if (cmbTipo == 'A' && cmbPlanoContaPai == '') {
+							alerta('Atenção','É preciso informar o Plano de Conta quando o tipo é Analítico!','error');
+							$('#cmbPlanoContaPai').focus();
+							return;
+						}*/
 						
 						$( "#formPlanoContas" ).submit();
 					}
