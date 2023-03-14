@@ -2202,35 +2202,15 @@ if (isset($_POST['inputInicio'])) {
 
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-lg-9">
+                                            <div class="col-lg-6">
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="form-group"> 
                                                             <a href="#collapse1-link" class="font-weight-semibold collapsed" data-toggle="collapse" aria-expanded="false"><h5> 1. Queixa Principal (QP)</h5></a>   
                                                             <div class="collapse" id="collapse1-link" >
-                                                                <div class="col-lg-6 mt-3">
+                                                                <div class="mt-3">
                                                                     <textarea rows="4" cols="4" maxLength="500" onInput="contarCaracteres(this);"  id="summernote1" name="txtareaConteudo1" class="form-control" placeholder="Corpo da anamnese (informe aqui o texto que você queira que apareça na queixa principal)" ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaQueixaPrincipal']; ?></textarea>
                                                                     <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote1"></span></small>
-                                                                </div>
-                                                                <div class="col-lg-6">
-                                                                    <label>Diagnóstico de Enfermagem (NANDA) </label>
-                                                                    <select id="cmbNanda" name="cmbNanda" class="select-search" >
-                                                                        <option value="">Selecione</option>
-                                                                        <?php 
-                                                                            $sql = "SELECT DgNanId, DgNanCodigo, DgNanNome, DgNanStatus, DgNanUsuarioAtualizador
-                                                                                    FROM DiagnosticoNanda
-                                                                                    JOIN Situacao on SituaId = DgNanStatus
-                                                                                    WHERE SituaChave = 'ATIVO'
-                                                                                    ORDER BY DgNanCodigo ASC";
-                                                                            $result = $conn->query($sql);
-                                                                            $row = $result->fetchAll(PDO::FETCH_ASSOC);
-
-                                                                            foreach ($row as $item){
-                                                                                //$seleciona = $item['DgNanId'] == $rowAnamnese['EnAnaDiagnosticoNanda'] ? "selected" : "";
-                                                                                print('<option value="'.$item['DgNanId'].'" '. $seleciona .'>'.$item['DgNanCodigo'] . ' - ' . $item['DgNanNome'] . ' ' .'</option>');
-                                                                            }
-                                                                        ?>
-                                                                    </select>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2306,7 +2286,27 @@ if (isset($_POST['inputInicio'])) {
                                                         </div>
                                                     </div>
                                                 </div>                                                
-                                            </div>                                            
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <label>Diagnóstico de Enfermagem (NANDA) </label>
+                                                <select id="cmbNanda" name="cmbNanda" class="select-search" >
+                                                    <option value="">Selecione</option>
+                                                    <?php 
+                                                        $sql = "SELECT DgNanId, DgNanCodigo, DgNanNome, DgNanStatus, DgNanUsuarioAtualizador
+                                                                FROM DiagnosticoNanda
+                                                                JOIN Situacao on SituaId = DgNanStatus
+                                                                WHERE SituaChave = 'ATIVO'
+                                                                ORDER BY DgNanCodigo ASC";
+                                                        $result = $conn->query($sql);
+                                                        $row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                        foreach ($row as $item){
+                                                            //$seleciona = $item['DgNanId'] == $rowAnamnese['EnAnaDiagnosticoNanda'] ? "selected" : "";
+                                                            print('<option value="'.$item['DgNanId'].'" '. $seleciona .'>'.$item['DgNanCodigo'] . ' - ' . $item['DgNanNome'] . ' ' .'</option>');
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </div>    
                                         </div>                                         
                                     </div>
                                 </div>
