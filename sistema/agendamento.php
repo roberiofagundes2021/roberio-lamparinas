@@ -1058,6 +1058,13 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				$('#filtro').attr('style','cursor: pointer; font-size:20px;color: #000;')
 			}
 
+			// reseta o calendário
+			$('#calendarioagendamento').fullCalendar('destroy')
+			$('#calendarioagendamento').html(`<div class="text-center">
+			<img src='global_assets/images/lamparinas/loader.gif' style='width: 200px' alt='Carregando calendário'>
+			</div>`)
+			// return
+
 			// iniciar o calendário
 			$.ajax({
 				type: 'POST',
@@ -1163,8 +1170,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 									})
 								})
 							})
-							// reseta o calendário
-							$('#calendarioagendamento').fullCalendar('destroy')
+							//cria outro calendário com as informações novas
 
 							$.ajax({
 								type: 'POST',
@@ -1193,6 +1199,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 									}
 
 									// Initialize the calendar
+									$('#calendarioagendamento').html('')
 									$('#calendarioagendamento').fullCalendar({
 										header: {
 											left: 'prev,next today',
