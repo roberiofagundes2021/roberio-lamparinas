@@ -168,29 +168,24 @@ if ($row['ClienSexo'] == 'F'){
 					targets: [1]
 				},
 				{ 
-					orderable: true,   //grupo
-					width: "10%", //15
+					orderable: true,   //codigo
+					width: "15%", //15
 					targets: [2]
-				},				
-				{ 
-					orderable: true,   //subgrupo
-					width: "10%", //15
-					targets: [3]
 				},
 				{ 
 					orderable: true,   //procedimento
-					width: "40%", //15
-					targets: [4]
+					width: "45%", //15
+					targets: [3]
 				},
 				{ 
 					orderable: true,   //Valor
 					width: "10%",
-					targets: [5]
+					targets: [4]
 				},
 				{ 
 					orderable: false,   //Ações
 					width: "10%",
-					targets: [6]
+					targets: [5]
 				}],
 				dom: '<"datatable-header"fl><"datatable-scroll-wrap"t><"datatable-footer">',
 				language: {
@@ -223,12 +218,12 @@ if ($row['ClienSexo'] == 'F'){
 				},
 				{ 
 					orderable: true,   //codigo
-					width: "10%", //15
+					width: "15%", //15
 					targets: [2]
 				},				
 				{ 
 					orderable: true,   //produto
-					width: "50%", //15
+					width: "45%", //15
 					targets: [3]
 				},
 				{ 
@@ -334,6 +329,12 @@ if ($row['ClienSexo'] == 'F'){
 					},
 					success: function(response) {
 						if(response.status == 'success'){
+
+							$('#grupo').val('')
+							$('#subgrupo').val('')
+							$('#procedimentos').val('')
+							$('#nomeProcedimento').val('')
+							
 							getCmbs()
 							checkServicos()
 							alerta(response.titulo, response.menssagem, response.status)
@@ -375,6 +376,10 @@ if ($row['ClienSexo'] == 'F'){
 					},
 					success: function(response) {
 						if(response.status == 'success'){
+
+							$('#produtos').val('')
+							$('#nomeProdutos').val('')
+
 							getCmbs()
 							checkProdutos()
 							alerta(response.titulo, response.menssagem, response.status)
@@ -560,8 +565,7 @@ if ($row['ClienSexo'] == 'F'){
 								<tr class='servicoItem'>
 									<td class="text-left">${i}</td>
 									<td class="text-left">${item.sData} - ${item.hora}</td>
-									<td class="text-left">${item.grupo}</td>
-									<td class="text-left">${item.subgrupo}</td>
+									<td class="text-left">${item.codigo}</td>
 									<td class="text-left">${item.servico}</td>
 									<td class="text-right">R$ ${float2moeda(item.valor)}</td>
 									<td class="text-center">${acoes}</td>
@@ -675,7 +679,7 @@ if ($row['ClienSexo'] == 'F'){
 								<tr class='servicoItem'>
 									<td class="text-left">${i}</td>
 									<td class="text-left">${item.sData} - ${item.hora}</td>
-									<td class="text-left">${item.codigo}</td>
+									<td class="text-left">${item.codigoCompleto}</td>
 									<td class="text-left">${item.servico}</td>
 									<td class="text-right">R$ ${float2moeda(item.valor)}</td>
 									<td class="text-center">${acoes}</td>
@@ -924,8 +928,7 @@ if ($row['ClienSexo'] == 'F'){
 												<tr class="bg-slate">
 													<th class="text-left">Item</th>
 													<th class="text-left">Data Registro</th>
-													<th class="text-left">Grupo</th>
-													<th class="text-left">SubGrupo</th>
+													<th class="text-left">Código</th>
 													<th class="text-left">Procedimento</th>
 													<th class="text-right">Valor</th>
 													<th class="text-center">Ações</th>
