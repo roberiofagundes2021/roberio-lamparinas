@@ -2140,6 +2140,51 @@ if (isset($_POST['inputInicio'])) {
                                 <div class="card">
 
                                     <div class="card-header header-elements-inline">
+                                        <h3 class="card-title font-weight-bold ">ENTRADA DO PACIENTE</h3>  
+                                    </div>
+
+                                    <div class="card-body">
+
+                                        <div class="col-lg-12 mb-2 row">
+                                            <!-- titulos -->
+                                            <div class="col-lg-4">
+                                                <label>HISTÓRIA DA MOLÉSTIA ATUAL </label>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <label>EXAME FÍSICO </label>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <label>ANAMNESE MÉDICA (DIGITAÇÃO LIVRE) </label>
+                                            </div>
+                                            
+                                            <!-- campos -->										
+                                            <div class="col-lg-4">
+                                                <div >
+                                                    <textarea rows="1" cols="5"maxLength="500" onInput="contarCaracteres(this);" id="summernote2" name="txtareaConteudo2" class="form-control" placeholder=" História da moléstia atual" readOnly><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaMolestiaAtual']; ?></textarea>
+                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote2"></span></small>
+                                                
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div >
+                                                    <textarea rows="1" cols="5"maxLength="500" onInput="contarCaracteres(this);" id="summernote2" name="txtareaConteudo2" class="form-control" placeholder=" Exame Físico"  readOnly><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaMolestiaAtual']; ?></textarea>
+                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote2"></span></small>
+                                                
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div >
+                                                    <textarea rows="1" cols="5"  maxLength="1000" onInput="contarCaracteres(this);" id="summernote6" name="txtareaConteudo6" class="form-control" placeholder="Anamnese Médica" readOnly ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaDigitacaoLivre']; ?></textarea>
+                                                    <small class="text-muted form-text">Max. 1000 caracteres<span class="caracteressummernote6"></span></small>
+                                                
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+
+                                    <div class="card-header header-elements-inline">
                                         <h3 class="card-title font-weight-bold ">DIAGNÓSTICO PRINCIPAL</h3>  
                                     </div>
 
