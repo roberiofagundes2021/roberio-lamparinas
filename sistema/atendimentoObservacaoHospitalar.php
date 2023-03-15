@@ -2174,7 +2174,7 @@ if ($row['ClienSexo'] == 'F'){
 							<div class="card-header header-elements-inline">
 								<div class="col-lg-11">	
 									<button type="button" id="entradaPaciente-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activeEntrada' ? 'active' : '' ) : ''; ?> " onclick="mudarGrid('entradaPaciente')" style="margin-left: -10px;" >Entrada do Paciente</button>
-									<button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activePrescricao' ? 'active' : '' ) : ''; ?> " onclick="mudarGrid('prescricao')"  >Prescrição</button>
+									<button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activePrescricao' ? 'active' : '' ) : ''; ?> " onclick="mudarGrid('prescricao')"  >Prescrição Médica</button>
 									<button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 <?php echo isset($_POST['screen']) ? ($_POST['screen'] == 'activeEvolucaoMedica' ? 'active' : '' ) : ''; ?> " onclick="mudarGrid('evolucao')" >Evolução Médica</button>
 									<button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg itemLink " data-tipo='evolucaoEnfermagem' >Evolução de Enfermagem</button>
 								</div>
