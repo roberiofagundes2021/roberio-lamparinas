@@ -2065,8 +2065,7 @@ if ($row['ClienSexo'] == 'F'){
 							<div class="card-header header-elements-inline">
 								<div class="col-lg-11">	
                                     <button type="button" id="entradaPaciente-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg active mr-2" onclick="mudarGrid('entradaPaciente')" style="margin-left: -10px;" >Entrada do Paciente</button>
-									<button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 " onclick="mudarGrid('prescricao')" >Prescrição</button>
-									<button type="button" id="evolucao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2" onclick="mudarGrid('evolucao')" >Evolução</button>
+									<button type="button" id="prescricao-btn" class="btn-grid btn btn-lg btn-outline-secondary btn-lg mr-2 " onclick="mudarGrid('prescricao')" >Prescrição Médica</button>
 								</div>
 							</div>
 							

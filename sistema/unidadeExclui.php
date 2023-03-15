@@ -6,10 +6,10 @@ include('global_assets/php/conexao.php');
 
 if(isset($_POST['inputUnidadeId'])){        	
 	try{
-		$conn->beginTransaction();
+		//$conn->beginTransaction();
 
 		$iUnidade = $_POST['inputUnidadeId'];
-
+/*
 		$sql = "DELETE FROM PadraoPerfilXPermissao WHERE PaPrXPeUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$result = $result->fetch(PDO::FETCH_ASSOC);
@@ -57,26 +57,34 @@ if(isset($_POST['inputUnidadeId'])){
 		$sql = "DELETE FROM Setor WHERE SetorUnidade = $iUnidade";
 		$result = $conn->query($sql);
 		$result = $result->fetch(PDO::FETCH_ASSOC);
-		
-		$sql = "DELETE FROM Unidade WHERE UnidaId = $iUnidade";
-		$result = $conn->query($sql);
-		$result = $result->fetch(PDO::FETCH_ASSOC);
+*/		
+
+		/* Não precisa mais excluir as tabelas que são geradas pelo sistema quando se cria uma 
+		nova unidade, pois todas essas tabelas estão excluindo em cascata. Poranto, todas as 
+		tabelas (geradas pelo sistema) que contenham a unidade que está sendo excluída está 
+		excluindo em cascata */
+		$sql = "DELETE FROM Unidade WHERE UnidaId = :id";
+		$result = $conn->prepare($sql);
+		$result->bindParam(':id', $iUnidade); 
+		$result->execute();		
+
+		//$conn->commit();
 		
 		$_SESSION['msg']['titulo'] = "Sucesso";
 		$_SESSION['msg']['mensagem'] = "Unidade excluída!!!";
 		$_SESSION['msg']['tipo'] = "success";
 		
 	} catch(PDOException $e) {
-		$conn->rollback();
+		//$conn->rollback();
 		
 		$_SESSION['msg']['titulo'] = "Erro";
 		$_SESSION['msg']['mensagem'] = "Não é possível excluir essa unidade, pois existem registros ligados a ela!!!";
 		$_SESSION['msg']['tipo'] = "error";
 		
-		var_dump($e);
+		var_dump($e);die;
 	}
 }
 
-// irpara("unidade.php");
+irpara("unidade.php");
 
 ?>

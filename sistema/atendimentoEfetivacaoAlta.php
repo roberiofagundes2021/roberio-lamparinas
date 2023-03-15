@@ -1177,7 +1177,7 @@ if (isset($_POST['inputInicio'])) {
                                     
                                 </div>                                 
 
-                                <div class="box-alta" style="display: block <?php echo isset($iAtendimentoEfetivacaoAlta) ? (( $rowEfetivacao['TpAltChave'] == 'PORALTAMEDICA' || $rowEfetivacao['TpAltChave'] == 'PORPERMANENCIA' || $rowEfetivacao['TpAltChave'] == 'PORALTAADMINISTRATIVA' || $rowEfetivacao['TpAltChave'] == 'PORTRANSFERENCIA' || $rowEfetivacao['TpAltChave'] == 'PORPROCEDIMENTOSDEPARTO' ) ? 'block' : 'none') : 'none'; ?>; ">
+                                <div class="box-alta" style="display: <?php echo isset($iAtendimentoEfetivacaoAlta) ? (( $rowEfetivacao['TpAltChave'] == 'PORALTAMEDICA' || $rowEfetivacao['TpAltChave'] == 'PORPERMANENCIA' || $rowEfetivacao['TpAltChave'] == 'PORALTAADMINISTRATIVA' || $rowEfetivacao['TpAltChave'] == 'PORTRANSFERENCIA' || $rowEfetivacao['TpAltChave'] == 'PORPROCEDIMENTOSDEPARTO' ) ? 'block' : 'none') : 'none'; ?>; ">
 
                                     <!-- titulo box -->
                                     <div class="card-header header-elements-inline">
@@ -1601,7 +1601,7 @@ if (isset($_POST['inputInicio'])) {
                                         <div class="col-lg-4 ">
                                             <div class="form-group">
                                                 <label for="inputOrientacaoAlta">Orientações da Alta</label>
-                                                <input type="text" class="form-control" name="inputOrientacaoAlta" id="inputOrientacaoAlta" >                                              
+                                                <input type="text" class="form-control" name="inputOrientacaoAlta" id="inputOrientacaoAlta" maxLength="100">                                              
                                             </div>
                                             
                                         </div>

@@ -645,7 +645,7 @@ include('global_assets/php/conexao.php');
 										<div class="col-lg-4">
 											<div class="form-group">
 												<label for="cmbCategoriaPF">Categoria<span class="text-danger"> *</span></label>
-												<select id="cmbCategoriaPF" name="cmbCategoria" class="form-control select-search">
+												<select id="cmbCategoriaPF" name="cmbCategoriaPF" class="form-control select-search">
 													<option value="">Selecione</option>
 													<?php
 													$sql = "SELECT CategId, CategNome

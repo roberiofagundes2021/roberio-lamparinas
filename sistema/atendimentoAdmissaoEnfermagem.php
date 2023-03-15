@@ -161,6 +161,7 @@ if (isset($_POST['inputInicio'])) {
                 EnAnaUsoMedicamentoDescricao = :sUsoMedicamentoDescricao,
                 EnAnaCid10 = :sCid10,
                 EnAnaProcedimento = :sProcedimento,
+                EnAnaDignosticoEnfermagemNanda = :sDignosticoEnfermagemNanda,
                 EnAnaQueixaPrincipal = :sQueixaPrincipal,
                 EnAnaHistoriaMolestiaAtual = :sHistoriaMolestiaAtual,
                 EnAnaHistoriaPatologicaPregressa = :sHistoriaPatologicaPregressa,
@@ -209,7 +210,7 @@ if (isset($_POST['inputInicio'])) {
 
                 ':sCid10' => $_POST['cmbCId10'] == "" ? null : $_POST['cmbCId10'],
                 ':sProcedimento' => $_POST['cmbProcedimento'] == "" ? null : $_POST['cmbProcedimento'],
-
+                ':sDignosticoEnfermagemNanda' => $_POST['cmbNanda'] == "" ? null : $_POST['cmbNanda'],
                 ':sQueixaPrincipal' => $_POST['txtareaConteudo1'] == "" ? null : $_POST['txtareaConteudo1'],
                 ':sHistoriaMolestiaAtual' => $_POST['txtareaConteudo2'] == "" ? null : $_POST['txtareaConteudo2'],
                 ':sHistoriaPatologicaPregressa' => $_POST['txtareaConteudo3'] == "" ? null : $_POST['txtareaConteudo3'],
@@ -261,6 +262,7 @@ if (isset($_POST['inputInicio'])) {
                 EnAnaUsoMedicamentoDescricao, 
                 EnAnaCid10, 
                 EnAnaProcedimento, 
+                EnAnaDignosticoEnfermagemNanda,
                 EnAnaQueixaPrincipal, 
                 EnAnaHistoriaMolestiaAtual, 
                 EnAnaHistoriaPatologicaPregressa, 
@@ -303,6 +305,7 @@ if (isset($_POST['inputInicio'])) {
                 :sUsoMedicamentoDescricao,
                 :sCid10,
                 :sProcedimento,
+                :sDignosticoEnfermagemNanda,
                 :sQueixaPrincipal,
                 :sHistoriaMolestiaAtual,
                 :sHistoriaPatologicaPregressa,
@@ -350,7 +353,7 @@ if (isset($_POST['inputInicio'])) {
 
                 ':sCid10' => $_POST['cmbCId10'] == "" ? null : $_POST['cmbCId10'],
                 ':sProcedimento' => $_POST['cmbProcedimento'] == "" ? null : $_POST['cmbProcedimento'],
-
+                ':sDignosticoEnfermagemNanda' => $_POST['cmbNanda'] == "" ? null : $_POST['cmbNanda'],
                 ':sQueixaPrincipal' => $_POST['txtareaConteudo1'] == "" ? null : $_POST['txtareaConteudo1'],
                 ':sHistoriaMolestiaAtual' => $_POST['txtareaConteudo2'] == "" ? null : $_POST['txtareaConteudo2'],
                 ':sHistoriaPatologicaPregressa' => $_POST['txtareaConteudo3'] == "" ? null : $_POST['txtareaConteudo3'],
@@ -628,7 +631,7 @@ if (isset($_POST['inputInicio'])) {
                 EnExFSubirEscada = :sSubirEscada ,
                 EnExFBanho = :sBanho ,
                 EnExFDeambular = :sDeambular ,
-                EnExFAndar = :sDormir ,
+                EnExFDormir = :sDormir ,
                 EnExFUnidade = :sUnidade
                 WHERE EnExFId = :iAtendimentoExameFisico";
 
@@ -2101,7 +2104,7 @@ if (isset($_POST['inputInicio'])) {
 
                                         <div class="form-group" style="margin:20px;" >
                                             <?php 
-                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                if (isset($SituaChave) && $SituaChave == "ATENDIDO") {
                                                     echo "<button class='btn btn-lg btn-success mr-1 enviarAnamnese' >Salvar</button>";
                                                 }
                                             ?>
@@ -2202,7 +2205,7 @@ if (isset($_POST['inputInicio'])) {
 
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-lg-9">
+                                            <div class="col-lg-6">
                                                 <div class="row">
                                                     <div class="col-lg-12">
                                                         <div class="form-group"> 
@@ -2286,7 +2289,27 @@ if (isset($_POST['inputInicio'])) {
                                                         </div>
                                                     </div>
                                                 </div>                                                
-                                            </div>                                            
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <label>Diagnóstico de Enfermagem (NANDA) </label>
+                                                <select id="cmbNanda" name="cmbNanda" class="select-search" >
+                                                    <option value="">Selecione</option>
+                                                    <?php 
+                                                        $sql = "SELECT DgNanId, DgNanCodigo, DgNanNome, DgNanStatus, DgNanUsuarioAtualizador
+                                                                FROM DiagnosticoNanda
+                                                                JOIN Situacao on SituaId = DgNanStatus
+                                                                WHERE SituaChave = 'ATIVO'
+                                                                ORDER BY DgNanCodigo ASC";
+                                                        $result = $conn->query($sql);
+                                                        $row = $result->fetchAll(PDO::FETCH_ASSOC);
+
+                                                        foreach ($row as $item){
+                                                            $seleciona = $item['DgNanId'] == $rowAnamnese['EnAnaDignosticoEnfermagemNanda'] ? "selected" : "";
+                                                            print('<option value="'.$item['DgNanId'].'" '. $seleciona .'>'.$item['DgNanCodigo'] . ' - ' . $item['DgNanNome'] . ' ' .'</option>');
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </div>    
                                         </div>                                         
                                     </div>
                                 </div>
@@ -2612,7 +2635,7 @@ if (isset($_POST['inputInicio'])) {
                                                 </div>
                                             </div>
                                             <div class="col-lg-4">
-                                                <div class="alteracaoCmbDorAguda" style="display: <?php echo isset($iAtendimentoExameFisicoId ) ? ($rowExameFisico['EnExFDorAguda'] != 'SD' ? 'block' : 'none') : 'none'; ?>;">                                                    
+                                                <div class="alteracaoCmbDorAguda" style="display: <?php echo isset($iAtendimentoExameFisicoId ) ? ($rowExameFisico['EnExFDorAguda'] == 'SD' ? 'block' : 'none') : 'none'; ?>;">                                                    
                                                     <input type="text" id="inputAlteracaoDorAguda" name="inputAlteracaoDorAguda" maxLength="80" class="form-control" placeholder="" value="<?php if (isset($iAtendimentoExameFisicoId )) echo $rowExameFisico['EnExFDorAgudaLocal']; ?>">
                                                     <small class="text-muted form-text">Max. de 80 caracteres<span class="caracteresinputAlteracaoDorAguda"></span></small>
                                                 </div>
@@ -3794,7 +3817,7 @@ if (isset($_POST['inputInicio'])) {
                                     <div class="col-lg-12">
                                         <div class="form-group" style="margin-bottom:0px;">
                                             <?php 
-                                                if (isset($SituaChave) && $SituaChave != "ATENDIDO") {
+                                                if (isset($SituaChave) && $SituaChave == "ATENDIDO") {
                                                     echo "<button class='btn btn-lg btn-success mr-1 enviarAnamnese' >Salvar</button>";
                                                 }
                                             ?>

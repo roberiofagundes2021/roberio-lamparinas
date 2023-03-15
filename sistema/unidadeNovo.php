@@ -246,10 +246,10 @@ include('global_assets/php/conexao.php');
                 
                 for(key in itensRequest){
                   $('#infoCard').append(`
-                  <div class='row col-lg-6 text-center mt-3 ml-3' style="background-color: #f8f8f8; border: 1px solid #eee; padding: 10px;">
-                    <span id='textProgress'>Incluindo ${itensRequest[key]}</span>
-                    <div id="imgLoading-${key}" class="ml-2">
-                      <img src='global_assets/images/lamparinas/loader.gif' style='width: 80px; height: 40px;'>
+                  <div class='row col-lg-12 text-center mt-3' style="background-color: #f8f8f8; border: 1px solid #eee; padding: 10px;">
+                    <span id='textProgress' class="ml-2">Incluindo ${itensRequest[key]}</span>
+                    <div id="imgLoading-${key}" style="margin-left: 4px; margin-top: -4px;">
+                      <img src='global_assets/images/lamparinas/infinity.gif' style='width: 30px; height: 30px;'>
                     </div>
                   </div>`)
                   $('#progressBar').attr('style',`width: ${porcentagem}%;`)
@@ -752,14 +752,18 @@ include('global_assets/php/conexao.php');
           </form>
         </div>
         
-        <div id="cardLoading" class="card d-none">
+        <div id="cardLoading" class="card d-none" style="padding: 30px;">
+
+          <h1>Criando Unidade</h1>
+          <h4>Favor aguardar até que todos os passos sejam finalizados!!</h4>
+
           <div class="progress">
             <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
           </div>
           <div id="infoCard" class="row m-0 mb-4 col-lg-12 align-content-center">
             <!-- <div class="col-lg-10 text-center">
               <span></span>
-              <img id="gifLoading" src="global_assets/images/lamparinas/loader.gif" style="width: 80px; height: 40px;">
+              <img id="gifLoading" src="global_assets/images/lamparinas/triangulos.gif" style="width: 80px; height: 40px;">
             </div> -->
           </div>
         </div>

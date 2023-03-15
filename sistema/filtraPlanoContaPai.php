@@ -2,7 +2,7 @@
 include_once("sessao.php");
 include('global_assets/php/conexao.php');
 
-$codigo = $_POST['inputCodigo'].'%';
+$codigo = '%' . $_POST['inputCodigo'] ;//. '%';
 
 $sql = "SELECT PlConId, PlConCodigo, PlConNome
         FROM PlanoConta
