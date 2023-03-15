@@ -1521,6 +1521,19 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 		}
 
 		function getCmbs(obj){
+			$('#paciente').empty()
+			$('#modalidade').empty()
+			$('#servico').empty()
+			$('#situacao').empty()
+			$('#localAtendimento').empty()
+			$('#medico').empty()
+
+			$('#paciente').append(`<option selected value=''>Carregando...</option>`)
+			$('#modalidade').append(`<option selected value=''>Carregando...</option>`)
+			$('#servico').append(`<option selected value=''>Carregando...</option>`)
+			$('#situacao').append(`<option selected value=''>Carregando...</option>`)
+			$('#localAtendimento').append(`<option selected value=''>Carregando...</option>`)
+			$('#medico').append(`<option selected value=''>Carregando...</option>`)
 			// vai preencher cmbPaciente
 			$.ajax({
 				type: 'POST',

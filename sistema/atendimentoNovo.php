@@ -467,38 +467,6 @@ $_SESSION['atendimento'] = [
 				$('#page-modal-responsavel').fadeIn(200)
 			})
 
-			$('#paciente').on('change', function() {
-				let iPaciente = $(this).val()
-				setPacienteAtribut(iPaciente)
-			});
-
-			$('#servico').on('change', function(e) {
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimento.php',
-					dataType: 'json',
-					data: {
-						'tipoRequest': 'MEDICOS',
-						'servico': $(this).val()
-					},
-					success: function(response) {
-						$('#medicos').empty();
-						$('#medicos').append(`<option value=''>Selecione</option>`)		
-
-						response.forEach(item => {
-							let opt = `<option value="${item.id}">${item.nome}</option>`
-							$('#medicos').append(opt)
-						})
-						$('#medicos').focus()
-					}
-				});
-			})
-
-			$('#parentescoCadatrado').on('change', function() {
-				let iResponsavel = $(this).val();
-				setResponsavelAtribut(iResponsavel)
-			});
-
 			$('#salvarPacienteModal').on('click', function(e) {
 				e.preventDefault()
 
@@ -740,7 +708,6 @@ $_SESSION['atendimento'] = [
 
 				$('#pageModalDescontos').fadeIn(200);
 			})
-
 			$('#setDesconto').on('click', function(item){
 				$.ajax({
 					type: 'POST',
@@ -758,8 +725,42 @@ $_SESSION['atendimento'] = [
 					}
 				});
 			})
+			$('#paciente').on('change', function() {
+				let iPaciente = $(this).val()
+				setPacienteAtribut(iPaciente)
+			})
+			$('#servico').on('change', function(e) {
+				$('#medicos').empty();
+				$('#medicos').append(`<option selected value=''>Carregando...</option>`)
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAtendimento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest': 'MEDICOS',
+						'servico': $(this).val()
+					},
+					success: function(response) {
+						$('#medicos').empty();
+						$('#medicos').append(`<option value=''>Selecione</option>`)		
 
+						response.forEach(item => {
+							let opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#medicos').append(opt)
+						})
+						$('#medicos').focus()
+					}
+				});
+			})
+			$('#parentescoCadatrado').on('change', function() {
+				let iResponsavel = $(this).val();
+				setResponsavelAtribut(iResponsavel)
+			})
 			$('#grupo').on('change',function(e){
+				$('#subgrupo').empty()
+				$('#servico').empty()
+				$('#subgrupo').append(`<option selected value=''>Carregando...</option>`)
+				$('#servico').append(`<option selected value=''>Carregando...</option>`)
 				// vai preencher cmbSubGrupo
 				$.ajax({
 					type: 'POST',
@@ -799,6 +800,8 @@ $_SESSION['atendimento'] = [
 				});
 			})
 			$('#subgrupo').on('change',function(e){
+				$('#servico').empty()
+				$('#servico').append(`<option selected value=''>Carregando...</option>`)
 				// vai preencher cmbServicos
 				$.ajax({
 					type: 'POST',
@@ -839,6 +842,24 @@ $_SESSION['atendimento'] = [
 		});
 
 		function getCmbs(obj) {
+			$('#grupo').empty()
+			$('#subgrupo').empty()
+			$('#classificacaoRisco').empty()
+			$('#paciente').empty()
+			$('#modalidade').empty()
+			$('#servico').empty()
+			$('#classificacao').empty()
+			$('#localAtendimento').empty()
+
+			$('#grupo').append(`<option selected value=''>Carregando...</option>`)
+			$('#subgrupo').append(`<option selected value=''>Carregando...</option>`)
+			$('#classificacaoRisco').append(`<option selected value=''>Carregando...</option>`)
+			$('#paciente').append(`<option selected value=''>Carregando...</option>`)
+			$('#modalidade').append(`<option selected value=''>Carregando...</option>`)
+			$('#servico').append(`<option selected value=''>Carregando...</option>`)
+			$('#parentescoCadatrado').html("<option selected value=''>selecione</option>")
+			$('#classificacao').append(`<option selected value=''>Carregando...</option>`)
+			$('#localAtendimento').append(`<option selected value=''>Carregando...</option>`)
 			// vai preencher cmbGrupo
 			$.ajax({
 				type: 'POST',
@@ -1354,6 +1375,8 @@ $_SESSION['atendimento'] = [
 		}
 
 		function setHoraProfissional(range) {
+			$('#modalHora').html('');
+			$('#modalHora').html('Carregando...')
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimento.php',
