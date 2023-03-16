@@ -42,7 +42,7 @@ try {
        
         $iAtendimentoId = $_POST['iAtendimentoId'];
 
-        $sql = "SELECT AtSPrId, AtSPrDataInicio, AtSPrHoraInicio, AtGruNome, AtSubNome, SrVenCodigo, SrVenNome, Cid10Codigo, Cid10Descricao
+        $sql = "SELECT *
                 FROM AtendimentoSolicitacaoProcedimento
                 JOIN AtendimentoGrupo ON AtSPrGrupo = AtGruId
                 JOIN AtendimentoSubGrupo ON AtSPrSubGrupo = AtSubId
@@ -56,17 +56,20 @@ try {
         $dataProcedimentos = [];
         $i = 1;
         foreach ($rowProcedimentos as $item) {
-            $print = "<a style='color: blue;' href='#' onclick='imprimirSolProcedimento($item[AtSPrId])' class='list-icons-item'><i class='icon-printer2' title='Imprimir Solicitação'></i></a>";
-            $exc = "<button style='color: black' type='button' onclick='excluirProcedimento($item[AtSPrId])' class='btn btn-link list-icons-item'><i class='icon-bin' title='Excluir Procedimento'></i></button>";
+            $print = "<a style='color: blue;' href='#' onclick='imprimirSolProcedimento($item[AtSPrId])' class='list-icons-item mr-2'><i class='icon-printer2' title='Imprimir Solicitação'></i></a>";
+            $copiar = "<a style='color: black'  onclick='copiarProcedimento(" . json_encode($item) . ")' class='list-icons-item mr-2'><i class='icon-files-empty' title='Copiar Sol. Procedimento'></i></a>";
+            $exc = "<a style='color: black' onclick='excluirProcedimento($item[AtSPrId])' class='list-icons-item'><i class='icon-bin' title='Excluir Procedimento'></i></a>";
            
             if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
                 $acoes = "<div class='list-icons'>
                             ${print}
+                            ${copiar}
                             ${exc}
                         </div>";
             } else{
                 $acoes = "<div class='list-icons'>
                             ${print}
+                            ${copiar}
                         </div>";
             }
             
@@ -97,7 +100,7 @@ try {
         
     } elseif ($tipoRequest == 'EXCLUIRPROCEDIMENTO') {
 
-        $idProcedimento = $_POST['idProcedimento'];
+        $idProcedimento = $_POST['id'];
 
         $sql = "DELETE FROM AtendimentoSolicitacaoProcedimento
                 WHERE AtSPrId = $idProcedimento

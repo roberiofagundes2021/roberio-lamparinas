@@ -2606,7 +2606,7 @@ try{
 	} elseif ($tipoRequest == 'ENCAMINHAMENTOS'){
 		$iAtendimento = $_POST['id'];
 	
-		$sql = "SELECT AtEMeId,AtEMeDataInicio,AtEMeHoraInicio,ProfiNome,EspecNome
+		$sql = "SELECT AtEMeId,AtEMeDataInicio,AtEMeHoraInicio,ProfiNome,EspecNome, AtEMeProfissional, AtEMeProfissionalDestino, AtEMeEspecialidade, AtEMeModelo, AtEMeCid10, AtEMeEncaminhamentoMedico
 			FROM AtendimentoEncaminhamentoMedico
 			JOIN Profissional ON ProfiId = AtEMeProfissionalDestino
 			JOIN Especialidade ON EspecId = AtEMeEspecialidade
@@ -2626,6 +2626,11 @@ try{
 				'id'=>$item['AtEMeId'],
 				'data'=>$data,
 				'hora'=>$hora,
+				'idProfissionalDestino' => $item['AtEMeProfissionalDestino'],
+				'idEspecialidade' => $item['AtEMeEspecialidade'],
+				'idModelo' => $item['AtEMeModelo'],
+				'idCid10' => $item['AtEMeCid10'],
+				'encaminhamentoMedico' => $item['AtEMeEncaminhamentoMedico'],
 				'profissional'=>$item['ProfiNome'],
 				'especialidade'=>$item['EspecNome'],
 			]);

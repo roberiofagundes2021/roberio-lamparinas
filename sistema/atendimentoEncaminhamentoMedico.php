@@ -253,27 +253,6 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 				$( "#formAtendimentoEncaminhamentoMedico" ).submit()
 			})
 
-			$('#profissional').on('change', function(){
-				// vai preencher cmbProfissionais
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimento.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'ESPECIALIDADES',
-						'id': $(this).val()
-					},
-					success: function(response) {
-						$('#especialidade').empty();
-						$('#especialidade').append(`<option value=''>Selecione</option>`)
-						response.forEach(item => {
-							let opt = `<option value="${item.id}">${item.nome}</option>`
-							$('#especialidade').append(opt)
-						})
-					}
-				});
-			})
-
 			$('#enviar').on('click', function(e){
 				e.preventDefault()
 				// vai preencher cmbProfissionais
@@ -309,6 +288,12 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 						'encaminhamentoMedico': $('#summernote').val(),
 					},
 					success: function(response) {
+						alerta(response.titulo, response.menssagem, response.status);
+						$('#profissional').val('').change();
+						$('#especialidade').val('').change();
+						$('#modelo').val('').change();
+						$('#cid').val('').change();
+						$('#summernote').summernote('code', '');
 						getCmbs()
 						checkEncaminhamentos()
 					}
@@ -339,6 +324,27 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 				})
 			})
 		})//document.ready
+
+		async function filtrarEspecialidades() {
+			// vai preencher especialidade
+			await $.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'ESPECIALIDADES',
+					'id': $('#profissional').val()
+				},
+				success: function(response) {
+					$('#especialidade').empty();
+					$('#especialidade').append(`<option value=''>Selecione</option>`)
+					response.forEach(item => {
+						let opt = `<option value="${item.id}">${item.nome}</option>`
+						$('#especialidade').append(opt)
+					})
+				}
+			});			
+		}
 
 		function getCmbs(){
 			// limpa o campo text
@@ -416,21 +422,24 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 
 							let situaChave = $("#atendimentoSituaChave").val();
 							let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Encaminhamento'></i></a>`;
+							let copiar = `<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarEncaminhamento( \"${item.idProfissionalDestino}\", \"${item.idEspecialidade}\", \"${item.idModelo}\", \"${item.idCid10}\", \"${item.encaminhamentoMedico}\"  )'><i class='icon-files-empty' title='Copiar Encaminhamento'></i></a>`; 
 							let print = `<a style='color: black; cursor:pointer' onclick='imprimirServico(\"${item.id}\")' class='list-icons-item'><i class='icon-printer2' title='Imprimir Encaminhamento'></i></a>`;
 							let acoes = '';			
 
 							if (situaChave != 'ATENDIDO'){
 								acoes = `<div class='list-icons'>
                                         ${print}
+										${copiar}
 										${exc}
 									</div>`;
 							} else{
 								acoes = `<div class='list-icons'>
-                                        ${print}
+										${print}
+										${copiar}
 									</div>`;
 							}
 							HTML += `
-							<tr class='servicoItem'>
+							<tr class='servicoItem'>profissional
 								<td class="text-left">${index+1}</td>
 								<td class="text-left">${item.data} ${item.hora}</td>
 								<td class="text-left">${item.profissional}</td>
@@ -446,22 +455,21 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 			});
 		}
 
-		function excluiServico(id){
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'EXCLUIRENCAMINHAMENTO',
-					'id': id
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.status)
-					checkEncaminhamentos()
-					getCmbs()
-				}
-			});
+		async function copiarEncaminhamento(idProfissionalDestino, idEspecialidade, idModelo, idCid10, encaminhamentoMedico) {
+			
+			await $('#profissional').val(idProfissionalDestino).change();
+			await filtrarEspecialidades();
+			$('#especialidade').val(idEspecialidade).change();
+			$('#modelo').val(idModelo).change();
+			$('#cid').val(idCid10).change();
+			$('#summernote').summernote('code', encaminhamentoMedico);
 		}
+
+		function excluiServico(id){
+			confirmaExclusaoAjax('filtraAtendimento.php', 'Excluir Solicitação de Procedimento?', 'EXCLUIRENCAMINHAMENTO', id, checkEncaminhamentos);
+			getCmbs()
+		}
+
 		function imprimirServico(id){
 			console.log(id)
 		}
@@ -534,7 +542,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 										</div>
 
 										<div class="col-lg-6 input-group">
-											<select id="profissional" name="profissional" class="form-control select-search">
+											<select id="profissional" name="profissional" class="form-control select-search" onChange="filtrarEspecialidades()">
 												<option value="">Selecione</option>
 											</select>
 										</div>

@@ -268,62 +268,65 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 			});
 
-			$('#grupo').on('change', function() {
-
-				let idGrupo = $(this).val();				
-
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimentoSolicitacaoExame.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'SUBGRUPOS',
-						'idGrupo' : idGrupo						 
-					},
-					success: function(response) {
-						$('#subgrupo').empty();
-						$('#subgrupo').append(`<option value=''>Selecione</option>`)
-
-						if (response.length !== 0) {
-							Array.from(response).forEach(item => {
-								let opt = `<option value="${item.id}">${item.nome}</option>`
-								$('#subgrupo').append(opt)	
-							})							
-						}	
-						$('#subgrupo').focus();			
-					}	
-				})
-			})
-
-			$('#subgrupo').on('change', function() {
-				let idSubGrupo = $(this).val();	
-
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimentoSolicitacaoExame.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'PROCEDIMENTOS',
-						'idSubGrupo' : idSubGrupo						 
-					},
-					success: function(response) {
-						$('#exame').empty();
-						$('#exame').append(`<option value=''>Selecione</option>`)
-
-						if (response.length !== 0) {
-							Array.from(response).forEach(item => {
-								let opt = `<option value="${item.id}">${item.nome}</option>`
-								$('#exame').append(opt)	
-							})							
-						}	
-						$('#exame').focus();			
-					}	
-				})
-			})
-
 			$(".caracteresjustificativa").text((500 - $("#justificativa").val().length) + ' restantes'); //restantes em motivo da consulta
 
 		}); //document.ready
+
+		async function filtrarSubGrupo() {
+
+			let idGrupo = $('#grupo').val();				
+
+			await $.ajax({
+				type: 'POST',
+				url: 'filtraAtendimentoSolicitacaoExame.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'SUBGRUPOS',
+					'idGrupo' : idGrupo						 
+				},
+				success: function(response) {
+					$('#subgrupo').empty();
+					$('#subgrupo').append(`<option value=''>Selecione</option>`)
+
+					if (response.length !== 0) {
+						Array.from(response).forEach(item => {
+							let opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#subgrupo').append(opt)	
+						})							
+					}	
+					$('#subgrupo').focus();			
+				}	
+			})
+			
+		}
+
+		async function filtrarProcedimento() {
+
+			let idSubGrupo = $('#subgrupo').val();	
+
+			await $.ajax({
+				type: 'POST',
+				url: 'filtraAtendimentoSolicitacaoExame.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'PROCEDIMENTOS',
+					'idSubGrupo' : idSubGrupo						 
+				},
+				success: function(response) {
+					$('#exame').empty();
+					$('#exame').append(`<option value=''>Selecione</option>`)
+
+					if (response.length !== 0) {
+						Array.from(response).forEach(item => {
+							let opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#exame').append(opt)	
+						})							
+					}	
+					$('#exame').focus();			
+				}	
+			})
+			
+		}	
 
 		function contarCaracteres(params) {
 
@@ -368,22 +371,24 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 		}
 
-		function excluirExame(idExame){
+		async function copiarExame(params) {
 
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoSolicitacaoExame.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'EXCLUIREXAME',
-					'idExame' : idExame
-				},
-				success: function(response) {
-					checkExames();
-					alerta(response.titulo, response.menssagem, response.status)
-				}
-			});
+			$('#grupo').val(params.AtSExGrupo).change();
+			
+			await filtrarSubGrupo();
 
+			$('#subgrupo').val(params.AtSExSubGrupo).change();
+
+			await filtrarProcedimento();
+
+			$('#exame').val(params.AtSExExame).change();
+			
+			$('#justificativa').val(params.AtSExJustificativa);
+			
+		}
+
+		function excluirExame(id){
+			confirmaExclusaoAjax('filtraAtendimentoSolicitacaoExame.php', 'Excluir Solicitação de Exame?', 'EXCLUIREXAME', id, checkExames);
 		}
 
 		function getCmbs(){
@@ -474,12 +479,12 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 												
 												<!-- campos -->										
 												<div class="col-lg-3">
-													<select id="grupo" name="grupo" class="select-search" required>
+													<select id="grupo" name="grupo" class="select-search" onChange="filtrarSubGrupo()" required>
 														<option value=''>Selecione</option>
 													</select>
 												</div>
 												<div class="col-lg-4">
-													<select id="subgrupo" name="subgrupo" class="select-search" required>
+													<select id="subgrupo" name="subgrupo" class="select-search" onChange="filtrarProcedimento()" required>
 														<option value=''>Selecione</option>
 													</select>											
 												</div>
