@@ -48,7 +48,8 @@ try {
                 JOIN AtendimentoSubGrupo ON AtSPrSubGrupo = AtSubId
                 JOIN ServicoVenda ON AtSPrProcedimento = SrVenId    
 				JOIN Cid10 ON AtSPrCid10 = Cid10Id
-                WHERE AtSPrAtendimento = $iAtendimentoId and AtSPrUnidade = $iUnidade";
+                WHERE AtSPrAtendimento = $iAtendimentoId and AtSPrUnidade = $iUnidade
+                ORDER BY AtSPrDataInicio DESC, AtSPrHoraInicio DESC ";
         $result = $conn->query($sql);
         $rowProcedimentos = $result->fetchAll(PDO::FETCH_ASSOC);
 

@@ -137,13 +137,10 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 			getCmbs()
 			checkExames()
 			
-			$('#tblTabelaGastos').DataTable( {
+			$('#tblSolicitacaoExame').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
-				searching: false,
-				ordering: false, 
-				paging: false,
 			    columnDefs: [
 				{ 
 					orderable: true,   //item
@@ -357,9 +354,9 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 					'iAtendimentoId': iAtendimentoId
 				},
 				success: async function(response) {
-					let table = $('#tblTabelaGastos').DataTable().clear().draw()
+					let table = $('#tblSolicitacaoExame').DataTable().clear().draw()
 
-					table = $('#tblTabelaGastos').DataTable()
+					table = $('#tblSolicitacaoExame').DataTable()
 					let rowNode	
 
 					response.forEach(item => {
@@ -543,7 +540,7 @@ if(isset($iAtendimentoSolicitacaoExameId ) && $iAtendimentoSolicitacaoExameId ){
 
 									<div class="row">
 										<div class="col-lg-12">
-											<table class="table" id="tblTabelaGastos">
+											<table class="table" id="tblSolicitacaoExame">
 												<thead>
 													<tr class="bg-slate">
 														<th class="text-left">Item</th>

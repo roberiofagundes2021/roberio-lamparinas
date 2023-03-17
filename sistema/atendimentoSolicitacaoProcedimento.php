@@ -98,13 +98,10 @@ if ($row['ClienSexo'] == 'F'){
 			getCmbs()
 			checkProcedimentos()
 			
-			$('#tblTabelaGastos').DataTable( {
+			$('#tblSolicitacaoProcedimento').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
-				searching: false,
-				ordering: false, 
-				paging: false,
 			    columnDefs: [
 				{ 
 					orderable: true,   //item
@@ -331,9 +328,9 @@ if ($row['ClienSexo'] == 'F'){
 					'iAtendimentoId': iAtendimentoId
 				},
 				success: async function(response) {
-					let table = $('#tblTabelaGastos').DataTable().clear().draw()
+					let table = $('#tblSolicitacaoProcedimento').DataTable().clear().draw()
 
-					table = $('#tblTabelaGastos').DataTable()
+					table = $('#tblSolicitacaoProcedimento').DataTable()
 					let rowNode	
 
 					response.dataProcedimentos.forEach(item => {
@@ -548,7 +545,7 @@ if ($row['ClienSexo'] == 'F'){
 
 									<div class="row">
 										<div class="col-lg-12">
-											<table class="table" id="tblTabelaGastos">
+											<table class="table" id="tblSolicitacaoProcedimento">
 												<thead>
 													<tr class="bg-slate">
 														<th class="text-left">Item</th>
