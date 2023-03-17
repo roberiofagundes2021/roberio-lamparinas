@@ -18,6 +18,16 @@ if(!$iAtendimentoId){
 }
 
 
+//Essa consulta é para  preenchimento o campo da entrada do paciente e diagnóstico principal.
+$sql = "SELECT AtIEnAtendimento, AtIEnHistoriaMolestiaAtual, AtlEnExameFisico, 
+               AtIEnDigitacaoLivre, AtIEnCid10 ,AtIEnProcedimento
+        FROM AtendimentoInternacaoEntrada
+        WHERE  AtIEnAtendimento = $iAtendimentoId ORDER BY AtIEnId ASC
+";
+$result = $conn->query($sql);
+$rowInternacaoEntrada = $result->fetch(PDO::FETCH_ASSOC);
+
+
 //anamnese
 $sql = "SELECT TOP(1) EnAnaId
 FROM EnfermagemAnamnese
@@ -2161,22 +2171,19 @@ if (isset($_POST['inputInicio'])) {
                                             <!-- campos -->										
                                             <div class="col-lg-4">
                                                 <div >
-                                                    <textarea rows="1" cols="5"maxLength="500" onInput="contarCaracteres(this);" id="summernote2" name="txtareaConteudo2" class="form-control" placeholder=" História da moléstia atual" readOnly><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaMolestiaAtual']; ?></textarea>
-                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote2"></span></small>
+                                                    <textarea rows="4" cols="5" id="summernote7" name="txtareaEntradaMolestiaAtual" class="form-control" placeholder=" História da moléstia atual" readOnly><?php if (isset($iAtendimentoAnamneseId )) echo $rowInternacaoEntrada['AtIEnHistoriaMolestiaAtual']; ?></textarea>
+                                                    
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div >
+                                                    <textarea rows="4" cols="5" id="summernote8" name="txtareaEntradaExameFisico" class="form-control" placeholder=" Exame Físico"  readOnly><?php if (isset($iAtendimentoAnamneseId )) echo $rowInternacaoEntrada['AtlEnExameFisico']; ?></textarea>
                                                 
                                                 </div>
                                             </div>
                                             <div class="col-lg-4">
                                                 <div >
-                                                    <textarea rows="1" cols="5"maxLength="500" onInput="contarCaracteres(this);" id="summernote2" name="txtareaConteudo2" class="form-control" placeholder=" Exame Físico"  readOnly><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaHistoriaMolestiaAtual']; ?></textarea>
-                                                    <small class="text-muted form-text">Max. 500 caracteres<span class="caracteressummernote2"></span></small>
-                                                
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4">
-                                                <div >
-                                                    <textarea rows="1" cols="5"  maxLength="1000" onInput="contarCaracteres(this);" id="summernote6" name="txtareaConteudo6" class="form-control" placeholder="Anamnese Médica" readOnly ><?php if (isset($iAtendimentoAnamneseId )) echo $rowAnamnese['EnAnaDigitacaoLivre']; ?></textarea>
-                                                    <small class="text-muted form-text">Max. 1000 caracteres<span class="caracteressummernote6"></span></small>
+                                                    <textarea rows="4" cols="5" id="summernote9" name="txtareaEntradaDigitacaoLivre" class="form-control" placeholder="Anamnese Médica" readOnly ><?php if (isset($iAtendimentoAnamneseId )) echo $rowInternacaoEntrada['AtIEnDigitacaoLivre']; ?></textarea>
                                                 
                                                 </div>
                                             </div>
@@ -2213,7 +2220,7 @@ if (isset($_POST['inputInicio'])) {
                                                         $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                         foreach ($row as $item){
-                                                            $seleciona = $item['Cid10Id'] == $rowAnamnese['EnAnaCid10'] ? "selected" : "";
+                                                            $seleciona = $item['Cid10Id'] == $rowInternacaoEntrada['AtIEnCid10'] ? "selected" : "";
                                                             print('<option value="'.$item['Cid10Id'].'" '. $seleciona .'>'.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
                                                         }
                                                     ?>
@@ -2231,7 +2238,7 @@ if (isset($_POST['inputInicio'])) {
                                                         $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                         foreach ($row as $item) {
-                                                            $seleciona = $item['SrVenId'] == $rowAnamnese['EnAnaProcedimento'] ? "selected" : "";
+                                                            $seleciona = $item['SrVenId'] == $rowInternacaoEntrada['AtIEnProcedimento'] ? "selected" : "";
                                                             print('<option value="' . $item['SrVenId'] . '" ' . $seleciona . '>' . $item['SrVenCodigo'] . ' - ' . $item['SrVenNome'] . '</option>');
                                                         }
                                                     ?>
