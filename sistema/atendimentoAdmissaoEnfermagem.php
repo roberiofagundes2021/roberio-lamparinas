@@ -169,6 +169,9 @@ if (isset($_POST['inputInicio'])) {
                 EnAnaNeoplasiaDescricao = :sNeoplasiaDescricao,
                 EnAnaUsoMedicamento = :sUsoMedicamento,
                 EnAnaUsoMedicamentoDescricao = :sUsoMedicamentoDescricao,
+                EnAnaHistoriaEntrada = :sHistoriaEntrada,
+                EnAnaExameFisico = :sExameFisico,
+                EnAnaAnamneseMedicaDigitacaoLivre = :sMedicaDigitacaoLivre,
                 EnAnaCid10 = :sCid10,
                 EnAnaProcedimento = :sProcedimento,
                 EnAnaDignosticoEnfermagemNanda = :sDignosticoEnfermagemNanda,
@@ -216,8 +219,10 @@ if (isset($_POST['inputInicio'])) {
                 ':sNeoplasia' => $_POST['inputNeoplasia'] == "" ? null : $_POST['inputNeoplasia'],
                 ':sNeoplasiaDescricao' => $_POST['inputNeoplasiaDescricao'] == "" ? null : $_POST['inputNeoplasiaDescricao'],
                 ':sUsoMedicamento' => $_POST['inputUsoMedicamento'] == "" ? null : $_POST['inputUsoMedicamento'],
+                ':sHistoriaEntrada' => $_POST['txtareaEntradaMolestiaAtual'] == "" ? null : $_POST['txtareaEntradaMolestiaAtual'],
                 ':sUsoMedicamentoDescricao' => $_POST['inputUsoMedicamentoDescricao'] == "" ? null : $_POST['inputUsoMedicamentoDescricao'],
-
+                ':sExameFisico' => $_POST['txtareaEntradaExameFisico'] == "" ? null : $_POST['txtareaEntradaExameFisico'],
+                ':sMedicaDigitacaoLivre'  => $_POST['txtareaEntradaDigitacaoLivre'] == "" ? null : $_POST['txtareaEntradaDigitacaoLivre'],
                 ':sCid10' => $_POST['cmbCId10'] == "" ? null : $_POST['cmbCId10'],
                 ':sProcedimento' => $_POST['cmbProcedimento'] == "" ? null : $_POST['cmbProcedimento'],
                 ':sDignosticoEnfermagemNanda' => $_POST['cmbNanda'] == "" ? null : $_POST['cmbNanda'],
@@ -269,7 +274,10 @@ if (isset($_POST['inputInicio'])) {
                 EnAnaNeoplasia, 
                 EnAnaNeoplasiaDescricao, 
                 EnAnaUsoMedicamento, 
-                EnAnaUsoMedicamentoDescricao, 
+                EnAnaUsoMedicamentoDescricao,
+                EnAnaHistoriaEntrada,
+                EnAnaExameFisico,
+                EnAnaAnamneseMedicaDigitacaoLivre,
                 EnAnaCid10, 
                 EnAnaProcedimento, 
                 EnAnaDignosticoEnfermagemNanda,
@@ -313,6 +321,9 @@ if (isset($_POST['inputInicio'])) {
                 :sNeoplasiaDescricao,
                 :sUsoMedicamento,
                 :sUsoMedicamentoDescricao,
+                :sHistoriaEntrada,
+                :sExameFisico,
+                :sMedicaDigitacaoLivre,
                 :sCid10,
                 :sProcedimento,
                 :sDignosticoEnfermagemNanda,
@@ -359,8 +370,10 @@ if (isset($_POST['inputInicio'])) {
                 ':sNeoplasia' => $_POST['inputNeoplasia'] == "" ? null : $_POST['inputNeoplasia'],
                 ':sNeoplasiaDescricao' => $_POST['inputNeoplasiaDescricao'] == "" ? null : $_POST['inputNeoplasiaDescricao'],
                 ':sUsoMedicamento' => $_POST['inputUsoMedicamento'] == "" ? null : $_POST['inputUsoMedicamento'],
+                ':sHistoriaEntrada' => $_POST['txtareaEntradaMolestiaAtual'] == "" ? null : $_POST['txtareaEntradaMolestiaAtual'],
                 ':sUsoMedicamentoDescricao' => $_POST['inputUsoMedicamentoDescricao'] == "" ? null : $_POST['inputUsoMedicamentoDescricao'],
-
+                ':sExameFisico' => $_POST['txtareaEntradaExameFisico'] == "" ? null : $_POST['txtareaEntradaExameFisico'],
+                ':sMedicaDigitacaoLivre'  => $_POST['txtareaEntradaDigitacaoLivre'] == "" ? null : $_POST['txtareaEntradaDigitacaoLivre'],
                 ':sCid10' => $_POST['cmbCId10'] == "" ? null : $_POST['cmbCId10'],
                 ':sProcedimento' => $_POST['cmbProcedimento'] == "" ? null : $_POST['cmbProcedimento'],
                 ':sDignosticoEnfermagemNanda' => $_POST['cmbNanda'] == "" ? null : $_POST['cmbNanda'],
@@ -2208,7 +2221,7 @@ if (isset($_POST['inputInicio'])) {
                                             
                                             <!-- campos -->										
                                             <div class="col-lg-6">
-                                                <select id="cmbCId10" name="cmbCId10" class="select-search" >
+                                                <select id="cmbCId10" name="cmbCId10" class="select-search " disabled="true">
                                                     <option value="">Selecione</option>
                                                     <?php 
                                                         $sql = "SELECT Cid10Id,Cid10Capitulo, Cid10Codigo, Cid10Descricao
@@ -2227,7 +2240,8 @@ if (isset($_POST['inputInicio'])) {
                                                 </select>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="cmbProcedimento" name="cmbProcedimento" class="select-search" >
+                                                <select id="cmbProcedimento" name="cmbProcedimento" class="select-search" disabled="true"
+                                                 >
                                                     <option value="">Selecione</option>
                                                     <?php  
                                                         $sql = "SELECT SrVenId,SrVenCodigo, SrVenNome
