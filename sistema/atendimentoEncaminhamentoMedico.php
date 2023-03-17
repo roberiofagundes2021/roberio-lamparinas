@@ -209,9 +209,6 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
-				searching: false,
-				ordering: false, 
-				paging: false,
 			    columnDefs: [
 				{ 
 					orderable: true,   //item
@@ -411,11 +408,19 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 				dataType: 'json',
 				data:{
 					'tipoRequest': 'ENCAMINHAMENTOS',
-					'id': <?php echo $iAtendimentoId?>
+					'id': <?php echo $iAtendimentoId?>,
+					'situaChave' : $("#atendimentoSituaChave").val()
 				},
 				success: function(response) {
-					if(response.length){
-						
+
+					let tableE = $('#encaminhamentoTable').DataTable().clear().draw()
+					let rowNodeE
+
+					response.forEach(item => {
+						rowNodeE = tableE.row.add(item).draw().node()
+					})
+
+					/*if(response.length){						
 						$('#dataEncaminhamento').html('')
 						let HTML = ''
 						response.forEach((item,index) => {
@@ -450,7 +455,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 						$('#dataEncaminhamento').html(HTML)
 					}else{
 						$('#dataEncaminhamento').html('')
-					}
+					}*/
 				}
 			});
 		}
@@ -586,7 +591,11 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 												<span id="caracteresInputEncaminhamentoMedico"></span>
 											</small>
 										</div>
-									</div>	 
+									</div>	
+									
+									<div class="col-lg-12 mb-3">
+										<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+									</div>
 
 									<div class="col-lg-12 mt-2">
 										<div class="col-lg-12 card-header p-0">
@@ -611,8 +620,7 @@ if(isset($iAtendimentoEncaminhamentoMedicoId ) && $iAtendimentoEncaminhamentoMed
 
 									<div class="row">
 										<div class="col-lg-12">
-											<div class="form-group" style="padding-top:25px;">
-												<button class="btn btn-lg btn-principal" id="enviar">Incluir</button>
+											<div class="form-group" style="padding-top:25px;">	
 												<?php 
 													if (isset($ClaChave) && $ClaChave == "ELETIVO") {
 													echo "<a href='atendimentoEletivoListagem.php' class='btn btn-basic' role='button'>Cancelar</a>";
