@@ -282,14 +282,12 @@ try{
 
 					// define as datas de acordo à repetição
 					if($repeticao[1]=="S"){// se for semanal "S"...
-						$firstWeeK = true;
 						for($x=0; $x < $quantidade; $x++){
 							$dateLoop = date_create(date_format($data,"Y-m-d"));
-							$first = true;
 							$notfound = true;
+							$loopWhile = true;
 
-							while(date_format($dateLoop,"D") != 'Sat' || $first){
-								$first = false;
+							while($loopWhile){
 								if(in_array(date_format($dateLoop,"D"),$arrayDays)){
 									array_push($arrayDatasRecorrente, [
 										'id' => $bloqueio['AgBloId'],
@@ -297,18 +295,21 @@ try{
 									]);
 									$notfound = false;
 								}
-								$dateLoop = $dateLoop->modify("+1 Day");
+								$loopWhile = date_format($dateLoop,"D") == 'Sat'?false:true;
+								if($loopWhile){
+									$dateLoop = $dateLoop->modify("+1 day");
+								}
 							}
 
 							$x = $notfound?$x-1:$x;
 
 							$d = intval($repeticao[0]);
 							for($y=0; $y < $d; $y++){
-								while($data->format('D') != 'Sun' || $firstWeeK){
+								$loopWhile = true;
+								while($loopWhile){
 									$data = $data->modify("+1 day");
-									$firstWeeK = false;
+									$loopWhile = date_format($data,"D") == 'Sun'?false:true;
 								}
-								$data = $data->modify("+1 day");
 							}
 						}
 					}
@@ -542,7 +543,7 @@ try{
 			'id' => $lestIdCliente,
 		]);
 	} elseif($tipoRequest == 'SITUACAO'){
-		$sql = "SELECT SituaId, SituaNome
+		$sql = "SELECT SituaId, SituaNome, SituaChave
 			FROM Situacao
 			WHERE SituaChave in ('AGENDADO','CONFIRMADO','FILAESPERA','ATENDIDO','CANCELADO')";
 		$result = $conn->query($sql);
@@ -553,9 +554,9 @@ try{
 			array_push($array, [
 				'id' => $item['SituaId'],
 				'nome' => $item['SituaNome'],
+				'chave' => $item['SituaChave'],
 			]);
 		}
-
 		echo json_encode($array);
 	} elseif($tipoRequest == 'UPDATEDATA'){
 		$id = $_POST['id'];
@@ -938,7 +939,7 @@ try{
 		if(!COUNT($datasSelect)){
 			echo json_encode([
 				'titulo' => 'Campo obrigatório',
-				'status' => 'error',
+				'status' => '',
 				'menssagem' => "Informe pelo menos 1 dia da semana!!"
 			]);
 			exit;
@@ -973,17 +974,16 @@ try{
 		// loop para verificar disponibilidade das datas de acordo funcionamento da unidade
 		$dateBase = date_create($data);
 		$datasRecorrentes = [];
-		$first = true;
-		$firstWeeK = true;
 		$countWeek = 0;
 
 		if($dataFim){
 			while($dateBase->format('Y-m-d') <= $dataFim->format('Y-m-d')){
 				$dateLoop = $dateBase;
 				$dayCount = false;
+				$loopWhile = true;
 	
 				if($dateLoop->format('Y-m-d') <= $dataFim){
-					while($dateLoop->format('D') != 'Sat'){
+					while($loopWhile){
 						// se o dia em questão estiver sido marcado como dia para agendar...
 						if(in_array($dateLoop->format('D'), $datasSelect)){
 							$dateLoop = $dateLoop->format('Y-m-d');
@@ -1008,19 +1008,21 @@ try{
 							$dayCount = true;
 							$dateLoop = date_create($dateLoop);
 						}
-						$dateLoop = $dateLoop->modify("+1 day");
+						$loopWhile = $dateLoop->format('D') == 'Sat'?false:true;
+						if($loopWhile){
+							$dateLoop = $dateLoop->modify("+1 day");
+						}
 					}
 				}
 				$countWeek = $dayCount? $countWeek+1:$countWeek;
-	
 				if($repeticao[1] == 'S'){
 					$d = intval($repeticao[0]);
 					for($y=0; $y < $d; $y++){
-						while($dateBase->format('D') != 'Sun' || $firstWeeK){
+						$loopWhile = true;
+						while($loopWhile){
 							$dateBase = $dateBase->modify("+1 day");
-							$firstWeeK = false;
+							$loopWhile = $dateBase->format('D') == 'Sun'?false:true;
 						}
-						$dateBase = $dateBase->modify("+1 day");
 					}
 				}
 	
@@ -1028,16 +1030,16 @@ try{
 				while(in_array($dateBase->format('D'), $arrayDays)){
 					$dateBase = $dateBase->modify("+1 day");
 				}
-				$first = false;
 			}
 		}else{
 			for($x=0; $x < intval($quantidade); $x++){
 				$dayCount = false;
 				$dateLoop = $dateBase;
+				$loopWhile = true;
 	
-				while($dateLoop->format('D') != 'Sat'){
+				while($loopWhile){
 					// se o dia em questão estiver sido marcado como dia para agendar...
-					if(in_array($dateLoop->format('D'), $datasSelect)){
+					if(in_array($dateLoop->format('D'), $datasSelect) && !in_array($dateLoop->format('D'), $arrayDays)){
 						$dateLoop = $dateLoop->format('Y-m-d');
 	
 						$sql = "SELECT AgendId FROM Agendamento WHERE AgendData = '$dateLoop' and
@@ -1060,19 +1062,21 @@ try{
 						$dayCount = true;
 						$dateLoop = date_create($dateLoop);
 					}
-					$dateLoop = $dateLoop->modify("+1 day");
+					$loopWhile = $dateLoop->format('D') == 'Sat'?false:true;
+					if($loopWhile){
+						$dateLoop = $dateLoop->modify("+1 day");
+					}
 				}
 	
 				$x = $dayCount?$x:$x-1; //caso não encontre um dia para marcar ele decrementa o loop
-	
 				if($repeticao[1] == 'S'){
 					$d = intval($repeticao[0]);
 					for($y=0; $y < $d; $y++){
-						while($dateBase->format('D') != 'Sun' || $firstWeeK){
+						$loopWhile = true;
+						while($loopWhile){
 							$dateBase = $dateBase->modify("+1 day");
-							$firstWeeK = false;
+							$loopWhile = $dateBase->format('D') == 'Sun'?false:true;
 						}
-						$dateBase = $dateBase->modify("+1 day");
 					}
 				}
 	
@@ -1080,7 +1084,6 @@ try{
 				while(in_array($dateBase->format('D'), $arrayDays)){
 					$dateBase = $dateBase->modify("+1 day");
 				}
-				$first = false;
 			}
 		}
 

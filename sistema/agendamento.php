@@ -205,6 +205,13 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
             })
 			$('#novoAgendamento').on('click', function(e){
 				e.preventDefault()
+				$('#paciente').val('').change()
+				$('#modalidade').val('').change()
+				$('#servico').val('').change()
+				$('#situacao').val('').change()
+				$('#localAtendimento').val('').change()
+				$('#medico').val('').change()
+				getCmbs()
 				const date = new Date();
 
 				let dia = date.getDate() > 9?date.getDate():`0${date.getDate()}`
@@ -237,7 +244,19 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				$('#agendaRecorrente').addClass('d-none')
 				$('#addPaciente').removeClass('d-none')
 
-				getCmbs()
+				$('#agendaRecorrenteCheck').prop('checked', false)
+				$('#repeticaoAgendamento').val('').change()
+				$('#quantidadeRecorrenciaAgendamento').val(0)
+				$('#segundaAg').prop('checked', false)
+				$('#tercaAg').prop('checked', false)
+				$('#quartaAg').prop('checked', false)
+				$('#quintaAg').prop('checked', false)
+				$('#sextaAg').prop('checked', false)
+				$('#sabadoAg').prop('checked', false)
+				$('#domingoAg').prop('checked', false)
+				$('#dataRecorrenciaAgendamento').val('')
+
+				$('#agendaRecorrente').addClass('d-none')
 				$('#page-modal-agendamento').fadeIn(200)
 			})
 			$('#formAgendamentoNovo').submit(function(e){
@@ -267,6 +286,8 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 							$('#inputData').val('')
 						}else{
 							getCmbs()
+							$('#inputHora').val('')
+							$('#inputHoraFim').val('')
 						}
 					}
 				})
@@ -717,7 +738,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 					$('#agendaRecorrente').removeClass('d-none')
 				}else{
 					$('#recorrente').prop('checked', false)
-					$('#repeticaoAgendamento').val('')
+					$('#repeticaoAgendamento').val('').change()
 					$('#quantidadeRecorrenciaAgendamento').val(0)
 					$('#segundaAg').prop('checked', false)
 					$('#tercaAg').prop('checked', false)
@@ -901,80 +922,14 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 					$('#quantidadeRecorrencia').val(Math.round(diffDays/30))
 				}
 			})
+			$('#repeticaoAgendamento').on('change', function(e){
+				getRecorrencia()
+			})
 			$('#quantidadeRecorrenciaAgendamento').on('input', function(e){
-				if(!$('#inputData').val() || !$('#inputHora').val() || !$('#medico').val()){
-					alerta('Campo necessário!!','Informe um profissional uma data e um horário!!', 'error')
-					return
-				}
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAgendamento.php',
-					dataType: 'json',
-					data: {
-						'tipoRequest':'GETRECORRENCIA',
-						'data': $('#inputData').val(),
-						'horaI': $('#inputHora').val(),
-						'horaF': $('#inputHoraFim').val(),
-						'repeticaoAgendamento': $('#repeticaoAgendamento').val()?$('#repeticaoAgendamento').val():'1S',
-						'quantidadeRecorrenciaAgendamento': $('#quantidadeRecorrenciaAgendamento').val(),
-						'segunda': $('#segundaAg').is(':checked')?1:0,
-						'terca': $('#tercaAg').is(':checked')?1:0,
-						'quarta': $('#quartaAg').is(':checked')?1:0,
-						'quinta': $('#quintaAg').is(':checked')?1:0,
-						'sexta': $('#sextaAg').is(':checked')?1:0,
-						'sabado': $('#sabadoAg').is(':checked')?1:0,
-						'domingo': $('#domingoAg').is(':checked')?1:0,
-						'recorrente': $('#agendaRecorrenteCheck').is(':checked')?1:0,
-						'profissional': $('#medico').val()
-					},
-					success: function(response) {
-						if(response.status == 'error'){
-							alerta(response.titulo, response.menssagem, response.status)
-							$('#quantidadeRecorrenciaAgendamento').val(0)
-							return
-						}
-						let data = response.datas[response.datas.length-1]
-						$('#dataRecorrenciaAgendamento').val(data)
-					}
-				})
+				getRecorrencia()
 			})
 			$('#dataRecorrenciaAgendamento').on('input', function(e){
-				if(!$('#inputData').val() || !$('#inputHora').val() || !$('#medico').val()){
-					alerta('Campo necessário!!','Informe um profissional uma data e um horário!!', 'error')
-					return
-				}
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAgendamento.php',
-					dataType: 'json',
-					data: {
-						'tipoRequest':'GETRECORRENCIA',
-						'data': $('#inputData').val(),
-						'horaI': $('#inputHora').val(),
-						'horaF': $('#inputHoraFim').val(),
-						'repeticaoAgendamento': $('#repeticaoAgendamento').val()?$('#repeticaoAgendamento').val():'1S',
-						'quantidadeRecorrenciaAgendamento': $('#quantidadeRecorrenciaAgendamento').val(),
-						'segunda': $('#segundaAg').is(':checked')?1:0,
-						'terca': $('#tercaAg').is(':checked')?1:0,
-						'quarta': $('#quartaAg').is(':checked')?1:0,
-						'quinta': $('#quintaAg').is(':checked')?1:0,
-						'sexta': $('#sextaAg').is(':checked')?1:0,
-						'sabado': $('#sabadoAg').is(':checked')?1:0,
-						'domingo': $('#domingoAg').is(':checked')?1:0,
-						'recorrente': $('#agendaRecorrenteCheck').is(':checked')?1:0,
-						'dataFim': $('#dataRecorrenciaAgendamento').val(),
-						'profissional': $('#medico').val()
-					},
-					success: function(response) {
-						if(response.status == 'error'){
-							alerta(response.titulo, response.menssagem, response.status)
-							$('#dataRecorrenciaAgendamento').val('')
-							return
-						}
-						let data = response.datas[response.datas.length-1]
-						$('#quantidadeRecorrenciaAgendamento').val(response.counter)
-					}
-				})
+				getRecorrencia()
 			})
 			$('#modalConfig-close-x').on('click', function(e){
 				e.preventDefault()
@@ -998,7 +953,52 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			$('#modalAgendamento-close-x').on('click', function(){
 				$('#page-modal-agendamento').fadeOut(200)
 			})
+			$('.diasUpdate').each(function(e){
+				$(this).on('change', function(el){
+					getRecorrencia()
+				})
+			})
 		})
+
+		function getRecorrencia(){
+			if(!$('#inputData').val() || !$('#inputHora').val() || !$('#medico').val()){
+					// alerta('Campo necessário!!','Informe um profissional uma data e um horário!!', 'error')
+					return
+				}
+				$.ajax({
+					type: 'POST',
+					url: 'filtraAgendamento.php',
+					dataType: 'json',
+					data: {
+						'tipoRequest':'GETRECORRENCIA',
+						'data': $('#inputData').val(),
+						'horaI': $('#inputHora').val(),
+						'horaF': $('#inputHoraFim').val(),
+						'repeticaoAgendamento': $('#repeticaoAgendamento').val()?$('#repeticaoAgendamento').val():'1S',
+						'quantidadeRecorrenciaAgendamento': $('#quantidadeRecorrenciaAgendamento').val(),
+						'segunda': $('#segundaAg').is(':checked')?1:0,
+						'terca': $('#tercaAg').is(':checked')?1:0,
+						'quarta': $('#quartaAg').is(':checked')?1:0,
+						'quinta': $('#quintaAg').is(':checked')?1:0,
+						'sexta': $('#sextaAg').is(':checked')?1:0,
+						'sabado': $('#sabadoAg').is(':checked')?1:0,
+						'domingo': $('#domingoAg').is(':checked')?1:0,
+						'recorrente': $('#agendaRecorrenteCheck').is(':checked')?1:0,
+						'profissional': $('#medico').val()
+					},
+					success: function(response) {
+						if(response.status == 'success'){
+							let data = response.datas[response.datas.length-1]
+							$('#dataRecorrenciaAgendamento').val(data)
+						}else if(response.status == 'error'){
+							alerta(response.titulo, response.menssagem, response.status)
+							// $('#quantidadeRecorrenciaAgendamento').val(0)
+							return
+						}
+						
+					}
+				})
+		}
 
 		function getBloqueios(){
 			getAgenda()
@@ -1259,9 +1259,25 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 														// $('#situacao').attr('disabled', readOnlyOption)
 														if(readOnlyOption){
 															$('#addPaciente').addClass('d-none')
+															$('#agendaRecorrenteCheckContainer').addClass('d-none')
 														}else{
 															$('#addPaciente').removeClass('d-none')
+															$('#agendaRecorrenteCheckContainer').removeClass('d-none')
 														}
+
+														$('#agendaRecorrenteCheck').prop('checked', false)
+														$('#repeticaoAgendamento').val('').change()
+														$('#quantidadeRecorrenciaAgendamento').val(0)
+														$('#segundaAg').prop('checked', false)
+														$('#tercaAg').prop('checked', false)
+														$('#quartaAg').prop('checked', false)
+														$('#quintaAg').prop('checked', false)
+														$('#sextaAg').prop('checked', false)
+														$('#sabadoAg').prop('checked', false)
+														$('#domingoAg').prop('checked', false)
+														$('#dataRecorrenciaAgendamento').val('')
+
+														$('#agendaRecorrente').addClass('d-none')
 
 														$('#page-modal-agendamento').fadeIn(200)
 													}else if(event.type == 'BLOQUEIO'){
@@ -1445,10 +1461,23 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 																	$('#servico').attr('disabled', false)
 																	$('#localAtendimento').attr('disabled', false)
 																	$('#medico').attr('disabled', false)
-																	$('#agendaRecorrenteCheck').prop('checked', false)
 																	$('#agendaRecorrente').addClass('d-none')
 																	$('#addPaciente').removeClass('d-none')
 																	$('#textObservacao').val('')
+
+																	$('#agendaRecorrenteCheck').prop('checked', false)
+																	$('#repeticaoAgendamento').val('').change()
+																	$('#quantidadeRecorrenciaAgendamento').val(0)
+																	$('#segundaAg').prop('checked', false)
+																	$('#tercaAg').prop('checked', false)
+																	$('#quartaAg').prop('checked', false)
+																	$('#quintaAg').prop('checked', false)
+																	$('#sextaAg').prop('checked', false)
+																	$('#sabadoAg').prop('checked', false)
+																	$('#domingoAg').prop('checked', false)
+																	$('#dataRecorrenciaAgendamento').val('')
+
+																	$('#agendaRecorrente').addClass('d-none')
 				
 																	$('#page-modal-agendamento').fadeIn(200)
 																}
@@ -1521,6 +1550,13 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 		}
 
 		function getCmbs(obj){
+			let oldPaciente = $('#paciente').val()
+			let oldModalidade = $('#modalidade').val()
+			let oldServico = $('#servico').val()
+			let oldSituacao = $('#situacao').val()
+			let oldLocalAtendimento = $('#localAtendimento').val()
+			let oldMedico = $('#medico').val()
+
 			$('#paciente').empty()
 			$('#modalidade').empty()
 			$('#servico').empty()
@@ -1531,7 +1567,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 			$('#paciente').append(`<option selected value=''>Carregando...</option>`)
 			$('#modalidade').append(`<option selected value=''>Carregando...</option>`)
 			$('#servico').append(`<option selected value=''>Carregando...</option>`)
-			$('#situacao').append(`<option selected value=''>Carregando...</option>`)
+			$('#situacao').append(`<option data-chave='' selected value=''>Carregando...</option>`)
 			$('#localAtendimento').append(`<option selected value=''>Carregando...</option>`)
 			$('#medico').append(`<option selected value=''>Carregando...</option>`)
 			// vai preencher cmbPaciente
@@ -1550,6 +1586,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						let opt = id == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#paciente').append(opt)
 					})
+					$('#paciente').val(oldPaciente).change()
 				}
 			});
 
@@ -1570,6 +1607,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						let opt = id == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#modalidade').append(opt)
 					})
+					$('#modalidade').val(oldModalidade).change()
 				}
 			});
 
@@ -1589,6 +1627,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						let opt = id == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#servico').append(opt)
 					})
+					$('#servico').val(oldServico).change()
 				}
 			});
 
@@ -1600,13 +1639,18 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 				data:{
 					'tipoRequest': 'SITUACAO'
 				},
-				success: function(response) {
+				success: async function(response) {
 					$('#situacao').empty();
 					$('#situacao').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
+					await response.forEach(item => {
 						let id = obj && obj.situacaoID? obj.situacaoID:null
-						let opt = id == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
+						let opt = id == item.id?`<option selected value="${item.id}" data-chave='${item.chave}'>${item.nome}</option>`:`<option value="${item.id}" data-chave='${item.chave}'>${item.nome}</option>`
 						$('#situacao').append(opt)
+					})
+					$('#situacao option').each(function(e){
+						if($(this).data('chave') == 'AGENDADO'){
+							$('#situacao').val($(this).val()).change()
+						}
 					})
 				}
 			});
@@ -1627,6 +1671,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 						let opt = id == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#localAtendimento').append(opt)
 					})
+					$('#localAtendimento').val(oldLocalAtendimento).change()
 				}
 			});
 
@@ -1650,32 +1695,9 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 							let opt = id == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 							$('#medico').append(opt)
 						})
+						$('#medico').val(oldMedico).change()
 					}
 				});
-
-				// if(obj && obj.medicoID){
-				// 	// vai preencher cmbLocalAtendimento
-				// 	$.ajax({
-				// 		type: 'POST',
-				// 		url: 'filtraAgendamento.php',
-				// 		dataType: 'json',
-				// 		data:{
-				// 			'tipoRequest': 'LOCALATENDIMENTO',
-				// 			'iMedico': obj.medicoID
-				// 		},
-				// 		success: function(response) {
-				// 			$('#localAtendimento').empty();
-				// 			$('#localAtendimento').append(`<option value=''>Selecione</option>`)
-				// 			response.forEach(item => {
-				// 				let id = obj && obj.localAtendimentoID? obj.localAtendimentoID:null
-				// 				let opt = id == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
-				// 				$('#localAtendimento').append(opt)
-				// 			})
-				// 		}
-				// 	});
-
-
-				// }
 			}else{
 				$('#medico').empty()
 				$('#medico').append(`<option value=''>Selecione</option>`)
@@ -1909,7 +1931,7 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 									<div class="col-lg-8"></div>
 
 									<!-- linha 5 -->
-									<div class="col-lg-12 row p-3 m-0">
+									<div class="col-lg-12 row p-3 m-0" id="agendaRecorrenteCheckContainer">
 										<input type="checkbox" id="agendaRecorrenteCheck" name="agendaRecorrenteCheck">
 										<div class="pl-2">Evento Recorrente</div>
 									</div>
@@ -1948,23 +1970,23 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 											<div class="col-lg-6"></div>
 
 											<div class="col-lg-2">
-												<input id="segundaAg" type="checkbox">
+												<input class="diasUpdate" id="segundaAg" type="checkbox">
 												Segunda-Feira
 											</div>
 											<div class="col-lg-2">
-												<input id="tercaAg" type="checkbox">
+												<input class="diasUpdate" id="tercaAg" type="checkbox">
 												Terça-Feira
 											</div>
 											<div class="col-lg-2">
-												<input id="quartaAg" type="checkbox">
+												<input class="diasUpdate" id="quartaAg" type="checkbox">
 												Quarta-Feira
 											</div>
 											<div class="col-lg-2">
-												<input id="quintaAg" type="checkbox">
+												<input class="diasUpdate" id="quintaAg" type="checkbox">
 												Quinta-Feira
 											</div>
 											<div class="col-lg-2">
-												<input id="sextaAg" type="checkbox">
+												<input class="diasUpdate" id="sextaAg" type="checkbox">
 												Sexta-Feira
 											</div>
 											<div class="col-lg-2"></div>
@@ -1976,11 +1998,11 @@ $rowProfissionais = $result->fetchAll(PDO::FETCH_ASSOC);
 											<div class="col-lg-6"></div>
 
 											<div class="col-lg-2">
-												<input id="sabadoAg" type="checkbox">
+												<input class="diasUpdate" id="sabadoAg" type="checkbox">
 												Sábado
 											</div>
 											<div class="col-lg-2">
-												<input id="domingoAg" type="checkbox">
+												<input class="diasUpdate" id="domingoAg" type="checkbox">
 												Domingo
 											</div>
 											<div class="col-lg-8"></div>
