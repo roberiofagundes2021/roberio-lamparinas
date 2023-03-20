@@ -1846,6 +1846,7 @@ try{
 		$id = isset($_POST['iAtendimento'])?$_POST['iAtendimento']:null;
 
 		$mes = explode('/',$dataRegistro);
+		$dataRegistro = $mes[2].'-'.$mes[1].'-'.$mes[0];
 		$mes = $mes[1];
 
 		$sql="SELECT AtModTipoRecebimento FROM AtendimentoModalidade WHERE AtModId = '$_POST[modalidade]' ";

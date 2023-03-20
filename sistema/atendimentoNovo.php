@@ -389,7 +389,6 @@ $_SESSION['atendimento'] = [
 			$('#dataAtendimento').val(dataAtual)
 
 			getCmbs()
-			checkServicos()
 
 			$('#incluirServico').on('click', function(e) {
 				e.preventDefault();
@@ -449,7 +448,6 @@ $_SESSION['atendimento'] = [
 					success: function(response) {
 						if (response.status == 'success') {
 							resetServicoCmb()
-							checkServicos()
 							alerta(response.titulo, response.menssagem, response.status)
 						} else {
 							alerta(response.titulo, response.menssagem, response.status);
@@ -720,7 +718,6 @@ $_SESSION['atendimento'] = [
 					},
 					success: function(response) {
 						$('#pageModalDescontos').fadeOut(200)
-						checkServicos()
 						alerta(response.titulo,response.menssagem,response.status)
 					}
 				});
@@ -1243,7 +1240,6 @@ $_SESSION['atendimento'] = [
 				},
 				success: function(response) {
 					alerta(response.titulo, response.menssagem, response.status)
-					checkServicos()
 				}
 			});
 		}
