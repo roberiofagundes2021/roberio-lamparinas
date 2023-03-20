@@ -104,7 +104,7 @@ try{
 		$dataAgendamento = [];
 		$dataSolicitacao = [];
 		foreach($rowAgendamento as $item){
-			$att = "<a style='color: black' href='#' data-tipo='AGENDAMENTO' onclick='atualizaAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
+			$att = "<a style='color: black' href='#' data-tipo='AGENDAMENTO' onclick='newAtendimento(this)' class='list-icons-item' data-id='$item[AgendId]'><i class='icon-pencil7' title='Editar Atendimento'></i></a>";
 			$exc = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='excluiAtendimento(this)' class='list-icons-item' data-agendamento='$item[AgendId]'><i class='icon-bin' title='Excluir Atendimento'></i></a>";
 			$aud = "<a style='color: black' href='#'  data-tipo='AGENDAMENTO' onclick='auditoria(this)' class='list-icons-item' data-id='$item[AgendId]'><i class='icon-eye4' title='Auditoria'></i></a>";
 			$acoes = "<div class='list-icons'>

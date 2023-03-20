@@ -675,20 +675,17 @@ $acesso = 'ATENDIMENTO';
 		function mudarGrid(grid){
 
 			if (grid == 'atendimentos') {
-				document.getElementById("card-title").innerText = "Atendimentos";
 				document.getElementById("box-atendimentos").style.display = 'block';
 				document.getElementById("box-agendamentos").style.display = 'none';
 				document.getElementById("box-solicitacoes-medicas").style.display = 'none';
 			}
 			if (grid == 'agendamentos') {
-				document.getElementById("card-title").innerText = "Agendamentos do Dia";
 				document.getElementById("box-agendamentos").style.display = 'block';
 				document.getElementById("box-atendimentos").style.display = 'none';	
 				document.getElementById("box-solicitacoes-medicas").style.display = 'none';
 
 			}
 			if (grid == 'solicitacoes-medicas') {
-				document.getElementById("card-title").innerText = "Solicitações Médicas";
 				document.getElementById("box-solicitacoes-medicas").style.display = 'block';
 				document.getElementById("box-agendamentos").style.display = 'none';
 				document.getElementById("box-atendimentos").style.display = 'none';			
@@ -734,10 +731,6 @@ $acesso = 'ATENDIMENTO';
 					<div class="col-lg-12">
 						<!-- Basic responsive configuration -->
 						<div class="card">
-							<div class="card-header header-elements-inline">
-								<h3 class="card-title">Relação de Atendimentos</h3>
-							</div>
-
 							<div class="card-body">
 								<div class="row">
 									<div class="col-lg-7">
@@ -771,18 +764,7 @@ $acesso = 'ATENDIMENTO';
 									</div>
 
 								</div>
-							</div>
-
-							
-							<div class="card-body" style="display:none;">
-								<div class="row">
-									<div class="col-md-9">
-										<h3 class="card-title" id="card-title">Agendamentos</h3>
-									</div>
-								</div>
-								
-							</div>
-							
+							</div>							
 
 							<!-- Agendamentos -->
 							<div id="box-agendamentos" style="display: block;">
