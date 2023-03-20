@@ -681,7 +681,7 @@ $acesso = 'ATENDIMENTO';
 				document.getElementById("box-solicitacoes-medicas").style.display = 'none';
 			}
 			if (grid == 'agendamentos') {
-				document.getElementById("card-title").innerText = "Agendamentos";
+				document.getElementById("card-title").innerText = "Agendamentos do Dia";
 				document.getElementById("box-agendamentos").style.display = 'block';
 				document.getElementById("box-atendimentos").style.display = 'none';	
 				document.getElementById("box-solicitacoes-medicas").style.display = 'none';
@@ -758,7 +758,7 @@ $acesso = 'ATENDIMENTO';
 									</div>
 									
 									<div class="col-lg-12">	
-										<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('agendamentos')" >Agendamentos</button>
+										<button type="button" id="pacientes-espera-btn" class="btn-grid btn btn-outline-secondary btn-lg active" onclick="mudarGrid('agendamentos')" >Agendamentos do Dia</button>
 										<button type="button" id="pacientes-atendidos-btn" class="btn-grid btn btn-outline-secondary btn-lg " onclick="mudarGrid('atendimentos')" >Atendimentos</button>
 
 										<div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -773,7 +773,8 @@ $acesso = 'ATENDIMENTO';
 								</div>
 							</div>
 
-							<div class="card-body">
+							<!--
+							<div class="card-body" style="display:none;">
 								<div class="row">
 									<div class="col-md-9">
 										<h3 class="card-title" id="card-title">Agendamentos</h3>
@@ -781,8 +782,7 @@ $acesso = 'ATENDIMENTO';
 								</div>
 								
 							</div>
-
-
+							-->
 
 							<!-- Agendamentos -->
 							<div id="box-agendamentos" style="display: block;">

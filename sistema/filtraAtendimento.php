@@ -34,7 +34,7 @@ try{
 		$array = [];
 		$hoje = date('Y-m-d');
 
-		$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHorario,AtModNome,
+		$sql = "SELECT AgendId,AgendDataRegistro,AgendData,AgendHoraInicio,AtModNome,
 			AgendClienteResponsavel,AgendAtendimentoLocal,AgendServico,
 			AgendObservacao,AgendJustificativa,ClienNome,ClienCodigo,ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave, ClienDtNascimento,
 			SituaCor,Profissional.ProfiNome as ProfissionalNome,AtLocNome, SrVenNome, ProfiCbo, Profissao.ProfiNome as ProfissaoNome
@@ -131,7 +131,7 @@ try{
 			$difference = diferencaEmHoras($dataEspera, $item['AgendData']);
 			array_push($dataAgendamento, [
 				'data' => [
-					mostraData($item['AgendData']) . " - " . mostraHora($item['AgendHorario']), // Data - Hora
+					mostraData($item['AgendData']) . " - " . mostraHora($item['AgendHoraInicio']), // Data - Hora
 					$difference,  // Espera
 					$item['ClienNome'],  // Paciente
 					calculaIdadeSimples($item['ClienDtNascimento']), // Idade Paciente
@@ -2415,7 +2415,7 @@ try{
 		$tipo = $_POST['tipo'];
 		$id = $_POST['id'];
 
-		$sql = $tipo == 'AGENDAMENTO'? "SELECT UsuarNome, ProfiNome, ClienNome, AgendData as dataRegistro, AgendHorario as horaRegistro, AgendDataRegistro as dtHrRegistro
+		$sql = $tipo == 'AGENDAMENTO'? "SELECT UsuarNome, ProfiNome, ClienNome, AgendData as dataRegistro, AgendHoraInicio as horaRegistro, AgendDataRegistro as dtHrRegistro
 			FROM Agendamento
 			JOIN Cliente ON ClienId = AgendCliente
 			JOIN Profissional ON ProfiId = AgendProfissional
