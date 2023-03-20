@@ -41,29 +41,33 @@ try {
        
         $iAtendimentoId = $_POST['iAtendimentoId'];
 
-        $sql = "SELECT AtSExId, AtSExDataInicio, AtSExHoraInicio, AtGruNome, AtSubNome, SrVenCodigo, SrVenNome
+        $sql = "SELECT * 
                 FROM AtendimentoSolicitacaoExame
                 JOIN AtendimentoGrupo ON AtSExGrupo = AtGruId
                 JOIN AtendimentoSubGrupo ON AtSExSubGrupo = AtSubId
                 JOIN ServicoVenda ON AtSExExame = SrVenId    
-                WHERE AtSExAtendimento = $iAtendimentoId and AtSExUnidade = $iUnidade";
+                WHERE AtSExAtendimento = $iAtendimentoId and AtSExUnidade = $iUnidade
+                ORDER BY AtSExDataInicio DESC, AtSExHoraInicio DESC";
         $result = $conn->query($sql);
         $rowExames = $result->fetchAll(PDO::FETCH_ASSOC);
 
         $array = [];
         $i = 1;
         foreach ($rowExames as $item) {
-            $print = "<a style='color: blue;' href='#' onclick='imprimirSolExame($item[AtSExId])' class='list-icons-item'><i class='icon-printer2' title='Imprimir Solicitação'></i></a>";
-            $exc = "<button style='color: black' type='button' onclick='excluirExame($item[AtSExId])' class='btn btn-link list-icons-item'><i class='icon-bin' title='Excluir Exame'></i></button>";
+            $print = "<a style='color: blue;' href='#' onclick='imprimirSolExame($item[AtSExId])' class='list-icons-item mr-2'><i class='icon-printer2' title='Imprimir Solicitação'></i></a>";
+            $copiar = "<a style='color: black'  onclick='copiarExame(" . json_encode($item) . ")' class='list-icons-item mr-2'><i class='icon-files-empty' title='Copiar Sol. Exame'></i></a>";
+            $exc = "<a style='color: black'  onclick='excluirExame($item[AtSExId])' class='list-icons-item'><i class='icon-bin' title='Excluir Exame'></i></a>";
 
                     if (isset($_SESSION['SituaChave']) && $_SESSION['SituaChave'] != "ATENDIDO") {
                         $acoes = "<div class='list-icons'>
                                     ${print}
+                                    ${copiar}
                                     ${exc}
                                 </div>";
                     } else{
                         $acoes = "<div class='list-icons'>
                                     ${print}
+                                    ${copiar}
                                 </div>";
                     }
             
@@ -86,13 +90,13 @@ try {
         
     } elseif ($tipoRequest == 'EXCLUIREXAME') {
 
-        $idExame = $_POST['idExame'];
+        $idExame = $_POST['id'];
 
         $sql = "DELETE FROM AtendimentoSolicitacaoExame
                 WHERE AtSExId = $idExame
                 AND AtSExUnidade = $iUnidade";
                         
-        $result = $conn->query($sql);
+        $conn->query($sql);
 
         echo json_encode([
             'status' => 'success',

@@ -98,13 +98,10 @@ if ($row['ClienSexo'] == 'F'){
 			getCmbs()
 			checkProcedimentos()
 			
-			$('#tblTabelaGastos').DataTable( {
+			$('#tblSolicitacaoProcedimento').DataTable( {
 				"order": [[ 0, "asc" ]],
 			    autoWidth: false,
 				responsive: true,
-				searching: false,
-				ordering: false, 
-				paging: false,
 			    columnDefs: [
 				{ 
 					orderable: true,   //item
@@ -241,65 +238,66 @@ if ($row['ClienSexo'] == 'F'){
 
 			});
 
-			$('#grupo').on('change', function() {
-
-				let idGrupo = $(this).val();				
-
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimentoSolicitacaoProcedimento.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'SUBGRUPOS',
-						'idGrupo' : idGrupo						 
-					},
-					success: function(response) {
-						$('#subgrupo').empty();
-						$('#subgrupo').append(`<option value=''>Selecione</option>`)
-
-						if (response.length !== 0) {
-							Array.from(response).forEach(item => {
-								let opt = `<option value="${item.id}">${item.nome}</option>`
-								$('#subgrupo').append(opt)	
-							})							
-						}	
-						$('#subgrupo').focus();			
-					}	
-				})
-			})
-
-			$('#subgrupo').on('change', function() {
-				let idSubGrupo = $(this).val();	
-
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimentoSolicitacaoProcedimento.php',
-					dataType: 'json',
-					data:{
-						'tipoRequest': 'PROCEDIMENTOS',
-						'idSubGrupo' : idSubGrupo						 
-					},
-					success: function(response) {
-						$('#procedimento').empty();
-						$('#procedimento').append(`<option value=''>Selecione</option>`)
-
-						if (response.length !== 0) {
-							Array.from(response).forEach(item => {
-								let opt = `<option value="${item.id}">${item.nome}</option>`
-								$('#procedimento').append(opt)	
-							})							
-						}	
-						$('#procedimento').focus();			
-					}	
-				})
-
-
-
-			})
-
 			$(".caracteresjustificativa").text((500 - $("#justificativa").val().length) + ' restantes'); //restantes em motivo da consulta
 
 		}); //document.ready
+
+
+		async function filtrarSubGrupo() {
+
+			let idGrupo = $('#grupo').val();				
+
+			await $.ajax({
+				type: 'POST',
+				url: 'filtraAtendimentoSolicitacaoProcedimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'SUBGRUPOS',
+					'idGrupo' : idGrupo						 
+				},
+				success: function(response) {
+					$('#subgrupo').empty();
+					$('#subgrupo').append(`<option value=''>Selecione</option>`)
+
+					if (response.length !== 0) {
+						Array.from(response).forEach(item => {
+							let opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#subgrupo').append(opt)	
+						})							
+					}	
+					$('#subgrupo').focus();			
+				}	
+			})
+
+		}
+
+		async function filtrarProcedimento() {
+
+			let idSubGrupo = $('#subgrupo').val();	
+
+			await $.ajax({
+				type: 'POST',
+				url: 'filtraAtendimentoSolicitacaoProcedimento.php',
+				dataType: 'json',
+				data:{
+					'tipoRequest': 'PROCEDIMENTOS',
+					'idSubGrupo' : idSubGrupo						 
+				},
+				success: function(response) {
+					$('#procedimento').empty();
+					$('#procedimento').append(`<option value=''>Selecione</option>`)
+
+					if (response.length !== 0) {
+						Array.from(response).forEach(item => {
+							let opt = `<option value="${item.id}">${item.nome}</option>`
+							$('#procedimento').append(opt)	
+						})							
+					}	
+					$('#procedimento').focus();			
+				}	
+			})
+
+		}
 
 		function contarCaracteres(params) {
 
@@ -330,9 +328,9 @@ if ($row['ClienSexo'] == 'F'){
 					'iAtendimentoId': iAtendimentoId
 				},
 				success: async function(response) {
-					let table = $('#tblTabelaGastos').DataTable().clear().draw()
+					let table = $('#tblSolicitacaoProcedimento').DataTable().clear().draw()
 
-					table = $('#tblTabelaGastos').DataTable()
+					table = $('#tblSolicitacaoProcedimento').DataTable()
 					let rowNode	
 
 					response.dataProcedimentos.forEach(item => {
@@ -345,22 +343,26 @@ if ($row['ClienSexo'] == 'F'){
 
 		}
 
-		function excluirProcedimento(idProcedimento){
+		async function copiarProcedimento(params) {
 
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimentoSolicitacaoProcedimento.php',
-				dataType: 'json',
-				data:{
-					'tipoRequest': 'EXCLUIRPROCEDIMENTO',
-					'idProcedimento' : idProcedimento
-				},
-				success: function(response) {
-					checkProcedimentos();
-					alerta(response.titulo, response.menssagem, response.status)
-				}
-			});
+			await $('#grupo').val(params.AtSPrGrupo).change();
 
+			await filtrarSubGrupo();
+
+			await $('#subgrupo').val(params.AtSPrSubGrupo).change();
+
+			await filtrarProcedimento();
+
+			await $('#procedimento').val(params.AtSPrProcedimento).change();
+
+			$('#cid10').val(params.AtSPrCid10).change();
+
+			$('#justificativa').val(params.AtSPrJustificativa);
+
+		}
+
+		function excluirProcedimento(id){
+			confirmaExclusaoAjax('filtraAtendimentoSolicitacaoProcedimento.php', 'Excluir Solicitação de Procedimento?', 'EXCLUIRPROCEDIMENTO', id, checkProcedimentos);
 		}
 
 		function getCmbs(){
@@ -474,12 +476,12 @@ if ($row['ClienSexo'] == 'F'){
 												
 												<!-- campos -->										
 												<div class="col-lg-2">
-													<select id="grupo" name="grupo" class="select-search" required>
+													<select id="grupo" name="grupo" class="select-search" onChange="filtrarSubGrupo()" required>
 														<option value=''>Selecione</option>
 													</select>
 												</div>
 												<div class="col-lg-3">
-													<select id="subgrupo" name="subgrupo" class="select-search" required>
+													<select id="subgrupo" name="subgrupo" class="select-search" onChange="filtrarProcedimento()" required>
 														<option value=''>Selecione</option>
 													</select>											
 												</div>
@@ -543,7 +545,7 @@ if ($row['ClienSexo'] == 'F'){
 
 									<div class="row">
 										<div class="col-lg-12">
-											<table class="table" id="tblTabelaGastos">
+											<table class="table" id="tblSolicitacaoProcedimento">
 												<thead>
 													<tr class="bg-slate">
 														<th class="text-left">Item</th>

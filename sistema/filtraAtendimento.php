@@ -2605,32 +2605,58 @@ try{
 		]);
 	} elseif ($tipoRequest == 'ENCAMINHAMENTOS'){
 		$iAtendimento = $_POST['id'];
+		$situaChave = $_POST['situaChave'];
 	
-		$sql = "SELECT AtEMeId,AtEMeDataInicio,AtEMeHoraInicio,ProfiNome,EspecNome
+		$sql = "SELECT AtEMeId,AtEMeDataInicio,AtEMeHoraInicio,ProfiNome,EspecNome, AtEMeProfissional, AtEMeProfissionalDestino, AtEMeEspecialidade, AtEMeModelo, AtEMeCid10, AtEMeEncaminhamentoMedico
 			FROM AtendimentoEncaminhamentoMedico
 			JOIN Profissional ON ProfiId = AtEMeProfissionalDestino
 			JOIN Especialidade ON EspecId = AtEMeEspecialidade
-			WHERE AtEMeAtendimento = $iAtendimento";
+			WHERE AtEMeAtendimento = $iAtendimento
+			ORDER BY AtEMeDataInicio, AtEMeHoraInicio DESC ";
 		$result = $conn->query($sql);
 		$rowEncaminhamento = $result->fetchAll(PDO::FETCH_ASSOC);
 
 		$array = [];
 
-		foreach($rowEncaminhamento as $item){
+		foreach ($rowEncaminhamento as $key => $item){
+
 			$data = explode('-',$item['AtEMeDataInicio']);
 			$data = $data[2].'/'.$data[1].'/'.$data[0];
-
 			$hora = explode(':',$item['AtEMeHoraInicio']);
 			$hora = $hora[0].':'.$hora[1];
-			array_push($array,[
-				'id'=>$item['AtEMeId'],
-				'data'=>$data,
-				'hora'=>$hora,
-				'profissional'=>$item['ProfiNome'],
-				'especialidade'=>$item['EspecNome'],
+
+			$excluir = "<a style='color: black; cursor:pointer' onclick='excluiServico($item[AtEMeId])' class='list-icons-item mr-2'><i class='icon-bin' title='Excluir Encaminhamento'></i></a>";
+			$copiar = "<a class='list-icons-item mr-2 ' style='color: black; cursor:pointer' onclick='copiarEncaminhamento( $item[AtEMeProfissionalDestino], $item[AtEMeEspecialidade], $item[AtEMeModelo], $item[AtEMeCid10], \"$item[AtEMeEncaminhamentoMedico]\" )'><i class='icon-files-empty' title='Copiar Encaminhamento'></i></a>";
+			$print = "<a style='color: black; cursor:pointer' onclick='imprimirServico($item[AtEMeId])' class='list-icons-item'><i class='icon-printer2' title='Imprimir Encaminhamento'></i></a>";
+			$acoes = '';
+
+			if ($situaChave != 'ATENDIDO'){
+
+				$acoes = "<div class='list-icons'>
+					$print
+					$copiar
+					$excluir
+				</div>";
+
+			} else {
+
+				$acoes = "<div class='list-icons'>
+					$print
+					$copiar
+				</div>";
+
+			}
+
+			array_push($array, [
+				$key + 1,
+				$data . ' ' . $hora,
+				$item['ProfiNome'],
+				$item['EspecNome'],
+				$acoes
 			]);
+
 		}
-		
+
 		echo json_encode($array);
 	} elseif ($tipoRequest == 'EXCLUIRENCAMINHAMENTO'){
 		$id = $_POST['id'];

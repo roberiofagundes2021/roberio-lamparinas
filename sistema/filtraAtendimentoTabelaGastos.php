@@ -101,7 +101,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 	$resultSubGrupo = $conn->query($sql);
 	$resultSubGrupo = $resultSubGrupo->fetch(PDO::FETCH_ASSOC);
 	
-	$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SVXMoValorVenda,SrVenUnidade
+	$sql = "SELECT SrVenId,SrVenNome,SrVenDetalhamento,SVXMoValorVenda,SrVenUnidade, SrVenCodigo
 	FROM ServicoVenda
 	LEFT JOIN ServicoVendaXModalidade ON SVXMoServicoVenda = SrVenId
 	WHERE SrVenId = $iServico and SrVenUnidade = $iUnidade";
@@ -121,7 +121,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 		'iMedico' => $resultMedico['ProfiId'],
 		'iGrupo' => $resultGrupo['AtGruId'],
 		'iSubGrupo' => $resultSubGrupo['AtSubId'],
-
+		'codigo' => $resultServico['SrVenCodigo'],
 		'status' => 'new',
 		'grupo' => $resultGrupo['AtGruNome'],
 		'subgrupo' => $resultSubGrupo['AtSubNome'],
@@ -149,7 +149,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 	$sData = date("Y-m-d");
 	$sHora = date("H:i:s");
 	
-	$sql = "SELECT ProduId,ProduNome,ProduDetalhamento,ProduValorVenda,ProduEmpresa, ProduCodigo
+	$sql = "SELECT ProduId,ProduNome,ProduDetalhamento,ProduValorVenda,ProduEmpresa, ProduCodigo, ProduCodigoCompleto
 	FROM Produto WHERE ProduId = $iServico and ProduEmpresa = $iEmpresa";
 	$resultServico = $conn->query($sql);
 	$resultServico = $resultServico->fetch(PDO::FETCH_ASSOC);
@@ -164,7 +164,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 		'id' => "$resultServico[ProduId]$resultMedico[ProfiId]$keyHora", // #$resultLocal[AtLocId]",
 		'iProduto' => $resultServico['ProduId'],
 		'iMedico' => $resultMedico['ProfiId'],
-		'codigo' => $resultServico['ProduCodigo'],
+		'codigoCompleto' => $resultServico['ProduCodigoCompleto'],
 		
 		'status' => 'new',
 		'servico' => $resultServico['ProduNome'],
@@ -192,7 +192,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 			,AtTGaDataAtendimento,AtTGaValor,AtTGaDesconto, AtTGaGrupo, AtTGaSubGrupo,
 			AtGruNome, AtGruId, AtSubNome, AtSubId,
 			Profissional.ProfiId,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-			SituaCor,ProfiNome,SrVenNome,SVXMoValorVenda,SrVenId
+			SituaCor,ProfiNome,SrVenNome,SVXMoValorVenda,SrVenId, SrVenCodigo
 			FROM AtendimentoTabelaGastoProcedimento
 			JOIN Atendimento ON AtendId = AtTGaAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -223,6 +223,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 					'iMedico' => $item['ProfiId'],
 					'iGrupo' => $item['AtTGaGrupo'],
 					'iSubGrupo' => $item['AtTGaSubGrupo'],
+					'codigo' => $item['SrVenCodigo'],
 					'status' => 'att',
 					'grupo' => $item['AtGruNome'],
 					'subgrupo' => $item['AtSubNome'],
@@ -264,7 +265,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 		$sql = "SELECT AtTGaId,AtTGaAtendimento,AtTGaProfissional,AtTGaDataRegistro,AtTGaHorario
 			,AtTGaDataAtendimento,AtTGaValor,AtTGaDesconto,
 			Profissional.ProfiId,AtModNome,ClienNome, ClienCelular,ClienTelefone,ClienEmail,SituaNome,SituaChave,
-			SituaCor,ProfiNome,ProduNome,ProduValorVenda,ProduId, ProduCodigo
+			SituaCor,ProfiNome,ProduNome,ProduValorVenda,ProduId, ProduCodigo, ProduCodigoCompleto
 			FROM AtendimentoTabelaGastoProduto
 			JOIN Atendimento ON AtendId = AtTGaAtendimento
 			JOIN AtendimentoModalidade ON AtModId = AtendModalidade
@@ -292,7 +293,7 @@ if($tipoRequest == 'PROCEDIMENTOS'){
 					'iMedico' => $item['ProfiId'],
 
 					'status' => 'att',
-					'codigo' => $item['ProduCodigo'],
+					'codigoCompleto' => $item['ProduCodigoCompleto'],
 					'servico' => $item['ProduNome'],
 					'medico' => $item['ProfiNome'],
 					'sData' => mostraData($item['AtTGaDataAtendimento']),

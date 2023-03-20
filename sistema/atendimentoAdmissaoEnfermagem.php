@@ -18,6 +18,16 @@ if(!$iAtendimentoId){
 }
 
 
+//Essa consulta é para  preenchimento o campo da entrada do paciente e diagnóstico principal.
+$sql = "SELECT AtIEnAtendimento, AtIEnHistoriaMolestiaAtual, AtlEnExameFisico, 
+               AtIEnDigitacaoLivre, AtIEnCid10 ,AtIEnProcedimento
+        FROM AtendimentoInternacaoEntrada
+        WHERE  AtIEnAtendimento = $iAtendimentoId ORDER BY AtIEnId ASC
+";
+$result = $conn->query($sql);
+$rowInternacaoEntrada = $result->fetch(PDO::FETCH_ASSOC);
+
+
 //anamnese
 $sql = "SELECT TOP(1) EnAnaId
 FROM EnfermagemAnamnese
@@ -159,6 +169,9 @@ if (isset($_POST['inputInicio'])) {
                 EnAnaNeoplasiaDescricao = :sNeoplasiaDescricao,
                 EnAnaUsoMedicamento = :sUsoMedicamento,
                 EnAnaUsoMedicamentoDescricao = :sUsoMedicamentoDescricao,
+                EnAnaHistoriaEntrada = :sHistoriaEntrada,
+                EnAnaExameFisico = :sExameFisico,
+                EnAnaAnamneseMedicaDigitacaoLivre = :sMedicaDigitacaoLivre,
                 EnAnaCid10 = :sCid10,
                 EnAnaProcedimento = :sProcedimento,
                 EnAnaDignosticoEnfermagemNanda = :sDignosticoEnfermagemNanda,
@@ -206,8 +219,10 @@ if (isset($_POST['inputInicio'])) {
                 ':sNeoplasia' => $_POST['inputNeoplasia'] == "" ? null : $_POST['inputNeoplasia'],
                 ':sNeoplasiaDescricao' => $_POST['inputNeoplasiaDescricao'] == "" ? null : $_POST['inputNeoplasiaDescricao'],
                 ':sUsoMedicamento' => $_POST['inputUsoMedicamento'] == "" ? null : $_POST['inputUsoMedicamento'],
+                ':sHistoriaEntrada' => $_POST['txtareaEntradaMolestiaAtual'] == "" ? null : $_POST['txtareaEntradaMolestiaAtual'],
                 ':sUsoMedicamentoDescricao' => $_POST['inputUsoMedicamentoDescricao'] == "" ? null : $_POST['inputUsoMedicamentoDescricao'],
-
+                ':sExameFisico' => $_POST['txtareaEntradaExameFisico'] == "" ? null : $_POST['txtareaEntradaExameFisico'],
+                ':sMedicaDigitacaoLivre'  => $_POST['txtareaEntradaDigitacaoLivre'] == "" ? null : $_POST['txtareaEntradaDigitacaoLivre'],
                 ':sCid10' => $_POST['cmbCId10'] == "" ? null : $_POST['cmbCId10'],
                 ':sProcedimento' => $_POST['cmbProcedimento'] == "" ? null : $_POST['cmbProcedimento'],
                 ':sDignosticoEnfermagemNanda' => $_POST['cmbNanda'] == "" ? null : $_POST['cmbNanda'],
@@ -259,7 +274,10 @@ if (isset($_POST['inputInicio'])) {
                 EnAnaNeoplasia, 
                 EnAnaNeoplasiaDescricao, 
                 EnAnaUsoMedicamento, 
-                EnAnaUsoMedicamentoDescricao, 
+                EnAnaUsoMedicamentoDescricao,
+                EnAnaHistoriaEntrada,
+                EnAnaExameFisico,
+                EnAnaAnamneseMedicaDigitacaoLivre,
                 EnAnaCid10, 
                 EnAnaProcedimento, 
                 EnAnaDignosticoEnfermagemNanda,
@@ -303,6 +321,9 @@ if (isset($_POST['inputInicio'])) {
                 :sNeoplasiaDescricao,
                 :sUsoMedicamento,
                 :sUsoMedicamentoDescricao,
+                :sHistoriaEntrada,
+                :sExameFisico,
+                :sMedicaDigitacaoLivre,
                 :sCid10,
                 :sProcedimento,
                 :sDignosticoEnfermagemNanda,
@@ -349,8 +370,10 @@ if (isset($_POST['inputInicio'])) {
                 ':sNeoplasia' => $_POST['inputNeoplasia'] == "" ? null : $_POST['inputNeoplasia'],
                 ':sNeoplasiaDescricao' => $_POST['inputNeoplasiaDescricao'] == "" ? null : $_POST['inputNeoplasiaDescricao'],
                 ':sUsoMedicamento' => $_POST['inputUsoMedicamento'] == "" ? null : $_POST['inputUsoMedicamento'],
+                ':sHistoriaEntrada' => $_POST['txtareaEntradaMolestiaAtual'] == "" ? null : $_POST['txtareaEntradaMolestiaAtual'],
                 ':sUsoMedicamentoDescricao' => $_POST['inputUsoMedicamentoDescricao'] == "" ? null : $_POST['inputUsoMedicamentoDescricao'],
-
+                ':sExameFisico' => $_POST['txtareaEntradaExameFisico'] == "" ? null : $_POST['txtareaEntradaExameFisico'],
+                ':sMedicaDigitacaoLivre'  => $_POST['txtareaEntradaDigitacaoLivre'] == "" ? null : $_POST['txtareaEntradaDigitacaoLivre'],
                 ':sCid10' => $_POST['cmbCId10'] == "" ? null : $_POST['cmbCId10'],
                 ':sProcedimento' => $_POST['cmbProcedimento'] == "" ? null : $_POST['cmbProcedimento'],
                 ':sDignosticoEnfermagemNanda' => $_POST['cmbNanda'] == "" ? null : $_POST['cmbNanda'],
@@ -2140,6 +2163,48 @@ if (isset($_POST['inputInicio'])) {
                                 <div class="card">
 
                                     <div class="card-header header-elements-inline">
+                                        <h3 class="card-title font-weight-bold ">ENTRADA DO PACIENTE</h3>  
+                                    </div>
+
+                                    <div class="card-body">
+
+                                        <div class="col-lg-12 mb-2 row">
+                                            <!-- titulos -->
+                                            <div class="col-lg-4">
+                                                <label>HISTÓRIA DA MOLÉSTIA ATUAL </label>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <label>EXAME FÍSICO </label>
+                                            </div>
+
+                                            <div class="col-lg-4">
+                                                <label>ANAMNESE MÉDICA (DIGITAÇÃO LIVRE) </label>
+                                            </div>
+                                            
+                                            <!-- campos -->										
+                                            <div class="col-lg-4">
+                                                <div >
+                                                    <textarea rows="4" cols="5" id="summernote7" name="txtareaEntradaMolestiaAtual" class="form-control" placeholder=" História da moléstia atual" readOnly><?php if (isset($iAtendimentoAnamneseId )) echo $rowInternacaoEntrada['AtIEnHistoriaMolestiaAtual']; ?></textarea>
+                                                    
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div >
+                                                    <textarea rows="4" cols="5" id="summernote8" name="txtareaEntradaExameFisico" class="form-control" placeholder=" Exame Físico"  readOnly><?php if (isset($iAtendimentoAnamneseId )) echo $rowInternacaoEntrada['AtlEnExameFisico']; ?></textarea>
+                                                
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4">
+                                                <div >
+                                                    <textarea rows="4" cols="5" id="summernote9" name="txtareaEntradaDigitacaoLivre" class="form-control" placeholder="Anamnese Médica" readOnly ><?php if (isset($iAtendimentoAnamneseId )) echo $rowInternacaoEntrada['AtIEnDigitacaoLivre']; ?></textarea>
+                                                
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+
+                                    <div class="card-header header-elements-inline">
                                         <h3 class="card-title font-weight-bold ">DIAGNÓSTICO PRINCIPAL</h3>  
                                     </div>
 
@@ -2156,7 +2221,7 @@ if (isset($_POST['inputInicio'])) {
                                             
                                             <!-- campos -->										
                                             <div class="col-lg-6">
-                                                <select id="cmbCId10" name="cmbCId10" class="select-search" >
+                                                <select id="cmbCId10" name="cmbCId10" class="select-search " disabled="true">
                                                     <option value="">Selecione</option>
                                                     <?php 
                                                         $sql = "SELECT Cid10Id,Cid10Capitulo, Cid10Codigo, Cid10Descricao
@@ -2168,14 +2233,15 @@ if (isset($_POST['inputInicio'])) {
                                                         $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                         foreach ($row as $item){
-                                                            $seleciona = $item['Cid10Id'] == $rowAnamnese['EnAnaCid10'] ? "selected" : "";
+                                                            $seleciona = $item['Cid10Id'] == $rowInternacaoEntrada['AtIEnCid10'] ? "selected" : "";
                                                             print('<option value="'.$item['Cid10Id'].'" '. $seleciona .'>'.$item['Cid10Codigo'] . ' - ' . $item['Cid10Descricao'] . ' ' .'</option>');
                                                         }
                                                     ?>
                                                 </select>
                                             </div>
                                             <div class="col-lg-6">
-                                                <select id="cmbProcedimento" name="cmbProcedimento" class="select-search" >
+                                                <select id="cmbProcedimento" name="cmbProcedimento" class="select-search" disabled="true"
+                                                 >
                                                     <option value="">Selecione</option>
                                                     <?php  
                                                         $sql = "SELECT SrVenId,SrVenCodigo, SrVenNome
@@ -2186,7 +2252,7 @@ if (isset($_POST['inputInicio'])) {
                                                         $row = $result->fetchAll(PDO::FETCH_ASSOC);
 
                                                         foreach ($row as $item) {
-                                                            $seleciona = $item['SrVenId'] == $rowAnamnese['EnAnaProcedimento'] ? "selected" : "";
+                                                            $seleciona = $item['SrVenId'] == $rowInternacaoEntrada['AtIEnProcedimento'] ? "selected" : "";
                                                             print('<option value="' . $item['SrVenId'] . '" ' . $seleciona . '>' . $item['SrVenCodigo'] . ' - ' . $item['SrVenNome'] . '</option>');
                                                         }
                                                     ?>
