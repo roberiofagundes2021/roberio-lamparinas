@@ -647,6 +647,439 @@ try{
       ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
       ':iUnidade' => $unidadeIdNovo
     ));
+    
+    echo json_encode(true);
+
+  }elseif($typeRequest == "ESPECIALIDADELEITO"){
+    $unidadeIdNovo = $_POST['unidadeIdNovo'];
+
+    $sql = "INSERT INTO EspecialidadeLeito (EsLeiNome, EsLeiStatus, EsLeiUsuarioAtualizador, EsLeiUnidade)
+					 VALUES (:sNome, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+		$result = $conn->prepare($sql);
+
+    $result->execute(array(
+      ':sNome' =>'CLÍNICO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertClinicoId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'CIRÚRGICO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertCirurgicoId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'OBSTÉTRICO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertObstetricoId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'ORTOPÉDICO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertOrtopedicoId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'PEDIÁTRICO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertPediatricoId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'ISOLAMENTO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertIsolamentoId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'ISOLAMENTO REVERSO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertIsolamentoReversoId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'UTI',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertUtiId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'UCI',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertUciId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'RECUPERAÇÃO PÓS-ANESTÉSICA',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertRecuperacaoPosAnestesicaId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'LEITO DE APOIO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertLeitoApoioId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'URGÊNCIA E EMERGÊNCIA',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertUrgenciaEmergenciaId = $conn->lastInsertId();
+
+    $result->execute(array(
+      ':sNome' =>'PRÉ-PARTO',
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $insertPrePartoId = $conn->lastInsertId();
+
+    $sql = "INSERT INTO EspecialidadeLeitoXClassificacao (ELXClEspecialidadeLeito, ELXClClassificacao, ELXClUnidade)
+						VALUES (:iEspecialidadeLeito, :iClassificacao, :iUnidade)";
+		$result = $conn->prepare($sql);
+	
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertClinicoId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertCirurgicoId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertObstetricoId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertOrtopedicoId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertPediatricoId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertIsolamentoId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertIsolamentoReversoId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertUtiId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertUciId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertRecuperacaoPosAnestesicaId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertLeitoApoioId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertLeitoApoioId,
+      ':iClassificacao' => 'A',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertUrgenciaEmergenciaId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertUrgenciaEmergenciaId,
+      ':iClassificacao' => 'A',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+
+    $result->execute(array(
+      ':iEspecialidadeLeito' => $insertPrePartoId,
+      ':iClassificacao' => 'H',
+      ':iUnidade' => $unidadeIdNovo			
+    ));
+    
+    echo json_encode(true);
+  }elseif($typeRequest == "ALTA"){
+    $unidadeIdNovo = $_POST['unidadeIdNovo'];
+
+    $sql = "SELECT TpAltId, TpAltChave, SituaChave
+            FROM TipoAlta
+            JOIN Situacao on SituaId = TpAltStatus
+            WHERE SituaChave = 'ATIVO' ";
+    $result = $conn->query($sql);
+    $rowTipoAlta = $result->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($rowTipoAlta as $item){
+
+     if ($item['TpAltChave']=='PORALTAMEDICA'){
+        $tipoAltaMedica = $item['TpAltId'];
+      }
+     if ($item['TpAltChave']=='PORPERMANENCIA'){
+        $tipoPermanencia = $item['TpAltId'];
+      }
+      if ($item['TpAltChave']=='PORALTAADMINISTRATIVA'){
+        $tipoAltaAdministrativa = $item['TpAltId'];
+      }
+      if ($item['TpAltChave']=='PORTRANSFERENCIA'){
+        $tipoTransferencia = $item['TpAltId'];
+      }
+     if ($item['TpAltChave']=='PORPROCEDIMENTOSDEPARTO'){
+        $tipoProcedimentoParto = $item['TpAltId'];
+      }
+      if ($item['TpAltChave']=='POROBITO'){
+        $tipoObito = $item['TpAltId'];
+      }
+
+    }
+
+    $sql = "INSERT INTO MotivoAlta (MtAltNome, MtAltTipoAlta, MtAltStatus, MtAltUsuarioAtualizador, MtAltUnidade)
+					  VALUES (:sNome, :sTipoAlta, :bStatus, :iUsuarioAtualizador, :iUnidade)";
+		$result = $conn->prepare($sql);
+					
+    $result->execute(array(
+      ':sNome' => 'Curado',
+      ':sTipoAlta' => $tipoAltaMedica,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Melhorado',
+      ':sTipoAlta' => $tipoAltaMedica,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'A Pedido',
+      ':sTipoAlta' => $tipoAltaMedica,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Com Previsão de Retorno',
+      ':sTipoAlta' => $tipoAltaMedica,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Por Evasão',
+      ':sTipoAlta' => $tipoAltaMedica,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Por outros Motivos',
+      ':sTipoAlta' => $tipoAltaMedica,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' => 'Por características próprias da doença',
+      ':sTipoAlta' => $tipoPermanencia,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Por impossibilidade sócio familiar',
+      ':sTipoAlta' => $tipoPermanencia,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Por processo de doação de órgãos, tecidos e células - doador vivo',
+      ':sTipoAlta' => $tipoPermanencia,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Por processo de doação de órgãos, tecidos e células - doador morto',
+      ':sTipoAlta' => $tipoPermanencia,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Por mudança de procedimento',
+      ':sTipoAlta' => $tipoPermanencia,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Por reoperação',
+      ':sTipoAlta' => $tipoPermanencia,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Outros motivos',
+      ':sTipoAlta' => $tipoPermanencia,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' => 'Por Administrativa',
+      ':sTipoAlta' => $tipoAltaAdministrativa,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Encerramento administrativo',
+      ':sTipoAlta' => $tipoAltaAdministrativa,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+   
+    $result->execute(array(
+      ':sNome' => 'Transferido para outro estabelecimento',
+      ':sTipoAlta' => $tipoTransferencia,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Transferido para internação domiciliar',
+      ':sTipoAlta' => $tipoTransferencia,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' => 'Alta da mãe (puérpera) e do recém-nascido',
+      ':sTipoAlta' => $tipoProcedimentoParto,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Alta da mãe (puérpera) e permanência do recém-nascido',
+      ':sTipoAlta' => $tipoProcedimentoParto,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Alta da mãe (puérpera) e óbito do recém-nascido',
+      ':sTipoAlta' => $tipoProcedimentoParto,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Alta da mãe (puérpera) com óbito fetal',
+      ':sTipoAlta' => $tipoProcedimentoParto,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Óbito da gestante e do concepto',
+      ':sTipoAlta' => $tipoProcedimentoParto,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Óbito da mãe (puérpera) e alta do recém-nascido',
+      ':sTipoAlta' => $tipoProcedimentoParto,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Óbito da mãe (puérpera) e permanência do recém-nascido',
+      ':sTipoAlta' => $tipoProcedimentoParto,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+
+    $result->execute(array(
+      ':sNome' => 'Com declaração de óbito fornecida pelo medico assistente',
+      ':sTipoAlta' => $tipoObito,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
+    $result->execute(array(
+      ':sNome' => 'Com declaração de óbito fornecida pelo Instituto Médico Legal – IML',
+      ':sTipoAlta' => $tipoObito,
+      ':bStatus' => 1,
+      ':iUsuarioAtualizador' => $_SESSION['UsuarId'],
+      ':iUnidade' => $unidadeIdNovo
+    ));
 
     echo json_encode([
       'titulo' => "Sucesso",

@@ -163,6 +163,8 @@ include('global_assets/php/conexao.php');
           'CLASSIFICACAORISCO': 'Classificação de risco',
           'CENTROCUSTO': 'Centro de custos',
           'MODALIDADE': 'Modalidades',
+          'ALTA': 'Motivo da Alta',
+          'ESPECIALIDADELEITO': 'Especialidade do Leito',
         }
         let increment = 100 / Object.keys(itensRequest).length
         let porcentagem = 0
