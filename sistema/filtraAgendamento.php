@@ -892,6 +892,9 @@ try{
 			'menssagem' => 'Bloqueio excluido com sucesso!!!'
 		]);
 	} elseif($tipoRequest == 'GETRECORRENCIA'){
+		$data = $_POST['data'];
+		$horaI = $_POST['horaI'];
+		$horaF = $_POST['horaF'];
 		if(!intval($_POST['recorrente'])){
 			$dateBase = date_create($data);
 			echo json_encode([
@@ -900,9 +903,6 @@ try{
 			]);
 			exit;
 		}
-		$data = $_POST['data'];
-		$horaI = $_POST['horaI'];
-		$horaF = $_POST['horaF'];
 
 		$repeticao = $_POST['repeticaoAgendamento'];
 		$quantidade = $_POST['quantidadeRecorrenciaAgendamento'];

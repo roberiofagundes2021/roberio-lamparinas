@@ -35,7 +35,8 @@ if ($tipo == 'ATENDIMENTO'){
 	$sql = "SELECT AgendId as AgAtId,'' as AgAtNumRegistro,'' as classRisco,
 		AgendDataRegistro as AgAtdataRegistro,AgendCliente as AgAtCliente,
 		AgendModalidade as AgAtModalidade,AgendClienteResponsavel as AgAtResponsavel,'' as AgAtClassificacao,
-		AgendObservacao as AgAtObservacao,SituaNome,SituaChave
+		AgendObservacao as AgAtObservacao,SituaNome,SituaChave, AgendProfissional as AtendProfissional,
+		AgendHoraInicio as AtendHorario,AgendAtendimentoLocal as AtendLocal, AgendServico as AtendServico
 		FROM Agendamento
 		JOIN Situacao ON SituaId = AgendSituacao
 		WHERE AgendId = $iAtendimento and AgendUnidade = $iUnidade";
@@ -416,14 +417,12 @@ if ($tipo == 'ATENDIMENTO'){
 			$('#dataAtendimento').val(dataAtual)
 
 			getCmbs()
-			checkServicos()
 
 			$('#dataRegistro').val(atendimento.AgAtdataRegistro)
 			$('#observacao').val(atendimento.AgAtObservacao)
 			$('#servico').val(atendimento.AtendServico)
 			$('#medicos').val(atendimento.AtendProfissional)
 			$('#localAtendimento').val(atendimento.AtendLocal)
-			$('#horaAtendimento').val(atendimento.AtendHorario)
 
 			// serve para vir os itens já selecionado nos campos select
 			$('#servico').children("option").each(function(index, item){
@@ -442,78 +441,76 @@ if ($tipo == 'ATENDIMENTO'){
 				}
 			})
 
-
 			$('#tipoRequest').val('EDITAR')
 
-			$('#incluirServico').on('click', function(e) {
-				e.preventDefault();
-				let menssageError = ''
-				let servico = $('#servico').val()
-				let medicos = $('#medicos').val()
-				let grupo = $('#grupo').val()
-				let subGrupo = $('#subgrupo').val()
-				let dataAtendimento = $('#dataAtendimento').val()
-				let horaAtendimento = $('#horaAtendimento').val()
-				let localAtendimento = $('#localAtendimento').val()
+			// $('#incluirServico').on('click', function(e) {
+			// 	e.preventDefault();
+			// 	let menssageError = ''
+			// 	let servico = $('#servico').val()
+			// 	let medicos = $('#medicos').val()
+			// 	let grupo = $('#grupo').val()
+			// 	let subGrupo = $('#subgrupo').val()
+			// 	let dataAtendimento = $('#dataAtendimento').val()
+			// 	let horaAtendimento = $('#horaAtendimento').val()
+			// 	let localAtendimento = $('#localAtendimento').val()
 
-				switch (menssageError) {
-					case servico:
-						menssageError = 'informe o serviço';
-						$('#servico').focus();
-						break;
-					case medicos:
-						menssageError = 'informe o médico';
-						$('#medicos').focus();
-						break;
-					case $('#dataAtendimento').val():
-						menssageError = 'Sem data disponível para o serviço!!';
-						break;
-					case horaAtendimento:
-						menssageError = 'informe o horário';
-						$('#horaAtendimento').focus();
-						break;
-					case localAtendimento:
-						menssageError = 'informe o local de atendimento';
-						$('#localAtendimento').focus();
-						break;
-					default:
-						menssageError = '';
-						break;
-				}
+			// 	switch (menssageError) {
+			// 		case servico:
+			// 			menssageError = 'informe o serviço';
+			// 			$('#servico').focus();
+			// 			break;
+			// 		case medicos:
+			// 			menssageError = 'informe o médico';
+			// 			$('#medicos').focus();
+			// 			break;
+			// 		case $('#dataAtendimento').val():
+			// 			menssageError = 'Sem data disponível para o serviço!!';
+			// 			break;
+			// 		case horaAtendimento:
+			// 			menssageError = 'informe o horário';
+			// 			$('#horaAtendimento').focus();
+			// 			break;
+			// 		case localAtendimento:
+			// 			menssageError = 'informe o local de atendimento';
+			// 			$('#localAtendimento').focus();
+			// 			break;
+			// 		default:
+			// 			menssageError = '';
+			// 			break;
+			// 	}
 
-				if (menssageError) {
-					alerta('Campo Obrigatório!', menssageError, 'error')
-					return
-				}
+			// 	if (menssageError) {
+			// 		alerta('Campo Obrigatório!', menssageError, 'error')
+			// 		return
+			// 	}
 
-				$.ajax({
-					type: 'POST',
-					url: 'filtraAtendimento.php',
-					dataType: 'json',
-					data: {
-						'tipoRequest': 'ADICIONARSERVICO',
-						'servico': servico,
-						'grupo':grupo,
-						'subGrupo':subGrupo,
-						'medicos': medicos,
-						'dataAtendimento': dataAtendimento,
-						'horaAtendimento': horaAtendimento,
-						'localAtendimento': localAtendimento
-					},
-					success: function(response) {
-						if (response.status == 'success') {
-							resetServicoCmb()
-							checkServicos()
-							alerta(response.titulo, response.menssagem, response.status)
-						} else {
-							alerta(response.titulo, response.menssagem, response.status);
-						}
-					},
-					error: function(response) {
-						alerta(response.titulo, response.menssagem, response.status);
-					}
-				});
-			})
+			// 	$.ajax({
+			// 		type: 'POST',
+			// 		url: 'filtraAtendimento.php',
+			// 		dataType: 'json',
+			// 		data: {
+			// 			'tipoRequest': 'ADICIONARSERVICO',
+			// 			'servico': servico,
+			// 			'grupo':grupo,
+			// 			'subGrupo':subGrupo,
+			// 			'medicos': medicos,
+			// 			'dataAtendimento': dataAtendimento,
+			// 			'horaAtendimento': horaAtendimento,
+			// 			'localAtendimento': localAtendimento
+			// 		},
+			// 		success: function(response) {
+			// 			if (response.status == 'success') {
+			// 				resetServicoCmb()
+			// 				alerta(response.titulo, response.menssagem, response.status)
+			// 			} else {
+			// 				alerta(response.titulo, response.menssagem, response.status);
+			// 			}
+			// 		},
+			// 		error: function(response) {
+			// 			alerta(response.titulo, response.menssagem, response.status);
+			// 		}
+			// 	});
+			// })
 
 			// btn de adicionar novo responsavel
 			$('#addResponsavel').on('click', function(e) {
@@ -807,7 +804,6 @@ if ($tipo == 'ATENDIMENTO'){
 					},
 					success: function(response) {
 						$('#pageModalDescontos').fadeOut(200)
-						checkServicos()
 						alerta(response.titulo,response.menssagem,response.status)
 					}
 				});
@@ -890,7 +886,7 @@ if ($tipo == 'ATENDIMENTO'){
 				});
 			})
 
-			resetServicoCmb()
+			// resetServicoCmb()
 		});
 
 		function getCmbs(obj) {
@@ -993,6 +989,7 @@ if ($tipo == 'ATENDIMENTO'){
 					})
 				}
 			});
+
 			// vai preencher cmbServicos
 			$.ajax({
 				type: 'POST',
@@ -1005,7 +1002,7 @@ if ($tipo == 'ATENDIMENTO'){
 					$('#servico').empty();
 					$('#servico').append(`<option value=''>Selecione</option>`)
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.codigo} - ${item.nome}</option>`
+						let opt = atendimento.AtendServico == item.id?`<option selected value="${item.id}">${item.codigo} - ${item.nome}</option>`:`<option value="${item.id}">${item.codigo} - ${item.nome}</option>`
 						$('#servico').append(opt)
 					})
 				}
@@ -1067,8 +1064,31 @@ if ($tipo == 'ATENDIMENTO'){
 					$('#localAtendimento').empty();
 					$('#localAtendimento').append(`<option value=''>Selecione</option>`);			
 					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
+						let opt = atendimento.AtendLocal == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
 						$('#localAtendimento').append(opt)
+					})
+				}
+			})
+			//  vai preencher cmbMedicos
+			$.ajax({
+				type: 'POST',
+				url: 'filtraAtendimento.php',
+				dataType: 'json',
+				data: {
+					'tipoRequest' : 'MEDICOS'
+				},
+				success: function(response) {
+					$('#medicos').empty();
+					$('#medicos').append(`<option value=''>Selecione</option>`);			
+					response.forEach(item => {
+						if(atendimento.AtendProfissional == item.id){
+							let hora = atendimento.AtendHorario.split(':') //16:00:00.0000000
+							hora = `${hora[0]}:${hora[1]}`
+							setHoraProfissional(item.bloqueio, hora)
+							// $('#horaAtendimento').val(hora)
+						}
+						let opt = atendimento.AtendProfissional == item.id?`<option selected value="${item.id}">${item.nome}</option>`:`<option value="${item.id}">${item.nome}</option>`
+						$('#medicos').append(opt)
 					})
 				}
 			})
@@ -1283,149 +1303,148 @@ if ($tipo == 'ATENDIMENTO'){
 			}
 		}
 
-		function excluiServico(id) {
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data: {
-					'tipoRequest': 'EXCLUISERVICO',
-					'id': id
-				},
-				success: function(response) {
-					alerta(response.titulo, response.menssagem, response.status)
-					checkServicos()
-				}
-			});
-		}
+		// function excluiServico(id) {
+		// 	$.ajax({
+		// 		type: 'POST',
+		// 		url: 'filtraAtendimento.php',
+		// 		dataType: 'json',
+		// 		data: {
+		// 			'tipoRequest': 'EXCLUISERVICO',
+		// 			'id': id
+		// 		},
+		// 		success: function(response) {
+		// 			alerta(response.titulo, response.menssagem, response.status)
+		// 		}
+		// 	});
+		// }
 
-		function checkServicos() {
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data: {
-					'tipoRequest': 'CHECKSERVICO',
-					'iAtendimento': atendimento.AgAtId,
-					'tipo': '<?php echo $tipo ?>'
-				},
-				success: async function(response) {
-					statusServicos = response.array.length ? true : false;
-					if (statusServicos) {
-						$('#dataServico').html('');
+		// function checkServicos() {
+		// 	$.ajax({
+		// 		type: 'POST',
+		// 		url: 'filtraAtendimento.php',
+		// 		dataType: 'json',
+		// 		data: {
+		// 			'tipoRequest': 'CHECKSERVICO',
+		// 			'iAtendimento': atendimento.AgAtId,
+		// 			'tipo': '<?php echo $tipo ?>'
+		// 		},
+		// 		success: async function(response) {
+		// 			statusServicos = response.array.length ? true : false;
+		// 			if (statusServicos) {
+		// 				$('#dataServico').html('');
 
-						let HTML = ''
-						response.array.forEach(item => {
-							if(item.status != 'rem'){
-								let popup = `<i style='color:${(item.desconto && item.desconto>0?'#50b900':'#000')}; cursor:pointer'
-								data-id="${item.id}" data-desconto="${item.desconto}" data-valor="${item.valor}"
-								data-titulo="${item.servico}"
-								class='icon-cash descontoModal' title='Descontos'></i>`
-								let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
-								let acoes = `<div class='list-icons'>
-												${popup}			
-												${exc}
-											</div>`;
-								HTML += `
-								<tr class='servicoItem'>
-									<td class="text-left">${item.servico}</td>
-									<td class="text-left">${item.medico}</td>
-									<td class="text-left">${item.sData}</td>
-									<td class="text-left">${item.hora}</td>
-									<td class="text-left">${item.local}</td>
-									<td class="text-right">R$ ${float2moeda(item.valor)}</td>
-									<td class="text-left">${acoes}</td>
-								</tr>`
-							}
-						})
-						$('#servicoValorTotal').html(`R$ ${float2moeda(response.valorTotal)}`)
-						$('#servicoValorDescontoTotal').html(`R$ ${float2moeda(response.valorTotalDesconto)}`)
-						$('#dataServico').html(HTML);
-						$('#servicoTable').removeClass('d-none');
+		// 				let HTML = ''
+		// 				response.array.forEach(item => {
+		// 					if(item.status != 'rem'){
+		// 						let popup = `<i style='color:${(item.desconto && item.desconto>0?'#50b900':'#000')}; cursor:pointer'
+		// 						data-id="${item.id}" data-desconto="${item.desconto}" data-valor="${item.valor}"
+		// 						data-titulo="${item.servico}"
+		// 						class='icon-cash descontoModal' title='Descontos'></i>`
+		// 						let exc = `<a style='color: black; cursor:pointer' onclick='excluiServico(\"${item.id}\")' class='list-icons-item'><i class='icon-bin' title='Excluir Atendimento'></i></a>`;
+		// 						let acoes = `<div class='list-icons'>
+		// 										${popup}			
+		// 										${exc}
+		// 									</div>`;
+		// 						HTML += `
+		// 						<tr class='servicoItem'>
+		// 							<td class="text-left">${item.servico}</td>
+		// 							<td class="text-left">${item.medico}</td>
+		// 							<td class="text-left">${item.sData}</td>
+		// 							<td class="text-left">${item.hora}</td>
+		// 							<td class="text-left">${item.local}</td>
+		// 							<td class="text-right">R$ ${float2moeda(item.valor)}</td>
+		// 							<td class="text-left">${acoes}</td>
+		// 						</tr>`
+		// 					}
+		// 				})
+		// 				$('#servicoValorTotal').html(`R$ ${float2moeda(response.valorTotal)}`)
+		// 				$('#servicoValorDescontoTotal').html(`R$ ${float2moeda(response.valorTotalDesconto)}`)
+		// 				$('#dataServico').html(HTML);
+		// 				$('#servicoTable').removeClass('d-none');
 
-						$('.descontoModal').each(function(index, element){
-							$(element).on('click', function(item){
-								let id = $(this).data('id')
-								let valor = $(this).data('valor')
-								let desconto = $(this).data('desconto')
-								let valorF = 0
+		// 				$('.descontoModal').each(function(index, element){
+		// 					$(element).on('click', function(item){
+		// 						let id = $(this).data('id')
+		// 						let valor = $(this).data('valor')
+		// 						let desconto = $(this).data('desconto')
+		// 						let valorF = 0
 
-								$('#inputDesconto').val(desconto)
-								$('#itemDescontoId').val(id)
-								$('#itemDescontoValue').val(valor)
+		// 						$('#inputDesconto').val(desconto)
+		// 						$('#itemDescontoId').val(id)
+		// 						$('#itemDescontoValue').val(valor)
 
-								$('#inputModalValorB').val('R$ '+float2moeda(valor))
+		// 						$('#inputModalValorB').val('R$ '+float2moeda(valor))
 
-								valorF = valor - desconto
+		// 						valorF = valor - desconto
 
-								$('#inputModalValorF').val('R$ '+float2moeda(valorF))
+		// 						$('#inputModalValorF').val('R$ '+float2moeda(valorF))
 
-								$('#pageModalDescontos').fadeIn(200);
-							})
-						})
-					} else {
-						$('#servicoTable').addClass('d-none');
-					}
-				}
-			});
-		}
+		// 						$('#pageModalDescontos').fadeIn(200);
+		// 					})
+		// 				})
+		// 			} else {
+		// 				$('#servicoTable').addClass('d-none');
+		// 			}
+		// 		}
+		// 	});
+		// }
 
-		function resetServicoCmb() {
-			// vai preencher cmbServicos
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data: {
-					'tipoRequest': 'SERVICOS'
-				},
-				success: function(response) {
-					$('#servico').empty();
-					$('#servico').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.codigo} - ${item.nome}</option>`
-						$('#servico').append(opt)
-					})
-				}
-			});
-			// vai preencher cmbMedicos
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data: {
-					'tipoRequest': 'MEDICOS'
-				},
-				success: function(response) {
-					$('#medicos').empty();
-					$('#medicos').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
-						$('#medicos').append(opt)
-					})
-				}
-			});
-			// vai preencher cmbLocalAtendimento
-			$.ajax({
-				type: 'POST',
-				url: 'filtraAtendimento.php',
-				dataType: 'json',
-				data: {
-					'tipoRequest': 'LOCALATENDIMENTO'
-				},
-				success: function(response) {
-					$('#localAtendimento').empty();
-					$('#localAtendimento').append(`<option value=''>Selecione</option>`)
-					response.forEach(item => {
-						let opt = `<option value="${item.id}">${item.nome}</option>`
-						$('#localAtendimento').append(opt)
-					})
-				}
-			});
-			$('#horaAtendimento').val('')
-		}
+		// function resetServicoCmb() {
+		// 	// vai preencher cmbServicos
+		// 	$.ajax({
+		// 		type: 'POST',
+		// 		url: 'filtraAtendimento.php',
+		// 		dataType: 'json',
+		// 		data: {
+		// 			'tipoRequest': 'SERVICOS'
+		// 		},
+		// 		success: function(response) {
+		// 			$('#servico').empty();
+		// 			$('#servico').append(`<option value=''>Selecione</option>`)
+		// 			response.forEach(item => {
+		// 				let opt = `<option value="${item.id}">${item.codigo} - ${item.nome}</option>`
+		// 				$('#servico').append(opt)
+		// 			})
+		// 		}
+		// 	});
+		// 	// vai preencher cmbMedicos
+		// 	$.ajax({
+		// 		type: 'POST',
+		// 		url: 'filtraAtendimento.php',
+		// 		dataType: 'json',
+		// 		data: {
+		// 			'tipoRequest': 'MEDICOS'
+		// 		},
+		// 		success: function(response) {
+		// 			$('#medicos').empty();
+		// 			$('#medicos').append(`<option value=''>Selecione</option>`)
+		// 			response.forEach(item => {
+		// 				let opt = `<option value="${item.id}">${item.nome}</option>`
+		// 				$('#medicos').append(opt)
+		// 			})
+		// 		}
+		// 	});
+		// 	// vai preencher cmbLocalAtendimento
+		// 	$.ajax({
+		// 		type: 'POST',
+		// 		url: 'filtraAtendimento.php',
+		// 		dataType: 'json',
+		// 		data: {
+		// 			'tipoRequest': 'LOCALATENDIMENTO'
+		// 		},
+		// 		success: function(response) {
+		// 			$('#localAtendimento').empty();
+		// 			$('#localAtendimento').append(`<option value=''>Selecione</option>`)
+		// 			response.forEach(item => {
+		// 				let opt = `<option value="${item.id}">${item.nome}</option>`
+		// 				$('#localAtendimento').append(opt)
+		// 			})
+		// 		}
+		// 	});
+		// 	$('#horaAtendimento').val('')
+		// }
 
-		function setHoraProfissional(range) {
+		function setHoraProfissional(range, starter) {
 			$.ajax({
 				type: 'POST',
 				url: 'filtraAtendimento.php',
@@ -1449,6 +1468,7 @@ if ($tipo == 'ATENDIMENTO'){
 
 					// doc: https://amsul.ca/pickadate.js/time/
 					$('#horaAtendimento').pickatime({
+						clear: 'Limpar',
 						// Regras
 						interval: intervalo,
 						disable: range && range.length ? range : undefined,
@@ -1479,6 +1499,7 @@ if ($tipo == 'ATENDIMENTO'){
 						onClose: undefined,
 						onStop: undefined,
 					});
+					$('#horaAtendimento').val(starter)
 				}
 			});
 		}
