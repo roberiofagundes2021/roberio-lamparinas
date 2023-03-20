@@ -389,7 +389,7 @@
 
         }
 
-        irpara("anotacaoTransOperatoria.php");
+        irpara("anotacaoTransOperatori.php");
         
         
     }
