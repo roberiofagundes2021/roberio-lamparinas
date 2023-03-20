@@ -773,7 +773,7 @@ $acesso = 'ATENDIMENTO';
 								</div>
 							</div>
 
-							<!--
+							
 							<div class="card-body" style="display:none;">
 								<div class="row">
 									<div class="col-md-9">
@@ -782,7 +782,7 @@ $acesso = 'ATENDIMENTO';
 								</div>
 								
 							</div>
-							-->
+							
 
 							<!-- Agendamentos -->
 							<div id="box-agendamentos" style="display: block;">
