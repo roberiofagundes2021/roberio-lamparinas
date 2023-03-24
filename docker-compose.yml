@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  lamparinas:
+    image: lamparinas
+    build:
+      context: .
+      dockerfile: ./Dockerfile
